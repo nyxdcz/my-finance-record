@@ -38,6 +38,14 @@
 - [ ] Reconciliation creates one documented adjustment and history record.
 - [ ] Posted income reverses safely when edited or deleted.
 - [ ] Utility, Gym, normal, and reserved-budget totals match reports and exports.
+- [ ] Monthly budget actual values use paid included expenses only.
+- [ ] Monthly budget committed values include paid and unpaid included expenses.
+- [ ] Copy Previous Month applies rollover once and does not change the source month.
+- [ ] Applying a template creates new category IDs and does not link monthly records accidentally.
+- [ ] Forecast does not subtract paid expenses a second time from current account balances.
+- [ ] Unassigned category reserves exclude already committed expenses.
+- [ ] Savings allocation changes the forecast without creating a ledger entry.
+- [ ] Low-balance warnings use scheduled account activity and configured thresholds.
 
 ## Cloud and security
 
@@ -57,6 +65,9 @@
 - [ ] Retry, Discard local, Keep this version, and conflict download work.
 - [ ] An older app version is blocked from writing protected newer records.
 - [ ] Revoked devices cannot register or commit V2 records.
+- [ ] Monthly budgets synchronize as month-level records.
+- [ ] Budget templates synchronize as independent records.
+- [ ] Budget settings synchronize through the singleton settings record.
 
 ## Publication
 

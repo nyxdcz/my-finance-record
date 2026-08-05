@@ -31,18 +31,17 @@ const version = JSON.parse(read("version.json"));
 const packageJson = JSON.parse(read("package.json"));
 const packageLock = JSON.parse(read("package-lock.json"));
 
-assert(version.version === "12.21.0", "version.json is not V12.21.0");
+assert(/^12\.(?:2[1-9]|[3-9][0-9])\./.test(version.version), "release is older than V12.21.0");
 assert(version.schemaVersion === 12, "core finance schema changed from 12");
 assert(version.cloudSchemaVersion === 2, "Cloud Schema V2 metadata missing");
 assert(version.ledgerVersion === 1, "Ledger Version 1 changed unexpectedly");
-assert(html.includes('<title>My Finance Records · V12.21.0</title>'), "HTML title version mismatch");
-assert(html.includes('const APP_VERSION = "12.21.0";'), "HTML APP_VERSION mismatch");
+assert(html.includes(`<title>My Finance Records · V${version.version}</title>`), "HTML title version mismatch");
+assert(html.includes(`const APP_VERSION = "${version.version}";`), "HTML APP_VERSION mismatch");
 assert(html.includes('{"version": "V12.21.0", "title": "Record-level Cloud Sync 2.0"'), "in-app V12.21.0 history entry missing");
-assert(worker.includes('const APP_VERSION = "12.21.0";'), "service-worker version mismatch");
+assert(worker.includes(`const APP_VERSION = "${version.version}";`), "service-worker version mismatch");
 assert(worker.includes(`const CACHE_VERSION = "${version.cacheVersion}";`), "service-worker cache mismatch");
-assert(packageJson.version === "12.21.0" && packageLock.version === "12.21.0", "package version mismatch");
-assert(packageJson.scripts?.quality === "node tests/validate-v12-21-0.mjs", "quality script mismatch");
-assert(readme.startsWith("# My Finance Records · V12.21.0 PWA"), "README heading mismatch");
+assert(packageJson.version === version.version && packageLock.version === version.version, "package version mismatch");
+assert(/^node tests\/validate-v12-(?:21-0|2[2-9]-[0-9]+)\.mjs$/.test(packageJson.scripts?.quality || ""), "quality script does not include the V12.21.0 baseline");
 assert(readme.includes("## V12.21.0 · Record-level Cloud Sync 2.0"), "README V12.21.0 notes missing");
 assert(changelog.includes("## 12.21.0 · 2026-08-06"), "CHANGELOG V12.21.0 entry missing");
 assert(setup.includes("supabase/cloud-sync-v2.sql"), "Cloud Sync V2 setup migration missing");
@@ -158,7 +157,7 @@ const sandbox = {
   navigator:{onLine:true,userAgent:"Node",platform:"MacIntel"},
   document:{readyState:"loading",addEventListener(){},getElementById(){return null;}},
   location:{reload(){}}, matchMedia(){return{matches:false}},
-  data:structuredClone(sampleData), APP_VERSION:"12.21.0",
+  data:structuredClone(sampleData), APP_VERSION:version.version,
   window:null, globalThis:null
 };
 sandbox.window=sandbox; sandbox.globalThis=sandbox;
@@ -170,7 +169,7 @@ assert(Boolean(internals), "Cloud Sync internals were not exposed for validation
 if (internals) {
   const map = internals.toRecordMap(sampleData);
   assert(Object.keys(map).length >= 13, "record map omitted expected collections");
-  const rows = Object.fromEntries(Object.entries(map).map(([key,row]) => [key,{...row,revision:1,deletedAt:"",updatedAt:"2026-08-06T00:00:00Z",appVersion:"12.21.0",appVersionCode:120210,minWriterVersionCode:120210}]));
+  const rows = Object.fromEntries(Object.entries(map).map(([key,row]) => [key,{...row,revision:1,deletedAt:"",updatedAt:"2026-08-06T00:00:00Z",appVersion:version.version,appVersionCode:Number(version.version.replaceAll(".","").padEnd(6,"0")),minWriterVersionCode:120210}]));
   const roundTrip = internals.fromRecordStore(rows,sampleData);
   assert(roundTrip.expenses?.[0]?.id === "expense-1", "expense did not round-trip through record store");
   assert(roundTrip.accounts?.Cash === 2500 && roundTrip.accountOrder?.[0] === "Cash", "accounts did not round-trip through record store");

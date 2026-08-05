@@ -53,7 +53,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p _site/icons _site/vendor
-          cp index.html offline.html manifest.webmanifest version.json sw.js cloud-sync.js account-ledger.js account-ledger.css sync-config.js _site/
+          cp index.html offline.html manifest.webmanifest version.json sw.js cloud-sync.js account-ledger.js account-ledger.css budget-planning.js budget-planning.css sync-config.js _site/
           cp vendor/supabase.min.js _site/vendor/
           cp icons/* _site/icons/
       - name: Upload GitHub Pages artifact

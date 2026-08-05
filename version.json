@@ -1,10 +1,11 @@
 {
-  "version": "12.21.0",
+  "version": "12.22.0",
   "schemaVersion": 12,
   "cloudSchemaVersion": 2,
   "ledgerVersion": 1,
-  "cacheVersion": "finance-v12-20260806-v12210-record-level-cloud-sync-v2",
+  "budgetVersion": 1,
+  "cacheVersion": "finance-v12-20260806-v12220-monthly-budgets-cash-flow-forecast",
   "released": "2026-08-06",
-  "name": "Record-level Cloud Sync 2.0",
-  "notes": "Replaces whole-state cloud uploads with changed-record synchronization, atomic multi-record commits, immutable audit history, exponential retry, per-record conflict controls, Sync Health, remote device sign-out, and minimum-writer compatibility safeguards."
+  "name": "Monthly Budgets & Cash-flow Forecasting",
+  "notes": "Adds monthly category budgets, fixed and flexible groups, personal and project scopes, rollover and templates, planned-versus-actual reporting, savings allocation, low-balance warnings, and month-end cash-flow forecasting while preserving Finance Schema 12, Cloud Schema V2, and Ledger Version 1."
 }

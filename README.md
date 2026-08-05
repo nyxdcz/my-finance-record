@@ -1,4 +1,21 @@
-# My Finance Records · V12.21.0 PWA
+# My Finance Records · V12.22.0 PWA
+
+## V12.22.0 · Monthly Budgets & Cash-flow Forecasting
+
+- Added a monthly category budget plan inside **Budget & Expenses**. Each category has a planned amount, Fixed or Flexible group, Personal or Project scope, optional rollover, and planning note.
+- Added **Build from expenses**, **Copy previous month**, and reusable budget templates. Rollover-enabled categories carry unused paid-budget value into the copied month.
+- Added planned-versus-actual and committed-spending comparisons. Actual uses paid included expenses; committed uses all included paid and unpaid expense records.
+- Added a month-end cash forecast based on current Available Money, expected income that has not yet been posted to an account, unpaid recorded expenses, unassigned category reserves, and the selected savings allocation.
+- Added separate forecast classifications for paid expenses, recurring upcoming expenses, one-time upcoming expenses, and overdue unpaid items.
+- Added account-level low-balance and shortfall warnings using the selected month’s planned payment accounts and unposted income accounts.
+- Added a fixed-amount or percentage-based savings allocation. This reserves money in the forecast but does not move money or create a ledger entry.
+- Added monthly budget CSV export, Dashboard forecast summaries, and a Monthly Report budget-versus-actual card.
+- Added Cloud Schema V2 record synchronization for `monthlyBudgets`, `budgetTemplates`, and `budgetSettings`. No additional Supabase SQL migration is required after V12.21.0.
+- Core Finance Schema remains 12, Cloud Schema remains V2, Ledger Version remains 1, and Budget Version is 1.
+
+### First use
+
+Open the MacBook app online first, wait for **Synced**, then build the selected month from current expenses or add categories manually. Save a template only after reviewing the category amounts. Open the iPhone after the MacBook returns to **Synced**.
 
 ## V12.21.0 · Record-level Cloud Sync 2.0
 

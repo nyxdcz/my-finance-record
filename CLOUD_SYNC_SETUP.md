@@ -132,3 +132,15 @@ Removing a connected device sets a server-side revocation timestamp. The revoked
 - Writes occur through authenticated security-definer RPC functions with explicit user, device, revision, and version checks.
 - Anonymous access is revoked.
 - Cloud sync is not a replacement for independent backups.
+
+## V12.22.0 budget synchronization
+
+No additional Supabase migration is required after Cloud Sync V2 is installed.
+
+V12.22.0 synchronizes these new record types through the existing Cloud Schema V2 record tables and RPC functions:
+
+- `monthlyBudgets` — one monthly plan record keyed by `YYYY-MM`
+- `budgetTemplates` — reusable category-plan templates
+- `budgetSettings` — savings-allocation, low-balance, and forecast preferences
+
+Open the MacBook online first after deployment, wait for **Synced**, and then open the iPhone. Budget-plan changes remain local-first and are included in the same pending-record, conflict, audit, and revision safeguards as other Cloud Sync V2 records.

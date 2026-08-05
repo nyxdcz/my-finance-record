@@ -2,6 +2,26 @@
 
 All notable changes to My Finance Records are documented here.
 
+## 12.22.0 · 2026-08-06
+
+### Added
+
+- Monthly category budgets with Fixed/Flexible grouping and Personal/Project scope.
+- Planned, actual paid, committed, remaining, and utilization values per category.
+- Optional unused-budget rollover when copying the previous month.
+- Reusable budget templates and build-from-expenses planning.
+- Fixed-amount or income-percentage savings allocation.
+- Month-end forecast with expected unposted income, upcoming expenses, unassigned reserves, and savings allocation.
+- Recurring, one-time, overdue, and low-balance forecast classifications.
+- Dashboard and Monthly Report budget forecast summaries.
+- Monthly budget and forecast CSV export.
+- Record-level Cloud Schema V2 synchronization for monthly plans, templates, and settings.
+
+### Preserved
+
+- Core Finance Schema 12, Cloud Schema V2, Ledger Version 1, account balances, ledger operations, transfers, reconciliations, payment IDs, backups, reports, manifest, offline page, and icons.
+- No new Supabase migration is required after the V12.21.0 Cloud Schema V2 migration.
+
 ## 12.21.0 · 2026-08-06
 
 ### Added
