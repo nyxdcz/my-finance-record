@@ -29,7 +29,7 @@ const policiesSql = read("supabase/security-policies.sql");
 const operationsSql = read("supabase/payment-operations.sql");
 const version = JSON.parse(read("version.json"));
 
-assert(/^12\.19\.\d+$/.test(version.version), "version.json is not a V12.19.x release");
+assert(/^12\.(?:19\.\d+|20\.\d+)$/.test(version.version), "version.json is not a V12.19+ compatible release");
 assert(version.schemaVersion === 12, "core finance schema changed from 12");
 assert(version.cloudSchemaVersion === 1, "Cloud Schema V1 is missing");
 assert(html.includes(`const APP_VERSION = "${version.version}";`), "index.html version mismatch");

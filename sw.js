@@ -1,6 +1,6 @@
 "use strict";
-const APP_VERSION = "12.19.1";
-const CACHE_VERSION = "finance-v12-20260806-v12191-repository-security-hardening";
+const APP_VERSION = "12.20.0";
+const CACHE_VERSION = "finance-v12-20260806-v12200-account-ledger-transfers-reconciliation";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const DB_NAME = "simple-finance-project-records-v12-db";
@@ -14,6 +14,8 @@ const APP_SHELL = [
   asset("./manifest.webmanifest"),
   asset("./version.json"),
   asset("./cloud-sync.js"),
+  asset("./account-ledger.js"),
+  asset("./account-ledger.css"),
   asset("./sync-config.js"),
   asset("./vendor/supabase.min.js"),
   asset("./icons/icon-192.png"),

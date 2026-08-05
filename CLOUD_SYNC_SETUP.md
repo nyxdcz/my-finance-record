@@ -1,4 +1,4 @@
-# Cloud Sync Setup · V12.19.0
+# Cloud Sync Setup · V12.20.0
 
 Cloud Sync is optional. The app remains fully usable as a local offline PWA when cloud configuration is blank.
 
@@ -91,6 +91,23 @@ An empty new iPhone installation does not overwrite an existing cloud copy autom
 - Supabase Realtime prompts an open device to download a revision created by the other device.
 - When both devices changed different records, both versions are merged.
 - When both devices changed the same payment state or account value, the cloud-confirmed version is retained and a recoverable conflict snapshot is listed.
+
+
+## V12.20.0 ledger synchronization
+
+No additional Supabase SQL migration is required for V12.20.0. The existing `finance_cloud_state` JSON payload now also includes:
+
+- `accountLedger` — append-only account balance entries
+- `accountReconciliations` — documented actual-versus-calculated balance checks
+
+Both collections use stable record IDs, update metadata, tombstones, and the existing three-way merge process. Core finance schema remains 12 and Cloud Schema remains V1.
+
+For safest cross-device use:
+
+1. Open the first device online and wait for **Synced** before the first V12.20.0 migration.
+2. Confirm that Available Money is unchanged after opening-balance entries are created.
+3. Wait for **Synced** before using transfers or reconciliation on the second device.
+4. Never manually edit ledger rows in the Supabase Table Editor.
 
 ## Payment safety
 

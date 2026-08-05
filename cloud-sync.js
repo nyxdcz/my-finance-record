@@ -1,6 +1,6 @@
 "use strict";
 
-/* My Finance Records V12.19.1 · optional MacBook + iPhone cloud synchronization.
+/* My Finance Records V12.20.0 · optional MacBook + iPhone cloud synchronization.
    Local records remain the primary offline copy. Supabase is used only after the user
    configures a project, signs in, and chooses the first-sync direction. */
 (function financeCloudSyncBootstrap() {
@@ -8,7 +8,7 @@
   const BASE_KEY = "simple-finance-cloud-base-v1";
   const CONFLICT_KEY = "simple-finance-cloud-conflicts-v1";
   const CONFIG_KEY = "simple-finance-cloud-config-v1";
-  const COLLECTIONS = ["expenses", "projects", "incomeRecords", "savingsGoals"];
+  const COLLECTIONS = ["expenses", "projects", "incomeRecords", "savingsGoals", "accountLedger", "accountReconciliations"];
   const MAX_CONFLICTS = 8;
   const MAX_HISTORY_PATHS = 80;
   const SYNC_DELAY = 900;

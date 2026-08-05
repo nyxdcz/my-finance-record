@@ -2,6 +2,32 @@
 
 All notable changes to My Finance Records are documented here.
 
+## 12.20.0 · 2026-08-06
+
+### Added
+
+- Append-only Account Ledger with Ledger Version 1 metadata.
+- One-time opening-balance migration that preserves existing account totals.
+- Ledger-derived account balances for payments, reversals, income deposits, transfers, reconciliation adjustments, and manual adjustments.
+- Linked two-sided transfers with different-account and sufficient-funds validation.
+- Account reconciliation history with documented balance differences.
+- Optional income posting to an account with safe reversal on edit or deletion.
+- Search, filters, summaries, and CSV exports for ledger and reconciliation history.
+- Cloud synchronization for account-ledger and reconciliation records within the existing Cloud Schema V1 state payload.
+
+### Changed
+
+- Account balance editing now creates a reconciliation adjustment instead of silently replacing the balance.
+- Accounts with a non-zero ledger balance must be transferred or reconciled to zero before deletion.
+- Account renaming updates all supported linked financial references.
+- GitHub Pages deployment includes the new ledger JavaScript and stylesheet.
+
+### Preserved
+
+- Core finance schema 12 and Cloud Schema V1.
+- Existing account balances during the opening-balance migration.
+- Expense payment IDs, duplicate-operation protection, backups, reports, Supabase configuration, manifest, offline page, and icons.
+
 ## 12.19.1 — 2026-08-06
 
 ### Added

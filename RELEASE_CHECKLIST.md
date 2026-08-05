@@ -31,6 +31,12 @@
 - [ ] Bulk payments remain atomic.
 - [ ] Recurring-series edits preserve payment history.
 - [ ] Gym month-end auto-pay cannot run twice.
+- [ ] Opening-balance migration preserves every account balance and Available Money.
+- [ ] Every supported balance change creates the expected ledger entry.
+- [ ] Transfers create equal linked debit and credit entries and preserve total money.
+- [ ] Insufficient or same-account transfers are blocked.
+- [ ] Reconciliation creates one documented adjustment and history record.
+- [ ] Posted income reverses safely when edited or deleted.
 - [ ] Utility, Gym, normal, and reserved-budget totals match reports and exports.
 
 ## Cloud and security
@@ -40,6 +46,7 @@
 - [ ] Payment-operation rows remain append-only.
 - [ ] No `sb_secret_`, `service_role`, database password, or personal token is committed.
 - [ ] MacBook and iPhone sync tests use non-sensitive sample records.
+- [ ] Account ledger and reconciliation records sync without duplicate operation IDs.
 
 ## Publication
 

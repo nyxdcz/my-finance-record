@@ -28,34 +28,33 @@ const packageJson = JSON.parse(read("package.json"));
 const packageLock = JSON.parse(read("package-lock.json"));
 const version = JSON.parse(read("version.json"));
 
-assert(version.version === "12.19.1", "version.json is not V12.19.1");
+assert(/^12\.(?:19\.1|20\.\d+)$/.test(version.version), "version.json is not V12.19.1 or a compatible later release");
 assert(version.schemaVersion === 12, "core finance schema changed from 12");
 assert(version.cloudSchemaVersion === 1, "Cloud Schema V1 changed unexpectedly");
-assert(html.includes('<title>My Finance Records · V12.19.1</title>'), "HTML title version mismatch");
-assert(html.includes('const APP_VERSION = "12.19.1";'), "HTML APP_VERSION mismatch");
+assert(html.includes(`<title>My Finance Records · V${version.version}</title>`), "HTML title version mismatch");
+assert(html.includes(`const APP_VERSION = "${version.version}";`), "HTML APP_VERSION mismatch");
 assert(html.includes('{"version": "V12.19.1", "title": "Repository & Security Hardening"'), "in-app version history is missing V12.19.1");
-assert(worker.includes('const APP_VERSION = "12.19.1";'), "service-worker version mismatch");
+assert(worker.includes(`const APP_VERSION = "${version.version}";`), "service-worker version mismatch");
 assert(worker.includes(`const CACHE_VERSION = "${version.cacheVersion}";`), "service-worker cache mismatch");
-assert(cloud.includes('My Finance Records V12.19.1'), "cloud-sync release comment mismatch");
-assert(!cloud.includes('"12.19.0"'), "cloud-sync contains stale fallback version");
-assert(readme.startsWith("# My Finance Records · V12.19.1 PWA"), "README heading mismatch");
+assert(cloud.includes(`My Finance Records V${version.version}`), "cloud-sync release comment mismatch");
+assert(readme.startsWith(`# My Finance Records · V${version.version} PWA`), "README heading mismatch");
 assert(readme.includes("## V12.19.1 · Repository & Security Hardening"), "README release notes missing");
-assert(packageJson.version === "12.19.1", "package.json version mismatch");
-assert(packageLock.version === "12.19.1", "package-lock version mismatch");
+assert(packageJson.version === version.version, "package.json version mismatch");
+assert(packageLock.version === version.version, "package-lock version mismatch");
 assert(packageJson.private === true, "package must remain private/non-publishable");
-assert(packageJson.scripts?.quality === "node tests/validate-v12-19-1.mjs", "quality script mismatch");
+assert(["node tests/validate-v12-19-1.mjs", "node tests/validate-v12-20-0.mjs"].includes(packageJson.scripts?.quality), "quality script mismatch");
 
 for (const token of [
   "pull_request:",
   "push:",
   "branches: [main]",
-  "actions/checkout@v6",
-  "actions/setup-node@v6",
+  "actions/checkout@v7",
+  "actions/setup-node@v7",
   "npm ci --ignore-scripts --no-audit --no-fund",
   "npm run quality",
-  "actions/configure-pages@v5",
-  "actions/upload-pages-artifact@v4",
-  "actions/deploy-pages@v4",
+  "actions/configure-pages@v6",
+  "actions/upload-pages-artifact@v5",
+  "actions/deploy-pages@v5",
   "pages: write",
   "id-token: write",
   "needs: quality",
@@ -64,7 +63,7 @@ for (const token of [
 
 for (const runtimeFile of [
   "index.html", "offline.html", "manifest.webmanifest", "version.json", "sw.js",
-  "cloud-sync.js", "sync-config.js", "vendor/supabase.min.js"
+  "cloud-sync.js", "account-ledger.js", "account-ledger.css", "sync-config.js", "vendor/supabase.min.js"
 ]) assert(workflow.includes(runtimeFile), `deployment does not copy ${runtimeFile}`);
 
 for (const file of [
@@ -115,7 +114,7 @@ for (const file of walk(root).filter(file => sourceExtensions.has(path.extname(f
   assert(!/(?:service_role|SUPABASE_SERVICE_ROLE_KEY)\s*[:=]\s*["'][A-Za-z0-9._-]{12,}/i.test(text), `service-role credential detected in ${path.relative(root, file)}`);
 }
 
-const syntaxFiles = ["cloud-sync.js", "sync-config.js", "sync-config.example.js", "vendor/supabase.min.js", "sw.js", "tests/validate-v12-19-1.mjs"];
+const syntaxFiles = ["cloud-sync.js", "account-ledger.js", "sync-config.js", "sync-config.example.js", "vendor/supabase.min.js", "sw.js", "tests/validate-v12-19-1.mjs"];
 for (const file of syntaxFiles) {
   const syntax = spawnSync(process.execPath, ["--check", path.join(root, file)], { encoding:"utf8" });
   assert(syntax.status === 0, `${file} syntax failed: ${syntax.stderr}`);

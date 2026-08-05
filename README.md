@@ -1,4 +1,22 @@
-# My Finance Records · V12.19.1 PWA
+# My Finance Records · V12.20.0 PWA
+
+## V12.20.0 · Account Ledger, Transfers & Reconciliation
+
+- Added an append-only Account Ledger that records every supported balance change instead of silently replacing account totals.
+- Existing V12.19.1 account balances are migrated once into deterministic opening-balance entries. The migration preserves each balance and does not change Available Money.
+- Account balances are recalculated from active ledger entries for opening balances, expense payments, Gym auto-payments, payment reversals, income deposits, transfers, reconciliations, and documented manual adjustments.
+- Mark Paid creates one ledger debit per expense, while Move to Unpaid creates one linked reversal. Existing transaction IDs and duplicate-payment protections remain active.
+- Added linked account transfers. One transfer creates an equal debit and credit, requires different active accounts, blocks insufficient funds, and does not count as income or expense.
+- Reworked account balance editing into reconciliation. Entering the actual account balance creates a documented adjustment and stores the prior balance, actual balance, difference, date, and note.
+- Added optional income posting. New income may be added to its selected account balance; editing or deleting posted income reverses the original ledger entry safely.
+- Added searchable Account Ledger and Reconciliation History cards under Settings → Accounts & Savings, plus CSV exports for both histories.
+- Account renaming updates linked ledger, reconciliation, expense-payment, Gym auto-pay, income, and savings references. Accounts with a non-zero ledger balance cannot be deleted.
+- Cloud Sync now includes `accountLedger` and `accountReconciliations` as record-level collections inside the existing Cloud Schema V1 state payload.
+- Core finance schema remains version 12, Cloud Schema remains V1, and the new local ledger metadata uses Ledger Version 1. Existing records, backups, reports, Supabase configuration, manifest, offline page, and icons remain compatible.
+
+### One-time behavior after updating
+
+On the first app opening, each active account receives one opening-balance ledger entry equal to its current saved balance. Verify that the total Available Money is unchanged before recording new transfers or reconciliations.
 
 ## V12.19.1 · Repository & Security Hardening
 
