@@ -46,6 +46,19 @@
 - [ ] Unassigned category reserves exclude already committed expenses.
 - [ ] Savings allocation changes the forecast without creating a ledger entry.
 - [ ] Low-balance warnings use scheduled account activity and configured thresholds.
+- [ ] Insights Total Income equals included manual income plus eligible project payments for the selected range.
+- [ ] Insights Actual Spending uses paid included expenses and confirmed payment dates.
+- [ ] Net Cash Flow equals Total Income minus Actual Spending.
+- [ ] Account filters use the confirmed payment or receiving account and clearly exclude unassigned project payments.
+- [ ] Expense-category filters do not change income values unexpectedly.
+- [ ] Account history uses saved month-end snapshots before ledger fallback.
+- [ ] Planned-versus-actual uses monthly budget plans and paid spending without changing budget records.
+- [ ] Utility Bill trends preserve separate Electric and Water amounts.
+- [ ] Gym cost per visit handles zero visits without division errors.
+- [ ] Recurring change detection does not modify recurring series.
+- [ ] Project margin uses project payments minus paid Project Costs and is labeled as cash-basis.
+- [ ] YTD comparison uses the same months in the selected and previous year.
+- [ ] Insights CSV and Print / Save PDF contain the selected range and filters.
 
 ## Cloud and security
 

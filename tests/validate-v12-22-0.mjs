@@ -30,24 +30,26 @@ const validation=read("MONTHLY_BUDGET_CASH_FLOW_VALIDATION_V12_22_0.md");
 const version=JSON.parse(read("version.json"));
 const packageJson=JSON.parse(read("package.json"));
 const packageLock=JSON.parse(read("package-lock.json"));
+const versionParts=version.version.split(".").map(Number);
+const appVersionCode=(versionParts[0]||0)*10000+(versionParts[1]||0)*10+(versionParts[2]||0);
 
-assert(version.version==="12.22.0","version.json is not V12.22.0");
+assert(["12.22.0","12.23.0"].includes(version.version),"version.json is not a supported V12.22+ release");
 assert(version.schemaVersion===12,"core finance schema changed from 12");
 assert(version.cloudSchemaVersion===2,"Cloud Schema changed from V2");
 assert(version.ledgerVersion===1,"Ledger Version changed from 1");
 assert(version.budgetVersion===1,"Budget Version 1 metadata missing");
-assert(html.includes('<title>My Finance Records · V12.22.0</title>'),"HTML title version mismatch");
-assert(html.includes('const APP_VERSION = "12.22.0";'),"HTML APP_VERSION mismatch");
+assert(html.includes(`<title>My Finance Records · V${version.version}</title>`),"HTML title version mismatch");
+assert(html.includes(`const APP_VERSION = "${version.version}";`),"HTML APP_VERSION mismatch");
 assert(html.includes('budget-planning.css')&&html.includes('budget-planning.js'),"budget runtime assets are not loaded");
 assert(html.includes('monthlyBudgets')&&html.includes('budgetTemplates')&&html.includes('budgetSettings'),"base normalization does not preserve budget records");
 assert(html.includes('{"version": "V12.22.0", "title": "Monthly Budgets & Cash-flow Forecasting"'),"in-app V12.22.0 history entry missing");
-assert(worker.includes('const APP_VERSION = "12.22.0";'),"service-worker version mismatch");
+assert(worker.includes(`const APP_VERSION = "${version.version}";`),"service-worker version mismatch");
 assert(worker.includes(`const CACHE_VERSION = "${version.cacheVersion}";`),"service-worker cache mismatch");
 assert(worker.includes('asset("./budget-planning.js")')&&worker.includes('asset("./budget-planning.css")'),"budget assets missing from PWA shell");
 assert(workflow.includes('budget-planning.js budget-planning.css'),"GitHub Pages workflow does not deploy budget assets");
-assert(packageJson.version==="12.22.0"&&packageLock.version==="12.22.0","package version mismatch");
-assert(packageJson.scripts?.quality==="node tests/validate-v12-22-0.mjs","quality script mismatch");
-assert(readme.startsWith("# My Finance Records · V12.22.0 PWA"),"README heading mismatch");
+assert(packageJson.version===version.version&&packageLock.version===version.version,"package version mismatch");
+assert(["node tests/validate-v12-22-0.mjs","node tests/validate-v12-23-0.mjs"].includes(packageJson.scripts?.quality),"quality script mismatch");
+assert(readme.startsWith(`# My Finance Records · V${version.version} PWA`),"README heading mismatch");
 assert(readme.includes("No additional Supabase SQL migration is required"),"README migration guidance missing");
 assert(changelog.includes("## 12.22.0 · 2026-08-06"),"CHANGELOG V12.22.0 entry missing");
 assert(checklist.includes("Forecast does not subtract paid expenses a second time"),"release forecast safety checklist missing");
@@ -60,7 +62,7 @@ for (const token of [
   "lowBalanceAlerts","Savings allocation is reserved in the forecast","Forecast month-end","Upcoming recurring","Overdue unpaid",
   "monthly-budget-${month}.csv","FinanceBudgetPlanningInternals"
 ]) assert(budget.includes(token),`budget safeguard missing: ${token}`);
-for (const token of ["monthlyBudgets","budgetTemplates","budgetSettings","APP_VERSION_CODE = 120220","V12.22.0</strong>"]) assert(cloud.includes(token),`Cloud Sync V2 budget mapping missing: ${token}`);
+for (const token of ["monthlyBudgets","budgetTemplates","budgetSettings",`APP_VERSION_CODE = ${appVersionCode}`,`V${version.version}</strong>`]) assert(cloud.includes(token),`Cloud Sync V2 budget mapping missing: ${token}`);
 for (const token of ["budget-planner-summary","budget-planner-grid","budget-category-table","cash-forecast-panel","budget-dashboard-forecast","budget-report-grid","@media (max-width:700px)"]) assert(budgetCss.includes(token),`budget responsive style missing: ${token}`);
 
 for (const file of ["budget-planning.js","cloud-sync.js","account-ledger.js","sw.js","tests/validate-v12-21-0.mjs","tests/validate-v12-22-0.mjs"]) {
@@ -121,7 +123,7 @@ if(budgetInternals){
 }
 
 const cloudMemory=new Map();
-const cloudSandbox={console,structuredClone,crypto:crypto.webcrypto,localStorage:{getItem:key=>cloudMemory.get(key)??null,setItem:(key,value)=>cloudMemory.set(key,String(value)),removeItem:key=>cloudMemory.delete(key)},navigator:{onLine:true,userAgent:"Node",platform:"MacIntel"},document:{readyState:"loading",addEventListener(){},getElementById(){return null;}},location:{reload(){}},matchMedia(){return{matches:false}},data:structuredClone(baseData),APP_VERSION:"12.22.0",window:null,globalThis:null};
+const cloudSandbox={console,structuredClone,crypto:crypto.webcrypto,localStorage:{getItem:key=>cloudMemory.get(key)??null,setItem:(key,value)=>cloudMemory.set(key,String(value)),removeItem:key=>cloudMemory.delete(key)},navigator:{onLine:true,userAgent:"Node",platform:"MacIntel"},document:{readyState:"loading",addEventListener(){},getElementById(){return null;}},location:{reload(){}},matchMedia(){return{matches:false}},data:structuredClone(baseData),APP_VERSION:version.version,window:null,globalThis:null};
 cloudSandbox.window=cloudSandbox;cloudSandbox.globalThis=cloudSandbox;
 vm.createContext(cloudSandbox);
 try{vm.runInContext(cloud,cloudSandbox,{filename:"cloud-sync.js"});}catch(error){failures.push(`cloud-sync budget VM bootstrap failed: ${error.stack||error}`);}
@@ -133,7 +135,7 @@ if(cloudInternals){
   const templateData=structuredClone(baseData);templateData.budgetTemplates=[{id:"template-1",name:"Base",items:[]}];
   const templateMap=cloudInternals.toRecordMap(templateData);
   assert(Object.values(templateMap).some(row=>row.collection==="budgetTemplates"&&row.recordId==="template-1"),"budget template was not mapped independently");
-  const rows=Object.fromEntries(Object.entries(templateMap).map(([key,row])=>[key,{...row,revision:1,deletedAt:"",updatedAt:"2099-08-01T00:00:00Z",appVersion:"12.22.0",appVersionCode:120220,minWriterVersionCode:120220}]));
+  const rows=Object.fromEntries(Object.entries(templateMap).map(([key,row])=>[key,{...row,revision:1,deletedAt:"",updatedAt:"2099-08-01T00:00:00Z",appVersion:version.version,appVersionCode,minWriterVersionCode:120220}]));
   const roundTrip=cloudInternals.fromRecordStore(rows,templateData);
   assert(roundTrip.monthlyBudgets?.["2099-08"]?.items?.length===2,"monthly budget did not round-trip through Cloud Schema V2");
   assert(roundTrip.budgetTemplates?.[0]?.id==="template-1","budget template did not round-trip through Cloud Schema V2");

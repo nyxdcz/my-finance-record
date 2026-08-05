@@ -1,11 +1,11 @@
 "use strict";
 
-/* My Finance Records V12.22.0 · Record-level Cloud Sync 2.0.
+/* My Finance Records V12.23.0 · Record-level Cloud Sync 2.0.
    Local storage remains the immediate working copy. Cloud Schema V2 exchanges only
    changed records, commits related changes atomically, and preserves an immutable audit trail. */
 (function financeCloudSyncV2Bootstrap() {
-  const APP_VERSION_FALLBACK = "12.22.0";
-  const APP_VERSION_CODE = 120220;
+  const APP_VERSION_FALLBACK = "12.23.0";
+  const APP_VERSION_CODE = 120230;
   const CLOUD_SCHEMA_VERSION = 2;
   const CORE_SCHEMA_VERSION = 12;
   const META_KEY = "simple-finance-cloud-sync-v2";
@@ -499,7 +499,7 @@
           <div><span>Pending records</span><strong id="cloudHealthPending">0</strong></div>
           <div><span>Conflicts</span><strong id="cloudHealthConflicts">0</strong></div>
           <div><span>This app</span><strong id="cloudHealthAppVersion">V${appVersion()}</strong></div>
-          <div><span>Minimum writer</span><strong id="cloudHealthRequiredVersion">V12.22.0</strong></div>
+          <div><span>Minimum writer</span><strong id="cloudHealthRequiredVersion">V12.23.0</strong></div>
         </div>
         <p class="v12-help" id="cloudHealthMessage">Only changed records are exchanged. Related payment and ledger changes are committed together.</p>
       </article>

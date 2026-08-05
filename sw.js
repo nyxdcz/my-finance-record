@@ -1,6 +1,6 @@
 "use strict";
-const APP_VERSION = "12.22.0";
-const CACHE_VERSION = "finance-v12-20260806-v12220-monthly-budgets-cash-flow-forecast";
+const APP_VERSION = "12.23.0";
+const CACHE_VERSION = "finance-v12-20260806-v12230-reports-financial-insights";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const DB_NAME = "simple-finance-project-records-v12-db";
@@ -18,6 +18,8 @@ const APP_SHELL = [
   asset("./account-ledger.css"),
   asset("./budget-planning.js"),
   asset("./budget-planning.css"),
+  asset("./reports-insights.js"),
+  asset("./reports-insights.css"),
   asset("./sync-config.js"),
   asset("./vendor/supabase.min.js"),
   asset("./icons/icon-192.png"),

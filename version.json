@@ -1,11 +1,12 @@
 {
-  "version": "12.22.0",
+  "version": "12.23.0",
   "schemaVersion": 12,
   "cloudSchemaVersion": 2,
   "ledgerVersion": 1,
   "budgetVersion": 1,
-  "cacheVersion": "finance-v12-20260806-v12220-monthly-budgets-cash-flow-forecast",
+  "insightsVersion": 1,
+  "cacheVersion": "finance-v12-20260806-v12230-reports-financial-insights",
   "released": "2026-08-06",
-  "name": "Monthly Budgets & Cash-flow Forecasting",
-  "notes": "Adds monthly category budgets, fixed and flexible groups, personal and project scopes, rollover and templates, planned-versus-actual reporting, savings allocation, low-balance warnings, and month-end cash-flow forecasting while preserving Finance Schema 12, Cloud Schema V2, and Ledger Version 1."
+  "name": "Reports & Financial Insights",
+  "notes": "Adds multi-month and custom-date financial insights for income, actual spending, net cash flow, category distribution, account-balance history, planned-versus-actual budgets, Utility Bills, Gym activity, recurring-expense changes, Savings progress, project profitability, year-to-date comparison, CSV export, and print-ready PDF output while preserving Finance Schema 12, Cloud Schema V2, Ledger Version 1, and Budget Version 1."
 }

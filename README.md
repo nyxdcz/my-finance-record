@@ -1,4 +1,20 @@
-# My Finance Records · V12.22.0 PWA
+# My Finance Records · V12.23.0 PWA
+
+## V12.23.0 · Reports & Financial Insights
+
+- Added a multi-month financial insights workspace inside **Monthly Reports** with Selected Month, Last 3 Months, Last 6 Months, Last 12 Months, Year to Date, Year Comparison, and custom date ranges.
+- Added Account and Expense Category filters. Paid spending follows the confirmed payment account; project payments are excluded when an account filter is active because project payments do not yet store a receiving account.
+- Added total income, actual paid spending, net cash flow, Savings change, and project cash-margin summaries.
+- Added monthly cash-flow trends, paid spending by category, account-balance history, and planned-versus-actual budget comparisons.
+- Added Utility Bill trends for Electric and Water, Gym visits and cost per visit, and recurring-expense change detection for started, stopped, increased, and decreased monthly series.
+- Added Savings Goal progress, Savings-account change, project income versus paid Project Costs, and selected-year YTD comparison against the prior year.
+- Added one consolidated financial-insights CSV export and a print-ready **Print / Save PDF** workflow.
+- Insights are derived from existing local and synchronized records. No new finance records or automatic ledger transactions are created.
+- No additional Supabase migration is required. Finance Schema remains 12, Cloud Schema remains V2, Ledger Version remains 1, Budget Version remains 1, and Insights Version is 1.
+
+### First use
+
+Open **Monthly Reports → Insights**, choose a range, and verify the totals against one known month. Historical account balances use saved month-end report snapshots when available and ledger history as a fallback. Export a recovery backup before using insights for an important financial review.
 
 ## V12.22.0 · Monthly Budgets & Cash-flow Forecasting
 

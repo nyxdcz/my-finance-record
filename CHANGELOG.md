@@ -2,6 +2,26 @@
 
 All notable changes to My Finance Records are documented here.
 
+## 12.23.0 · 2026-08-06
+
+### Added
+
+- Multi-month, year-to-date, prior-year, and custom-date financial insight ranges.
+- Account and expense-category filters for reports.
+- Income, actual spending, net cash flow, Savings change, and project cash-margin KPIs.
+- Monthly cash-flow, category-spending, account-history, and planned-versus-actual views.
+- Electric and Water Utility Bill trends.
+- Gym visits, total Gym cost, and cost-per-visit insights.
+- Recurring monthly expense change detection.
+- Savings Goal progress and Savings-account trend reporting.
+- Project income, paid Project Costs, and cash-basis project profitability.
+- Consolidated financial-insights CSV export and print-ready PDF output.
+
+### Preserved
+
+- Existing Monthly Reports, snapshots, CSV/JSON exports, account ledger, budgets, cloud records, payment IDs, Finance Schema 12, Cloud Schema V2, Ledger Version 1, Budget Version 1, manifest, offline page, and icons.
+- No Supabase migration is required.
+
 ## 12.22.0 · 2026-08-06
 
 ### Added
