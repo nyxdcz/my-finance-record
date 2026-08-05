@@ -1,4 +1,19 @@
-# My Finance Records · V12.24.0 PWA
+# My Finance Records · V12.25.0 PWA
+
+## V12.25.0 · Reminders & Scheduled Alerts
+
+- Added configurable reminders for expense due dates, overdue bills, low account balances, expected unposted income, monthly Savings contributions, missing Utility Bill entry, today’s Gym schedule, failed Gym month-end auto-payment, unsynchronized Cloud Sync changes, and stale recovery backups.
+- Added one daily grouped notification digest with a selected local time. Turning the digest off changes delivery to newly detected individual alerts while the app is active or the browser gives the installed PWA background time.
+- Added a current-alert list, system-notification permission status, best-effort background-delivery status, next scheduled check, device-local notification history, test notification, and a 24-hour pause.
+- Added app-badge counts when the browser and installed platform support badging.
+- Reminder settings synchronize through the existing Cloud Schema V2 singleton settings record. Notification permission, sent history, pause state, and delivery history stay device-local.
+- System notifications use the service worker and Periodic Background Sync where available. Exact closed-app delivery is browser-controlled and is not guaranteed; opening or focusing the app also runs the checks.
+- Alerts are informational only. They never mark expenses paid, transfer money, post income, reconcile balances, change budgets, or create ledger entries automatically.
+- No additional Supabase SQL migration is required. Finance Schema remains 12, Cloud Schema remains V2, Ledger Version remains 1, Budget Version remains 1, Insights Version remains 1, Productivity Version remains 1, and Reminders Version is 1.
+
+### First use
+
+Open the MacBook app first and wait for **Synced**. Go to **Settings → Offline App**, review the alert types and schedule, then select **Enable notifications** directly. Send one test notification and run one manual alert check. On iPhone or iPad, open the installed Home Screen app before requesting notification permission. After the MacBook returns to **Synced**, open the iPhone and confirm the reminder settings match. Export a new recovery backup.
 
 ## V12.24.0 · Quick Entry & Productivity
 

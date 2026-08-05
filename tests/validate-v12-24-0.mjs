@@ -30,30 +30,32 @@ const version=JSON.parse(read("version.json"));
 const packageJson=JSON.parse(read("package.json"));
 const packageLock=JSON.parse(read("package-lock.json"));
 
-assert(version.version==="12.24.0","version.json is not V12.24.0");
+assert(["12.24.0","12.25.0"].includes(version.version),"version.json is not a supported V12.24+ release");
 assert(version.schemaVersion===12,"Finance Schema changed from 12");
 assert(version.cloudSchemaVersion===2,"Cloud Schema changed from V2");
 assert(version.ledgerVersion===1,"Ledger Version changed from 1");
 assert(version.budgetVersion===1,"Budget Version changed from 1");
 assert(version.insightsVersion===1,"Insights Version changed from 1");
 assert(version.productivityVersion===1,"Productivity Version 1 metadata missing");
-assert(html.includes('<title>My Finance Records · V12.24.0</title>'),"HTML title version mismatch");
-assert(html.includes('const APP_VERSION = "12.24.0";'),"HTML APP_VERSION mismatch");
+assert(html.includes(`<title>My Finance Records · V${version.version}</title>`),"HTML title version mismatch");
+assert(html.includes(`const APP_VERSION = "${version.version}";`),"HTML APP_VERSION mismatch");
 assert(html.includes('productivity-tools.css')&&html.includes('productivity-tools.js'),"productivity assets are not loaded");
 assert(html.includes('data-paid-expense-row="${item.id}"'),"paid expense rows do not expose stable IDs for bulk selection");
 assert(html.includes('{"version": "V12.24.0", "title": "Quick Entry & Productivity"'),"in-app V12.24.0 history entry missing");
-assert(worker.includes('const APP_VERSION = "12.24.0";'),"service-worker version mismatch");
+assert(worker.includes(`const APP_VERSION = "${version.version}";`),"service-worker version mismatch");
 assert(worker.includes(`const CACHE_VERSION = "${version.cacheVersion}";`),"service-worker cache mismatch");
 assert(worker.includes('asset("./productivity-tools.js")')&&worker.includes('asset("./productivity-tools.css")'),"productivity assets missing from PWA shell");
 assert(workflow.includes('productivity-tools.js productivity-tools.css'),"GitHub Pages workflow does not deploy productivity assets");
-assert(packageJson.version==="12.24.0"&&packageLock.version==="12.24.0","package version mismatch");
-assert(packageJson.scripts?.quality==="node tests/validate-v12-24-0.mjs","quality script mismatch");
-assert(readme.startsWith("# My Finance Records · V12.24.0 PWA"),"README heading mismatch");
+assert(packageJson.version===version.version&&packageLock.version===version.version,"package version mismatch");
+assert(packageJson.scripts?.quality===`node tests/validate-v${version.version.replaceAll(".","-")}.mjs`,"quality script mismatch");
+assert(readme.startsWith(`# My Finance Records · V${version.version} PWA`),"README heading mismatch");
 assert(readme.includes("No additional Supabase migration is required"),"README migration guidance missing");
 assert(changelog.includes("## 12.24.0 · 2026-08-06"),"CHANGELOG V12.24.0 entry missing");
 assert(checklist.includes("Paid payment-account correction creates one reversal and one replacement ledger entry"),"productivity release checklist missing");
 assert(validation.includes("review-before-save")&&validation.includes("12-step local undo history"),"productivity validation guidance incomplete");
-assert(cloud.includes('const APP_VERSION_CODE = 120240;')&&cloud.includes('V12.24.0</strong>'),"Cloud Sync app-version metadata mismatch");
+const versionParts=version.version.split(".").map(Number);
+const appVersionCode=(versionParts[0]||0)*10000+(versionParts[1]||0)*10+(versionParts[2]||0);
+assert(cloud.includes(`const APP_VERSION_CODE = ${appVersionCode};`)&&cloud.includes(`V${version.version}</strong>`),"Cloud Sync app-version metadata mismatch");
 assert(cloud.includes('"expenseTemplates"')&&cloud.includes('productivitySettings:clone(source?.productivitySettings || {})'),"Cloud Sync productivity mapping missing");
 assert(cloud.includes('output.productivitySettings = clone(settings.productivitySettings'),"Cloud Sync productivity settings restore missing");
 
@@ -140,7 +142,7 @@ const cloudSandbox={
   console,structuredClone,crypto:crypto.webcrypto,window:null,globalThis:null,
   localStorage:{getItem:key=>cloudMemory.get(key)??null,setItem:(key,value)=>cloudMemory.set(key,String(value)),removeItem:key=>cloudMemory.delete(key)},
   navigator:{onLine:true,userAgent:"Node",platform:"MacIntel"},document:{readyState:"loading",addEventListener(){},getElementById(){return null;}},location:{reload(){}},matchMedia(){return{matches:false}},
-  data:structuredClone(sampleData),APP_VERSION:"12.24.0",normalizeData:value=>value,saveData(){},renderAll(){},STORAGE_KEY:"finance",windowAddEventListener(){},setInterval(){return 0},clearInterval(){},setTimeout(){return 0},clearTimeout(){},
+  data:structuredClone(sampleData),APP_VERSION:version.version,normalizeData:value=>value,saveData(){},renderAll(){},STORAGE_KEY:"finance",windowAddEventListener(){},setInterval(){return 0},clearInterval(){},setTimeout(){return 0},clearTimeout(){},
 };
 cloudSandbox.window=cloudSandbox; cloudSandbox.globalThis=cloudSandbox; cloudSandbox.window.addEventListener=()=>{};
 vm.createContext(cloudSandbox);
@@ -175,7 +177,7 @@ for(const [file,text] of [["index.html",html],["productivity-tools.js",productiv
 }
 
 if(failures.length){console.error("V12.24.0 Quick Entry & Productivity validation failed:\n"+failures.map(item=>`- ${item}`).join("\n"));process.exit(1);}
-console.log("V12.24.0 Quick Entry & Productivity validation passed.");
+console.log("V12.24+ Quick Entry & Productivity baseline passed.");
 console.log(`- ${staticIds.length} static HTML IDs and ${injectedIds.length} injected runtime IDs checked with no duplicates`);
 console.log("- Template, search, filter, payment-account correction, cloud round-trip, keyboard, and phone-layout safeguards passed");
 console.log("- Finance Schema 12, Cloud Schema V2, Ledger/Budget/Insights/Productivity Version 1, manifest, offline page, and icons remain protected");

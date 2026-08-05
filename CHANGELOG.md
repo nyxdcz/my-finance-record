@@ -2,6 +2,27 @@
 
 All notable changes to My Finance Records are documented here.
 
+## 12.25.0 · 2026-08-06
+
+### Added
+
+- Configurable reminders for due and overdue expenses, low balances, expected unposted income, monthly Savings contributions, missing Utility Bill entries, Gym schedules, failed Gym auto-payments, unsynchronized cloud changes, and recovery backups.
+- Daily grouped notification scheduling with a selected local time and optional newly detected individual-alert delivery.
+- Current-alert list, permission and delivery status, next-check time, app badges, test notification, 24-hour pause, and device-local notification history.
+- Service-worker notification handling plus best-effort Periodic Background Sync and foreground checks on app open, focus, visibility, reconnect, and interval.
+- Cloud Schema V2 synchronization for reminder settings.
+
+### Safety
+
+- Alerts never mark expenses paid, transfer money, post income, reconcile balances, modify budgets, or create ledger entries automatically.
+- Notification permission, delivery history, sent fingerprints, and pause state remain device-local.
+- Exact closed-app timing remains browser-controlled and is not guaranteed.
+
+### Preserved
+
+- Finance Schema 12, Cloud Schema V2, Ledger Version 1, Budget Version 1, Insights Version 1, Productivity Version 1, all existing finance records, balances, ledger operations, backups, reports, manifest, offline page, and icons.
+- No additional Supabase migration is required.
+
 ## 12.24.0 · 2026-08-06
 
 ### Added

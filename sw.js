@@ -1,6 +1,6 @@
 "use strict";
-const APP_VERSION = "12.24.0";
-const CACHE_VERSION = "finance-v12-20260806-v12240-quick-entry-productivity";
+const APP_VERSION = "12.25.0";
+const CACHE_VERSION = "finance-v12-20260806-v12250-reminders-scheduled-alerts";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const DB_NAME = "simple-finance-project-records-v12-db";
@@ -22,6 +22,8 @@ const APP_SHELL = [
   asset("./reports-insights.css"),
   asset("./productivity-tools.js"),
   asset("./productivity-tools.css"),
+  asset("./reminders-alerts.js"),
+  asset("./reminders-alerts.css"),
   asset("./sync-config.js"),
   asset("./vendor/supabase.min.js"),
   asset("./icons/icon-192.png"),
@@ -102,6 +104,12 @@ self.addEventListener("message", event => {
   if (event.data?.type === "CLEAR_CACHES") {
     event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(key => key.startsWith("finance-v12-")).map(key => caches.delete(key)))).then(precache));
   }
+  if (event.data?.type === "FINANCE_ALERT_NOTIFY") {
+    event.waitUntil(showFinanceNotification(event.data.payload || {}, { force:true }));
+  }
+  if (event.data?.type === "FINANCE_ALERT_CHECK") {
+    event.waitUntil(showScheduledFinanceAlert());
+  }
 });
 
 function openDb() {
@@ -129,31 +137,87 @@ async function readReminderIndex() {
   });
 }
 
-async function showReviewNotification() {
-  const reminder = await readReminderIndex().catch(() => null);
-  if (!reminder?.enabled || Notification.permission !== "granted") return;
-  const body = reminder.issues?.length ? reminder.body : "No urgent finance review items.";
-  await self.registration.showNotification(reminder.title || "Finance review", {
-    body,
-    icon: asset("./icons/icon-192.png"),
-    badge: asset("./icons/icon-192.png"),
-    tag: "finance-review",
-    data: { url: asset("./index.html?page=dashboard") }
+async function writeReminderIndex(value) {
+  const db = await openDb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction("reminderIndex", "readwrite");
+    tx.objectStore("reminderIndex").put(value);
+    tx.oncomplete = () => { db.close(); resolve(value); };
+    tx.onerror = () => { db.close(); reject(tx.error); };
+    tx.onabort = () => { db.close(); reject(tx.error); };
   });
 }
 
+function localDateKey(date = new Date()) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function scheduledTimeReached(value, date = new Date()) {
+  const match = String(value || "08:00").match(/^(\d{1,2}):(\d{2})$/);
+  const hour = match ? Math.min(23, Math.max(0, Number(match[1]))) : 8;
+  const minute = match ? Math.min(59, Math.max(0, Number(match[2]))) : 0;
+  const scheduled = new Date(date);
+  scheduled.setHours(hour, minute, 0, 0);
+  return date >= scheduled;
+}
+
+function reminderSnoozed(reminder, date = new Date()) {
+  const until = new Date(reminder?.snoozedUntil || 0);
+  return !Number.isNaN(until.getTime()) && until > date;
+}
+
+async function showFinanceNotification(payload = {}, { force = false } = {}) {
+  if (typeof Notification !== "undefined" && Notification.permission !== "granted") return false;
+  const title = String(payload.title || "Finance reminder");
+  const options = {
+    body:String(payload.body || "Open My Finance Records to review your alerts."),
+    icon:asset("./icons/icon-192.png"),
+    badge:asset("./icons/icon-192.png"),
+    tag:String(payload.tag || (force ? "finance-alert-manual" : `finance-alert-${localDateKey()}`)),
+    renotify:false,
+    data:{ url:new URL(payload.url || "./index.html?page=dashboard", scopeUrl).toString(), source:payload.source || "scheduled-alert" }
+  };
+  await self.registration.showNotification(title, options);
+  return true;
+}
+
+async function showScheduledFinanceAlert() {
+  const reminder = await readReminderIndex().catch(() => null);
+  const now = new Date();
+  if (!reminder?.enabled || reminderSnoozed(reminder, now)) return false;
+  if (reminder.settings?.dailyDigest === false) return false;
+  if (!scheduledTimeReached(reminder.settings?.dailyTime, now)) return false;
+  const date = localDateKey(now);
+  if (String(reminder.lastNotificationDate || "") === date) return false;
+  const payload = reminder.notification || {
+    title:reminder.title || "Finance alerts",
+    body:reminder.body || "Open My Finance Records to review your alerts.",
+    tag:`finance-alert-digest-${date}`,
+    url:"./index.html?page=dashboard"
+  };
+  const delivered = await showFinanceNotification(payload);
+  if (!delivered) return false;
+  reminder.lastNotificationDate = date;
+  reminder.lastNotificationAt = now.toISOString();
+  await writeReminderIndex(reminder).catch(() => null);
+  return true;
+}
+
 self.addEventListener("periodicsync", event => {
-  if (event.tag === "finance-review-reminder") event.waitUntil(showReviewNotification());
+  if (["finance-review-reminder", "finance-scheduled-alerts-v1"].includes(event.tag)) event.waitUntil(showScheduledFinanceAlert());
 });
 
 self.addEventListener("sync", event => {
-  if (event.tag === "finance-review-now") event.waitUntil(showReviewNotification());
+  if (["finance-review-now", "finance-scheduled-alerts-now"].includes(event.tag)) event.waitUntil(showScheduledFinanceAlert());
 });
 
 self.addEventListener("notificationclick", event => {
   event.notification.close();
   event.waitUntil((async () => {
-    const target = event.notification.data?.url || asset("./index.html?page=dashboard");
+    const target = new URL(event.notification.data?.url || "./index.html?page=dashboard", scopeUrl).toString();
     const clientsList = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
     const existing = clientsList.find(client => client.url.startsWith(scopeUrl));
     if (existing) { await existing.focus(); existing.navigate(target); return; }

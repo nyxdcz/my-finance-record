@@ -1,13 +1,14 @@
 {
-  "version": "12.24.0",
+  "version": "12.25.0",
   "schemaVersion": 12,
   "cloudSchemaVersion": 2,
   "ledgerVersion": 1,
   "budgetVersion": 1,
   "insightsVersion": 1,
   "productivityVersion": 1,
-  "cacheVersion": "finance-v12-20260806-v12240-quick-entry-productivity",
+  "remindersVersion": 1,
+  "cacheVersion": "finance-v12-20260806-v12250-reminders-scheduled-alerts",
   "released": "2026-08-06",
-  "name": "Quick Entry & Productivity",
-  "notes": "Adds a universal Quick Add menu, synchronized expense templates, global search, advanced expense filters, bulk category and paid-account corrections, duplicate-last-month entry, recent-account suggestions, recently edited records, multi-step undo history, keyboard shortcuts, and iPhone bottom-sheet forms while preserving Finance Schema 12, Cloud Schema V2, Ledger Version 1, Budget Version 1, and Insights Version 1."
+  "name": "Reminders & Scheduled Alerts",
+  "notes": "Adds configurable due-date, overdue, low-balance, expected-income, Savings contribution, Utility Bill, Gym, cloud-sync, and backup reminders with a daily grouped notification schedule, device-local history, pause and test controls, app badges, and best-effort foreground and background delivery while never changing financial records automatically."
 }

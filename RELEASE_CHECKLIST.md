@@ -71,6 +71,14 @@
 - [ ] Multi-step Undo restores a complete normalized snapshot and keeps the current state recoverable.
 - [ ] Keyboard shortcuts do not trigger while typing in a form field.
 - [ ] iPhone bottom-sheet dialogs remain scrollable and keep action buttons reachable.
+- [ ] Reminder checks identify due, overdue, low-balance, expected-income, Savings, Utility, Gym, cloud-sync, and backup conditions without changing finance records.
+- [ ] Posted income and transfers from Savings do not create expected-income reminders.
+- [ ] Daily digest fires at most once per local date after the selected time.
+- [ ] Individual-alert mode sends only newly detected fingerprints unless a manual test is forced.
+- [ ] Pause blocks notification delivery for 24 hours without disabling reminder calculations.
+- [ ] Notification permission is requested only from an explicit user action.
+- [ ] Alerts never mark paid, post income, transfer funds, reconcile balances, alter budgets, or append ledger entries.
+- [ ] iPhone guidance requires the installed Home Screen app and does not promise exact closed-app timing.
 
 ## Cloud and security
 
@@ -96,6 +104,9 @@
 - [ ] Expense templates synchronize as independent Cloud Schema V2 records.
 - [ ] Productivity settings synchronize through the singleton settings record.
 - [ ] Recently edited and multi-step undo histories remain device-local and are not uploaded.
+- [ ] Reminder settings synchronize through the Cloud Schema V2 singleton settings record.
+- [ ] Notification permission, delivery history, pause state, and sent fingerprints remain device-local and are not uploaded.
+- [ ] No new Supabase table or migration is required for V12.25.0.
 
 ## Publication
 

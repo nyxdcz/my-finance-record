@@ -30,7 +30,7 @@ const version=JSON.parse(read("version.json"));
 const packageJson=JSON.parse(read("package.json"));
 const packageLock=JSON.parse(read("package-lock.json"));
 
-assert(["12.23.0","12.24.0"].includes(version.version),"version.json is not a supported V12.23+ release");
+assert(["12.23.0","12.24.0","12.25.0"].includes(version.version),"version.json is not a supported V12.23+ release");
 const versionParts=version.version.split(".").map(Number);
 const appVersionCode=(versionParts[0]||0)*10000+(versionParts[1]||0)*10+(versionParts[2]||0);
 assert(version.schemaVersion===12,"Finance Schema changed from 12");
