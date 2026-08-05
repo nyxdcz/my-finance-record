@@ -110,7 +110,7 @@
     return ensureProductivityShape(baseNormalizeData(value));
   };
   data = ensureProductivityShape(data);
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (error) {}
+  try { if (typeof persistFinanceDataRaw === "function") persistFinanceDataRaw("Productivity tools initialized"); else localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (error) {}
 
   let activity = safeJson(ACTIVITY_KEY, []);
   activity = Array.isArray(activity) ? activity.slice(0, MAX_ACTIVITY) : [];

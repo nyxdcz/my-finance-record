@@ -672,7 +672,8 @@
 
   injectLedgerUi();
   recalculateBalances(data);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  if (typeof persistFinanceDataRaw === "function") persistFinanceDataRaw("Account ledger updated");
+  else localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   renderAll(false);
 
   window.FinanceAccountLedger = {

@@ -1,70 +1,30 @@
-# Cloud Sync Setup · V12.21.0
+# Cloud Sync Setup · V13.0.0
 
-Cloud Sync remains optional. The app continues to work locally when no Supabase project is configured or the device is offline.
+Cloud Sync is optional. The app remains local-first when Supabase is not configured.
 
 ## Required components
 
-- One Supabase project
-- One HTTPS address hosting the complete PWA
-- The same Supabase sign-in account on the MacBook and iPhone
-- A browser-safe Supabase publishable key or legacy `anon` key
+- A Supabase project already configured for V12 Cloud Sync V2
+- The browser-safe Supabase publishable key or legacy anon key
+- One HTTPS PWA address
+- `supabase/cloud-profiles-v13.sql`
+- A unique profile encryption passphrase stored outside the app
 
-Never place a Supabase secret key, `service_role` key, database password, or personal access token in browser files.
+Never place a Supabase secret key or `service_role` key in this browser application.
 
-## Existing project upgrade from V12.20.0
+## 1. Back up V12.25.0
 
-1. Open the app on the authoritative MacBook and export a recovery backup.
-2. Wait until the existing Cloud Sync status shows **Synced**.
-3. In the Supabase SQL Editor, run:
+On the MacBook, open V12.25.0, wait for **Synced**, export a recovery backup, and keep it unchanged. Do not start V13 migration from an empty iPhone installation.
 
-```text
-supabase/cloud-sync-v2.sql
-```
+## 2. Install Cloud Schema V3
 
-4. Confirm the query completes without an error.
-5. Deploy V12.21.0 through GitHub Pages.
-6. Open the MacBook app online first.
-7. Sign in and review the first Cloud Sync V2 choice:
-   - **Upload this device’s data** when the MacBook is authoritative.
-   - **Download cloud data** only when the V2 cloud already contains the intended records.
-   - **Review and merge** when both copies contain valid changes.
-8. Wait for **Synced** before opening the iPhone.
-9. Open or update the iPhone PWA and sign in to the same account.
-10. Confirm the balances, ledger totals, expenses, income, projects, and Sync Health values match.
+Run the complete `supabase/cloud-profiles-v13.sql` file in the Supabase SQL Editor. The migration creates profile, member, encrypted record, batch, audit, device, payment-operation, invitation, and restore-point tables plus profile-scoped RLS and RPC functions.
 
-The migration does not delete the legacy `finance_cloud_state` row. It creates the V2 record store separately so the old cloud payload remains available as migration evidence until it is removed manually.
+The migration does not delete or alter the V2 cloud tables.
 
-## New Supabase project
+## 3. Configure the hosted app
 
-Run the SQL files in this order:
-
-```text
-supabase/schema.sql
-supabase/security-policies.sql
-supabase/payment-operations.sql
-supabase/security-hardening-v12-19-1.sql
-supabase/cloud-sync-v2.sql
-```
-
-Then review:
-
-```text
-supabase/rls-smoke-tests.sql
-supabase/rls-smoke-tests-v2.sql
-```
-
-The V2 migration creates:
-
-- `finance_sync_profiles` — cloud protocol, audit cursor, and minimum supported writer version
-- `finance_sync_records` — one current row per synchronized record
-- `finance_sync_batches` — idempotent all-or-nothing commit results
-- `finance_sync_audit` — immutable record-level history used for incremental pull and Realtime notification
-
-It also adds version, cursor, push, and revocation fields to `finance_cloud_devices`.
-
-## Browser configuration
-
-The hosted `sync-config.js` may contain only:
+Use a browser-safe configuration:
 
 ```js
 window.FINANCE_SYNC_CONFIG = {
@@ -73,74 +33,62 @@ window.FINANCE_SYNC_CONFIG = {
 };
 ```
 
-The same values can instead be saved separately on each device under **Settings → Cloud Sync & Devices**.
+A device-only configuration may instead be saved in **Settings → Cloud Sync & Devices** on each device.
 
-## How Cloud Sync V2 works
+## 4. Create the first encrypted profile
 
-- Every app save completes in local browser storage first.
-- The client compares the previous and current normalized finance data.
-- Only added, changed, reordered, or deleted records enter the pending queue.
-- Pending records are committed through RPC functions in atomic batches.
-- The database verifies each record’s expected revision before applying any record in the batch.
-- A successful commit increments record revisions and writes immutable audit events.
-- Other open devices receive an audit notification and pull only events after their saved cursor.
-- Offline or failed records retry with a capped exponential delay.
-- Deleted records remain as cloud tombstones so an older device cannot recreate them accidentally.
+1. Open V13.0.0 on the MacBook.
+2. Sign in to Supabase.
+3. Open **Settings → Profiles & Security**.
+4. Confirm the active local profile contains the expected V12 records.
+5. Create an encrypted personal or household cloud profile.
+6. Choose a strong unique passphrase and save it in a password manager or another secure location.
+7. Return to **Cloud Sync & Devices** and select **Upload this device’s data**.
+8. Wait for **Synced**.
 
-## Financial-operation protection
+Every outgoing record payload is encrypted in the browser. Supabase receives ciphertext envelopes and synchronization metadata.
 
-Payment and restoration changes may affect an expense, one or more account values, and ledger entries. V12.21.0 sends these related records through one financial-operation RPC. The database either commits the complete batch or rejects the complete batch.
+## 5. Connect another device
 
-Payment-operation IDs remain unique and append-only. A repeated network request can return the previously committed result without applying the same deduction again.
+1. Update or reinstall the hosted PWA on the second device.
+2. Sign in with an authorized account.
+3. For a personal profile, open **Profiles & Security**, select **Find existing profiles**, and connect the matching profile with its passphrase.
+4. For a household profile, accept an invitation code, then enter the shared profile passphrase received through a separate trusted channel.
+5. Unlock the profile and choose **Download cloud data**.
+6. Confirm balances, ledger totals, and profile name match.
 
-## Conflict controls
+## Household roles
 
-A conflict occurs when the cloud revision no longer matches the revision used by the pending local record.
+- **Owner:** Full finance access, invitation management, role changes, member removal, restore points, and device revocation.
+- **Editor:** Can read and edit synchronized finance records.
+- **Viewer:** Can read and download records but cannot save or upload financial changes.
 
-The Cloud Sync panel provides:
+## Encryption and metadata
 
-- **Retry** — automatically merges non-overlapping object fields and retries
-- **Discard local** — removes the pending local version and activates the cloud-confirmed record
-- **Keep this version** — explicitly rebases the local version onto the current cloud revision and resubmits it
-- **Download copies** — exports the base, local, and remote versions for review
+Encrypted with the profile passphrase:
 
-Overlapping fields are never silently merged. Payment and account-related batches remain atomic.
+- Record payloads
+- Cloud restore-point snapshots
+- Portable `.mfrx` backups
 
-## Sync Health
+Visible as operational metadata:
 
-Sync Health displays:
+- Profile and user membership
+- Collection and record identifiers
+- Revisions, deletion markers, timestamps, app version, and device metadata
 
-- Cloud Schema and protocol
-- Last audit cursor
-- Last successful pull and push
-- Pending and conflicted record counts
-- Installed app version
-- Minimum writer version required by the cloud
-- Recent cloud audit events
+The active local browser copy remains plaintext. The optional app lock is a screen-access control, not localStorage encryption.
 
-A device running below the cloud minimum is allowed to read but is blocked from committing changes until it updates.
+## MFA and passkeys
 
-## Remote device removal
+Authenticator MFA may be enrolled after normal password sign-in and recovery have been tested. Do not enforce an AAL2-only policy until every intended device can complete MFA.
 
-Removing a connected device sets a server-side revocation timestamp. The revoked device is blocked from future V2 registration and commits and clears its local cloud session the next time it connects. Remove the device’s browser/site data separately when physical access is available.
+Passkeys are experimental. They require supported Supabase project configuration, a compatible browser, a secure HTTPS origin, and the V13 pinned Supabase client. Keep password sign-in and account recovery available.
 
-## Security boundaries
+## Recovery
 
-- V2 tables have Row Level Security enabled and forced.
-- Authenticated browser users may select only rows owned by their `auth.uid()`.
-- Direct browser insert, update, and delete access to V2 rows is revoked.
-- Writes occur through authenticated security-definer RPC functions with explicit user, device, revision, and version checks.
-- Anonymous access is revoked.
-- Cloud sync is not a replacement for independent backups.
-
-## V12.22.0 budget synchronization
-
-No additional Supabase migration is required after Cloud Sync V2 is installed.
-
-V12.22.0 synchronizes these new record types through the existing Cloud Schema V2 record tables and RPC functions:
-
-- `monthlyBudgets` — one monthly plan record keyed by `YYYY-MM`
-- `budgetTemplates` — reusable category-plan templates
-- `budgetSettings` — savings-allocation, low-balance, and forecast preferences
-
-Open the MacBook online first after deployment, wait for **Synced**, and then open the iPhone. Budget-plan changes remain local-first and are included in the same pending-record, conflict, audit, and revision safeguards as other Cloud Sync V2 records.
+- Export both a normal pre-migration V12 backup and an encrypted V13 `.mfrx` backup.
+- Test the encrypted backup passphrase before relying on it.
+- Create encrypted cloud restore points before large changes.
+- Keep the profile passphrase separate from the backup file.
+- A lost passphrase cannot be recovered by Supabase or this app.

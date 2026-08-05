@@ -1,5 +1,24 @@
 # Release Checklist
 
+
+## V13.0.0 Cloud, encryption, and profiles
+
+- [ ] Clean V12.25.0 repository passes `npm run quality` before applying V13.
+- [ ] A fresh V12 recovery backup exists before running the V3 SQL migration.
+- [ ] `supabase/cloud-profiles-v13.sql` succeeds before V13 Cloud Sync is enabled.
+- [ ] V2 tables and rollback SQL remain unchanged.
+- [ ] Cloud payloads are AES-256-GCM envelopes before RPC submission.
+- [ ] Incoming cloud payloads are decrypted only after profile membership and passphrase unlock.
+- [ ] Viewer profiles cannot save locally or commit cloud changes.
+- [ ] Owner/Editor financial operations preserve idempotent operation IDs.
+- [ ] Household invitation codes do not contain the encryption passphrase.
+- [ ] Wrong passphrases and modified ciphertext fail without replacing active data.
+- [ ] Encrypted `.mfrx` export and restore are tested with sample data.
+- [ ] The app lock is described as screen access control, not localStorage encryption.
+- [ ] Passkeys are labeled experimental and password recovery remains available.
+- [ ] No Supabase secret, service-role key, passphrase, or derived encryption key is committed.
+- [ ] MacBook-first upload and iPhone download are tested after deployment.
+
 ## Before editing
 
 - [ ] Inspect the latest `main` files and commits.

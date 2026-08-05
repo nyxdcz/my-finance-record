@@ -1,4 +1,37 @@
-# My Finance Records · V12.25.0 PWA
+# My Finance Records · V13.0.0 PWA
+
+## V13.0.0 · Major Cloud, Encryption & Profile Architecture
+
+V13 introduces separate **personal** and **household** finance profiles without changing Finance Schema 12. Each profile keeps its own accounts, ledger, budgets, reports, reminders, templates, and synchronized records. Household profiles support **Owner**, **Editor**, and **Viewer** roles; Viewer profiles are read-only in the app and database.
+
+Cloud Sync now uses **Cloud Schema V3**. Before upload, each record payload is encrypted in the browser with **AES-256-GCM** using a key derived from the profile passphrase with **PBKDF2-SHA-256**. Supabase stores the encrypted envelope plus necessary synchronization metadata such as profile ID, collection, record ID, revision, timestamps, device ID, and app version. The profile passphrase and derived key are not sent to Supabase.
+
+### Required upgrade order
+
+1. Open V12.25.0 on the MacBook, wait for **Synced**, and export a normal recovery backup.
+2. Run `supabase/cloud-profiles-v13.sql` in the Supabase SQL Editor.
+3. Deploy V13.0.0.
+4. Open the MacBook app first, sign in, then open **Settings → Profiles & Security**.
+5. Create an encrypted cloud profile and save its passphrase outside the app.
+6. In **Cloud Sync & Devices**, choose **Upload this device’s data** when the MacBook is authoritative.
+7. Create an encrypted `.mfrx` backup and verify that it can be decrypted.
+8. Update the iPhone, sign in, use **Find existing profiles** (or accept a household invitation), connect the same profile with its passphrase, and choose **Download cloud data**.
+
+See `V13_MIGRATION_GUIDE.md` and `CLOUD_SYNC_SETUP.md` for the controlled procedure.
+
+### Security boundaries
+
+- **Encrypted:** Cloud record payloads, encrypted cloud restore points, and `.mfrx` portable backups.
+- **Not encrypted by the profile passphrase:** The active browser working copy in localStorage, record identifiers, collection names, revisions, timestamps, user/profile membership, and device metadata.
+- The optional app lock blocks casual screen access on that browser. It is not full local database encryption and does not protect an already-unlocked operating-system account from browser-storage inspection.
+- Losing the profile passphrase means encrypted cloud records and encrypted backups cannot be recovered by the app or Supabase.
+- Household members must receive the encryption passphrase through a separate trusted channel. An invitation code grants profile membership but does not reveal the passphrase.
+- Passkey controls are experimental and depend on project configuration, supported browsers, and the Supabase client. Password sign-in remains available.
+
+### Preserved
+
+Finance Schema 12, Ledger Version 1, Budget Version 1, Insights Version 1, Productivity Version 1, Reminders Version 1, account balances, payment operation IDs, V12 Cloud Schema V2 tables, manifest, offline page, icons, and local-first use remain preserved. V2 data is not deleted by the V13 migration, providing a controlled rollback reference.
+
 
 ## V12.25.0 · Reminders & Scheduled Alerts
 

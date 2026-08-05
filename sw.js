@@ -1,6 +1,6 @@
 "use strict";
-const APP_VERSION = "12.25.0";
-const CACHE_VERSION = "finance-v12-20260806-v12250-reminders-scheduled-alerts";
+const APP_VERSION = "13.0.0";
+const CACHE_VERSION = "finance-v13-20260806-v13000-cloud-encryption-profiles";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const DB_NAME = "simple-finance-project-records-v12-db";
@@ -13,6 +13,8 @@ const APP_SHELL = [
   asset("./offline.html"),
   asset("./manifest.webmanifest"),
   asset("./version.json"),
+  asset("./security-profiles.js"),
+  asset("./security-profiles.css"),
   asset("./cloud-sync.js"),
   asset("./account-ledger.js"),
   asset("./account-ledger.css"),

@@ -1,22 +1,24 @@
 "use strict";
 
-/* My Finance Records V12.25.0 · Record-level Cloud Sync 2.0.
-   Local storage remains the immediate working copy. Cloud Schema V2 exchanges only
-   changed records, commits related changes atomically, and preserves an immutable audit trail. */
-(function financeCloudSyncV2Bootstrap() {
-  const APP_VERSION_FALLBACK = "12.25.0";
-  const APP_VERSION_CODE = 120250;
-  const CLOUD_SCHEMA_VERSION = 2;
+/* My Finance Records V13.0.0 · Encrypted profile-scoped Cloud Sync 3.0.
+   Local storage remains the immediate working copy. Cloud Schema V3 exchanges only
+   changed encrypted records, commits related changes atomically, and preserves an immutable audit trail. */
+(function financeCloudSyncV3Bootstrap() {
+  const APP_VERSION_FALLBACK = "13.0.0";
+  const APP_VERSION_CODE = 130000;
+  const CLOUD_SCHEMA_VERSION = 3;
   const CORE_SCHEMA_VERSION = 12;
-  const META_KEY = "simple-finance-cloud-sync-v2";
-  const BASE_KEY = "simple-finance-cloud-record-base-v2";
-  const QUEUE_KEY = "simple-finance-cloud-record-queue-v2";
-  const CONFLICT_KEY = "simple-finance-cloud-record-conflicts-v2";
+  const PROFILE_ARCH = () => window.FinanceProfileArchitecture || null;
+  const LOCAL_PROFILE_ID = PROFILE_ARCH()?.activeProfileId?.() || "profile-personal";
+  const META_KEY = `simple-finance-cloud-sync-v3:${LOCAL_PROFILE_ID}`;
+  const BASE_KEY = `simple-finance-cloud-record-base-v3:${LOCAL_PROFILE_ID}`;
+  const QUEUE_KEY = `simple-finance-cloud-record-queue-v3:${LOCAL_PROFILE_ID}`;
+  const CONFLICT_KEY = `simple-finance-cloud-record-conflicts-v3:${LOCAL_PROFILE_ID}`;
   const CONFIG_KEY = "simple-finance-cloud-config-v1";
   const LEGACY_META_KEY = "simple-finance-cloud-sync-v1";
   const LEGACY_CLOUD_TABLE = "finance_cloud_state";
-  const DEVICE_TABLE = "finance_cloud_devices";
-  const AUDIT_TABLE = "finance_sync_audit";
+  const DEVICE_TABLE = "finance_v3_devices";
+  const AUDIT_TABLE = "finance_v3_audit";
   const SYNC_DELAY = 850;
   const MAX_PULL_PAGES = 12;
   const MAX_BATCH_RECORDS = 350;
@@ -53,6 +55,8 @@
     enabled:true,
     autoSync:true,
     initializedUserId:"",
+    initializedProfileId:"",
+    profileRole:"owner",
     lastAuditId:0,
     lastSyncAt:"",
     lastPullAt:"",
@@ -75,6 +79,42 @@
 
   function appVersion() {
     return typeof APP_VERSION !== "undefined" ? APP_VERSION : APP_VERSION_FALLBACK;
+  }
+
+  function cloudProfileId() { return String(PROFILE_ARCH()?.cloudProfileId?.() || ""); }
+  function profileRole() { return String(PROFILE_ARCH()?.activeRole?.() || "owner"); }
+  function profileCanWrite() { return PROFILE_ARCH()?.canWrite?.() !== false; }
+  function initializedScope() { return cloudUser && cloudProfileId() ? `${cloudUser.id}:${cloudProfileId()}` : ""; }
+  function requireCloudProfile({ write = false } = {}) {
+    const architecture = PROFILE_ARCH();
+    if (!architecture) throw new Error("Profile architecture is unavailable. Reload V13.0.0.");
+    if (!cloudProfileId()) throw new Error("Open Settings → Profiles & Security and create or join an encrypted cloud profile first.");
+    if (!architecture.isCloudUnlocked?.()) throw new Error("Unlock this finance profile’s encryption passphrase before cloud sync.");
+    if (write && !profileCanWrite()) throw new Error("This Viewer profile is read-only. It can download cloud changes but cannot upload records.");
+    return cloudProfileId();
+  }
+
+  async function encryptRecordPayload(payload, collection, recordId) {
+    const architecture = PROFILE_ARCH();
+    if (!architecture?.encryptCloudPayload) throw new Error("Client-side cloud encryption is unavailable.");
+    return architecture.encryptCloudPayload(payload || {}, { collection, recordId });
+  }
+
+  async function decryptRecordPayload(payload, collection, recordId) {
+    const architecture = PROFILE_ARCH();
+    if (!payload?.__financeEncrypted) throw new Error(`Cloud record ${collection}/${recordId} is not encrypted.`);
+    if (!architecture?.decryptCloudPayload) throw new Error("Client-side cloud decryption is unavailable.");
+    return architecture.decryptCloudPayload(payload, { collection, recordId });
+  }
+
+  async function decryptRow(raw) {
+    const collection = String(raw?.collection || "");
+    const recordId = String(raw?.record_id ?? raw?.recordId ?? "");
+    return { ...raw, payload:await decryptRecordPayload(raw?.payload, collection, recordId) };
+  }
+
+  async function decryptRows(rows = []) {
+    return Promise.all((rows || []).map(decryptRow));
   }
 
   function clone(value) {
@@ -359,11 +399,12 @@
     try {
       const next = fromRecordStore(effectiveRecordStore(), typeof data !== "undefined" ? data : {});
       data = normalizeData(clone(next));
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      if (typeof persistFinanceDataRaw === "function") persistFinanceDataRaw(message);
+      else localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
       lastObservedData = clone(data);
       if (typeof renderAll === "function") renderAll(false);
       if (typeof renderV12Settings === "function") renderV12Settings();
-      try { if (typeof addSyncHistory === "function") addSyncHistory(message, "success", { cloudSchemaVersion:2, auditId:state.lastAuditId }); } catch (error) {}
+      try { if (typeof addSyncHistory === "function") addSyncHistory(message, "success", { cloudSchemaVersion:3, profileId:cloudProfileId(), auditId:state.lastAuditId }); } catch (error) {}
     } finally { suppressQueue = false; }
   }
 
@@ -378,7 +419,7 @@
   }
 
   function queueDiff(beforeData, afterData, reason = "Local save") {
-    if (suppressQueue || state.initializedUserId !== cloudUser?.id) return;
+    if (suppressQueue || state.initializedUserId !== initializedScope()) return;
     const before = toRecordMap(beforeData);
     const after = toRecordMap(afterData);
     const keys = new Set([...Object.keys(before), ...Object.keys(after)]);
@@ -487,25 +528,25 @@
     if (!connected) return;
     const style = document.createElement("style");
     style.textContent = `
-      .cloud-v2-health-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.cloud-v2-health-grid>div{padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface-soft);min-width:0}.cloud-v2-health-grid span,.cloud-v2-health-grid strong{display:block;overflow-wrap:anywhere}.cloud-v2-health-grid span{color:var(--muted);font-size:.61rem}.cloud-v2-health-grid strong{margin-top:3px;font-size:.72rem}.cloud-pending-list{display:grid;gap:7px}.cloud-pending-item{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface-soft)}.cloud-pending-item[data-status="conflict"]{border-color:color-mix(in srgb,var(--orange) 42%,var(--line));background:var(--orange-soft)}.cloud-pending-item[data-status="error"]{border-color:color-mix(in srgb,var(--red) 35%,var(--line));background:var(--red-soft)}.cloud-pending-item strong,.cloud-pending-item small{display:block;overflow-wrap:anywhere}.cloud-pending-item strong{font-size:.69rem}.cloud-pending-item small{margin-top:2px;color:var(--muted);font-size:.59rem}.cloud-pending-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:5px}.cloud-audit-list{display:grid;gap:5px;max-height:250px;overflow:auto}.cloud-audit-row{display:grid;grid-template-columns:90px minmax(0,1fr) auto;gap:8px;align-items:center;padding:7px 8px;border-bottom:1px solid var(--line);font-size:.62rem}.cloud-audit-row small{color:var(--muted)}@media(max-width:900px){.cloud-v2-health-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:700px){.cloud-v2-health-grid{grid-template-columns:1fr}.cloud-pending-item{grid-template-columns:1fr}.cloud-pending-actions{justify-content:flex-start}.cloud-pending-actions .button{min-height:42px}.cloud-audit-row{grid-template-columns:1fr}.cloud-device-table th:nth-child(3),.cloud-device-table td:nth-child(3){display:table-cell}}
+      .cloud-v3-health-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.cloud-v3-health-grid>div{padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface-soft);min-width:0}.cloud-v3-health-grid span,.cloud-v3-health-grid strong{display:block;overflow-wrap:anywhere}.cloud-v3-health-grid span{color:var(--muted);font-size:.61rem}.cloud-v3-health-grid strong{margin-top:3px;font-size:.72rem}.cloud-pending-list{display:grid;gap:7px}.cloud-pending-item{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface-soft)}.cloud-pending-item[data-status="conflict"]{border-color:color-mix(in srgb,var(--orange) 42%,var(--line));background:var(--orange-soft)}.cloud-pending-item[data-status="error"]{border-color:color-mix(in srgb,var(--red) 35%,var(--line));background:var(--red-soft)}.cloud-pending-item strong,.cloud-pending-item small{display:block;overflow-wrap:anywhere}.cloud-pending-item strong{font-size:.69rem}.cloud-pending-item small{margin-top:2px;color:var(--muted);font-size:.59rem}.cloud-pending-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:5px}.cloud-audit-list{display:grid;gap:5px;max-height:250px;overflow:auto}.cloud-audit-row{display:grid;grid-template-columns:90px minmax(0,1fr) auto;gap:8px;align-items:center;padding:7px 8px;border-bottom:1px solid var(--line);font-size:.62rem}.cloud-audit-row small{color:var(--muted)}@media(max-width:900px){.cloud-v3-health-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:700px){.cloud-v3-health-grid{grid-template-columns:1fr}.cloud-pending-item{grid-template-columns:1fr}.cloud-pending-actions{justify-content:flex-start}.cloud-pending-actions .button{min-height:42px}.cloud-audit-row{grid-template-columns:1fr}.cloud-device-table th:nth-child(3),.cloud-device-table td:nth-child(3){display:table-cell}}
     `;
     document.head.appendChild(style);
 
     const controls = connected.firstElementChild;
     controls?.insertAdjacentHTML("afterend", `
       <article class="card" id="cloudSyncHealthCard">
-        <div class="card-header"><div><h3>Sync Health</h3><p>Record-level Cloud Sync 2.0 status and compatibility</p></div><span class="v12-chip info" id="cloudProtocolChip">Cloud Schema V2</span></div>
-        <div class="cloud-v2-health-grid">
-          <div><span>Protocol</span><strong>Record-level V2</strong></div>
+        <div class="card-header"><div><h3>Sync Health</h3><p>Encrypted Cloud Sync 3.0 status and compatibility</p></div><span class="v12-chip info" id="cloudProtocolChip">Cloud Schema V3</span></div>
+        <div class="cloud-v3-health-grid">
+          <div><span>Protocol</span><strong>Encrypted record-level V3</strong></div>
           <div><span>Last cloud audit</span><strong id="cloudAuditCursor">0</strong></div>
           <div><span>Last pull</span><strong id="cloudLastPull">Never</strong></div>
           <div><span>Last push</span><strong id="cloudLastPush">Never</strong></div>
           <div><span>Pending records</span><strong id="cloudHealthPending">0</strong></div>
           <div><span>Conflicts</span><strong id="cloudHealthConflicts">0</strong></div>
           <div><span>This app</span><strong id="cloudHealthAppVersion">V${appVersion()}</strong></div>
-          <div><span>Minimum writer</span><strong id="cloudHealthRequiredVersion">V12.25.0</strong></div>
+          <div><span>Minimum writer</span><strong id="cloudHealthRequiredVersion">V13.0.0</strong></div>
         </div>
-        <p class="v12-help" id="cloudHealthMessage">Only changed records are exchanged. Related payment and ledger changes are committed together.</p>
+        <p class="v12-help" id="cloudHealthMessage">Only changed AES-256-GCM encrypted records are exchanged. Related payment and ledger changes are committed together.</p>
       </article>
       <article class="card" id="cloudPendingCard">
         <div class="card-header"><div><h3>Pending record changes</h3><p>Review records waiting for cloud confirmation</p></div><span class="v12-chip success" id="cloudPendingChip">Nothing pending</span></div>
@@ -513,7 +554,7 @@
       </article>
       <article class="card" id="cloudAuditCard">
         <div class="card-header"><div><h3>Recent cloud audit</h3><p>Immutable record activity received by this device</p></div><span class="v12-chip info">Latest 30</span></div>
-        <div class="cloud-audit-list" id="cloudAuditList"><div class="v12-empty">No Cloud Schema V2 activity has been received yet.</div></div>
+        <div class="cloud-audit-list" id="cloudAuditList"><div class="v12-empty">No Cloud Schema V3 activity has been received yet.</div></div>
       </article>
     `);
   }
@@ -521,7 +562,7 @@
   function renderCloudStats() {
     injectV2Ui();
     const configured = configStatus().ok;
-    const ready = Boolean(cloudUser && state.initializedUserId === cloudUser.id);
+    const ready = Boolean(cloudUser && state.initializedUserId === initializedScope());
     const disconnected = document.getElementById("cloudDisconnectedSection");
     const connected = document.getElementById("cloudConnectedSection");
     if (disconnected) disconnected.hidden = !configured || Boolean(cloudUser);
@@ -534,7 +575,7 @@
     const device = document.getElementById("cloudCurrentDevice"); if (device) device.textContent = currentDeviceName();
     const deviceInput = document.getElementById("cloudDeviceName"); if (deviceInput && document.activeElement !== deviceInput) deviceInput.value = currentDeviceName();
     const auto = document.getElementById("cloudAutoSync"); if (auto) auto.checked = state.autoSync !== false;
-    const first = document.getElementById("cloudFirstSyncCard"); if (first) first.hidden = !cloudUser || ready;
+    const first = document.getElementById("cloudFirstSyncCard"); if (first) first.hidden = !cloudUser || ready || !cloudProfileId() || !PROFILE_ARCH()?.isCloudUnlocked?.();
     const config = getStoredConfig();
     const urlInput = document.getElementById("cloudConfigUrl"); if (urlInput && !urlInput.value) urlInput.value = config.supabaseUrl;
     const keyInput = document.getElementById("cloudConfigKey"); if (keyInput && !keyInput.value) keyInput.value = config.supabasePublishableKey;
@@ -556,7 +597,7 @@
     const health = document.getElementById("cloudHealthMessage");
     if (health) health.textContent = (state.requiredAppVersionCode || 0) > APP_VERSION_CODE
       ? `This cloud account requires ${versionFromCode(state.requiredAppVersionCode)} or newer. Update this device before writing records.`
-      : state.lastError || "Only changed records are exchanged. Related payment and ledger changes are committed together.";
+      : state.lastError || "Only changed AES-256-GCM encrypted records are exchanged. Related payment and ledger changes are committed together.";
 
     const chip = document.getElementById("cloudPendingChip");
     if (chip) { chip.textContent = pendingCount() ? `${pendingCount()} waiting` : "Nothing pending"; chip.className = `v12-chip ${conflictCount() ? "warning" : pendingCount() ? "info" : "success"}`; }
@@ -612,7 +653,7 @@
     const createClient = library?.createClient || library?.default?.createClient || window.supabase?.createClient;
     if (typeof createClient !== "function") throw new Error("Supabase client could not be loaded.");
     client = createClient(config.supabaseUrl, config.supabasePublishableKey, {
-      auth:{ persistSession:true, autoRefreshToken:true, detectSessionInUrl:true },
+      auth:{ persistSession:true, autoRefreshToken:true, detectSessionInUrl:true, experimental:{ passkey:true } },
       realtime:{ params:{ eventsPerSecond:8 } },
       global:{ headers:{ "x-client-info":`my-finance-records/${appVersion()}` } }
     });
@@ -630,7 +671,7 @@
     const result = await sdk.rpc(name,args);
     if (result.error) {
       const message = result.error.message || String(result.error);
-      if (/finance_sync_|schema cache|could not find the function/i.test(message)) throw new Error("Cloud Schema V2 is not installed. Run supabase/cloud-sync-v2.sql in the Supabase SQL Editor.");
+      if (/finance_v3_|schema cache|could not find the function/i.test(message)) throw new Error("Cloud Schema V3 is not installed. Run supabase/cloud-profiles-v13.sql in the Supabase SQL Editor.");
       throw result.error;
     }
     return result.data || {};
@@ -686,13 +727,15 @@
   }
 
   async function registerDevice() {
-    const result = await rpc("finance_sync_register_device", {
-      p_device_id:currentDeviceId(), p_device_name:currentDeviceName(),
+    const profileId = requireCloudProfile();
+    const result = await rpc("finance_v3_register_device", {
+      p_profile_id:profileId, p_device_id:currentDeviceId(), p_device_name:currentDeviceName(),
       p_platform:navigator.userAgent || navigator.platform || "Browser",
       p_app_version:appVersion(), p_app_version_code:APP_VERSION_CODE,
       p_last_pull_audit_id:Number(state.lastAuditId || 0)
     });
     if (result.status === "revoked") { await handleRevoked(result); return false; }
+    state.profileRole = result.role || profileRole();
     return true;
   }
 
@@ -710,13 +753,25 @@
     state.enabled = true;
     state.currentDeviceId = currentDeviceId();
     state.currentDeviceName = currentDeviceName();
+    if (!cloudProfileId()) {
+      persist();
+      setStatus("Cloud profile required", "Open Profiles & Security to create or join an encrypted Cloud Schema V3 profile.", "warning");
+      renderCloudStats();
+      return;
+    }
+    if (!PROFILE_ARCH()?.isCloudUnlocked?.()) {
+      persist();
+      setStatus("Encryption locked", "Unlock this profile’s passphrase in Profiles & Security before synchronizing.", "warning");
+      renderCloudStats();
+      return;
+    }
     persist();
     if (!await registerDevice()) return;
     await setupRealtime();
-    const first = state.initializedUserId !== cloudUser.id;
+    const first = state.initializedUserId !== initializedScope();
     if (first) {
       await prepareFirstSyncChoices();
-      setStatus("Cloud upgrade ready", "Choose how this device should initialize Record-level Cloud Sync 2.0.", "warning");
+      setStatus("Cloud upgrade ready", "Choose how this device should initialize encrypted, profile-scoped Cloud Sync 3.0.", "warning");
       renderCloudStats();
       return;
     }
@@ -724,10 +779,13 @@
   }
 
   async function snapshot() {
-    const result = await rpc("finance_sync_snapshot", { p_device_id:currentDeviceId() });
+    const profileId = requireCloudProfile();
+    const result = await rpc("finance_v3_snapshot", { p_profile_id:profileId, p_device_id:currentDeviceId() });
     if (result.status === "revoked") await handleRevoked(result);
+    if (result.status === "ok") result.records = await decryptRows(result.records || []);
     state.requiredAppVersionCode = Number(result.min_app_version_code || APP_VERSION_CODE);
     state.cloudSchemaVersion = Number(result.cloud_schema_version || CLOUD_SCHEMA_VERSION);
+    state.profileRole = result.role || profileRole();
     persist();
     return result;
   }
@@ -747,26 +805,26 @@
   async function prepareFirstSyncChoices() {
     const snap = await snapshot();
     if (snap.status === "revoked") return;
-    const v2Exists = Array.isArray(snap.records) && snap.records.length > 0;
-    const legacy = v2Exists ? null : await fetchLegacyPayload();
-    const cloudExists = v2Exists || Boolean(legacyPayloadData(legacy));
+    const v3Exists = Array.isArray(snap.records) && snap.records.length > 0;
+    const legacy = null;
+    const cloudExists = v3Exists;
     const download = document.getElementById("cloudInitialDownload");
     const merge = document.getElementById("cloudInitialMerge");
     if (download) download.disabled = !cloudExists;
     if (merge) merge.disabled = !cloudExists;
     const message = document.getElementById("cloudFirstSyncMessage");
-    if (message) message.textContent = v2Exists
-      ? "This account already uses Record-level Cloud Sync 2.0. Download it on a new device or merge carefully."
+    if (message) message.textContent = v3Exists
+      ? "This account already uses Encrypted Cloud Sync 3.0. Download it on a new device or merge carefully."
       : legacy
-        ? "Cloud Sync 1.0 data was found. Choose Upload, Download, or Review and merge to migrate it safely to Cloud Schema V2."
-        : "Cloud Schema V2 is empty. Upload this device to create the first record-level cloud copy.";
+        ? "A legacy Cloud Sync V1 copy was found. Use V12.25.0 to recover it first, then return to V13.0.0."
+        : "Cloud Schema V3 is empty. Upload this device to create the first record-level cloud copy.";
     const upload = document.getElementById("cloudInitialUpload");
     if (!cloudExists && upload) upload.checked = true;
     renderCloudStats();
   }
 
   function recoveryPoint(label) {
-    const backup = { format:"my-finance-cloud-recovery-v2", label, createdAt:nowIso(), appVersion:appVersion(), schemaVersion:12, cloudSchemaVersion:2, data:clone(data), pending:clone(pending) };
+    const backup = { format:"my-finance-cloud-recovery-v3", label, createdAt:nowIso(), appVersion:appVersion(), schemaVersion:12, cloudSchemaVersion:3, data:clone(data), pending:clone(pending) };
     try { localStorage.setItem(`simple-finance-cloud-recovery-${Date.now()}`,JSON.stringify(backup)); } catch (error) {}
     return backup;
   }
@@ -786,46 +844,61 @@
     return changes;
   }
 
-  async function commitRawChanges(changes,{ migratedFromV1=false, operations=[] } = {}) {
+  async function commitRawChanges(changes,{ migratedFromV2=false, operations=[] } = {}) {
+    const profileId = requireCloudProfile({ write:true });
     let latest = Number(state.lastAuditId || 0);
     for (let offset=0; offset<changes.length; offset += MAX_BATCH_RECORDS) {
       const chunk = changes.slice(offset,offset+MAX_BATCH_RECORDS);
+      const encryptedChanges = await Promise.all(chunk.map(toRpcChange));
       const batchId = uid("batch");
       let result;
       if (Array.isArray(operations) && operations.length && changes.length <= MAX_BATCH_RECORDS) {
-        result = await rpc("finance_sync_commit_financial_operations", {
-          p_batch_id:`financial-set:${operations.map(item => item.operationId).sort().join("+").slice(0,100)}:${checksum(chunk.map(toRpcChange))}`,
+        result = await rpc("finance_v3_commit_financial_operations", {
+          p_profile_id:profileId,
+          p_batch_id:`financial-set:${operations.map(item => item.operationId).sort().join("+").slice(0,100)}:${checksum(encryptedChanges)}`,
           p_operations:operations.map(item => ({
             operation_id:item.operationId, operation_type:item.operationType, expense_id:item.expenseId,
             account_name:item.accountName, amount:Number(item.amount || 0)
           })),
           p_device_id:currentDeviceId(), p_app_version:appVersion(), p_app_version_code:APP_VERSION_CODE,
-          p_changes:chunk.map(toRpcChange)
+          p_changes:encryptedChanges
         });
       } else {
-        result = await rpc("finance_sync_commit_batch", {
-          p_batch_id:batchId, p_device_id:currentDeviceId(), p_app_version:appVersion(),
-          p_app_version_code:APP_VERSION_CODE, p_changes:chunk.map(toRpcChange), p_migrated_from_v1:Boolean(migratedFromV1)
+        result = await rpc("finance_v3_commit_batch", {
+          p_profile_id:profileId, p_batch_id:batchId, p_device_id:currentDeviceId(), p_app_version:appVersion(),
+          p_app_version_code:APP_VERSION_CODE, p_changes:encryptedChanges, p_migrated_from_v2:Boolean(migratedFromV2)
         });
       }
-      if (result.status !== "committed") return result;
-      applyCommitResult(result);
+      if (result.status !== "committed") {
+        if (result.status === "conflict") result.conflicts = await decryptConflictRows(result.conflicts || []);
+        return result;
+      }
+      await applyCommitResult(result);
       latest = Math.max(latest,Number(result.latest_audit_id || 0));
     }
     state.lastAuditId = latest;
     return { status:"committed",latest_audit_id:latest };
   }
 
-  function toRpcChange(item) {
+  async function toRpcChange(item) {
     return {
-      collection:item.collection, record_id:item.recordId, payload:item.payload || {}, sort_index:Number(item.sortIndex || 0),
-      deleted:Boolean(item.deleted), base_revision:Number(item.baseRevision || 0),
+      collection:item.collection, record_id:item.recordId,
+      payload:await encryptRecordPayload(item.payload || {}, item.collection, item.recordId),
+      sort_index:Number(item.sortIndex || 0), deleted:Boolean(item.deleted), base_revision:Number(item.baseRevision || 0),
       min_writer_version_code:Number(item.minWriterVersionCode || APP_VERSION_CODE)
     };
   }
 
-  function applyCommitResult(result) {
-    (result.records || []).forEach(raw => {
+  async function decryptConflictRows(rows = []) {
+    return Promise.all((rows || []).map(async remote => {
+      if (!remote?.remote_payload?.__financeEncrypted) return remote;
+      return { ...remote, remote_payload:await decryptRecordPayload(remote.remote_payload, remote.collection, remote.record_id) };
+    }));
+  }
+
+  async function applyCommitResult(result) {
+    const records = await decryptRows(result.records || []);
+    records.forEach(raw => {
       const row = recordFromRow(raw);
       const key = recordKey(row.collection,row.recordId);
       baseRecords[key] = row;
@@ -861,17 +934,12 @@
   async function initializeFirstSync(mode) {
     if (!cloudUser) throw new Error("Sign in first.");
     if (!navigator.onLine) throw new Error("Connect to the internet for the first cloud synchronization.");
-    setStatus("Preparing Cloud Sync 2.0", "Creating a recovery point before migration…", "info");
-    recoveryPoint("Before Cloud Sync 2.0 initialization");
+    setStatus("Preparing Cloud Sync 3.0", "Creating a recovery point before migration…", "info");
+    recoveryPoint("Before Cloud Sync 3.0 initialization");
     const snap = await snapshot();
     if (snap.status === "revoked") return;
     const remoteStore = storeFromSnapshotRows(snap.records || []);
-    const legacy = Object.keys(remoteStore).length ? null : await fetchLegacyPayload();
-    const legacyData = legacyPayloadData(legacy);
-    if (!Object.keys(remoteStore).length && legacyData) {
-      const legacyMap = toRecordMap(normalizeData(clone(legacyData)));
-      Object.entries(legacyMap).forEach(([key,item]) => { remoteStore[key] = { ...item, revision:0, deletedAt:"" }; });
-    }
+    const legacyData = null;
     const localMap = toRecordMap(data);
     let desired = localMap;
 
@@ -887,7 +955,7 @@
 
     if (mode !== "download" || legacyData) {
       const changes = changesBetween(legacyData ? {} : remoteStore,desired);
-      const result = await commitRawChanges(changes,{ migratedFromV1:Boolean(legacyData) });
+      const result = await commitRawChanges(changes,{ migratedFromV2:true });
       if (result.status === "conflict") throw new Error("Cloud records changed during migration. Select Sync now and review the listed records.");
       if (result.status === "upgrade_required") throw new Error(`Cloud requires ${versionFromCode(result.min_app_version_code)} or newer.`);
       if (result.status !== "committed") throw new Error(`Cloud initialization returned ${result.status || "an unknown status"}.`);
@@ -898,25 +966,27 @@
       applyEffectiveRecords(mode === "merge" ? "Device and cloud records merged" : mode === "download" ? "Legacy cloud records migrated" : "Device records uploaded");
     }
 
-    state.initializedUserId = cloudUser.id;
-    state.migratedFromV1 = Boolean(legacyData);
+    state.initializedUserId = initializedScope();
+    state.initializedProfileId = cloudProfileId();
+    state.migratedFromV1 = false;
     state.lastSyncAt = nowIso();
     state.lastPullAt = nowIso();
     persist();
     await registerDevice();
     await loadDevices();
     await loadRecentAudit();
-    setStatus("Synced", "Record-level Cloud Sync 2.0 is ready on this device.", "success");
+    setStatus("Synced", "Encrypted Cloud Sync 3.0 is ready on this device.", "success");
   }
 
   async function pullChanges() {
     let pages=0, changed=false, hasMore=true;
     while (hasMore && pages < MAX_PULL_PAGES) {
-      const result = await rpc("finance_sync_pull", { p_after_audit_id:Number(state.lastAuditId || 0), p_limit:250, p_device_id:currentDeviceId() });
+      const result = await rpc("finance_v3_pull", { p_profile_id:requireCloudProfile(), p_after_audit_id:Number(state.lastAuditId || 0), p_limit:250, p_device_id:currentDeviceId() });
       if (result.status === "revoked") { await handleRevoked(result); return false; }
       if (result.status === "device_missing") { if (!await registerDevice()) return false; pages += 1; continue; }
       if (result.status !== "ok") throw new Error(`Cloud pull returned ${result.status || "an unknown status"}.`);
-      for (const event of result.events || []) {
+      for (const encryptedEvent of result.events || []) {
+        const event = await decryptRow(encryptedEvent);
         applyRemoteEvent(event);
         changed = true;
         state.lastAuditId = Math.max(Number(state.lastAuditId || 0),Number(event.id || 0));
@@ -996,6 +1066,7 @@
   }
 
   async function pushPending() {
+    if (!profileCanWrite()) return false;
     const due = Object.values(pending).filter(item => item.status !== "conflict" && Number(item.nextAttemptAt || 0) <= Date.now()).slice(0,MAX_BATCH_RECORDS);
     if (!due.length) return false;
     due.forEach(item => { item.status="retrying"; });
@@ -1056,8 +1127,9 @@
 
   async function syncNow({ reason="manual" } = {}) {
     if (syncing) return;
-    if (!cloudUser || state.initializedUserId !== cloudUser.id) { renderCloudStats(); return; }
+    if (!cloudUser || state.initializedUserId !== initializedScope()) { renderCloudStats(); return; }
     if (!navigator.onLine) { setStatus("Offline", `${pendingCount()} record${pendingCount()===1?"":"s"} waiting.`, "info"); return; }
+    requireCloudProfile();
     syncing=true;
     setStatus("Syncing", `Checking record-level changes (${reason})…`, "info");
     try {
@@ -1086,8 +1158,8 @@
   async function setupRealtime() {
     if (!client || !cloudUser) return;
     if (realtimeChannel) await client.removeChannel(realtimeChannel);
-    realtimeChannel = client.channel(`finance-sync-v2-${cloudUser.id}`)
-      .on("postgres_changes", { event:"INSERT", schema:"public", table:AUDIT_TABLE, filter:`user_id=eq.${cloudUser.id}` }, payload => {
+    realtimeChannel = client.channel(`finance-sync-v3-${cloudProfileId()}-${cloudUser.id}`)
+      .on("postgres_changes", { event:"INSERT", schema:"public", table:AUDIT_TABLE, filter:`profile_id=eq.${cloudProfileId()}` }, payload => {
         const source=payload?.new?.device_id;
         const auditId=Number(payload?.new?.id || 0);
         if (source===currentDeviceId() || auditId<=Number(state.lastAuditId||0)) return;
@@ -1096,7 +1168,7 @@
         setStatus("Cloud change received", "Downloading changed records from another device…", "info");
         scheduleSync(220);
       })
-      .on("postgres_changes", { event:"UPDATE", schema:"public", table:DEVICE_TABLE, filter:`user_id=eq.${cloudUser.id}` }, payload => {
+      .on("postgres_changes", { event:"UPDATE", schema:"public", table:DEVICE_TABLE, filter:`profile_id=eq.${cloudProfileId()}` }, payload => {
         if (payload?.new?.device_id===currentDeviceId() && payload?.new?.revoked_at) handleRevoked(payload.new).catch(()=>{});
       })
       .subscribe(status => { state.realtimeStatus=String(status || "Connecting"); persist(); renderSyncHealth(); });
@@ -1104,7 +1176,7 @@
 
   async function loadDevices() {
     if (!client || !cloudUser) return renderDevices([]);
-    const result=await client.from(DEVICE_TABLE).select("device_id,device_name,platform,app_version,app_version_code,cloud_schema_version,last_seen_at,last_sync_at,last_push_at,last_pull_audit_id,revoked_at").eq("user_id",cloudUser.id).order("last_seen_at",{ascending:false});
+    const result=await client.from(DEVICE_TABLE).select("user_id,device_id,device_name,platform,app_version,app_version_code,cloud_schema_version,last_seen_at,last_sync_at,last_push_at,last_pull_audit_id,revoked_at").eq("profile_id",requireCloudProfile()).order("last_seen_at",{ascending:false});
     if (result.error) throw result.error;
     renderDevices(result.data || []);
   }
@@ -1115,17 +1187,17 @@
     const table=body.closest("table");
     if (table?.tHead?.rows?.[0]) table.tHead.rows[0].innerHTML="<th>Device</th><th>Status</th><th>App</th><th>Last seen</th><th>Action</th>";
     body.innerHTML=devices.length?devices.map(device=>{
-      const current=device.device_id===currentDeviceId();
+      const current=device.device_id===currentDeviceId() && device.user_id===cloudUser?.id;
       const revoked=Boolean(device.revoked_at);
       const status=revoked?"Revoked":current?"Current":"Connected";
       const tone=revoked?"danger":current?"success":"info";
-      return `<tr><td><strong>${escape(device.device_name||"Device")}</strong><br><small>${escape(device.platform||"Browser")}</small></td><td><span class="v12-chip ${tone}">${status}</span></td><td>V${escape(device.app_version||"Unknown")}<br><small>Cloud V${Number(device.cloud_schema_version||1)}</small></td><td>${escape(formatDateTime(device.last_seen_at))}</td><td>${current||revoked?"—":`<button class="button button-secondary button-small" type="button" data-revoke-cloud-device="${escape(device.device_id)}">Sign out remotely</button>`}</td></tr>`;
+      return `<tr><td><strong>${escape(device.device_name||"Device")}</strong><br><small>${escape(device.platform||"Browser")}</small></td><td><span class="v12-chip ${tone}">${status}</span></td><td>V${escape(device.app_version||"Unknown")}<br><small>Cloud V${Number(device.cloud_schema_version||1)}</small></td><td>${escape(formatDateTime(device.last_seen_at))}</td><td>${current||revoked?"—":`<button class="button button-secondary button-small" type="button" data-revoke-cloud-device="${escape(device.device_id)}" data-revoke-cloud-user="${escape(device.user_id || cloudUser?.id || "")}">Sign out remotely</button>`}</td></tr>`;
     }).join(""):`<tr><td colspan="5"><div class="v12-empty">No cloud devices are listed yet.</div></td></tr>`;
   }
 
-  async function revokeDevice(deviceId) {
-    if (!deviceId || deviceId===currentDeviceId()) return;
-    const result=await rpc("finance_sync_revoke_device",{p_device_id:deviceId,p_revoked_by_device:currentDeviceId()});
+  async function revokeDevice(deviceId,userId = cloudUser?.id) {
+    if (!deviceId || (deviceId===currentDeviceId() && userId===cloudUser?.id)) return;
+    const result=await rpc("finance_v3_revoke_device",{p_profile_id:requireCloudProfile(),p_user_id:userId,p_device_id:deviceId,p_revoked_by_device:currentDeviceId()});
     if (result.status!=="revoked") throw new Error("The device could not be revoked.");
     await loadDevices();
     showToast("The device will sign out the next time it connects.","success");
@@ -1133,11 +1205,11 @@
 
   async function loadRecentAudit() {
     if (!client || !cloudUser) return;
-    const result=await client.from(AUDIT_TABLE).select("id,collection,record_id,action,revision,device_id,app_version,created_at").eq("user_id",cloudUser.id).order("id",{ascending:false}).limit(30);
+    const result=await client.from(AUDIT_TABLE).select("id,collection,record_id,action,revision,device_id,app_version,created_at").eq("profile_id",requireCloudProfile()).order("id",{ascending:false}).limit(30);
     if (result.error) throw result.error;
     const node=document.getElementById("cloudAuditList");
     if (!node) return;
-    node.innerHTML=(result.data||[]).length?(result.data||[]).map(item=>`<div class="cloud-audit-row"><small>#${Number(item.id||0)} · ${escape(item.action)}</small><span>${escape(item.collection)} · ${escape(item.record_id)}</span><small>r${Number(item.revision||0)} · V${escape(item.app_version||"?")}</small></div>`).join(""):`<div class="v12-empty">No Cloud Schema V2 activity has been recorded yet.</div>`;
+    node.innerHTML=(result.data||[]).length?(result.data||[]).map(item=>`<div class="cloud-audit-row"><small>#${Number(item.id||0)} · ${escape(item.action)}</small><span>${escape(item.collection)} · ${escape(item.record_id)}</span><small>r${Number(item.revision||0)} · V${escape(item.app_version||"?")}</small></div>`).join(""):`<div class="v12-empty">No encrypted Cloud Schema V3 activity has been recorded yet.</div>`;
   }
 
   function renderConflicts() {
@@ -1219,9 +1291,9 @@
     document.getElementById("cloudSignOut")?.addEventListener("click",()=>signOut().catch(error=>showToast(error.message,"warning")));
     document.getElementById("cloudAutoSync")?.addEventListener("change",event=>{state.autoSync=Boolean(event.target.checked);persist();if(state.autoSync)scheduleSync(100);renderCloudStats();});
     document.getElementById("cloudInitialConfirm")?.addEventListener("click",async()=>{const mode=document.querySelector('input[name="cloudInitialMode"]:checked')?.value||"upload";try{await initializeFirstSync(mode);}catch(error){setStatus("Cloud initialization failed",error.message,"danger");}});
-    document.getElementById("cloudExportBeforeFirst")?.addEventListener("click",()=>downloadJson(`my-finance-before-cloud-v2-${new Date().toISOString().slice(0,10)}.json`,recoveryPoint("Manual pre-cloud-v2 export")));
+    document.getElementById("cloudExportBeforeFirst")?.addEventListener("click",()=>downloadJson(`my-finance-before-cloud-v3-${new Date().toISOString().slice(0,10)}.json`,recoveryPoint("Manual pre-cloud-v3 export")));
     document.getElementById("cloudSaveDeviceName")?.addEventListener("click",async()=>{const value=document.getElementById("cloudDeviceName").value.trim().slice(0,60);if(!value)return showToast("Enter a device name.","warning");state.currentDeviceName=value;persist();try{const id=currentDeviceId();if(typeof appMeta!=="undefined"&&appMeta.devices?.[id]){appMeta.devices[id].name=value;if(typeof writeMeta==="function")writeMeta();}}catch(error){}try{await registerDevice();await loadDevices();setStatus("Device renamed",value,"success");}catch(error){setStatus("Rename needs sync",error.message,"warning");}});
-    document.getElementById("cloudDevicesBody")?.addEventListener("click",event=>{const button=event.target.closest("[data-revoke-cloud-device]");if(!button)return;if(!confirm("Sign out this device remotely? It will be blocked from future Cloud Sync 2.0 commits and will clear its cloud session the next time it connects."))return;revokeDevice(button.dataset.revokeCloudDevice).catch(error=>showToast(error.message,"warning"));});
+    document.getElementById("cloudDevicesBody")?.addEventListener("click",event=>{const button=event.target.closest("[data-revoke-cloud-device]");if(!button)return;if(!confirm("Sign out this device remotely? It will be blocked from future Cloud Sync 3.0 commits and will clear its cloud session the next time it connects."))return;revokeDevice(button.dataset.revokeCloudDevice,button.dataset.revokeCloudUser).catch(error=>showToast(error.message,"warning"));});
     document.getElementById("cloudPendingList")?.addEventListener("click",handlePendingClick);
     document.getElementById("cloudConflictList")?.addEventListener("click",event=>{const download=event.target.closest("[data-download-cloud-conflict]");if(download)downloadConflict(download.dataset.downloadCloudConflict);else handlePendingClick(event);});
     window.addEventListener("online",()=>{setStatus("Back online","Checking pending record changes…","info");if(state.autoSync!==false)scheduleSync(120);});
@@ -1229,6 +1301,8 @@
     window.addEventListener("focus",()=>{if(state.autoSync!==false&&cloudUser)scheduleSync(220);});
     document.addEventListener("visibilitychange",()=>{if(!document.hidden&&state.autoSync!==false&&cloudUser)scheduleSync(220);});
     window.addEventListener("storage",event=>{if(event.key===STORAGE_KEY&&!suppressQueue){try{const next=normalizeData(JSON.parse(event.newValue||"{}"));queueDiff(lastObservedData,next,"Another tab changed finance records");lastObservedData=clone(next);}catch(error){}}});
+    window.addEventListener("finance:cloud-profile-linked",()=>{state={...defaultState()};baseRecords={};pending={};conflicts=[];persist();setStatus("Cloud profile linked","Reloading encrypted Cloud Sync 3.0…","success");setTimeout(()=>location.reload(),400);});
+    window.addEventListener("finance:profile-unlocked",()=>{if(cloudUser)scheduleSync(100);});
   }
 
   function handlePendingClick(event) {
@@ -1254,7 +1328,7 @@
     buildRecordMap:()=>toRecordMap(data),
     get status(){return{...state,pendingCount:pendingCount(),conflictCount:conflictCount(),signedIn:Boolean(cloudUser),email:cloudUser?.email||""};}
   };
-  window.FinanceCloudSyncInternals={stable,checksum,deepMerge,threeWayMerge,toRecordMap,fromRecordStore,changesBetween,recordKey,keyToken,keyFromToken,retryDelay,detectFinancialOperations};
+  window.FinanceCloudSyncInternals={loadClient,stable,checksum,deepMerge,threeWayMerge,toRecordMap,fromRecordStore,changesBetween,recordKey,keyToken,keyFromToken,retryDelay,detectFinancialOperations,encryptRecordPayload,decryptRecordPayload,toRpcChange,decryptRow};
 
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",()=>initialize().catch(error=>setStatus("Cloud sync unavailable",error.message,"danger")),{once:true});
   else initialize().catch(error=>setStatus("Cloud sync unavailable",error.message,"danger"));

@@ -2,6 +2,38 @@
 
 All notable changes to My Finance Records are documented here.
 
+
+## 13.0.0 · 2026-08-06
+
+### Added
+
+- Separate personal and household finance profiles with profile switching.
+- Owner, Editor, and Viewer household roles with read-only enforcement for Viewers.
+- Cloud Schema V3 profile-scoped record synchronization and immutable audit history.
+- Client-side AES-256-GCM encryption for cloud record payloads and restore points.
+- PBKDF2-SHA-256 passphrase key derivation with a 310,000-iteration default.
+- Encrypted `.mfrx` backup export and restore.
+- Invitation codes, member management, profile-aware device revocation, and encrypted cloud restore points.
+- Optional device app lock, authenticator-app MFA management, and experimental passkey controls.
+- Controlled migration documentation and Cloud Schema V3 RLS smoke-test guidance.
+
+### Migration
+
+- Requires `supabase/cloud-profiles-v13.sql` before enabling Cloud Sync V3.
+- Existing Cloud Schema V2 tables and data are retained and are not modified.
+- The first V3 upload encrypts the existing local profile records before sending them.
+
+### Security boundaries
+
+- Active browser localStorage remains a plaintext working copy.
+- Record identifiers, revisions, timestamps, membership, and device metadata remain visible to the cloud service.
+- The app cannot recover a lost profile passphrase.
+
+### Preserved
+
+- Finance Schema 12 and every V12.25.0 financial calculation and feature baseline.
+- Ledger, budgets, reports, productivity tools, reminders, payment-operation IDs, manifest, offline page, and icons.
+
 ## 12.25.0 · 2026-08-06
 
 ### Added

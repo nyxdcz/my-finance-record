@@ -1,41 +1,36 @@
-# MacBook and iPhone Installation · V12.21.0
+# MacBook and iPhone Installation · V13.0.0
 
-## Before updating
+## Before deploying
 
-1. Open V12.20.0 on the MacBook while online.
-2. Wait for **Synced**.
-3. Export a recovery backup.
-4. Run `supabase/cloud-sync-v2.sql` in the Supabase SQL Editor.
-5. Deploy V12.21.0 and wait for the GitHub Pages workflow to finish.
+1. Verify V12.25.0 is synchronized on both devices.
+2. Export a recovery backup from the authoritative MacBook.
+3. Run `supabase/cloud-profiles-v13.sql`.
+4. Deploy the complete V13 PWA through HTTPS.
 
-## MacBook
+## MacBook first
 
-1. Open the hosted HTTPS address.
-2. Reload once when the update notice appears.
-3. Confirm **Settings → Advanced → Version History** shows V12.21.0.
-4. Open **Settings → Cloud Sync & Devices**.
-5. Sign in when required.
-6. Choose **Upload this device’s data** when the MacBook contains the authoritative records, or use **Review and merge** when both copies contain changes.
-7. Wait until the status says **Synced** and Sync Health shows zero pending records.
+1. Open the hosted PWA in Chrome or Safari and reload once online.
+2. Confirm **V13.0.0** in Settings → Advanced.
+3. Confirm existing accounts, balances, ledger, budgets, reports, and reminders are unchanged.
+4. Sign in to Supabase.
+5. Open **Profiles & Security** and create an encrypted cloud profile.
+6. Store the passphrase outside the app.
+7. Choose **Upload this device’s data** in Cloud Sync.
+8. Wait for **Synced** and create an encrypted restore point.
+9. Export and test an encrypted `.mfrx` backup.
 
 ## iPhone
 
-1. Open the same HTTPS address in Safari.
-2. Launch or replace the Home Screen PWA.
-3. Fully close and reopen it if the previous service-worker copy remains visible.
-4. Confirm V12.21.0 in Version History.
-5. Sign in with the same cloud account.
-6. Choose **Download cloud data** on a new or empty installation.
-7. Confirm balances, ledger totals, expenses, income, projects, and Sync Health match the MacBook.
+1. Open the exact HTTPS address in Safari.
+2. Use **Share → Add to Home Screen** or update the existing installed PWA.
+3. Open the Home Screen app and confirm V13.0.0.
+4. Sign in to an authorized account.
+5. In **Profiles & Security**, use **Find existing profiles** and connect the personal profile, or accept the household invitation.
+6. Enter the same profile passphrase to verify and unlock encryption.
+7. Choose **Download cloud data**.
+8. Compare account totals, ledger balances, and one recent expense with the MacBook.
+9. Enable notifications only through a direct user action in the installed app.
 
-## Daily use
+## Rollback reference
 
-- Local edits remain available immediately, including while offline.
-- Wait for **Synced** after important payments, restorations, transfers, or reconciliations.
-- Sync Health lists the exact records waiting when a connection fails.
-- Open the app online after a long offline period so incremental audit events can be pulled.
-- Keep regular recovery exports outside both devices and outside the public repository.
-
-## Device-specific values
-
-Theme, installation state, current page, current month, sidebar state, and responsive presentation remain local. Finance records, account ledger, reconciliations, expenses, income, projects, goals, report data, recurrence settings, and payment states synchronize at record level.
+V13 does not remove V2 cloud tables. If migration cannot be completed, stop using V13 sync, retain all backups, and return to the known V12.25.0 package before making further cloud changes. Do not alternate V12 and V13 writers against the same active finance workflow.

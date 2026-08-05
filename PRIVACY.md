@@ -1,37 +1,21 @@
-# Privacy Notes
+# Privacy Notes · V13.0.0
 
-My Finance Records is a local-first personal finance PWA.
+My Finance Records has no analytics or advertising code. Local finance records remain in the browser unless the user explicitly enables Supabase synchronization or exports a file.
 
-## Data stored locally
+## Cloud Sync V3
 
-The browser may store finance records, preferences, recovery information, device metadata, pending record changes, conflict evidence, cloud cursors, and cached application files. Clearing browser or installed-app storage may remove the local copy.
+Cloud record payloads are encrypted in the browser before upload. Supabase stores ciphertext envelopes. Operational metadata remains visible to the configured project, including profile membership, collection and record identifiers, revisions, deletion markers, timestamps, app versions, and device information.
 
-## Optional cloud synchronization
+Authentication email addresses and MFA/passkey information are handled by the configured Supabase Auth project under its policies.
 
-When Cloud Sync V2 is enabled, the configured Supabase project stores:
+## Local browser data
 
-- Current record rows for finance collections and saved settings
-- Connected-device names, versions, cursors, and revocation state
-- Atomic batch results
-- Immutable record-level audit events
-- Append-only payment-operation audit rows
-- Legacy Cloud Sync V1 state until the project owner removes it
+The active profile working copy remains plaintext in localStorage for compatibility with the existing local-first app. The optional device app lock prevents casual on-screen access but is not full storage encryption. Anyone with access to the unlocked operating-system account and browser profile may be able to inspect local data.
 
-Access is restricted through Supabase authentication, Row Level Security, table grants, and authenticated RPC functions.
+## Household profiles
 
-## Data not requested
+Owners can invite members and manage roles. Authorized members can see profile metadata. Editors can change finance records. Viewers can read synchronized records. The shared encryption passphrase must be communicated outside the invitation workflow.
 
-The app does not request online-banking usernames, banking passwords, card PINs, Supabase secret/service-role credentials, or direct bank access.
+## Backups
 
-## User responsibilities
-
-- Protect the Supabase and email accounts.
-- Keep recovery exports in a secure location.
-- Review and revoke devices no longer controlled.
-- Avoid placing finance exports in a public repository.
-- Verify the project URL and signed-in account before migration or upload.
-- Delete legacy V1 cloud state only after V2 operation and independent backups are confirmed.
-
-## Deletion
-
-Local records can be removed through the app or by clearing site data. V2 deletions are synchronized as tombstones and retained in immutable audit history. Removing the current cloud rows or audit history requires deliberate database administration and may affect recovery or other connected devices. Independent backups must be deleted separately.
+Normal legacy exports may be plaintext. V13 encrypted `.mfrx` exports use a user-supplied passphrase. Losing that passphrase makes the encrypted file unrecoverable.

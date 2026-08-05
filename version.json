@@ -1,14 +1,17 @@
 {
-  "version": "12.25.0",
+  "version": "13.0.0",
   "schemaVersion": 12,
-  "cloudSchemaVersion": 2,
+  "cloudSchemaVersion": 3,
   "ledgerVersion": 1,
   "budgetVersion": 1,
   "insightsVersion": 1,
   "productivityVersion": 1,
   "remindersVersion": 1,
-  "cacheVersion": "finance-v12-20260806-v12250-reminders-scheduled-alerts",
+  "profileArchitectureVersion": 1,
+  "encryptionVersion": 1,
+  "authSecurityVersion": 1,
+  "cacheVersion": "finance-v13-20260806-v13000-cloud-encryption-profiles",
   "released": "2026-08-06",
-  "name": "Reminders & Scheduled Alerts",
-  "notes": "Adds configurable due-date, overdue, low-balance, expected-income, Savings contribution, Utility Bill, Gym, cloud-sync, and backup reminders with a daily grouped notification schedule, device-local history, pause and test controls, app badges, and best-effort foreground and background delivery while never changing financial records automatically."
+  "name": "Major Cloud, Encryption & Profile Architecture",
+  "notes": "Adds personal and household finance profiles, Owner/Editor/Viewer roles, Cloud Schema V3 profile-scoped synchronization, client-side AES-256-GCM encrypted cloud payloads and backups, invitation codes, encrypted restore points, optional device app lock, MFA controls, and experimental passkeys while preserving Finance Schema 12 and the V12 Cloud Schema V2 rollback path."
 }
