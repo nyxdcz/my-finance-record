@@ -1,9 +1,13 @@
--- My Finance Records V12.19.0 · Row Level Security
+-- My Finance Records V12.19.1 · Row Level Security
 -- Run after supabase/schema.sql.
 
 alter table public.finance_cloud_state enable row level security;
 alter table public.finance_cloud_devices enable row level security;
 alter table public.finance_payment_operations enable row level security;
+
+alter table public.finance_cloud_state force row level security;
+alter table public.finance_cloud_devices force row level security;
+alter table public.finance_payment_operations force row level security;
 
 revoke all on public.finance_cloud_state from anon;
 revoke all on public.finance_cloud_devices from anon;
@@ -11,7 +15,8 @@ revoke all on public.finance_payment_operations from anon;
 
 grant select, insert, update, delete on public.finance_cloud_state to authenticated;
 grant select, insert, update, delete on public.finance_cloud_devices to authenticated;
-grant select, insert, update on public.finance_payment_operations to authenticated;
+revoke update, delete on public.finance_payment_operations from authenticated;
+grant select, insert on public.finance_payment_operations to authenticated;
 grant usage, select on sequence public.finance_payment_operations_id_seq to authenticated;
 
 drop policy if exists "finance state select own" on public.finance_cloud_state;
@@ -77,8 +82,7 @@ to authenticated
 with check ((select auth.uid()) = user_id);
 
 drop policy if exists "finance operations update own" on public.finance_payment_operations;
-create policy "finance operations update own"
-on public.finance_payment_operations for update
-to authenticated
-using ((select auth.uid()) = user_id)
-with check ((select auth.uid()) = user_id);
+drop policy if exists "finance operations delete own" on public.finance_payment_operations;
+
+comment on table public.finance_payment_operations is
+  'Append-only payment-operation audit rows. Authenticated clients may select and insert their own rows but cannot update or delete them.';

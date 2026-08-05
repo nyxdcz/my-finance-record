@@ -1,4 +1,4 @@
--- My Finance Records V12.19.0 · Payment-operation safeguards
+-- My Finance Records V12.19.1 · Payment-operation safeguards
 -- The unique constraint makes retries idempotent for each expense in a payment or restore operation.
 
 alter table public.finance_payment_operations

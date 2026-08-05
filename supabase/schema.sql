@@ -1,4 +1,4 @@
--- My Finance Records V12.19.0 · Cloud Schema V1
+-- My Finance Records V12.19.1 · Cloud Schema V1
 -- Run in the Supabase SQL Editor before enabling Cloud Sync.
 
 create table if not exists public.finance_cloud_state (

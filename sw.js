@@ -1,6 +1,6 @@
 "use strict";
-const APP_VERSION = "12.19.0";
-const CACHE_VERSION = "finance-v12-20260805-v12190-macbook-iphone-cloud-sync";
+const APP_VERSION = "12.19.1";
+const CACHE_VERSION = "finance-v12-20260806-v12191-repository-security-hardening";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const DB_NAME = "simple-finance-project-records-v12-db";

@@ -1,0 +1,9 @@
+{
+  "version": "12.19.1",
+  "schemaVersion": 12,
+  "cloudSchemaVersion": 1,
+  "cacheVersion": "finance-v12-20260806-v12191-repository-security-hardening",
+  "released": "2026-08-06",
+  "name": "Repository & Security Hardening",
+  "notes": "Adds automated regression validation and controlled GitHub Pages deployment, completes repository documentation and release safeguards, and strengthens Supabase Row Level Security while preserving finance schema 12 and Cloud Schema V1."
+}

@@ -1,6 +1,6 @@
 "use strict";
 
-/* My Finance Records V12.19.0 · optional MacBook + iPhone cloud synchronization.
+/* My Finance Records V12.19.1 · optional MacBook + iPhone cloud synchronization.
    Local records remain the primary offline copy. Supabase is used only after the user
    configures a project, signs in, and chooses the first-sync direction. */
 (function financeCloudSyncBootstrap() {
@@ -280,7 +280,7 @@
     if (!operation?.operationId || !operation?.expenseId) return;
     const key = `${operation.operationId}|${operation.expenseId}|${operation.operationType}`;
     if (cloudState.pendingOperations.some(item => `${item.operationId}|${item.expenseId}|${item.operationType}` === key)) return;
-    cloudState.pendingOperations.push({ ...operation, deviceId:currentDeviceId(), appVersion:typeof APP_VERSION !== "undefined" ? APP_VERSION : "12.19.0" });
+    cloudState.pendingOperations.push({ ...operation, deviceId:currentDeviceId(), appVersion:typeof APP_VERSION !== "undefined" ? APP_VERSION : "12.19.1" });
     cloudState.pendingOperations = cloudState.pendingOperations.slice(-500);
   }
 
@@ -325,7 +325,7 @@
     return {
       format:"my-finance-cloud-state-v1",
       schemaVersion:typeof SCHEMA_VERSION !== "undefined" ? SCHEMA_VERSION : 12,
-      appVersion:typeof APP_VERSION !== "undefined" ? APP_VERSION : "12.19.0",
+      appVersion:typeof APP_VERSION !== "undefined" ? APP_VERSION : "12.19.1",
       exportedAt,
       updatedByDevice:currentDeviceId(),
       data:payloadData,
@@ -491,7 +491,7 @@
     const merged = {
       format:"my-finance-cloud-state-v1",
       schemaVersion:12,
-      appVersion:typeof APP_VERSION !== "undefined" ? APP_VERSION : "12.19.0",
+      appVersion:typeof APP_VERSION !== "undefined" ? APP_VERSION : "12.19.1",
       exportedAt:nowIso(),
       updatedByDevice:currentDeviceId(),
       data:mergedData,
@@ -524,7 +524,7 @@
     client = createClient(config.supabaseUrl, config.supabasePublishableKey, {
       auth:{ persistSession:true, autoRefreshToken:true, detectSessionInUrl:true },
       realtime:{ params:{ eventsPerSecond:5 } },
-      global:{ headers:{ "x-client-info":`my-finance-records/${typeof APP_VERSION !== "undefined" ? APP_VERSION : "12.19.0"}` } }
+      global:{ headers:{ "x-client-info":`my-finance-records/${typeof APP_VERSION !== "undefined" ? APP_VERSION : "12.19.1"}` } }
     });
     client.auth.onAuthStateChange((_event, nextSession) => {
       session = nextSession || null;
@@ -685,7 +685,7 @@
       payload,
       revision:1,
       updated_by_device:currentDeviceId(),
-      app_version:typeof APP_VERSION !== "undefined" ? APP_VERSION : "12.19.0",
+      app_version:typeof APP_VERSION !== "undefined" ? APP_VERSION : "12.19.1",
       schema_version:12
     }).select().single();
     if (result.error) throw result.error;
@@ -698,7 +698,7 @@
       payload,
       revision:nextRevision,
       updated_by_device:currentDeviceId(),
-      app_version:typeof APP_VERSION !== "undefined" ? APP_VERSION : "12.19.0",
+      app_version:typeof APP_VERSION !== "undefined" ? APP_VERSION : "12.19.1",
       schema_version:12
     }).eq("user_id", cloudUser.id).eq("revision", Number(expectedRevision || 0)).select().maybeSingle();
     if (result.error) throw result.error;
@@ -798,7 +798,7 @@
         amount:Number(item.paidAmount || item.amount || 0),
         occurredAt:String(item.paidDate || nowIso()),
         deviceId:String(item.syncUpdatedByDevice || currentDeviceId()),
-        appVersion:typeof APP_VERSION !== "undefined" ? APP_VERSION : "12.19.0",
+        appVersion:typeof APP_VERSION !== "undefined" ? APP_VERSION : "12.19.1",
         payload:{ autoPaidAtMonthEnd:Boolean(item.autoPaidAtMonthEnd) }
       });
     });
@@ -813,7 +813,7 @@
       amount:Number(item.amount || 0),
       occurred_at:item.occurredAt || nowIso(),
       device_id:item.deviceId || currentDeviceId(),
-      app_version:item.appVersion || (typeof APP_VERSION !== "undefined" ? APP_VERSION : "12.19.0"),
+      app_version:item.appVersion || (typeof APP_VERSION !== "undefined" ? APP_VERSION : "12.19.1"),
       payload:item.payload || {}
     }));
     const result = await client.from(PAYMENT_TABLE).upsert(rows, { onConflict:"user_id,operation_id,expense_id,operation_type", ignoreDuplicates:true });
@@ -831,7 +831,7 @@
       device_id:id,
       device_name:name,
       platform:navigator.userAgent || navigator.platform || "Browser",
-      app_version:typeof APP_VERSION !== "undefined" ? APP_VERSION : "12.19.0",
+      app_version:typeof APP_VERSION !== "undefined" ? APP_VERSION : "12.19.1",
       last_seen_at:nowIso(),
       last_sync_at:cloudState.lastSyncAt || null
     };
@@ -891,7 +891,7 @@
       format:"my-finance-cloud-recovery-v1",
       label,
       createdAt:nowIso(),
-      appVersion:typeof APP_VERSION !== "undefined" ? APP_VERSION : "12.19.0",
+      appVersion:typeof APP_VERSION !== "undefined" ? APP_VERSION : "12.19.1",
       schemaVersion:12,
       data:safeClone(data)
     };
