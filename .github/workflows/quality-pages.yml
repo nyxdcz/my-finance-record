@@ -57,7 +57,7 @@ jobs:
           cp vendor/supabase.min.js _site/vendor/
           cp icons/* _site/icons/
       - name: Upload GitHub Pages artifact
-        uses: actions/upload-pages-artifact@v4
+        uses: actions/upload-pages-artifact@v5
         with:
           path: _site
       - name: Deploy GitHub Pages
