@@ -2,6 +2,30 @@
 
 All notable changes to My Finance Records are documented here.
 
+## 12.21.0 · 2026-08-06
+
+### Added
+
+- Cloud Schema V2 record tables, sync profiles, atomic batch records, and immutable audit events.
+- Record-level change queues for finance collections and singleton settings.
+- Incremental pull by audit cursor and Realtime audit notifications.
+- Atomic multi-record RPC commits with optimistic revision checks.
+- Financial-operation RPC commits that keep payments, restorations, accounts, and ledger entries in one transaction.
+- Capped exponential retry, exact pending-record controls, and per-record conflict recovery.
+- Sync Health with protocol, cursor, pull/push times, pending records, conflicts, device versions, required writer version, and recent audit events.
+- Remote device revocation and minimum-app/minimum-writer compatibility safeguards.
+- Safe first-use migration from the Cloud Sync V1 state payload.
+
+### Changed
+
+- Normal cloud saves transmit only changed records rather than the complete finance state.
+- Cloud writes are restricted to security-definer RPC functions; authenticated browser clients retain read-only access to their own V2 records and audit history.
+- Realtime listens for immutable audit inserts instead of full-state row replacement.
+
+### Preserved
+
+- Core finance schema 12, Ledger Version 1, local-first saves, account-ledger calculations, payment-operation IDs, backups, reports, PWA configuration, manifest, offline page, and icons.
+
 ## 12.20.0 · 2026-08-06
 
 ### Added

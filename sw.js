@@ -1,6 +1,6 @@
 "use strict";
-const APP_VERSION = "12.20.0";
-const CACHE_VERSION = "finance-v12-20260806-v12200-account-ledger-transfers-reconciliation";
+const APP_VERSION = "12.21.0";
+const CACHE_VERSION = "finance-v12-20260806-v12210-record-level-cloud-sync-v2";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const DB_NAME = "simple-finance-project-records-v12-db";

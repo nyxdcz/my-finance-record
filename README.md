@@ -1,4 +1,28 @@
-# My Finance Records · V12.20.0 PWA
+# My Finance Records · V12.21.0 PWA
+
+## V12.21.0 · Record-level Cloud Sync 2.0
+
+- Replaced whole-finance-state uploads with record-level synchronization. Expenses, income, projects, accounts, ledger entries, reconciliations, reports, settings, goals, recurrence records, and other saved finance values are stored as independently revisioned cloud records.
+- Added Cloud Schema V2 tables for current records, sync profiles, atomic batches, and immutable audit events.
+- Added database RPC functions for device registration, snapshots, incremental pull, atomic record commits, financial-operation commits, and remote device revocation.
+- Local saves remain immediate. Only changed records enter the pending queue, and retries use capped exponential backoff while the app is offline or the cloud is temporarily unavailable.
+- Added server-confirmed record revisions and all-or-nothing multi-record batches. Transfers, account-affecting payments, restorations, and related ledger changes cannot be partially committed across devices.
+- Added per-record conflict recovery with **Retry**, **Discard local**, **Keep this version**, and downloadable conflict evidence.
+- Added **Sync Health** showing the cloud protocol, audit cursor, last pull, last push, pending records, conflicts, installed app version, required writer version, and recent immutable cloud events.
+- Connected Devices now shows each device’s app version and Cloud Schema. Removing a device marks it revoked for future Cloud Sync V2 commits; its cloud session is cleared when that device reconnects.
+- Added minimum-writer safeguards so an older app cannot overwrite records that require a newer release. Object payloads are deep-merged server-side to preserve fields introduced by later versions.
+- Existing Cloud Sync V1 data is detected during first V2 initialization and can be uploaded, downloaded, or reviewed and merged into the record-level store.
+- Core finance schema remains 12 and Ledger Version remains 1. Cloud Schema advances from V1 to V2 and requires the included one-time Supabase migration.
+
+### Required Supabase migration
+
+Before using V12.21.0 cloud sync, run this file once in the existing Supabase project:
+
+```text
+supabase/cloud-sync-v2.sql
+```
+
+Export a recovery backup first. After the SQL succeeds, deploy V12.21.0, open the authoritative MacBook copy first, choose the appropriate migration direction, wait for **Synced**, and then update the iPhone.
 
 ## V12.20.0 · Account Ledger, Transfers & Reconciliation
 

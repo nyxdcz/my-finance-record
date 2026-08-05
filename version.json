@@ -1,10 +1,10 @@
 {
-  "version": "12.20.0",
+  "version": "12.21.0",
   "schemaVersion": 12,
-  "cloudSchemaVersion": 1,
+  "cloudSchemaVersion": 2,
   "ledgerVersion": 1,
-  "cacheVersion": "finance-v12-20260806-v12200-account-ledger-transfers-reconciliation",
+  "cacheVersion": "finance-v12-20260806-v12210-record-level-cloud-sync-v2",
   "released": "2026-08-06",
-  "name": "Account Ledger, Transfers & Reconciliation",
-  "notes": "Adds append-only account activity, ledger-derived balances, linked account transfers, income posting, and reconciliation history while preserving schema 12 and Cloud Schema V1."
+  "name": "Record-level Cloud Sync 2.0",
+  "notes": "Replaces whole-state cloud uploads with changed-record synchronization, atomic multi-record commits, immutable audit history, exponential retry, per-record conflict controls, Sync Health, remote device sign-out, and minimum-writer compatibility safeguards."
 }

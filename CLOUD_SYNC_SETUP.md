@@ -1,40 +1,70 @@
-# Cloud Sync Setup · V12.20.0
+# Cloud Sync Setup · V12.21.0
 
-Cloud Sync is optional. The app remains fully usable as a local offline PWA when cloud configuration is blank.
+Cloud Sync remains optional. The app continues to work locally when no Supabase project is configured or the device is offline.
 
-## What you need
+## Required components
 
 - One Supabase project
-- One HTTPS address hosting this PWA
-- The same sign-in email and password on the MacBook and iPhone
-- A Supabase **publishable key** (`sb_publishable_...`) or legacy **anon key**
+- One HTTPS address hosting the complete PWA
+- The same Supabase sign-in account on the MacBook and iPhone
+- A browser-safe Supabase publishable key or legacy `anon` key
 
-Never use a Supabase secret key or `service_role` key in this browser app.
+Never place a Supabase secret key, `service_role` key, database password, or personal access token in browser files.
 
-## 1. Create the Supabase project
+## Existing project upgrade from V12.20.0
 
-1. Create a new Supabase project.
-2. Open the project SQL Editor.
-3. Run `supabase/schema.sql`.
-4. Run `supabase/security-policies.sql`.
-5. Run `supabase/payment-operations.sql`.
-6. In Authentication → URL Configuration, add the final HTTPS app address as the Site URL and an allowed redirect URL.
-7. Review the Supabase Security Advisor before entering real finance records.
+1. Open the app on the authoritative MacBook and export a recovery backup.
+2. Wait until the existing Cloud Sync status shows **Synced**.
+3. In the Supabase SQL Editor, run:
 
-The SQL creates:
+```text
+supabase/cloud-sync-v2.sql
+```
 
-- `finance_cloud_state` — one encrypted-in-transit JSON state row per authenticated user
-- `finance_cloud_devices` — device names and last-seen information
-- `finance_payment_operations` — idempotent payment and restoration audit records
-- Row Level Security policies that restrict every row to `auth.uid()`
+4. Confirm the query completes without an error.
+5. Deploy V12.21.0 through GitHub Pages.
+6. Open the MacBook app online first.
+7. Sign in and review the first Cloud Sync V2 choice:
+   - **Upload this device’s data** when the MacBook is authoritative.
+   - **Download cloud data** only when the V2 cloud already contains the intended records.
+   - **Review and merge** when both copies contain valid changes.
+8. Wait for **Synced** before opening the iPhone.
+9. Open or update the iPhone PWA and sign in to the same account.
+10. Confirm the balances, ledger totals, expenses, income, projects, and Sync Health values match.
 
-## 2. Add the browser-safe project values
+The migration does not delete the legacy `finance_cloud_state` row. It creates the V2 record store separately so the old cloud payload remains available as migration evidence until it is removed manually.
 
-Two setup methods are supported.
+## New Supabase project
 
-### Hosted configuration
+Run the SQL files in this order:
 
-Copy `sync-config.example.js` to `sync-config.js`, then replace:
+```text
+supabase/schema.sql
+supabase/security-policies.sql
+supabase/payment-operations.sql
+supabase/security-hardening-v12-19-1.sql
+supabase/cloud-sync-v2.sql
+```
+
+Then review:
+
+```text
+supabase/rls-smoke-tests.sql
+supabase/rls-smoke-tests-v2.sql
+```
+
+The V2 migration creates:
+
+- `finance_sync_profiles` — cloud protocol, audit cursor, and minimum supported writer version
+- `finance_sync_records` — one current row per synchronized record
+- `finance_sync_batches` — idempotent all-or-nothing commit results
+- `finance_sync_audit` — immutable record-level history used for incremental pull and Realtime notification
+
+It also adds version, cursor, push, and revocation fields to `finance_cloud_devices`.
+
+## Browser configuration
+
+The hosted `sync-config.js` may contain only:
 
 ```js
 window.FINANCE_SYNC_CONFIG = {
@@ -43,117 +73,62 @@ window.FINANCE_SYNC_CONFIG = {
 };
 ```
 
-Deploy the edited `sync-config.js` with the PWA. Both devices then use the same project automatically.
+The same values can instead be saved separately on each device under **Settings → Cloud Sync & Devices**.
 
-### Device-only configuration
+## How Cloud Sync V2 works
 
-Leave `sync-config.js` blank. Open:
+- Every app save completes in local browser storage first.
+- The client compares the previous and current normalized finance data.
+- Only added, changed, reordered, or deleted records enter the pending queue.
+- Pending records are committed through RPC functions in atomic batches.
+- The database verifies each record’s expected revision before applying any record in the batch.
+- A successful commit increments record revisions and writes immutable audit events.
+- Other open devices receive an audit notification and pull only events after their saved cursor.
+- Offline or failed records retry with a capped exponential delay.
+- Deleted records remain as cloud tombstones so an older device cannot recreate them accidentally.
 
-`Settings → Cloud Sync & Devices`
+## Financial-operation protection
 
-Paste the project URL and publishable key, then choose **Save on this device**. This method must be repeated on each device.
+Payment and restoration changes may affect an expense, one or more account values, and ledger entries. V12.21.0 sends these related records through one financial-operation RPC. The database either commits the complete batch or rejects the complete batch.
 
-## 3. Deploy through HTTPS
+Payment-operation IDs remain unique and append-only. A repeated network request can return the previously committed result without applying the same deduction again.
 
-Cloud Sync, installation, service workers, and iPhone home-screen use require one HTTPS website. GitHub Pages, Cloudflare Pages, Netlify, Vercel static hosting, or another HTTPS host can serve the package.
+## Conflict controls
 
-Do not use `file://` for cross-device synchronization. A local HTML file on the MacBook cannot be opened as the same origin on the iPhone.
+A conflict occurs when the cloud revision no longer matches the revision used by the pending local record.
 
-## 4. Initialize the MacBook first
+The Cloud Sync panel provides:
 
-1. Open the hosted app on the MacBook.
-2. Export a recovery bundle.
-3. Open **Settings → Cloud Sync & Devices**.
-4. Create an account or sign in.
-5. Choose **Upload this device’s data**.
-6. Confirm that the status becomes **Synced**.
+- **Retry** — automatically merges non-overlapping object fields and retries
+- **Discard local** — removes the pending local version and activates the cloud-confirmed record
+- **Keep this version** — explicitly rebases the local version onto the current cloud revision and resubmits it
+- **Download copies** — exports the base, local, and remote versions for review
 
-The upload choice is recommended when the MacBook already contains the authoritative records.
+Overlapping fields are never silently merged. Payment and account-related batches remain atomic.
 
-## 5. Connect the iPhone
+## Sync Health
 
-1. Open the exact same HTTPS address in Safari.
-2. Use **Share → Add to Home Screen**.
-3. Open the installed app.
-4. Open **Settings → Cloud Sync & Devices**.
-5. Sign in with the same account.
-6. Choose **Download cloud data**.
-7. Confirm that account totals and records match the MacBook.
+Sync Health displays:
 
-An empty new iPhone installation does not overwrite an existing cloud copy automatically. The first-sync choice must be confirmed.
+- Cloud Schema and protocol
+- Last audit cursor
+- Last successful pull and push
+- Pending and conflicted record counts
+- Installed app version
+- Minimum writer version required by the cloud
+- Recent cloud audit events
 
-## Synchronization behavior
+A device running below the cloud minimum is allowed to read but is blocked from committing changes until it updates.
 
-- Every normal save is written locally first.
-- Online changes are queued and synchronized shortly afterward.
-- Offline changes remain queued until the app is opened online.
-- Returning from the background, focusing the app, reconnecting, or selecting **Sync now** checks for cloud changes.
-- Supabase Realtime prompts an open device to download a revision created by the other device.
-- When both devices changed different records, both versions are merged.
-- When both devices changed the same payment state or account value, the cloud-confirmed version is retained and a recoverable conflict snapshot is listed.
+## Remote device removal
 
-
-## V12.20.0 ledger synchronization
-
-No additional Supabase SQL migration is required for V12.20.0. The existing `finance_cloud_state` JSON payload now also includes:
-
-- `accountLedger` — append-only account balance entries
-- `accountReconciliations` — documented actual-versus-calculated balance checks
-
-Both collections use stable record IDs, update metadata, tombstones, and the existing three-way merge process. Core finance schema remains 12 and Cloud Schema remains V1.
-
-For safest cross-device use:
-
-1. Open the first device online and wait for **Synced** before the first V12.20.0 migration.
-2. Confirm that Available Money is unchanged after opening-balance entries are created.
-3. Wait for **Synced** before using transfers or reconciliation on the second device.
-4. Never manually edit ledger rows in the Supabase Table Editor.
-
-## Payment safety
-
-Each paid expense stores a transaction ID. Cloud Sync also writes an idempotent operation row containing:
-
-- user ID
-- operation ID
-- expense ID
-- payment or restoration type
-- account
-- amount
-- device
-
-The unique database constraint prevents the same operation from being inserted twice during retries. The state merger gives the cloud-confirmed payment state priority when the same expense was changed on two devices.
-
-For the strongest protection, synchronize before marking an expense paid when the other device may also be open.
-
-## Conflict recovery
-
-The Cloud Sync panel lists unresolved conflicts. Each entry supports:
-
-- **Download copies** — exports the local, cloud, and merged snapshots
-- **Restore local copy** — replaces the current copy after saving a recovery point
-- **Keep current** — resolves the notice without replacing data
-
-Conflict snapshots are stored locally and are limited to the most recent entries to protect browser storage.
+Removing a connected device sets a server-side revocation timestamp. The revoked device is blocked from future V2 registration and commits and clears its local cloud session the next time it connects. Remove the device’s browser/site data separately when physical access is available.
 
 ## Security boundaries
 
-- Finance data is sent only to the configured Supabase project.
-- Row Level Security must remain enabled.
-- The publishable key identifies the project but does not grant unrestricted access.
-- The signed-in user’s JWT is used by Supabase to enforce `auth.uid()` policies.
-- No bank login, card credential, or banking API is used.
-- Local backups remain necessary before replacing devices, clearing browser data, or changing cloud projects.
-
-## V12.19.1 security hardening
-
-For an existing V12.19.0 Supabase project, run this additional migration once after creating a recovery backup:
-
-```text
-supabase/security-hardening-v12-19-1.sql
-```
-
-Then review `supabase/rls-smoke-tests.sql`. The migration forces RLS on all finance tables and makes payment-operation rows append-only for authenticated browser clients.
-
-Authentication rate limits are configured in the Supabase Dashboard under **Authentication → Rate Limits**; they are not stored in this repository. Review the current project values before using real finance records.
-
-Optional MFA should be enabled only after testing enrollment and recovery with a separate test account. Do not enforce an `aal2` database policy until every intended device can complete MFA and a recovery method is documented.
+- V2 tables have Row Level Security enabled and forced.
+- Authenticated browser users may select only rows owned by their `auth.uid()`.
+- Direct browser insert, update, and delete access to V2 rows is revoked.
+- Writes occur through authenticated security-definer RPC functions with explicit user, device, revision, and version checks.
+- Anonymous access is revoked.
+- Cloud sync is not a replacement for independent backups.

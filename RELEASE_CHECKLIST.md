@@ -47,6 +47,16 @@
 - [ ] No `sb_secret_`, `service_role`, database password, or personal token is committed.
 - [ ] MacBook and iPhone sync tests use non-sensitive sample records.
 - [ ] Account ledger and reconciliation records sync without duplicate operation IDs.
+- [ ] `supabase/cloud-sync-v2.sql` succeeds on a representative V12.20 project.
+- [ ] V2 profile, record, batch, audit, and device RLS checks pass.
+- [ ] Only changed records enter the pending queue.
+- [ ] Atomic batches reject all records when one expected revision conflicts.
+- [ ] Payment, restoration, transfer, account, and ledger changes cannot partially commit.
+- [ ] Incremental pull advances the audit cursor without skipping records.
+- [ ] Retry delay increases and remains capped.
+- [ ] Retry, Discard local, Keep this version, and conflict download work.
+- [ ] An older app version is blocked from writing protected newer records.
+- [ ] Revoked devices cannot register or commit V2 records.
 
 ## Publication
 

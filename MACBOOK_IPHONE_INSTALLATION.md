@@ -1,30 +1,41 @@
-# MacBook and iPhone Installation · V12.19.0
+# MacBook and iPhone Installation · V12.21.0
+
+## Before updating
+
+1. Open V12.20.0 on the MacBook while online.
+2. Wait for **Synced**.
+3. Export a recovery backup.
+4. Run `supabase/cloud-sync-v2.sql` in the Supabase SQL Editor.
+5. Deploy V12.21.0 and wait for the GitHub Pages workflow to finish.
 
 ## MacBook
 
-1. Deploy the complete folder to one HTTPS address.
-2. Open the address in Safari or Chrome.
-3. Use the browser’s **Install App** or **Add to Dock** command when available.
+1. Open the hosted HTTPS address.
+2. Reload once when the update notice appears.
+3. Confirm **Settings → Advanced → Version History** shows V12.21.0.
 4. Open **Settings → Cloud Sync & Devices**.
-5. Sign in and initialize the cloud from the MacBook records.
+5. Sign in when required.
+6. Choose **Upload this device’s data** when the MacBook contains the authoritative records, or use **Review and merge** when both copies contain changes.
+7. Wait until the status says **Synced** and Sync Health shows zero pending records.
 
 ## iPhone
 
 1. Open the same HTTPS address in Safari.
-2. Tap **Share**.
-3. Tap **Add to Home Screen**.
-4. Open the installed icon.
-5. Sign in under **Cloud Sync & Devices**.
-6. Choose **Download cloud data** for a new empty iPhone installation.
+2. Launch or replace the Home Screen PWA.
+3. Fully close and reopen it if the previous service-worker copy remains visible.
+4. Confirm V12.21.0 in Version History.
+5. Sign in with the same cloud account.
+6. Choose **Download cloud data** on a new or empty installation.
+7. Confirm balances, ledger totals, expenses, income, projects, and Sync Health match the MacBook.
 
 ## Daily use
 
-- Wait for the toolbar cloud indicator to show **Synced** before closing after important payment or account changes.
-- Edits made offline are safe locally and show a pending count.
-- Open the app online to catch up after an offline period.
-- Use **Sync now** before editing the same expense on another device.
-- Keep periodic JSON or recovery-bundle exports outside both devices.
+- Local edits remain available immediately, including while offline.
+- Wait for **Synced** after important payments, restorations, transfers, or reconciliations.
+- Sync Health lists the exact records waiting when a connection fails.
+- Open the app online after a long offline period so incremental audit events can be pulled.
+- Keep regular recovery exports outside both devices and outside the public repository.
 
-## Device-specific settings
+## Device-specific values
 
-Theme, installed-app state, sidebar state, current page, selected month, and responsive Dashboard presentation stay on each device. Finance records, balances, expenses, projects, reports, goals, payment states, and recurrence settings synchronize.
+Theme, installation state, current page, current month, sidebar state, and responsive presentation remain local. Finance records, account ledger, reconciliations, expenses, income, projects, goals, report data, recurrence settings, and payment states synchronize at record level.
