@@ -2,6 +2,23 @@
 
 All notable changes to My Finance Records are documented here.
 
+## 12.24.0 · 2026-08-06
+
+### Added
+
+- Universal Quick Add for Expense, Income, Project, Transfer, Reconciliation, templates, and previous-month duplication.
+- Synchronized expense templates with review-before-save behavior.
+- Global search across major finance records, accounts, ledger history, budgets, and templates.
+- Advanced account, amount, date, and status filters for unpaid and paid expenses.
+- Bulk category changes and append-only paid-expense payment-account corrections.
+- Recent-account suggestions, recently edited records, and 12-step local undo history.
+- Mac keyboard shortcuts and iPhone bottom-sheet dialog presentation.
+
+### Preserved
+
+- Finance Schema 12, Cloud Schema V2, Ledger Version 1, Budget Version 1, Insights Version 1, account balances, payment IDs, ledger history, reports, backups, manifest, offline page, icons, and Supabase security rules.
+- No additional Supabase migration is required.
+
 ## 12.23.0 · 2026-08-06
 
 ### Added

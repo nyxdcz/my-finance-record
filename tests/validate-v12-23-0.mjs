@@ -30,28 +30,30 @@ const version=JSON.parse(read("version.json"));
 const packageJson=JSON.parse(read("package.json"));
 const packageLock=JSON.parse(read("package-lock.json"));
 
-assert(version.version==="12.23.0","version.json is not V12.23.0");
+assert(["12.23.0","12.24.0"].includes(version.version),"version.json is not a supported V12.23+ release");
+const versionParts=version.version.split(".").map(Number);
+const appVersionCode=(versionParts[0]||0)*10000+(versionParts[1]||0)*10+(versionParts[2]||0);
 assert(version.schemaVersion===12,"Finance Schema changed from 12");
 assert(version.cloudSchemaVersion===2,"Cloud Schema changed from V2");
 assert(version.ledgerVersion===1,"Ledger Version changed from 1");
 assert(version.budgetVersion===1,"Budget Version changed from 1");
 assert(version.insightsVersion===1,"Insights Version 1 metadata missing");
-assert(html.includes('<title>My Finance Records · V12.23.0</title>'),"HTML title version mismatch");
-assert(html.includes('const APP_VERSION = "12.23.0";'),"HTML APP_VERSION mismatch");
+assert(html.includes(`<title>My Finance Records · V${version.version}</title>`),"HTML title version mismatch");
+assert(html.includes(`const APP_VERSION = "${version.version}";`),"HTML APP_VERSION mismatch");
 assert(html.includes('reports-insights.css')&&html.includes('reports-insights.js'),"insights runtime assets are not loaded");
 assert(html.includes('{"version": "V12.23.0", "title": "Reports & Financial Insights"'),"in-app V12.23.0 history entry missing");
-assert(worker.includes('const APP_VERSION = "12.23.0";'),"service-worker version mismatch");
+assert(worker.includes(`const APP_VERSION = "${version.version}";`),"service-worker version mismatch");
 assert(worker.includes(`const CACHE_VERSION = "${version.cacheVersion}";`),"service-worker cache mismatch");
 assert(worker.includes('asset("./reports-insights.js")')&&worker.includes('asset("./reports-insights.css")'),"insights assets missing from PWA shell");
 assert(workflow.includes('reports-insights.js reports-insights.css'),"GitHub Pages workflow does not deploy insights assets");
-assert(packageJson.version==="12.23.0"&&packageLock.version==="12.23.0","package version mismatch");
-assert(packageJson.scripts?.quality==="node tests/validate-v12-23-0.mjs","quality script mismatch");
-assert(readme.startsWith("# My Finance Records · V12.23.0 PWA"),"README heading mismatch");
+assert(packageJson.version===version.version&&packageLock.version===version.version,"package version mismatch");
+assert(packageJson.scripts?.quality===`node tests/validate-v${version.version.replaceAll(".","-")}.mjs`,"quality script mismatch");
+assert(readme.startsWith(`# My Finance Records · V${version.version} PWA`),"README heading mismatch");
 assert(readme.includes("No additional Supabase migration is required"),"README migration guidance missing");
 assert(changelog.includes("## 12.23.0 · 2026-08-06"),"CHANGELOG V12.23.0 entry missing");
 assert(checklist.includes("Net Cash Flow equals Total Income minus Actual Spending"),"release insights checklist missing");
 assert(validation.includes("Account History")&&validation.includes("Project Margin"),"insights validation guidance incomplete");
-assert(cloud.includes('const APP_VERSION_CODE = 120230;')&&cloud.includes('V12.23.0</strong>'),"Cloud Sync app-version metadata mismatch");
+assert(cloud.includes(`const APP_VERSION_CODE = ${appVersionCode};`)&&cloud.includes(`V${version.version}</strong>`),"Cloud Sync app-version metadata mismatch");
 
 for(const token of [
   "Reports & financial insights","Selected month","Last 3 months","Last 6 months","Last 12 months","Year to date","Custom date range",

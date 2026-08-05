@@ -59,6 +59,18 @@
 - [ ] Project margin uses project payments minus paid Project Costs and is labeled as cash-basis.
 - [ ] YTD comparison uses the same months in the selected and previous year.
 - [ ] Insights CSV and Print / Save PDF contain the selected range and filters.
+- [ ] Quick Add opens the correct complete form and never saves a record without confirmation.
+- [ ] Expense templates create a new record ID and preserve type-specific fields without carrying paid state.
+- [ ] Duplicate Last Month creates an unpaid current-month copy and does not duplicate the original ID or payment operation.
+- [ ] Global search opens the correct record or workspace for every supported collection.
+- [ ] Advanced filters combine with existing month, search, and category filters without changing records.
+- [ ] Bulk category changes affect only selected records.
+- [ ] Paid payment-account correction creates one reversal and one replacement ledger entry per corrected payment.
+- [ ] Payment-account correction is blocked when the destination account cannot cover the corrected debit.
+- [ ] Recent-account suggestions never create or rename accounts.
+- [ ] Multi-step Undo restores a complete normalized snapshot and keeps the current state recoverable.
+- [ ] Keyboard shortcuts do not trigger while typing in a form field.
+- [ ] iPhone bottom-sheet dialogs remain scrollable and keep action buttons reachable.
 
 ## Cloud and security
 
@@ -81,6 +93,9 @@
 - [ ] Monthly budgets synchronize as month-level records.
 - [ ] Budget templates synchronize as independent records.
 - [ ] Budget settings synchronize through the singleton settings record.
+- [ ] Expense templates synchronize as independent Cloud Schema V2 records.
+- [ ] Productivity settings synchronize through the singleton settings record.
+- [ ] Recently edited and multi-step undo histories remain device-local and are not uploaded.
 
 ## Publication
 

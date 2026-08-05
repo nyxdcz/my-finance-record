@@ -33,7 +33,7 @@ const packageLock=JSON.parse(read("package-lock.json"));
 const versionParts=version.version.split(".").map(Number);
 const appVersionCode=(versionParts[0]||0)*10000+(versionParts[1]||0)*10+(versionParts[2]||0);
 
-assert(["12.22.0","12.23.0"].includes(version.version),"version.json is not a supported V12.22+ release");
+assert(["12.22.0","12.23.0","12.24.0"].includes(version.version),"version.json is not a supported V12.22+ release");
 assert(version.schemaVersion===12,"core finance schema changed from 12");
 assert(version.cloudSchemaVersion===2,"Cloud Schema changed from V2");
 assert(version.ledgerVersion===1,"Ledger Version changed from 1");
@@ -48,7 +48,7 @@ assert(worker.includes(`const CACHE_VERSION = "${version.cacheVersion}";`),"serv
 assert(worker.includes('asset("./budget-planning.js")')&&worker.includes('asset("./budget-planning.css")'),"budget assets missing from PWA shell");
 assert(workflow.includes('budget-planning.js budget-planning.css'),"GitHub Pages workflow does not deploy budget assets");
 assert(packageJson.version===version.version&&packageLock.version===version.version,"package version mismatch");
-assert(["node tests/validate-v12-22-0.mjs","node tests/validate-v12-23-0.mjs"].includes(packageJson.scripts?.quality),"quality script mismatch");
+assert(["node tests/validate-v12-22-0.mjs","node tests/validate-v12-23-0.mjs","node tests/validate-v12-24-0.mjs"].includes(packageJson.scripts?.quality),"quality script mismatch");
 assert(readme.startsWith(`# My Finance Records · V${version.version} PWA`),"README heading mismatch");
 assert(readme.includes("No additional Supabase SQL migration is required"),"README migration guidance missing");
 assert(changelog.includes("## 12.22.0 · 2026-08-06"),"CHANGELOG V12.22.0 entry missing");

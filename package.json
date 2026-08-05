@@ -1,12 +1,12 @@
 {
   "name": "my-finance-record",
-  "version": "12.23.0",
+  "version": "12.24.0",
   "private": true,
   "description": "Local-first personal finance PWA with optional Supabase synchronization.",
   "type": "module",
   "scripts": {
-    "test": "node tests/validate-v12-23-0.mjs",
-    "quality": "node tests/validate-v12-23-0.mjs"
+    "test": "node tests/validate-v12-24-0.mjs",
+    "quality": "node tests/validate-v12-24-0.mjs"
   },
   "engines": {
     "node": ">=22"

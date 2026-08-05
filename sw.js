@@ -1,6 +1,6 @@
 "use strict";
-const APP_VERSION = "12.23.0";
-const CACHE_VERSION = "finance-v12-20260806-v12230-reports-financial-insights";
+const APP_VERSION = "12.24.0";
+const CACHE_VERSION = "finance-v12-20260806-v12240-quick-entry-productivity";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const DB_NAME = "simple-finance-project-records-v12-db";
@@ -20,6 +20,8 @@ const APP_SHELL = [
   asset("./budget-planning.css"),
   asset("./reports-insights.js"),
   asset("./reports-insights.css"),
+  asset("./productivity-tools.js"),
+  asset("./productivity-tools.css"),
   asset("./sync-config.js"),
   asset("./vendor/supabase.min.js"),
   asset("./icons/icon-192.png"),

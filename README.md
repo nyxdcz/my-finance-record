@@ -1,4 +1,21 @@
-# My Finance Records · V12.23.0 PWA
+# My Finance Records · V12.24.0 PWA
+
+## V12.24.0 · Quick Entry & Productivity
+
+- Added one universal **Quick add** menu for Expense, Income, Project, Account Transfer, previous-month duplication, saved templates, and Account Reconciliation.
+- Added synchronized expense templates. A template preserves the expense type, amounts, category, due day, period, recurrence, payment account, Gym schedule, optional icon, and inclusion settings, but always opens the form for review before saving a new record.
+- Added global search across expenses, income, projects, Savings Goals, accounts, Account Ledger entries, reconciliations, monthly budgets, and saved templates.
+- Added advanced unpaid and paid expense filters for account, amount range, date range, and status while preserving the existing month, search, and category filters.
+- Added bulk category changes for unpaid and paid expenses. Paid-expense payment-account correction creates append-only reversal and replacement ledger entries instead of silently moving a deduction.
+- Added **Duplicate last month** for reusing one prior expense as a new unpaid current-month draft with a new record ID and preserved recurring-series safeguards.
+- Added recent-account suggestions, recently edited records, and a 12-step local undo history. Recent and undo histories stay on the current device; finance records and expense templates continue to use normal backup and Cloud Sync behavior.
+- Added Mac keyboard shortcuts for Search, Quick Add, Expense, Income, Project, and Undo.
+- Added compact iPhone bottom-sheet presentation for application dialogs without changing desktop forms.
+- No additional Supabase migration is required. Finance Schema remains 12, Cloud Schema remains V2, Ledger Version remains 1, Budget Version remains 1, Insights Version remains 1, and Productivity Version is 1.
+
+### First use
+
+Open the MacBook app first and wait for **Synced**. Test one expense template, one global search, and one duplicate-last-month entry using a small non-sensitive record. Review the expense form before saving. After the MacBook returns to **Synced**, open the iPhone and confirm the template and finance record appear. Export a new recovery backup.
 
 ## V12.23.0 · Reports & Financial Insights
 
