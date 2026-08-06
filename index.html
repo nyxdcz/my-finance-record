@@ -29,7 +29,7 @@
     })();
   </script>
 
-  <title>My Finance Records · V13.0.0</title>
+  <title>My Finance Records · V13.0.1</title>
   <style>
     :root {
       --bg: #f5f7fa;
@@ -4203,6 +4203,211 @@
       .cloud-conflict-actions .button { min-height:44px; }
     }
 
+
+
+    /* V13.0.1 · MacBook and iPhone UI stabilization */
+    .mobile-topbar-tools { display:none; }
+    .workspace-label-mobile { display:none; }
+    .mobile-filter-count { display:none; }
+
+    @media (max-width:850px) {
+      :root { --mobile-topbar-offset:calc(env(safe-area-inset-top) + 112px); }
+      .topbar {
+        display:grid;
+        grid-template-columns:minmax(0,1fr) auto;
+        grid-template-areas:"title tools" "month month";
+        align-items:center;
+        gap:8px 9px;
+        min-height:0;
+        padding:max(8px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) 8px max(10px,env(safe-area-inset-left));
+        overflow:visible;
+      }
+      .topbar-left { grid-area:title; min-width:0; }
+      .topbar-left > div { min-width:0; }
+      .topbar h1,
+      .topbar p { max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+      .topbar h1 { font-size:1rem; }
+      .topbar p { font-size:.67rem; }
+      .topbar-actions { display:contents; }
+      .topbar-actions > :not(.month-navigator),
+      .topbar-actions #quickAddExpense,
+      .topbar-actions #globalSearchButton,
+      .topbar-actions #productivityCenterButton,
+      .topbar-actions #cloudSyncStatusButton,
+      .topbar-actions #themeToggleButton { display:none !important; }
+      .topbar-actions .month-navigator {
+        grid-area:month;
+        display:grid;
+        grid-template-columns:44px minmax(0,1fr) 44px;
+        align-items:center;
+        gap:7px;
+        width:100%;
+        max-width:none;
+        min-width:0;
+      }
+      .topbar-actions .month-control {
+        display:grid;
+        grid-template-columns:auto minmax(0,1fr);
+        width:100%;
+        max-width:none;
+        min-width:0;
+        height:44px;
+        min-height:44px;
+        max-height:44px;
+        padding:5px 9px;
+      }
+      .topbar-actions .month-control input { width:100%; min-width:0; font-size:.78rem; }
+      .topbar-actions .month-nav-button { width:44px; height:44px; min-height:44px; max-height:44px; }
+      .topbar-actions .month-current-button,
+      .topbar-actions .month-status-chip { display:none !important; }
+      .mobile-topbar-tools { grid-area:tools; display:flex; align-items:center; justify-content:flex-end; gap:6px; }
+      .mobile-topbar-action,
+      .mobile-utility-menu > summary {
+        width:44px;
+        min-width:44px;
+        height:44px;
+        min-height:44px;
+        display:grid;
+        place-items:center;
+        padding:0;
+        border:1px solid var(--line);
+        border-radius:7px;
+        background:var(--surface);
+        color:var(--text);
+        font-size:1.2rem;
+        font-weight:900;
+        line-height:1;
+        cursor:pointer;
+        list-style:none;
+      }
+      .mobile-topbar-action[hidden] { display:none !important; }
+      .mobile-quick-action { border-color:var(--primary); background:var(--primary); color:#fff; }
+      .mobile-utility-menu { position:relative; }
+      .mobile-utility-menu > summary::-webkit-details-marker { display:none; }
+      .mobile-utility-menu[open] > summary { border-color:var(--primary); color:var(--primary); }
+      .mobile-utility-panel {
+        position:absolute;
+        top:calc(100% + 8px);
+        right:0;
+        z-index:95;
+        width:min(238px,calc(100vw - 20px));
+        display:grid;
+        gap:5px;
+        padding:7px;
+        border:1px solid var(--line);
+        border-radius:9px;
+        background:var(--surface);
+        box-shadow:0 16px 42px rgba(15,23,42,.2);
+      }
+      .mobile-utility-panel button {
+        min-height:44px;
+        display:flex;
+        align-items:center;
+        gap:9px;
+        width:100%;
+        padding:8px 10px;
+        border:0;
+        border-radius:6px;
+        background:transparent;
+        color:var(--text);
+        text-align:left;
+        font-weight:750;
+      }
+      .mobile-utility-panel button:hover,
+      .mobile-utility-panel button:focus-visible { background:var(--surface-soft); }
+      .mobile-utility-icon { width:24px; text-align:center; font-size:1rem; }
+      .mobile-add-expense-fab { display:none !important; }
+      .content { padding-bottom:max(30px,calc(env(safe-area-inset-bottom) + 24px)); }
+      .settings-navigation,
+      #settings > .settings-navigation,
+      .report-section-nav,
+      #reports .report-section-nav { top:var(--mobile-topbar-offset); }
+      .report-section-heading { scroll-margin-top:calc(var(--mobile-topbar-offset) + 62px); }
+
+      #settings .settings-tablist,
+      #reports .report-section-nav {
+        scrollbar-width:none;
+        -ms-overflow-style:none;
+        overscroll-behavior-inline:contain;
+        scroll-snap-type:x proximity;
+      }
+      #settings .settings-tablist::-webkit-scrollbar,
+      #reports .report-section-nav::-webkit-scrollbar { display:none; }
+      #settings .settings-tablist button,
+      #reports .report-section-nav button { scroll-snap-align:center; min-height:44px; }
+      #settings > .settings-navigation::before,
+      #settings > .settings-navigation::after {
+        content:"";
+        position:absolute;
+        top:1px;
+        bottom:1px;
+        z-index:3;
+        width:18px;
+        pointer-events:none;
+      }
+      #settings > .settings-navigation::before { left:1px; background:linear-gradient(90deg,var(--surface),transparent); }
+      #settings > .settings-navigation::after { right:1px; background:linear-gradient(270deg,var(--surface),transparent); }
+      #reports .report-section-nav button[aria-current="true"] { border-color:var(--primary); background:color-mix(in srgb,var(--primary) 12%,var(--surface)); color:var(--primary); }
+
+      .workspace-label-desktop { display:none; }
+      .workspace-label-mobile { display:inline; }
+      .money-workspace-switcher .workspace-switcher-button { white-space:nowrap; }
+
+      #dashboard > .kpi-grid,
+      #income .compact-income-grid,
+      #paid-expenses .compact-paid-grid,
+      #payments > .kpi-grid,
+      #reports > .report-compact-group .report-kpi-grid,
+      #reports .report-insights-kpis,
+      #money .legend,
+      #money .summary-strip { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      #dashboard > .kpi-grid .kpi-card:last-child,
+      #reports .report-kpi-grid .kpi-card:last-child { grid-column:1/-1; }
+      #money .summary-strip .summary-item:first-child,
+      #money .summary-strip .summary-item:last-child { grid-column:1/-1; }
+      #income .compact-summary-grid .kpi-card,
+      #paid-expenses .compact-summary-grid .kpi-card { min-height:72px; }
+
+      .income-filters-panel,
+      .expense-filters-panel,
+      .paid-filters-panel,
+      .project-filters-panel { overflow:hidden; }
+      .income-filters-panel > summary,
+      .expense-filters-panel > summary,
+      .paid-filters-panel > summary,
+      .project-filters-panel > summary { gap:8px; }
+      .mobile-filter-count {
+        flex:0 0 auto;
+        min-width:22px;
+        height:22px;
+        align-items:center;
+        justify-content:center;
+        padding:0 6px;
+        border-radius:999px;
+        background:var(--primary);
+        color:#fff;
+        font-size:.65rem;
+        font-weight:900;
+      }
+      .mobile-filter-count:not([hidden]) { display:inline-flex; }
+    }
+
+    @media (max-width:370px) {
+      #dashboard > .kpi-grid,
+      #income .compact-income-grid,
+      #paid-expenses .compact-paid-grid,
+      #payments > .kpi-grid,
+      #reports > .report-compact-group .report-kpi-grid,
+      #reports .report-insights-kpis,
+      #money .legend,
+      #money .summary-strip { grid-template-columns:1fr; }
+      #dashboard > .kpi-grid .kpi-card:last-child,
+      #reports .report-kpi-grid .kpi-card:last-child,
+      #money .summary-strip .summary-item:first-child,
+      #money .summary-strip .summary-item:last-child { grid-column:1; }
+      .topbar h1 { font-size:.93rem; }
+    }
+
 </style>
 </head>
 <body>
@@ -4249,7 +4454,7 @@
           <div>
             <h1 id="topTitle">Budget &amp; Expenses</h1>
             <p id="todayLabel">Tuesday, July 21, 2026</p>
-            <small id="buildBadge" title="V13.0.0 · Major Cloud, Encryption & Profile Architecture · August 6, 2026">V13.0.0</small>
+            <small id="buildBadge" title="V13.0.1 · MacBook & iPhone UI Stabilization · August 7, 2026">V13.0.1</small>
           </div>
         </div>
         <div class="topbar-actions">
@@ -4266,6 +4471,18 @@
           <button class="cloud-sync-toolbar-button" id="cloudSyncStatusButton" type="button" aria-label="Cloud sync: Cloud off" title="Cloud sync: Cloud off"><span aria-hidden="true">☁</span><span>Cloud off</span></button>
           <button class="theme-toggle-button" id="themeToggleButton" type="button" aria-label="Appearance: System" title="Appearance: System"><span aria-hidden="true" id="themeToggleIcon">◐</span><span class="theme-toggle-text" id="themeToggleText" hidden>System</span></button>
           <button class="button button-primary" id="quickAddExpense" hidden>+ Add expense</button>
+        </div>
+        <div class="mobile-topbar-tools no-print">
+          <button class="mobile-topbar-action mobile-quick-action" id="mobileQuickActionButton" type="button" aria-label="Add expense" title="Add expense" hidden><span aria-hidden="true">+</span><span class="sr-only" id="mobileQuickActionLabel">Add expense</span></button>
+          <details class="mobile-utility-menu" id="mobileUtilityMenu">
+            <summary aria-label="More actions" title="More actions">•••</summary>
+            <div class="mobile-utility-panel" role="menu" aria-label="Mobile utilities">
+              <button type="button" role="menuitem" data-mobile-proxy="globalSearchButton"><span class="mobile-utility-icon" aria-hidden="true">⌕</span><span>Search records</span></button>
+              <button type="button" role="menuitem" data-mobile-proxy="productivityCenterButton"><span class="mobile-utility-icon" aria-hidden="true">⚡</span><span>Productivity center</span></button>
+              <button type="button" role="menuitem" data-mobile-proxy="cloudSyncStatusButton"><span class="mobile-utility-icon" aria-hidden="true">☁</span><span>Cloud sync</span></button>
+              <button type="button" role="menuitem" data-mobile-proxy="themeToggleButton"><span class="mobile-utility-icon" aria-hidden="true">◐</span><span>Change appearance</span></button>
+            </div>
+          </details>
         </div>
       </header>
 
@@ -4435,9 +4652,9 @@
 
         <section class="page" id="income" aria-labelledby="income-title">
           <div class="workspace-switcher money-workspace-switcher no-print" role="tablist" aria-label="Money workspace">
-            <button class="workspace-switcher-button" type="button" role="tab" aria-selected="false" data-go="income" data-workspace-page="income">Income</button>
-            <button class="workspace-switcher-button" type="button" role="tab" aria-selected="false" data-go="money" data-workspace-page="money">Budget &amp; Expenses</button>
-            <button class="workspace-switcher-button" type="button" role="tab" aria-selected="false" data-go="paid-expenses" data-workspace-page="paid-expenses">Paid Expenses</button>
+            <button class="workspace-switcher-button" type="button" role="tab" aria-selected="false" data-go="income" data-workspace-page="income"><span class="workspace-label-desktop">Income</span><span class="workspace-label-mobile">Income</span></button>
+            <button class="workspace-switcher-button" type="button" role="tab" aria-selected="false" data-go="money" data-workspace-page="money"><span class="workspace-label-desktop">Budget &amp; Expenses</span><span class="workspace-label-mobile">Budget</span></button>
+            <button class="workspace-switcher-button" type="button" role="tab" aria-selected="false" data-go="paid-expenses" data-workspace-page="paid-expenses"><span class="workspace-label-desktop">Paid Expenses</span><span class="workspace-label-mobile">Paid</span></button>
           </div>
           <div class="page-heading">
             <div><h2 id="income-title">Income</h2><p>Track salary, project payments, and other money received.</p></div>
@@ -4468,9 +4685,9 @@
 
         <section class="page active" id="money" aria-labelledby="money-title">
           <div class="workspace-switcher money-workspace-switcher no-print" role="tablist" aria-label="Money workspace">
-            <button class="workspace-switcher-button" type="button" role="tab" aria-selected="false" data-go="income" data-workspace-page="income">Income</button>
-            <button class="workspace-switcher-button" type="button" role="tab" aria-selected="false" data-go="money" data-workspace-page="money">Budget &amp; Expenses</button>
-            <button class="workspace-switcher-button" type="button" role="tab" aria-selected="false" data-go="paid-expenses" data-workspace-page="paid-expenses">Paid Expenses</button>
+            <button class="workspace-switcher-button" type="button" role="tab" aria-selected="false" data-go="income" data-workspace-page="income"><span class="workspace-label-desktop">Income</span><span class="workspace-label-mobile">Income</span></button>
+            <button class="workspace-switcher-button" type="button" role="tab" aria-selected="false" data-go="money" data-workspace-page="money"><span class="workspace-label-desktop">Budget &amp; Expenses</span><span class="workspace-label-mobile">Budget</span></button>
+            <button class="workspace-switcher-button" type="button" role="tab" aria-selected="false" data-go="paid-expenses" data-workspace-page="paid-expenses"><span class="workspace-label-desktop">Paid Expenses</span><span class="workspace-label-mobile">Paid</span></button>
           </div>
           <div class="page-heading">
             <div>
@@ -4704,9 +4921,9 @@
 
         <section class="page" id="paid-expenses" aria-labelledby="paid-expenses-title">
           <div class="workspace-switcher money-workspace-switcher no-print" role="tablist" aria-label="Money workspace">
-            <button class="workspace-switcher-button" type="button" role="tab" aria-selected="false" data-go="income" data-workspace-page="income">Income</button>
-            <button class="workspace-switcher-button" type="button" role="tab" aria-selected="false" data-go="money" data-workspace-page="money">Budget &amp; Expenses</button>
-            <button class="workspace-switcher-button" type="button" role="tab" aria-selected="false" data-go="paid-expenses" data-workspace-page="paid-expenses">Paid Expenses</button>
+            <button class="workspace-switcher-button" type="button" role="tab" aria-selected="false" data-go="income" data-workspace-page="income"><span class="workspace-label-desktop">Income</span><span class="workspace-label-mobile">Income</span></button>
+            <button class="workspace-switcher-button" type="button" role="tab" aria-selected="false" data-go="money" data-workspace-page="money"><span class="workspace-label-desktop">Budget &amp; Expenses</span><span class="workspace-label-mobile">Budget</span></button>
+            <button class="workspace-switcher-button" type="button" role="tab" aria-selected="false" data-go="paid-expenses" data-workspace-page="paid-expenses"><span class="workspace-label-desktop">Paid Expenses</span><span class="workspace-label-mobile">Paid</span></button>
           </div>
           <div class="page-heading">
             <div>
@@ -5584,8 +5801,6 @@
       <button type="button" class="button button-danger" id="replaceWithIncomingButton">Replace after backup</button>
     </div>
   </dialog>
-
-  <button class="mobile-add-expense-fab no-print" id="mobileAddExpenseButton" type="button" aria-label="Add expense" hidden><span aria-hidden="true">+</span><span>Add expense</span></button>
 
   <div id="pwaUpdateBanner" hidden role="status" aria-live="polite">
     <div class="pwa-update-inner"><div><strong>App update available</strong><p>The new version is ready. Your current data stays in browser storage.</p></div><div class="pwa-update-actions"><button class="button button-secondary" id="laterUpdateButton" type="button">Later</button><button class="button button-primary" id="applyUpdateButton" type="button">Update now</button></div></div>
@@ -9361,7 +9576,7 @@
       const showProjectAction = pageId === "projects";
       const showIncomeAction = pageId === "income";
       const quick = document.getElementById("quickAddExpense");
-      const mobile = document.getElementById("mobileAddExpenseButton");
+      const mobile = document.getElementById("mobileQuickActionButton");
       if (quick) {
         quick.hidden = !(showExpenseAction || showProjectAction || showIncomeAction);
         quick.dataset.actionKind = showProjectAction ? "project" : (showIncomeAction ? "income" : "expense");
@@ -9369,8 +9584,20 @@
         const actionLabel = showProjectAction ? "Add project" : (showIncomeAction ? "Add income" : "Add expense");
         quick.setAttribute("aria-label", actionLabel);
         quick.title = actionLabel;
+        if (window.matchMedia("(max-width:850px)").matches) quick.style.setProperty("display", "none", "important");
+        else quick.style.removeProperty("display");
       }
-      if (mobile) mobile.hidden = !showExpenseAction;
+      const utilityMenu = document.getElementById("mobileUtilityMenu");
+      if (utilityMenu) utilityMenu.open = false;
+      if (mobile) {
+        const actionLabel = showProjectAction ? "Add project" : (showIncomeAction ? "Add income" : "Add expense");
+        mobile.hidden = !(showExpenseAction || showProjectAction || showIncomeAction);
+        mobile.dataset.actionKind = showProjectAction ? "project" : (showIncomeAction ? "income" : "expense");
+        mobile.setAttribute("aria-label", actionLabel);
+        mobile.title = actionLabel;
+        const label = document.getElementById("mobileQuickActionLabel");
+        if (label) label.textContent = actionLabel;
+      }
     }
 
     const PAGE_TITLES = {
@@ -9501,9 +9728,90 @@
       reports.dataset.compactGroups = "true";
     }
 
+    function centerScrollableTab(tablist, button, smooth = true) {
+      if (!tablist || !button || tablist.scrollWidth <= tablist.clientWidth) return;
+      const left = Math.max(0, button.offsetLeft - (tablist.clientWidth - button.offsetWidth) / 2);
+      tablist.scrollTo({ left, behavior:smooth && !window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "smooth" : "auto" });
+    }
+
+    const MOBILE_FILTER_CONFIG = [
+      ["incomeFiltersPanel", ["incomeSearch", "incomeCategoryFilter", "incomeDateFilter"]],
+      ["expenseFiltersPanel", ["expenseSearch", "expenseCategoryFilter", "expenseDateFilter"]],
+      ["paidFiltersPanel", ["paidSearch", "paidCategoryFilter"]],
+      ["projectFiltersPanel", ["projectSearch", "projectStatusFilter", "projectTypeFilter", "projectSourceFilter"]]
+    ];
+
+    function filterValueIsActive(control) {
+      if (!control) return false;
+      const value = String(control.value || "").trim();
+      if (!value) return false;
+      if (["incomeDateFilter", "expenseDateFilter"].includes(control.id) && value === "month") return false;
+      return true;
+    }
+
+    function updateMobileFilterBadges() {
+      MOBILE_FILTER_CONFIG.forEach(([panelId, controlIds]) => {
+        const panel = document.getElementById(panelId);
+        const summary = panel?.querySelector(":scope > summary");
+        if (!summary) return;
+        let badge = summary.querySelector(".mobile-filter-count");
+        if (!badge) {
+          badge = document.createElement("span");
+          badge.className = "mobile-filter-count";
+          badge.hidden = true;
+          summary.appendChild(badge);
+        }
+        const count = controlIds.map(id => document.getElementById(id)).filter(filterValueIsActive).length;
+        const advanced = panelId === "expenseFiltersPanel" ? Number(document.querySelector('[data-open-advanced-filters="expense"] .productivity-filter-count')?.textContent || 0) : panelId === "paidFiltersPanel" ? Number(document.querySelector('[data-open-advanced-filters="paid"] .productivity-filter-count')?.textContent || 0) : 0;
+        const total = count + advanced;
+        badge.hidden = total === 0;
+        badge.textContent = total ? String(total) : "";
+        badge.setAttribute("aria-label", `${total} active filter${total === 1 ? "" : "s"}`);
+      });
+    }
+
+    function syncMobileFilterPanels() {
+      const mobile = window.matchMedia("(max-width:700px)").matches;
+      MOBILE_FILTER_CONFIG.forEach(([panelId]) => {
+        const panel = document.getElementById(panelId);
+        if (!panel) return;
+        if (mobile && panel.dataset.mobileFilterReady !== "true") {
+          panel.open = false;
+          panel.dataset.mobileFilterReady = "true";
+        } else if (!mobile && panel.dataset.mobileFilterReady === "true") {
+          panel.open = true;
+          delete panel.dataset.mobileFilterReady;
+        }
+      });
+      updateMobileFilterBadges();
+    }
+
+    function setupMobileTopbarUtilities() {
+      const menu = document.getElementById("mobileUtilityMenu");
+      const mobileAction = document.getElementById("mobileQuickActionButton");
+      mobileAction?.addEventListener("click", event => {
+        const kind = event.currentTarget.dataset.actionKind;
+        if (kind === "project") openProjectDialog();
+        else if (kind === "income") openIncomeDialog();
+        else openExpenseDialog();
+      });
+      menu?.addEventListener("click", event => {
+        const proxy = event.target.closest("[data-mobile-proxy]");
+        if (!proxy) return;
+        document.getElementById(proxy.dataset.mobileProxy)?.click();
+        menu.open = false;
+      });
+      document.addEventListener("click", event => {
+        if (menu?.open && !menu.contains(event.target)) menu.open = false;
+      });
+      document.addEventListener("keydown", event => {
+        if (event.key === "Escape" && menu?.open) { menu.open = false; menu.querySelector("summary")?.focus(); }
+      });
+    }
+
     const SETTINGS_PANEL_KEY = `${STORAGE_KEY}-settings-panel-v1`;
     const SETTINGS_PANELS = ["accounts", "calendar", "profiles", "cloud", "backup", "offline", "advanced"];
-    const VERSION_HISTORY = [{"version": "V13.0.0", "title": "Major Cloud, Encryption & Profile Architecture", "changes": ["Added separate personal and household finance profiles with Owner, Editor, and Viewer roles, non-destructive Schema 12 migration, profile switching, and local profile audit history.", "Added Cloud Schema V3 with profile-scoped record synchronization, client-side AES-256-GCM payload encryption, invitation codes, immutable audit records, device revocation, and encrypted cloud restore points.", "Added encrypted portable backups, an optional device app lock, authenticator MFA controls, and experimental passkey enrollment while preserving the V12 Cloud Schema V2 tables for rollback."]}, {"version": "V12.25.0", "title": "Reminders & Scheduled Alerts", "changes": ["Added configurable reminders for expense due dates, overdue bills, low account balances, expected income, Savings contributions, Utility Bill entry, Gym schedules, failed Gym auto-payments, unsynchronized changes, and recovery backups.", "Added a daily grouped notification schedule, device-local notification history, 24-hour pause, test notification, app-badge count, and best-effort foreground and Periodic Background Sync checks.", "Alerts never mark expenses paid, transfer money, reconcile balances, or change finance records automatically; exact closed-app delivery remains browser-controlled."]}, {"version": "V12.24.0", "title": "Quick Entry & Productivity", "changes": ["Added a universal Quick Add menu, synchronized expense templates, recent-account suggestions, and duplicate-last-month expense entry.", "Added global search, advanced expense filters, bulk category changes, paid-expense payment-account correction, recently edited records, and multi-step undo history.", "Added Mac keyboard shortcuts and iPhone bottom-sheet forms while preserving account-ledger, budget, report, and Cloud Sync V2 safeguards."]}, {"version": "V12.23.0", "title": "Reports & Financial Insights", "changes": ["Added multi-month and custom-date financial insights with account and expense-category filters.", "Added income, actual spending, net cash flow, category spending, account history, budget variance, Utility Bill, Gym, recurring-expense, Savings, project-margin, and year-to-date comparisons.", "Added a consolidated insights CSV export and print-ready PDF workflow while preserving existing monthly reports and cloud records."]}, {"version": "V12.22.0", "title": "Monthly Budgets & Cash-flow Forecasting", "changes": ["Added monthly category budgets with fixed or flexible groups, personal or project scope, planned-versus-actual tracking, rollover controls, and reusable templates.", "Added a cash-flow forecast that separates current money, expected unposted income, upcoming recorded expenses, unassigned category reserves, savings allocation, recurring estimates, one-time commitments, and overdue items.", "Added low-balance warnings, Dashboard and Monthly Report forecast summaries, and synchronized budget plans through Cloud Schema V2."]}, {"version": "V12.21.0", "title": "Record-level Cloud Sync 2.0", "changes": ["Replaced full-state cloud uploads with record-level synchronization for expenses, income, projects, accounts, ledger entries, reconciliations, reports, settings, and other saved records.", "Added atomic multi-record commits, server-confirmed revisions, immutable cloud audit history, exponential retry, exact pending-record controls, and recoverable per-record conflicts.", "Added Sync Health, remote device sign-out, device app-version visibility, and safeguards that prevent older app versions from erasing fields written by newer releases."]}, {"version": "V12.20.0", "title": "Account Ledger, Transfers & Reconciliation", "changes": ["Added an append-only account ledger that recalculates active account balances from opening balances, expense payments, reversals, income deposits, transfers, and reconciliation adjustments.", "Added safe account-to-account transfers with linked debit and credit entries, insufficient-funds protection, and CSV export.", "Replaced silent balance overwrites with dated reconciliation records while preserving V12.19.1 balances through a one-time opening-balance migration."]}, {"version": "V12.19.1", "title": "Repository & Security Hardening", "changes": ["Added automated GitHub quality checks and controlled GitHub Pages deployment from validated main-branch commits.", "Completed the repository with version metadata, offline assets, regression tests, release documentation, and contribution safeguards.", "Strengthened Supabase policies with forced Row Level Security and immutable payment-operation audit rows." ]}, {"version": "V12.19.0", "title": "MacBook & iPhone Cloud Sync", "changes": ["Added optional Supabase cloud synchronization between MacBook and iPhone while preserving local-first offline saves.", "Added first-device upload, new-device download, merge, pending-change, Realtime, connected-device, and conflict-recovery controls.", "Added optimistic cloud revisions, record timestamps, deletion tombstones, and idempotent payment-operation audit records to reduce duplicate payment risks across devices."]}, {"version": "V12.18.10", "title": "Confirmed Payment Account Deduction & Gym Month-End Auto-Pay", "changes": ["Mark Paid now requires the actual payment account and deducts the confirmed amount from that account balance.", "Moving a paid expense back to unpaid restores the exact app-deducted amount once.", "Gym expenses can auto-pay after month-end using a separately authorized account, with insufficient-balance protection."]}, {"version": "V12.18.9", "title": "Split Utility Bills & Recurring Series Editing", "changes": ["Added Utility Bill expenses with separate Electric and Water amounts and a live combined total.", "Editing a monthly expense supports this month only, this month and future months, or every month in the recurring series.", "Recurring-series changes protect paid status, paid dates, record IDs, and month-specific Gym adjustments."]}, {"version": "V12.18.8", "title": "Optional Gym Emoji & Settings History", "changes": ["Gym expenses no longer receive an emoji automatically; icons are added only when selected manually.", "Removed the separate Appearance category from Settings while preserving the top-right theme control.", "Added an offline Version History card under Advanced with concise change summaries for documented releases."]}, {"version": "V12.18.7", "title": "Flexible Gym Expense", "changes": ["Added Gym expense as a third expense type alongside Normal Expense and Daily Reserved Budget.", "New Gym expenses default to ₱80 per visit and Monday, Tuesday, Thursday, and Friday.", "Added seven editable weekday controls so the usual gym days can be changed at any time."]}, {"version": "V12.18.6", "title": "Compact Dashboard and Project Payment Summaries", "changes": ["Set the five Dashboard Monthly Overview cards to min-height: 54px.", "Set the four Project Payments summary cards to min-height: 54px.", "Reduced summary-card padding and internal spacing while keeping values readable."]}, {"version": "V12.18.5", "title": "Compact Summary Heights", "changes": ["Verified the live Budget & Expenses first-row summary cards at a browser-computed height of 70px, including padding and border-box sizing.", "Matched all five Income summary cards to the same 70px desktop height.", "Matched all four Paid Expenses summary cards to the same 70px desktop height."]}, {"version": "V12.18.4", "title": "Dashboard Resize Grid", "changes": ["Changed the desktop Dashboard bento grid from six to twelve logical columns.", "Small cards now span three columns, allowing four Small cards per row.", "Large cards now span four columns, allowing three Large cards per row."]}, {"version": "V12.18.3", "title": "Bento Resize Reliability", "changes": ["Added a persistent Dashboard Customize mode with a visible toolbar for Card settings, Reset, and Done.", "Made edge resize controls usable after the settings dialog closes.", "Added real pointer drag resizing with safe snapping to Small, Large, or Wide sizes."]}, {"version": "V12.18.2", "title": "Bento Dashboard and Compact Summaries", "changes": ["Rebuilt the Dashboard detail area as a six-column bento grid. Small cards span two columns, Large cards span three columns, and Wide cards span the full row.", "Added Dashboard card-size preferences with safe Small, Large, and Wide snap sizes.", "Added edge resize controls that appear only while Customize Dashboard is open."]}, {"version": "V12.18.1", "title": "UX Reliability", "changes": ["Separated full Monthly Expenses from the current Outstanding Expenses countdown used on Budget & Expenses.", "Dashboard, cash-flow charts, month comparisons, and live Monthly Reports now use the same full monthly-expense totals.", "Preserved remaining-day Daily Reserved Budget calculations on Budget & Expenses and due-soon displays."]}, {"version": "V12.18.0", "title": "Compact Consistent Workspace UI", "changes": ["Standardized the page headers, card padding, radii, shadows, button sizes, form controls, section gaps, and typography across Dashboard, Budget & Expenses, Projects, Monthly Reports, and Settings.", "Dashboard now uses five equal compact KPI cards and a consistent two-column desktop detail grid, while full-width charts and the monthly calendar retain the space they need.", "Budget & Expenses keeps the Income, Budget & Expenses, and Paid Expenses workspace tabs, uses matching summary cards, tighter account cards, and the existing single-line compact filters."]}, {"version": "V12.17.3", "title": "Consolidated Navigation Workspaces", "changes": ["Simplified the primary sidebar to four numbered destinations: Dashboard, Budget & Expenses, Projects, and Monthly Reports; Settings remains unnumbered at the bottom.", "Moved Income and Paid Expenses into a shared Money workspace switcher: Income | Budget & Expenses | Paid Expenses.", "Kept the existing View paid expenses shortcut inside Budget & Expenses."]}, {"version": "V12.17.2", "title": "Compact Popup Inputs & Monthly Checkboxes", "changes": ["Reduced the value and placeholder text size across Account, Income, Expense, Project, and Savings Goal popup forms while keeping labels, headers, and actions readable.", "Removed visible peso prefixes from popup amount fields and standardized empty amount placeholders to 0.00.", "Replaced the expanded monthly recurrence controls with direct checkboxes for Income and Expense records."]}, {"version": "V12.17.1", "title": "Recurring Delete & Duplicate Reliability", "changes": ["Fixed monthly expenses returning immediately after deletion by saving a skipped occurrence for the deleted month.", "Recurring expense deletion now offers Delete this month only or Stop this and future.", "Stopping a recurring expense removes the selected and already-created future copies while preserving earlier expense history."]}, {"version": "V12.17.0", "title": "Unified Popup Forms", "changes": ["Standardized all 11 dialogs with one shared 8px-radius popup system, sticky headers and footers, scrollable bodies, consistent padding, and safe mobile viewport behavior.", "Account, Income, Expense, Project, and Savings Goal forms now share compact labels, inputs, required-field guidance, short context notes, and aligned Add/Edit footers.", "Added Delete Goal inside Edit Savings Goal and kept destructive actions on the far left, Cancel before Save, and primary actions on the far right."]}, {"version": "V12.16.4", "title": "Expense Dialog Reliability", "changes": ["Rebuilt Delete Expense with a dedicated handler and an in-app confirmation dialog.", "Fixed Duplicate Expense so it changes the already-open Edit Expense dialog into an unsaved duplicate review instead of reopening the modal.", "Duplicate review advances the date one month, resets paid status and recurrence, clears the original ID, and leaves the source record unchanged."]}, {"version": "V12.16.3", "title": "compact forms, icon picker, and annual Income", "changes": ["Income Add/Edit uses a tighter 638px desktop dialog, reduced padding, a joined peso amount field, collapsed recurrence, two-row Notes, and a short account-balance helper.", "Category Name appears only for Other Wages and Other Income. Add Income never shows Delete; Edit Income does.", "Accounts, Income, Expenses, and Savings Goals now use the icon square itself as the picker trigger. Emoji, upload, and conditional remove actions stay inside a compact popover."]}, {"version": "V12.16.2", "title": "Income interface refinements", "changes": ["Add Income now uses the same top-bar action position as Add Expense and Add Project.", "Income summary cards use consistent heights, descriptions, amount alignment, and responsive grids.", "Income filters now match the compact Paid Expenses and Projects toolbars, including an expandable mobile Filters panel."]}, {"version": "V12.16.2", "title": "Calendar Deduplication & Compact View", "changes": ["Calendar expenses are now assigned to one event date only: unpaid records use their due date, while paid records use their paid date or saved expense date when a legacy paid date is missing.", "Recurring expense copies are scoped to their own saved month, so future or prior copies no longer appear on the selected month’s matching due day.", "Paid expenses no longer appear again as Due."]}, {"version": "V12.16.0", "title": "Record Icons & Project Action", "changes": ["Accounts, Savings Goals, and Expenses can use an optional emoji or uploaded PNG, JPEG, or WebP logo.", "Uploaded logos are fitted into a transparent 64 × 64px canvas and compressed before storage.", "Identical uploaded images share one deduplicated local icon-library entry."]}, {"version": "V12.15.0", "title": "Income, Dashboard Calendar & Brand Refresh", "changes": ["Added a complete Income page for wages, bonuses, commissions, interest, dividends, gifts, refunds, transfers from Savings, and custom income categories.", "Added recurring monthly income records, calculator-style amount entry, account selection, included/excluded totals, Edit/Delete workflow, monthly CSV, and annual Income CSV.", "Added an annual Income table with January–December values, totals, and monthly averages."]}, {"version": "V12.11.2", "title": "project fixes", "changes": ["Active Projects now sort by status first: Ongoing, then On hold, then Completed items that still have a balance or no project value.", "Completed projects in the Active Projects box no longer show overdue or due-soon deadline warnings.", "The Active Projects summary ignores Completed deadlines and uses the nearest Ongoing or On hold deadline instead."]}, {"version": "V12.12.0", "title": "salary-work workflow", "changes": ["The package folder is permanently titled My_Finance_Records folder. The release version remains inside the app, README, service worker, and version.json.", "Projects can be classified as Freelance Project or Salary-job Project.", "Salary projects can be Included in Fixed Salary or Extra Project — Freelance Payment."]}, {"version": "V12.13.0", "title": "dashboard charts and action consistency", "changes": ["Income versus Expenses now contains two coordinated graphs: vertical Income/Expense columns with a blue Balance line, and a horizontal monthly comparison.", "Income remains green, Expenses remain red, and Balance is blue. Balance equals project income received minus included monthly expenses.", "Fixed-salary projects remain excluded from Income; extra paid salary projects remain included."]}, {"version": "V12.13.1", "title": "compact filter toolbars", "changes": ["Removed visible field titles from the Budget & Expenses, Paid Expenses, and Projects filter rows.", "Preserved hidden labels and ARIA names for screen-reader users.", "Reduced desktop filter height, padding, gaps, and visual weight."]}, {"version": "V12.13.2", "title": "single-line filter actions", "changes": ["Budget & Expenses now uses Compact expense rows permanently; the Comfortable/Compact selector and saved density preference were removed.", "Select Visible, selected count, Search, Date, Category, and Clear now share one compact desktop toolbar.", "Bulk Actions, Apply, and Clear appear in that same toolbar only after at least one unpaid expense is selected."]}, {"version": "V12.14.0", "title": "navigation and custom categories", "changes": ["Removed the peso mark from the sidebar brand and removed the sidebar instruction block.", "Grouped navigation into Overview, Expenses, Projects, Reports, and App.", "Renamed the Payments navigation item to Project Payments."]}, {"version": "V12.4", "title": "Phase 5", "changes": ["Added System, Light, and Dark appearance modes with a quick top-bar toggle.", "Reduced card, dialog, input, navigation, and button corner radius.", "Replaced colored top lines and decorative corner marks with softly filled bento cards."]}, {"version": "V12.5", "title": "Phase 6 Savings & Insights", "changes": ["Added account types: Cash, Bank, E-wallet, Savings, and Other.", "Existing account names and balances remain unchanged; recognizable account names receive a safe default type.", "Added a real Total savings dashboard card calculated only from accounts marked as Savings."]}, {"version": "V12.6", "title": "Phase 7 Secure Sample-Data Reset", "changes": ["Replaced the one-click browser confirmation for Reset sample data with a dedicated warning dialog.", "The destructive reset button remains locked until reset sample data is typed. Matching ignores capitalization and leading or trailing spaces; partial phrases do not unlock it.", "Pressing Enter cannot reset records unless the complete confirmation phrase matches."]}, {"version": "V12.7.1", "title": "Phase 8 Expense Total Choice · Font Reverted", "changes": ["Added Add this amount to expense totals to the Add/Edit Expense form.", "New expenses are included by default, preserving the existing calculation behavior.", "Existing and imported expenses without the new field remain included automatically."]}, {"version": "V12.8.0", "title": "Phase 9 UI/UX Stabilization", "changes": ["Rebuilt Projects, Project Payments, and Monthly Report records as responsive mobile cards to prevent horizontal overflow.", "Kept one mobile Add expense action visible while preserving the single desktop top-bar action.", "Fixed Monthly Checklist contrast in dark mode and increased touch targets and small-text readability."]}, {"version": "V12.9.0", "title": "Phase 10 Projects, Savings Goals & Number Inputs", "changes": ["Active projects are permanently ordered by deadline priority: nearest overdue items, due today, nearest upcoming deadlines, then projects without deadlines.", "Added separate Active Projects and collapsible Completed Projects sections. A project enters Completed Projects only when its status is Completed and its received amount covers the full project value.", "Added Mark fully paid, which records only the remaining balance as a final payment and preserves payment history."]}, {"version": "V12.9.1", "title": "Calculator Number-Input Correction", "changes": ["Added safe calculator-style entry to every monetary field. Examples: 200 + 100, 1,500 + 250.50, 400 × 15, 6000 / 3, and (5000 - 500) / 2.", "Supported operators are addition (+), subtraction (- or −), multiplication ( or ×), division (/ or ÷), and parentheses.", "Operators are preserved while typing and are never silently removed. 200+100 evaluates to ₱300.00; it cannot become 200100."]}, {"version": "V12.10.0", "title": "Phase 11 Interface Refinement", "changes": ["Compact top navigation, month controls, Budget summary cards, Available Money cards, filters, and bulk-action controls without changing any financial formula.", "Added a saved account order. Account cards can be dragged on desktop, reordered with arrow keys, or moved with accessible Up and Down controls on touch layouts. The selected order is reused on the Dashboard, Budget & Expenses, Settings, and account selectors.", "Unified desktop column alignment so Expense descriptions, dates, payment accounts, amounts, and actions remain directly beneath their headers. Applied matching alignment improvements to Paid Expenses, Projects, Project Payments, and report records while preserving stacked mobile cards."]}, {"version": "V12.11.0", "title": "Phase 12 Application-wide Accessible Help", "changes": ["Added compact contextual ? help beside every page title, major KPI, summary value, Dashboard card, Budget section, Paid Expenses area, Project section, Project Payments summary, Monthly Report section, Settings card, and major dialog.", "Added focused help beside complex form labels for account balances and types, expense amounts and periods, due days, payment accounts, recurrence, project status and values, and Savings Goal settings.", "The help controls remain visually quiet at approximately 19–20px and sit directly beside the words they explain. Their invisible pointer area is larger so they remain usable on touch screens."]}, {"version": "V12.11.1", "title": "Hover Help & Bento Polish", "changes": ["Contextual help remains available throughout the application, but hover-capable devices now reveal each ? only when the related title or label is hovered or focused. The button remains keyboard accessible and a faint touch fallback is retained for devices without hover.", "Reduced the help icon to a quieter 16–18px visual size while preserving its larger invisible pointer target. Titles reserve the small icon space, so revealing help does not shift surrounding text or values.", "Restored one continuous, slightly stronger colored border around every summary bento card, including the top edge and rounded corners."]}];
+    const VERSION_HISTORY = [{"version": "V13.0.1", "title": "MacBook & iPhone UI Stabilization", "changes": ["Rebuilt the iPhone top bar into separate title, utility, and full-width month-navigation rows without changing the MacBook layout.", "Removed the overlapping floating expense action, centered mobile Settings and Reports tabs, shortened Money workspace labels, and kept all visible mobile controls at least 44px.", "Made mobile summaries more compact, collapsed filter panels by default with active-filter counts, and preserved Finance Schema 12, Cloud Schema V3, encryption, profile, and calculation behavior."]}, {"version": "V13.0.0", "title": "Major Cloud, Encryption & Profile Architecture", "changes": ["Added separate personal and household finance profiles with Owner, Editor, and Viewer roles, non-destructive Schema 12 migration, profile switching, and local profile audit history.", "Added Cloud Schema V3 with profile-scoped record synchronization, client-side AES-256-GCM payload encryption, invitation codes, immutable audit records, device revocation, and encrypted cloud restore points.", "Added encrypted portable backups, an optional device app lock, authenticator MFA controls, and experimental passkey enrollment while preserving the V12 Cloud Schema V2 tables for rollback."]}, {"version": "V12.25.0", "title": "Reminders & Scheduled Alerts", "changes": ["Added configurable reminders for expense due dates, overdue bills, low account balances, expected income, Savings contributions, Utility Bill entry, Gym schedules, failed Gym auto-payments, unsynchronized changes, and recovery backups.", "Added a daily grouped notification schedule, device-local notification history, 24-hour pause, test notification, app-badge count, and best-effort foreground and Periodic Background Sync checks.", "Alerts never mark expenses paid, transfer money, reconcile balances, or change finance records automatically; exact closed-app delivery remains browser-controlled."]}, {"version": "V12.24.0", "title": "Quick Entry & Productivity", "changes": ["Added a universal Quick Add menu, synchronized expense templates, recent-account suggestions, and duplicate-last-month expense entry.", "Added global search, advanced expense filters, bulk category changes, paid-expense payment-account correction, recently edited records, and multi-step undo history.", "Added Mac keyboard shortcuts and iPhone bottom-sheet forms while preserving account-ledger, budget, report, and Cloud Sync V2 safeguards."]}, {"version": "V12.23.0", "title": "Reports & Financial Insights", "changes": ["Added multi-month and custom-date financial insights with account and expense-category filters.", "Added income, actual spending, net cash flow, category spending, account history, budget variance, Utility Bill, Gym, recurring-expense, Savings, project-margin, and year-to-date comparisons.", "Added a consolidated insights CSV export and print-ready PDF workflow while preserving existing monthly reports and cloud records."]}, {"version": "V12.22.0", "title": "Monthly Budgets & Cash-flow Forecasting", "changes": ["Added monthly category budgets with fixed or flexible groups, personal or project scope, planned-versus-actual tracking, rollover controls, and reusable templates.", "Added a cash-flow forecast that separates current money, expected unposted income, upcoming recorded expenses, unassigned category reserves, savings allocation, recurring estimates, one-time commitments, and overdue items.", "Added low-balance warnings, Dashboard and Monthly Report forecast summaries, and synchronized budget plans through Cloud Schema V2."]}, {"version": "V12.21.0", "title": "Record-level Cloud Sync 2.0", "changes": ["Replaced full-state cloud uploads with record-level synchronization for expenses, income, projects, accounts, ledger entries, reconciliations, reports, settings, and other saved records.", "Added atomic multi-record commits, server-confirmed revisions, immutable cloud audit history, exponential retry, exact pending-record controls, and recoverable per-record conflicts.", "Added Sync Health, remote device sign-out, device app-version visibility, and safeguards that prevent older app versions from erasing fields written by newer releases."]}, {"version": "V12.20.0", "title": "Account Ledger, Transfers & Reconciliation", "changes": ["Added an append-only account ledger that recalculates active account balances from opening balances, expense payments, reversals, income deposits, transfers, and reconciliation adjustments.", "Added safe account-to-account transfers with linked debit and credit entries, insufficient-funds protection, and CSV export.", "Replaced silent balance overwrites with dated reconciliation records while preserving V12.19.1 balances through a one-time opening-balance migration."]}, {"version": "V12.19.1", "title": "Repository & Security Hardening", "changes": ["Added automated GitHub quality checks and controlled GitHub Pages deployment from validated main-branch commits.", "Completed the repository with version metadata, offline assets, regression tests, release documentation, and contribution safeguards.", "Strengthened Supabase policies with forced Row Level Security and immutable payment-operation audit rows." ]}, {"version": "V12.19.0", "title": "MacBook & iPhone Cloud Sync", "changes": ["Added optional Supabase cloud synchronization between MacBook and iPhone while preserving local-first offline saves.", "Added first-device upload, new-device download, merge, pending-change, Realtime, connected-device, and conflict-recovery controls.", "Added optimistic cloud revisions, record timestamps, deletion tombstones, and idempotent payment-operation audit records to reduce duplicate payment risks across devices."]}, {"version": "V12.18.10", "title": "Confirmed Payment Account Deduction & Gym Month-End Auto-Pay", "changes": ["Mark Paid now requires the actual payment account and deducts the confirmed amount from that account balance.", "Moving a paid expense back to unpaid restores the exact app-deducted amount once.", "Gym expenses can auto-pay after month-end using a separately authorized account, with insufficient-balance protection."]}, {"version": "V12.18.9", "title": "Split Utility Bills & Recurring Series Editing", "changes": ["Added Utility Bill expenses with separate Electric and Water amounts and a live combined total.", "Editing a monthly expense supports this month only, this month and future months, or every month in the recurring series.", "Recurring-series changes protect paid status, paid dates, record IDs, and month-specific Gym adjustments."]}, {"version": "V12.18.8", "title": "Optional Gym Emoji & Settings History", "changes": ["Gym expenses no longer receive an emoji automatically; icons are added only when selected manually.", "Removed the separate Appearance category from Settings while preserving the top-right theme control.", "Added an offline Version History card under Advanced with concise change summaries for documented releases."]}, {"version": "V12.18.7", "title": "Flexible Gym Expense", "changes": ["Added Gym expense as a third expense type alongside Normal Expense and Daily Reserved Budget.", "New Gym expenses default to ₱80 per visit and Monday, Tuesday, Thursday, and Friday.", "Added seven editable weekday controls so the usual gym days can be changed at any time."]}, {"version": "V12.18.6", "title": "Compact Dashboard and Project Payment Summaries", "changes": ["Set the five Dashboard Monthly Overview cards to min-height: 54px.", "Set the four Project Payments summary cards to min-height: 54px.", "Reduced summary-card padding and internal spacing while keeping values readable."]}, {"version": "V12.18.5", "title": "Compact Summary Heights", "changes": ["Verified the live Budget & Expenses first-row summary cards at a browser-computed height of 70px, including padding and border-box sizing.", "Matched all five Income summary cards to the same 70px desktop height.", "Matched all four Paid Expenses summary cards to the same 70px desktop height."]}, {"version": "V12.18.4", "title": "Dashboard Resize Grid", "changes": ["Changed the desktop Dashboard bento grid from six to twelve logical columns.", "Small cards now span three columns, allowing four Small cards per row.", "Large cards now span four columns, allowing three Large cards per row."]}, {"version": "V12.18.3", "title": "Bento Resize Reliability", "changes": ["Added a persistent Dashboard Customize mode with a visible toolbar for Card settings, Reset, and Done.", "Made edge resize controls usable after the settings dialog closes.", "Added real pointer drag resizing with safe snapping to Small, Large, or Wide sizes."]}, {"version": "V12.18.2", "title": "Bento Dashboard and Compact Summaries", "changes": ["Rebuilt the Dashboard detail area as a six-column bento grid. Small cards span two columns, Large cards span three columns, and Wide cards span the full row.", "Added Dashboard card-size preferences with safe Small, Large, and Wide snap sizes.", "Added edge resize controls that appear only while Customize Dashboard is open."]}, {"version": "V12.18.1", "title": "UX Reliability", "changes": ["Separated full Monthly Expenses from the current Outstanding Expenses countdown used on Budget & Expenses.", "Dashboard, cash-flow charts, month comparisons, and live Monthly Reports now use the same full monthly-expense totals.", "Preserved remaining-day Daily Reserved Budget calculations on Budget & Expenses and due-soon displays."]}, {"version": "V12.18.0", "title": "Compact Consistent Workspace UI", "changes": ["Standardized the page headers, card padding, radii, shadows, button sizes, form controls, section gaps, and typography across Dashboard, Budget & Expenses, Projects, Monthly Reports, and Settings.", "Dashboard now uses five equal compact KPI cards and a consistent two-column desktop detail grid, while full-width charts and the monthly calendar retain the space they need.", "Budget & Expenses keeps the Income, Budget & Expenses, and Paid Expenses workspace tabs, uses matching summary cards, tighter account cards, and the existing single-line compact filters."]}, {"version": "V12.17.3", "title": "Consolidated Navigation Workspaces", "changes": ["Simplified the primary sidebar to four numbered destinations: Dashboard, Budget & Expenses, Projects, and Monthly Reports; Settings remains unnumbered at the bottom.", "Moved Income and Paid Expenses into a shared Money workspace switcher: Income | Budget & Expenses | Paid Expenses.", "Kept the existing View paid expenses shortcut inside Budget & Expenses."]}, {"version": "V12.17.2", "title": "Compact Popup Inputs & Monthly Checkboxes", "changes": ["Reduced the value and placeholder text size across Account, Income, Expense, Project, and Savings Goal popup forms while keeping labels, headers, and actions readable.", "Removed visible peso prefixes from popup amount fields and standardized empty amount placeholders to 0.00.", "Replaced the expanded monthly recurrence controls with direct checkboxes for Income and Expense records."]}, {"version": "V12.17.1", "title": "Recurring Delete & Duplicate Reliability", "changes": ["Fixed monthly expenses returning immediately after deletion by saving a skipped occurrence for the deleted month.", "Recurring expense deletion now offers Delete this month only or Stop this and future.", "Stopping a recurring expense removes the selected and already-created future copies while preserving earlier expense history."]}, {"version": "V12.17.0", "title": "Unified Popup Forms", "changes": ["Standardized all 11 dialogs with one shared 8px-radius popup system, sticky headers and footers, scrollable bodies, consistent padding, and safe mobile viewport behavior.", "Account, Income, Expense, Project, and Savings Goal forms now share compact labels, inputs, required-field guidance, short context notes, and aligned Add/Edit footers.", "Added Delete Goal inside Edit Savings Goal and kept destructive actions on the far left, Cancel before Save, and primary actions on the far right."]}, {"version": "V12.16.4", "title": "Expense Dialog Reliability", "changes": ["Rebuilt Delete Expense with a dedicated handler and an in-app confirmation dialog.", "Fixed Duplicate Expense so it changes the already-open Edit Expense dialog into an unsaved duplicate review instead of reopening the modal.", "Duplicate review advances the date one month, resets paid status and recurrence, clears the original ID, and leaves the source record unchanged."]}, {"version": "V12.16.3", "title": "compact forms, icon picker, and annual Income", "changes": ["Income Add/Edit uses a tighter 638px desktop dialog, reduced padding, a joined peso amount field, collapsed recurrence, two-row Notes, and a short account-balance helper.", "Category Name appears only for Other Wages and Other Income. Add Income never shows Delete; Edit Income does.", "Accounts, Income, Expenses, and Savings Goals now use the icon square itself as the picker trigger. Emoji, upload, and conditional remove actions stay inside a compact popover."]}, {"version": "V12.16.2", "title": "Income interface refinements", "changes": ["Add Income now uses the same top-bar action position as Add Expense and Add Project.", "Income summary cards use consistent heights, descriptions, amount alignment, and responsive grids.", "Income filters now match the compact Paid Expenses and Projects toolbars, including an expandable mobile Filters panel."]}, {"version": "V12.16.2", "title": "Calendar Deduplication & Compact View", "changes": ["Calendar expenses are now assigned to one event date only: unpaid records use their due date, while paid records use their paid date or saved expense date when a legacy paid date is missing.", "Recurring expense copies are scoped to their own saved month, so future or prior copies no longer appear on the selected month’s matching due day.", "Paid expenses no longer appear again as Due."]}, {"version": "V12.16.0", "title": "Record Icons & Project Action", "changes": ["Accounts, Savings Goals, and Expenses can use an optional emoji or uploaded PNG, JPEG, or WebP logo.", "Uploaded logos are fitted into a transparent 64 × 64px canvas and compressed before storage.", "Identical uploaded images share one deduplicated local icon-library entry."]}, {"version": "V12.15.0", "title": "Income, Dashboard Calendar & Brand Refresh", "changes": ["Added a complete Income page for wages, bonuses, commissions, interest, dividends, gifts, refunds, transfers from Savings, and custom income categories.", "Added recurring monthly income records, calculator-style amount entry, account selection, included/excluded totals, Edit/Delete workflow, monthly CSV, and annual Income CSV.", "Added an annual Income table with January–December values, totals, and monthly averages."]}, {"version": "V12.11.2", "title": "project fixes", "changes": ["Active Projects now sort by status first: Ongoing, then On hold, then Completed items that still have a balance or no project value.", "Completed projects in the Active Projects box no longer show overdue or due-soon deadline warnings.", "The Active Projects summary ignores Completed deadlines and uses the nearest Ongoing or On hold deadline instead."]}, {"version": "V12.12.0", "title": "salary-work workflow", "changes": ["The package folder is permanently titled My_Finance_Records folder. The release version remains inside the app, README, service worker, and version.json.", "Projects can be classified as Freelance Project or Salary-job Project.", "Salary projects can be Included in Fixed Salary or Extra Project — Freelance Payment."]}, {"version": "V12.13.0", "title": "dashboard charts and action consistency", "changes": ["Income versus Expenses now contains two coordinated graphs: vertical Income/Expense columns with a blue Balance line, and a horizontal monthly comparison.", "Income remains green, Expenses remain red, and Balance is blue. Balance equals project income received minus included monthly expenses.", "Fixed-salary projects remain excluded from Income; extra paid salary projects remain included."]}, {"version": "V12.13.1", "title": "compact filter toolbars", "changes": ["Removed visible field titles from the Budget & Expenses, Paid Expenses, and Projects filter rows.", "Preserved hidden labels and ARIA names for screen-reader users.", "Reduced desktop filter height, padding, gaps, and visual weight."]}, {"version": "V12.13.2", "title": "single-line filter actions", "changes": ["Budget & Expenses now uses Compact expense rows permanently; the Comfortable/Compact selector and saved density preference were removed.", "Select Visible, selected count, Search, Date, Category, and Clear now share one compact desktop toolbar.", "Bulk Actions, Apply, and Clear appear in that same toolbar only after at least one unpaid expense is selected."]}, {"version": "V12.14.0", "title": "navigation and custom categories", "changes": ["Removed the peso mark from the sidebar brand and removed the sidebar instruction block.", "Grouped navigation into Overview, Expenses, Projects, Reports, and App.", "Renamed the Payments navigation item to Project Payments."]}, {"version": "V12.4", "title": "Phase 5", "changes": ["Added System, Light, and Dark appearance modes with a quick top-bar toggle.", "Reduced card, dialog, input, navigation, and button corner radius.", "Replaced colored top lines and decorative corner marks with softly filled bento cards."]}, {"version": "V12.5", "title": "Phase 6 Savings & Insights", "changes": ["Added account types: Cash, Bank, E-wallet, Savings, and Other.", "Existing account names and balances remain unchanged; recognizable account names receive a safe default type.", "Added a real Total savings dashboard card calculated only from accounts marked as Savings."]}, {"version": "V12.6", "title": "Phase 7 Secure Sample-Data Reset", "changes": ["Replaced the one-click browser confirmation for Reset sample data with a dedicated warning dialog.", "The destructive reset button remains locked until reset sample data is typed. Matching ignores capitalization and leading or trailing spaces; partial phrases do not unlock it.", "Pressing Enter cannot reset records unless the complete confirmation phrase matches."]}, {"version": "V12.7.1", "title": "Phase 8 Expense Total Choice · Font Reverted", "changes": ["Added Add this amount to expense totals to the Add/Edit Expense form.", "New expenses are included by default, preserving the existing calculation behavior.", "Existing and imported expenses without the new field remain included automatically."]}, {"version": "V12.8.0", "title": "Phase 9 UI/UX Stabilization", "changes": ["Rebuilt Projects, Project Payments, and Monthly Report records as responsive mobile cards to prevent horizontal overflow.", "Kept one mobile Add expense action visible while preserving the single desktop top-bar action.", "Fixed Monthly Checklist contrast in dark mode and increased touch targets and small-text readability."]}, {"version": "V12.9.0", "title": "Phase 10 Projects, Savings Goals & Number Inputs", "changes": ["Active projects are permanently ordered by deadline priority: nearest overdue items, due today, nearest upcoming deadlines, then projects without deadlines.", "Added separate Active Projects and collapsible Completed Projects sections. A project enters Completed Projects only when its status is Completed and its received amount covers the full project value.", "Added Mark fully paid, which records only the remaining balance as a final payment and preserves payment history."]}, {"version": "V12.9.1", "title": "Calculator Number-Input Correction", "changes": ["Added safe calculator-style entry to every monetary field. Examples: 200 + 100, 1,500 + 250.50, 400 × 15, 6000 / 3, and (5000 - 500) / 2.", "Supported operators are addition (+), subtraction (- or −), multiplication ( or ×), division (/ or ÷), and parentheses.", "Operators are preserved while typing and are never silently removed. 200+100 evaluates to ₱300.00; it cannot become 200100."]}, {"version": "V12.10.0", "title": "Phase 11 Interface Refinement", "changes": ["Compact top navigation, month controls, Budget summary cards, Available Money cards, filters, and bulk-action controls without changing any financial formula.", "Added a saved account order. Account cards can be dragged on desktop, reordered with arrow keys, or moved with accessible Up and Down controls on touch layouts. The selected order is reused on the Dashboard, Budget & Expenses, Settings, and account selectors.", "Unified desktop column alignment so Expense descriptions, dates, payment accounts, amounts, and actions remain directly beneath their headers. Applied matching alignment improvements to Paid Expenses, Projects, Project Payments, and report records while preserving stacked mobile cards."]}, {"version": "V12.11.0", "title": "Phase 12 Application-wide Accessible Help", "changes": ["Added compact contextual ? help beside every page title, major KPI, summary value, Dashboard card, Budget section, Paid Expenses area, Project section, Project Payments summary, Monthly Report section, Settings card, and major dialog.", "Added focused help beside complex form labels for account balances and types, expense amounts and periods, due days, payment accounts, recurrence, project status and values, and Savings Goal settings.", "The help controls remain visually quiet at approximately 19–20px and sit directly beside the words they explain. Their invisible pointer area is larger so they remain usable on touch screens."]}, {"version": "V12.11.1", "title": "Hover Help & Bento Polish", "changes": ["Contextual help remains available throughout the application, but hover-capable devices now reveal each ? only when the related title or label is hovered or focused. The button remains keyboard accessible and a faint touch fallback is retained for devices without hover.", "Reduced the help icon to a quieter 16–18px visual size while preserving its larger invisible pointer target. Titles reserve the small icon space, so revealing help does not shift surrounding text or values.", "Restored one continuous, slightly stronger colored border around every summary bento card, including the top edge and rounded corners."]}];
 
     function versionHistoryCardHtml() {
       const entries = VERSION_HISTORY.map((release, index) => `
@@ -9543,7 +9851,9 @@
       document.querySelectorAll("[data-settings-panel]").forEach(panel => { panel.hidden = panel.dataset.settingsPanel !== key; });
       try { localStorage.setItem(SETTINGS_PANEL_KEY, key); } catch (error) {}
       if (updateUrl) { const url = new URL(location.href); url.searchParams.set("page", "settings"); url.searchParams.set("settings", key); history.replaceState({ page: "settings", settings: key }, "", url); }
-      if (focusTab) document.querySelector(`[data-settings-tab="${key}"]`)?.focus();
+      const selectedTab = document.querySelector(`[data-settings-tab="${key}"]`);
+      if (focusTab) selectedTab?.focus();
+      if (selectedTab && window.matchMedia("(max-width:850px)").matches) requestAnimationFrame(() => centerScrollableTab(selectedTab.closest(".settings-tablist"), selectedTab, updateUrl));
     }
 
     function setupSettingsNavigation() {
@@ -10582,7 +10892,6 @@
     document.getElementById("expenseActionConfirmDialog").addEventListener("cancel", event => { event.preventDefault(); settleExpenseConfirmation(false); });
 
     document.getElementById("quickAddExpense").addEventListener("click", event => { const kind=event.currentTarget.dataset.actionKind; if(kind==="project") openProjectDialog(); else if(kind==="income") openIncomeDialog(); else openExpenseDialog(); });
-    document.getElementById("mobileAddExpenseButton").addEventListener("click", () => openExpenseDialog());
     document.getElementById("themeToggleButton").addEventListener("click", cycleThemePreference);
     document.querySelectorAll("[data-theme-choice]").forEach(button => button.addEventListener("click", () => setThemePreference(button.dataset.themeChoice)));
     themeMedia.addEventListener?.("change", () => { if (currentThemePreference() === "system") syncThemeControls(); });
@@ -11031,9 +11340,13 @@
 
 
     document.getElementById("generateMonthlyReportButton").addEventListener("click", saveSelectedMonthlyReport);
-    document.querySelector(".report-section-nav")?.addEventListener("click", event => {
+    const reportSectionNav = document.querySelector(".report-section-nav");
+    reportSectionNav?.querySelector("[data-report-target]")?.setAttribute("aria-current", "true");
+    reportSectionNav?.addEventListener("click", event => {
       const button = event.target.closest("[data-report-target]");
       if (!button) return;
+      reportSectionNav.querySelectorAll("[data-report-target]").forEach(item => item.toggleAttribute("aria-current", item === button));
+      centerScrollableTab(reportSectionNav, button, true);
       const target = document.getElementById(button.dataset.reportTarget);
       const group = target?.closest(".report-compact-group");
       if (group) group.open = true;
@@ -11256,7 +11569,7 @@
     });
 
     // ---------------- V12.10.0 PWA, Phase 11 interface refinement, Phase 10 calculator number inputs, projects, savings goals, and number inputs, Phase 7 secure reset, Phase 6 savings + dashboard insights, Phase 5 reports + dark mode, Phase 4 dashboard + Apple Calendar, Phase 3 monthly navigation, Phase 2 expense workflow, device registry, sync history, offline packs, reminders, and migration ----------------
-    const APP_VERSION = "13.0.0";
+    const APP_VERSION = "13.0.1";
     const SCHEMA_VERSION = 12;
     const V12_META_KEY = "simple-finance-project-records-v12-meta";
     const V11_BACKUP_KEY = "simple-finance-project-records-v11-backup";
@@ -12321,6 +12634,12 @@
     organizeSettingsPanels();
     setupWorkspaceNavigation();
     setupSettingsNavigation();
+    setupMobileTopbarUtilities();
+    syncMobileFilterPanels();
+    window.addEventListener("resize", () => { syncMobileFilterPanels(); syncPageSpecificActions(); });
+    document.addEventListener("input", updateMobileFilterBadges);
+    document.addEventListener("change", updateMobileFilterBadges);
+    new MutationObserver(updateMobileFilterBadges).observe(document.body, { subtree:true, childList:true, characterData:true });
     syncThemeControls();
     runV12Migration();
     installV12Wrappers();

@@ -1,3 +1,16 @@
+## 13.0.1 · 2026-08-07
+
+### Changed
+- Rebuilt the iPhone top bar so page information, utilities, and month navigation no longer compete for one row.
+- Replaced duplicate mobile Add Expense controls with one contextual top-bar action.
+- Shortened Money workspace labels on mobile and restored two-column summary cards on standard iPhones.
+- Collapsed Income, Budget, Paid Expense, and Project filters by default on mobile and added active-filter counts.
+- Centered selected Settings and Reports tabs, removed native horizontal scrollbars, and added subtle Settings edge indicators.
+
+### Preserved
+- MacBook layout and desktop navigation.
+- Finance Schema 12, Cloud Schema V3, encryption, profile roles, ledger, calculations, stored data, and protected rollback assets.
+
 # Changelog
 
 All notable changes to My Finance Records are documented here.

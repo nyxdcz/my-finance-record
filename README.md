@@ -1,4 +1,11 @@
-# My Finance Records · V13.0.0 PWA
+# My Finance Records · V13.0.1 PWA
+
+## V13.0.1 · MacBook & iPhone UI Stabilization
+
+- Rebuilt the iPhone top bar into a title row, compact utility menu, and full-width month selector.
+- Removed the overlapping floating Add Expense button and kept one contextual mobile add action.
+- Added centered mobile Settings and Reports tabs, shorter Money workspace labels, compact two-column summaries, and collapsed filter panels with active-filter counts.
+- Preserved the MacBook layout, Finance Schema 12, Cloud Schema V3, encrypted cloud payloads, profiles, account ledger, calculations, and stored records.
 
 ## V13.0.0 · Major Cloud, Encryption & Profile Architecture
 

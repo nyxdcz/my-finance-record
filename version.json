@@ -1,5 +1,5 @@
 {
-  "version": "13.0.0",
+  "version": "13.0.1",
   "schemaVersion": 12,
   "cloudSchemaVersion": 3,
   "ledgerVersion": 1,
@@ -10,8 +10,8 @@
   "profileArchitectureVersion": 1,
   "encryptionVersion": 1,
   "authSecurityVersion": 1,
-  "cacheVersion": "finance-v13-20260806-v13000-cloud-encryption-profiles",
-  "released": "2026-08-06",
-  "name": "Major Cloud, Encryption & Profile Architecture",
-  "notes": "Adds personal and household finance profiles, Owner/Editor/Viewer roles, Cloud Schema V3 profile-scoped synchronization, client-side AES-256-GCM encrypted cloud payloads and backups, invitation codes, encrypted restore points, optional device app lock, MFA controls, and experimental passkeys while preserving Finance Schema 12 and the V12 Cloud Schema V2 rollback path."
+  "cacheVersion": "finance-v13-20260807-v13001-iphone-ui-stabilization",
+  "released": "2026-08-07",
+  "name": "MacBook & iPhone UI Stabilization",
+  "notes": "Stabilizes the iPhone top bar, month selector, mobile utilities, workspace labels, summary grids, filter panels, Settings tabs, and Reports navigation while preserving the MacBook layout, Finance Schema 12, Cloud Schema V3, encryption, profiles, calculations, and stored data."
 }
