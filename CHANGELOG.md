@@ -1,3 +1,13 @@
+## 13.0.9 · 2026-08-07
+
+### Changed
+- Reordered phone top-bar actions to Add, Sync, then More and removed duplicate plus rendering while keeping all phone controls at 44 × 44px.
+- Rebuilt phone Projects into compact cards with concise facts, smaller status badges, primary actions plus More, and overlap-safe project actions on desktop/iPad.
+- Compacted Budget & Expenses phone summary cards with shorter mobile labels and descriptions while preserving all calculations.
+
+### Fixed
+- Added an explicit ledger recalculation and UI refresh after account reconciliation so edited account balances immediately update account cards and dependent totals without a manual page refresh.
+
 ## 13.0.8 · 2026-08-07
 
 ### Changed

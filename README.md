@@ -1,6 +1,14 @@
-# My Finance Records · V13.0.8 PWA
+# My Finance Records · V13.0.9 PWA
 
 
+
+
+## V13.0.9 · Phone UI & Account Balance Refresh
+
+- Phone top-bar actions now follow **Add → Sync → More** with one SVG plus icon and consistent 44 × 44px controls.
+- Projects use compact phone cards and overlap-safe primary + More actions; Budget & Expenses summary cards use shorter phone labels and tighter spacing.
+- Editing an account balance now explicitly recalculates the append-only ledger and refreshes every visible account/totals surface immediately after reconciliation.
+- Finance Schema 12, Cloud Schema V3, project revisions, payments, encrypted sync, and stored records are unchanged.
 
 
 ## V13.0.8 · Calendar Paid-State & Project Completion Cleanup
@@ -47,10 +55,10 @@
 
 ## macOS File Inspection and Fixes installer
 
-Use the V13.0.8 **File Inspection and Fixes** installer when updating this repository on a Mac.
+Use the V13.0.9 **File Inspection and Fixes** installer when updating this repository on a Mac.
 
-1. Extract `My_Finance_Records_V13_0_8_File_Inspection_and_Fixes_Installer.zip`.
-2. Double-click `Install_V13_0_8.command`.
+1. Extract `My_Finance_Records_V13_0_9_File_Inspection_and_Fixes_Installer.zip`.
+2. Double-click `Install_V13_0_9.command`.
 3. The installer uses `~/Documents/My_Finance_Records` by default, cloning the GitHub repository there when needed.
 4. It checks the current Git state, required files, local asset paths, package metadata, permissions, and configuration before applying the V13.0.8 payload.
 5. It preserves the repository copy of `sync-config.js`, installs locked npm metadata with `npm ci`, then runs `npm run inspect`, `npm run quality`, and `git diff --check`.

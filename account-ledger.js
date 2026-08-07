@@ -214,6 +214,17 @@
     return reconciliation;
   }
 
+  function refreshReconciledAccountState(account, targetBalance = null) {
+    recalculateBalances(data);
+    const actual = roundMoney(data.accounts?.[account] || 0);
+    if (targetBalance != null && Number.isFinite(Number(targetBalance)) && actual !== roundMoney(targetBalance)) {
+      console.warn(`Account ledger refresh mismatch for ${account}: expected ${roundMoney(targetBalance)}, calculated ${actual}`);
+    }
+    renderAll(false);
+    try { window.dispatchEvent(new CustomEvent("finance:account-balance-refreshed", { detail:{ account, balance:actual } })); } catch (error) {}
+    return actual;
+  }
+
   function reverseIncomeLedger(existing, reason = "Income record changed") {
     if (!existing?.ledgerTransactionId) return null;
     const original = (data.accountLedger || []).find(entry => entry.transactionId === existing.ledgerTransactionId && entry.type === "income-deposit" && entry.incomeId === existing.id);
@@ -548,11 +559,13 @@
       const openingId = `opening:${uid()}`;
       appendLedgerEntries([{ id:uid(), transactionId:openingId, operationId:openingId, account:newName, type:"opening-balance", amount:targetBalance, date:localDateKey(), description:`Opening balance for ${newName}`, source:"account-create" }]);
     } else appendReconciliation(newName, targetBalance, { note:"Balance changed from Edit account" });
+    recalculateBalances(data);
     if (type !== "Savings") (data.savingsGoals || []).forEach(goal => { if (goal.sourceType === "linked" && goal.linkedAccount === newName) { goal.sourceType = "manual"; goal.currentAmount = Number(data.accounts[newName] || 0); goal.linkedAccount = ""; goal.updatedAt = new Date().toISOString(); } });
     if (type === "Savings" && !data.savingsSettings.defaultAccount) data.savingsSettings.defaultAccount = newName;
     if (type !== "Savings" && data.savingsSettings.defaultAccount === newName) data.savingsSettings.defaultAccount = "";
     closeTrackedFormAfterAction("accountDialog");
     saveData(originalName ? "Account updated and reconciled" : "Account added with opening balance");
+    refreshReconciledAccountState(newName, targetBalance);
   }
 
   function submitAccountsReconciliationForm() {

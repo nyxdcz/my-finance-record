@@ -1,5 +1,5 @@
 {
-  "version": "13.0.8",
+  "version": "13.0.9",
   "schemaVersion": 12,
   "cloudSchemaVersion": 3,
   "ledgerVersion": 1,
@@ -10,8 +10,8 @@
   "profileArchitectureVersion": 1,
   "encryptionVersion": 1,
   "authSecurityVersion": 1,
-  "cacheVersion": "finance-v13-20260807-v13008-paid-calendar-project-completion-r1",
+  "cacheVersion": "finance-v13-20260807-v13009-phone-account-project-r1",
   "released": "2026-08-07",
-  "name": "Calendar Paid-State & Project Completion Cleanup",
-  "notes": "Removes paid expense due-events from the Dashboard calendar, separates project completion from payment completion in project lists, compacts project actions, and standardizes disclosure chevrons and control sizes without changing finance records or calculations."
+  "name": "Phone UI & Account Balance Refresh",
+  "notes": "Compacts phone Budget and Projects layouts, standardizes phone top-bar action order and icon sizing, prevents project action overlap, and explicitly refreshes ledger-calculated account balances after reconciliation while preserving finance, project, cloud, and security logic."
 }
