@@ -1,5 +1,5 @@
 {
-  "version": "13.0.12",
+  "version": "13.0.13",
   "schemaVersion": 12,
   "cloudSchemaVersion": 3,
   "ledgerVersion": 1,
@@ -10,8 +10,8 @@
   "profileArchitectureVersion": 1,
   "encryptionVersion": 1,
   "authSecurityVersion": 1,
-  "cacheVersion": "finance-v13-20260807-v13012-spend-budget-r1",
+  "cacheVersion": "finance-v13-20260807-v13013-spend-transaction-r1",
   "released": "2026-08-07",
-  "name": "Spend Reliability & Phone Budget Compaction",
-  "notes": "Makes Spend a permanent account-card action, hardens Record Spending against stale/mixed PWA modules and silent failures, version-pins first-party assets, and compacts the phone Budget & Expenses summary and Available Money collapse header."
+  "name": "Record Spending Transaction Hotfix",
+  "notes": "Separates Record Spending from account correction validation, verifies and rolls back the full persisted purchase transaction before close, preserves ledger history across reload normalization, and keeps normal quick-spend purchases correctly classified."
 }

@@ -1,6 +1,16 @@
-# My Finance Records · V13.0.12 PWA
+# My Finance Records · V13.0.13 PWA
 
 
+
+
+## V13.0.13 · Record Spending Transaction Hotfix
+
+- Separates **Record spending** from the account-correction form submit path, so hidden maintenance fields and native form validation cannot block a purchase.
+- Runs quick spending as one verified transaction: validate → Paid Expense → ledger debit → recalculated balance → persist → storage verification → close.
+- Rolls back failed spending attempts, keeps the modal open with an inline error, and clears the dirty state only after a verified successful save.
+- Disables inactive mode controls so Correct Balance and Record Spending cannot interfere with each other.
+- Preserves the append-only account ledger and reconciliation history through the app reload/normalization path, so a verified purchase remains traceable after reopening the app.
+- Keeps direct purchases such as Dinner classified as normal paid expenses rather than accidentally treating empty utility fields as a utility bill.
 
 
 ## V13.0.12 · Spend Reliability & Phone Budget Compaction
@@ -80,12 +90,12 @@
 
 ## macOS File Inspection and Fixes installer
 
-Use the V13.0.12 **File Inspection and Fixes** installer when updating this repository on a Mac.
+Use the V13.0.13 **File Inspection and Fixes** installer when updating this repository on a Mac.
 
-1. Extract `My_Finance_Records_V13_0_12_File_Inspection_and_Fixes_Installer.zip`.
-2. Double-click `Install_V13_0_12.command`.
+1. Extract `My_Finance_Records_V13_0_13_File_Inspection_and_Fixes_Installer.zip`.
+2. Double-click `Install_V13_0_13.command`.
 3. The installer uses `~/Documents/My_Finance_Records` by default, cloning the GitHub repository there when needed.
-4. It checks the current Git state, required files, local asset paths, package metadata, permissions, and configuration before applying the V13.0.10 payload.
+4. It checks the current Git state, required files, local asset paths, package metadata, permissions, and configuration before applying the V13.0.13 payload.
 5. It preserves the repository copy of `sync-config.js`, installs locked npm metadata with `npm ci`, then runs `npm run inspect`, `npm run quality`, and `git diff --check`.
 6. The installer **does not commit or push**. Review `git status` and publish only after the checks report success.
 

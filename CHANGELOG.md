@@ -1,3 +1,16 @@
+## 13.0.13 · 2026-08-07
+
+### Fixed
+- Record Spending is isolated from the Correct Account Balance form submit/native-validation path.
+- Successful quick spending now requires exactly one Paid Expense, exactly one expense-payment ledger debit, the expected recalculated balance, successful persistence, and storage verification before the modal closes.
+- Failed spending attempts roll back in-memory changes and any already-persisted transaction, keep user inputs available, and show an inline error instead of leaving the form in an ambiguous dirty state.
+- Inactive account-mode fields are disabled so hidden correction controls cannot block Record Spending.
+- Persisted account-ledger and reconciliation fields now survive the base normalization/reload path instead of being reconstructed from balances.
+- Normal quick-spend purchases with empty utility fields no longer normalize into utility expenses.
+
+### Preserved
+- Finance Schema 12, Cloud Schema V3, append-only account ledger history, quick-spend reversal behavior, budgets, profiles, encryption, sync, and stored records.
+
 ## 13.0.12 · 2026-08-07
 
 ### Fixed
