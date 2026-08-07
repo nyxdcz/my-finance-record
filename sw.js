@@ -1,6 +1,6 @@
 "use strict";
-const APP_VERSION = "13.0.7";
-const CACHE_VERSION = "finance-v13-20260807-v13007-budget-plan-compact-r1";
+const APP_VERSION = "13.0.8";
+const CACHE_VERSION = "finance-v13-20260807-v13008-paid-calendar-project-completion-r1";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const DB_NAME = "simple-finance-project-records-v12-db";

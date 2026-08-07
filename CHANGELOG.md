@@ -1,3 +1,12 @@
+## 13.0.8 · 2026-08-07
+
+### Changed
+- Paid expenses no longer appear as due/upcoming expense entries or dots in the Dashboard Monthly Calendar; paid history remains in Paid Expenses, reports, ledger, and calculations.
+- Projects with Completed status now appear in Completed Projects whether fully paid or still carrying a client balance.
+- Completed projects with remaining balances clearly show Completed · balance due alongside their Unpaid/Partial payment status and keep Mark paid available.
+- Project action buttons are more compact on desktop while retaining phone touch targets.
+- Disclosure/expand controls now share one SVG chevron, 40px desktop/iPad sizing, 44px phone sizing, and consistent border/focus treatment.
+
 ## 13.0.7 · 2026-08-07
 
 ### Changed

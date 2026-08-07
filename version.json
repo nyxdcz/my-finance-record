@@ -1,5 +1,5 @@
 {
-  "version": "13.0.7",
+  "version": "13.0.8",
   "schemaVersion": 12,
   "cloudSchemaVersion": 3,
   "ledgerVersion": 1,
@@ -10,8 +10,8 @@
   "profileArchitectureVersion": 1,
   "encryptionVersion": 1,
   "authSecurityVersion": 1,
-  "cacheVersion": "finance-v13-20260807-v13007-budget-plan-compact-r1",
+  "cacheVersion": "finance-v13-20260807-v13008-paid-calendar-project-completion-r1",
   "released": "2026-08-07",
-  "name": "Budget Plan Compact Layout",
-  "notes": "Adds a persistent full Monthly budget plan collapse control, compact summary mode, consistent vertical spacing, and tighter plan cards and paired bento panels without changing budget or forecast calculations."
+  "name": "Calendar Paid-State & Project Completion Cleanup",
+  "notes": "Removes paid expense due-events from the Dashboard calendar, separates project completion from payment completion in project lists, compacts project actions, and standardizes disclosure chevrons and control sizes without changing finance records or calculations."
 }
