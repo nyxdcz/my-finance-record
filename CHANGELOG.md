@@ -1,3 +1,13 @@
+## 13.0.5 · 2026-08-07
+
+### Fixed
+- Scoped unpaid Gym calendar visits to the Gym expense record saved for the calendar month, so recurring copies from other months cannot repeat the same visit.
+- Added stable calendar event source keys and idempotent deduplication for income, expenses, project deadlines, and project payments.
+- Kept underlying expense records, recurring-series data, account balances, payment history, and finance calculations unchanged.
+
+### Validation
+- Added Dashboard calendar deduplication regression coverage, including repeated recurring Gym copies, repeat rendering, and stable event identity.
+
 ## 13.0.4 · 2026-08-07
 
 ### Changed

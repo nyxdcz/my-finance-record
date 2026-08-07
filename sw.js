@@ -1,6 +1,6 @@
 "use strict";
-const APP_VERSION = "13.0.4";
-const CACHE_VERSION = "finance-v13-20260807-v13004-settings-topbar-r1";
+const APP_VERSION = "13.0.5";
+const CACHE_VERSION = "finance-v13-20260807-v13005-calendar-dedup-r1";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const DB_NAME = "simple-finance-project-records-v12-db";

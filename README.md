@@ -1,5 +1,12 @@
-# My Finance Records · V13.0.4 PWA
+# My Finance Records · V13.0.5 PWA
 
+
+
+## V13.0.5 · Dashboard Calendar Deduplication
+
+- Fixes repeated Gym visits in the Dashboard Monthly calendar by using only the recurring Gym record saved for that month.
+- Deduplicates calendar projections with stable source identities, so refreshes, sync updates, and repeated renders cannot append the same logical event again.
+- Does not delete or merge saved expenses; finance records, recurring schedules, payment history, and account calculations remain unchanged.
 
 ## V13.0.4 · Settings & Top Bar UI Refinement
 
@@ -18,16 +25,16 @@
 
 ## macOS File Inspection and Fixes installer
 
-Use the V13.0.4 **File Inspection and Fixes** installer when updating this repository on a Mac.
+Use the V13.0.5 **File Inspection and Fixes** installer when updating this repository on a Mac.
 
-1. Extract `My_Finance_Records_V13_0_4_File_Inspection_and_Fixes_Installer.zip`.
-2. Double-click `Install_V13_0_4.command`.
+1. Extract `My_Finance_Records_V13_0_5_File_Inspection_and_Fixes_Installer.zip`.
+2. Double-click `Install_V13_0_5.command`.
 3. The installer uses `~/Documents/My_Finance_Records` by default, cloning the GitHub repository there when needed.
-4. It checks the current Git state, required files, local asset paths, package metadata, permissions, and configuration before applying the V13.0.4 payload.
+4. It checks the current Git state, required files, local asset paths, package metadata, permissions, and configuration before applying the V13.0.5 payload.
 5. It preserves the repository copy of `sync-config.js`, installs locked npm metadata with `npm ci`, then runs `npm run inspect`, `npm run quality`, and `git diff --check`.
 6. The installer **does not commit or push**. Review `git status` and publish only after the checks report success.
 
-Requirements: macOS, Git, and Node.js 22 or newer. The installer is safe to run again; an already-applied V13.0.4 working tree is revalidated instead of reapplied.
+Requirements: macOS, Git, and Node.js 22 or newer. The installer is safe to run again; an already-applied V13.0.5 working tree is revalidated instead of reapplied.
 
 
 ## V13.0.2 · Simplified Settings UI
