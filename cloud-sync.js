@@ -1,6 +1,6 @@
 "use strict";
 
-/* My Finance Records V13.0.0 · Encrypted profile-scoped Cloud Sync 3.0.
+/* My Finance Records V13.0.18 · Encrypted profile-scoped Cloud Sync 3.0.
    Local storage remains the immediate working copy. Cloud Schema V3 exchanges only
    changed encrypted records, commits related changes atomically, and preserves an immutable audit trail. */
 (function financeCloudSyncV3Bootstrap() {
@@ -677,6 +677,10 @@
     return Math.min(RETRY_MAX_MS, exponential + Math.floor(Math.random() * Math.min(1500, exponential * .2)));
   }
 
+  function setPrivacyAuthentication(authenticated, detail = {}) {
+    try { window.FinancePrivacyLock?.setAuthenticated?.(Boolean(authenticated), { email:String(detail.email || cloudUser?.email || "") }); } catch (error) {}
+  }
+
   async function loadClient() {
     if (client) return client;
     const config = getStoredConfig();
@@ -695,6 +699,7 @@
       session = nextSession || null;
       cloudUser = nextSession?.user || null;
       if (event === "PASSWORD_RECOVERY") {
+        setPrivacyAuthentication(false, { email:nextSession?.user?.email || "" });
         passwordRecoveryRouteActive = true;
         passwordRecoveryError = null;
         passwordRecoveryActive = true;
@@ -904,7 +909,7 @@
       session = result.data?.session || null;
       cloudUser = session?.user || null;
       if (cloudUser) await onSignedIn();
-      else setStatus("Not connected", "Sign in to synchronize this device.", "info");
+      else onSignedOut();
     } catch (error) { setStatus("Cloud sync unavailable", error.message || "Could not load cloud sync.", "danger"); }
   }
 
@@ -948,6 +953,7 @@
 
   function onSignedOut() {
     session = null; cloudUser = null;
+    setPrivacyAuthentication(false);
     passwordRecoveryActive = false;
     if (realtimeChannel && client) client.removeChannel(realtimeChannel).catch(() => {});
     realtimeChannel = null;
@@ -973,11 +979,13 @@
     persist();
     try { await client?.auth?.signOut?.({ scope:"local" }); } catch (error) {}
     session = null; cloudUser = null;
+    setPrivacyAuthentication(false);
     setStatus("Signed out remotely", `This installation was revoked${result.revoked_at ? ` on ${formatDateTime(result.revoked_at)}` : ""}. Local records remain available.`, "danger");
   }
 
   async function onSignedIn() {
     if (!cloudUser) return;
+    setPrivacyAuthentication(true, { email:cloudUser.email || "" });
     state.enabled = true;
     state.currentDeviceId = currentDeviceId();
     state.currentDeviceName = currentDeviceName();
@@ -1520,10 +1528,10 @@
     document.getElementById("clearCloudConfig")?.addEventListener("click",()=>{ if(!confirm("Remove cloud configuration from this device? Local records remain."))return; localStorage.removeItem(CONFIG_KEY); setTimeout(()=>location.reload(),250); });
     document.getElementById("cloudPasswordToggle")?.addEventListener("click",event=>{const input=document.getElementById("cloudAuthPassword");setPasswordVisibility(input,event.currentTarget,input?.type === "password");});
     document.querySelectorAll("[data-cloud-password-target]").forEach(button=>button.addEventListener("click",()=>{const input=document.getElementById(button.dataset.cloudPasswordTarget);setPasswordVisibility(input,button,input?.type === "password");}));
-    document.getElementById("cloudSignIn")?.addEventListener("click",event=>withAuthButtonBusy(event.currentTarget,"Signing in…",async()=>{const email=document.getElementById("cloudAuthEmail").value.trim(),password=document.getElementById("cloudAuthPassword").value;if(!email||password.length<6){setAuthMessage("Enter your email and password. Passwords must have at least 6 characters.","warning");return;}try{await signIn(email,password);}catch(error){const message=friendlyAuthError(error,"sign-in");if(/wrong email or password/i.test(message))setCloudConnectionStatus("Cloud reached","success");setAuthMessage(`${message} Your local finance records are still available on this device.`,"danger");setStatus("Sign-in failed",message,"danger");}}));
-    document.getElementById("cloudCreateAccount")?.addEventListener("click",event=>withAuthButtonBusy(event.currentTarget,"Creating…",async()=>{const email=document.getElementById("cloudAuthEmail").value.trim(),password=document.getElementById("cloudAuthPassword").value;if(!email||password.length<6){setAuthMessage("Use a valid email and a password with at least 6 characters.","warning");return;}try{await createAccount(email,password);}catch(error){const message=friendlyAuthError(error,"create-account");setAuthMessage(`${message} Your local finance records are unchanged.`,"danger");setStatus("Account creation failed",message,"danger");}}));
+    document.getElementById("cloudSignIn")?.addEventListener("click",event=>withAuthButtonBusy(event.currentTarget,"Signing in…",async()=>{const email=document.getElementById("cloudAuthEmail").value.trim(),password=document.getElementById("cloudAuthPassword").value;if(!email||password.length<6){setAuthMessage("Enter your email and password. Passwords must have at least 6 characters.","warning");return;}try{await signIn(email,password);}catch(error){const message=friendlyAuthError(error,"sign-in");if(/wrong email or password/i.test(message))setCloudConnectionStatus("Cloud reached","success");setAuthMessage(`${message} Your local finance records stay stored on this device and remain hidden until you sign in.`,"danger");setStatus("Sign-in failed",message,"danger");}}));
+    document.getElementById("cloudCreateAccount")?.addEventListener("click",event=>withAuthButtonBusy(event.currentTarget,"Creating…",async()=>{const email=document.getElementById("cloudAuthEmail").value.trim(),password=document.getElementById("cloudAuthPassword").value;if(!email||password.length<6){setAuthMessage("Use a valid email and a password with at least 6 characters.","warning");return;}try{await createAccount(email,password);}catch(error){const message=friendlyAuthError(error,"create-account");setAuthMessage(`${message} Your local finance records stay stored on this device and remain hidden until you sign in.`,"danger");setStatus("Account creation failed",message,"danger");}}));
     document.getElementById("cloudAuthPassword")?.addEventListener("keydown",event=>{if(event.key === "Enter"){event.preventDefault();document.getElementById("cloudSignIn")?.click();}});
-    document.getElementById("cloudForgotPassword")?.addEventListener("click",event=>withAuthButtonBusy(event.currentTarget,"Sending…",async()=>{const email=document.getElementById("cloudAuthEmail")?.value?.trim()||"";try{await requestPasswordReset(email);setCloudConnectionStatus("Cloud reached","success");setAuthMessage("If a cloud account exists for this email, a password-reset link has been sent. Check your inbox and spam folder.","success");setStatus("Password reset sent","Check your email for the secure reset link.","success");}catch(error){const message=friendlyAuthError(error,"reset-request");setAuthMessage(`${message} Your local finance records are unchanged.`,"danger");setStatus("Password reset failed",message,"danger");}}));
+    document.getElementById("cloudForgotPassword")?.addEventListener("click",event=>withAuthButtonBusy(event.currentTarget,"Sending…",async()=>{const email=document.getElementById("cloudAuthEmail")?.value?.trim()||"";try{await requestPasswordReset(email);setCloudConnectionStatus("Cloud reached","success");setAuthMessage("If a cloud account exists for this email, a password-reset link has been sent. Check your inbox and spam folder.","success");setStatus("Password reset sent","Check your email for the secure reset link.","success");}catch(error){const message=friendlyAuthError(error,"reset-request");setAuthMessage(`${message} Your local finance records stay stored on this device and remain hidden until you sign in.`,"danger");setStatus("Password reset failed",message,"danger");}}));
     document.getElementById("cloudTestConnection")?.addEventListener("click",event=>withAuthButtonBusy(event.currentTarget,"Testing…",async()=>{setCloudConnectionStatus("Testing…","info");try{await testCloudConnection();setCloudConnectionStatus("Connected","success");setAuthMessage("Cloud service is reachable. If sign-in still fails, check the email/password or use Forgot password.","success");}catch(error){const message=friendlyAuthError(error,"connection");setCloudConnectionStatus("Connection failed","danger");setAuthMessage(message,"danger");}}));
     document.getElementById("cloudRecoveryResend")?.addEventListener("click",event=>withAuthButtonBusy(event.currentTarget,"Sending…",async()=>{const email=document.getElementById("cloudRecoveryEmail")?.value?.trim()||document.getElementById("cloudAuthEmail")?.value?.trim()||"";try{await requestPasswordReset(email);passwordRecoveryRouteActive=true;passwordRecoveryError=null;setRecoveryHelpMessage("A new reset email was requested. If the account exists, check your inbox and spam folder.","success");setStatus("Password reset sent","Use the newest reset email only.","success");}catch(error){setRecoveryHelpMessage(friendlyAuthError(error,"reset-request"),"danger");}}));
     document.getElementById("cloudVerifyRecoveryCode")?.addEventListener("click",event=>withAuthButtonBusy(event.currentTarget,"Verifying…",async()=>{const email=document.getElementById("cloudRecoveryEmail")?.value?.trim()||"",token=document.getElementById("cloudRecoveryCode")?.value||"";try{await verifyRecoveryCode(email,token);}catch(error){setRecoveryHelpMessage(friendlyAuthError(error,"recovery-code"),"danger");}}));
@@ -1558,6 +1566,7 @@
   async function initialize() {
     if(initialized)return;
     initialized=true;
+    setPrivacyAuthentication(false);
     injectV2Ui(); wrapSaveData(); bindEvents();
     const recoveryRoute = parsePasswordRecoveryUrl();
     if (recoveryRoute.requested) {

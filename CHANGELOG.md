@@ -1,5 +1,17 @@
-## 13.0.17 · 2026-08-07
+## 13.0.18 · 2026-08-07
 
+### Added
+- Added a signed-out privacy lock that is active before the first finance render and unlocks only after cloud authentication succeeds.
+- Added zero-only signed-out placeholders and a dedicated top-bar Sign in action.
+
+### Changed
+- Accounts, expenses, projects, payments, reports, calendar events, search/productivity data, and finance notifications stay hidden while signed out.
+- Finance-data actions are blocked while signed out while authentication/recovery, cloud setup, basic app controls, and backup restore remain available.
+
+### Preserved
+- Sign-out does not delete local finance/profile data. Existing Finance Schema 12, Cloud Schema V3, encryption, ledger, revisions, calculations, and stored records remain unchanged.
+
+## 13.0.17 · 2026-08-07
 ### Fixed
 - Prevented iPhone WebKit browsers and installed PWA mode from automatically zooming into focused editable fields by enforcing a 16px minimum rendered font size for phone inputs, selects, textareas, date/month controls, amount/calculator fields, passwords, searches, and dynamically created form controls.
 - Kept mobile forms compact through spacing and padding rather than shrinking editable values below the iPhone-safe threshold.
