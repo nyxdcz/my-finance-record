@@ -1,3 +1,13 @@
+## 13.0.17 · 2026-08-07
+
+### Fixed
+- Prevented iPhone WebKit browsers and installed PWA mode from automatically zooming into focused editable fields by enforcing a 16px minimum rendered font size for phone inputs, selects, textareas, date/month controls, amount/calculator fields, passwords, searches, and dynamically created form controls.
+- Kept mobile forms compact through spacing and padding rather than shrinking editable values below the iPhone-safe threshold.
+
+### Preserved
+- Manual pinch zoom and browser accessibility remain available; no `user-scalable=no` or maximum-scale lock was added.
+- Finance Schema 12, Cloud Schema V3, account ledger, password recovery, projects, calculations, profiles, sync, desktop/iPad layout, and stored records are unchanged.
+
 ## 13.0.16 · 2026-08-07
 
 - Added a dedicated `?auth=recovery` redirect target and explicit parsing of Supabase password-reset error fragments.

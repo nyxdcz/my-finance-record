@@ -1,4 +1,12 @@
-# My Finance Records · V13.0.16 PWA
+# My Finance Records · V13.0.17 PWA
+
+## V13.0.17 · iPhone Input Zoom Prevention
+
+- Prevents iPhone Safari, Brave, Chrome, and installed PWA views from automatically zooming when an editable field receives focus.
+- Phone `input`, `select`, `textarea`, date/month, numeric/calculator, password, search, and dynamically created form controls use a minimum **16px** editable-value text size.
+- Labels, helper text, badges, tables, and normal interface copy remain compact; the change does not enlarge the whole phone UI.
+- Manual pinch zoom remains available. The viewport is not locked with `user-scalable=no` or similar accessibility-reducing settings.
+- Finance calculations, account balances, projects, cloud sync, password recovery, stored records, and desktop/iPad layouts are unchanged.
 
 ## V13.0.16 · Password Recovery Redirect Fix
 
@@ -110,16 +118,16 @@
 
 ## macOS File Inspection and Fixes installer
 
-Use the V13.0.16 **File Inspection and Fixes** installer when updating this repository on a Mac.
+Use the V13.0.17 **File Inspection and Fixes** installer when updating this repository on a Mac.
 
-1. Extract `My_Finance_Records_V13_0_16_File_Inspection_and_Fixes_Installer.zip`.
-2. Double-click `Install_V13_0_16.command`.
+1. Extract `My_Finance_Records_V13_0_17_File_Inspection_and_Fixes_Installer.zip`.
+2. Double-click `Install_V13_0_17.command`.
 3. The installer uses `~/Documents/My_Finance_Records` by default, cloning the GitHub repository there when needed.
-4. It checks the current Git state, required files, local asset paths, package metadata, permissions, and configuration before applying the V13.0.16 payload.
+4. It checks the current Git state, required files, local asset paths, package metadata, permissions, and configuration before applying the V13.0.17 payload.
 5. It preserves the repository copy of `sync-config.js`, installs locked npm metadata with `npm ci`, then runs `npm run inspect`, `npm run quality`, and `git diff --check`.
 6. The installer **does not commit or push**. Review `git status` and publish only after the checks report success.
 
-Requirements: macOS, Git, and Node.js 22 or newer. The installer is safe to run again; an already-applied V13.0.16 working tree is revalidated instead of reapplied.
+Requirements: macOS, Git, and Node.js 22 or newer. The installer is safe to run again; an already-applied V13.0.17 working tree is revalidated instead of reapplied.
 
 
 ## V13.0.2 · Simplified Settings UI
