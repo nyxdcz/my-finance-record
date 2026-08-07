@@ -1,7 +1,14 @@
-# My Finance Records · V13.0.6 PWA
+# My Finance Records · V13.0.7 PWA
 
 
 
+
+## V13.0.7 · Budget Plan Compact Layout
+
+- The full Monthly budget plan can now be expanded or collapsed, with the preference remembered locally.
+- Collapsed mode keeps Planned budget, Budget remaining, and Forecast month-end visible as a compact summary.
+- Plan actions, KPI cards, Category plan, Cash-flow forecast, and the spacing around Available money are more compact and consistent.
+- Budget formulas, category limits, committed expenses, forecast calculations, account balances, and stored finance data are unchanged.
 
 ## V13.0.6 · Project Revision Cycles
 
@@ -33,16 +40,16 @@
 
 ## macOS File Inspection and Fixes installer
 
-Use the V13.0.6 **File Inspection and Fixes** installer when updating this repository on a Mac.
+Use the V13.0.7 **File Inspection and Fixes** installer when updating this repository on a Mac.
 
-1. Extract `My_Finance_Records_V13_0_6_File_Inspection_and_Fixes_Installer.zip`.
-2. Double-click `Install_V13_0_6.command`.
+1. Extract `My_Finance_Records_V13_0_7_File_Inspection_and_Fixes_Installer.zip`.
+2. Double-click `Install_V13_0_7.command`.
 3. The installer uses `~/Documents/My_Finance_Records` by default, cloning the GitHub repository there when needed.
-4. It checks the current Git state, required files, local asset paths, package metadata, permissions, and configuration before applying the V13.0.6 payload.
+4. It checks the current Git state, required files, local asset paths, package metadata, permissions, and configuration before applying the V13.0.7 payload.
 5. It preserves the repository copy of `sync-config.js`, installs locked npm metadata with `npm ci`, then runs `npm run inspect`, `npm run quality`, and `git diff --check`.
 6. The installer **does not commit or push**. Review `git status` and publish only after the checks report success.
 
-Requirements: macOS, Git, and Node.js 22 or newer. The installer is safe to run again; an already-applied V13.0.6 working tree is revalidated instead of reapplied.
+Requirements: macOS, Git, and Node.js 22 or newer. The installer is safe to run again; an already-applied V13.0.7 working tree is revalidated instead of reapplied.
 
 
 ## V13.0.2 · Simplified Settings UI

@@ -168,10 +168,12 @@
     if (!document.getElementById("monthlyBudgetPlannerCard")) {
       const summary = document.getElementById("moneySummary");
       summary?.insertAdjacentHTML("afterend", `<article class="card budget-planner-card" id="monthlyBudgetPlannerCard" aria-labelledby="monthlyBudgetPlannerTitle">
-        <div class="card-header budget-planner-header"><div><h3 id="monthlyBudgetPlannerTitle">Monthly budget plan</h3><p id="monthlyBudgetPlannerSubtitle">Plan categories, compare actual spending, and forecast month-end cash.</p></div><div class="budget-planner-actions no-print"><button class="button button-secondary button-small" id="buildBudgetFromExpenses" type="button">Build from expenses</button><button class="button button-secondary button-small" id="copyPreviousBudget" type="button">Copy previous month</button><button class="button button-secondary button-small" id="openBudgetSettings" type="button">Plan settings</button><button class="button button-secondary button-small" id="exportBudgetCsv" type="button">Export CSV</button><button class="button button-primary button-small" id="addBudgetItem" type="button">+ Add category</button></div></div>
+        <div class="card-header budget-planner-header"><div class="budget-planner-heading-copy"><h3 id="monthlyBudgetPlannerTitle">Monthly budget plan</h3><p id="monthlyBudgetPlannerSubtitle">Plan categories, compare actual spending, and forecast month-end cash.</p></div><div class="budget-planner-actions no-print"><button class="button button-secondary button-small" id="buildBudgetFromExpenses" type="button">Build from expenses</button><button class="button button-secondary button-small" id="copyPreviousBudget" type="button">Copy previous month</button><button class="button button-secondary button-small" id="openBudgetSettings" type="button">Plan settings</button><button class="button button-secondary button-small" id="exportBudgetCsv" type="button">Export CSV</button><button class="button button-primary button-small" id="addBudgetItem" type="button">+ Add category</button><button class="budget-planner-toggle budget-panel-collapse" id="monthlyBudgetPlannerToggle" type="button" aria-controls="monthlyBudgetPlannerBody" aria-expanded="true" aria-label="Collapse Monthly budget plan" title="Collapse Monthly budget plan"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m6 15 6-6 6 6"/></svg></button></div></div>
+        <div id="monthlyBudgetPlannerBody" class="budget-planner-body">
         <div class="budget-planner-summary" id="budgetPlannerSummary"></div>
         <div class="budget-planner-grid"><section class="budget-category-panel budget-bento-panel" data-budget-panel="category"><div class="budget-panel-heading"><div class="budget-panel-heading-copy"><h4>Category plan</h4><p>Fixed and flexible budgets for personal and project spending.</p></div><div class="budget-panel-heading-actions"><span class="v12-chip info" id="budgetCategoryCount">0 categories</span><button class="budget-panel-collapse no-print" type="button" data-budget-panel-toggle="category" aria-controls="budgetCategoryPanelBody" aria-expanded="true" aria-label="Collapse Category plan" title="Collapse Category plan"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m6 15 6-6 6 6"/></svg></button></div></div><div class="budget-panel-body budget-category-body" id="budgetCategoryPanelBody"><div id="budgetCategoryTableWrap"></div><div class="budget-template-bar no-print"><div class="field"><label for="budgetTemplateSelect">Budget template</label><select class="select" id="budgetTemplateSelect"><option value="">Choose a template</option></select></div><button class="button button-secondary button-small" id="applyBudgetTemplate" type="button">Apply</button><button class="button button-secondary button-small" id="saveBudgetTemplate" type="button">Save current</button><button class="button button-secondary button-small" id="deleteBudgetTemplate" type="button">Delete</button></div></div></section>
         <aside class="cash-forecast-panel budget-bento-panel" data-budget-panel="forecast"><div class="budget-panel-heading"><div class="budget-panel-heading-copy"><h4>Cash-flow forecast</h4><p>Current money plus expected income minus future commitments.</p></div><div class="budget-panel-heading-actions"><span class="v12-chip" id="cashForecastStatus">No plan</span><button class="budget-panel-collapse no-print" type="button" data-budget-panel-toggle="forecast" aria-controls="cashForecastPanelBody" aria-expanded="true" aria-label="Collapse Cash-flow forecast" title="Collapse Cash-flow forecast"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m6 15 6-6 6 6"/></svg></button></div></div><div class="cash-forecast-body budget-panel-body" id="cashForecastPanelBody"><div class="forecast-breakdown" id="cashForecastBreakdown"></div><div class="forecast-classification" id="cashForecastClassification"></div><div class="budget-alerts" id="budgetForecastAlerts"></div></div></aside></div>
+        </div>
       </article>`);
     }
     if (!document.getElementById("budgetDashboardForecast")) {
@@ -406,6 +408,32 @@
     }
   }
 
+  function setBudgetPlannerCollapsed(collapsed, persist = true) {
+    const card = document.getElementById("monthlyBudgetPlannerCard");
+    const toggle = document.getElementById("monthlyBudgetPlannerToggle");
+    if (!card || !toggle) return;
+    card.classList.toggle("is-planner-collapsed", collapsed);
+    toggle.setAttribute("aria-expanded", String(!collapsed));
+    toggle.setAttribute("aria-label", `${collapsed ? "Expand" : "Collapse"} Monthly budget plan`);
+    toggle.title = `${collapsed ? "Expand" : "Collapse"} Monthly budget plan`;
+    if (persist) {
+      const state = budgetPanelState();
+      state.planner = Boolean(collapsed);
+      try { localStorage.setItem(BUDGET_PANEL_STATE_KEY, JSON.stringify(state)); } catch (error) {}
+    }
+  }
+
+  function setupBudgetPlannerCollapser() {
+    const state = budgetPanelState();
+    setBudgetPlannerCollapsed(Boolean(state.planner), false);
+    document.addEventListener("click", event => {
+      const toggle = event.target.closest("#monthlyBudgetPlannerToggle");
+      if (!toggle) return;
+      const card = document.getElementById("monthlyBudgetPlannerCard");
+      setBudgetPlannerCollapsed(!card?.classList.contains("is-planner-collapsed"));
+    });
+  }
+
   function setupBudgetPanelCollapsers() {
     const state = budgetPanelState();
     ["category", "forecast"].forEach(name => setBudgetPanelCollapsed(name, Boolean(state[name]), false));
@@ -460,6 +488,7 @@
   renderAll = function budgetRenderAll(...args) { const result=originalRenderAll(...args); injectUi(); renderBudgetWorkspace(); return result; };
 
   injectUi();
+  setupBudgetPlannerCollapser();
   setupBudgetPanelCollapsers();
   bindEvents();
   renderBudgetWorkspace();

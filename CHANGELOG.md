@@ -1,3 +1,11 @@
+## 13.0.7 · 2026-08-07
+
+### Changed
+- Added a persistent expand/collapse control for the complete Monthly budget plan.
+- Compact mode keeps Planned budget, Budget remaining, and Forecast month-end visible while hiding plan editing details.
+- Tightened plan toolbar actions, KPI cards, Category plan, Cash-flow forecast, and spacing between summary cards and Available money.
+- Preserved all monthly budget, category, committed-expense, and cash-flow forecast calculations.
+
 ## 13.0.6 · 2026-08-07
 
 ### Added
