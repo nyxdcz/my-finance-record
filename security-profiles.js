@@ -816,13 +816,13 @@
       </article>
 
       <div class="profile-two-column">
-        <article class="card">
+        <article class="card profile-sharing-card">
           <div class="card-header"><div><h3>Household sharing</h3><p>Invite an authenticated member as Editor or Viewer</p></div></div>
           <div class="profile-inline-fields"><div class="field"><label for="profileInviteRole">Role</label><select class="select" id="profileInviteRole"><option value="viewer">Viewer</option><option value="editor">Editor</option></select></div><div class="field"><label for="profileInviteHours">Expires after</label><select class="select" id="profileInviteHours"><option value="24">24 hours</option><option value="72" selected>72 hours</option><option value="168">7 days</option></select></div></div>
           <button class="button button-secondary" id="createProfileInviteButton" type="button" ${profile.role !== "owner" || !profile.cloudProfileId ? "disabled" : ""}>Create invitation code</button>
           <div class="field"><label for="profileAcceptInvite">Invitation code</label><input class="input" id="profileAcceptInvite" autocomplete="off" placeholder="MFR3-..."></div>
           <div class="field"><label for="profileInvitePassphrase">Shared profile passphrase</label><input class="input" id="profileInvitePassphrase" type="password" autocomplete="current-password"></div>
-          <button class="button button-primary" id="acceptProfileInviteButton" type="button">Accept and open shared profile</button>
+          <button class="button button-primary" id="acceptProfileInviteButton" type="button" disabled>Accept and open shared profile</button>
           <div id="profileInviteResult" class="profile-result"></div>
         </article>
 
@@ -888,6 +888,15 @@
     const showCloudProfiles = () => run(renderAccessibleCloudProfiles);
     get("refreshCloudProfilesButton")?.addEventListener("click", showCloudProfiles);
     get("findCloudProfilesButton")?.addEventListener("click", showCloudProfiles);
+    const syncInviteAcceptState = () => {
+      const button=get("acceptProfileInviteButton"), code=get("profileAcceptInvite"), pass=get("profileInvitePassphrase");
+      if (!button || !code || !pass) return;
+      button.disabled = !/^MFR3-/i.test(code.value.trim()) || pass.value.trim().length < 10;
+    };
+    get("profileAcceptInvite")?.addEventListener("input", syncInviteAcceptState);
+    get("profileInvitePassphrase")?.addEventListener("input", syncInviteAcceptState);
+    syncInviteAcceptState();
+
     get("createProfileInviteButton")?.addEventListener("click", () => run(async () => {
       const result = await createInvite(get("profileInviteRole").value, get("profileInviteHours").value);
       get("profileInviteResult").innerHTML = `<strong>Invitation code</strong><code>${escape(result.code)}</code><small>Share the encryption passphrase separately. The code expires automatically.</small>`;

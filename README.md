@@ -1,4 +1,13 @@
-# My Finance Records · V13.0.3 PWA
+# My Finance Records · V13.0.4 PWA
+
+
+## V13.0.4 · Settings & Top Bar UI Refinement
+
+- Standardized Settings row heights and compact Account Ledger text.
+- Added clear cloud-sync status feedback and a compact status panel.
+- Added responsive Month display and a direct month picker.
+- Tightened Add Expense and Quick Add layouts.
+- Prevented stale V13 service-worker caches from serving older interface assets.
 
 ## V13.0.3 · Compact Modals & SVG Interface Icons
 
@@ -9,16 +18,16 @@
 
 ## macOS File Inspection and Fixes installer
 
-Use the V13.0.3 **File Inspection and Fixes** installer when updating this repository on a Mac.
+Use the V13.0.4 **File Inspection and Fixes** installer when updating this repository on a Mac.
 
-1. Extract `My_Finance_Records_V13_0_3_File_Inspection_and_Fixes_Installer.zip`.
-2. Double-click `Install_V13_0_3.command`.
+1. Extract `My_Finance_Records_V13_0_4_File_Inspection_and_Fixes_Installer.zip`.
+2. Double-click `Install_V13_0_4.command`.
 3. The installer uses `~/Documents/My_Finance_Records` by default, cloning the GitHub repository there when needed.
-4. It checks the current Git state, required files, local asset paths, package metadata, permissions, and configuration before applying the V13.0.3 payload.
+4. It checks the current Git state, required files, local asset paths, package metadata, permissions, and configuration before applying the V13.0.4 payload.
 5. It preserves the repository copy of `sync-config.js`, installs locked npm metadata with `npm ci`, then runs `npm run inspect`, `npm run quality`, and `git diff --check`.
 6. The installer **does not commit or push**. Review `git status` and publish only after the checks report success.
 
-Requirements: macOS, Git, and Node.js 22 or newer. The installer is safe to run again; an already-applied V13.0.3 working tree is revalidated instead of reapplied.
+Requirements: macOS, Git, and Node.js 22 or newer. The installer is safe to run again; an already-applied V13.0.4 working tree is revalidated instead of reapplied.
 
 
 ## V13.0.2 · Simplified Settings UI

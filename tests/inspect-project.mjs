@@ -18,7 +18,7 @@ const requiredFiles = [
   "index.html", "offline.html", "manifest.webmanifest", "version.json", "sw.js",
   "package.json", "package-lock.json", "README.md", ".gitignore",
   ".github/workflows/quality-pages.yml", "vendor/supabase.min.js",
-  "sync-config.js", "sync-config.example.js", "tests/validate-v13-0-3.mjs"
+  "sync-config.js", "sync-config.example.js", "tests/validate-v13-0-4.mjs"
 ];
 for (const file of requiredFiles) if (!exists(file)) fail(`Missing required file: ${file}`);
 

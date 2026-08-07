@@ -1,3 +1,15 @@
+## 13.0.4 · 2026-08-07
+
+### Changed
+- Standardized adjacent Settings controls, Household Sharing actions, Work & Calendar fields, Savings settings, and Account Ledger typography.
+- Added clear Synced, Syncing, Offline, Needs sync, and Sync issue toolbar feedback with a compact sync-status panel.
+- Added responsive month formatting: YYYY-MM on phones and full Month Year on iPad/Mac, plus a direct month picker.
+- Tightened Add Expense field alignment and made Quick Add visibly smaller with SVG-only system icons.
+- Fixed V13 service-worker cache cleanup so older V13 assets cannot override the current release.
+
+### Preserved
+- Finance Schema 12, Cloud Schema V3, encrypted sync, profiles, account ledger calculations, recurrence, Gym month-end payment logic, backups, and stored records.
+
 ## 13.0.2 · 2026-08-07
 - Simplified Settings with a status overview, six plain-language sections, vertical iPhone navigation, collapsed advanced tools, account-history and reminder disclosures, save buttons enabled only after changes, and a separate danger zone.
 - Preserved all account, profile, encryption, cloud sync, backup, reminder, PWA, schema, and calculation behavior.

@@ -1,6 +1,6 @@
 "use strict";
-const APP_VERSION = "13.0.3";
-const CACHE_VERSION = "finance-v13-20260807-v13003-compact-modals-svg-r1";
+const APP_VERSION = "13.0.4";
+const CACHE_VERSION = "finance-v13-20260807-v13004-settings-topbar-r1";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const DB_NAME = "simple-finance-project-records-v12-db";
@@ -47,7 +47,7 @@ self.addEventListener("install", event => {
 self.addEventListener("activate", event => {
   event.waitUntil((async () => {
     const keys = await caches.keys();
-    await Promise.all(keys.filter(key => key.startsWith("finance-v12-") && ![SHELL_CACHE, RUNTIME_CACHE].includes(key)).map(key => caches.delete(key)));
+    await Promise.all(keys.filter(key => /^finance-v(?:12|13)-/.test(key) && ![SHELL_CACHE, RUNTIME_CACHE].includes(key)).map(key => caches.delete(key)));
     await self.clients.claim();
   })());
 });
@@ -64,13 +64,12 @@ async function navigationResponse(request) {
 }
 
 async function cacheFirst(request) {
-  const cached = await caches.match(request);
+  const shell = await caches.open(SHELL_CACHE);
+  const runtime = await caches.open(RUNTIME_CACHE);
+  const cached = (await shell.match(request)) || (await runtime.match(request));
   if (cached) return cached;
   const response = await fetch(request);
-  if (response && response.ok && new URL(request.url).origin === self.location.origin) {
-    const cache = await caches.open(RUNTIME_CACHE);
-    cache.put(request, response.clone());
-  }
+  if (response && response.ok && new URL(request.url).origin === self.location.origin) runtime.put(request, response.clone());
   return response;
 }
 
@@ -104,7 +103,7 @@ self.addEventListener("message", event => {
   if (event.data?.type === "SKIP_WAITING") self.skipWaiting();
   if (event.data?.type === "PRECACHE") event.waitUntil(precache());
   if (event.data?.type === "CLEAR_CACHES") {
-    event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(key => key.startsWith("finance-v12-")).map(key => caches.delete(key)))).then(precache));
+    event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(key => /^finance-v(?:12|13)-/.test(key)).map(key => caches.delete(key)))).then(precache));
   }
   if (event.data?.type === "FINANCE_ALERT_NOTIFY") {
     event.waitUntil(showFinanceNotification(event.data.payload || {}, { force:true }));

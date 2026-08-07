@@ -40,3 +40,7 @@
 #settings-panel-accounts > .card,
 #settings-panel-accounts > .grid { min-width:0; max-width:100%; }
 #settings-panel-accounts .table-scroll { min-width:0; max-width:100%; overflow-x:auto; }
+
+
+/* V13.0.4 · compact ledger typography */
+.ledger-table{font-size:.72rem}.ledger-table th{padding:7px 8px;font-size:.64rem;font-weight:780}.ledger-table td{padding:7px 8px;font-size:.72rem;line-height:1.28;vertical-align:middle}.ledger-table td strong{font-size:.72rem;font-weight:760}.ledger-table td small{font-size:.61rem;line-height:1.25}.reconciliation-table{font-size:.72rem}.reconciliation-table th,.reconciliation-table td{padding:7px 8px;font-size:.7rem}

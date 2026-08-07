@@ -487,12 +487,45 @@
   function topStatusLabel() {
     if (!configStatus().ok) return "Cloud off";
     if (!navigator.onLine) return pendingCount() ? `${pendingCount()} pending` : "Offline";
-    if (syncing) return "Syncing";
+    if (syncing) return "Syncing…";
     if (!cloudUser) return "Sign in";
-    if (conflictCount()) return `${conflictCount()} conflicts`;
-    if (pendingCount()) return `${pendingCount()} pending`;
-    if (state.lastError) return "Needs attention";
-    return state.lastSyncAt ? "Synced" : "Ready";
+    if (conflictCount()) return "Sync issue";
+    if (pendingCount()) return "Needs sync";
+    if (state.lastError) return "Sync issue";
+    return state.lastSyncAt ? "Synced" : "Needs sync";
+  }
+
+  function topSyncStateKey(label = topStatusLabel()) {
+    if (label === "Synced") return "synced";
+    if (label === "Syncing…") return "syncing";
+    if (label === "Needs sync") return "needs-sync";
+    if (label === "Sync issue") return "sync-issue";
+    if (label === "Offline") return "offline";
+    return "setup";
+  }
+
+  function updateTopSyncUi(detail = "") {
+    const top=document.getElementById("cloudSyncStatusButton"), label=topStatusLabel();
+    if (top) {
+      top.dataset.syncState=topSyncStateKey(label);
+      const text=top.querySelector(".cloud-sync-label") || top.querySelector("span:last-child");
+      if (text) text.textContent=label;
+      top.setAttribute("aria-label",`Cloud sync: ${label}`); top.title=`Cloud sync: ${label}`;
+    }
+    const stateNode=document.getElementById("cloudToolbarState"), detailNode=document.getElementById("cloudToolbarDetail"), lastNode=document.getElementById("cloudToolbarLastSync"), syncButton=document.getElementById("cloudToolbarSyncNow");
+    if (stateNode) stateNode.textContent=label;
+    if (detailNode) detailNode.textContent=detail || state.status || (label === "Synced" ? "This device matches the latest cloud state." : label === "Cloud off" ? "Cloud sync is not configured on this device." : "Review cloud sync status and settings.");
+    if (lastNode) lastNode.textContent=formatDateTime(state.lastSyncAt);
+    if (syncButton) syncButton.disabled=syncing || !cloudUser || !navigator.onLine || !configStatus().ok;
+  }
+
+  function closeTopSyncPopover() {
+    const pop=document.getElementById("cloudSyncToolbarPopover"), button=document.getElementById("cloudSyncStatusButton"); if(pop)pop.hidden=true; if(button)button.setAttribute("aria-expanded","false");
+  }
+  function toggleTopSyncPopover() {
+    const pop=document.getElementById("cloudSyncToolbarPopover"), button=document.getElementById("cloudSyncStatusButton"); if(!pop||!button)return;
+    const opening=pop.hidden; pop.hidden=!opening; button.setAttribute("aria-expanded",String(opening)); updateTopSyncUi();
+    if(opening && typeof positionCloudToolbarPopover === "function") requestAnimationFrame(positionCloudToolbarPopover);
   }
 
   function setStatus(status, detail = "", tone = "info") {
@@ -505,14 +538,7 @@
     const detailNode = document.getElementById("cloudStatusDetail");
     if (detailNode) detailNode.textContent = detail || status;
     const top = document.getElementById("cloudSyncStatusButton");
-    if (top) {
-      const label = topStatusLabel();
-      top.dataset.state = tone;
-      const text = top.querySelector("span:last-child");
-      if (text) text.textContent = label;
-      top.setAttribute("aria-label", `Cloud sync: ${label}`);
-      top.title = `Cloud sync: ${label}`;
-    }
+    updateTopSyncUi(detail);
     renderCloudStats();
   }
 
@@ -1152,7 +1178,7 @@
     } catch (error) {
       setStatus("Sync needs attention", error.message || "Cloud synchronization failed.", "danger");
       throw error;
-    } finally { syncing=false; renderCloudStats(); scheduleRetry(); }
+    } finally { syncing=false; updateTopSyncUi(); renderCloudStats(); scheduleRetry(); }
   }
 
   async function setupRealtime() {
@@ -1278,7 +1304,12 @@
   }
 
   function bindEvents() {
-    document.getElementById("cloudSyncStatusButton")?.addEventListener("click",()=>{ goToPage("settings",{smooth:false}); activateSettingsPanel("cloud",true); });
+    document.getElementById("cloudSyncStatusButton")?.addEventListener("click",event=>{event.stopPropagation();toggleTopSyncPopover();});
+    document.getElementById("cloudToolbarClose")?.addEventListener("click",closeTopSyncPopover);
+    document.getElementById("cloudToolbarSyncNow")?.addEventListener("click",()=>syncNow({reason:"toolbar"}).catch(error=>showToast(error.message,"warning")));
+    document.getElementById("cloudToolbarOpenSettings")?.addEventListener("click",()=>{closeTopSyncPopover();goToPage("settings",{smooth:false});activateSettingsPanel("cloud",true);});
+    document.addEventListener("click",event=>{if(!event.target.closest("#cloudSyncToolbarPopover")&&!event.target.closest("#cloudSyncStatusButton"))closeTopSyncPopover();});
+    window.addEventListener("resize",()=>{if(!document.getElementById("cloudSyncToolbarPopover")?.hidden&&typeof positionCloudToolbarPopover==="function")positionCloudToolbarPopover();});
     document.getElementById("saveCloudConfig")?.addEventListener("click",()=>{
       const config={supabaseUrl:document.getElementById("cloudConfigUrl").value.trim(),supabasePublishableKey:document.getElementById("cloudConfigKey").value.trim()};
       const status=configStatus(config); if(!status.ok)return showToast(status.message,"warning");
