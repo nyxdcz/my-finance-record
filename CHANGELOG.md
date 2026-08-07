@@ -1,3 +1,10 @@
+## 13.0.16 · 2026-08-07
+
+- Added a dedicated `?auth=recovery` redirect target and explicit parsing of Supabase password-reset error fragments.
+- Expired, invalid, reused, and access-denied reset links now open Sync & Backup recovery help instead of silently returning to Dashboard.
+- Added resend, recovery-code verification, recovery URL cleanup, and preserved the existing valid `PASSWORD_RECOVERY` new-password flow.
+- Finance records, cloud schema, encryption, profiles, and local access remain unchanged.
+
 ## 13.0.15 · 2026-08-07
 
 ### Added

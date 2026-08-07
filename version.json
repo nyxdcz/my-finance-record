@@ -1,5 +1,5 @@
 {
-  "version": "13.0.15",
+  "version": "13.0.16",
   "schemaVersion": 12,
   "cloudSchemaVersion": 3,
   "ledgerVersion": 1,
@@ -10,8 +10,8 @@
   "profileArchitectureVersion": 1,
   "encryptionVersion": 1,
   "authSecurityVersion": 1,
-  "cacheVersion": "finance-v13-20260807-v13015-auth-recovery-r1",
+  "cacheVersion": "finance-v13-20260807-v13016-recovery-redirect-r1",
   "released": "2026-08-07",
-  "name": "Cloud Sign-in Recovery & Diagnostics",
-  "notes": "Adds password recovery, clearer authentication errors, password visibility controls, processing states, and cloud connection diagnostics while preserving local-first finance records and encrypted Cloud Sync 3.0."
+  "name": "Password Recovery Redirect Fix",
+  "notes": "Adds a dedicated password-recovery route, explicit expired/invalid/reused-link handling, resend and recovery-code fallback controls, and URL cleanup while preserving local-first finance records and encrypted Cloud Sync 3.0."
 }

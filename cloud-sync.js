@@ -47,6 +47,8 @@
   let retryTimer = null;
   let syncing = false;
   let passwordRecoveryActive = false;
+  let passwordRecoveryRouteActive = false;
+  let passwordRecoveryError = null;
   let suppressQueue = false;
   let saveWrapped = false;
   let initialized = false;
@@ -593,9 +595,12 @@
     const disconnected = document.getElementById("cloudDisconnectedSection");
     const connected = document.getElementById("cloudConnectedSection");
     const recovery = document.getElementById("cloudPasswordRecoveryCard");
+    const recoveryHelp = document.getElementById("cloudRecoveryHelpCard");
     if (recovery) recovery.hidden = !passwordRecoveryActive;
-    if (disconnected) disconnected.hidden = passwordRecoveryActive || !configured || Boolean(cloudUser);
-    if (connected) connected.hidden = passwordRecoveryActive || !configured || !ready;
+    if (recoveryHelp) recoveryHelp.hidden = !(passwordRecoveryRouteActive && !passwordRecoveryActive);
+    const recoveryUiActive = passwordRecoveryActive || passwordRecoveryRouteActive;
+    if (disconnected) disconnected.hidden = recoveryUiActive || !configured || Boolean(cloudUser);
+    if (connected) connected.hidden = recoveryUiActive || !configured || !ready;
     const configChip = document.getElementById("cloudConfigStatusChip");
     if (configChip) { configChip.textContent = configured ? "Configured" : "Setup required"; configChip.className = `v12-chip ${configured ? "success" : "warning"}`; }
     const user = document.getElementById("cloudUserEmail"); if (user) user.textContent = cloudUser?.email || "—";
@@ -690,7 +695,11 @@
       session = nextSession || null;
       cloudUser = nextSession?.user || null;
       if (event === "PASSWORD_RECOVERY") {
+        passwordRecoveryRouteActive = true;
+        passwordRecoveryError = null;
         passwordRecoveryActive = true;
+        cleanPasswordRecoveryUrl({ keepRoute:true });
+        focusPasswordRecoverySettings();
         renderCloudStats();
         setAuthMessage("Choose a new password to finish account recovery.", "warning", "recovery");
         setStatus("Reset password", "Choose a new password before continuing cloud sync.", "warning");
@@ -749,8 +758,82 @@
       if (!/^https?:$/.test(url.protocol)) return "";
       url.search = "";
       url.hash = "";
+      url.searchParams.set("auth", "recovery");
       return url.href;
     } catch (error) { return ""; }
+  }
+
+  function parsePasswordRecoveryUrl() {
+    try {
+      const url = new URL(location.href);
+      const hash = new URLSearchParams(String(url.hash || "").replace(/^#/, ""));
+      const requested = url.searchParams.get("auth") === "recovery" || hash.get("type") === "recovery" || hash.has("error") || hash.has("error_code");
+      const error = hash.get("error") || "";
+      const errorCode = hash.get("error_code") || "";
+      const description = hash.get("error_description") || "";
+      return { requested, error, errorCode, description };
+    } catch (error) { return { requested:false, error:"", errorCode:"", description:"" }; }
+  }
+
+  function recoveryErrorMessage(info = {}) {
+    const code = String(info.errorCode || "").toLowerCase();
+    const text = decodeURIComponent(String(info.description || info.error || "").replace(/\+/g, " "));
+    if (/otp_expired|expired|invalid.*link|access_denied/.test(`${code} ${text}`.toLowerCase())) return "This reset link is invalid, expired, or already used. Request a new reset email or use a recovery code.";
+    if (/redirect/.test(`${code} ${text}`.toLowerCase())) return "The password-reset redirect is not allowed by the cloud project. Check Supabase Auth redirect URLs.";
+    return text || "Password recovery could not be completed. Request a new reset email or use a recovery code.";
+  }
+
+  function focusPasswordRecoverySettings() {
+    try {
+      if (typeof goToPage === "function") goToPage("settings", { historyMode:"none", smooth:false });
+      if (typeof activateSettingsPanel === "function") activateSettingsPanel("sync", false);
+    } catch (error) {}
+  }
+
+  function cleanPasswordRecoveryUrl({ keepRoute = true } = {}) {
+    try {
+      const url = new URL(location.href);
+      url.hash = "";
+      if (keepRoute) url.searchParams.set("auth", "recovery");
+      else url.searchParams.delete("auth");
+      history.replaceState(history.state, "", `${url.pathname}${url.search}${url.hash}`);
+    } catch (error) {}
+  }
+
+  function setRecoveryHelpMessage(message, tone = "warning") {
+    const node = document.getElementById("cloudRecoveryHelpMessage");
+    if (!node) return;
+    node.textContent = String(message || "");
+    node.dataset.tone = tone;
+  }
+
+  function setRecoveryRouteState({ active = false, error = null } = {}) {
+    passwordRecoveryRouteActive = Boolean(active);
+    passwordRecoveryError = error || null;
+    if (passwordRecoveryRouteActive) focusPasswordRecoverySettings();
+    renderCloudStats();
+    if (passwordRecoveryError) setRecoveryHelpMessage(recoveryErrorMessage(passwordRecoveryError), "danger");
+  }
+
+  async function verifyRecoveryCode(email, token) {
+    const value = String(email || "").trim();
+    const code = String(token || "").trim();
+    if (!/^\S+@\S+\.\S+$/.test(value)) throw new Error("Enter the email address used for your cloud account.");
+    if (!code) throw new Error("Enter the recovery code from your reset email.");
+    const sdk = await loadClient();
+    if (typeof sdk.auth.verifyOtp !== "function") throw new Error("This app build cannot verify recovery codes. Update the app and try again.");
+    const result = await sdk.auth.verifyOtp({ email:value, token:code, type:"recovery" });
+    if (result.error) throw result.error;
+    session = result.data?.session || session;
+    cloudUser = result.data?.user || session?.user || cloudUser;
+    passwordRecoveryRouteActive = true;
+    passwordRecoveryError = null;
+    passwordRecoveryActive = true;
+    cleanPasswordRecoveryUrl({ keepRoute:true });
+    focusPasswordRecoverySettings();
+    renderCloudStats();
+    setAuthMessage("Recovery code accepted. Choose a new password.", "success", "recovery");
+    return result.data || {};
   }
 
   function setPasswordVisibility(input, button, visible) {
@@ -804,6 +887,9 @@
     const result = await sdk.auth.updateUser({ password:next });
     if (result.error) throw result.error;
     passwordRecoveryActive = false;
+    passwordRecoveryRouteActive = false;
+    passwordRecoveryError = null;
+    cleanPasswordRecoveryUrl({ keepRoute:false });
     session = result.data?.session || session;
     cloudUser = result.data?.user || session?.user || cloudUser;
     return result.data?.user || cloudUser;
@@ -1439,8 +1525,11 @@
     document.getElementById("cloudAuthPassword")?.addEventListener("keydown",event=>{if(event.key === "Enter"){event.preventDefault();document.getElementById("cloudSignIn")?.click();}});
     document.getElementById("cloudForgotPassword")?.addEventListener("click",event=>withAuthButtonBusy(event.currentTarget,"Sending…",async()=>{const email=document.getElementById("cloudAuthEmail")?.value?.trim()||"";try{await requestPasswordReset(email);setCloudConnectionStatus("Cloud reached","success");setAuthMessage("If a cloud account exists for this email, a password-reset link has been sent. Check your inbox and spam folder.","success");setStatus("Password reset sent","Check your email for the secure reset link.","success");}catch(error){const message=friendlyAuthError(error,"reset-request");setAuthMessage(`${message} Your local finance records are unchanged.`,"danger");setStatus("Password reset failed",message,"danger");}}));
     document.getElementById("cloudTestConnection")?.addEventListener("click",event=>withAuthButtonBusy(event.currentTarget,"Testing…",async()=>{setCloudConnectionStatus("Testing…","info");try{await testCloudConnection();setCloudConnectionStatus("Connected","success");setAuthMessage("Cloud service is reachable. If sign-in still fails, check the email/password or use Forgot password.","success");}catch(error){const message=friendlyAuthError(error,"connection");setCloudConnectionStatus("Connection failed","danger");setAuthMessage(message,"danger");}}));
+    document.getElementById("cloudRecoveryResend")?.addEventListener("click",event=>withAuthButtonBusy(event.currentTarget,"Sending…",async()=>{const email=document.getElementById("cloudRecoveryEmail")?.value?.trim()||document.getElementById("cloudAuthEmail")?.value?.trim()||"";try{await requestPasswordReset(email);passwordRecoveryRouteActive=true;passwordRecoveryError=null;setRecoveryHelpMessage("A new reset email was requested. If the account exists, check your inbox and spam folder.","success");setStatus("Password reset sent","Use the newest reset email only.","success");}catch(error){setRecoveryHelpMessage(friendlyAuthError(error,"reset-request"),"danger");}}));
+    document.getElementById("cloudVerifyRecoveryCode")?.addEventListener("click",event=>withAuthButtonBusy(event.currentTarget,"Verifying…",async()=>{const email=document.getElementById("cloudRecoveryEmail")?.value?.trim()||"",token=document.getElementById("cloudRecoveryCode")?.value||"";try{await verifyRecoveryCode(email,token);}catch(error){setRecoveryHelpMessage(friendlyAuthError(error,"recovery-code"),"danger");}}));
+    document.getElementById("cloudRecoveryBackToSignIn")?.addEventListener("click",()=>{passwordRecoveryRouteActive=false;passwordRecoveryError=null;passwordRecoveryActive=false;cleanPasswordRecoveryUrl({keepRoute:false});renderCloudStats();});
     document.getElementById("cloudCompletePasswordReset")?.addEventListener("click",event=>withAuthButtonBusy(event.currentTarget,"Saving…",async()=>{const next=document.getElementById("cloudNewPassword")?.value||"",confirmPassword=document.getElementById("cloudConfirmPassword")?.value||"";try{await completePasswordReset(next,confirmPassword);document.getElementById("cloudNewPassword").value="";document.getElementById("cloudConfirmPassword").value="";setAuthMessage("Password updated successfully. Continuing cloud sign-in…","success","recovery");setStatus("Password updated","Your new cloud password is active.","success");renderCloudStats();if(cloudUser)await onSignedIn();}catch(error){const message=friendlyAuthError(error,"password-reset");setAuthMessage(message,"danger","recovery");}}));
-    document.getElementById("cloudCancelPasswordReset")?.addEventListener("click",async()=>{passwordRecoveryActive=false;try{const sdk=await loadClient();await sdk.auth.signOut({scope:"local"});}catch(error){}onSignedOut();renderCloudStats();});
+    document.getElementById("cloudCancelPasswordReset")?.addEventListener("click",async()=>{passwordRecoveryActive=false;passwordRecoveryRouteActive=false;passwordRecoveryError=null;cleanPasswordRecoveryUrl({keepRoute:false});try{const sdk=await loadClient();await sdk.auth.signOut({scope:"local"});}catch(error){}onSignedOut();renderCloudStats();});
     document.getElementById("cloudSyncNow")?.addEventListener("click",()=>syncNow({reason:"manual"}).catch(error=>showToast(error.message,"warning")));
     document.getElementById("cloudSignOut")?.addEventListener("click",()=>signOut().catch(error=>showToast(error.message,"warning")));
     document.getElementById("cloudAutoSync")?.addEventListener("change",event=>{state.autoSync=Boolean(event.target.checked);persist();if(state.autoSync)scheduleSync(100);renderCloudStats();});
@@ -1469,7 +1558,19 @@
   async function initialize() {
     if(initialized)return;
     initialized=true;
-    injectV2Ui(); wrapSaveData(); bindEvents(); renderCloudStats();
+    injectV2Ui(); wrapSaveData(); bindEvents();
+    const recoveryRoute = parsePasswordRecoveryUrl();
+    if (recoveryRoute.requested) {
+      passwordRecoveryRouteActive = true;
+      passwordRecoveryError = recoveryRoute.error || recoveryRoute.errorCode ? recoveryRoute : null;
+      focusPasswordRecoverySettings();
+      if (passwordRecoveryError) {
+        cleanPasswordRecoveryUrl({ keepRoute:true });
+        setStatus("Password reset needs attention", recoveryErrorMessage(passwordRecoveryError), "danger");
+      }
+    }
+    renderCloudStats();
+    if (passwordRecoveryError) setRecoveryHelpMessage(recoveryErrorMessage(passwordRecoveryError), "danger");
     const status=configStatus();
     if(!status.ok){setStatus("Cloud sync not configured",status.message,"warning");return;}
     await restoreSession();
@@ -1482,7 +1583,7 @@
     buildRecordMap:()=>toRecordMap(data),
     get status(){return{...state,pendingCount:pendingCount(),conflictCount:conflictCount(),signedIn:Boolean(cloudUser),email:cloudUser?.email||""};}
   };
-  window.FinanceCloudSyncInternals={loadClient,stable,checksum,deepMerge,threeWayMerge,toRecordMap,fromRecordStore,changesBetween,recordKey,keyToken,keyFromToken,retryDelay,detectFinancialOperations,encryptRecordPayload,decryptRecordPayload,toRpcChange,decryptRow,friendlyAuthError,passwordRecoveryRedirect,testCloudConnection,requestPasswordReset,completePasswordReset,setPasswordVisibility};
+  window.FinanceCloudSyncInternals={loadClient,stable,checksum,deepMerge,threeWayMerge,toRecordMap,fromRecordStore,changesBetween,recordKey,keyToken,keyFromToken,retryDelay,detectFinancialOperations,encryptRecordPayload,decryptRecordPayload,toRpcChange,decryptRow,friendlyAuthError,passwordRecoveryRedirect,parsePasswordRecoveryUrl,recoveryErrorMessage,cleanPasswordRecoveryUrl,testCloudConnection,requestPasswordReset,verifyRecoveryCode,completePasswordReset,setPasswordVisibility};
 
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",()=>initialize().catch(error=>setStatus("Cloud sync unavailable",error.message,"danger")),{once:true});
   else initialize().catch(error=>setStatus("Cloud sync unavailable",error.message,"danger"));

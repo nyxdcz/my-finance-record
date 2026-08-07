@@ -1,4 +1,12 @@
-# My Finance Records · V13.0.15 PWA
+# My Finance Records · V13.0.16 PWA
+
+## V13.0.16 · Password Recovery Redirect Fix
+
+- Password-reset emails now return to a dedicated `?auth=recovery` route instead of silently opening the normal Dashboard.
+- Failed reset links parse Supabase `error`, `error_code`, and `error_description` fragments and open **Settings → Sync & Backup** with a clear expired/invalid/reused-link message.
+- Added **Send new reset email**, **Verify recovery code**, and **Back to sign in** recovery controls. Recovery-code fallback uses `verifyOtp({ email, token, type: "recovery" })` and requires the Supabase Recovery email template to include `{{ .Token }}`.
+- Successful recovery links still use Supabase `PASSWORD_RECOVERY`, then show **Choose a new password** and clean the auth fragments after processing.
+- Local finance records remain available and unchanged when password recovery fails.
 
 ## V13.0.15 · Cloud Sign-in Recovery & Diagnostics
 
@@ -102,16 +110,16 @@
 
 ## macOS File Inspection and Fixes installer
 
-Use the V13.0.15 **File Inspection and Fixes** installer when updating this repository on a Mac.
+Use the V13.0.16 **File Inspection and Fixes** installer when updating this repository on a Mac.
 
-1. Extract `My_Finance_Records_V13_0_15_File_Inspection_and_Fixes_Installer.zip`.
-2. Double-click `Install_V13_0_15.command`.
+1. Extract `My_Finance_Records_V13_0_16_File_Inspection_and_Fixes_Installer.zip`.
+2. Double-click `Install_V13_0_16.command`.
 3. The installer uses `~/Documents/My_Finance_Records` by default, cloning the GitHub repository there when needed.
-4. It checks the current Git state, required files, local asset paths, package metadata, permissions, and configuration before applying the V13.0.15 payload.
+4. It checks the current Git state, required files, local asset paths, package metadata, permissions, and configuration before applying the V13.0.16 payload.
 5. It preserves the repository copy of `sync-config.js`, installs locked npm metadata with `npm ci`, then runs `npm run inspect`, `npm run quality`, and `git diff --check`.
 6. The installer **does not commit or push**. Review `git status` and publish only after the checks report success.
 
-Requirements: macOS, Git, and Node.js 22 or newer. The installer is safe to run again; an already-applied V13.0.10 working tree is revalidated instead of reapplied.
+Requirements: macOS, Git, and Node.js 22 or newer. The installer is safe to run again; an already-applied V13.0.16 working tree is revalidated instead of reapplied.
 
 
 ## V13.0.2 · Simplified Settings UI
