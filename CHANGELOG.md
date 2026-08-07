@@ -1,3 +1,17 @@
+## 13.0.6 · 2026-08-07
+
+### Added
+- Added numbered project revision cycles for completed projects, with requested date, optional deadline, revision notes, and per-revision completion date.
+- Added Reopen for revision and Mark revision complete actions in Project lists and Edit Project.
+- Added Revision history inside Edit Project while preserving the original project completion date.
+
+### Changed
+- In-revision projects return to Active Projects without becoming a new project or changing payment/fixed-salary classification.
+- Dashboard project deadlines and Apple Calendar exports use the active revision deadline; calendar exports keep the existing project UID so revisions update the existing calendar identity instead of duplicating the original deadline.
+
+### Preserved
+- Finance Schema 12, Cloud Schema V3, project value, payment history, work month, salary classification, encrypted sync, and stored records.
+
 ## 13.0.5 · 2026-08-07
 
 ### Fixed
