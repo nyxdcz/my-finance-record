@@ -430,14 +430,26 @@
     footer.querySelector(".footer-spacer")?.before(button);
   }
 
+  function productivityUiIcon(name) {
+    const icons = {
+      expense:'<svg viewBox="0 0 24 24" focusable="false"><path d="M7 3h10v18l-2.5-1.5L12 21l-2.5-1.5L7 21V3Z"/><path d="M10 8h4M10 12h4M10 16h3"/></svg>',
+      income:'<svg viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="12" r="8"/><path d="M12 7v10M15 9.2c-.7-.8-1.7-1.2-3-1.2-1.7 0-3 .8-3 2s1.1 1.8 3 2 3 1 3 2-1.3 2-3 2c-1.3 0-2.4-.4-3-1.2"/></svg>',
+      project:'<svg viewBox="0 0 24 24" focusable="false"><path d="M4 19V8l8-4 8 4v11H4Z"/><path d="M8 19v-5h8v5M8 9h.01M12 9h.01M16 9h.01"/></svg>',
+      transfer:'<svg viewBox="0 0 24 24" focusable="false"><path d="M4 8h14M15 5l3 3-3 3M20 16H6M9 13l-3 3 3 3"/></svg>',
+      duplicate:'<svg viewBox="0 0 24 24" focusable="false"><rect x="8" y="8" width="11" height="11" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>',
+      center:'<svg viewBox="0 0 24 24" focusable="false"><path d="M4 7h10M18 7h2M4 17h2M10 17h10M14 4v6M8 14v6"/></svg>'
+    };
+    return `<span class="productivity-quick-icon" aria-hidden="true">${icons[name] || icons.center}</span>`;
+  }
+
   function quickActionHtml() {
     return `
-      <button class="productivity-quick-action" type="button" data-productivity-action="expense"><span class="productivity-quick-icon">🧾</span><strong>Add expense</strong><small>Open the complete expense form</small></button>
-      <button class="productivity-quick-action" type="button" data-productivity-action="income"><span class="productivity-quick-icon">💵</span><strong>Add income</strong><small>Record income or a deposit</small></button>
-      <button class="productivity-quick-action" type="button" data-productivity-action="project"><span class="productivity-quick-icon">📐</span><strong>Add project</strong><small>Create salary or freelance work</small></button>
-      <button class="productivity-quick-action" type="button" data-productivity-action="transfer"><span class="productivity-quick-icon">↔</span><strong>Transfer money</strong><small>Move money between accounts</small></button>
-      <button class="productivity-quick-action" type="button" data-productivity-action="duplicate"><span class="productivity-quick-icon">⧉</span><strong>Duplicate last month</strong><small>Reuse one previous expense</small></button>
-      <button class="productivity-quick-action" type="button" data-productivity-action="center"><span class="productivity-quick-icon">⚡</span><strong>Productivity center</strong><small>Templates, recent records and undo</small></button>`;
+      <button class="productivity-quick-action" type="button" data-productivity-action="expense">${productivityUiIcon("expense")}<span><strong>Add expense</strong><small>Expense form</small></span></button>
+      <button class="productivity-quick-action" type="button" data-productivity-action="income">${productivityUiIcon("income")}<span><strong>Add income</strong><small>Record income</small></span></button>
+      <button class="productivity-quick-action" type="button" data-productivity-action="project">${productivityUiIcon("project")}<span><strong>Add project</strong><small>New project</small></span></button>
+      <button class="productivity-quick-action" type="button" data-productivity-action="transfer">${productivityUiIcon("transfer")}<span><strong>Transfer money</strong><small>Between accounts</small></span></button>
+      <button class="productivity-quick-action" type="button" data-productivity-action="duplicate">${productivityUiIcon("duplicate")}<span><strong>Duplicate last month</strong><small>Reuse expense</small></span></button>
+      <button class="productivity-quick-action" type="button" data-productivity-action="center">${productivityUiIcon("center")}<span><strong>Productivity center</strong><small>Templates & undo</small></span></button>`;
   }
 
   function injectUi() {

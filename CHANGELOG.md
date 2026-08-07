@@ -28,6 +28,21 @@
 
 # Changelog
 
+## 13.0.3 · 2026-08-07
+
+### Repository readiness
+- Added a repeatable repository inspection command for required files, local paths, package metadata, permissions, deployment paths, and public sync configuration.
+- Added simple macOS File Inspection and Fixes installer instructions.
+- Renamed the stale GitHub Actions quality-job display label without changing workflow behavior.
+
+### Changed
+- Compacted Quick Add and the shared modal spacing system across major forms.
+- Replaced system emoji icons in Quick Add and the device-lock screen with monochrome SVG interface icons.
+- Grouped recurring expense controls and Gym automatic-payment controls into expandable sections with concise helper text.
+
+### Preserved
+- Finance Schema 12, Cloud Schema V3, account deduction, recurrence, templates, profiles, encryption, backups, and stored records.
+
 All notable changes to My Finance Records are documented here.
 
 

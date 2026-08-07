@@ -1,4 +1,24 @@
-# My Finance Records · V13.0.2 PWA
+# My Finance Records · V13.0.3 PWA
+
+## V13.0.3 · Compact Modals & SVG Interface Icons
+
+- Made Quick Add smaller while keeping all six actions and responsive phone access.
+- Standardized system interface icons on SVGs instead of emoji-style symbols; user-selected record icons remain available.
+- Compacted shared modal spacing and grouped recurring and automatic Gym payment options into clear expandable sections.
+- Preserved Finance Schema 12, Cloud Schema V3, profiles, encryption, payment logic, recurrence logic, templates, and stored records.
+
+## macOS File Inspection and Fixes installer
+
+Use the V13.0.3 **File Inspection and Fixes** installer when updating this repository on a Mac.
+
+1. Extract `My_Finance_Records_V13_0_3_File_Inspection_and_Fixes_Installer.zip`.
+2. Double-click `Install_V13_0_3.command`.
+3. The installer uses `~/Documents/My_Finance_Records` by default, cloning the GitHub repository there when needed.
+4. It checks the current Git state, required files, local asset paths, package metadata, permissions, and configuration before applying the V13.0.3 payload.
+5. It preserves the repository copy of `sync-config.js`, installs locked npm metadata with `npm ci`, then runs `npm run inspect`, `npm run quality`, and `git diff --check`.
+6. The installer **does not commit or push**. Review `git status` and publish only after the checks report success.
+
+Requirements: macOS, Git, and Node.js 22 or newer. The installer is safe to run again; an already-applied V13.0.3 working tree is revalidated instead of reapplied.
 
 
 ## V13.0.2 · Simplified Settings UI

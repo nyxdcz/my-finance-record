@@ -653,7 +653,7 @@
     overlay.id = "financeDeviceLockOverlay";
     overlay.className = "finance-device-lock-overlay";
     overlay.hidden = true;
-    overlay.innerHTML = `<div class="finance-device-lock-card"><div class="finance-lock-mark" aria-hidden="true">🔒</div><h2>My Finance Records is locked</h2><p>This device lock blocks access to the open app. Browser storage encryption is separate from this screen lock.</p><form id="financeDeviceUnlockForm"><label for="financeDeviceUnlockPassphrase">Device lock passphrase</label><input class="input" id="financeDeviceUnlockPassphrase" type="password" autocomplete="current-password" required><button class="button button-primary" type="submit">Unlock</button><small id="financeDeviceUnlockError" role="alert"></small></form></div>`;
+    overlay.innerHTML = `<div class="finance-device-lock-card"><div class="finance-lock-mark" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v2"/></svg></div><h2>My Finance Records is locked</h2><p>This device lock blocks access to the open app. Browser storage encryption is separate from this screen lock.</p><form id="financeDeviceUnlockForm"><label for="financeDeviceUnlockPassphrase">Device lock passphrase</label><input class="input" id="financeDeviceUnlockPassphrase" type="password" autocomplete="current-password" required><button class="button button-primary" type="submit">Unlock</button><small id="financeDeviceUnlockError" role="alert"></small></form></div>`;
     document.body.appendChild(overlay);
     overlay.querySelector("form").addEventListener("submit", async event => {
       event.preventDefault();

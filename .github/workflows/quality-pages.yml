@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   quality:
-    name: V12 regression quality
+    name: Regression quality
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
