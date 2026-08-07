@@ -1,7 +1,14 @@
-# My Finance Records · V13.0.13 PWA
+# My Finance Records · V13.0.14 PWA
 
 
 
+
+
+## V13.0.14 · Brave PWA Install Flow
+
+- Detects Brave separately from other Chromium browsers and keeps the native `beforeinstallprompt` flow when Brave provides it.
+- When Brave does not expose a native prompt, **Install app** becomes **Install with Brave** and opens clear steps: **Brave menu → Save and Share → Install page as app…**.
+- Shows explicit Installed, Ready to install, Install from Brave menu, browser-menu, and HTTPS-required states without changing finance records or offline data.
 
 ## V13.0.13 · Record Spending Transaction Hotfix
 
@@ -90,12 +97,12 @@
 
 ## macOS File Inspection and Fixes installer
 
-Use the V13.0.13 **File Inspection and Fixes** installer when updating this repository on a Mac.
+Use the V13.0.14 **File Inspection and Fixes** installer when updating this repository on a Mac.
 
-1. Extract `My_Finance_Records_V13_0_13_File_Inspection_and_Fixes_Installer.zip`.
-2. Double-click `Install_V13_0_13.command`.
+1. Extract `My_Finance_Records_V13_0_14_File_Inspection_and_Fixes_Installer.zip`.
+2. Double-click `Install_V13_0_14.command`.
 3. The installer uses `~/Documents/My_Finance_Records` by default, cloning the GitHub repository there when needed.
-4. It checks the current Git state, required files, local asset paths, package metadata, permissions, and configuration before applying the V13.0.13 payload.
+4. It checks the current Git state, required files, local asset paths, package metadata, permissions, and configuration before applying the V13.0.14 payload.
 5. It preserves the repository copy of `sync-config.js`, installs locked npm metadata with `npm ci`, then runs `npm run inspect`, `npm run quality`, and `git diff --check`.
 6. The installer **does not commit or push**. Review `git status` and publish only after the checks report success.
 

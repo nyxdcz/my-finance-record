@@ -1,6 +1,6 @@
 "use strict";
-const APP_VERSION = "13.0.13";
-const CACHE_VERSION = "finance-v13-20260807-v13013-spend-transaction-r1";
+const APP_VERSION = "13.0.14";
+const CACHE_VERSION = "finance-v13-20260807-v13014-brave-install-r1";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const DB_NAME = "simple-finance-project-records-v12-db";
@@ -13,19 +13,19 @@ const APP_SHELL = [
   asset("./offline.html"),
   asset("./manifest.webmanifest"),
   asset("./version.json"),
-  asset("./security-profiles.js?v=13.0.13"),
-  asset("./security-profiles.css?v=13.0.13"),
-  asset("./cloud-sync.js?v=13.0.13"),
-  asset("./account-ledger.js?v=13.0.13"),
-  asset("./account-ledger.css?v=13.0.13"),
-  asset("./budget-planning.js?v=13.0.13"),
-  asset("./budget-planning.css?v=13.0.13"),
-  asset("./reports-insights.js?v=13.0.13"),
-  asset("./reports-insights.css?v=13.0.13"),
-  asset("./productivity-tools.js?v=13.0.13"),
-  asset("./productivity-tools.css?v=13.0.13"),
-  asset("./reminders-alerts.js?v=13.0.13"),
-  asset("./reminders-alerts.css?v=13.0.13"),
+  asset("./security-profiles.js?v=13.0.14"),
+  asset("./security-profiles.css?v=13.0.14"),
+  asset("./cloud-sync.js?v=13.0.14"),
+  asset("./account-ledger.js?v=13.0.14"),
+  asset("./account-ledger.css?v=13.0.14"),
+  asset("./budget-planning.js?v=13.0.14"),
+  asset("./budget-planning.css?v=13.0.14"),
+  asset("./reports-insights.js?v=13.0.14"),
+  asset("./reports-insights.css?v=13.0.14"),
+  asset("./productivity-tools.js?v=13.0.14"),
+  asset("./productivity-tools.css?v=13.0.14"),
+  asset("./reminders-alerts.js?v=13.0.14"),
+  asset("./reminders-alerts.css?v=13.0.14"),
   asset("./sync-config.js"),
   asset("./vendor/supabase.min.js"),
   asset("./icons/icon-192.png"),

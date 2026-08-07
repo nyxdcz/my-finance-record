@@ -1,3 +1,13 @@
+## 13.0.14 · 2026-08-07
+
+### Changed
+- Added Brave-aware PWA install detection while preserving the normal browser-provided install prompt when available.
+- Added an in-app Brave installation guide for cases where Brave requires Menu → Save and Share → Install page as app….
+- Added clearer Installed, browser-menu, Brave-menu, and HTTPS-required install states so the Install control never appears to do nothing.
+
+### Preserved
+- Finance Schema 12, Cloud Schema V3, profiles, encryption, account ledger, calculations, stored records, manifest capabilities, and offline service-worker behavior.
+
 ## 13.0.13 · 2026-08-07
 
 ### Fixed
