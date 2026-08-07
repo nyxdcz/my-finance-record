@@ -1,3 +1,16 @@
+## 13.0.15 · 2026-08-07
+
+### Added
+- Added Forgot password with Supabase reset-email delivery and a password-recovery completion screen.
+- Added Show/Hide password controls, processing states, and a Test cloud connection action.
+
+### Changed
+- Replaced technical authentication errors with plain-language sign-in guidance while keeping local finance records available when cloud login fails.
+- Password-reset messaging avoids revealing whether an email address is registered.
+
+### Preserved
+- Finance Schema 12, Cloud Schema V3, client-side encryption, local records, account ledger, profiles, calculations, and Brave PWA installation behavior.
+
 ## 13.0.14 · 2026-08-07
 
 ### Changed

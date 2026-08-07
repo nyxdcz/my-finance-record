@@ -46,6 +46,7 @@
   let syncTimer = null;
   let retryTimer = null;
   let syncing = false;
+  let passwordRecoveryActive = false;
   let suppressQueue = false;
   let saveWrapped = false;
   let initialized = false;
@@ -591,8 +592,10 @@
     const ready = Boolean(cloudUser && state.initializedUserId === initializedScope());
     const disconnected = document.getElementById("cloudDisconnectedSection");
     const connected = document.getElementById("cloudConnectedSection");
-    if (disconnected) disconnected.hidden = !configured || Boolean(cloudUser);
-    if (connected) connected.hidden = !configured || !ready;
+    const recovery = document.getElementById("cloudPasswordRecoveryCard");
+    if (recovery) recovery.hidden = !passwordRecoveryActive;
+    if (disconnected) disconnected.hidden = passwordRecoveryActive || !configured || Boolean(cloudUser);
+    if (connected) connected.hidden = passwordRecoveryActive || !configured || !ready;
     const configChip = document.getElementById("cloudConfigStatusChip");
     if (configChip) { configChip.textContent = configured ? "Configured" : "Setup required"; configChip.className = `v12-chip ${configured ? "success" : "warning"}`; }
     const user = document.getElementById("cloudUserEmail"); if (user) user.textContent = cloudUser?.email || "—";
@@ -683,10 +686,17 @@
       realtime:{ params:{ eventsPerSecond:8 } },
       global:{ headers:{ "x-client-info":`my-finance-records/${appVersion()}` } }
     });
-    client.auth.onAuthStateChange((_event,nextSession) => {
+    client.auth.onAuthStateChange((event,nextSession) => {
       session = nextSession || null;
       cloudUser = nextSession?.user || null;
-      if (cloudUser) onSignedIn().catch(error => setStatus("Sync needs attention", error.message, "danger"));
+      if (event === "PASSWORD_RECOVERY") {
+        passwordRecoveryActive = true;
+        renderCloudStats();
+        setAuthMessage("Choose a new password to finish account recovery.", "warning", "recovery");
+        setStatus("Reset password", "Choose a new password before continuing cloud sync.", "warning");
+        return;
+      }
+      if (cloudUser) onSignedIn().catch(error => setStatus("Sync needs attention", friendlyAuthError(error,"sync"), "danger"));
       else onSignedOut();
     });
     return client;
@@ -701,6 +711,102 @@
       throw result.error;
     }
     return result.data || {};
+  }
+
+  function friendlyAuthError(error, context = "sign-in") {
+    const message = String(error?.message || error || "").trim();
+    const lower = message.toLowerCase();
+    if (/invalid login credentials|invalid credentials|email or password/i.test(message)) return "Wrong email or password. If you have not created a cloud account yet, choose Create account.";
+    if (/email not confirmed|confirm.*email/i.test(message)) return "Your email is not confirmed yet. Open the confirmation email first, then sign in again.";
+    if (/user already registered|already been registered|already exists/i.test(message)) return "An account with this email already exists. Sign in or use Forgot password.";
+    if (/password.*(?:short|weak|least)|should be at least/i.test(message)) return "Use a stronger password with at least 6 characters.";
+    if (/rate limit|too many requests/i.test(message)) return "Too many authentication attempts. Wait a moment, then try again.";
+    if (/failed to fetch|network|load failed|networkerror|timeout|timed out/i.test(message)) return "Could not reach the cloud service. Check your internet connection and cloud configuration.";
+    if (/redirect.*not.*allow|redirect.*not.*permitted|redirect_to/i.test(message)) return "Password-reset redirect is not allowed by the cloud project. Add this app URL to Supabase Auth redirect URLs.";
+    if (/session.*missing|auth session missing/i.test(message)) return "The password-reset session has expired. Request a new password reset email.";
+    if (context === "reset-request" && !message) return "Could not request a password reset email.";
+    return message || (context === "sign-in" ? "Could not sign in. Check your email, password, and internet connection." : "The cloud request could not be completed.");
+  }
+
+  function setAuthMessage(message, tone = "info", area = "sign-in") {
+    const id = area === "recovery" ? "cloudPasswordRecoveryMessage" : "cloudAuthMessage";
+    const node = document.getElementById(id);
+    if (!node) return;
+    node.textContent = String(message || "");
+    node.dataset.tone = tone;
+  }
+
+  function setCloudConnectionStatus(label, tone = "info") {
+    const node = document.getElementById("cloudConnectionStatus");
+    if (!node) return;
+    node.textContent = String(label || "Not tested");
+    node.dataset.tone = tone;
+  }
+
+  function passwordRecoveryRedirect() {
+    try {
+      const url = new URL(location.href);
+      if (!/^https?:$/.test(url.protocol)) return "";
+      url.search = "";
+      url.hash = "";
+      return url.href;
+    } catch (error) { return ""; }
+  }
+
+  function setPasswordVisibility(input, button, visible) {
+    if (!input || !button) return;
+    input.type = visible ? "text" : "password";
+    button.textContent = visible ? "Hide" : "Show";
+    button.setAttribute("aria-pressed", String(Boolean(visible)));
+    button.setAttribute("aria-label", `${visible ? "Hide" : "Show"} password`);
+  }
+
+  async function withAuthButtonBusy(button, busyText, action) {
+    if (!button || button.dataset.busy === "true") return;
+    const priorText = button.textContent;
+    button.dataset.busy = "true";
+    button.disabled = true;
+    button.textContent = busyText;
+    try { return await action(); }
+    finally { button.dataset.busy = "false"; button.disabled = false; button.textContent = priorText; }
+  }
+
+  async function testCloudConnection() {
+    const config = getStoredConfig();
+    const status = configStatus(config);
+    if (!status.ok) throw new Error(status.message);
+    const controller = typeof AbortController !== "undefined" ? new AbortController() : null;
+    const timer = controller ? setTimeout(() => controller.abort(), 8000) : null;
+    try {
+      const endpoint = `${String(config.supabaseUrl).replace(/\/$/,"")}/auth/v1/health`;
+      const response = await fetch(endpoint, { method:"GET", cache:"no-store", headers:{ apikey:config.supabasePublishableKey }, signal:controller?.signal });
+      if (!response.ok) throw new Error(`Cloud service responded with HTTP ${response.status}.`);
+      return { ok:true, status:response.status, endpoint };
+    } finally { if (timer) clearTimeout(timer); }
+  }
+
+  async function requestPasswordReset(email) {
+    const value = String(email || "").trim();
+    if (!value || !/^\S+@\S+\.\S+$/.test(value)) throw new Error("Enter the email address used for your cloud account.");
+    const sdk = await loadClient();
+    const redirectTo = passwordRecoveryRedirect();
+    if (!redirectTo) throw new Error("Open the hosted HTTPS app to reset a cloud password. Local file copies cannot receive the secure reset link.");
+    const result = await sdk.auth.resetPasswordForEmail(value, { redirectTo });
+    if (result.error) throw result.error;
+    return true;
+  }
+
+  async function completePasswordReset(password, confirmPassword) {
+    const next = String(password || "");
+    if (next.length < 6) throw new Error("Use a password with at least 6 characters.");
+    if (next !== String(confirmPassword || "")) throw new Error("The new passwords do not match.");
+    const sdk = await loadClient();
+    const result = await sdk.auth.updateUser({ password:next });
+    if (result.error) throw result.error;
+    passwordRecoveryActive = false;
+    session = result.data?.session || session;
+    cloudUser = result.data?.user || session?.user || cloudUser;
+    return result.data?.user || cloudUser;
   }
 
   async function restoreSession() {
@@ -719,21 +825,30 @@
   async function signIn(email,password) {
     const sdk = await loadClient();
     setStatus("Signing in", "Checking your cloud account…", "info");
+    setAuthMessage("Checking your email and password…", "info");
     const result = await sdk.auth.signInWithPassword({ email,password });
     if (result.error) throw result.error;
     session = result.data?.session || null;
     cloudUser = result.data?.user || session?.user || null;
+    setCloudConnectionStatus("Cloud reached", "success");
+    setAuthMessage("Signed in successfully. Preparing cloud sync…", "success");
     if (cloudUser) await onSignedIn();
   }
 
   async function createAccount(email,password) {
     const sdk = await loadClient();
     setStatus("Creating account", "Creating your private cloud account…", "info");
+    setAuthMessage("Creating your private cloud account…", "info");
     const result = await sdk.auth.signUp({ email,password });
     if (result.error) throw result.error;
-    if (!result.data?.session) return setStatus("Check your email", "Confirm the sign-up email, then return and sign in.", "warning");
+    setCloudConnectionStatus("Cloud reached", "success");
+    if (!result.data?.session) {
+      setAuthMessage("Account created. Check your email and confirm it, then return here to sign in.", "warning");
+      return setStatus("Check your email", "Confirm the sign-up email, then return and sign in.", "warning");
+    }
     session = result.data.session;
     cloudUser = result.data.user;
+    setAuthMessage("Account created and signed in.", "success");
     await onSignedIn();
   }
 
@@ -747,6 +862,7 @@
 
   function onSignedOut() {
     session = null; cloudUser = null;
+    passwordRecoveryActive = false;
     if (realtimeChannel && client) client.removeChannel(realtimeChannel).catch(() => {});
     realtimeChannel = null;
     setStatus("Not connected", "Local finance records remain on this device.", "info");
@@ -1316,8 +1432,15 @@
       saveJson(CONFIG_KEY,config); showToast("Cloud configuration saved. Reloading…","success"); setTimeout(()=>location.reload(),350);
     });
     document.getElementById("clearCloudConfig")?.addEventListener("click",()=>{ if(!confirm("Remove cloud configuration from this device? Local records remain."))return; localStorage.removeItem(CONFIG_KEY); setTimeout(()=>location.reload(),250); });
-    document.getElementById("cloudSignIn")?.addEventListener("click",async()=>{const email=document.getElementById("cloudAuthEmail").value.trim(),password=document.getElementById("cloudAuthPassword").value;if(!email||password.length<6)return showToast("Enter your email and password.","warning");try{await signIn(email,password);}catch(error){setStatus("Sign-in failed",error.message,"danger");}});
-    document.getElementById("cloudCreateAccount")?.addEventListener("click",async()=>{const email=document.getElementById("cloudAuthEmail").value.trim(),password=document.getElementById("cloudAuthPassword").value;if(!email||password.length<6)return showToast("Use a valid email and a password with at least 6 characters.","warning");try{await createAccount(email,password);}catch(error){setStatus("Account creation failed",error.message,"danger");}});
+    document.getElementById("cloudPasswordToggle")?.addEventListener("click",event=>{const input=document.getElementById("cloudAuthPassword");setPasswordVisibility(input,event.currentTarget,input?.type === "password");});
+    document.querySelectorAll("[data-cloud-password-target]").forEach(button=>button.addEventListener("click",()=>{const input=document.getElementById(button.dataset.cloudPasswordTarget);setPasswordVisibility(input,button,input?.type === "password");}));
+    document.getElementById("cloudSignIn")?.addEventListener("click",event=>withAuthButtonBusy(event.currentTarget,"Signing in…",async()=>{const email=document.getElementById("cloudAuthEmail").value.trim(),password=document.getElementById("cloudAuthPassword").value;if(!email||password.length<6){setAuthMessage("Enter your email and password. Passwords must have at least 6 characters.","warning");return;}try{await signIn(email,password);}catch(error){const message=friendlyAuthError(error,"sign-in");if(/wrong email or password/i.test(message))setCloudConnectionStatus("Cloud reached","success");setAuthMessage(`${message} Your local finance records are still available on this device.`,"danger");setStatus("Sign-in failed",message,"danger");}}));
+    document.getElementById("cloudCreateAccount")?.addEventListener("click",event=>withAuthButtonBusy(event.currentTarget,"Creating…",async()=>{const email=document.getElementById("cloudAuthEmail").value.trim(),password=document.getElementById("cloudAuthPassword").value;if(!email||password.length<6){setAuthMessage("Use a valid email and a password with at least 6 characters.","warning");return;}try{await createAccount(email,password);}catch(error){const message=friendlyAuthError(error,"create-account");setAuthMessage(`${message} Your local finance records are unchanged.`,"danger");setStatus("Account creation failed",message,"danger");}}));
+    document.getElementById("cloudAuthPassword")?.addEventListener("keydown",event=>{if(event.key === "Enter"){event.preventDefault();document.getElementById("cloudSignIn")?.click();}});
+    document.getElementById("cloudForgotPassword")?.addEventListener("click",event=>withAuthButtonBusy(event.currentTarget,"Sending…",async()=>{const email=document.getElementById("cloudAuthEmail")?.value?.trim()||"";try{await requestPasswordReset(email);setCloudConnectionStatus("Cloud reached","success");setAuthMessage("If a cloud account exists for this email, a password-reset link has been sent. Check your inbox and spam folder.","success");setStatus("Password reset sent","Check your email for the secure reset link.","success");}catch(error){const message=friendlyAuthError(error,"reset-request");setAuthMessage(`${message} Your local finance records are unchanged.`,"danger");setStatus("Password reset failed",message,"danger");}}));
+    document.getElementById("cloudTestConnection")?.addEventListener("click",event=>withAuthButtonBusy(event.currentTarget,"Testing…",async()=>{setCloudConnectionStatus("Testing…","info");try{await testCloudConnection();setCloudConnectionStatus("Connected","success");setAuthMessage("Cloud service is reachable. If sign-in still fails, check the email/password or use Forgot password.","success");}catch(error){const message=friendlyAuthError(error,"connection");setCloudConnectionStatus("Connection failed","danger");setAuthMessage(message,"danger");}}));
+    document.getElementById("cloudCompletePasswordReset")?.addEventListener("click",event=>withAuthButtonBusy(event.currentTarget,"Saving…",async()=>{const next=document.getElementById("cloudNewPassword")?.value||"",confirmPassword=document.getElementById("cloudConfirmPassword")?.value||"";try{await completePasswordReset(next,confirmPassword);document.getElementById("cloudNewPassword").value="";document.getElementById("cloudConfirmPassword").value="";setAuthMessage("Password updated successfully. Continuing cloud sign-in…","success","recovery");setStatus("Password updated","Your new cloud password is active.","success");renderCloudStats();if(cloudUser)await onSignedIn();}catch(error){const message=friendlyAuthError(error,"password-reset");setAuthMessage(message,"danger","recovery");}}));
+    document.getElementById("cloudCancelPasswordReset")?.addEventListener("click",async()=>{passwordRecoveryActive=false;try{const sdk=await loadClient();await sdk.auth.signOut({scope:"local"});}catch(error){}onSignedOut();renderCloudStats();});
     document.getElementById("cloudSyncNow")?.addEventListener("click",()=>syncNow({reason:"manual"}).catch(error=>showToast(error.message,"warning")));
     document.getElementById("cloudSignOut")?.addEventListener("click",()=>signOut().catch(error=>showToast(error.message,"warning")));
     document.getElementById("cloudAutoSync")?.addEventListener("change",event=>{state.autoSync=Boolean(event.target.checked);persist();if(state.autoSync)scheduleSync(100);renderCloudStats();});
@@ -1359,7 +1482,7 @@
     buildRecordMap:()=>toRecordMap(data),
     get status(){return{...state,pendingCount:pendingCount(),conflictCount:conflictCount(),signedIn:Boolean(cloudUser),email:cloudUser?.email||""};}
   };
-  window.FinanceCloudSyncInternals={loadClient,stable,checksum,deepMerge,threeWayMerge,toRecordMap,fromRecordStore,changesBetween,recordKey,keyToken,keyFromToken,retryDelay,detectFinancialOperations,encryptRecordPayload,decryptRecordPayload,toRpcChange,decryptRow};
+  window.FinanceCloudSyncInternals={loadClient,stable,checksum,deepMerge,threeWayMerge,toRecordMap,fromRecordStore,changesBetween,recordKey,keyToken,keyFromToken,retryDelay,detectFinancialOperations,encryptRecordPayload,decryptRecordPayload,toRpcChange,decryptRow,friendlyAuthError,passwordRecoveryRedirect,testCloudConnection,requestPasswordReset,completePasswordReset,setPasswordVisibility};
 
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",()=>initialize().catch(error=>setStatus("Cloud sync unavailable",error.message,"danger")),{once:true});
   else initialize().catch(error=>setStatus("Cloud sync unavailable",error.message,"danger"));

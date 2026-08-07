@@ -92,3 +92,13 @@ Passkeys are experimental. They require supported Supabase project configuration
 - Create encrypted cloud restore points before large changes.
 - Keep the profile passphrase separate from the backup file.
 - A lost passphrase cannot be recovered by Supabase or this app.
+
+## Password reset redirect (V13.0.15+)
+
+For **Forgot password?** to return to the hosted PWA, add the deployed HTTPS app URL to your Supabase project:
+
+1. Open **Supabase Dashboard → Authentication → URL Configuration**.
+2. Under **Redirect URLs**, add the exact hosted My Finance Records URL you use in Brave/Chrome/Safari.
+3. Keep the app hosted over HTTPS. A local `file://` copy cannot receive the secure password-recovery redirect.
+
+The app intentionally does not reveal whether an email address is registered when a reset is requested.

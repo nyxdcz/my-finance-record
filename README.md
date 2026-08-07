@@ -1,8 +1,13 @@
-# My Finance Records · V13.0.14 PWA
+# My Finance Records · V13.0.15 PWA
 
+## V13.0.15 · Cloud Sign-in Recovery & Diagnostics
 
-
-
+- Adds **Forgot password?** to the Sync & Backup sign-in card and sends a Supabase password-recovery email without exposing whether an email is registered.
+- Adds a secure in-app **Choose a new password** completion step when the recovery link returns to the PWA.
+- Replaces technical authentication errors with plain-language guidance such as **Wrong email or password** and **Email not confirmed**.
+- Adds **Show / Hide password**, disabled/busy button states, Enter-to-sign-in, and a visible authentication message area.
+- Adds **Test cloud connection** so project/network reachability can be checked separately from credentials.
+- Failed cloud sign-in never removes local finance records; the app remains local-first.
 
 ## V13.0.14 · Brave PWA Install Flow
 
@@ -97,12 +102,12 @@
 
 ## macOS File Inspection and Fixes installer
 
-Use the V13.0.14 **File Inspection and Fixes** installer when updating this repository on a Mac.
+Use the V13.0.15 **File Inspection and Fixes** installer when updating this repository on a Mac.
 
-1. Extract `My_Finance_Records_V13_0_14_File_Inspection_and_Fixes_Installer.zip`.
-2. Double-click `Install_V13_0_14.command`.
+1. Extract `My_Finance_Records_V13_0_15_File_Inspection_and_Fixes_Installer.zip`.
+2. Double-click `Install_V13_0_15.command`.
 3. The installer uses `~/Documents/My_Finance_Records` by default, cloning the GitHub repository there when needed.
-4. It checks the current Git state, required files, local asset paths, package metadata, permissions, and configuration before applying the V13.0.14 payload.
+4. It checks the current Git state, required files, local asset paths, package metadata, permissions, and configuration before applying the V13.0.15 payload.
 5. It preserves the repository copy of `sync-config.js`, installs locked npm metadata with `npm ci`, then runs `npm run inspect`, `npm run quality`, and `git diff --check`.
 6. The installer **does not commit or push**. Review `git status` and publish only after the checks report success.
 
