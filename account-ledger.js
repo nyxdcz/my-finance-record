@@ -1,6 +1,6 @@
 "use strict";
 
-/* My Finance Records V12.20.0 · account ledger, transfers, and reconciliation.
+/* My Finance Records V13.0.10 · account ledger, transfers, reconciliation, and direct account spending.
    The ledger is append-only. Account balances are recalculated from signed entries.
    Existing V12.19.1 balances migrate once as opening-balance entries without changing totals. */
 (function accountLedgerBootstrap() {
@@ -269,6 +269,8 @@
     recalculateBalances(data);
     const result = originalRenderAll(...args);
     renderLedgerWorkspace();
+    decorateAccountSpendActions();
+    if (document.getElementById("accountDialog")?.open && document.getElementById("accountDialog")?.dataset.accountMode === "spend") updateAccountSpendPreview();
     return result;
   };
 
@@ -360,13 +362,195 @@
     (data.savingsGoals || []).forEach(goal => { if (goal.linkedAccount === originalName) goal.linkedAccount = newName; });
   }
 
+  const SPEND_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 7h16v11H4zM4 10h16M8 15h3"/></svg>';
+  const CORRECT_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 6h14v12H5zM8 10h8M8 14h5"/></svg>';
+
+  function ensureAccountSpendUi() {
+    const dialog = document.getElementById("accountDialog");
+    const form = document.getElementById("accountForm");
+    if (!dialog || !form || document.getElementById("accountModeSwitch")) return;
+    const body = dialog.querySelector(".modal-body");
+    const grid = body?.querySelector(".form-grid");
+    const context = body?.querySelector(".dialog-context-note");
+    if (!body || !grid) return;
+    grid.id = "accountMaintenanceFields";
+    const switcher = document.createElement("div");
+    switcher.className = "account-mode-switch";
+    switcher.id = "accountModeSwitch";
+    switcher.setAttribute("role", "group");
+    switcher.setAttribute("aria-label", "Account action");
+    switcher.innerHTML = `
+      <button class="account-mode-button" id="accountCorrectModeButton" type="button" data-account-mode="correct" aria-pressed="true">${CORRECT_ICON}<span><strong>Correct account balance</strong><small>Use when the displayed balance is wrong.</small></span></button>
+      <button class="account-mode-button" id="accountSpendModeButton" type="button" data-account-mode="spend" aria-pressed="false">${SPEND_ICON}<span><strong>Record spending</strong><small>Use when you bought or paid for something.</small></span></button>`;
+    if (context?.nextSibling) body.insertBefore(switcher, context.nextSibling); else body.insertBefore(switcher, grid);
+
+    const panel = document.createElement("section");
+    panel.id = "accountSpendPanel";
+    panel.className = "account-spend-panel";
+    panel.hidden = true;
+    panel.innerHTML = `
+      <div class="account-spend-summary">
+        <div class="account-spend-summary-copy"><span>Payment account</span><strong id="accountSpendAccountName">—</strong></div>
+        <div class="account-spend-summary-balance"><span>Current balance</span><strong id="accountSpendCurrentBalance">—</strong></div>
+      </div>
+      <div class="account-spend-grid">
+        <div class="field"><label for="accountSpendAmount">Amount spent <span class="required-mark" aria-hidden="true">*</span></label><input class="input" id="accountSpendAmount" type="text" inputmode="decimal" autocomplete="off" data-money-input placeholder="0.00"></div>
+        <div class="field"><label for="accountSpendDescription">What you bought / description <span class="required-mark" aria-hidden="true">*</span></label><input class="input" id="accountSpendDescription" maxlength="80" placeholder="Example: Lunch"></div>
+        <div class="field"><label for="accountSpendCategory">Category <span class="required-mark" aria-hidden="true">*</span></label><select class="select" id="accountSpendCategory"></select></div>
+        <div class="field"><label for="accountSpendDate">Date <span class="required-mark" aria-hidden="true">*</span></label><input class="input" id="accountSpendDate" type="date"></div>
+        <div class="field field-full"><label for="accountSpendNote">Note <span class="muted-label">(optional)</span></label><input class="input" id="accountSpendNote" maxlength="160" placeholder="Example: Jollibee SM City"></div>
+        <label class="account-spend-total-choice field-full" for="accountSpendIncludeTotals"><input id="accountSpendIncludeTotals" type="checkbox" checked><span><strong>Include in calculated totals</strong><small>Included by default in expenses and Money Remaining.</small></span></label>
+      </div>
+      <div class="account-spend-preview" id="accountSpendPreview" aria-live="polite">${SPEND_ICON}<p id="accountSpendPreviewText">Enter an amount to preview this purchase.</p><strong class="account-spend-preview-balance" id="accountSpendAfterBalance">—</strong></div>`;
+    grid.insertAdjacentElement("afterend", panel);
+    setupNumericInputs?.(panel);
+    const dialogClose = () => { dialog.dataset.accountMode = "correct"; };
+    dialog.addEventListener("close", dialogClose);
+  }
+
+  function fillSpendCategories() {
+    const select = document.getElementById("accountSpendCategory");
+    if (!select) return;
+    const values = typeof categoryValues === "function" ? categoryValues(false) : ["Bills","Rent","Loans","Groceries","Utilities","Subscriptions","Transport","Project Costs","Personal","Health & Fitness","Other"];
+    const previous = select.value;
+    select.innerHTML = values.map(value => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join("");
+    if ([...select.options].some(option => option.value === previous)) select.value = previous;
+    else if ([...select.options].some(option => option.value === "Personal")) select.value = "Personal";
+  }
+
+  function resetAccountSpendForm(account) {
+    fillSpendCategories();
+    setMoneyInputValue("accountSpendAmount", "", true);
+    const description = document.getElementById("accountSpendDescription");
+    const date = document.getElementById("accountSpendDate");
+    const note = document.getElementById("accountSpendNote");
+    const include = document.getElementById("accountSpendIncludeTotals");
+    if (description) description.value = "";
+    if (date) date.value = localDateKey();
+    if (note) note.value = "";
+    if (include) include.checked = true;
+    const name = document.getElementById("accountSpendAccountName");
+    if (name) name.textContent = account || "—";
+    updateAccountSpendPreview();
+  }
+
+  function setAccountDialogMode(mode = "correct", { focus = false } = {}) {
+    ensureAccountSpendUi();
+    const dialog = document.getElementById("accountDialog");
+    const editing = Boolean(document.getElementById("originalAccountName")?.value);
+    const next = editing && mode === "spend" ? "spend" : "correct";
+    dialog.dataset.accountMode = next;
+    const switcher = document.getElementById("accountModeSwitch");
+    if (switcher) switcher.hidden = !editing;
+    const maintenance = document.getElementById("accountMaintenanceFields");
+    const spend = document.getElementById("accountSpendPanel");
+    if (maintenance) maintenance.hidden = next === "spend";
+    if (spend) spend.hidden = next !== "spend";
+    document.getElementById("accountCorrectModeButton")?.setAttribute("aria-pressed", String(next === "correct"));
+    document.getElementById("accountSpendModeButton")?.setAttribute("aria-pressed", String(next === "spend"));
+    const submit = document.querySelector('#accountForm button[type="submit"]');
+    if (submit) submit.textContent = next === "spend" ? "Record spending" : "Save account";
+    const deleteButton = document.getElementById("deleteAccountFromDialog");
+    if (deleteButton) deleteButton.hidden = next === "spend" || !editing;
+    const note = dialog.querySelector(".dialog-context-note");
+    if (note) note.textContent = next === "spend" ? "This purchase will be deducted once and automatically added to Paid Expenses." : (editing ? "Correct the balance only when the displayed amount does not match the real account." : "The starting amount becomes this account’s opening-balance ledger entry.");
+    if (next === "spend") updateAccountSpendPreview();
+    setTrackedFormBaseline?.("accountDialog");
+    if (focus) setTimeout(() => document.getElementById(next === "spend" ? "accountSpendAmount" : "accountName")?.focus(), 0);
+  }
+
+  function updateAccountSpendPreview() {
+    const account = document.getElementById("originalAccountName")?.value || "";
+    const exists = account && Object.prototype.hasOwnProperty.call(data.accounts || {}, account);
+    const current = exists ? roundMoney(data.accounts[account]) : 0;
+    const amount = Math.max(0, Number(moneyInputValue("accountSpendAmount") || 0));
+    const after = roundMoney(current - amount);
+    const currentEl = document.getElementById("accountSpendCurrentBalance");
+    const afterEl = document.getElementById("accountSpendAfterBalance");
+    const preview = document.getElementById("accountSpendPreview");
+    const text = document.getElementById("accountSpendPreviewText");
+    if (currentEl) currentEl.textContent = exists ? money(current) : "—";
+    if (afterEl) afterEl.textContent = exists && amount > 0 ? `After: ${money(after)}` : "—";
+    const invalid = !exists || amount <= 0 || after < 0;
+    preview?.classList.toggle("is-warning", Boolean(amount > 0 && invalid));
+    if (!text) return;
+    if (!exists) text.textContent = "This account no longer exists.";
+    else if (amount <= 0) text.textContent = "Enter an amount to preview this purchase.";
+    else if (after < 0) text.innerHTML = `Insufficient balance. ${escapeHtml(account)} is short by <strong>${money(Math.abs(after))}</strong>.`;
+    else text.innerHTML = `This will deduct <strong>${money(amount)}</strong> from ${escapeHtml(account)} and create a <strong>Paid Expense</strong>.`;
+  }
+
+  function makeQuickSpendExpense({ account, amount, description, category, date, note, includeInTotals }) {
+    const id = uid();
+    return {
+      id, expenseType:"normal", name:description, amount, dailyRate:null, electricBillAmount:null, waterBillAmount:null,
+      gymPricePerVisit:null, gymDays:[], gymSeriesPricePerVisit:null, gymSeriesDays:[], gymDateOverrides:{added:[],removed:[]}, gymVisitCount:0,
+      expensePeriod:"other", budgetPeriod:"", date, dueDay:null, category, account, recurring:"No", seriesId:"", includeInTotals:Boolean(includeInTotals), notes:note,
+      paid:false, paidDate:"", paidFromAccount:"", paidAmount:0, accountDeducted:false, paymentTransactionId:"", autoPaidAtMonthEnd:false,
+      gymAutoPay:false, gymAutoPayAccount:"", gymAutoPaySuppressed:false, quickSpend:true, quickSpendSource:"account", icon:null
+    };
+  }
+
+  function submitAccountSpending() {
+    const account = document.getElementById("originalAccountName")?.value || "";
+    if (!account || !Object.prototype.hasOwnProperty.call(data.accounts || {}, account)) return showToast("This account no longer exists", "warning");
+    if (!validateMoneyInput("accountSpendAmount", { required:true, min:.01, message:"Enter an amount greater than zero." })) return;
+    const amount = roundMoney(moneyInputValue("accountSpendAmount"));
+    const description = String(document.getElementById("accountSpendDescription")?.value || "").trim().replace(/\s+/g, " ");
+    const category = String(document.getElementById("accountSpendCategory")?.value || "").trim();
+    const date = String(document.getElementById("accountSpendDate")?.value || "");
+    const note = String(document.getElementById("accountSpendNote")?.value || "").trim();
+    const includeInTotals = Boolean(document.getElementById("accountSpendIncludeTotals")?.checked);
+    if (!description) { document.getElementById("accountSpendDescription")?.focus(); return showToast("Enter what you bought or paid for", "warning"); }
+    if (!category) return showToast("Choose a category", "warning");
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) { document.getElementById("accountSpendDate")?.focus(); return showToast("Choose the purchase date", "warning"); }
+    const balance = roundMoney(data.accounts[account]);
+    if (amount > balance) { updateAccountSpendPreview(); return showToast(`${account} has insufficient funds for this purchase`, "warning"); }
+    pushUndo(`Spend ${money(amount)} from ${account}: ${description}`);
+    const expense = makeQuickSpendExpense({ account, amount, description, category, date, note, includeInTotals });
+    data.expenses.push(expense);
+    const result = applyExpensePayment([expense], account, { auto:false, paidDate:date });
+    if (!result.ok) {
+      data.expenses = data.expenses.filter(item => item.id !== expense.id);
+      return showToast(result.reason === "insufficient" ? `${account} has insufficient funds for this purchase` : "The purchase could not be recorded", "warning");
+    }
+    closeTrackedFormAfterAction("accountDialog");
+    saveData(`${money(amount)} spent from ${account} · added to Paid Expenses`);
+    refreshReconciledAccountState(account, roundMoney(balance - amount));
+  }
+
+  function decorateAccountSpendActions() {
+    document.querySelectorAll('#moneyAccounts .account-card-actions').forEach(actions => {
+      const edit = actions.querySelector('[data-edit-account]');
+      const account = edit?.dataset.editAccount || "";
+      if (!edit || !account || actions.querySelector('[data-spend-account]')) return;
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "button button-secondary button-small account-spend-button";
+      button.dataset.spendAccount = account;
+      button.setAttribute("aria-label", `Record spending from ${account}`);
+      button.innerHTML = `${SPEND_ICON}<span>Spend</span>`;
+      actions.insertBefore(button, edit);
+    });
+  }
+
+  function openAccountSpendDialog(account) {
+    if (!account || !Object.prototype.hasOwnProperty.call(data.accounts || {}, account)) return showToast("This account no longer exists", "warning");
+    openAccountDialog(account);
+    resetAccountSpendForm(account);
+    setAccountDialogMode("spend", { focus:true });
+  }
+
   openAccountDialog = function ledgerOpenAccountDialog(name = "") {
+    ensureAccountSpendUi();
     originalOpenAccountDialog(name);
     const editing = Boolean(name);
-    const note = document.querySelector("#accountDialog .dialog-context-note");
     const label = document.querySelector('#accountDialog label[for="accountBalance"]');
-    if (note) note.textContent = editing ? "Changing the balance creates a reconciliation entry in the account ledger." : "The starting amount becomes this account’s opening-balance ledger entry.";
-    if (label) label.textContent = editing ? "Reconciled balance" : "Opening balance";
+    const help = document.getElementById("accountBalanceHelp");
+    if (label) label.textContent = editing ? "Correct account balance" : "Opening balance";
+    if (help) help.textContent = editing ? "Use only when the displayed balance is wrong. The difference is recorded as a reconciliation adjustment." : "The starting amount becomes this account’s opening-balance ledger entry.";
+    resetAccountSpendForm(name);
+    setAccountDialogMode("correct");
   };
 
   openIncomeDialog = function ledgerOpenIncomeDialog(item = null) {
@@ -652,20 +836,26 @@
   }
 
   document.addEventListener("submit", event => {
-    if (event.target?.id === "accountForm") { event.preventDefault(); event.stopImmediatePropagation(); submitAccountForm(); }
+    if (event.target?.id === "accountForm") { event.preventDefault(); event.stopImmediatePropagation(); if (document.getElementById("accountDialog")?.dataset.accountMode === "spend") submitAccountSpending(); else submitAccountForm(); }
     else if (event.target?.id === "accountsForm") { event.preventDefault(); event.stopImmediatePropagation(); submitAccountsReconciliationForm(); }
     else if (event.target?.id === "incomeForm") { event.preventDefault(); event.stopImmediatePropagation(); submitIncomeForm(); }
     else if (event.target?.id === "accountTransferForm") { event.preventDefault(); event.stopImmediatePropagation(); submitTransfer(); }
   }, true);
 
   document.addEventListener("click", event => {
+    const spendSubmit = event.target.closest('#accountForm button[type="submit"]');
+    const spendAccount = event.target.closest("[data-spend-account]");
+    const accountMode = event.target.closest("[data-account-mode]");
     const deleteIncome = event.target.closest("#deleteIncomeFromDialog");
     const deleteAccount = event.target.closest("[data-delete-account]");
     const openTransfer = event.target.closest("#openTransferDialog");
     const closeDialog = event.target.closest("[data-close-ledger-dialog]");
     const exportLedger = event.target.closest("#exportLedgerCsv");
     const exportReconciliations = event.target.closest("#exportReconciliationsCsv");
-    if (deleteIncome) { event.preventDefault(); event.stopImmediatePropagation(); deleteIncomeRecord(deleteIncome); }
+    if (spendSubmit && document.getElementById("accountDialog")?.dataset.accountMode === "spend") { event.preventDefault(); event.stopImmediatePropagation(); submitAccountSpending(); }
+    else if (spendAccount) { event.preventDefault(); event.stopImmediatePropagation(); openAccountSpendDialog(spendAccount.dataset.spendAccount); }
+    else if (accountMode) { event.preventDefault(); event.stopImmediatePropagation(); if (accountMode.dataset.accountMode === "spend") resetAccountSpendForm(document.getElementById("originalAccountName")?.value || ""); setAccountDialogMode(accountMode.dataset.accountMode, { focus:true }); }
+    else if (deleteIncome) { event.preventDefault(); event.stopImmediatePropagation(); deleteIncomeRecord(deleteIncome); }
     else if (deleteAccount) { event.preventDefault(); event.stopImmediatePropagation(); deleteAccountSafely(deleteAccount); }
     else if (openTransfer) openTransferDialog();
     else if (closeDialog) document.getElementById(closeDialog.dataset.closeLedgerDialog)?.close();
@@ -675,15 +865,18 @@
 
   document.addEventListener("input", event => {
     if (["transferAmount","transferFromAccount","transferToAccount"].includes(event.target?.id)) updateTransferPreview();
+    if (["accountSpendAmount","accountSpendDescription","accountSpendNote"].includes(event.target?.id)) updateAccountSpendPreview();
     if (["ledgerSearch"].includes(event.target?.id)) renderLedgerWorkspace();
   });
   document.addEventListener("change", event => {
+    if (["accountSpendCategory","accountSpendDate","accountSpendIncludeTotals"].includes(event.target?.id)) updateAccountSpendPreview();
     if (["transferFromAccount","transferToAccount","ledgerAccountFilter","ledgerTypeFilter"].includes(event.target?.id)) {
       if (String(event.target.id).startsWith("transfer")) updateTransferPreview();
       else renderLedgerWorkspace();
     }
   });
 
+  ensureAccountSpendUi();
   injectLedgerUi();
   recalculateBalances(data);
   if (typeof persistFinanceDataRaw === "function") persistFinanceDataRaw("Account ledger updated");
@@ -695,6 +888,15 @@
     recalculateBalances,
     appendLedgerEntries,
     appendReconciliation,
+    openSpend:openAccountSpendDialog,
+    recordSpend:({account,amount,description,category="Personal",date=localDateKey(),note="",includeInTotals=true}) => {
+      if (!Object.prototype.hasOwnProperty.call(data.accounts || {}, account)) return {ok:false,reason:"missing-account"};
+      amount=roundMoney(Number(amount||0)); if(amount<=0) return {ok:false,reason:"invalid-amount"};
+      const before=roundMoney(data.accounts[account]); if(before<amount) return {ok:false,reason:"insufficient",balance:before};
+      const expense=makeQuickSpendExpense({account,amount,description:safeText(description||"Purchase",80),category:safeText(category||"Personal",80),date,note:safeText(note,160),includeInTotals});
+      data.expenses.push(expense); const result=applyExpensePayment([expense],account,{auto:false,paidDate:date});
+      if(!result.ok){data.expenses=data.expenses.filter(item=>item.id!==expense.id);return result;} return {ok:true,expense,before,after:roundMoney(data.accounts[account]),transactionId:result.transactionId};
+    },
     render:renderLedgerWorkspace,
     get entries() { return cloneData(data.accountLedger || []); },
     get reconciliations() { return cloneData(data.accountReconciliations || []); }

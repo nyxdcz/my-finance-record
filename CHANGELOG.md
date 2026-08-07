@@ -1,3 +1,16 @@
+## 13.0.10 · 2026-08-07
+
+### Added
+- Added direct account spending from Edit Account and Available Money account cards.
+- Purchases are automatically created as Paid Expenses and posted as one append-only expense-payment ledger debit.
+
+### Fixed
+- Separated reconciliation from normal spending so purchases are not misclassified as balance corrections.
+- Quick-spend deletion restores the original account deduction, and paid ledger amounts are protected from silent amount edits.
+
+### Preserved
+- Finance Schema 12, Cloud Schema V3, account ledger history, encrypted sync, project revisions, budget logic, and existing stored records.
+
 ## 13.0.9 · 2026-08-07
 
 ### Changed
