@@ -1,6 +1,14 @@
-# My Finance Records · V13.0.11 PWA
+# My Finance Records · V13.0.12 PWA
 
 
+
+
+## V13.0.12 · Spend Reliability & Phone Budget Compaction
+
+- Makes **Spend** part of the account-card renderer so it remains available after every rerender, sync, month change, balance update, and collapse/expand.
+- Hardens **Record spending** with an explicit module compatibility check, `Recording…` state, verified Paid Expense + ledger debit + balance persistence, and visible errors instead of silent no-ops.
+- Version-pins first-party JS/CSS assets and activates the fully precached service worker so mixed-release PWA modules cannot keep old spending logic behind a newer form.
+- Compacts phone Budget & Expenses summary cards and aligns Available Money amount/account count, Add account, and the standard 44px collapse control.
 
 
 ## V13.0.11 · UI & Interaction Reliability
@@ -72,10 +80,10 @@
 
 ## macOS File Inspection and Fixes installer
 
-Use the V13.0.11 **File Inspection and Fixes** installer when updating this repository on a Mac.
+Use the V13.0.12 **File Inspection and Fixes** installer when updating this repository on a Mac.
 
-1. Extract `My_Finance_Records_V13_0_11_File_Inspection_and_Fixes_Installer.zip`.
-2. Double-click `Install_V13_0_11.command`.
+1. Extract `My_Finance_Records_V13_0_12_File_Inspection_and_Fixes_Installer.zip`.
+2. Double-click `Install_V13_0_12.command`.
 3. The installer uses `~/Documents/My_Finance_Records` by default, cloning the GitHub repository there when needed.
 4. It checks the current Git state, required files, local asset paths, package metadata, permissions, and configuration before applying the V13.0.10 payload.
 5. It preserves the repository copy of `sync-config.js`, installs locked npm metadata with `npm ci`, then runs `npm run inspect`, `npm run quality`, and `git diff --check`.

@@ -1,3 +1,17 @@
+## 13.0.12 · 2026-08-07
+
+### Fixed
+- Spend is now rendered directly in every editable account card and survives all Budget & Expenses rerenders.
+- Record Spending can no longer silently no-op when a stale Account Ledger module is present; the app shows a clear update-incomplete message instead.
+- Quick spending verifies the Paid Expense, one expense-payment ledger debit, and recalculated account balance before closing the form.
+- Phone Available Money collapse/header controls and Budget summary cards are more compact and consistently sized.
+
+### Changed
+- First-party JS/CSS assets are release-versioned and the new service worker activates only after successful precaching, reducing mixed-version PWA states.
+
+### Preserved
+- Finance Schema 12, Cloud Schema V3, account-ledger history, quick-spend accounting, paid-expense reversal behavior, budgets, encryption, sync, and stored records.
+
 ## 13.0.11 · 2026-08-07
 
 ### Fixed

@@ -269,7 +269,6 @@
     recalculateBalances(data);
     const result = originalRenderAll(...args);
     renderLedgerWorkspace();
-    decorateAccountSpendActions();
     if (document.getElementById("accountDialog")?.open && document.getElementById("accountDialog")?.dataset.accountMode === "spend") updateAccountSpendPreview();
     return result;
   };
@@ -536,8 +535,9 @@
     const balance = roundMoney(data.accounts[account]);
     if (amount > balance) { setFieldError(amountInput, `Available balance is ${money(balance)}.`); updateAccountSpendPreview(); amountInput?.focus(); return showToast(`${account} has insufficient funds for this purchase`, "warning"); }
     const submit = document.querySelector('#accountForm button[type="submit"]');
+    const originalSubmitLabel = submit?.textContent || "Record spending";
     accountSpendSubmitPending = true;
-    if (submit) submit.disabled = true;
+    if (submit) { submit.disabled = true; submit.textContent = "Recording…"; }
     try {
       pushUndo(`Spend ${money(amount)} from ${account}: ${description}`);
       const expense = makeQuickSpendExpense({ account, amount, description, category, date, note, includeInTotals });
@@ -546,32 +546,36 @@
       if (!result.ok) {
         data.expenses = data.expenses.filter(item => item.id !== expense.id);
         accountSpendSubmitPending = false;
-        if (submit) submit.disabled = false;
+        if (submit) { submit.disabled = false; submit.textContent = originalSubmitLabel; }
         return showToast(result.reason === "insufficient" ? `${account} has insufficient funds for this purchase` : "The purchase could not be recorded", "warning");
       }
+      const expectedAfter = roundMoney(balance - amount);
+      recalculateBalances(data);
+      const paidRecordReady = Boolean(expense.paid && expense.accountDeducted && expense.paymentTransactionId);
+      const ledgerReady = (data.accountLedger || []).some(entry => entry.transactionId === result.transactionId && entry.expenseId === expense.id && entry.type === "expense-payment" && roundMoney(entry.amount) === roundMoney(-amount));
+      const balanceReady = roundMoney(data.accounts?.[account] || 0) === expectedAfter;
+      if (!paidRecordReady || !ledgerReady || !balanceReady) throw new Error("The purchase could not be fully verified. Nothing was closed; review and try again.");
+      saveData(`${description} recorded · ${account} ${money(expectedAfter)} remaining`);
+      refreshReconciledAccountState(account, expectedAfter);
       closeTrackedFormAfterAction("accountDialog");
-      saveData(`${money(amount)} spent from ${account} · added to Paid Expenses`);
-      refreshReconciledAccountState(account, roundMoney(balance - amount));
+      accountSpendSubmitPending = false;
+      showToast(`${description} recorded · ${account} ${money(expectedAfter)} remaining`, "success");
     } catch (error) {
       accountSpendSubmitPending = false;
-      if (submit) submit.disabled = false;
+      if (submit) { submit.disabled = false; submit.textContent = originalSubmitLabel; }
       showToast(error?.message || "The purchase could not be recorded", "warning");
     }
   }
 
-  function decorateAccountSpendActions() {
-    document.querySelectorAll('#moneyAccounts .account-card-actions').forEach(actions => {
-      const edit = actions.querySelector('[data-edit-account]');
-      const account = edit?.dataset.editAccount || "";
-      if (!edit || !account || actions.querySelector('[data-spend-account]')) return;
-      const button = document.createElement("button");
-      button.type = "button";
-      button.className = "button button-secondary button-small account-spend-button";
-      button.dataset.spendAccount = account;
-      button.setAttribute("aria-label", `Record spending from ${account}`);
-      button.innerHTML = `${SPEND_ICON}<span>Spend</span>`;
-      button.addEventListener("click", () => openAccountSpendDialog(account));
-      actions.insertBefore(button, edit);
+  function bindPersistentSpendActionDelegation() {
+    if (document.documentElement.dataset.accountSpendDelegated === "true") return;
+    document.documentElement.dataset.accountSpendDelegated = "true";
+    document.addEventListener("click", event => {
+      const button = event.target.closest("[data-spend-account]");
+      if (!button) return;
+      event.preventDefault();
+      const account = button.dataset.spendAccount || "";
+      openAccountSpendDialog(account);
     });
   }
 
@@ -909,6 +913,7 @@
   });
 
   ensureAccountSpendUi();
+  bindPersistentSpendActionDelegation();
   injectLedgerUi();
   recalculateBalances(data);
   if (typeof persistFinanceDataRaw === "function") persistFinanceDataRaw("Account ledger updated");
@@ -917,6 +922,8 @@
 
   window.FinanceAccountLedger = {
     version:LEDGER_VERSION,
+    releaseVersion:"13.0.12",
+    capabilities:{ accountSpending:true, verifiedSpendSubmit:true, persistentSpendActions:true },
     recalculateBalances,
     appendLedgerEntries,
     appendReconciliation,

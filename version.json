@@ -1,5 +1,5 @@
 {
-  "version": "13.0.11",
+  "version": "13.0.12",
   "schemaVersion": 12,
   "cloudSchemaVersion": 3,
   "ledgerVersion": 1,
@@ -10,8 +10,8 @@
   "profileArchitectureVersion": 1,
   "encryptionVersion": 1,
   "authSecurityVersion": 1,
-  "cacheVersion": "finance-v13-20260807-v13011-ui-interaction-r1",
+  "cacheVersion": "finance-v13-20260807-v13012-spend-budget-r1",
   "released": "2026-08-07",
-  "name": "UI & Interaction Reliability",
-  "notes": "Rebuilds Record Spending event wiring for reliable typing, mode switching, validation recovery, and single-submit behavior, audits critical controls, and removes Edit Project horizontal overflow on phones with a compact sticky form layout."
+  "name": "Spend Reliability & Phone Budget Compaction",
+  "notes": "Makes Spend a permanent account-card action, hardens Record Spending against stale/mixed PWA modules and silent failures, version-pins first-party assets, and compacts the phone Budget & Expenses summary and Available Money collapse header."
 }

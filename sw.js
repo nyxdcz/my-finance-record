@@ -1,6 +1,6 @@
 "use strict";
-const APP_VERSION = "13.0.11";
-const CACHE_VERSION = "finance-v13-20260807-v13011-ui-interaction-r1";
+const APP_VERSION = "13.0.12";
+const CACHE_VERSION = "finance-v13-20260807-v13012-spend-budget-r1";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const DB_NAME = "simple-finance-project-records-v12-db";
@@ -13,19 +13,19 @@ const APP_SHELL = [
   asset("./offline.html"),
   asset("./manifest.webmanifest"),
   asset("./version.json"),
-  asset("./security-profiles.js"),
-  asset("./security-profiles.css"),
-  asset("./cloud-sync.js"),
-  asset("./account-ledger.js"),
-  asset("./account-ledger.css"),
-  asset("./budget-planning.js"),
-  asset("./budget-planning.css"),
-  asset("./reports-insights.js"),
-  asset("./reports-insights.css"),
-  asset("./productivity-tools.js"),
-  asset("./productivity-tools.css"),
-  asset("./reminders-alerts.js"),
-  asset("./reminders-alerts.css"),
+  asset("./security-profiles.js?v=13.0.12"),
+  asset("./security-profiles.css?v=13.0.12"),
+  asset("./cloud-sync.js?v=13.0.12"),
+  asset("./account-ledger.js?v=13.0.12"),
+  asset("./account-ledger.css?v=13.0.12"),
+  asset("./budget-planning.js?v=13.0.12"),
+  asset("./budget-planning.css?v=13.0.12"),
+  asset("./reports-insights.js?v=13.0.12"),
+  asset("./reports-insights.css?v=13.0.12"),
+  asset("./productivity-tools.js?v=13.0.12"),
+  asset("./productivity-tools.css?v=13.0.12"),
+  asset("./reminders-alerts.js?v=13.0.12"),
+  asset("./reminders-alerts.css?v=13.0.12"),
   asset("./sync-config.js"),
   asset("./vendor/supabase.min.js"),
   asset("./icons/icon-192.png"),
@@ -41,7 +41,7 @@ async function precache() {
 }
 
 self.addEventListener("install", event => {
-  event.waitUntil(precache());
+  event.waitUntil(precache().then(() => self.skipWaiting()));
 });
 
 self.addEventListener("activate", event => {
