@@ -365,6 +365,27 @@
   const SPEND_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 7h16v11H4zM4 10h16M8 15h3"/></svg>';
   const CORRECT_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 6h14v12H5zM8 10h8M8 14h5"/></svg>';
 
+  let accountSpendSubmitPending = false;
+
+  function bindAccountSpendControls(panel) {
+    if (!panel || panel.dataset.spendControlsBound === "true") return;
+    panel.dataset.spendControlsBound = "true";
+    const amount = panel.querySelector("#accountSpendAmount");
+    if (amount) {
+      amount.dataset.numericBound = "simple";
+      amount.maxLength = 80;
+      amount.addEventListener("input", () => { setFieldError(amount, ""); updateAccountSpendPreview(); });
+      amount.addEventListener("blur", () => { if (String(amount.value || "").trim()) formatMoneyInput(amount, false); updateAccountSpendPreview(); });
+    }
+    ["accountSpendDescription","accountSpendNote"].forEach(id => document.getElementById(id)?.addEventListener("input", updateAccountSpendPreview));
+    ["accountSpendCategory","accountSpendDate","accountSpendIncludeTotals"].forEach(id => document.getElementById(id)?.addEventListener("change", updateAccountSpendPreview));
+    document.getElementById("accountCorrectModeButton")?.addEventListener("click", () => setAccountDialogMode("correct", { focus:true }));
+    document.getElementById("accountSpendModeButton")?.addEventListener("click", () => {
+      resetAccountSpendForm(document.getElementById("originalAccountName")?.value || "");
+      setAccountDialogMode("spend", { focus:true });
+    });
+  }
+
   function ensureAccountSpendUi() {
     const dialog = document.getElementById("accountDialog");
     const form = document.getElementById("accountForm");
@@ -403,8 +424,8 @@
       </div>
       <div class="account-spend-preview" id="accountSpendPreview" aria-live="polite">${SPEND_ICON}<p id="accountSpendPreviewText">Enter an amount to preview this purchase.</p><strong class="account-spend-preview-balance" id="accountSpendAfterBalance">—</strong></div>`;
     grid.insertAdjacentElement("afterend", panel);
-    setupNumericInputs?.(panel);
-    const dialogClose = () => { dialog.dataset.accountMode = "correct"; };
+    bindAccountSpendControls(panel);
+    const dialogClose = () => { dialog.dataset.accountMode = "correct"; accountSpendSubmitPending = false; };
     dialog.addEventListener("close", dialogClose);
   }
 
@@ -455,6 +476,8 @@
     const note = dialog.querySelector(".dialog-context-note");
     if (note) note.textContent = next === "spend" ? "This purchase will be deducted once and automatically added to Paid Expenses." : (editing ? "Correct the balance only when the displayed amount does not match the real account." : "The starting amount becomes this account’s opening-balance ledger entry.");
     if (next === "spend") updateAccountSpendPreview();
+    accountSpendSubmitPending = false;
+    if (submit) submit.disabled = false;
     setTrackedFormBaseline?.("accountDialog");
     if (focus) setTimeout(() => document.getElementById(next === "spend" ? "accountSpendAmount" : "accountName")?.focus(), 0);
   }
@@ -492,31 +515,48 @@
   }
 
   function submitAccountSpending() {
+    if (accountSpendSubmitPending) return;
     const account = document.getElementById("originalAccountName")?.value || "";
+    const amountInput = document.getElementById("accountSpendAmount");
+    const descriptionInput = document.getElementById("accountSpendDescription");
+    const categoryInput = document.getElementById("accountSpendCategory");
+    const dateInput = document.getElementById("accountSpendDate");
+    [amountInput, descriptionInput, categoryInput, dateInput].forEach(input => input && setFieldError(input, ""));
     if (!account || !Object.prototype.hasOwnProperty.call(data.accounts || {}, account)) return showToast("This account no longer exists", "warning");
-    if (!validateMoneyInput("accountSpendAmount", { required:true, min:.01, message:"Enter an amount greater than zero." })) return;
-    const amount = roundMoney(moneyInputValue("accountSpendAmount"));
-    const description = String(document.getElementById("accountSpendDescription")?.value || "").trim().replace(/\s+/g, " ");
-    const category = String(document.getElementById("accountSpendCategory")?.value || "").trim();
-    const date = String(document.getElementById("accountSpendDate")?.value || "");
+    if (!validateMoneyInput(amountInput, { required:true, min:.01, message:"Enter an amount greater than zero." })) return;
+    const amount = roundMoney(moneyInputValue(amountInput));
+    const description = String(descriptionInput?.value || "").trim().replace(/\s+/g, " ");
+    const category = String(categoryInput?.value || "").trim();
+    const date = String(dateInput?.value || "");
     const note = String(document.getElementById("accountSpendNote")?.value || "").trim();
     const includeInTotals = Boolean(document.getElementById("accountSpendIncludeTotals")?.checked);
-    if (!description) { document.getElementById("accountSpendDescription")?.focus(); return showToast("Enter what you bought or paid for", "warning"); }
-    if (!category) return showToast("Choose a category", "warning");
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) { document.getElementById("accountSpendDate")?.focus(); return showToast("Choose the purchase date", "warning"); }
+    if (!description) { setFieldError(descriptionInput, "Enter what you bought or paid for."); descriptionInput?.focus(); return showToast("Enter what you bought or paid for", "warning"); }
+    if (!category) { setFieldError(categoryInput, "Choose a category."); categoryInput?.focus(); return showToast("Choose a category", "warning"); }
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) { setFieldError(dateInput, "Choose the purchase date."); dateInput?.focus(); return showToast("Choose the purchase date", "warning"); }
     const balance = roundMoney(data.accounts[account]);
-    if (amount > balance) { updateAccountSpendPreview(); return showToast(`${account} has insufficient funds for this purchase`, "warning"); }
-    pushUndo(`Spend ${money(amount)} from ${account}: ${description}`);
-    const expense = makeQuickSpendExpense({ account, amount, description, category, date, note, includeInTotals });
-    data.expenses.push(expense);
-    const result = applyExpensePayment([expense], account, { auto:false, paidDate:date });
-    if (!result.ok) {
-      data.expenses = data.expenses.filter(item => item.id !== expense.id);
-      return showToast(result.reason === "insufficient" ? `${account} has insufficient funds for this purchase` : "The purchase could not be recorded", "warning");
+    if (amount > balance) { setFieldError(amountInput, `Available balance is ${money(balance)}.`); updateAccountSpendPreview(); amountInput?.focus(); return showToast(`${account} has insufficient funds for this purchase`, "warning"); }
+    const submit = document.querySelector('#accountForm button[type="submit"]');
+    accountSpendSubmitPending = true;
+    if (submit) submit.disabled = true;
+    try {
+      pushUndo(`Spend ${money(amount)} from ${account}: ${description}`);
+      const expense = makeQuickSpendExpense({ account, amount, description, category, date, note, includeInTotals });
+      data.expenses.push(expense);
+      const result = applyExpensePayment([expense], account, { auto:false, paidDate:date });
+      if (!result.ok) {
+        data.expenses = data.expenses.filter(item => item.id !== expense.id);
+        accountSpendSubmitPending = false;
+        if (submit) submit.disabled = false;
+        return showToast(result.reason === "insufficient" ? `${account} has insufficient funds for this purchase` : "The purchase could not be recorded", "warning");
+      }
+      closeTrackedFormAfterAction("accountDialog");
+      saveData(`${money(amount)} spent from ${account} · added to Paid Expenses`);
+      refreshReconciledAccountState(account, roundMoney(balance - amount));
+    } catch (error) {
+      accountSpendSubmitPending = false;
+      if (submit) submit.disabled = false;
+      showToast(error?.message || "The purchase could not be recorded", "warning");
     }
-    closeTrackedFormAfterAction("accountDialog");
-    saveData(`${money(amount)} spent from ${account} · added to Paid Expenses`);
-    refreshReconciledAccountState(account, roundMoney(balance - amount));
   }
 
   function decorateAccountSpendActions() {
@@ -530,6 +570,7 @@
       button.dataset.spendAccount = account;
       button.setAttribute("aria-label", `Record spending from ${account}`);
       button.innerHTML = `${SPEND_ICON}<span>Spend</span>`;
+      button.addEventListener("click", () => openAccountSpendDialog(account));
       actions.insertBefore(button, edit);
     });
   }
@@ -836,26 +877,19 @@
   }
 
   document.addEventListener("submit", event => {
-    if (event.target?.id === "accountForm") { event.preventDefault(); event.stopImmediatePropagation(); if (document.getElementById("accountDialog")?.dataset.accountMode === "spend") submitAccountSpending(); else submitAccountForm(); }
-    else if (event.target?.id === "accountsForm") { event.preventDefault(); event.stopImmediatePropagation(); submitAccountsReconciliationForm(); }
+    if (event.target?.id === "accountsForm") { event.preventDefault(); event.stopImmediatePropagation(); submitAccountsReconciliationForm(); }
     else if (event.target?.id === "incomeForm") { event.preventDefault(); event.stopImmediatePropagation(); submitIncomeForm(); }
     else if (event.target?.id === "accountTransferForm") { event.preventDefault(); event.stopImmediatePropagation(); submitTransfer(); }
   }, true);
 
   document.addEventListener("click", event => {
-    const spendSubmit = event.target.closest('#accountForm button[type="submit"]');
-    const spendAccount = event.target.closest("[data-spend-account]");
-    const accountMode = event.target.closest("[data-account-mode]");
     const deleteIncome = event.target.closest("#deleteIncomeFromDialog");
     const deleteAccount = event.target.closest("[data-delete-account]");
     const openTransfer = event.target.closest("#openTransferDialog");
     const closeDialog = event.target.closest("[data-close-ledger-dialog]");
     const exportLedger = event.target.closest("#exportLedgerCsv");
     const exportReconciliations = event.target.closest("#exportReconciliationsCsv");
-    if (spendSubmit && document.getElementById("accountDialog")?.dataset.accountMode === "spend") { event.preventDefault(); event.stopImmediatePropagation(); submitAccountSpending(); }
-    else if (spendAccount) { event.preventDefault(); event.stopImmediatePropagation(); openAccountSpendDialog(spendAccount.dataset.spendAccount); }
-    else if (accountMode) { event.preventDefault(); event.stopImmediatePropagation(); if (accountMode.dataset.accountMode === "spend") resetAccountSpendForm(document.getElementById("originalAccountName")?.value || ""); setAccountDialogMode(accountMode.dataset.accountMode, { focus:true }); }
-    else if (deleteIncome) { event.preventDefault(); event.stopImmediatePropagation(); deleteIncomeRecord(deleteIncome); }
+    if (deleteIncome) { event.preventDefault(); event.stopImmediatePropagation(); deleteIncomeRecord(deleteIncome); }
     else if (deleteAccount) { event.preventDefault(); event.stopImmediatePropagation(); deleteAccountSafely(deleteAccount); }
     else if (openTransfer) openTransferDialog();
     else if (closeDialog) document.getElementById(closeDialog.dataset.closeLedgerDialog)?.close();
@@ -865,11 +899,9 @@
 
   document.addEventListener("input", event => {
     if (["transferAmount","transferFromAccount","transferToAccount"].includes(event.target?.id)) updateTransferPreview();
-    if (["accountSpendAmount","accountSpendDescription","accountSpendNote"].includes(event.target?.id)) updateAccountSpendPreview();
     if (["ledgerSearch"].includes(event.target?.id)) renderLedgerWorkspace();
   });
   document.addEventListener("change", event => {
-    if (["accountSpendCategory","accountSpendDate","accountSpendIncludeTotals"].includes(event.target?.id)) updateAccountSpendPreview();
     if (["transferFromAccount","transferToAccount","ledgerAccountFilter","ledgerTypeFilter"].includes(event.target?.id)) {
       if (String(event.target.id).startsWith("transfer")) updateTransferPreview();
       else renderLedgerWorkspace();
@@ -889,6 +921,7 @@
     appendLedgerEntries,
     appendReconciliation,
     openSpend:openAccountSpendDialog,
+    submitSpend:submitAccountSpending,
     recordSpend:({account,amount,description,category="Personal",date=localDateKey(),note="",includeInTotals=true}) => {
       if (!Object.prototype.hasOwnProperty.call(data.accounts || {}, account)) return {ok:false,reason:"missing-account"};
       amount=roundMoney(Number(amount||0)); if(amount<=0) return {ok:false,reason:"invalid-amount"};

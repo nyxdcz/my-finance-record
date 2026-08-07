@@ -1,6 +1,6 @@
 "use strict";
-const APP_VERSION = "13.0.10";
-const CACHE_VERSION = "finance-v13-20260807-v13010-account-spending-r1";
+const APP_VERSION = "13.0.11";
+const CACHE_VERSION = "finance-v13-20260807-v13011-ui-interaction-r1";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const DB_NAME = "simple-finance-project-records-v12-db";

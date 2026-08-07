@@ -1,6 +1,14 @@
-# My Finance Records · V13.0.10 PWA
+# My Finance Records · V13.0.11 PWA
 
 
+
+
+## V13.0.11 · UI & Interaction Reliability
+
+- Rebuilt **Record spending** controls with direct, one-time bindings so amount typing, mode switching, validation, Cancel/Close, and submit remain responsive after rerenders and repeated modal opens.
+- Uses one form-submit path with double-submit protection while preserving exactly one Paid Expense and one account-ledger debit per purchase.
+- Cleaned up Edit Project on phones: zero horizontal overflow, compact date/month/salary/calendar sections, and a sticky **Cancel | Save project** footer with secondary actions under **More actions**.
+- Added interaction regression coverage for critical account/project controls and preserved finance, cloud, revision, and security logic.
 
 
 ## V13.0.10 · Account Spending from Balance
@@ -64,10 +72,10 @@
 
 ## macOS File Inspection and Fixes installer
 
-Use the V13.0.10 **File Inspection and Fixes** installer when updating this repository on a Mac.
+Use the V13.0.11 **File Inspection and Fixes** installer when updating this repository on a Mac.
 
-1. Extract `My_Finance_Records_V13_0_10_File_Inspection_and_Fixes_Installer.zip`.
-2. Double-click `Install_V13_0_10.command`.
+1. Extract `My_Finance_Records_V13_0_11_File_Inspection_and_Fixes_Installer.zip`.
+2. Double-click `Install_V13_0_11.command`.
 3. The installer uses `~/Documents/My_Finance_Records` by default, cloning the GitHub repository there when needed.
 4. It checks the current Git state, required files, local asset paths, package metadata, permissions, and configuration before applying the V13.0.10 payload.
 5. It preserves the repository copy of `sync-config.js`, installs locked npm metadata with `npm ci`, then runs `npm run inspect`, `npm run quality`, and `git diff --check`.

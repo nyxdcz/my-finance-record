@@ -1,3 +1,17 @@
+## 13.0.11 · 2026-08-07
+
+### Fixed
+- Rebuilt Record Spending interaction wiring so amount entry, mode switching, validation recovery, Close/Cancel, and submit controls remain reliable after repeated modal opens and rerenders.
+- Removed overlapping account-spend click/submit interception and added single-submit protection to prevent duplicate purchase posting.
+- Removed Edit Project horizontal overflow on phones and compacted date/month, salary, calendar, revision, and footer controls.
+
+### Changed
+- Phone Edit Project keeps Cancel and Save visible while Duplicate, revision, and Delete actions move into a compact More actions menu.
+- Salary project summary wording and mobile spacing are shorter and easier to scan.
+
+### Preserved
+- Finance Schema 12, Cloud Schema V3, account ledger rules, quick-spend accounting, project revisions, payments, encryption, and stored records.
+
 ## 13.0.10 · 2026-08-07
 
 ### Added
