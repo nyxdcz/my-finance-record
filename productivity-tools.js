@@ -511,17 +511,14 @@
   }
 
   function injectTopbarButtons() {
-    const topbar = document.querySelector(".topbar-actions");
-    const quick = document.getElementById("quickAddExpense");
-    if (!topbar || !quick) return;
-    if (!document.getElementById("globalSearchButton")) quick.insertAdjacentHTML("beforebegin", '<button class="productivity-topbar-button" id="globalSearchButton" type="button" aria-label="Search all finance records" title="Search all records · Command K">⌕</button><button class="productivity-topbar-button" id="productivityCenterButton" type="button" aria-label="Open productivity center" title="Productivity center">⚡</button>');
+    const tools = document.querySelector(".topbar-tools-panel");
+    if (!tools) return;
+    // V13.0.2 provides Search and Quick actions as standard SVG menu items in index.html.
   }
 
   function ensureUniversalActions() {
-    const quick = document.getElementById("quickAddExpense");
-    if (quick) { quick.hidden = false; quick.dataset.actionKind = "quick"; quick.textContent = "+ Quick add"; quick.title = "Quick add · Command Shift A"; }
-    const mobile = document.getElementById("mobileAddExpenseButton");
-    if (mobile) { mobile.hidden = false; const labels = mobile.querySelectorAll("span"); if (labels[1]) labels[1].textContent = "Quick add"; mobile.setAttribute("aria-label","Quick add"); }
+    // Keep the contextual Add Expense / Add Income / Add Project action managed by the core UI.
+    // Universal quick actions remain available through More tools and keyboard shortcuts.
   }
 
   function openDialog(id, focusSelector = "") {
@@ -936,7 +933,7 @@
 
   function setupEvents() {
     document.addEventListener("click", event => {
-      const quick = event.target.closest("#quickAddExpense, #mobileAddExpenseButton");
+      const quick = event.target.closest("#mobileAddExpenseButton");
       if (quick) { event.preventDefault(); event.stopImmediatePropagation(); openQuickMenu(); return; }
       if (event.target.closest("#globalSearchButton")) { openGlobalSearch(); return; }
       if (event.target.closest("#productivityCenterButton")) { openProductivityCenter("templates"); return; }

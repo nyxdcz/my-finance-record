@@ -1,6 +1,6 @@
 "use strict";
-const APP_VERSION = "13.0.1";
-const CACHE_VERSION = "finance-v13-20260807-v13001-iphone-ui-stabilization";
+const APP_VERSION = "13.0.2";
+const CACHE_VERSION = "finance-v13-20260807-v13002-simplified-settings-r4";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const DB_NAME = "simple-finance-project-records-v12-db";

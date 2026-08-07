@@ -29,7 +29,7 @@
     })();
   </script>
 
-  <title>My Finance Records · V13.0.1</title>
+  <title>My Finance Records · V13.0.2</title>
   <style>
     :root {
       --bg: #f5f7fa;
@@ -3363,6 +3363,47 @@
     .dialog-form .form-disclosure > .field { padding:0 10px 10px; }
     .dialog-form .expense-total-choice { padding:9px 10px; }
     .dialog-form .record-icon-picker-controls.compact-icon-popover { width:min(270px,calc(100vw - 42px)); }
+
+    /* V13.0.2 · Edit Account balance and type alignment correction */
+    #accountDialog .account-balance-type-row {
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:10px;
+      align-items:start;
+      min-width:0;
+    }
+    #accountDialog .account-balance-type-row > .field {
+      align-content:start;
+      min-width:0;
+    }
+    #accountDialog .account-balance-type-row .field-label-help-row {
+      min-height:18px;
+      align-items:center;
+    }
+    #accountDialog .account-balance-type-row label {
+      color:var(--text);
+      font-size:.72rem;
+      font-weight:780;
+      line-height:1.3;
+    }
+    #accountDialog .account-balance-type-row .input,
+    #accountDialog .account-balance-type-row .select {
+      box-sizing:border-box;
+      height:42px;
+      min-height:42px;
+      padding:8px 10px;
+    }
+    #accountDialog .account-reconcile-help {
+      display:block;
+      margin:2px 0 0;
+      color:var(--muted);
+      font-size:.68rem;
+      line-height:1.4;
+    }
+    html[data-theme="dark"] #accountDialog .account-balance-type-row label {
+      color:color-mix(in srgb,var(--text) 92%,white 8%);
+    }
+
     .form-action-footer,
     .utility-action-footer,
     .confirm-action-footer { display:flex; align-items:center; gap:8px; }
@@ -3400,6 +3441,15 @@
       .app-dialog .modal-body { padding:11px 12px; }
       .dialog-form .form-grid,
       .dialog-form .form-grid.two-column { grid-template-columns:1fr; }
+      #accountDialog .account-balance-type-row {
+        grid-template-columns:1fr;
+        gap:12px;
+      }
+      #accountDialog .account-balance-type-row .input,
+      #accountDialog .account-balance-type-row .select {
+        height:44px;
+        min-height:44px;
+      }
       .form-action-footer { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
       .form-action-footer .footer-spacer { display:none; }
       .form-action-footer .dialog-danger-leading { grid-column:1/-1; }
@@ -4408,7 +4458,246 @@
       .topbar h1 { font-size:.93rem; }
     }
 
+
+
+    /* V13.0.2 · simplified toolbar and paired budget bento controls */
+    .toolbar-icon,
+    .month-nav-button svg,
+    .budget-panel-collapse svg { width:18px; height:18px; display:block; flex:0 0 auto; }
+    .toolbar-icon svg,
+    .month-nav-button svg,
+    .budget-panel-collapse svg { width:100%; height:100%; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
+    .topbar-actions { min-width:0; margin-left:auto; gap:8px; flex-wrap:nowrap; }
+    .topbar-actions .cloud-sync-toolbar-button { order:1; }
+    .topbar-actions .month-navigator { order:2; }
+    .topbar-actions .topbar-add-button { order:3; }
+    .topbar-actions .topbar-tools-menu { order:4; }
+    .cloud-sync-toolbar-button { min-height:38px; }
+    .cloud-sync-toolbar-button .toolbar-icon { width:17px; height:17px; }
+    .month-navigator { min-width:0; padding:3px; border:1px solid var(--line); border-radius:9px; background:var(--surface); }
+    .month-navigator .month-nav-button { width:34px; height:34px; border:0; background:transparent; }
+    .month-navigator .month-nav-button:hover,
+    .month-navigator .month-nav-button:focus-visible { background:var(--surface-soft); }
+    .month-navigator .month-control { width:190px; min-height:34px; padding:4px 8px; border:0; border-radius:6px; background:var(--surface-soft); }
+    .month-navigator .month-current-button,
+    .month-navigator .month-status-chip { min-width:94px; min-height:34px; justify-content:center; border-radius:6px; }
+    .current-month-mobile { display:none; }
+    .topbar-add-button { min-height:38px; display:inline-flex; align-items:center; gap:7px; white-space:nowrap; }
+    .topbar-add-button .toolbar-icon { width:17px; height:17px; }
+    .topbar-tools-menu { position:relative; flex:0 0 auto; }
+    .topbar-tools-menu > summary {
+      width:38px; min-width:38px; height:38px; min-height:38px; display:grid; place-items:center; padding:0;
+      border:1px solid var(--line); border-radius:7px; background:var(--surface); color:var(--text); cursor:pointer; list-style:none;
+    }
+    .topbar-tools-menu > summary::-webkit-details-marker { display:none; }
+    .topbar-tools-menu[open] > summary { border-color:var(--primary); color:var(--primary); background:color-mix(in srgb,var(--primary) 8%,var(--surface)); }
+    .topbar-tools-panel {
+      position:absolute; top:calc(100% + 8px); right:0; z-index:100; width:248px; display:grid; gap:4px; padding:7px;
+      border:1px solid var(--line); border-radius:9px; background:var(--surface); box-shadow:0 16px 42px rgba(15,23,42,.2);
+    }
+    .topbar-tools-item,
+    .topbar-tools-item.theme-toggle-button {
+      width:100%; min-height:48px; display:flex; align-items:center; gap:10px; padding:8px 10px; border:0; border-radius:6px;
+      background:transparent; color:var(--text); text-align:left;
+    }
+    .topbar-tools-item:hover,
+    .topbar-tools-item:focus-visible { background:var(--surface-soft); }
+    .topbar-tools-item > span:last-child { min-width:0; display:block; }
+    .topbar-tools-item strong,
+    .topbar-tools-item small { display:block; }
+    .topbar-tools-item strong { font-size:.73rem; line-height:1.25; }
+    .topbar-tools-item small { margin-top:2px; color:var(--muted); font-size:.62rem; line-height:1.25; }
+    .topbar-tools-item .toolbar-icon { width:20px; height:20px; }
+    .topbar-actions #themeToggleButton,
+    .topbar-actions #globalSearchButton,
+    .topbar-actions #productivityCenterButton { display:flex !important; }
+    #themeToggleIcon { font-size:0; }
+    .budget-planner-grid { align-items:stretch; }
+    .budget-category-panel,
+    .cash-forecast-panel { display:flex; flex-direction:column; height:100%; }
+    .budget-panel-body { min-height:0; flex:1 1 auto; }
+    .budget-category-body { display:flex; flex-direction:column; }
+    .budget-category-body #budgetCategoryTableWrap { flex:1 1 auto; }
+    .cash-forecast-body.budget-panel-body { display:block; }
+    .budget-panel-heading-copy { min-width:0; }
+    .budget-panel-heading-actions { display:flex; align-items:center; justify-content:flex-end; gap:7px; flex:0 0 auto; }
+    .budget-panel-collapse {
+      width:34px; min-width:34px; height:34px; min-height:34px; display:grid; place-items:center; padding:0;
+      border:1px solid var(--line); border-radius:7px; background:var(--surface-soft); color:var(--text);
+    }
+    .budget-panel-collapse:hover,
+    .budget-panel-collapse:focus-visible { border-color:var(--primary); color:var(--primary); }
+    .budget-panel-collapse svg { transition:transform .18s ease; }
+    .budget-bento-panel.is-collapsed { align-self:start; height:auto; }
+    .budget-bento-panel.is-collapsed .budget-panel-body { display:none !important; }
+    .budget-bento-panel.is-collapsed .budget-panel-heading { border-bottom:0; }
+    .budget-bento-panel.is-collapsed .budget-panel-collapse svg { transform:rotate(180deg); }
+
+    @media (max-width:1120px) and (min-width:851px) {
+      .topbar { padding-inline:18px; gap:12px; }
+      .topbar-actions { gap:6px; }
+      .cloud-sync-toolbar-button { padding-inline:8px; }
+      .month-navigator .month-control { width:166px; }
+      .month-navigator .month-current-button,
+      .month-navigator .month-status-chip { min-width:86px; }
+      .topbar-add-button { padding-inline:10px; }
+    }
+
+    @media (max-width:850px) {
+      :root { --mobile-topbar-offset:calc(env(safe-area-inset-top) + 112px); }
+      .topbar {
+        display:grid; grid-template-columns:minmax(0,1fr) 44px 44px 44px;
+        grid-template-areas:"title sync add tools" "month month month month";
+        align-items:center; gap:8px 6px; min-height:0;
+        padding:max(8px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) 8px max(10px,env(safe-area-inset-left));
+        overflow:visible;
+      }
+      .topbar-left { grid-area:title; min-width:0; }
+      .topbar-left > div { min-width:0; }
+      .topbar h1,
+      .topbar p { max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+      .topbar h1 { font-size:1rem; }
+      .topbar p { font-size:.67rem; }
+      .topbar-actions { display:contents; }
+      .topbar-actions .cloud-sync-toolbar-button,
+      .topbar-actions #cloudSyncStatusButton {
+        grid-area:sync; width:44px; min-width:44px; height:44px; min-height:44px; padding:0; display:grid !important; place-items:center;
+      }
+      .topbar-actions .cloud-sync-label { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+      .topbar-actions .month-navigator {
+        grid-area:month; display:grid; grid-template-columns:44px minmax(0,1fr) 44px auto; align-items:center;
+        gap:7px; width:100%; max-width:none; min-width:0; padding:0; border:0; background:transparent;
+      }
+      .topbar-actions .month-control {
+        display:grid; grid-template-columns:auto minmax(0,1fr); width:100%; max-width:none; min-width:0;
+        height:44px; min-height:44px; max-height:44px; padding:5px 9px; border:1px solid var(--line); background:var(--surface);
+      }
+      .topbar-actions .month-control input { width:100%; min-width:0; font-size:.78rem; }
+      .topbar-actions .month-nav-button { width:44px; height:44px; min-height:44px; max-height:44px; border:1px solid var(--line); background:var(--surface); }
+      .topbar-actions .month-current-button,
+      .topbar-actions .month-status-chip { min-width:78px; height:44px; min-height:44px; max-height:44px; padding:5px 8px; }
+      .topbar-actions .month-current-button:not([hidden]),
+      .topbar-actions .month-status-chip:not([hidden]) { display:inline-flex !important; }
+      .current-month-desktop { display:none; }
+      .current-month-mobile { display:inline; }
+      .topbar-actions .topbar-add-button:not([hidden]) {
+        grid-area:add; width:44px; min-width:44px; height:44px; min-height:44px; padding:0; display:grid !important; place-items:center;
+      }
+      .topbar-add-label { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+      .topbar-actions .topbar-tools-menu { grid-area:tools; display:block !important; }
+      .topbar-tools-menu > summary { width:44px; min-width:44px; height:44px; min-height:44px; }
+      .topbar-tools-panel { width:min(248px,calc(100vw - 20px)); }
+    }
+
+    @media (max-width:700px) {
+      .budget-planner-header { display:block; }
+      .budget-panel-heading { display:flex; align-items:flex-start; }
+      .budget-panel-heading-actions { margin-left:auto; }
+    }
+
+    @media (max-width:380px) {
+      .topbar { grid-template-columns:minmax(0,1fr) 42px 42px 42px; gap-inline:5px; }
+      .topbar-actions .cloud-sync-toolbar-button,
+      .topbar-actions .topbar-add-button,
+      .topbar-tools-menu > summary { width:42px; min-width:42px; height:42px; min-height:42px; }
+      .topbar-actions .month-navigator { grid-template-columns:42px minmax(0,1fr) 42px auto; gap:5px; }
+      .topbar-actions .month-nav-button { width:42px; height:42px; min-height:42px; max-height:42px; }
+      .topbar-actions .month-control { height:42px; min-height:42px; max-height:42px; padding-inline:7px; }
+      .topbar-actions .month-current-button,
+      .topbar-actions .month-status-chip { min-width:70px; height:42px; min-height:42px; max-height:42px; padding-inline:6px; font-size:.62rem; }
+    }
+
 </style>
+
+  <style id="settings-simplification-v13-0-2">
+    /* V13.0.2 simplified Settings UI */
+    .settings-mobile-back { display:none; }
+    .settings-mobile-back svg { width:18px; height:18px; flex:0 0 auto; }
+    #settings .settings-tablist button { display:grid; gap:1px; align-content:center; }
+    #settings .settings-tablist button > span { color:inherit; font-size:.78rem; font-weight:850; }
+    #settings .settings-tablist button > small { color:var(--muted); font-size:.62rem; font-weight:650; }
+    #settings .settings-tablist button[aria-selected="true"] > small { color:color-mix(in srgb,#fff 78%,transparent); }
+    .settings-overview-panel { align-content:start; }
+    .settings-welcome-card { display:flex; align-items:center; min-height:116px; background:linear-gradient(135deg,color-mix(in srgb,var(--primary) 13%,var(--surface)),var(--surface)); }
+    .settings-eyebrow { display:block; margin-bottom:4px; color:var(--primary); font-size:.66rem; font-weight:900; letter-spacing:.08em; text-transform:uppercase; }
+    .settings-welcome-card h3,.settings-guidance-card h3 { margin:0 0 4px; }
+    .settings-welcome-card p,.settings-guidance-card p { margin:0; color:var(--muted); line-height:1.5; }
+    .settings-overview-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+    .settings-status-card { min-height:220px; display:flex; flex-direction:column; gap:13px; }
+    .settings-status-card > div:nth-child(2) { display:grid; gap:4px; }
+    .settings-status-card h3,.settings-status-card p { margin:0; }
+    .settings-status-card strong { font-size:.96rem; }
+    .settings-status-card p { color:var(--muted); font-size:.72rem; line-height:1.45; }
+    .settings-status-card .button { margin-top:auto; align-self:flex-start; }
+    .settings-status-card-top { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+    .settings-status-icon { width:38px; height:38px; display:grid; place-items:center; border:1px solid color-mix(in srgb,var(--primary) 34%,var(--line)); border-radius:9px; background:color-mix(in srgb,var(--primary) 10%,var(--surface)); color:var(--primary); }
+    .settings-status-icon svg { width:21px; height:21px; }
+    .settings-state-chip { display:inline-flex; align-items:center; min-height:24px; padding:3px 8px; border:1px solid var(--line); border-radius:999px; font-size:.62rem; font-weight:850; }
+    .settings-state-chip.success { border-color:color-mix(in srgb,var(--green) 44%,var(--line)); background:color-mix(in srgb,var(--green) 12%,var(--surface)); color:var(--green); }
+    .settings-state-chip.warning { border-color:color-mix(in srgb,var(--orange) 48%,var(--line)); background:color-mix(in srgb,var(--orange) 12%,var(--surface)); color:var(--orange); }
+    .settings-state-chip.danger { border-color:color-mix(in srgb,var(--red) 48%,var(--line)); background:color-mix(in srgb,var(--red) 11%,var(--surface)); color:var(--red); }
+    .settings-state-chip.neutral { color:var(--muted); }
+    .settings-guidance-card { border-style:dashed; }
+
+    .settings-section-intro { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; padding:13px; border:1px solid var(--line); border-radius:9px; background:var(--surface-soft); }
+    .settings-section-intro h3,.settings-section-intro p { margin:0; }
+    .settings-section-intro p { margin-top:3px; color:var(--muted); font-size:.72rem; line-height:1.45; }
+    .settings-disclosure { border:1px solid var(--line); border-radius:9px; background:var(--surface); overflow:hidden; }
+    .settings-disclosure > summary { min-height:54px; display:flex; align-items:center; justify-content:space-between; gap:12px; padding:11px 13px; cursor:pointer; list-style:none; }
+    .settings-disclosure > summary::-webkit-details-marker { display:none; }
+    .settings-disclosure > summary > span:first-child { display:grid; gap:2px; }
+    .settings-disclosure > summary strong { color:var(--text); font-size:.8rem; }
+    .settings-disclosure > summary small { color:var(--muted); font-size:.65rem; font-weight:650; }
+    .settings-disclosure-chevron { color:var(--muted); transition:transform .2s ease; }
+    .settings-disclosure[open] .settings-disclosure-chevron { transform:rotate(180deg); }
+    .settings-disclosure-body { display:grid; gap:10px; padding:0 10px 10px; }
+    .settings-disclosure-body > .card,.settings-disclosure-body > .grid,.settings-disclosure-body > div { margin:0 !important; }
+    .settings-inline-details { margin-top:9px; border-top:1px solid var(--line); }
+    .settings-inline-details > summary { min-height:42px; display:flex; align-items:center; cursor:pointer; color:var(--primary); font-size:.7rem; font-weight:850; }
+    .settings-inline-details-body { display:grid; gap:8px; padding-bottom:4px; }
+    .settings-quick-status { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
+    .settings-quick-status > div { padding:10px; border:1px solid var(--line); border-radius:7px; background:var(--surface-soft); }
+    .settings-quick-status span,.settings-quick-status strong { display:block; }
+    .settings-quick-status span { color:var(--muted); font-size:.64rem; }
+    .settings-quick-status strong { margin-top:3px; font-size:.78rem; overflow-wrap:anywhere; }
+    .settings-danger-zone { border-color:color-mix(in srgb,var(--red) 40%,var(--line)); }
+    .settings-danger-zone > summary strong { color:var(--red); }
+    .settings-danger-actions { display:flex; flex-wrap:wrap; gap:8px; }
+    .settings-danger-note { margin:0; color:var(--muted); font-size:.68rem; line-height:1.45; }
+    #settings .settings-form-clean button[type="submit"]:disabled { opacity:.52; cursor:not-allowed; }
+    #settings .settings-form-save-note { margin:0; color:var(--muted); font-size:.64rem; }
+    #settings .settings-panel > .v12-section-heading { display:none; }
+    #settings .profile-settings-primary { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+    #settings .profile-settings-primary > .card { margin:0; }
+    #settings .profile-two-column.settings-profile-hidden-grid { display:contents; }
+
+    @media (max-width:850px) {
+      #settings.active { display:block; }
+      #settings > .settings-navigation { position:relative; top:auto; margin:0 0 10px; }
+      #settings .settings-tablist { display:grid; grid-template-columns:1fr; gap:7px; overflow:visible; padding:0; border:0; background:transparent; backdrop-filter:none; }
+      #settings .settings-tablist button { width:100%; min-width:0; min-height:58px; padding:10px 12px; text-align:left; border:1px solid var(--line); background:var(--surface); border-radius:9px; }
+      #settings .settings-tablist button[aria-selected="true"] { border-color:color-mix(in srgb,var(--primary) 45%,var(--line)); background:color-mix(in srgb,var(--primary) 9%,var(--surface)); color:var(--text); }
+      #settings .settings-tablist button[aria-selected="true"] > small { color:var(--muted); }
+      #settings.settings-category-open > .settings-navigation { display:none; }
+      #settings.settings-category-open .settings-mobile-back { display:flex; position:sticky; top:var(--mobile-topbar-offset); z-index:25; align-items:center; justify-content:space-between; gap:10px; margin:0 0 9px; padding:7px; border:1px solid var(--line); border-radius:9px; background:color-mix(in srgb,var(--surface) 95%,transparent); backdrop-filter:blur(10px); }
+      #settings.settings-category-open .settings-mobile-back[hidden] { display:none; }
+      #settingsMobileCurrentTitle { padding-right:7px; font-size:.78rem; }
+      #settings .settings-overview-grid { grid-template-columns:1fr 1fr; }
+      #settings .settings-status-card { min-height:190px; }
+      #settings > .settings-navigation::before,#settings > .settings-navigation::after { display:none !important; }
+    }
+    @media (max-width:700px) {
+      #settings .settings-overview-grid { grid-template-columns:1fr; }
+      #settings .settings-status-card { min-height:0; }
+      #settings .settings-status-card .button { width:100%; }
+      #settings .settings-quick-status { grid-template-columns:1fr; }
+      #settings .profile-settings-primary { grid-template-columns:1fr; }
+      #settings .settings-disclosure > summary { min-height:58px; }
+      #settings .settings-disclosure-body { padding:0 8px 8px; }
+      #settings .settings-danger-actions { display:grid; grid-template-columns:1fr; }
+      #settings .settings-danger-actions .button { width:100%; }
+    }
+  </style>
 </head>
 <body>
   <div class="app">
@@ -4454,33 +4743,31 @@
           <div>
             <h1 id="topTitle">Budget &amp; Expenses</h1>
             <p id="todayLabel">Tuesday, July 21, 2026</p>
-            <small id="buildBadge" title="V13.0.1 · MacBook & iPhone UI Stabilization · August 7, 2026">V13.0.1</small>
+            <small id="buildBadge" title="V13.0.2 · Toolbar & Budget Bento UI · August 7, 2026">V13.0.2</small>
           </div>
         </div>
         <div class="topbar-actions">
+          <button class="cloud-sync-toolbar-button" id="cloudSyncStatusButton" type="button" aria-label="Cloud sync: Cloud off" title="Cloud sync: Cloud off">
+            <span class="toolbar-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M7.5 18.25h9.25a4.25 4.25 0 0 0 .63-8.45A5.75 5.75 0 0 0 6.2 8.54a4.86 4.86 0 0 0 1.3 9.71Z"/></svg></span>
+            <span class="cloud-sync-label">Cloud off</span>
+          </button>
           <div class="month-navigator" aria-label="Month navigation">
-            <button class="month-nav-button" id="previousMonthButton" type="button" aria-label="Previous month" title="Previous month">‹</button>
+            <button class="month-nav-button" id="previousMonthButton" type="button" aria-label="Previous month" title="Previous month"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m15 18-6-6 6-6"/></svg></button>
             <div class="month-control">
               <label for="monthPicker">Month</label>
               <input type="month" id="monthPicker" aria-label="Selected month">
             </div>
-            <button class="month-nav-button" id="nextMonthButton" type="button" aria-label="Next month" title="Next month">›</button>
-            <button class="button button-secondary button-small month-current-button" id="currentMonthButton" type="button" aria-label="Go to current month" title="Go to current month" hidden>Current</button>
+            <button class="month-nav-button" id="nextMonthButton" type="button" aria-label="Next month" title="Next month"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m9 18 6-6-6-6"/></svg></button>
+            <button class="button button-secondary button-small month-current-button" id="currentMonthButton" type="button" aria-label="Go to current month" title="Go to current month" hidden><span class="current-month-desktop">Current month</span><span class="current-month-mobile">Current</span></button>
             <span class="month-status-chip current" id="monthStatusChip">Current month</span>
           </div>
-          <button class="cloud-sync-toolbar-button" id="cloudSyncStatusButton" type="button" aria-label="Cloud sync: Cloud off" title="Cloud sync: Cloud off"><span aria-hidden="true">☁</span><span>Cloud off</span></button>
-          <button class="theme-toggle-button" id="themeToggleButton" type="button" aria-label="Appearance: System" title="Appearance: System"><span aria-hidden="true" id="themeToggleIcon">◐</span><span class="theme-toggle-text" id="themeToggleText" hidden>System</span></button>
-          <button class="button button-primary" id="quickAddExpense" hidden>+ Add expense</button>
-        </div>
-        <div class="mobile-topbar-tools no-print">
-          <button class="mobile-topbar-action mobile-quick-action" id="mobileQuickActionButton" type="button" aria-label="Add expense" title="Add expense" hidden><span aria-hidden="true">+</span><span class="sr-only" id="mobileQuickActionLabel">Add expense</span></button>
-          <details class="mobile-utility-menu" id="mobileUtilityMenu">
-            <summary aria-label="More actions" title="More actions">•••</summary>
-            <div class="mobile-utility-panel" role="menu" aria-label="Mobile utilities">
-              <button type="button" role="menuitem" data-mobile-proxy="globalSearchButton"><span class="mobile-utility-icon" aria-hidden="true">⌕</span><span>Search records</span></button>
-              <button type="button" role="menuitem" data-mobile-proxy="productivityCenterButton"><span class="mobile-utility-icon" aria-hidden="true">⚡</span><span>Productivity center</span></button>
-              <button type="button" role="menuitem" data-mobile-proxy="cloudSyncStatusButton"><span class="mobile-utility-icon" aria-hidden="true">☁</span><span>Cloud sync</span></button>
-              <button type="button" role="menuitem" data-mobile-proxy="themeToggleButton"><span class="mobile-utility-icon" aria-hidden="true">◐</span><span>Change appearance</span></button>
+          <button class="button button-primary topbar-add-button" id="quickAddExpense" hidden><span class="toolbar-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M12 5v14M5 12h14"/></svg></span><span class="topbar-add-label">Add expense</span></button>
+          <details class="topbar-tools-menu no-print" id="topbarToolsMenu">
+            <summary aria-label="More tools" title="More tools"><span class="toolbar-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg></span><span class="sr-only">More tools</span></summary>
+            <div class="topbar-tools-panel" role="menu" aria-label="More tools">
+              <button class="topbar-tools-item theme-toggle-button" id="themeToggleButton" type="button" role="menuitem" aria-label="Appearance: System" title="Appearance: System"><span class="toolbar-icon" aria-hidden="true" id="themeToggleIcon"><svg viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16Z"/></svg></span><span><strong>Theme</strong><small class="theme-toggle-text" id="themeToggleText">System</small></span></button>
+              <button class="topbar-tools-item" id="globalSearchButton" type="button" role="menuitem"><span class="toolbar-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg></span><span><strong>Search</strong><small>Find finance records</small></span></button>
+              <button class="topbar-tools-item" id="productivityCenterButton" type="button" role="menuitem"><span class="toolbar-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M4 7h10M18 7h2M4 17h2M10 17h10M14 4v6M8 14v6"/></svg></span><span><strong>Quick actions</strong><small>Open productivity tools</small></span></button>
             </div>
           </details>
         </div>
@@ -5162,28 +5449,65 @@
         </section>
 
         <section class="page" id="settings" aria-labelledby="settings-title">
-          <div class="page-heading">
-            <div><h2 id="settings-title">Settings</h2><p>Manage profiles, security, accounts, calendar, encrypted cloud sync, recovery, offline app controls, and advanced information.</p></div>
+          <div class="page-heading settings-page-heading">
+            <div><h2 id="settings-title">Settings</h2><p>See what is working, what needs attention, and where to make changes.</p></div>
+          </div>
+
+          <div class="settings-mobile-back no-print" id="settingsMobileBack" hidden>
+            <button class="button button-secondary" type="button" id="settingsBackButton" aria-label="Back to Settings overview">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span>Back to Settings</span>
+            </button>
+            <strong id="settingsMobileCurrentTitle">Overview</strong>
           </div>
 
           <div class="settings-navigation no-print">
-            <div class="settings-tablist" role="tablist" aria-label="Settings categories">
-              <button type="button" role="tab" aria-selected="true" aria-controls="settings-panel-accounts" id="settings-tab-accounts" data-settings-tab="accounts">Accounts &amp; Savings</button>
-              <button type="button" role="tab" aria-selected="false" aria-controls="settings-panel-calendar" id="settings-tab-calendar" data-settings-tab="calendar">Projects &amp; Calendar</button>
-              <button type="button" role="tab" aria-selected="false" aria-controls="settings-panel-profiles" id="settings-tab-profiles" data-settings-tab="profiles">Profiles &amp; Security</button>
-              <button type="button" role="tab" aria-selected="false" aria-controls="settings-panel-cloud" id="settings-tab-cloud" data-settings-tab="cloud">Cloud Sync &amp; Devices</button>
-              <button type="button" role="tab" aria-selected="false" aria-controls="settings-panel-backup" id="settings-tab-backup" data-settings-tab="backup">Backup &amp; Recovery</button>
-              <button type="button" role="tab" aria-selected="false" aria-controls="settings-panel-offline" id="settings-tab-offline" data-settings-tab="offline">Offline App</button>
-              <button type="button" role="tab" aria-selected="false" aria-controls="settings-panel-advanced" id="settings-tab-advanced" data-settings-tab="advanced">Advanced</button>
+            <div class="settings-tablist" role="tablist" aria-label="Settings sections">
+              <button type="button" role="tab" aria-selected="true" aria-controls="settings-panel-overview" id="settings-tab-overview" data-settings-tab="overview"><span>Overview</span><small>Current status</small></button>
+              <button type="button" role="tab" aria-selected="false" aria-controls="settings-panel-accounts" id="settings-tab-accounts" data-settings-tab="accounts"><span>Accounts</span><small>Balances and savings</small></button>
+              <button type="button" role="tab" aria-selected="false" aria-controls="settings-panel-calendar" id="settings-tab-calendar" data-settings-tab="calendar"><span>Work &amp; Calendar</span><small>Projects and schedule</small></button>
+              <button type="button" role="tab" aria-selected="false" aria-controls="settings-panel-profiles" id="settings-tab-profiles" data-settings-tab="profiles"><span>Profile &amp; Security</span><small>Profiles and protection</small></button>
+              <button type="button" role="tab" aria-selected="false" aria-controls="settings-panel-cloud" id="settings-tab-sync" data-settings-tab="sync"><span>Sync &amp; Backup</span><small>Devices and recovery</small></button>
+              <button type="button" role="tab" aria-selected="false" aria-controls="settings-panel-advanced" id="settings-tab-app" data-settings-tab="app"><span>App &amp; About</span><small>Install and version</small></button>
             </div>
           </div>
           <div class="settings-panels">
-            <section class="settings-panel" id="settings-panel-accounts" role="tabpanel" aria-labelledby="settings-tab-accounts" data-settings-panel="accounts"></section>
+            <section class="settings-panel settings-overview-panel" id="settings-panel-overview" role="tabpanel" aria-labelledby="settings-tab-overview" data-settings-panel="overview">
+              <article class="card settings-welcome-card">
+                <div><span class="settings-eyebrow">Settings overview</span><h3>Your finance app at a glance</h3><p>Start with the card that needs your attention. Advanced tools stay available inside each section.</p></div>
+              </article>
+              <div class="settings-overview-grid">
+                <article class="card settings-status-card" data-settings-status="accounts">
+                  <div class="settings-status-card-top"><span class="settings-status-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 10h18" fill="none" stroke="currentColor" stroke-width="2"/></svg></span><span class="settings-state-chip neutral" id="settingsOverviewAccountsChip">Ready</span></div>
+                  <div><h3>Accounts</h3><strong id="settingsOverviewAccountsStatus">Checking accounts</strong><p id="settingsOverviewAccountsText">Balances and savings settings.</p></div>
+                  <button class="button button-secondary" type="button" data-settings-open="accounts">Manage accounts</button>
+                </article>
+                <article class="card settings-status-card" data-settings-status="profiles">
+                  <div class="settings-status-card-top"><span class="settings-status-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 21c.8-4.2 3.5-6 8-6s7.2 1.8 8 6" fill="none" stroke="currentColor" stroke-width="2"/></svg></span><span class="settings-state-chip neutral" id="settingsOverviewProfileChip">Checking</span></div>
+                  <div><h3>Profile &amp; Security</h3><strong id="settingsOverviewProfileStatus">Loading profile</strong><p id="settingsOverviewProfileText">Profile and protection status.</p></div>
+                  <button class="button button-secondary" type="button" data-settings-open="profiles">Review security</button>
+                </article>
+                <article class="card settings-status-card" data-settings-status="sync">
+                  <div class="settings-status-card-top"><span class="settings-status-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 18a5 5 0 0 1 .4-10A6 6 0 0 1 19 10.5 3.5 3.5 0 0 1 18.5 18H7z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9 13l3-3 3 3M12 10v7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="settings-state-chip neutral" id="settingsOverviewSyncChip">Checking</span></div>
+                  <div><h3>Sync &amp; Backup</h3><strong id="settingsOverviewSyncStatus">Checking storage</strong><p id="settingsOverviewSyncText">Cloud connection and backup status.</p></div>
+                  <button class="button button-secondary" type="button" data-settings-open="sync">Open sync &amp; backup</button>
+                </article>
+                <article class="card settings-status-card" data-settings-status="app">
+                  <div class="settings-status-card-top"><span class="settings-status-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9 18h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><span class="settings-state-chip success" id="settingsOverviewAppChip">Current</span></div>
+                  <div><h3>App</h3><strong id="settingsOverviewAppStatus">Version 13.0.2</strong><p id="settingsOverviewAppText">Installation, notifications, and app information.</p></div>
+                  <button class="button button-secondary" type="button" data-settings-open="app">Manage app</button>
+                </article>
+              </div>
+              <article class="card settings-guidance-card">
+                <div><h3>Not sure where to start?</h3><p>Accounts changes your balances. Sync &amp; Backup protects copies. Profile &amp; Security controls access. App &amp; About handles installation and notifications.</p></div>
+              </article>
+            </section>
+            <section class="settings-panel" id="settings-panel-accounts" role="tabpanel" aria-labelledby="settings-tab-accounts" data-settings-panel="accounts" hidden></section>
             <section class="settings-panel" id="settings-panel-calendar" role="tabpanel" aria-labelledby="settings-tab-calendar" data-settings-panel="calendar" hidden></section>
             <section class="settings-panel profile-security-panel" id="settings-panel-profiles" role="tabpanel" aria-labelledby="settings-tab-profiles" data-settings-panel="profiles" hidden></section>
-            <section class="settings-panel cloud-sync-panel" id="settings-panel-cloud" role="tabpanel" aria-labelledby="settings-tab-cloud" data-settings-panel="cloud" hidden>
+            <section class="settings-panel cloud-sync-panel" id="settings-panel-cloud" role="tabpanel" aria-labelledby="settings-tab-sync" data-settings-panel="sync" hidden>
               <article class="card cloud-sync-overview-card">
-                <div class="card-header"><div><h3>Encrypted Cloud Sync 3.0</h3><p>Synchronize changed records between your MacBook and iPhone</p></div><span class="v12-chip info" id="cloudStatusChip">Checking</span></div>
+                <div class="card-header"><div><h3>Sync across devices</h3><p>Keep the same finance records available on your devices</p></div><span class="v12-chip info" id="cloudStatusChip">Checking</span></div>
                 <div class="cloud-sync-status-grid">
                   <div><span>Status</span><strong id="cloudStatusDetail">Checking configuration</strong></div>
                   <div><span>Signed-in account</span><strong id="cloudUserEmail">—</strong></div>
@@ -5192,11 +5516,11 @@
                   <div><span>Current device</span><strong id="cloudCurrentDevice">This device</strong></div>
                   <div><span>Sync protocol</span><strong>Profile-scoped V3 · encrypted</strong></div>
                 </div>
-                <p class="v12-help">Local saves complete immediately. Encrypted Cloud Sync 3.0 exchanges only changed records and keeps external backups necessary.</p>
+                <p class="v12-help">Local saves complete immediately. Sync across devices exchanges only changed records and keeps external backups necessary.</p>
               </article>
 
               <article class="card cloud-config-card" id="cloudConfigCard">
-                <div class="card-header"><div><h3>Connect a Supabase project</h3><p>Use only a browser-safe publishable key or legacy anon key</p></div><span class="v12-chip warning" id="cloudConfigStatusChip">Setup required</span></div>
+                <div class="card-header"><div><h3>Advanced cloud connection</h3><p>Technical setup for your private cloud project</p></div><span class="v12-chip warning" id="cloudConfigStatusChip">Setup required</span></div>
                 <div class="cloud-config-grid">
                   <div class="field"><label for="cloudConfigUrl">Supabase project URL</label><input class="input" id="cloudConfigUrl" inputmode="url" autocomplete="off" placeholder="https://project-ref.supabase.co"></div>
                   <div class="field"><label for="cloudConfigKey">Publishable key</label><input class="input" id="cloudConfigKey" type="password" autocomplete="off" placeholder="sb_publishable_..."></div>
@@ -5215,7 +5539,7 @@
               </article>
 
               <article class="card cloud-first-sync-card" id="cloudFirstSyncCard" hidden>
-                <div class="card-header"><div><h3>Initialize Encrypted Cloud Sync 3.0</h3><p id="cloudFirstSyncMessage">Choose how this device and the cloud should start.</p></div><span class="v12-chip warning">Approval required</span></div>
+                <div class="card-header"><div><h3>Initialize Sync across devices</h3><p id="cloudFirstSyncMessage">Choose how this device and the cloud should start.</p></div><span class="v12-chip warning">Approval required</span></div>
                 <div class="cloud-first-sync-options">
                   <label><input type="radio" name="cloudInitialMode" id="cloudInitialUpload" value="upload" checked><span><strong>Upload this device’s records</strong><small>Recommended when the MacBook contains the authoritative records.</small></span></label>
                   <label><input type="radio" name="cloudInitialMode" id="cloudInitialDownload" value="download"><span><strong>Download existing cloud records</strong><small>Recommended for a new empty iPhone installation.</small></span></label>
@@ -5226,7 +5550,7 @@
 
               <div id="cloudConnectedSection" class="cloud-connected-stack" hidden>
                 <article class="card">
-                  <div class="card-header"><div><h3>Synchronization controls</h3><p>Pull and commit pending record changes</p></div><span class="v12-chip success">Connected</span></div>
+                  <div class="card-header"><div><h3>Sync controls</h3><p>Send and receive recent changes</p></div><span class="v12-chip success">Connected</span></div>
                   <label class="savings-setting-check cloud-auto-sync-check"><input id="cloudAutoSync" type="checkbox" checked> Synchronize automatically while the app is open and online</label>
                   <div class="v12-actions"><button class="button button-primary" id="cloudSyncNow" type="button">Sync now</button><button class="button button-secondary" id="cloudSignOut" type="button">Sign out this device</button></div>
                 </article>
@@ -5238,14 +5562,14 @@
                 </article>
 
                 <article class="card">
-                  <div class="card-header"><div><h3>Record conflict recovery</h3><p>Choose which version to keep when the same record changed on two devices</p></div><span class="v12-chip success" id="cloudConflictCount">No conflicts</span></div>
+                  <div class="card-header"><div><h3>Resolve sync differences</h3><p>Review differences only when two devices changed the same item</p></div><span class="v12-chip success" id="cloudConflictCount">No conflicts</span></div>
                   <div class="cloud-conflict-list" id="cloudConflictList"><div class="v12-empty">No unresolved cloud conflicts.</div></div>
                 </article>
               </div>
             </section>
             <section class="settings-panel" id="settings-panel-backup" role="tabpanel" aria-labelledby="settings-tab-backup" data-settings-panel="backup" hidden></section>
             <section class="settings-panel" id="settings-panel-offline" role="tabpanel" aria-labelledby="settings-tab-offline" data-settings-panel="offline" hidden></section>
-            <section class="settings-panel" id="settings-panel-advanced" role="tabpanel" aria-labelledby="settings-tab-advanced" data-settings-panel="advanced" hidden></section>
+            <section class="settings-panel" id="settings-panel-advanced" role="tabpanel" aria-labelledby="settings-tab-app" data-settings-panel="app" hidden></section>
           </div>
 
           <div class="grid equal-column" style="margin-top:12px">
@@ -5482,8 +5806,17 @@
             <small class="record-icon-help">Optional. Logos are resized to 64 × 64px and compressed before saving.</small>
             
           </div>
-          <div class="field"><label for="accountBalance">Reconciled balance</label><input class="input" id="accountBalance" type="text" inputmode="decimal" autocomplete="off" data-money-input placeholder="0.00"><small class="field-help">Changing an existing balance records a reconciliation adjustment.</small></div>
-          <div class="field"><label for="accountType">Account type</label><select class="select" id="accountType"><option>Cash</option><option>Bank</option><option>E-wallet</option><option>Savings</option><option>Other</option></select></div>
+          <div class="account-balance-type-row field-full">
+            <div class="field account-balance-field">
+              <label for="accountBalance">Reconciled balance</label>
+              <input class="input" id="accountBalance" type="text" inputmode="decimal" autocomplete="off" data-money-input placeholder="0.00" aria-describedby="accountBalanceHelp">
+              <small class="field-help account-reconcile-help" id="accountBalanceHelp">Changing an existing balance records a reconciliation adjustment.</small>
+            </div>
+            <div class="field account-type-field">
+              <label for="accountType">Account type</label>
+              <select class="select" id="accountType"><option>Cash</option><option>Bank</option><option>E-wallet</option><option>Savings</option><option>Other</option></select>
+            </div>
+          </div>
         </div>
       </div>
       <div class="modal-footer form-action-footer account-dialog-footer">
@@ -5856,13 +6189,17 @@
       const themeMeta = document.querySelector('meta[name="theme-color"]');
       if (themeMeta) themeMeta.content = resolved === "dark" ? "#101614" : "#173b67";
       const labels = { system: "System", light: "Light", dark: "Dark" };
-      const icons = { system: "◐", light: "☀", dark: "☾" };
+      const icons = {
+        system: '<svg viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16Z"/></svg>',
+        light: '<svg viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.66 6.34l1.41-1.41"/></svg>',
+        dark: '<svg viewBox="0 0 24 24" focusable="false"><path d="M20 15.2A8.5 8.5 0 0 1 8.8 4 8.5 8.5 0 1 0 20 15.2Z"/></svg>'
+      };
       const toggle = document.getElementById("themeToggleButton");
       if (toggle) { toggle.title = `Appearance: ${labels[preference]}`; toggle.setAttribute("aria-label", `Appearance: ${labels[preference]}`); }
       const icon = document.getElementById("themeToggleIcon");
       const text = document.getElementById("themeToggleText");
       const preview = document.getElementById("appearancePreview");
-      if (icon) icon.textContent = icons[preference];
+      if (icon) icon.innerHTML = icons[preference];
       if (text) text.textContent = labels[preference];
       if (preview) preview.textContent = preference === "system" ? `System · ${labels[resolved]}` : labels[preference];
       document.querySelectorAll("[data-theme-choice]").forEach(button => button.setAttribute("aria-checked", String(button.dataset.themeChoice === preference)));
@@ -9037,6 +9374,7 @@
       if (previousButton) previousButton.title = `Go to ${monthLabel(previous)}`;
       if (nextButton) nextButton.title = `Go to ${monthLabel(next)}`;
       if (currentButton) currentButton.hidden = month === currentMonth;
+      if (chip) chip.hidden = month !== currentMonth;
     }
 
     function renderMonthInsights() {
@@ -9576,28 +9914,17 @@
       const showProjectAction = pageId === "projects";
       const showIncomeAction = pageId === "income";
       const quick = document.getElementById("quickAddExpense");
-      const mobile = document.getElementById("mobileQuickActionButton");
       if (quick) {
+        const actionLabel = showProjectAction ? "Add project" : (showIncomeAction ? "Add income" : "Add expense");
         quick.hidden = !(showExpenseAction || showProjectAction || showIncomeAction);
         quick.dataset.actionKind = showProjectAction ? "project" : (showIncomeAction ? "income" : "expense");
-        quick.textContent = showProjectAction ? "+ Add project" : (showIncomeAction ? "+ Add income" : "+ Add expense");
-        const actionLabel = showProjectAction ? "Add project" : (showIncomeAction ? "Add income" : "Add expense");
         quick.setAttribute("aria-label", actionLabel);
         quick.title = actionLabel;
-        if (window.matchMedia("(max-width:850px)").matches) quick.style.setProperty("display", "none", "important");
-        else quick.style.removeProperty("display");
-      }
-      const utilityMenu = document.getElementById("mobileUtilityMenu");
-      if (utilityMenu) utilityMenu.open = false;
-      if (mobile) {
-        const actionLabel = showProjectAction ? "Add project" : (showIncomeAction ? "Add income" : "Add expense");
-        mobile.hidden = !(showExpenseAction || showProjectAction || showIncomeAction);
-        mobile.dataset.actionKind = showProjectAction ? "project" : (showIncomeAction ? "income" : "expense");
-        mobile.setAttribute("aria-label", actionLabel);
-        mobile.title = actionLabel;
-        const label = document.getElementById("mobileQuickActionLabel");
+        const label = quick.querySelector(".topbar-add-label");
         if (label) label.textContent = actionLabel;
       }
+      const toolsMenu = document.getElementById("topbarToolsMenu");
+      if (toolsMenu) toolsMenu.open = false;
     }
 
     const PAGE_TITLES = {
@@ -9764,9 +10091,12 @@
         const count = controlIds.map(id => document.getElementById(id)).filter(filterValueIsActive).length;
         const advanced = panelId === "expenseFiltersPanel" ? Number(document.querySelector('[data-open-advanced-filters="expense"] .productivity-filter-count')?.textContent || 0) : panelId === "paidFiltersPanel" ? Number(document.querySelector('[data-open-advanced-filters="paid"] .productivity-filter-count')?.textContent || 0) : 0;
         const total = count + advanced;
-        badge.hidden = total === 0;
-        badge.textContent = total ? String(total) : "";
-        badge.setAttribute("aria-label", `${total} active filter${total === 1 ? "" : "s"}`);
+        const hidden = total === 0;
+        const text = total ? String(total) : "";
+        const label = `${total} active filter${total === 1 ? "" : "s"}`;
+        if (badge.hidden !== hidden) badge.hidden = hidden;
+        if (badge.textContent !== text) badge.textContent = text;
+        if (badge.getAttribute("aria-label") !== label) badge.setAttribute("aria-label", label);
       });
     }
 
@@ -9786,20 +10116,10 @@
       updateMobileFilterBadges();
     }
 
-    function setupMobileTopbarUtilities() {
-      const menu = document.getElementById("mobileUtilityMenu");
-      const mobileAction = document.getElementById("mobileQuickActionButton");
-      mobileAction?.addEventListener("click", event => {
-        const kind = event.currentTarget.dataset.actionKind;
-        if (kind === "project") openProjectDialog();
-        else if (kind === "income") openIncomeDialog();
-        else openExpenseDialog();
-      });
+    function setupTopbarToolsMenu() {
+      const menu = document.getElementById("topbarToolsMenu");
       menu?.addEventListener("click", event => {
-        const proxy = event.target.closest("[data-mobile-proxy]");
-        if (!proxy) return;
-        document.getElementById(proxy.dataset.mobileProxy)?.click();
-        menu.open = false;
+        if (event.target.closest(".topbar-tools-item")) menu.open = false;
       });
       document.addEventListener("click", event => {
         if (menu?.open && !menu.contains(event.target)) menu.open = false;
@@ -9809,9 +10129,17 @@
       });
     }
 
-    const SETTINGS_PANEL_KEY = `${STORAGE_KEY}-settings-panel-v1`;
-    const SETTINGS_PANELS = ["accounts", "calendar", "profiles", "cloud", "backup", "offline", "advanced"];
-    const VERSION_HISTORY = [{"version": "V13.0.1", "title": "MacBook & iPhone UI Stabilization", "changes": ["Rebuilt the iPhone top bar into separate title, utility, and full-width month-navigation rows without changing the MacBook layout.", "Removed the overlapping floating expense action, centered mobile Settings and Reports tabs, shortened Money workspace labels, and kept all visible mobile controls at least 44px.", "Made mobile summaries more compact, collapsed filter panels by default with active-filter counts, and preserved Finance Schema 12, Cloud Schema V3, encryption, profile, and calculation behavior."]}, {"version": "V13.0.0", "title": "Major Cloud, Encryption & Profile Architecture", "changes": ["Added separate personal and household finance profiles with Owner, Editor, and Viewer roles, non-destructive Schema 12 migration, profile switching, and local profile audit history.", "Added Cloud Schema V3 with profile-scoped record synchronization, client-side AES-256-GCM payload encryption, invitation codes, immutable audit records, device revocation, and encrypted cloud restore points.", "Added encrypted portable backups, an optional device app lock, authenticator MFA controls, and experimental passkey enrollment while preserving the V12 Cloud Schema V2 tables for rollback."]}, {"version": "V12.25.0", "title": "Reminders & Scheduled Alerts", "changes": ["Added configurable reminders for expense due dates, overdue bills, low account balances, expected income, Savings contributions, Utility Bill entry, Gym schedules, failed Gym auto-payments, unsynchronized changes, and recovery backups.", "Added a daily grouped notification schedule, device-local notification history, 24-hour pause, test notification, app-badge count, and best-effort foreground and Periodic Background Sync checks.", "Alerts never mark expenses paid, transfer money, reconcile balances, or change finance records automatically; exact closed-app delivery remains browser-controlled."]}, {"version": "V12.24.0", "title": "Quick Entry & Productivity", "changes": ["Added a universal Quick Add menu, synchronized expense templates, recent-account suggestions, and duplicate-last-month expense entry.", "Added global search, advanced expense filters, bulk category changes, paid-expense payment-account correction, recently edited records, and multi-step undo history.", "Added Mac keyboard shortcuts and iPhone bottom-sheet forms while preserving account-ledger, budget, report, and Cloud Sync V2 safeguards."]}, {"version": "V12.23.0", "title": "Reports & Financial Insights", "changes": ["Added multi-month and custom-date financial insights with account and expense-category filters.", "Added income, actual spending, net cash flow, category spending, account history, budget variance, Utility Bill, Gym, recurring-expense, Savings, project-margin, and year-to-date comparisons.", "Added a consolidated insights CSV export and print-ready PDF workflow while preserving existing monthly reports and cloud records."]}, {"version": "V12.22.0", "title": "Monthly Budgets & Cash-flow Forecasting", "changes": ["Added monthly category budgets with fixed or flexible groups, personal or project scope, planned-versus-actual tracking, rollover controls, and reusable templates.", "Added a cash-flow forecast that separates current money, expected unposted income, upcoming recorded expenses, unassigned category reserves, savings allocation, recurring estimates, one-time commitments, and overdue items.", "Added low-balance warnings, Dashboard and Monthly Report forecast summaries, and synchronized budget plans through Cloud Schema V2."]}, {"version": "V12.21.0", "title": "Record-level Cloud Sync 2.0", "changes": ["Replaced full-state cloud uploads with record-level synchronization for expenses, income, projects, accounts, ledger entries, reconciliations, reports, settings, and other saved records.", "Added atomic multi-record commits, server-confirmed revisions, immutable cloud audit history, exponential retry, exact pending-record controls, and recoverable per-record conflicts.", "Added Sync Health, remote device sign-out, device app-version visibility, and safeguards that prevent older app versions from erasing fields written by newer releases."]}, {"version": "V12.20.0", "title": "Account Ledger, Transfers & Reconciliation", "changes": ["Added an append-only account ledger that recalculates active account balances from opening balances, expense payments, reversals, income deposits, transfers, and reconciliation adjustments.", "Added safe account-to-account transfers with linked debit and credit entries, insufficient-funds protection, and CSV export.", "Replaced silent balance overwrites with dated reconciliation records while preserving V12.19.1 balances through a one-time opening-balance migration."]}, {"version": "V12.19.1", "title": "Repository & Security Hardening", "changes": ["Added automated GitHub quality checks and controlled GitHub Pages deployment from validated main-branch commits.", "Completed the repository with version metadata, offline assets, regression tests, release documentation, and contribution safeguards.", "Strengthened Supabase policies with forced Row Level Security and immutable payment-operation audit rows." ]}, {"version": "V12.19.0", "title": "MacBook & iPhone Cloud Sync", "changes": ["Added optional Supabase cloud synchronization between MacBook and iPhone while preserving local-first offline saves.", "Added first-device upload, new-device download, merge, pending-change, Realtime, connected-device, and conflict-recovery controls.", "Added optimistic cloud revisions, record timestamps, deletion tombstones, and idempotent payment-operation audit records to reduce duplicate payment risks across devices."]}, {"version": "V12.18.10", "title": "Confirmed Payment Account Deduction & Gym Month-End Auto-Pay", "changes": ["Mark Paid now requires the actual payment account and deducts the confirmed amount from that account balance.", "Moving a paid expense back to unpaid restores the exact app-deducted amount once.", "Gym expenses can auto-pay after month-end using a separately authorized account, with insufficient-balance protection."]}, {"version": "V12.18.9", "title": "Split Utility Bills & Recurring Series Editing", "changes": ["Added Utility Bill expenses with separate Electric and Water amounts and a live combined total.", "Editing a monthly expense supports this month only, this month and future months, or every month in the recurring series.", "Recurring-series changes protect paid status, paid dates, record IDs, and month-specific Gym adjustments."]}, {"version": "V12.18.8", "title": "Optional Gym Emoji & Settings History", "changes": ["Gym expenses no longer receive an emoji automatically; icons are added only when selected manually.", "Removed the separate Appearance category from Settings while preserving the top-right theme control.", "Added an offline Version History card under Advanced with concise change summaries for documented releases."]}, {"version": "V12.18.7", "title": "Flexible Gym Expense", "changes": ["Added Gym expense as a third expense type alongside Normal Expense and Daily Reserved Budget.", "New Gym expenses default to ₱80 per visit and Monday, Tuesday, Thursday, and Friday.", "Added seven editable weekday controls so the usual gym days can be changed at any time."]}, {"version": "V12.18.6", "title": "Compact Dashboard and Project Payment Summaries", "changes": ["Set the five Dashboard Monthly Overview cards to min-height: 54px.", "Set the four Project Payments summary cards to min-height: 54px.", "Reduced summary-card padding and internal spacing while keeping values readable."]}, {"version": "V12.18.5", "title": "Compact Summary Heights", "changes": ["Verified the live Budget & Expenses first-row summary cards at a browser-computed height of 70px, including padding and border-box sizing.", "Matched all five Income summary cards to the same 70px desktop height.", "Matched all four Paid Expenses summary cards to the same 70px desktop height."]}, {"version": "V12.18.4", "title": "Dashboard Resize Grid", "changes": ["Changed the desktop Dashboard bento grid from six to twelve logical columns.", "Small cards now span three columns, allowing four Small cards per row.", "Large cards now span four columns, allowing three Large cards per row."]}, {"version": "V12.18.3", "title": "Bento Resize Reliability", "changes": ["Added a persistent Dashboard Customize mode with a visible toolbar for Card settings, Reset, and Done.", "Made edge resize controls usable after the settings dialog closes.", "Added real pointer drag resizing with safe snapping to Small, Large, or Wide sizes."]}, {"version": "V12.18.2", "title": "Bento Dashboard and Compact Summaries", "changes": ["Rebuilt the Dashboard detail area as a six-column bento grid. Small cards span two columns, Large cards span three columns, and Wide cards span the full row.", "Added Dashboard card-size preferences with safe Small, Large, and Wide snap sizes.", "Added edge resize controls that appear only while Customize Dashboard is open."]}, {"version": "V12.18.1", "title": "UX Reliability", "changes": ["Separated full Monthly Expenses from the current Outstanding Expenses countdown used on Budget & Expenses.", "Dashboard, cash-flow charts, month comparisons, and live Monthly Reports now use the same full monthly-expense totals.", "Preserved remaining-day Daily Reserved Budget calculations on Budget & Expenses and due-soon displays."]}, {"version": "V12.18.0", "title": "Compact Consistent Workspace UI", "changes": ["Standardized the page headers, card padding, radii, shadows, button sizes, form controls, section gaps, and typography across Dashboard, Budget & Expenses, Projects, Monthly Reports, and Settings.", "Dashboard now uses five equal compact KPI cards and a consistent two-column desktop detail grid, while full-width charts and the monthly calendar retain the space they need.", "Budget & Expenses keeps the Income, Budget & Expenses, and Paid Expenses workspace tabs, uses matching summary cards, tighter account cards, and the existing single-line compact filters."]}, {"version": "V12.17.3", "title": "Consolidated Navigation Workspaces", "changes": ["Simplified the primary sidebar to four numbered destinations: Dashboard, Budget & Expenses, Projects, and Monthly Reports; Settings remains unnumbered at the bottom.", "Moved Income and Paid Expenses into a shared Money workspace switcher: Income | Budget & Expenses | Paid Expenses.", "Kept the existing View paid expenses shortcut inside Budget & Expenses."]}, {"version": "V12.17.2", "title": "Compact Popup Inputs & Monthly Checkboxes", "changes": ["Reduced the value and placeholder text size across Account, Income, Expense, Project, and Savings Goal popup forms while keeping labels, headers, and actions readable.", "Removed visible peso prefixes from popup amount fields and standardized empty amount placeholders to 0.00.", "Replaced the expanded monthly recurrence controls with direct checkboxes for Income and Expense records."]}, {"version": "V12.17.1", "title": "Recurring Delete & Duplicate Reliability", "changes": ["Fixed monthly expenses returning immediately after deletion by saving a skipped occurrence for the deleted month.", "Recurring expense deletion now offers Delete this month only or Stop this and future.", "Stopping a recurring expense removes the selected and already-created future copies while preserving earlier expense history."]}, {"version": "V12.17.0", "title": "Unified Popup Forms", "changes": ["Standardized all 11 dialogs with one shared 8px-radius popup system, sticky headers and footers, scrollable bodies, consistent padding, and safe mobile viewport behavior.", "Account, Income, Expense, Project, and Savings Goal forms now share compact labels, inputs, required-field guidance, short context notes, and aligned Add/Edit footers.", "Added Delete Goal inside Edit Savings Goal and kept destructive actions on the far left, Cancel before Save, and primary actions on the far right."]}, {"version": "V12.16.4", "title": "Expense Dialog Reliability", "changes": ["Rebuilt Delete Expense with a dedicated handler and an in-app confirmation dialog.", "Fixed Duplicate Expense so it changes the already-open Edit Expense dialog into an unsaved duplicate review instead of reopening the modal.", "Duplicate review advances the date one month, resets paid status and recurrence, clears the original ID, and leaves the source record unchanged."]}, {"version": "V12.16.3", "title": "compact forms, icon picker, and annual Income", "changes": ["Income Add/Edit uses a tighter 638px desktop dialog, reduced padding, a joined peso amount field, collapsed recurrence, two-row Notes, and a short account-balance helper.", "Category Name appears only for Other Wages and Other Income. Add Income never shows Delete; Edit Income does.", "Accounts, Income, Expenses, and Savings Goals now use the icon square itself as the picker trigger. Emoji, upload, and conditional remove actions stay inside a compact popover."]}, {"version": "V12.16.2", "title": "Income interface refinements", "changes": ["Add Income now uses the same top-bar action position as Add Expense and Add Project.", "Income summary cards use consistent heights, descriptions, amount alignment, and responsive grids.", "Income filters now match the compact Paid Expenses and Projects toolbars, including an expandable mobile Filters panel."]}, {"version": "V12.16.2", "title": "Calendar Deduplication & Compact View", "changes": ["Calendar expenses are now assigned to one event date only: unpaid records use their due date, while paid records use their paid date or saved expense date when a legacy paid date is missing.", "Recurring expense copies are scoped to their own saved month, so future or prior copies no longer appear on the selected month’s matching due day.", "Paid expenses no longer appear again as Due."]}, {"version": "V12.16.0", "title": "Record Icons & Project Action", "changes": ["Accounts, Savings Goals, and Expenses can use an optional emoji or uploaded PNG, JPEG, or WebP logo.", "Uploaded logos are fitted into a transparent 64 × 64px canvas and compressed before storage.", "Identical uploaded images share one deduplicated local icon-library entry."]}, {"version": "V12.15.0", "title": "Income, Dashboard Calendar & Brand Refresh", "changes": ["Added a complete Income page for wages, bonuses, commissions, interest, dividends, gifts, refunds, transfers from Savings, and custom income categories.", "Added recurring monthly income records, calculator-style amount entry, account selection, included/excluded totals, Edit/Delete workflow, monthly CSV, and annual Income CSV.", "Added an annual Income table with January–December values, totals, and monthly averages."]}, {"version": "V12.11.2", "title": "project fixes", "changes": ["Active Projects now sort by status first: Ongoing, then On hold, then Completed items that still have a balance or no project value.", "Completed projects in the Active Projects box no longer show overdue or due-soon deadline warnings.", "The Active Projects summary ignores Completed deadlines and uses the nearest Ongoing or On hold deadline instead."]}, {"version": "V12.12.0", "title": "salary-work workflow", "changes": ["The package folder is permanently titled My_Finance_Records folder. The release version remains inside the app, README, service worker, and version.json.", "Projects can be classified as Freelance Project or Salary-job Project.", "Salary projects can be Included in Fixed Salary or Extra Project — Freelance Payment."]}, {"version": "V12.13.0", "title": "dashboard charts and action consistency", "changes": ["Income versus Expenses now contains two coordinated graphs: vertical Income/Expense columns with a blue Balance line, and a horizontal monthly comparison.", "Income remains green, Expenses remain red, and Balance is blue. Balance equals project income received minus included monthly expenses.", "Fixed-salary projects remain excluded from Income; extra paid salary projects remain included."]}, {"version": "V12.13.1", "title": "compact filter toolbars", "changes": ["Removed visible field titles from the Budget & Expenses, Paid Expenses, and Projects filter rows.", "Preserved hidden labels and ARIA names for screen-reader users.", "Reduced desktop filter height, padding, gaps, and visual weight."]}, {"version": "V12.13.2", "title": "single-line filter actions", "changes": ["Budget & Expenses now uses Compact expense rows permanently; the Comfortable/Compact selector and saved density preference were removed.", "Select Visible, selected count, Search, Date, Category, and Clear now share one compact desktop toolbar.", "Bulk Actions, Apply, and Clear appear in that same toolbar only after at least one unpaid expense is selected."]}, {"version": "V12.14.0", "title": "navigation and custom categories", "changes": ["Removed the peso mark from the sidebar brand and removed the sidebar instruction block.", "Grouped navigation into Overview, Expenses, Projects, Reports, and App.", "Renamed the Payments navigation item to Project Payments."]}, {"version": "V12.4", "title": "Phase 5", "changes": ["Added System, Light, and Dark appearance modes with a quick top-bar toggle.", "Reduced card, dialog, input, navigation, and button corner radius.", "Replaced colored top lines and decorative corner marks with softly filled bento cards."]}, {"version": "V12.5", "title": "Phase 6 Savings & Insights", "changes": ["Added account types: Cash, Bank, E-wallet, Savings, and Other.", "Existing account names and balances remain unchanged; recognizable account names receive a safe default type.", "Added a real Total savings dashboard card calculated only from accounts marked as Savings."]}, {"version": "V12.6", "title": "Phase 7 Secure Sample-Data Reset", "changes": ["Replaced the one-click browser confirmation for Reset sample data with a dedicated warning dialog.", "The destructive reset button remains locked until reset sample data is typed. Matching ignores capitalization and leading or trailing spaces; partial phrases do not unlock it.", "Pressing Enter cannot reset records unless the complete confirmation phrase matches."]}, {"version": "V12.7.1", "title": "Phase 8 Expense Total Choice · Font Reverted", "changes": ["Added Add this amount to expense totals to the Add/Edit Expense form.", "New expenses are included by default, preserving the existing calculation behavior.", "Existing and imported expenses without the new field remain included automatically."]}, {"version": "V12.8.0", "title": "Phase 9 UI/UX Stabilization", "changes": ["Rebuilt Projects, Project Payments, and Monthly Report records as responsive mobile cards to prevent horizontal overflow.", "Kept one mobile Add expense action visible while preserving the single desktop top-bar action.", "Fixed Monthly Checklist contrast in dark mode and increased touch targets and small-text readability."]}, {"version": "V12.9.0", "title": "Phase 10 Projects, Savings Goals & Number Inputs", "changes": ["Active projects are permanently ordered by deadline priority: nearest overdue items, due today, nearest upcoming deadlines, then projects without deadlines.", "Added separate Active Projects and collapsible Completed Projects sections. A project enters Completed Projects only when its status is Completed and its received amount covers the full project value.", "Added Mark fully paid, which records only the remaining balance as a final payment and preserves payment history."]}, {"version": "V12.9.1", "title": "Calculator Number-Input Correction", "changes": ["Added safe calculator-style entry to every monetary field. Examples: 200 + 100, 1,500 + 250.50, 400 × 15, 6000 / 3, and (5000 - 500) / 2.", "Supported operators are addition (+), subtraction (- or −), multiplication ( or ×), division (/ or ÷), and parentheses.", "Operators are preserved while typing and are never silently removed. 200+100 evaluates to ₱300.00; it cannot become 200100."]}, {"version": "V12.10.0", "title": "Phase 11 Interface Refinement", "changes": ["Compact top navigation, month controls, Budget summary cards, Available Money cards, filters, and bulk-action controls without changing any financial formula.", "Added a saved account order. Account cards can be dragged on desktop, reordered with arrow keys, or moved with accessible Up and Down controls on touch layouts. The selected order is reused on the Dashboard, Budget & Expenses, Settings, and account selectors.", "Unified desktop column alignment so Expense descriptions, dates, payment accounts, amounts, and actions remain directly beneath their headers. Applied matching alignment improvements to Paid Expenses, Projects, Project Payments, and report records while preserving stacked mobile cards."]}, {"version": "V12.11.0", "title": "Phase 12 Application-wide Accessible Help", "changes": ["Added compact contextual ? help beside every page title, major KPI, summary value, Dashboard card, Budget section, Paid Expenses area, Project section, Project Payments summary, Monthly Report section, Settings card, and major dialog.", "Added focused help beside complex form labels for account balances and types, expense amounts and periods, due days, payment accounts, recurrence, project status and values, and Savings Goal settings.", "The help controls remain visually quiet at approximately 19–20px and sit directly beside the words they explain. Their invisible pointer area is larger so they remain usable on touch screens."]}, {"version": "V12.11.1", "title": "Hover Help & Bento Polish", "changes": ["Contextual help remains available throughout the application, but hover-capable devices now reveal each ? only when the related title or label is hovered or focused. The button remains keyboard accessible and a faint touch fallback is retained for devices without hover.", "Reduced the help icon to a quieter 16–18px visual size while preserving its larger invisible pointer target. Titles reserve the small icon space, so revealing help does not shift surrounding text or values.", "Restored one continuous, slightly stronger colored border around every summary bento card, including the top edge and rounded corners."]}];
+    const SETTINGS_PANEL_KEY = `${STORAGE_KEY}-settings-panel-v2`;
+    const SETTINGS_PANELS = ["overview", "accounts", "calendar", "profiles", "sync", "app"];
+    const SETTINGS_PANEL_LABELS = { overview:"Overview", accounts:"Accounts", calendar:"Work & Calendar", profiles:"Profile & Security", sync:"Sync & Backup", app:"App & About" };
+    const SETTINGS_PANEL_ALIASES = { cloud:"sync", backup:"sync", offline:"app", advanced:"app" };
+
+    const VERSION_HISTORY = [{"version": "V13.0.2", "title": "Toolbar & Budget Bento UI", "changes": ["Reduced the visible top toolbar to Cloud Sync, month navigation, Current month, and the contextual Add action.", "Moved Theme, Search, and Quick actions into one accessible More tools menu using standard SVG interface icons.", "Added independent collapse controls to Category plan and Cash-flow forecast and matched their expanded bento heights without changing budget or forecast calculations.", "Aligned Edit Account balance and account-type controls, improved dark-mode label contrast, and kept the reconciliation note directly below the balance field.", "Simplified Settings with an overview, plain-language section names, vertical phone navigation, collapsed advanced tools, and a separate danger zone without removing any data, sync, profile, or security feature."]}, {"version": "V13.0.1", "title": "MacBook & iPhone UI Stabilization", "changes": ["Rebuilt the iPhone top bar into separate title, utility, and full-width month-navigation rows without changing the MacBook layout.", "Removed the overlapping floating expense action, centered mobile Settings and Reports tabs, shortened Money workspace labels, and kept all visible mobile controls at least 44px.", "Made mobile summaries more compact, collapsed filter panels by default with active-filter counts, and preserved Finance Schema 12, Cloud Schema V3, encryption, profile, and calculation behavior."]}, {"version": "V13.0.0", "title": "Major Cloud, Encryption & Profile Architecture", "changes": ["Added separate personal and household finance profiles with Owner, Editor, and Viewer roles, non-destructive Schema 12 migration, profile switching, and local profile audit history.", "Added Cloud Schema V3 with profile-scoped record synchronization, client-side AES-256-GCM payload encryption, invitation codes, immutable audit records, device revocation, and encrypted cloud restore points.", "Added encrypted portable backups, an optional device app lock, authenticator MFA controls, and experimental passkey enrollment while preserving the V12 Cloud Schema V2 tables for rollback."]}, {"version": "V12.25.0", "title": "Reminders & Scheduled Alerts", "changes": ["Added configurable reminders for expense due dates, overdue bills, low account balances, expected income, Savings contributions, Utility Bill entry, Gym schedules, failed Gym auto-payments, unsynchronized changes, and recovery backups.", "Added a daily grouped notification schedule, device-local notification history, 24-hour pause, test notification, app-badge count, and best-effort foreground and Periodic Background Sync checks.", "Alerts never mark expenses paid, transfer money, reconcile balances, or change finance records automatically; exact closed-app delivery remains browser-controlled."]}, {"version": "V12.24.0", "title": "Quick Entry & Productivity", "changes": ["Added a universal Quick Add menu, synchronized expense templates, recent-account suggestions, and duplicate-last-month expense entry.", "Added global search, advanced expense filters, bulk category changes, paid-expense payment-account correction, recently edited records, and multi-step undo history.", "Added Mac keyboard shortcuts and iPhone bottom-sheet forms while preserving account-ledger, budget, report, and Cloud Sync V2 safeguards."]}, {"version": "V12.23.0", "title": "Reports & Financial Insights", "changes": ["Added multi-month and custom-date financial insights with account and expense-category filters.", "Added income, actual spending, net cash flow, category spending, account history, budget variance, Utility Bill, Gym, recurring-expense, Savings, project-margin, and year-to-date comparisons.", "Added a consolidated insights CSV export and print-ready PDF workflow while preserving existing monthly reports and cloud records."]}, {"version": "V12.22.0", "title": "Monthly Budgets & Cash-flow Forecasting", "changes": ["Added monthly category budgets with fixed or flexible groups, personal or project scope, planned-versus-actual tracking, rollover controls, and reusable templates.", "Added a cash-flow forecast that separates current money, expected unposted income, upcoming recorded expenses, unassigned category reserves, savings allocation, recurring estimates, one-time commitments, and overdue items.", "Added low-balance warnings, Dashboard and Monthly Report forecast summaries, and synchronized budget plans through Cloud Schema V2."]}, {"version": "V12.21.0", "title": "Record-level Cloud Sync 2.0", "changes": ["Replaced full-state cloud uploads with record-level synchronization for expenses, income, projects, accounts, ledger entries, reconciliations, reports, settings, and other saved records.", "Added atomic multi-record commits, server-confirmed revisions, immutable cloud audit history, exponential retry, exact pending-record controls, and recoverable per-record conflicts.", "Added Sync Health, remote device sign-out, device app-version visibility, and safeguards that prevent older app versions from erasing fields written by newer releases."]}, {"version": "V12.20.0", "title": "Account Ledger, Transfers & Reconciliation", "changes": ["Added an append-only account ledger that recalculates active account balances from opening balances, expense payments, reversals, income deposits, transfers, and reconciliation adjustments.", "Added safe account-to-account transfers with linked debit and credit entries, insufficient-funds protection, and CSV export.", "Replaced silent balance overwrites with dated reconciliation records while preserving V12.19.1 balances through a one-time opening-balance migration."]}, {"version": "V12.19.1", "title": "Repository & Security Hardening", "changes": ["Added automated GitHub quality checks and controlled GitHub Pages deployment from validated main-branch commits.", "Completed the repository with version metadata, offline assets, regression tests, release documentation, and contribution safeguards.", "Strengthened Supabase policies with forced Row Level Security and immutable payment-operation audit rows." ]}, {"version": "V12.19.0", "title": "MacBook & iPhone Cloud Sync", "changes": ["Added optional Supabase cloud synchronization between MacBook and iPhone while preserving local-first offline saves.", "Added first-device upload, new-device download, merge, pending-change, Realtime, connected-device, and conflict-recovery controls.", "Added optimistic cloud revisions, record timestamps, deletion tombstones, and idempotent payment-operation audit records to reduce duplicate payment risks across devices."]}, {"version": "V12.18.10", "title": "Confirmed Payment Account Deduction & Gym Month-End Auto-Pay", "changes": ["Mark Paid now requires the actual payment account and deducts the confirmed amount from that account balance.", "Moving a paid expense back to unpaid restores the exact app-deducted amount once.", "Gym expenses can auto-pay after month-end using a separately authorized account, with insufficient-balance protection."]}, {"version": "V12.18.9", "title": "Split Utility Bills & Recurring Series Editing", "changes": ["Added Utility Bill expenses with separate Electric and Water amounts and a live combined total.", "Editing a monthly expense supports this month only, this month and future months, or every month in the recurring series.", "Recurring-series changes protect paid status, paid dates, record IDs, and month-specific Gym adjustments."]}, {"version": "V12.18.8", "title": "Optional Gym Emoji & Settings History", "changes": ["Gym expenses no longer receive an emoji automatically; icons are added only when selected manually.", "Removed the separate Appearance category from Settings while preserving the top-right theme control.", "Added an offline Version History card under Advanced with concise change summaries for documented releases."]}, {"version": "V12.18.7", "title": "Flexible Gym Expense", "changes": ["Added Gym expense as a third expense type alongside Normal Expense and Daily Reserved Budget.", "New Gym expenses default to ₱80 per visit and Monday, Tuesday, Thursday, and Friday.", "Added seven editable weekday controls so the usual gym days can be changed at any time."]}, {"version": "V12.18.6", "title": "Compact Dashboard and Project Payment Summaries", "changes": ["Set the five Dashboard Monthly Overview cards to min-height: 54px.", "Set the four Project Payments summary cards to min-height: 54px.", "Reduced summary-card padding and internal spacing while keeping values readable."]}, {"version": "V12.18.5", "title": "Compact Summary Heights", "changes": ["Verified the live Budget & Expenses first-row summary cards at a browser-computed height of 70px, including padding and border-box sizing.", "Matched all five Income summary cards to the same 70px desktop height.", "Matched all four Paid Expenses summary cards to the same 70px desktop height."]}, {"version": "V12.18.4", "title": "Dashboard Resize Grid", "changes": ["Changed the desktop Dashboard bento grid from six to twelve logical columns.", "Small cards now span three columns, allowing four Small cards per row.", "Large cards now span four columns, allowing three Large cards per row."]}, {"version": "V12.18.3", "title": "Bento Resize Reliability", "changes": ["Added a persistent Dashboard Customize mode with a visible toolbar for Card settings, Reset, and Done.", "Made edge resize controls usable after the settings dialog closes.", "Added real pointer drag resizing with safe snapping to Small, Large, or Wide sizes."]}, {"version": "V12.18.2", "title": "Bento Dashboard and Compact Summaries", "changes": ["Rebuilt the Dashboard detail area as a six-column bento grid. Small cards span two columns, Large cards span three columns, and Wide cards span the full row.", "Added Dashboard card-size preferences with safe Small, Large, and Wide snap sizes.", "Added edge resize controls that appear only while Customize Dashboard is open."]}, {"version": "V12.18.1", "title": "UX Reliability", "changes": ["Separated full Monthly Expenses from the current Outstanding Expenses countdown used on Budget & Expenses.", "Dashboard, cash-flow charts, month comparisons, and live Monthly Reports now use the same full monthly-expense totals.", "Preserved remaining-day Daily Reserved Budget calculations on Budget & Expenses and due-soon displays."]}, {"version": "V12.18.0", "title": "Compact Consistent Workspace UI", "changes": ["Standardized the page headers, card padding, radii, shadows, button sizes, form controls, section gaps, and typography across Dashboard, Budget & Expenses, Projects, Monthly Reports, and Settings.", "Dashboard now uses five equal compact KPI cards and a consistent two-column desktop detail grid, while full-width charts and the monthly calendar retain the space they need.", "Budget & Expenses keeps the Income, Budget & Expenses, and Paid Expenses workspace tabs, uses matching summary cards, tighter account cards, and the existing single-line compact filters."]}, {"version": "V12.17.3", "title": "Consolidated Navigation Workspaces", "changes": ["Simplified the primary sidebar to four numbered destinations: Dashboard, Budget & Expenses, Projects, and Monthly Reports; Settings remains unnumbered at the bottom.", "Moved Income and Paid Expenses into a shared Money workspace switcher: Income | Budget & Expenses | Paid Expenses.", "Kept the existing View paid expenses shortcut inside Budget & Expenses."]}, {"version": "V12.17.2", "title": "Compact Popup Inputs & Monthly Checkboxes", "changes": ["Reduced the value and placeholder text size across Account, Income, Expense, Project, and Savings Goal popup forms while keeping labels, headers, and actions readable.", "Removed visible peso prefixes from popup amount fields and standardized empty amount placeholders to 0.00.", "Replaced the expanded monthly recurrence controls with direct checkboxes for Income and Expense records."]}, {"version": "V12.17.1", "title": "Recurring Delete & Duplicate Reliability", "changes": ["Fixed monthly expenses returning immediately after deletion by saving a skipped occurrence for the deleted month.", "Recurring expense deletion now offers Delete this month only or Stop this and future.", "Stopping a recurring expense removes the selected and already-created future copies while preserving earlier expense history."]}, {"version": "V12.17.0", "title": "Unified Popup Forms", "changes": ["Standardized all 11 dialogs with one shared 8px-radius popup system, sticky headers and footers, scrollable bodies, consistent padding, and safe mobile viewport behavior.", "Account, Income, Expense, Project, and Savings Goal forms now share compact labels, inputs, required-field guidance, short context notes, and aligned Add/Edit footers.", "Added Delete Goal inside Edit Savings Goal and kept destructive actions on the far left, Cancel before Save, and primary actions on the far right."]}, {"version": "V12.16.4", "title": "Expense Dialog Reliability", "changes": ["Rebuilt Delete Expense with a dedicated handler and an in-app confirmation dialog.", "Fixed Duplicate Expense so it changes the already-open Edit Expense dialog into an unsaved duplicate review instead of reopening the modal.", "Duplicate review advances the date one month, resets paid status and recurrence, clears the original ID, and leaves the source record unchanged."]}, {"version": "V12.16.3", "title": "compact forms, icon picker, and annual Income", "changes": ["Income Add/Edit uses a tighter 638px desktop dialog, reduced padding, a joined peso amount field, collapsed recurrence, two-row Notes, and a short account-balance helper.", "Category Name appears only for Other Wages and Other Income. Add Income never shows Delete; Edit Income does.", "Accounts, Income, Expenses, and Savings Goals now use the icon square itself as the picker trigger. Emoji, upload, and conditional remove actions stay inside a compact popover."]}, {"version": "V12.16.2", "title": "Income interface refinements", "changes": ["Add Income now uses the same top-bar action position as Add Expense and Add Project.", "Income summary cards use consistent heights, descriptions, amount alignment, and responsive grids.", "Income filters now match the compact Paid Expenses and Projects toolbars, including an expandable mobile Filters panel."]}, {"version": "V12.16.2", "title": "Calendar Deduplication & Compact View", "changes": ["Calendar expenses are now assigned to one event date only: unpaid records use their due date, while paid records use their paid date or saved expense date when a legacy paid date is missing.", "Recurring expense copies are scoped to their own saved month, so future or prior copies no longer appear on the selected month’s matching due day.", "Paid expenses no longer appear again as Due."]}, {"version": "V12.16.0", "title": "Record Icons & Project Action", "changes": ["Accounts, Savings Goals, and Expenses can use an optional emoji or uploaded PNG, JPEG, or WebP logo.", "Uploaded logos are fitted into a transparent 64 × 64px canvas and compressed before storage.", "Identical uploaded images share one deduplicated local icon-library entry."]}, {"version": "V12.15.0", "title": "Income, Dashboard Calendar & Brand Refresh", "changes": ["Added a complete Income page for wages, bonuses, commissions, interest, dividends, gifts, refunds, transfers from Savings, and custom income categories.", "Added recurring monthly income records, calculator-style amount entry, account selection, included/excluded totals, Edit/Delete workflow, monthly CSV, and annual Income CSV.", "Added an annual Income table with January–December values, totals, and monthly averages."]}, {"version": "V12.11.2", "title": "project fixes", "changes": ["Active Projects now sort by status first: Ongoing, then On hold, then Completed items that still have a balance or no project value.", "Completed projects in the Active Projects box no longer show overdue or due-soon deadline warnings.", "The Active Projects summary ignores Completed deadlines and uses the nearest Ongoing or On hold deadline instead."]}, {"version": "V12.12.0", "title": "salary-work workflow", "changes": ["The package folder is permanently titled My_Finance_Records folder. The release version remains inside the app, README, service worker, and version.json.", "Projects can be classified as Freelance Project or Salary-job Project.", "Salary projects can be Included in Fixed Salary or Extra Project — Freelance Payment."]}, {"version": "V12.13.0", "title": "dashboard charts and action consistency", "changes": ["Income versus Expenses now contains two coordinated graphs: vertical Income/Expense columns with a blue Balance line, and a horizontal monthly comparison.", "Income remains green, Expenses remain red, and Balance is blue. Balance equals project income received minus included monthly expenses.", "Fixed-salary projects remain excluded from Income; extra paid salary projects remain included."]}, {"version": "V12.13.1", "title": "compact filter toolbars", "changes": ["Removed visible field titles from the Budget & Expenses, Paid Expenses, and Projects filter rows.", "Preserved hidden labels and ARIA names for screen-reader users.", "Reduced desktop filter height, padding, gaps, and visual weight."]}, {"version": "V12.13.2", "title": "single-line filter actions", "changes": ["Budget & Expenses now uses Compact expense rows permanently; the Comfortable/Compact selector and saved density preference were removed.", "Select Visible, selected count, Search, Date, Category, and Clear now share one compact desktop toolbar.", "Bulk Actions, Apply, and Clear appear in that same toolbar only after at least one unpaid expense is selected."]}, {"version": "V12.14.0", "title": "navigation and custom categories", "changes": ["Removed the peso mark from the sidebar brand and removed the sidebar instruction block.", "Grouped navigation into Overview, Expenses, Projects, Reports, and App.", "Renamed the Payments navigation item to Project Payments."]}, {"version": "V12.4", "title": "Phase 5", "changes": ["Added System, Light, and Dark appearance modes with a quick top-bar toggle.", "Reduced card, dialog, input, navigation, and button corner radius.", "Replaced colored top lines and decorative corner marks with softly filled bento cards."]}, {"version": "V12.5", "title": "Phase 6 Savings & Insights", "changes": ["Added account types: Cash, Bank, E-wallet, Savings, and Other.", "Existing account names and balances remain unchanged; recognizable account names receive a safe default type.", "Added a real Total savings dashboard card calculated only from accounts marked as Savings."]}, {"version": "V12.6", "title": "Phase 7 Secure Sample-Data Reset", "changes": ["Replaced the one-click browser confirmation for Reset sample data with a dedicated warning dialog.", "The destructive reset button remains locked until reset sample data is typed. Matching ignores capitalization and leading or trailing spaces; partial phrases do not unlock it.", "Pressing Enter cannot reset records unless the complete confirmation phrase matches."]}, {"version": "V12.7.1", "title": "Phase 8 Expense Total Choice · Font Reverted", "changes": ["Added Add this amount to expense totals to the Add/Edit Expense form.", "New expenses are included by default, preserving the existing calculation behavior.", "Existing and imported expenses without the new field remain included automatically."]}, {"version": "V12.8.0", "title": "Phase 9 UI/UX Stabilization", "changes": ["Rebuilt Projects, Project Payments, and Monthly Report records as responsive mobile cards to prevent horizontal overflow.", "Kept one mobile Add expense action visible while preserving the single desktop top-bar action.", "Fixed Monthly Checklist contrast in dark mode and increased touch targets and small-text readability."]}, {"version": "V12.9.0", "title": "Phase 10 Projects, Savings Goals & Number Inputs", "changes": ["Active projects are permanently ordered by deadline priority: nearest overdue items, due today, nearest upcoming deadlines, then projects without deadlines.", "Added separate Active Projects and collapsible Completed Projects sections. A project enters Completed Projects only when its status is Completed and its received amount covers the full project value.", "Added Mark fully paid, which records only the remaining balance as a final payment and preserves payment history."]}, {"version": "V12.9.1", "title": "Calculator Number-Input Correction", "changes": ["Added safe calculator-style entry to every monetary field. Examples: 200 + 100, 1,500 + 250.50, 400 × 15, 6000 / 3, and (5000 - 500) / 2.", "Supported operators are addition (+), subtraction (- or −), multiplication ( or ×), division (/ or ÷), and parentheses.", "Operators are preserved while typing and are never silently removed. 200+100 evaluates to ₱300.00; it cannot become 200100."]}, {"version": "V12.10.0", "title": "Phase 11 Interface Refinement", "changes": ["Compact top navigation, month controls, Budget summary cards, Available Money cards, filters, and bulk-action controls without changing any financial formula.", "Added a saved account order. Account cards can be dragged on desktop, reordered with arrow keys, or moved with accessible Up and Down controls on touch layouts. The selected order is reused on the Dashboard, Budget & Expenses, Settings, and account selectors.", "Unified desktop column alignment so Expense descriptions, dates, payment accounts, amounts, and actions remain directly beneath their headers. Applied matching alignment improvements to Paid Expenses, Projects, Project Payments, and report records while preserving stacked mobile cards."]}, {"version": "V12.11.0", "title": "Phase 12 Application-wide Accessible Help", "changes": ["Added compact contextual ? help beside every page title, major KPI, summary value, Dashboard card, Budget section, Paid Expenses area, Project section, Project Payments summary, Monthly Report section, Settings card, and major dialog.", "Added focused help beside complex form labels for account balances and types, expense amounts and periods, due days, payment accounts, recurrence, project status and values, and Savings Goal settings.", "The help controls remain visually quiet at approximately 19–20px and sit directly beside the words they explain. Their invisible pointer area is larger so they remain usable on touch screens."]}, {"version": "V12.11.1", "title": "Hover Help & Bento Polish", "changes": ["Contextual help remains available throughout the application, but hover-capable devices now reveal each ? only when the related title or label is hovered or focused. The button remains keyboard accessible and a faint touch fallback is retained for devices without hover.", "Reduced the help icon to a quieter 16–18px visual size while preserving its larger invisible pointer target. Titles reserve the small icon space, so revealing help does not shift surrounding text or values.", "Restored one continuous, slightly stronger colored border around every summary bento card, including the top edge and rounded corners."]}];
+
+    function normalizeSettingsPanelKey(key) {
+      const normalized = SETTINGS_PANEL_ALIASES[key] || key;
+      return SETTINGS_PANELS.includes(normalized) ? normalized : "overview";
+    }
 
     function versionHistoryCardHtml() {
       const entries = VERSION_HISTORY.map((release, index) => `
@@ -9819,11 +10147,74 @@
           <summary><span><strong>${escapeHtml(release.version)} · ${escapeHtml(release.title)}</strong><small>${release.changes.length} change${release.changes.length === 1 ? "" : "s"}</small></span><span class="version-history-chevron" aria-hidden="true">▾</span></summary>
           <ul>${release.changes.map(change => `<li>${escapeHtml(change)}</li>`).join("")}</ul>
         </details>`).join("");
-      return `<article class="card settings-version-history-card"><div class="card-header"><div><h3>Version History</h3><p>Concise changes documented for each app release</p></div><span class="v12-chip info">Offline</span></div><div class="version-history-list">${entries}</div></article>`;
+      return `<article class="card settings-version-history-card"><div class="card-header"><div><h3>Version history</h3><p>What changed in each app release</p></div><span class="v12-chip info">Offline</span></div><div class="version-history-list">${entries}</div></article>`;
     }
 
     function settingsCardByTitle(title) {
       return [...document.querySelectorAll("#settings article.card")].find(card => card.querySelector("h3")?.textContent.trim() === title) || null;
+    }
+
+    function settingsDisclosure(title, description, nodes = [], { open = false, className = "" } = {}) {
+      const details = document.createElement("details");
+      details.className = `settings-disclosure ${className}`.trim();
+      details.open = open;
+      details.innerHTML = `<summary><span><strong>${escapeHtml(title)}</strong><small>${escapeHtml(description)}</small></span><span class="settings-disclosure-chevron" aria-hidden="true">⌄</span></summary><div class="settings-disclosure-body"></div>`;
+      const body = details.querySelector(".settings-disclosure-body");
+      nodes.filter(Boolean).forEach(node => body.appendChild(node));
+      return details;
+    }
+
+    function settingsSectionIntro(title, description, status = "") {
+      const node = document.createElement("div");
+      node.className = "settings-section-intro";
+      node.innerHTML = `<div><h3>${escapeHtml(title)}</h3><p>${escapeHtml(description)}</p></div>${status ? `<span class="settings-state-chip neutral">${escapeHtml(status)}</span>` : ""}`;
+      return node;
+    }
+
+    function renameSettingsCard(card, title, description) {
+      if (!card) return;
+      const heading = card.querySelector("h3");
+      const paragraph = card.querySelector(".card-header p");
+      if (heading) heading.textContent = title;
+      if (paragraph && description) paragraph.textContent = description;
+    }
+
+    function moveButtonTo(button, container) {
+      if (!button || !container) return;
+      const parent = button.parentElement;
+      container.appendChild(button);
+      if (parent && !parent.children.length) parent.remove();
+    }
+
+    function simplifyCloudOverview() {
+      const card = document.querySelector("#settings-panel-cloud .cloud-sync-overview-card");
+      const grid = card?.querySelector(".cloud-sync-status-grid");
+      if (!card || !grid || card.dataset.simplified === "true") return;
+      renameSettingsCard(card, "Sync across devices", "Keep the same records available on your MacBook and iPhone");
+      const rows = [...grid.children];
+      const quick = document.createElement("div");
+      quick.className = "settings-quick-status";
+      [rows[0], rows[2], rows[3]].filter(Boolean).forEach(row => quick.appendChild(row));
+      const detailRows = rows.filter(row => !quick.contains(row));
+      const details = document.createElement("details");
+      details.className = "settings-inline-details";
+      details.innerHTML = `<summary>View sync details</summary><div class="settings-inline-details-body cloud-sync-status-grid"></div>`;
+      detailRows.forEach(row => details.querySelector("div").appendChild(row));
+      grid.replaceWith(quick, details);
+      const help = card.querySelector(".v12-help");
+      if (help) help.textContent = "Changes save on this device first. Cloud sync is optional, and a downloaded backup is still recommended.";
+      card.dataset.simplified = "true";
+    }
+
+    function buildDangerZone(appPanel, resetButton, cacheButton, packsButton, clearConfigButton) {
+      const actions = document.createElement("div");
+      actions.className = "settings-danger-actions";
+      [cacheButton, packsButton, clearConfigButton, resetButton].filter(Boolean).forEach(button => actions.appendChild(button));
+      const note = document.createElement("p");
+      note.className = "settings-danger-note";
+      note.textContent = "These actions can remove local app files, optional offline documents, device-only cloud setup, or active finance records. Read each confirmation carefully.";
+      const details = settingsDisclosure("Danger zone", "Destructive and troubleshooting actions", [note, actions], { className:"settings-danger-zone" });
+      appPanel.appendChild(details);
     }
 
     function organizeSettingsPanels() {
@@ -9836,24 +10227,231 @@
       const calendarCard = settingsCardByTitle("Project Calendar");
       const salaryWorkCard = settingsCardByTitle("Salary Work Settings");
       const calculationCard = settingsCardByTitle("How the calculation works");
-      [accountCard, savingsCard, calculationCard].filter(Boolean).forEach(node => panel("accounts").appendChild(node));
-      [salaryWorkCard, calendarCard].filter(Boolean).forEach(node => panel("calendar").appendChild(node));
-      [backupCard, settingsCardByTitle("Storage protection"), settingsCardByTitle("Known devices"), settingsCardByTitle("Local sync history"), settingsCardByTitle("Verified account snapshots"), settingsCardByTitle("V11 → V12 migration"), settingsCardByTitle("Device recovery guidance")].filter(Boolean).forEach(node => panel("backup").appendChild(node));
-      [settingsCardByTitle("Installable app"), settingsCardByTitle("Optional PDF packs"), settingsCardByTitle("Review reminders")].filter(Boolean).forEach(node => panel("offline").appendChild(node));
-      panel("advanced").innerHTML = `<article class="card settings-about-card"><div class="card-header"><div><h3>About & technical details</h3><p>Version, storage model, and privacy boundaries</p></div><span class="v12-chip info">Schema V12</span></div><div class="settings-about-grid"><div><span>App version</span><strong>${APP_VERSION}</strong></div><div><span>Data storage</span><strong>Local first + optional cloud</strong></div><div><span>Cloud sync</span><strong>Supabase Cloud Schema V2</strong></div><div><span>Financial access</span><strong>No bank credentials</strong></div></div><p class="v12-help">The app works offline after installation. Optional cloud sync uses your configured Supabase project; external backups remain necessary before clearing browser data or replacing a device.</p></article>${versionHistoryCardHtml()}`;
+      const legacyBackupPanel = document.getElementById("settings-panel-backup");
+      const legacyOfflinePanel = document.getElementById("settings-panel-offline");
+      const accountsPanel = panel("accounts");
+      const calendarPanel = panel("calendar");
+      const syncPanel = panel("sync");
+      const appPanel = panel("app");
+
+      accountsPanel.appendChild(settingsSectionIntro("Accounts", "Manage account balances and savings preferences. Most account changes are made from the account cards.", `${accountNames().length} accounts`));
+      renameSettingsCard(savingsCard, "Savings", "Choose how Savings accounts appear in totals and trends");
+      if (savingsCard) accountsPanel.appendChild(savingsCard);
+      renameSettingsCard(accountCard, "Update account balances", "Use this only when changing several balances at once");
+      const accountSubmit = accountCard?.querySelector('button[type="submit"]');
+      if (accountSubmit) accountSubmit.textContent = "Save account updates";
+      if (accountCard) accountsPanel.appendChild(settingsDisclosure("Advanced account updates", "Edit several balances and account types together", [accountCard]));
+      if (calculationCard) accountsPanel.appendChild(settingsDisclosure("How totals are calculated", "Plain explanation of available money, expenses, and savings", [calculationCard]));
+
+      calendarPanel.appendChild(settingsSectionIntro("Work & Calendar", "Set your salary-work defaults and how project deadlines are prepared for Calendar."));
+      renameSettingsCard(salaryWorkCard, "Work schedule", "Office days, home days, and included projects");
+      renameSettingsCard(calendarCard, "Calendar defaults", "How project deadline files are prepared");
+      [salaryWorkCard, calendarCard].filter(Boolean).forEach(node => calendarPanel.appendChild(node));
+
+      syncPanel.insertBefore(settingsSectionIntro("Sync & Backup", "Check whether records are local or synced, download a backup, and manage devices when needed."), syncPanel.firstChild);
+      simplifyCloudOverview();
+      const configCard = document.getElementById("cloudConfigCard");
+      if (configCard) {
+        const configDisclosure = settingsDisclosure("Advanced cloud connection", "Technical Supabase project URL and publishable key", [configCard]);
+        const disconnectedSection = document.getElementById("cloudDisconnectedSection");
+        syncPanel.insertBefore(configDisclosure, disconnectedSection || null);
+      }
+      const connected = document.getElementById("cloudConnectedSection");
+      if (connected) {
+        const connectedCards = [...connected.querySelectorAll(":scope > article.card")];
+        const devices = connectedCards.find(card => card.querySelector("h3")?.textContent.trim() === "Connected devices");
+        const conflicts = connectedCards.find(card => card.querySelector("h3")?.textContent.trim() === "Resolve sync differences");
+        if (devices || conflicts) connected.appendChild(settingsDisclosure("Devices and sync differences", "Rename devices, sign out old devices, or resolve a conflict", [devices, conflicts]));
+      }
+      renameSettingsCard(backupCard, "Download or restore backup", "Keep a copy outside this browser");
+      const exportBackup = document.getElementById("exportBackup");
+      const importBackupLabel = document.querySelector('label[for="importBackup"]');
+      if (exportBackup) exportBackup.textContent = "Download backup";
+      if (importBackupLabel) importBackupLabel.textContent = "Restore backup";
+      const resetButton = document.getElementById("resetData");
+      resetButton?.remove();
+      if (backupCard) syncPanel.appendChild(backupCard);
+      const storageCard = settingsCardByTitle("Storage protection");
+      const knownCard = settingsCardByTitle("Known devices");
+      const historyCard = settingsCardByTitle("Local sync history");
+      const snapshotsCard = settingsCardByTitle("Verified account snapshots");
+      const migrationCard = settingsCardByTitle("V11 → V12 migration");
+      const recoveryCard = settingsCardByTitle("Device recovery guidance");
+      renameSettingsCard(storageCard, "Protect local data", "Storage status and browser protection");
+      renameSettingsCard(knownCard, "Known devices", "Device names and recent activity");
+      renameSettingsCard(historyCard, "Sync history", "Recent imports, exports, restores, and merges");
+      renameSettingsCard(snapshotsCard, "Account snapshots", "Validated offline balance snapshots");
+      renameSettingsCard(migrationCard, "Move older app data", "Recovery and rollback for older app versions");
+      renameSettingsCard(recoveryCard, "Recovery help", "Steps for replacing or restoring a device");
+      const syncAdvancedNodes = [storageCard, knownCard, historyCard, snapshotsCard, migrationCard, recoveryCard].filter(Boolean);
+      if (syncAdvancedNodes.length) syncPanel.appendChild(settingsDisclosure("More sync & recovery options", "Storage, history, snapshots, migration, and recovery help", syncAdvancedNodes));
+
+      appPanel.appendChild(settingsSectionIntro("App & About", "Install the app, manage notifications, and review version information."));
+      const pwaCard = settingsCardByTitle("Installable app");
+      const pdfCard = settingsCardByTitle("Optional PDF packs");
+      const remindersCard = settingsCardByTitle("Review reminders");
+      renameSettingsCard(pwaCard, "Install this app", "Install, update, or repair the app on this device");
+      renameSettingsCard(pdfCard, "Offline documents", "Keep selected PDF files available without internet");
+      renameSettingsCard(remindersCard, "Notifications & reminders", "Choose when the app should remind you to review finances");
+      if (pwaCard) appPanel.appendChild(pwaCard);
+      if (remindersCard) appPanel.appendChild(remindersCard);
+      if (pdfCard) appPanel.appendChild(settingsDisclosure("Offline documents", "Optional PDFs stored only on this device", [pdfCard]));
+      appPanel.insertAdjacentHTML("beforeend", `<article class="card settings-about-card"><div class="card-header"><div><h3>About this app</h3><p>Version, storage, and privacy basics</p></div><span class="v12-chip info">${APP_VERSION}</span></div><div class="settings-about-grid"><div><span>App version</span><strong>${APP_VERSION}</strong></div><div><span>Storage</span><strong>On this device first</strong></div><div><span>Cloud sync</span><strong>Optional and encrypted</strong></div><div><span>Bank access</span><strong>No bank credentials</strong></div></div><p class="v12-help">The app works locally. Cloud sync uses your configured project, and a downloaded backup is recommended before clearing browser data or replacing a device.</p></article>`);
+      const versionCardHolder = document.createElement("div");
+      versionCardHolder.innerHTML = versionHistoryCardHtml();
+      appPanel.appendChild(settingsDisclosure("Version history", "See changes from current and earlier releases", [versionCardHolder.firstElementChild]));
+      const cacheButton = document.getElementById("clearAppCacheButton");
+      const packsButton = document.getElementById("clearOfflinePacksButton");
+      const clearConfigButton = document.getElementById("clearCloudConfig");
+      [cacheButton, packsButton, clearConfigButton].forEach(button => button?.remove());
+      buildDangerZone(appPanel, resetButton, cacheButton, packsButton, clearConfigButton);
+
+      [legacyBackupPanel, legacyOfflinePanel].filter(Boolean).forEach(node => node.remove());
       settings.querySelectorAll(":scope > .grid, :scope > .v12-section-heading").forEach(node => { if (!node.querySelector("article.card")) node.remove(); });
       settings.dataset.organized = "true";
+      setupSettingsFormDirtyState();
+      updateSettingsOverview();
+    }
+
+    function simplifyProfileSettingsPanel(panel) {
+      if (!panel || panel.dataset.simplePresentation === "true") return;
+      const overview = panel.querySelector(".profile-overview-card");
+      renameSettingsCard(overview, "Profile & security", "See the active profile, role, cloud connection, and protection status");
+      const grids = [...panel.querySelectorAll(":scope > .profile-two-column")];
+      const firstCards = grids[0] ? [...grids[0].querySelectorAll(":scope > article.card")] : [];
+      const createCard = firstCards.find(card => card.querySelector("h3")?.textContent.trim() === "Create local profile");
+      const encryptionCard = firstCards.find(card => card.querySelector("h3")?.textContent.trim() === "Profile encryption");
+      renameSettingsCard(encryptionCard, "Protect cloud records", "Use a passphrase for encrypted cloud records and protected backups");
+      const deviceLockCard = grids[2]?.querySelector(":scope > article.card:first-child");
+      const securityCard = grids[2]?.querySelector(":scope > article.card:nth-child(2)");
+      renameSettingsCard(deviceLockCard, "Protect this device", "Require a local passphrase after inactivity");
+      const primary = document.createElement("div");
+      primary.className = "profile-settings-primary";
+      [encryptionCard, deviceLockCard].filter(Boolean).forEach(card => primary.appendChild(card));
+      if (overview) overview.after(primary);
+      if (createCard) panel.appendChild(settingsDisclosure("More profile options", "Create another personal or household profile", [createCard]));
+      const cloudCard = panel.querySelector(".profile-cloud-card");
+      renameSettingsCard(cloudCard, "Move existing data to cloud", "Advanced setup for an encrypted cloud profile");
+      const householdCard = grids[1]?.querySelector(":scope > article.card:first-child");
+      const encryptedBackupCard = grids[1]?.querySelector(":scope > article.card:nth-child(2)");
+      renameSettingsCard(encryptedBackupCard, "Protected profile backup", "Password-protected profile recovery file");
+      renameSettingsCard(securityCard, "Sign-in security", "Authenticator verification and optional passkeys");
+      const auditCard = [...panel.querySelectorAll(":scope > article.card")].find(card => card.querySelector("h3")?.textContent.trim() === "Local profile audit");
+      renameSettingsCard(auditCard, "Recent security activity", "Profile, backup, and protection changes on this device");
+      const advanced = [cloudCard, householdCard, encryptedBackupCard, securityCard, auditCard].filter(Boolean);
+      if (advanced.length) panel.appendChild(settingsDisclosure("Advanced profile tools", "Cloud migration, sharing, protected backups, sign-in security, and activity", advanced));
+      grids.forEach(grid => { if (!grid.children.length) grid.remove(); });
+      panel.dataset.simplePresentation = "true";
+      setTimeout(updateSettingsOverview, 0);
+    }
+    window.simplifyProfileSettingsPanel = simplifyProfileSettingsPanel;
+
+    function simplifyAccountLedgerSettings(panel, ledgerCard, reconciliationCard) {
+      if (!panel || panel.querySelector('[data-settings-ledger-disclosure="true"]')) return;
+      renameSettingsCard(ledgerCard, "Account history & transfers", "Transfer money or review detailed account activity");
+      renameSettingsCard(reconciliationCard, "Balance adjustment history", "Review differences recorded when an account balance was updated");
+      const details = settingsDisclosure(
+        "Account history & transfers",
+        "Transfer money, search account activity, or review balance adjustments",
+        [ledgerCard, reconciliationCard]
+      );
+      details.dataset.settingsLedgerDisclosure = "true";
+      panel.appendChild(details);
+    }
+    window.simplifyAccountLedgerSettings = simplifyAccountLedgerSettings;
+
+    function simplifyReminderSettingsCard(card) {
+      if (!card || card.closest('[data-settings-reminders-disclosure="true"]')) return;
+      const panel = document.querySelector('[data-settings-panel="app"]');
+      if (!panel) return;
+      renameSettingsCard(card, "Notifications & reminders", "Choose when the app should remind you to review finances");
+      const details = settingsDisclosure(
+        "Notifications & reminders",
+        "Daily schedule, alert types, current alerts, and notification history",
+        [card]
+      );
+      details.dataset.settingsRemindersDisclosure = "true";
+      const offlineDocuments = [...panel.querySelectorAll(':scope > details.settings-disclosure')].find(node => node.querySelector(':scope > summary strong')?.textContent.trim() === "Offline documents");
+      const aboutCard = panel.querySelector(':scope > .settings-about-card');
+      panel.insertBefore(details, offlineDocuments || aboutCard || null);
+    }
+    window.simplifyReminderSettingsCard = simplifyReminderSettingsCard;
+
+    function setOverviewState(chipId, statusId, textId, { chip, state = "neutral", status, text }) {
+      const chipNode = document.getElementById(chipId);
+      const statusNode = document.getElementById(statusId);
+      const textNode = document.getElementById(textId);
+      if (chipNode) { chipNode.textContent = chip; chipNode.className = `settings-state-chip ${state}`; }
+      if (statusNode) statusNode.textContent = status;
+      if (textNode) textNode.textContent = text;
+    }
+
+    function updateSettingsOverview() {
+      if (!document.getElementById("settings-panel-overview")) return;
+      const names = typeof accountNames === "function" ? accountNames() : Object.keys(data?.accounts || {});
+      const savings = names.filter(name => typeof accountType === "function" && accountType(name) === "Savings").length;
+      setOverviewState("settingsOverviewAccountsChip", "settingsOverviewAccountsStatus", "settingsOverviewAccountsText", {
+        chip:"Ready", state:"success", status:`${names.length} account${names.length === 1 ? "" : "s"}`,
+        text:`${savings} Savings account${savings === 1 ? "" : "s"}. Edit an account card to update one balance.`
+      });
+      let profileStatus = "Local profile";
+      let profileText = "Records are available on this device.";
+      let profileChip = "Local";
+      let profileState = "neutral";
+      try {
+        const profile = window.FinanceProfileArchitecture?.activeProfile?.();
+        if (profile) {
+          profileStatus = profile.name || "Finance profile";
+          const locked = profile.encryption?.enabled && !window.FinanceProfileArchitecture?.isCloudUnlocked?.();
+          profileChip = locked ? "Locked" : profile.encryption?.enabled ? "Protected" : "Review";
+          profileState = locked ? "warning" : profile.encryption?.enabled ? "success" : "neutral";
+          profileText = `${profile.role === "owner" ? "Owner" : profile.role || "Member"} · ${profile.cloudProfileId ? "Cloud connected" : "Stored locally"}`;
+        }
+      } catch (error) {}
+      setOverviewState("settingsOverviewProfileChip", "settingsOverviewProfileStatus", "settingsOverviewProfileText", { chip:profileChip, state:profileState, status:profileStatus, text:profileText });
+      const cloudChip = document.getElementById("cloudStatusChip")?.textContent?.trim() || "Local only";
+      const cloudDetail = document.getElementById("cloudStatusDetail")?.textContent?.trim() || "Records are stored on this device";
+      const lastBackup = document.getElementById("lastBackupStatus")?.textContent?.trim() || "Never";
+      const cloudState = /synced|connected|ready/i.test(`${cloudChip} ${cloudDetail}`) ? "success" : /error|failed|attention|offline/i.test(`${cloudChip} ${cloudDetail}`) ? "warning" : "neutral";
+      setOverviewState("settingsOverviewSyncChip", "settingsOverviewSyncStatus", "settingsOverviewSyncText", { chip:cloudChip, state:cloudState, status:cloudDetail, text:`Last downloaded backup: ${lastBackup}.` });
+      const installStatus = document.getElementById("pwaInstallStatus")?.textContent?.trim() || "Available in browser";
+      const reminderStatus = document.getElementById("reminderStatusChip")?.textContent?.trim() || "Off";
+      setOverviewState("settingsOverviewAppChip", "settingsOverviewAppStatus", "settingsOverviewAppText", { chip:"Current", state:"success", status:`Version ${APP_VERSION}`, text:`${installStatus}. Notifications: ${reminderStatus}.` });
+    }
+
+    function setupSettingsFormDirtyState() {
+      document.querySelectorAll("#settings form").forEach(form => {
+        if (form.dataset.settingsDirtyReady === "true") return;
+        const submit = form.querySelector('button[type="submit"]');
+        if (!submit || form.id === "sampleResetForm") return;
+        form.dataset.settingsDirtyReady = "true";
+        form.classList.add("settings-form-clean");
+        submit.disabled = true;
+        submit.title = "Change a setting before saving";
+        const markDirty = () => { submit.disabled = false; submit.title = ""; form.classList.remove("settings-form-clean"); };
+        form.addEventListener("input", markDirty);
+        form.addEventListener("change", markDirty);
+        form.addEventListener("submit", () => setTimeout(() => { submit.disabled = true; submit.title = "Change a setting before saving"; form.classList.add("settings-form-clean"); updateSettingsOverview(); }, 0));
+      });
     }
 
     function activateSettingsPanel(key, updateUrl = false, focusTab = false) {
-      if (!SETTINGS_PANELS.includes(key)) key = "accounts";
+      key = normalizeSettingsPanelKey(key);
       document.querySelectorAll("[data-settings-tab]").forEach(button => { const active = button.dataset.settingsTab === key; button.setAttribute("aria-selected", String(active)); button.tabIndex = active ? 0 : -1; });
       document.querySelectorAll("[data-settings-panel]").forEach(panel => { panel.hidden = panel.dataset.settingsPanel !== key; });
+      const settings = document.getElementById("settings");
+      const mobileBack = document.getElementById("settingsMobileBack");
+      const categoryOpen = key !== "overview";
+      settings?.classList.toggle("settings-category-open", categoryOpen);
+      if (mobileBack) mobileBack.hidden = !categoryOpen;
+      const currentTitle = document.getElementById("settingsMobileCurrentTitle");
+      if (currentTitle) currentTitle.textContent = SETTINGS_PANEL_LABELS[key] || "Settings";
       try { localStorage.setItem(SETTINGS_PANEL_KEY, key); } catch (error) {}
-      if (updateUrl) { const url = new URL(location.href); url.searchParams.set("page", "settings"); url.searchParams.set("settings", key); history.replaceState({ page: "settings", settings: key }, "", url); }
+      if (updateUrl) { const url = new URL(location.href); url.searchParams.set("page", "settings"); url.searchParams.set("settings", key); history.replaceState({ page:"settings", settings:key }, "", url); }
       const selectedTab = document.querySelector(`[data-settings-tab="${key}"]`);
-      if (focusTab) selectedTab?.focus();
-      if (selectedTab && window.matchMedia("(max-width:850px)").matches) requestAnimationFrame(() => centerScrollableTab(selectedTab.closest(".settings-tablist"), selectedTab, updateUrl));
+      if (focusTab && !window.matchMedia("(max-width:850px)").matches) selectedTab?.focus();
+      if (categoryOpen && window.matchMedia("(max-width:850px)").matches) document.getElementById("settingsBackButton")?.focus({ preventScroll:true });
+      updateSettingsOverview();
     }
 
     function setupSettingsNavigation() {
@@ -9862,15 +10460,22 @@
       tablist.addEventListener("click", event => { const button = event.target.closest("[data-settings-tab]"); if (button) activateSettingsPanel(button.dataset.settingsTab, true); });
       tablist.addEventListener("keydown", event => {
         const current = event.target.closest("[data-settings-tab]");
-        if (!current || !["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+        const keys = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"];
+        if (!current || !keys.includes(event.key)) return;
         event.preventDefault();
         const index = SETTINGS_PANELS.indexOf(current.dataset.settingsTab);
-        const next = event.key === "Home" ? 0 : event.key === "End" ? SETTINGS_PANELS.length - 1 : (index + (event.key === "ArrowRight" ? 1 : -1) + SETTINGS_PANELS.length) % SETTINGS_PANELS.length;
+        const direction = ["ArrowRight", "ArrowDown"].includes(event.key) ? 1 : -1;
+        const next = event.key === "Home" ? 0 : event.key === "End" ? SETTINGS_PANELS.length - 1 : (index + direction + SETTINGS_PANELS.length) % SETTINGS_PANELS.length;
         activateSettingsPanel(SETTINGS_PANELS[next], true, true);
       });
+      document.getElementById("settingsBackButton")?.addEventListener("click", () => activateSettingsPanel("overview", true));
+      document.getElementById("settings-panel-overview")?.addEventListener("click", event => {
+        const button = event.target.closest("[data-settings-open]");
+        if (button) activateSettingsPanel(button.dataset.settingsOpen, true);
+      });
       let initial = new URL(location.href).searchParams.get("settings");
-      if (!SETTINGS_PANELS.includes(initial)) { try { initial = localStorage.getItem(SETTINGS_PANEL_KEY); } catch (error) {} }
-      activateSettingsPanel(SETTINGS_PANELS.includes(initial) ? initial : "accounts", false);
+      if (!initial) { try { initial = localStorage.getItem(SETTINGS_PANEL_KEY); } catch (error) {} }
+      activateSettingsPanel(normalizeSettingsPanelKey(initial || "overview"), false);
     }
 
     let sidebarHideTimer = null;
@@ -11569,7 +12174,7 @@
     });
 
     // ---------------- V12.10.0 PWA, Phase 11 interface refinement, Phase 10 calculator number inputs, projects, savings goals, and number inputs, Phase 7 secure reset, Phase 6 savings + dashboard insights, Phase 5 reports + dark mode, Phase 4 dashboard + Apple Calendar, Phase 3 monthly navigation, Phase 2 expense workflow, device registry, sync history, offline packs, reminders, and migration ----------------
-    const APP_VERSION = "13.0.1";
+    const APP_VERSION = "13.0.2";
     const SCHEMA_VERSION = 12;
     const V12_META_KEY = "simple-finance-project-records-v12-meta";
     const V11_BACKUP_KEY = "simple-finance-project-records-v11-backup";
@@ -12566,6 +13171,8 @@
       renderSettings = function() {
         baseRenderSettings();
         renderV12Settings();
+        setupSettingsFormDirtyState();
+        updateSettingsOverview();
       };
     }
 
@@ -12634,7 +13241,7 @@
     organizeSettingsPanels();
     setupWorkspaceNavigation();
     setupSettingsNavigation();
-    setupMobileTopbarUtilities();
+    setupTopbarToolsMenu();
     syncMobileFilterPanels();
     window.addEventListener("resize", () => { syncMobileFilterPanels(); syncPageSpecificActions(); });
     document.addEventListener("input", updateMobileFilterBadges);

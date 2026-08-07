@@ -387,14 +387,14 @@
       const heading = accountCard.querySelector("h3");
       if (heading) {
         const headingText = [...heading.childNodes].find(node => node.nodeType === Node.TEXT_NODE);
-        if (headingText) headingText.textContent = "Reconcile account balances";
-        else heading.prepend(document.createTextNode("Reconcile account balances"));
+        if (headingText) headingText.textContent = "Update account balances";
+        else heading.prepend(document.createTextNode("Update account balances"));
       }
       const copy = accountCard.querySelector(".card-header p");
-      if (copy) copy.textContent = "Enter each real bank, wallet, or cash balance; differences become ledger adjustments";
+      if (copy) copy.textContent = "Enter the balances shown by your bank, wallet, or cash count. Any difference is safely recorded.";
       const submit = accountForm.querySelector('button[type="submit"]');
-      if (submit) submit.textContent = "Save reconciliations";
-      if (!accountForm.querySelector(".ledger-reconcile-note")) accountForm.insertAdjacentHTML("afterbegin", '<p class="v12-help ledger-reconcile-note">Balances are calculated from the ledger. Saving a different real-world balance creates a dated reconciliation adjustment instead of silently replacing history.</p>');
+      if (submit) submit.textContent = "Save account updates";
+      if (!accountForm.querySelector(".ledger-reconcile-note")) accountForm.insertAdjacentHTML("afterbegin", '<p class="v12-help ledger-reconcile-note">Saving a different balance records an adjustment so earlier account activity stays available.</p>');
     }
 
     const ledgerCard = document.createElement("article");
@@ -414,6 +414,7 @@
       <div class="card-header"><div><h3>Reconciliation history</h3><p>Recorded differences between the app and actual account statements</p></div><button class="button button-secondary button-small" id="exportReconciliationsCsv" type="button">Export CSV</button></div>
       <div class="table-scroll"><table class="responsive-table reconciliation-table"><thead><tr><th>Date</th><th>Account</th><th>Before</th><th>Actual</th><th>Difference</th><th>Note</th></tr></thead><tbody id="accountReconciliationBody"></tbody></table></div>`;
     panel.append(ledgerCard, reconciliationCard);
+    window.simplifyAccountLedgerSettings?.(panel, ledgerCard, reconciliationCard);
 
     document.querySelector("#incomeDialog .income-account-helper")?.replaceChildren(document.createTextNode("When enabled below, saving the income adds it to this account’s ledger balance."));
     const incomeTotalsField = document.getElementById("incomeIncludeTotalsField");

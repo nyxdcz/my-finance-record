@@ -857,6 +857,7 @@
         <div class="card-header"><div><h3>Local profile audit</h3><p>Recent profile, security, backup, and migration activity on this device</p></div><span class="v13-chip info">Latest ${audit.length}</span></div>
         <div class="profile-audit-list">${audit.length ? audit.map(item => `<div><strong>${escape(item.action)}</strong><small>${escape(new Date(item.createdAt).toLocaleString())} · ${escape(item.appVersion || "")}</small></div>`).join("") : `<div class="v13-empty">No local profile activity yet.</div>`}</div>
       </article>`;
+    window.simplifyProfileSettingsPanel?.(panel);
     bindPanelEvents();
   }
 

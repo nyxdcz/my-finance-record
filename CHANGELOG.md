@@ -1,3 +1,18 @@
+## 13.0.2 · 2026-08-07
+- Simplified Settings with a status overview, six plain-language sections, vertical iPhone navigation, collapsed advanced tools, account-history and reminder disclosures, save buttons enabled only after changes, and a separate danger zone.
+- Preserved all account, profile, encryption, cloud sync, backup, reminder, PWA, schema, and calculation behavior.
+
+### Changed
+- Simplified the visible toolbar to Cloud Sync, month navigation, Current month, and the contextual Add action.
+- Moved Theme, Search, and Quick actions into one More tools menu with standard SVG icons.
+- Added independent accessible collapse controls to Category plan and Cash-flow forecast.
+- Matched the expanded height and header structure of both budget bento panels.
+- Aligned Reconciled balance and Account type in the Edit Account dialog, improved label contrast, standardized control height, and stacked the pair cleanly on iPhone.
+
+### Preserved
+- Budget and forecast calculations, account values, records, month navigation, Cloud Sync, profiles, encryption, and Finance Schema 12.
+- No Supabase migration is required.
+
 ## 13.0.1 · 2026-08-07
 
 ### Changed

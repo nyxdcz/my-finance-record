@@ -4,6 +4,7 @@
    Plans are local-first finance records and Cloud Schema V2 synchronizes each month,
    template, and settings record independently. */
 (function monthlyBudgetPlanningBootstrap() {
+  const BUDGET_PANEL_STATE_KEY = "simple-finance-budget-panel-state-v1";
   const BUDGET_VERSION = 1;
   const FIXED_CATEGORIES = new Set(["Bills","Rent","Loans","Utilities","Subscriptions"]);
   const DEFAULT_THRESHOLD = 1000;
@@ -169,8 +170,8 @@
       summary?.insertAdjacentHTML("afterend", `<article class="card budget-planner-card" id="monthlyBudgetPlannerCard" aria-labelledby="monthlyBudgetPlannerTitle">
         <div class="card-header budget-planner-header"><div><h3 id="monthlyBudgetPlannerTitle">Monthly budget plan</h3><p id="monthlyBudgetPlannerSubtitle">Plan categories, compare actual spending, and forecast month-end cash.</p></div><div class="budget-planner-actions no-print"><button class="button button-secondary button-small" id="buildBudgetFromExpenses" type="button">Build from expenses</button><button class="button button-secondary button-small" id="copyPreviousBudget" type="button">Copy previous month</button><button class="button button-secondary button-small" id="openBudgetSettings" type="button">Plan settings</button><button class="button button-secondary button-small" id="exportBudgetCsv" type="button">Export CSV</button><button class="button button-primary button-small" id="addBudgetItem" type="button">+ Add category</button></div></div>
         <div class="budget-planner-summary" id="budgetPlannerSummary"></div>
-        <div class="budget-planner-grid"><section class="budget-category-panel"><div class="budget-panel-heading"><div><h4>Category plan</h4><p>Fixed and flexible budgets for personal and project spending.</p></div><span class="v12-chip info" id="budgetCategoryCount">0 categories</span></div><div id="budgetCategoryTableWrap"></div><div class="budget-template-bar no-print"><div class="field"><label for="budgetTemplateSelect">Budget template</label><select class="select" id="budgetTemplateSelect"><option value="">Choose a template</option></select></div><button class="button button-secondary button-small" id="applyBudgetTemplate" type="button">Apply</button><button class="button button-secondary button-small" id="saveBudgetTemplate" type="button">Save current</button><button class="button button-secondary button-small" id="deleteBudgetTemplate" type="button">Delete</button></div></section>
-        <aside class="cash-forecast-panel"><div class="budget-panel-heading"><div><h4>Cash-flow forecast</h4><p>Current money plus expected income minus future commitments.</p></div><span class="v12-chip" id="cashForecastStatus">No plan</span></div><div class="cash-forecast-body"><div class="forecast-breakdown" id="cashForecastBreakdown"></div><div class="forecast-classification" id="cashForecastClassification"></div><div class="budget-alerts" id="budgetForecastAlerts"></div></div></aside></div>
+        <div class="budget-planner-grid"><section class="budget-category-panel budget-bento-panel" data-budget-panel="category"><div class="budget-panel-heading"><div class="budget-panel-heading-copy"><h4>Category plan</h4><p>Fixed and flexible budgets for personal and project spending.</p></div><div class="budget-panel-heading-actions"><span class="v12-chip info" id="budgetCategoryCount">0 categories</span><button class="budget-panel-collapse no-print" type="button" data-budget-panel-toggle="category" aria-controls="budgetCategoryPanelBody" aria-expanded="true" aria-label="Collapse Category plan" title="Collapse Category plan"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m6 15 6-6 6 6"/></svg></button></div></div><div class="budget-panel-body budget-category-body" id="budgetCategoryPanelBody"><div id="budgetCategoryTableWrap"></div><div class="budget-template-bar no-print"><div class="field"><label for="budgetTemplateSelect">Budget template</label><select class="select" id="budgetTemplateSelect"><option value="">Choose a template</option></select></div><button class="button button-secondary button-small" id="applyBudgetTemplate" type="button">Apply</button><button class="button button-secondary button-small" id="saveBudgetTemplate" type="button">Save current</button><button class="button button-secondary button-small" id="deleteBudgetTemplate" type="button">Delete</button></div></div></section>
+        <aside class="cash-forecast-panel budget-bento-panel" data-budget-panel="forecast"><div class="budget-panel-heading"><div class="budget-panel-heading-copy"><h4>Cash-flow forecast</h4><p>Current money plus expected income minus future commitments.</p></div><div class="budget-panel-heading-actions"><span class="v12-chip" id="cashForecastStatus">No plan</span><button class="budget-panel-collapse no-print" type="button" data-budget-panel-toggle="forecast" aria-controls="cashForecastPanelBody" aria-expanded="true" aria-label="Collapse Cash-flow forecast" title="Collapse Cash-flow forecast"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m6 15 6-6 6 6"/></svg></button></div></div><div class="cash-forecast-body budget-panel-body" id="cashForecastPanelBody"><div class="forecast-breakdown" id="cashForecastBreakdown"></div><div class="forecast-classification" id="cashForecastClassification"></div><div class="budget-alerts" id="budgetForecastAlerts"></div></div></aside></div>
       </article>`);
     }
     if (!document.getElementById("budgetDashboardForecast")) {
@@ -382,6 +383,41 @@
     grid.innerHTML=[["Planned",metrics.planned],["Actual paid",metrics.actual],["Committed",metrics.committed],["Forecast month-end",metrics.forecast]].map(([label,value])=>`<div><span>${label}</span><strong class="${label==="Forecast month-end"?(value<0?"text-red":"text-green"):""}">${money(value)}</strong></div>`).join("");
   }
 
+  function budgetPanelState() {
+    try {
+      const value = JSON.parse(localStorage.getItem(BUDGET_PANEL_STATE_KEY) || "{}");
+      return value && typeof value === "object" ? value : {};
+    } catch (error) { return {}; }
+  }
+
+  function setBudgetPanelCollapsed(name, collapsed, persist = true) {
+    const panel = document.querySelector(`[data-budget-panel="${name}"]`);
+    const toggle = document.querySelector(`[data-budget-panel-toggle="${name}"]`);
+    if (!panel || !toggle) return;
+    const title = name === "forecast" ? "Cash-flow forecast" : "Category plan";
+    panel.classList.toggle("is-collapsed", collapsed);
+    toggle.setAttribute("aria-expanded", String(!collapsed));
+    toggle.setAttribute("aria-label", `${collapsed ? "Expand" : "Collapse"} ${title}`);
+    toggle.title = `${collapsed ? "Expand" : "Collapse"} ${title}`;
+    if (persist) {
+      const state = budgetPanelState();
+      state[name] = Boolean(collapsed);
+      try { localStorage.setItem(BUDGET_PANEL_STATE_KEY, JSON.stringify(state)); } catch (error) {}
+    }
+  }
+
+  function setupBudgetPanelCollapsers() {
+    const state = budgetPanelState();
+    ["category", "forecast"].forEach(name => setBudgetPanelCollapsed(name, Boolean(state[name]), false));
+    document.addEventListener("click", event => {
+      const toggle = event.target.closest("[data-budget-panel-toggle]");
+      if (!toggle) return;
+      const name = toggle.dataset.budgetPanelToggle;
+      const panel = document.querySelector(`[data-budget-panel="${name}"]`);
+      setBudgetPanelCollapsed(name, !panel?.classList.contains("is-collapsed"));
+    });
+  }
+
   function bindEvents() {
     document.addEventListener("click",event=>{
       if(event.target.closest("#addBudgetItem")) openItemDialog();
@@ -424,6 +460,7 @@
   renderAll = function budgetRenderAll(...args) { const result=originalRenderAll(...args); injectUi(); renderBudgetWorkspace(); return result; };
 
   injectUi();
+  setupBudgetPanelCollapsers();
   bindEvents();
   renderBudgetWorkspace();
 })();

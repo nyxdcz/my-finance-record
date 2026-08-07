@@ -775,6 +775,7 @@
       <div class="v12-check-list finance-alert-list" id="reviewIssueList"></div>
       <details class="finance-alert-history"><summary>Notification history on this device</summary><div id="financeAlertHistory"></div><button class="button button-secondary button-small" id="clearFinanceAlertHistory" type="button">Clear history</button></details>
       <p class="v12-help">Exact closed-app delivery is not guaranteed. Periodic Background Sync is browser-controlled and has limited support. On iPhone and iPad, install this website to the Home Screen and allow notifications. Alerts never mark expenses paid, transfer money, reconcile balances, or change financial records automatically.</p>`;
+    window.simplifyReminderSettingsCard?.(card);
   }
 
   function bindEvents() {

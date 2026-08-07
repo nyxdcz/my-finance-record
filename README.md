@@ -1,4 +1,23 @@
-# My Finance Records · V13.0.1 PWA
+# My Finance Records · V13.0.2 PWA
+
+
+## V13.0.2 · Simplified Settings UI
+
+### Settings simplification
+
+- Added an Overview showing account, profile/security, sync/backup, and app status with one clear action per card.
+- Reduced seven technical categories to Overview, Accounts, Work & Calendar, Profile & Security, Sync & Backup, and App & About.
+- Replaced iPhone horizontal Settings tabs with a vertical menu and Back to Settings control.
+- Moved technical configuration, migration, device history, snapshots, and other advanced tools behind collapsed disclosures.
+- Kept account history, transfers, balance-adjustment history, notification schedules, alert types, and notification history available inside collapsed plain-language sections.
+- Separated destructive and troubleshooting actions into a collapsed Danger zone.
+- Preserved all stored settings, accounts, profiles, encryption, cloud sync, backups, reminders, schemas, and calculation logic.
+
+- Reduced the visible top toolbar to Cloud Sync, previous month, month selector, next month, Current month, and the contextual Add action.
+- Moved Theme, Search, and Quick actions into one accessible More tools menu using standard SVG interface icons instead of emoji-style glyphs.
+- Added independent collapse controls to Category plan and Cash-flow forecast and matched their expanded bento heights.
+- Corrected the Edit Account balance/type row with equal-width desktop fields, matching control heights, clearer labels, and responsive iPhone stacking.
+- Preserved all budget, forecast, account, sync, profile, encryption, and stored-data logic. No Supabase migration is required.
 
 ## V13.0.1 · MacBook & iPhone UI Stabilization
 
@@ -367,7 +386,7 @@ See `CLOUD_SYNC_SETUP.md` for the complete security and deployment process. Neve
 - Budget & Expenses keeps the Income, Budget & Expenses, and Paid Expenses workspace tabs, uses matching summary cards, tighter account cards, and the existing single-line compact filters.
 - Projects keeps the Projects and Project Payments workspace tabs, aligns project rows, filters, status chips, payment controls, and Active/Completed section spacing.
 - Monthly Reports now groups Summary, Income, Expenses, Expense records, Projects & payments, Accounts & savings, and Exports into compact expandable sections. Summary remains open by default, and report-navigation buttons open the required section before scrolling.
-- Settings uses a compact two-column desktop workspace with category navigation on the left and the active settings panel on the right. Tablet and phone layouts retain horizontally scrollable category controls and 44-pixel touch targets.
+- Settings now opens to a plain-language overview. MacBook uses six clear sections in a left menu. iPhone uses a vertical Settings menu and a Back to Settings control instead of horizontally scrolling category tabs. Advanced, technical, and destructive actions remain available inside collapsed More options and Danger zone sections.
 - Removed duplicate page-level Paid Expenses shortcuts where the consolidated workspace tabs already provide access.
 - Updated the app version and service-worker cache to V12.18.0.
 
