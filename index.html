@@ -6800,7 +6800,7 @@
         <div class="dialog-context-note">Keep the original completion date and start a new client revision cycle.</div>
         <div class="form-grid project-revision-form-grid">
           <div class="field"><label for="projectRevisionRequestedDate">Revision requested date <span class="required-mark" aria-hidden="true">*</span></label><input class="input" id="projectRevisionRequestedDate" type="date" required></div>
-          <div class="field"><label for="projectRevisionDeadline">Revision deadline</label><input class="input" id="projectRevisionDeadline" type="date"></div>
+          <div class="field"><label for="projectRevisionDeadline">New deadline for this revision</label><input class="input" id="projectRevisionDeadline" type="date" aria-describedby="projectRevisionDeadlineHelp"><small class="field-help" id="projectRevisionDeadlineHelp">Optional. This applies only to this revision and does not replace the original project deadline.</small></div>
           <div class="field field-full"><label for="projectRevisionNotes">Revision notes</label><textarea class="textarea" id="projectRevisionNotes" rows="3" placeholder="Example: Client requested updated landscape layout"></textarea></div>
           <div class="project-revision-calendar field-full">
             <label class="project-calendar-check"><input id="projectRevisionCalendarEnabled" type="checkbox"> <span>Add the revision deadline to Apple Calendar</span></label>
@@ -11948,8 +11948,15 @@
       document.getElementById("projectRevisionNotes").value = "";
       document.getElementById("projectRevisionCalendarEnabled").checked = false;
       document.getElementById("projectRevisionCalendarReminder").value = calendarSettings().defaultReminder || "P1D";
-      syncProjectRevisionCalendarFields();
+      syncProjectRevisionDeadlineFields();
       showAppDialog("projectRevisionDialog", "#projectRevisionRequestedDate");
+    }
+
+    function syncProjectRevisionDeadlineFields() {
+      const requestedDate = document.getElementById("projectRevisionRequestedDate")?.value || "";
+      const deadline = document.getElementById("projectRevisionDeadline");
+      if (deadline) deadline.min = requestedDate;
+      syncProjectRevisionCalendarFields();
     }
 
     function syncProjectRevisionCalendarFields() {
@@ -12761,7 +12768,8 @@
       }catch(error){showToast(error?.message||"Could not save this expense","warning");}finally{if(!done){expenseSavePending=false;button.disabled=false;}}
     });
 
-    document.getElementById("projectRevisionDeadline").addEventListener("change", syncProjectRevisionCalendarFields);
+    document.getElementById("projectRevisionRequestedDate").addEventListener("change", syncProjectRevisionDeadlineFields);
+    document.getElementById("projectRevisionDeadline").addEventListener("change", syncProjectRevisionDeadlineFields);
     document.getElementById("projectRevisionCalendarEnabled").addEventListener("change", syncProjectRevisionCalendarFields);
     document.getElementById("projectRevisionForm").addEventListener("submit", event => {
       event.preventDefault();

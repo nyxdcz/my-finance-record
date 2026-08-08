@@ -1,6 +1,6 @@
 "use strict";
 const APP_VERSION = "13.0.18";
-const CACHE_VERSION = "finance-v13-20260808-v13018-payment-safeguard-r2";
+const CACHE_VERSION = "finance-v13-20260808-v13018-revision-deadline-r3";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const DB_NAME = "simple-finance-project-records-v12-db";
