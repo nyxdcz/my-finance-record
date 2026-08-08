@@ -10066,12 +10066,12 @@
               <span class="saved-icon-container" aria-hidden="true"><span class="saved-icon">${item.recurring === "Monthly" ? "★" : "☆"}</span></span>
               <span class="saved-button-text">${item.recurring === "Monthly" ? "Repeats" : "Repeat"}</span>
             </button>
-            <button class="button button-secondary button-small" data-undo-paid="${item.id}">Move to unpaid</button>
+            <button class="button button-secondary button-small" data-undo-paid="${item.id}">Move to unpaid…</button>
             <button class="button button-secondary button-small" data-edit-expense="${item.id}">Edit</button>
 
           </div>
           <div class="mobile-record-actions">
-            <button class="button button-secondary" data-undo-paid="${item.id}">Move to unpaid</button>
+            <button class="button button-secondary" data-undo-paid="${item.id}">Move to unpaid…</button>
             <details class="record-more-menu"><summary class="button button-secondary">More actions</summary><div class="record-more-panel">
               <button class="button button-secondary" data-edit-expense="${item.id}">Edit expense</button>
               <button class="button button-secondary" data-toggle-saved="${item.id}">${item.recurring === "Monthly" ? "Stop monthly repeat" : "Repeat monthly"}</button>
@@ -12228,10 +12228,22 @@
       }
       if (undoPaid) {
         const item = data.expenses.find(expense => expense.id === undoPaid.dataset.undoPaid);
-        if (item) {
+        if (item?.paid) {
           if (item.accountDeducted && item.paidFromAccount && !Object.prototype.hasOwnProperty.call(data.accounts || {}, item.paidFromAccount)) {
             showToast(`Cannot restore ${money(item.paidAmount)} because ${item.paidFromAccount} no longer exists. Recreate the account first.`, "warning");
           } else {
+            const restoredAmount = settledExpenseAmount(item);
+            const details = item.accountDeducted && item.paidFromAccount
+              ? `${money(restoredAmount)} will be restored to ${item.paidFromAccount}.`
+              : "This paid status will be removed. No account balance will change.";
+            const confirmed = await openAppConfirmation({
+              title:"Move paid expense back to unpaid?",
+              message:`Move “${item.name}” out of Paid Expenses?`,
+              details,
+              confirmLabel:"Move to unpaid",
+              danger:true
+            });
+            if (!confirmed) return;
             pushUndo(`Move ${item.name} back to unpaid`);
             const result = restoreExpensePayment(item);
             saveData(result.restored ? `${money(result.restored)} restored to the payment account` : "Expense moved back to unpaid");

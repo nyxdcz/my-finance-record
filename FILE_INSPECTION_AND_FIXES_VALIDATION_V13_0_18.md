@@ -1,51 +1,36 @@
-# V13.0.18 File Inspection and Fixes Installer Validation
+# File Inspection and Fixes Installer Validation
 
 ## Installer scope
-- macOS `.command` installer with Linux-only explicit test mode for automated validation.
-- Payload SHA-256 verification before modifying the target repository.
-- V13.0.17 local-base verification before upgrade.
-- Repeat-safe V13.0.18 verification.
-- Missing verified release-file recovery.
-- Preservation of an existing `sync-config.js`.
-- Refusal to overwrite a genuinely edited V13.0.17 release file.
-- Repository inspection, V13.0.18 quality validation, `git diff --check`, installed-payload checksum verification, and final version verification.
 
-## Tests actually executed
-All automated installer tests below were run in the available Linux environment with `FILE_FIXES_TEST_MODE=1`; they are not claimed as native macOS execution.
+- Tracked macOS installer: `scripts/file-inspection-and-fixes.command`.
+- Verifies Git and Node.js 22+ before changing the target repository.
+- Restores only an absent critical file that is tracked in the target repository's current `HEAD`; modified files are not overwritten.
+- Rebuilds ignored npm metadata with `npm ci --ignore-scripts --no-audit --no-fund`.
+- Runs repository inspection, the complete quality validation, and `git diff --check` before reporting success.
+- Can create a fresh clone when the standalone script is run outside a repository. It never commits or pushes.
 
-### V13.0.17 → V13.0.18
-- Created a clean Git repository fixture from the actual V13.0.17 project.
-- Ran the packaged installer.
-- Result: **SUCCESS**.
-- Final `npm run inspect`: **0 errors, 0 warnings**.
-- Final `npm run quality`: **passed**.
+## Tests executed on macOS
 
-### Repeat installation
-- Ran the same installer again against the already-applied V13.0.18 fixture.
-- Result: **SUCCESS · V13.0.18 is already installed and verified**.
+These commands were run in a native Apple Silicon macOS shell with Node.js `v24.18.0` and npm `11.16.0`:
 
-### Missing-file recovery
-- Deleted `privacy-lock.js` from the V13.0.18 fixture and reran the installer.
-- Installer restored the verified missing release file before validation.
-- Result: **SUCCESS**.
+```bash
+npm run inspect
+npm run installer:test
+bash scripts/file-inspection-and-fixes.command
+npm test
+git diff --check
+```
 
-### `sync-config.js` preservation
-- Added a custom sentinel to the V13.0.17 fixture’s `sync-config.js` before upgrading.
-- After installation, the custom sentinel remained present.
-- Result: **passed**.
+All commands passed.
 
-### Local-edit protection
-- Added a user edit to V13.0.17 `index.html` before running the installer.
-- Installer stopped with `Local V13.0.17 file was edited after installation: index.html`.
-- Result: **passed — user edit was not overwritten**.
+`npm run installer:test` creates an independent temporary Git fixture, deletes `offline.html`, and adds stale data under `node_modules`. Its first installer run restored the deleted tracked file, removed the stale npm data, and completed inspection, quality validation, and whitespace checks. Its second installer run passed without changing the fixture's tracked working tree.
 
-### Corrupted payload rejection
-- Modified the installer payload’s `privacy-lock.js` after checksums were generated.
-- Installer rejected the package at the payload-verification stage before applying changes.
-- Result: **passed**.
+The installer was also run directly against this repository; it required no file repair and completed all verification checks successfully.
 
-## Final-package permission check
-The extracted `Install_V13_0_18.command` permission was verified as **755** in the test environment.
+## Automated publishing guard
+
+The GitHub Actions workflow runs repository inspection on every pull request and push, and runs the installer regression test on `macos-latest`. GitHub Pages deployment waits for both jobs.
 
 ## Limitation
-A native macOS Finder/Terminal execution is not available in this environment. The user’s Mac remains the final macOS-specific verification.
+
+The installer was tested by running it with `bash`. Finder double-click interaction was not tested.

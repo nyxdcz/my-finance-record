@@ -28,13 +28,31 @@ jobs:
           package-manager-cache: false
       - name: Install locked project metadata
         run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Inspect repository integrity
+        run: npm run inspect
       - name: Run complete quality validation
         run: npm run quality
+
+  installer:
+    name: macOS installer regression
+    runs-on: macos-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+      - name: Use Node.js 24
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          package-manager-cache: false
+      - name: Install locked project metadata
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Test macOS installer repair and repeat safety
+        run: npm run installer:test
 
   deploy:
     name: Deploy validated PWA
     if: github.event_name != 'pull_request'
-    needs: quality
+    needs: [quality, installer]
     runs-on: ubuntu-latest
     permissions:
       contents: read

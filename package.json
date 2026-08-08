@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "inspect": "node tests/inspect-project.mjs",
+    "installer:test": "node tests/test-file-inspection-installer.mjs",
     "test": "node tests/validate-v13-0-18.mjs",
     "quality": "node tests/validate-v13-0-18.mjs"
   },

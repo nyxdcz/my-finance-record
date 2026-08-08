@@ -71,7 +71,7 @@
 - Record spending deducts the purchase exactly once from the chosen account and automatically creates an already-paid expense with description, category, date, note, and totals choice.
 - Account cards include a compact **Spend** action, and account balances, Available Money, Paid Expenses, Dashboard totals, and ledger views refresh immediately after the purchase.
 - Quick-spend deletion restores its deducted account balance before removing the expense, while paid ledger amounts cannot be silently changed without first moving the expense back to unpaid.
-- The standard File Inspection and Fixes macOS installer is included with this release.
+- The repository includes a File Inspection and Fixes macOS installer.
 
 
 ## V13.0.9 · Phone UI & Account Balance Refresh
@@ -126,16 +126,23 @@
 
 ## macOS File Inspection and Fixes installer
 
-Use the V13.0.18 **File Inspection and Fixes** installer when updating this repository on a Mac.
+The tracked installer works from a normal clone and is safe to run repeatedly:
 
-1. Extract `My_Finance_Records_V13_0_18_File_Inspection_and_Fixes_Installer.zip`.
-2. Double-click `Install_V13_0_18.command`.
-3. The installer uses `~/Documents/My_Finance_Records` by default, cloning the GitHub repository there when needed.
-4. It checks the current Git state, required files, local asset paths, package metadata, permissions, and configuration before applying the V13.0.18 payload.
-5. It preserves the repository copy of `sync-config.js`, installs locked npm metadata with `npm ci`, then runs `npm run inspect`, `npm run quality`, and `git diff --check`.
-6. The installer **does not commit or push**. Review `git status` and publish only after the checks report success.
+```bash
+git clone https://github.com/nyxdcz/my-finance-record.git
+cd my-finance-record
+bash scripts/file-inspection-and-fixes.command
+```
 
-Requirements: macOS, Git, and Node.js 22 or newer. The installer is safe to run again; an already-applied V13.0.18 working tree is revalidated instead of reapplied.
+It requires macOS, Git, and Node.js 22 or newer. It restores only missing critical files that are tracked in the current Git `HEAD`, rebuilds ignored npm metadata with `npm ci`, then runs `npm run inspect`, `npm run quality`, and `git diff --check`. Modified files are never overwritten; configuration that needs credentials must be corrected manually. The installer does not commit or push.
+
+To verify the installer itself on a Mac, run:
+
+```bash
+npm run installer:test
+```
+
+That test creates a temporary Git fixture, removes a required file and adds stale npm metadata, confirms the installer repairs both safely, then runs the installer a second time to confirm it leaves the tracked working tree unchanged.
 
 
 ## V13.0.2 · Simplified Settings UI

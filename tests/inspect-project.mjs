@@ -18,7 +18,8 @@ const requiredFiles = [
   "index.html", "offline.html", "manifest.webmanifest", "version.json", "sw.js",
   "package.json", "package-lock.json", "README.md", ".gitignore",
   ".github/workflows/quality-pages.yml", "vendor/supabase.min.js",
-  "sync-config.js", "sync-config.example.js", "privacy-lock.js", "tests/validate-v13-0-8.mjs"
+  "sync-config.js", "sync-config.example.js", "privacy-lock.js", "tests/validate-v13-0-8.mjs",
+  "scripts/file-inspection-and-fixes.command", "tests/test-file-inspection-installer.mjs"
 ];
 for (const file of requiredFiles) if (!exists(file)) fail(`Missing required file: ${file}`);
 
@@ -69,6 +70,11 @@ const quality = pkg.scripts?.quality || "";
 const qualityTarget = quality.match(/^node\s+(\S+)/)?.[1];
 if (!qualityTarget || !exists(qualityTarget)) fail(`Quality script target is missing: ${quality || "(not configured)"}`);
 if (!String(pkg.engines?.node || "").includes("22")) warn(`Node engine is ${pkg.engines?.node || "not set"}; project validation expects Node 22+`);
+if (pkg.scripts?.["installer:test"] !== "node tests/test-file-inspection-installer.mjs") fail("installer:test script is missing or incorrect");
+if (process.platform !== "win32" && exists("scripts/file-inspection-and-fixes.command")) {
+  const mode = fs.statSync(path.join(root, "scripts/file-inspection-and-fixes.command")).mode;
+  if ((mode & 0o100) === 0) fail("macOS installer is not executable by its owner");
+}
 
 const syncConfig = read("sync-config.js");
 const syncConfigCode = syncConfig.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|\s)\/\/.*$/gm, "$1");

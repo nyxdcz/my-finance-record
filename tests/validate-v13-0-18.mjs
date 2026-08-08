@@ -68,13 +68,16 @@ assert(exists("SIGNED_OUT_PRIVACY_LOCK_VALIDATION_V13_0_18.md"),"V13.0.18 privac
 
 assert(packageJson.scripts?.quality==="node tests/validate-v13-0-18.mjs","quality script mismatch");
 assert(packageJson.scripts?.inspect==="node tests/inspect-project.mjs"&&exists("tests/inspect-project.mjs"),"repository inspection script missing");
-assert(readme.includes("macOS File Inspection and Fixes installer")&&readme.includes("npm run inspect"),"README installer instructions missing");
+assert(readme.includes("macOS File Inspection and Fixes installer")&&readme.includes("bash scripts/file-inspection-and-fixes.command"),"README installer instructions missing");
+assert(exists("scripts/file-inspection-and-fixes.command")&&exists("tests/test-file-inspection-installer.mjs"),"macOS installer or installer regression test missing");
+assert(packageJson.scripts?.["installer:test"]==="node tests/test-file-inspection-installer.mjs","installer test script mismatch");
 assert(exists("SETTINGS_TOPBAR_UI_VALIDATION_V13_0_4.md"),"V13.0.4 UI validation report missing");
 assert(exists("DASHBOARD_CALENDAR_DEDUP_VALIDATION_V13_0_5.md"),"V13.0.5 calendar validation report missing");
 assert(exists("PROJECT_REVISION_CYCLES_VALIDATION_V13_0_6.md"),"V13.0.9 project revision validation report missing");
 assert(exists("FILE_INSPECTION_AND_FIXES_VALIDATION_V13_0_5.md"),"V13.0.5 installer validation report missing");
-assert(readme.includes("My_Finance_Records_V13_0_18_File_Inspection_and_Fixes_Installer.zip")&&readme.includes("Install_V13_0_18.command"),"README V13.0.15 installer filenames are stale");
+assert(!readme.includes("My_Finance_Records_V13_0_18_File_Inspection_and_Fixes_Installer.zip")&&!readme.includes("Install_V13_0_18.command"),"README installer filenames are stale");
 assert(workflow.includes("name: Regression quality")&&!workflow.includes("name: V12 regression quality"),"GitHub Actions quality label is stale");
+assert(workflow.includes("macos-latest")&&workflow.includes("npm run installer:test"),"GitHub Actions does not test the macOS installer");
 assert(exists("FILE_INSPECTION_AND_FIXES_VALIDATION_V13_0_3.md"),"File Inspection and Fixes validation report missing");
 assert(exists("CLOUD_AUTH_RECOVERY_VALIDATION_V13_0_15.md"),"V13.0.15 cloud auth validation report missing");
 assert(exists("FILE_INSPECTION_AND_FIXES_VALIDATION_V13_0_15.md"),"V13.0.15 installer validation report missing");
@@ -422,6 +425,7 @@ for(const token of [
 ]) assert(ledgerSource.includes(token),`V13.0.10 account-spending ledger safeguard missing: ${token}`);
 assert(html.includes('if (expense.quickSpend && expense.paid && expense.accountDeducted) restoreExpensePayment(expense);'),"quick-spend deletion does not restore its account debit");
 assert(html.includes('Move this paid expense back to unpaid before changing its amount.'),"paid ledger amount edit protection missing");
+assert(html.includes('title:"Move paid expense back to unpaid?"')&&html.includes('confirmLabel:"Move to unpaid"')&&html.includes('if (!confirmed) return;'),"paid expense move-to-unpaid confirmation is missing");
 assert(!/[🛒💸]/u.test(ledgerSource),"emoji-style system icon introduced in account spending UI");
 assert(version.name==="Signed-Out Privacy Lock", "V13.0.15 version name mismatch");
 assert(readme.includes("Record spending")&&readme.includes("Paid Expenses"),"README V13.0.10 account spending summary missing");
