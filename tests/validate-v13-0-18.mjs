@@ -265,7 +265,7 @@ for(const token of [
 assert(read("account-ledger.js").includes('window.simplifyAccountLedgerSettings?.(panel, ledgerCard, reconciliationCard)'),"dynamic account history is not moved into progressive disclosure");
 assert(read("reminders-alerts.js").includes('window.simplifyReminderSettingsCard?.(card)'),"dynamic reminder settings are not moved into progressive disclosure");
 assert(html.includes('Save account updates')&&read("account-ledger.js").includes('Save account updates'),"plain-language account update action is incomplete");
-assert(version.cacheVersion.includes("v13018-signed-out-privacy-r1"),"V13.0.15 cache revision mismatch");
+assert(version.cacheVersion.includes("v13018-payment-safeguard-r2"),"V13.0.18 payment safeguard cache revision mismatch");
 
 // V13.0.3 compact modal and SVG icon safeguards preserved.
 for(const token of [
@@ -466,7 +466,7 @@ for(const token of [
 assert(html.includes('Record Spending is intentionally isolated from the account-maintenance form submit path.'),"Parent account form still owns Record Spending submit behavior");
 assert(html.includes('const saved = baseSaveData(message);')&&html.includes('if (saved === false) return false;')&&html.includes('return true;'),"saveData wrapper does not preserve persistence success/failure");
 assert(html.includes('account-spend-status')&&ledgerV1313.includes('accountSpendStatus'),"Inline spending status is missing");
-assert(version.cacheVersion.includes("v13018-signed-out-privacy-r1"),"V13.0.15 cache revision mismatch");
+assert(version.cacheVersion.includes("v13018-payment-safeguard-r2"),"V13.0.18 payment safeguard cache revision mismatch");
 assert(readme.startsWith("# My Finance Records · V13.0.18 PWA")&&readme.includes("Brave PWA Install Flow"),"V13.0.15 README metadata missing");
 assert(changelog.includes("## 13.0.15 · 2026-08-07"),"V13.0.15 changelog missing");
 assert(html.includes('?v=13.0.18')&&worker.includes('?v=13.0.18'),"Version-pinned V13.0.15 assets missing");
@@ -491,7 +491,7 @@ for (const token of [
 assert(html.includes('window.addEventListener("beforeinstallprompt"'),"Native beforeinstallprompt support was removed");
 assert(html.includes('window.addEventListener("appinstalled"'),"appinstalled support was removed");
 assert(version.name==="Signed-Out Privacy Lock","V13.0.15 version name mismatch");
-assert(version.cacheVersion.includes("v13018-signed-out-privacy-r1"),"V13.0.15 cache revision mismatch");
+assert(version.cacheVersion.includes("v13018-payment-safeguard-r2"),"V13.0.18 payment safeguard cache revision mismatch");
 assert(exists("BRAVE_PWA_INSTALL_VALIDATION_V13_0_14.md"),"V13.0.14 Brave validation report missing");
 assert(readme.includes("Install with Brave")&&readme.includes("Save and Share"),"README Brave install instructions missing");
 assert(changelog.includes("## 13.0.15 · 2026-08-07"),"V13.0.15 changelog entry missing");
@@ -513,13 +513,13 @@ assert(readme.includes('?auth=recovery')&&readme.includes('{{ .Token }}'),"READM
 assert(changelog.includes('## 13.0.18 · 2026-08-07'),"V13.0.18 changelog entry missing");
 assert(version.name==='Signed-Out Privacy Lock',"V13.0.18 version name mismatch");
 assert(changelog.includes('## 13.0.15 · 2026-08-07')&&changelog.includes('Password-reset messaging avoids revealing'),"CHANGELOG V13.0.18 auth entry missing");
-assert(version.cacheVersion.includes('v13018-signed-out-privacy-r1'),"V13.0.18 auth cache revision mismatch");
+assert(version.cacheVersion.includes('v13018-payment-safeguard-r2'),"V13.0.18 payment safeguard cache revision mismatch");
 assert(packageJson.scripts?.quality==='node tests/validate-v13-0-18.mjs',"V13.0.18 quality script mismatch");
 
 
 // V13.0.18 iPhone input zoom prevention safeguards.
 assert(version.name==="Signed-Out Privacy Lock","V13.0.18 version name mismatch");
-assert(version.cacheVersion.includes("v13018-signed-out-privacy-r1"),"V13.0.18 cache revision mismatch");
+assert(version.cacheVersion.includes("v13018-payment-safeguard-r2"),"V13.0.18 payment safeguard cache revision mismatch");
 assert(readme.includes("iPhone Input Zoom Prevention")&&readme.includes("minimum **16px**"),"README V13.0.18 input-zoom guidance missing");
 assert(changelog.includes("## 13.0.17 · 2026-08-07")&&changelog.includes("user-scalable=no"),"CHANGELOG V13.0.17 input-zoom/accessibility notes missing");
 for(const token of [
