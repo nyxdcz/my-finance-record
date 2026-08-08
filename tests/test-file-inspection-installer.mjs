@@ -34,13 +34,16 @@ try {
   run("git", ["commit", "-qm", "fixture"]);
 
   fs.rmSync(path.join(fixture, "offline.html"));
+  fs.chmodSync(path.join(fixture, "version.json"), 0o000);
   fs.mkdirSync(path.join(fixture, "node_modules"));
   fs.writeFileSync(path.join(fixture, "node_modules", "stale-file"), "stale\n");
 
   const first = spawnSync("/bin/bash", [installer, "--repo-dir", fixture], { encoding: "utf8" });
   assert.equal(first.status, 0, `Installer repair run failed:\n${first.stdout}\n${first.stderr}`);
   assert.match(first.stdout, /Restored missing tracked file: offline\.html/);
+  assert.match(first.stdout, /Restored read permission: version\.json/);
   assert.ok(fs.existsSync(path.join(fixture, "offline.html")), "Installer did not restore offline.html.");
+  assert.ok(fs.statSync(path.join(fixture, "version.json")).mode & 0o444, "Installer did not restore read permission.");
   assert.ok(!fs.existsSync(path.join(fixture, "node_modules", "stale-file")), "npm ci did not replace stale dependency metadata.");
   assert.equal(run("git", ["status", "--porcelain"]), "", "Installer left tracked changes after repair.");
 
@@ -49,7 +52,7 @@ try {
   assert.match(second.stdout, /no safe file repairs were needed/);
   assert.equal(run("git", ["status", "--porcelain"]), "", "Repeat installation changed the repository.");
 
-  console.log("macOS installer test passed: missing-file repair, dependency reset, verification, and repeat safety.");
+  console.log("macOS installer test passed: missing-file and read-permission repair, dependency reset, verification, and repeat safety.");
 } finally {
   fs.rmSync(tempRoot, { recursive: true, force: true });
 }

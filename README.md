@@ -134,7 +134,7 @@ cd my-finance-record
 bash scripts/file-inspection-and-fixes.command
 ```
 
-It requires macOS, Git, and Node.js 22 or newer. It restores only missing critical files that are tracked in the current Git `HEAD`, rebuilds ignored npm metadata with `npm ci`, then runs `npm run inspect`, `npm run quality`, and `git diff --check`. Modified files are never overwritten; configuration that needs credentials must be corrected manually. The installer does not commit or push.
+It requires macOS, Git, and Node.js 22 or newer. It restores only missing critical files that are tracked in the current Git `HEAD`, restores read permission on tracked files when needed, rebuilds ignored npm metadata with `npm ci`, then runs `npm run inspect`, `npm run quality`, and `git diff --check`. Modified files are never overwritten; configuration that needs credentials must be corrected manually. The installer does not commit or push.
 
 To verify the installer itself on a Mac, run:
 
@@ -142,7 +142,7 @@ To verify the installer itself on a Mac, run:
 npm run installer:test
 ```
 
-That test creates a temporary Git fixture, removes a required file and adds stale npm metadata, confirms the installer repairs both safely, then runs the installer a second time to confirm it leaves the tracked working tree unchanged.
+That test creates a temporary Git fixture, removes a required file, removes read permission from a tracked file, and adds stale npm metadata. It confirms the installer repairs all three safely, then runs the installer a second time to confirm it leaves the tracked working tree unchanged.
 
 
 ## V13.0.2 · Simplified Settings UI

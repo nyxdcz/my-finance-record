@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # macOS installer for a checked-out My Finance Records repository.
-# It only restores missing tracked files and rebuilds ignored npm metadata.
+# It only restores missing tracked files, repairs read permission on tracked
+# files, and rebuilds ignored npm metadata.
 
 set -euo pipefail
 
@@ -63,9 +64,15 @@ if [[ ! -e "$repo_dir" ]]; then
 fi
 
 [[ -d "$repo_dir" ]] || fail "Repository path is not a directory: $repo_dir"
-cd "$repo_dir"
+cd -P "$repo_dir"
 git rev-parse --is-inside-work-tree >/dev/null 2>&1 || fail "Repository path is not a Git working tree: $repo_dir"
 [[ -f package.json && -f package-lock.json ]] || fail "package.json and package-lock.json are required in $repo_dir"
+
+# A repository with a different top-level directory could make relative paths
+# below point outside the intended checkout. Resolve the user input once and
+# require that Git agrees it is the working-tree root.
+repo_root="$(git rev-parse --show-toplevel)"
+[[ "$repo_root" == "$(pwd -P)" ]] || fail "Repository path must be the Git working-tree root: $repo_dir"
 
 # Restoring a deleted tracked file is safe: its contents exactly match HEAD and
 # no existing user content is replaced. Modified files are deliberately left alone.
@@ -89,6 +96,22 @@ for file in "${REQUIRED_TRACKED_FILES[@]}"; do
   fi
 done
 
+# Removing public read permission is safe to repair for this public static
+# project: it does not alter tracked contents or Git's executable-bit metadata.
+# Do this before Node reads project files so the inspection can report
+# meaningful configuration errors.
+permission_fixes=0
+while IFS= read -r -d '' file; do
+  [[ -e "$file" ]] || continue
+  mode="$(stat -f '%Lp' "$file")"
+  if (( (8#$mode & 0444) != 0444 )); then
+    # BSD chmod on macOS does not support GNU's `--` option separator.
+    chmod a+r "./$file"
+    info "Restored read permission: $file"
+    ((permission_fixes += 1))
+  fi
+done < <(git ls-files -z)
+
 if [[ "$0" == "$SCRIPT_DIR"/* && -f "$0" && ! -x "$0" ]]; then
   chmod u+x "$0"
   info "Restored execute permission on the installer."
@@ -106,8 +129,8 @@ npm run quality
 info "Checking whitespace errors in tracked changes"
 git diff --check
 
-if ((fixed_files)); then
-  info "SUCCESS: repaired $fixed_files missing tracked file(s) and verified the project."
+if ((fixed_files || permission_fixes)); then
+  info "SUCCESS: repaired $fixed_files missing tracked file(s) and $permission_fixes permission issue(s); verified the project."
 else
   info "SUCCESS: no safe file repairs were needed; dependencies and project checks are verified."
 fi
