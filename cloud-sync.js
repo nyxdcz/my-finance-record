@@ -1,6 +1,6 @@
 "use strict";
 
-/* My Finance Records V13.0.18 · Encrypted profile-scoped Cloud Sync 3.0.
+/* My Finance Records V13.0.19 · Encrypted profile-scoped Cloud Sync 3.0.
    Local storage remains the immediate working copy. Cloud Schema V3 exchanges only
    changed encrypted records, commits related changes atomically, and preserves an immutable audit trail. */
 (function financeCloudSyncV3Bootstrap() {

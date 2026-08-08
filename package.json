@@ -1,14 +1,14 @@
 {
   "name": "my-finance-record",
-  "version": "13.0.18",
+  "version": "13.0.19",
   "private": true,
   "description": "Local-first profile-based personal and household finance PWA with encrypted Supabase synchronization.",
   "type": "module",
   "scripts": {
     "inspect": "node tests/inspect-project.mjs",
     "installer:test": "node tests/test-file-inspection-installer.mjs",
-    "test": "node tests/validate-v13-0-18.mjs",
-    "quality": "node tests/validate-v13-0-18.mjs"
+    "test": "node tests/validate-v13-0-19.mjs",
+    "quality": "node tests/validate-v13-0-19.mjs"
   },
   "engines": {
     "node": ">=22"

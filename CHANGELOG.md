@@ -1,3 +1,16 @@
+## 13.0.19 · 2026-08-08
+
+### Added
+- Added a **Forever** Auto-lock option in Protect this device / Device app lock.
+- Added V13.0.19 to the in-app Version history.
+
+### Changed
+- Forever is stored explicitly and does not schedule inactivity locking; the app still locks when manually locked, disabled, or closed.
+- Existing 5-, 15-, 30-, and 60-minute auto-lock selections remain available and retain their timing behavior.
+
+### Preserved
+- Finance Schema 12, Cloud Schema V3, encryption, signed-out privacy lock, records, account ledger, and existing device-lock passphrases remain unchanged.
+
 ## 13.0.18 · 2026-08-07
 
 ### Added

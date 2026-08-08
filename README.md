@@ -1,4 +1,10 @@
-# My Finance Records · V13.0.18 PWA
+# My Finance Records · V13.0.19 PWA
+
+## V13.0.19 · Forever Device Auto-Lock
+
+- Added **Forever** under **Settings → Profile & Security → Device app lock → Auto-lock**.
+- Forever keeps the open app unlocked until you choose **Lock now**, disable the device lock, or close the app; the existing 5-, 15-, 30-, and 60-minute choices are unchanged.
+- Added this release to the in-app **Version history**.
 
 ## V13.0.18 · Signed-Out Privacy Lock
 

@@ -583,17 +583,28 @@
     return cloudRpc("finance_v3_remove_member", { p_profile_id:cloudProfileId(), p_member_user_id:memberUserId });
   }
 
+  function normalizeAutoLockMinutes(value) {
+    if (value === "forever" || value === null) return null;
+    const minutes = Number(value);
+    return Number.isFinite(minutes) ? Math.max(1, Math.min(240, minutes)) : 15;
+  }
+
+  function autoLockIsForever(config) {
+    return config?.autoLockMinutes === null || config?.autoLockMinutes === "forever";
+  }
+
   async function setupDeviceLock(passphrase, minutes = 15) {
     if (String(passphrase || "").length < 6) throw new Error("Use at least 6 characters for the device lock.");
     const salt = randomBytes(16);
     const key = await deriveAesKey(passphrase, salt, 200000, true);
     const raw = new Uint8Array(await crypto.subtle.exportKey("raw", key));
     const verifier = await sha256Hex(raw);
-    localStorage.setItem(APP_LOCK_KEY, JSON.stringify({ enabled:true, salt:bytesToBase64(salt), iterations:200000, verifier, autoLockMinutes:Math.max(1,Math.min(240,Number(minutes||15))) }));
+    const autoLockMinutes = normalizeAutoLockMinutes(minutes);
+    localStorage.setItem(APP_LOCK_KEY, JSON.stringify({ enabled:true, salt:bytesToBase64(salt), iterations:200000, verifier, autoLockMinutes }));
     sessionStorage.setItem(APP_LOCK_SESSION_KEY, "unlocked");
     scheduleAutoLock();
     renderPanel();
-    appendLocalAudit("Device app lock enabled", { autoLockMinutes:Number(minutes || 15) });
+    appendLocalAudit("Device app lock enabled", { autoLockMinutes });
   }
 
   function deviceLockConfig() {
@@ -637,7 +648,8 @@
     clearTimeout(inactivityTimer);
     const config = deviceLockConfig();
     if (!config?.enabled || sessionStorage.getItem(APP_LOCK_SESSION_KEY) !== "unlocked") return;
-    const delay = Math.max(60000, Number(config.autoLockMinutes || 15) * 60000 - (Date.now() - lastActivityAt));
+    if (autoLockIsForever(config)) return;
+    const delay = Math.max(60000, normalizeAutoLockMinutes(config.autoLockMinutes) * 60000 - (Date.now() - lastActivityAt));
     inactivityTimer = setTimeout(lockDevice, delay);
   }
 
@@ -836,11 +848,11 @@
 
       <div class="profile-two-column">
         <article class="card">
-          <div class="card-header"><div><h3>Device app lock</h3><p>Require a local passphrase after inactivity</p></div><span class="v13-chip ${appLock?.enabled ? "success" : "info"}">${appLock?.enabled ? "Enabled" : "Optional"}</span></div>
+          <div class="card-header"><div><h3>Device app lock</h3><p>Protect access with a local passphrase</p></div><span class="v13-chip ${appLock?.enabled ? "success" : "info"}">${appLock?.enabled ? "Enabled" : "Optional"}</span></div>
           <div class="field"><label for="deviceLockPassphrase">Device lock passphrase</label><input class="input" id="deviceLockPassphrase" type="password" autocomplete="new-password" minlength="6"></div>
-          <div class="field"><label for="deviceLockMinutes">Auto-lock</label><select class="select" id="deviceLockMinutes"><option value="5">5 minutes</option><option value="15" selected>15 minutes</option><option value="30">30 minutes</option><option value="60">1 hour</option></select></div>
+          <div class="field"><label for="deviceLockMinutes">Auto-lock</label><select class="select" id="deviceLockMinutes"><option value="5" ${Number(appLock?.autoLockMinutes) === 5 ? "selected" : ""}>5 minutes</option><option value="15" ${normalizeAutoLockMinutes(appLock?.autoLockMinutes) === 15 && !autoLockIsForever(appLock) ? "selected" : ""}>15 minutes</option><option value="30" ${Number(appLock?.autoLockMinutes) === 30 ? "selected" : ""}>30 minutes</option><option value="60" ${Number(appLock?.autoLockMinutes) === 60 ? "selected" : ""}>1 hour</option><option value="forever" ${autoLockIsForever(appLock) ? "selected" : ""}>Forever</option></select></div>
           <div class="profile-actions"><button class="button button-primary" id="enableDeviceLockButton" type="button">${appLock?.enabled ? "Update device lock" : "Enable device lock"}</button>${appLock?.enabled ? `<button class="button button-secondary" id="lockDeviceNowButton" type="button">Lock now</button><button class="button button-danger" id="disableDeviceLockButton" type="button">Disable</button>` : ""}</div>
-          <p class="v13-help">This screen lock does not encrypt browser local storage. Use encrypted backups and encrypted Cloud Schema V3 for protected copies.</p>
+          <p class="v13-help">Forever keeps the app unlocked until you lock it, disable the lock, or close the app. This screen lock does not encrypt browser local storage. Use encrypted backups and encrypted Cloud Schema V3 for protected copies.</p>
         </article>
 
         <article class="card">
@@ -1036,7 +1048,7 @@
     document.addEventListener("visibilitychange", () => {
       if (document.hidden) {
         const config = deviceLockConfig();
-        if (config?.enabled && Number(config.autoLockMinutes || 15) <= 5) lockDevice();
+        if (config?.enabled && !autoLockIsForever(config) && normalizeAutoLockMinutes(config.autoLockMinutes) <= 5) lockDevice();
       } else scheduleAutoLock();
     });
   }
@@ -1075,7 +1087,7 @@
   window.FinanceProfileArchitectureInternals = {
     bytesToBase64, base64ToBytes, bytesToBase64Url, base64UrlToBytes, sha256Hex,
     deriveAesKey, encryptJsonWithKey, decryptJsonWithKey, encryptedBackup, decryptBackup, verifyCloudProfilePassphrase,
-    normalizeProfile, loadMeta, roleLabel
+    normalizeProfile, loadMeta, roleLabel, normalizeAutoLockMinutes, autoLockIsForever
   };
 
   if (typeof document !== "undefined" && !window.__FINANCE_PROFILE_TEST__) setTimeout(() => init().catch(error => console.error("Profile architecture initialization failed", error)), 0);

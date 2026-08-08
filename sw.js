@@ -1,6 +1,6 @@
 "use strict";
-const APP_VERSION = "13.0.18";
-const CACHE_VERSION = "finance-v13-20260808-v13018-revision-deadline-r3";
+const APP_VERSION = "13.0.19";
+const CACHE_VERSION = "finance-v13-20260808-v13019-forever-auto-lock-r1";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const DB_NAME = "simple-finance-project-records-v12-db";
@@ -14,20 +14,20 @@ const APP_SHELL = [
   asset("./offline.html"),
   asset("./manifest.webmanifest"),
   asset("./version.json"),
-  asset("./privacy-lock.js?v=13.0.18"),
-  asset("./security-profiles.js?v=13.0.18"),
-  asset("./security-profiles.css?v=13.0.18"),
-  asset("./cloud-sync.js?v=13.0.18"),
-  asset("./account-ledger.js?v=13.0.18"),
-  asset("./account-ledger.css?v=13.0.18"),
-  asset("./budget-planning.js?v=13.0.18"),
-  asset("./budget-planning.css?v=13.0.18"),
-  asset("./reports-insights.js?v=13.0.18"),
-  asset("./reports-insights.css?v=13.0.18"),
-  asset("./productivity-tools.js?v=13.0.18"),
-  asset("./productivity-tools.css?v=13.0.18"),
-  asset("./reminders-alerts.js?v=13.0.18"),
-  asset("./reminders-alerts.css?v=13.0.18"),
+  asset("./privacy-lock.js?v=13.0.19"),
+  asset("./security-profiles.js?v=13.0.19"),
+  asset("./security-profiles.css?v=13.0.19"),
+  asset("./cloud-sync.js?v=13.0.19"),
+  asset("./account-ledger.js?v=13.0.19"),
+  asset("./account-ledger.css?v=13.0.19"),
+  asset("./budget-planning.js?v=13.0.19"),
+  asset("./budget-planning.css?v=13.0.19"),
+  asset("./reports-insights.js?v=13.0.19"),
+  asset("./reports-insights.css?v=13.0.19"),
+  asset("./productivity-tools.js?v=13.0.19"),
+  asset("./productivity-tools.css?v=13.0.19"),
+  asset("./reminders-alerts.js?v=13.0.19"),
+  asset("./reminders-alerts.css?v=13.0.19"),
   asset("./sync-config.js"),
   asset("./vendor/supabase.min.js"),
   asset("./icons/icon-192.png"),
