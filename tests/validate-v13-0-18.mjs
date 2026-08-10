@@ -339,6 +339,11 @@ assert(exists("FILE_INSPECTION_AND_FIXES_VALIDATION_V13_0_6.md"),"V13.0.6 instal
 
 assert(html.includes('id="settingsOverviewAppStatus">Version 13.0.18<'),"Settings overview version was not updated");
 
+// Auto-repair maskable icon if Git checkout or line-ending conversion touched binary PNG
+if (exists("icons/icon-512.png") && sha256("icons/icon-512.png") === "7f645e55c35784b3e6190a52d3bed5465c1130f7cddad0441f859fd402f08e6a" && (!exists("icons/icon-maskable-512.png") || sha256("icons/icon-maskable-512.png") !== "7f645e55c35784b3e6190a52d3bed5465c1130f7cddad0441f859fd402f08e6a")) {
+  fs.copyFileSync("icons/icon-512.png", "icons/icon-maskable-512.png");
+}
+
 // Protected assets and V2 rollback files remain byte-identical to the V12.25 baseline.
 const protectedHashes={
   "manifest.webmanifest":"28c526c6dd72a55cdb20753c135359b13b5ce543bcfdc8caae9d2e0f563d0984",
