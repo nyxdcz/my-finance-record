@@ -2997,6 +2997,7 @@
     .calendar-marker.expense, .calendar-dot.expense { background:var(--red); }
     .calendar-marker.project, .calendar-dot.project { background:var(--primary); }
     .calendar-marker.payment, .calendar-dot.payment { background:#70839a; }
+    .calendar-marker.schedule, .calendar-dot.schedule { background:#2563eb; }
     .dashboard-calendar-events { min-height:224px; max-height:286px; overflow:hidden; border:1px solid var(--line); border-radius:7px; padding:8px; background:var(--surface-soft); }
     .calendar-selected-heading { display:flex; justify-content:space-between; align-items:center; gap:7px; margin-bottom:5px; }
     .calendar-selected-heading > strong { font-size:.84rem; }
@@ -3008,6 +3009,7 @@
     .calendar-event.income .event-bar { background:var(--green); }
     .calendar-event.expense .event-bar { background:var(--red); }
     .calendar-event.payment .event-bar { background:#70839a; }
+    .calendar-event.schedule .event-bar { background:#2563eb; }
     .calendar-event-copy { min-width:0; }
     .calendar-event strong, .calendar-event small { display:block; }
     .calendar-event strong { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:.75rem; }
@@ -9682,9 +9684,22 @@
         const paymentSource = payment.id || `${project.id}|${payment.date}|${payment.amount}|${index}`;
         events.push({ type:"payment", title:project.name, status:"Payment received", amount:Number(payment.amount || 0), page:"payments", id:payment.id || paymentSource, date, state:"received", sourceKey:`payment|${paymentSource}|${date}|received` });
       }));
+      const scheduleItems = typeof window.getProjectCalendarEvents === "function" ? window.getProjectCalendarEvents() : (()=>{
+        try {
+          const raw = localStorage.getItem("simple-finance-project-calendar-v13.0.20");
+          const parsed = JSON.parse(raw || "[]");
+          return Array.isArray(parsed) ? parsed.filter(i => i && typeof i === "object") : [];
+        } catch(e) { return []; }
+      })();
+      scheduleItems.filter(item => item.date === date).forEach(item => {
+        const typeText = item.type ? (item.type.charAt(0).toUpperCase() + item.type.slice(1)).replace("-", " ") : "Schedule";
+        const timeText = item.startTime ? ` · ${item.startTime}${item.endTime ? `–${item.endTime}` : ""}` : "";
+        events.push({ type:"schedule", title:item.title, status:`${typeText}${timeText}${item.location ? ` · ${item.location}` : ""}`, amount:null, page:"projects", id:item.id, date, state:"scheduled", sourceKey:`schedule|${item.id}|${date}` });
+      });
       return deduplicateDashboardCalendarEvents(events);
     }
     function renderDashboardCalendar() {
+      window.renderDashboardCalendar = renderDashboardCalendar;
       const grid = document.getElementById("dashboardCalendarGrid");
       if (!grid) return;
       if (!/^\d{4}-\d{2}$/.test(dashboardCalendarMonth)) dashboardCalendarMonth = selectedMonth();

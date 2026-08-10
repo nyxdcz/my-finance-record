@@ -46,6 +46,8 @@
     }
   }
 
+  window.getProjectCalendarEvents = () => (events && events.length) ? events : safeRead();
+
   function safeWrite(next) {
     try {
       localStorage.setItem(EVENTS_KEY, JSON.stringify(next));
@@ -248,6 +250,7 @@
     viewDate = new Date(`${date}T00:00:00`);
     closeDialog();
     render();
+    if (typeof window.renderDashboardCalendar === "function") window.renderDashboardCalendar();
     showCalendarMessage(existing ? "Calendar event updated." : "Calendar event scheduled.", "success");
   }
 
@@ -259,6 +262,7 @@
     if (!safeWrite(next)) return;
     events = next;
     render();
+    if (typeof window.renderDashboardCalendar === "function") window.renderDashboardCalendar();
     showCalendarMessage("Calendar event deleted.", "success");
   }
 
@@ -326,13 +330,12 @@
     card.innerHTML = `
       <div class="card-header pc-header">
         <div>
-          <span class="pc-eyebrow">V13.0.20</span>
           <h3>Projects Calendar</h3>
           <p>Schedule meetings, presentations, site visits, deadlines, and other project events.</p>
         </div>
         <div class="pc-header-actions">
           <span class="pc-count" data-pc-count>0 events</span>
-          <button type="button" class="button button-primary" data-pc-add>+ Schedule event</button>
+          <button type="button" class="button button-primary button-small" data-pc-add>+ Schedule event</button>
         </div>
       </div>
       <div class="pc-toolbar">
