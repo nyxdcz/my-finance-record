@@ -28,6 +28,8 @@ const APP_SHELL = [
   asset("./productivity-tools.css?v=13.0.18"),
   asset("./reminders-alerts.js?v=13.0.18"),
   asset("./reminders-alerts.css?v=13.0.18"),
+  asset("./projects-calendar-v13.0.20.js"),
+  asset("./projects-calendar-v13.0.20.css"),
   asset("./sync-config.js"),
   asset("./vendor/supabase.min.js"),
   asset("./icons/icon-192.png"),
