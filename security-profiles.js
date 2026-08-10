@@ -843,13 +843,13 @@
           <div><span>Encryption</span><strong>${profile.encryption.enabled ? (unlocked ? "Unlocked" : "Locked") : "Not configured"}</strong></div>
         </div>
         <div class="profile-switch-row" style="margin-top:12px; display:flex; gap:8px; align-items:flex-end;">
-          <div class="field" style="flex:1; margin:0;"><label for="renameProfileInput" style="font-size:0.8em; font-weight:600; color:var(--v12-text-main); margin-bottom:4px; display:block;">Rename active profile</label><input class="input" id="renameProfileInput" value="${escape(profile.name)}" maxlength="80"></div>
-          <button class="button button-secondary" id="renameProfileButton" type="button" style="display:inline-flex; align-items:center; gap:6px;">
+          <div class="field" style="flex:1; margin:0;"><label for="renameProfileInput" style="margin-bottom:4px; display:block; color:var(--text, inherit);">Rename active profile</label><input class="input" id="renameProfileInput" value="${escape(profile.name)}" maxlength="80"></div>
+          <button class="button button-secondary button-small" id="renameProfileButton" type="button" style="display:inline-flex; align-items:center; gap:6px; padding:6px 12px; font-size:0.8rem; height:auto; min-height:36px;">
             <span class="toolbar-icon" aria-hidden="true" style="display:inline-flex;"><svg viewBox="0 0 24 24" focusable="false" style="width:15px; height:15px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round;"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></span>
             <span>Rename profile</span>
           </button>
         </div>
-        <div class="profile-switch-row" style="margin-top:10px;"><select class="select" id="profileSwitcher">${profiles}</select><button class="button button-secondary" id="profileSwitchButton" type="button">Switch profile</button></div>
+        <div class="profile-switch-row" style="margin-top:10px;"><select class="select" id="profileSwitcher">${profiles}</select><button class="button button-secondary button-small" id="profileSwitchButton" type="button" style="padding:6px 12px; font-size:0.8rem; height:auto; min-height:36px;">Switch profile</button></div>
         ${profile.role === "viewer" ? `<div class="v13-warning">This is a read-only Viewer profile. Local edits and cloud writes are blocked.</div>` : ""}
       </article>
 
@@ -863,7 +863,7 @@
 
         <article class="card profile-encryption-card">
           <div class="card-header"><div><h3>Profile encryption</h3><p>AES-256-GCM cloud records with a passphrase-derived key</p></div><span class="v13-chip ${unlocked ? "success" : "warning"}">${unlocked ? "Unlocked" : "Locked"}</span></div>
-          <div id="profileEncryptionStatusBanner" class="v13-encryption-status" style="background:${isSavedOnDevice ? 'rgba(16,185,129,0.15)' : isSavedInSession ? 'rgba(59,130,246,0.15)' : unlocked ? 'rgba(245,158,11,0.15)' : profile.encryption?.enabled ? 'rgba(239,68,68,0.15)' : 'rgba(100,116,139,0.15)'}; border:1px solid ${isSavedOnDevice ? 'rgba(16,185,129,0.4)' : isSavedInSession ? 'rgba(59,130,246,0.4)' : unlocked ? 'rgba(245,158,11,0.4)' : profile.encryption?.enabled ? 'rgba(239,68,68,0.4)' : 'rgba(100,116,139,0.4)'}; color:var(--v12-text-main, inherit); font-size:0.88em; padding:10px 14px; border-radius:8px; margin-bottom:14px; display:flex; align-items:center; gap:8px;">
+          <div id="profileEncryptionStatusBanner" class="v13-encryption-status" style="background:${isSavedOnDevice ? 'rgba(16,185,129,0.15)' : isSavedInSession ? 'rgba(59,130,246,0.15)' : unlocked ? 'rgba(245,158,11,0.15)' : profile.encryption?.enabled ? 'rgba(239,68,68,0.15)' : 'rgba(100,116,139,0.15)'}; border:1px solid ${isSavedOnDevice ? 'rgba(16,185,129,0.4)' : isSavedInSession ? 'rgba(59,130,246,0.4)' : unlocked ? 'rgba(245,158,11,0.4)' : profile.encryption?.enabled ? 'rgba(239,68,68,0.4)' : 'rgba(100,116,139,0.4)'}; color:var(--text, inherit); font-size:0.88em; padding:10px 14px; border-radius:8px; margin-bottom:14px; display:flex; align-items:center; gap:8px;">
             ${isSavedOnDevice
               ? `<strong>✓ Saved on device.</strong> Auto-unlocks without entering password on this device.`
               : isSavedInSession
@@ -876,19 +876,19 @@
           </div>
           <div class="field"><label for="profileEncryptionPassphrase">Encryption passphrase</label><input class="input" id="profileEncryptionPassphrase" type="password" autocomplete="new-password" minlength="10" placeholder="At least 10 characters"></div>
           <div class="field" style="margin-top:12px;">
-            <label style="font-weight:600; font-size:0.88em; margin-bottom:6px; display:block; color:var(--v12-text-main, #0f172a);">Passphrase Memory Option</label>
-            <div class="remember-mode-buttons" id="rememberModeButtonGroup" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:8px;">
-              <button type="button" class="remember-option-btn ${defaultMode === 'device' ? 'active' : ''}" data-mode="device" style="padding:10px 12px; border-radius:8px; border:1px solid ${defaultMode === 'device' ? 'var(--v12-primary, #2563eb)' : 'var(--v12-border, #cbd5e1)'}; background:${defaultMode === 'device' ? 'var(--v12-primary, #2563eb)' : 'transparent'}; color:${defaultMode === 'device' ? '#ffffff' : 'inherit'}; font-size:0.85em; text-align:left; cursor:pointer; display:flex; flex-direction:column; gap:3px; transition:all 0.15s ease;">
-                <strong style="font-size:0.95em;">Permanent Device</strong>
-                <span style="font-size:0.78em; opacity:0.85;">Auto-unlocks on this device</span>
+            <label>Passphrase memory</label>
+            <div class="remember-mode-buttons" id="rememberModeButtonGroup" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:6px;">
+              <button type="button" class="remember-option-btn ${defaultMode === 'device' ? 'active' : ''}" data-mode="device" style="padding:8px 10px; border-radius:6px; border:1px solid ${defaultMode === 'device' ? 'var(--primary)' : 'var(--line)'}; background:${defaultMode === 'device' ? 'var(--primary)' : 'var(--surface-soft)'}; color:${defaultMode === 'device' ? '#fff' : 'var(--text)'}; font-size:.75rem; text-align:left; cursor:pointer; display:flex; flex-direction:column; gap:2px; transition:all 0.15s ease;">
+                <strong style="font-weight:700;">Permanent device</strong>
+                <span style="font-size:.65rem; opacity:0.8;">Auto-unlocks on this device</span>
               </button>
-              <button type="button" class="remember-option-btn ${defaultMode === 'session' ? 'active' : ''}" data-mode="session" style="padding:10px 12px; border-radius:8px; border:1px solid ${defaultMode === 'session' ? 'var(--v12-primary, #2563eb)' : 'var(--v12-border, #cbd5e1)'}; background:${defaultMode === 'session' ? 'var(--v12-primary, #2563eb)' : 'transparent'}; color:${defaultMode === 'session' ? '#ffffff' : 'inherit'}; font-size:0.85em; text-align:left; cursor:pointer; display:flex; flex-direction:column; gap:3px; transition:all 0.15s ease;">
-                <strong style="font-size:0.95em;">Tab Session</strong>
-                <span style="font-size:0.78em; opacity:0.85;">Until browser tab closes</span>
+              <button type="button" class="remember-option-btn ${defaultMode === 'session' ? 'active' : ''}" data-mode="session" style="padding:8px 10px; border-radius:6px; border:1px solid ${defaultMode === 'session' ? 'var(--primary)' : 'var(--line)'}; background:${defaultMode === 'session' ? 'var(--primary)' : 'var(--surface-soft)'}; color:${defaultMode === 'session' ? '#fff' : 'var(--text)'}; font-size:.75rem; text-align:left; cursor:pointer; display:flex; flex-direction:column; gap:2px; transition:all 0.15s ease;">
+                <strong style="font-weight:700;">Tab session</strong>
+                <span style="font-size:.65rem; opacity:0.8;">Until browser tab closes</span>
               </button>
-              <button type="button" class="remember-option-btn ${defaultMode === 'none' ? 'active' : ''}" data-mode="none" style="padding:10px 12px; border-radius:8px; border:1px solid ${defaultMode === 'none' ? 'var(--v12-primary, #2563eb)' : 'var(--v12-border, #cbd5e1)'}; background:${defaultMode === 'none' ? 'var(--v12-primary, #2563eb)' : 'transparent'}; color:${defaultMode === 'none' ? '#ffffff' : 'inherit'}; font-size:0.85em; text-align:left; cursor:pointer; display:flex; flex-direction:column; gap:3px; transition:all 0.15s ease;">
-                <strong style="font-size:0.95em;">One-Time Password</strong>
-                <span style="font-size:0.78em; opacity:0.85;">Ask for password every time</span>
+              <button type="button" class="remember-option-btn ${defaultMode === 'none' ? 'active' : ''}" data-mode="none" style="padding:8px 10px; border-radius:6px; border:1px solid ${defaultMode === 'none' ? 'var(--primary)' : 'var(--line)'}; background:${defaultMode === 'none' ? 'var(--primary)' : 'var(--surface-soft)'}; color:${defaultMode === 'none' ? '#fff' : 'var(--text)'}; font-size:.75rem; text-align:left; cursor:pointer; display:flex; flex-direction:column; gap:2px; transition:all 0.15s ease;">
+                <strong style="font-weight:700;">One-time password</strong>
+                <span style="font-size:.65rem; opacity:0.8;">Ask for password every time</span>
               </button>
             </div>
             <input type="hidden" id="rememberProfileKeyMode" value="${defaultMode}">
@@ -967,9 +967,9 @@
         if (hiddenInput) hiddenInput.value = mode;
         document.querySelectorAll("#rememberModeButtonGroup .remember-option-btn").forEach(b => {
           const active = b.dataset.mode === mode;
-          b.style.borderColor = active ? "var(--v12-primary, #2563eb)" : "var(--v12-border, #cbd5e1)";
-          b.style.background = active ? "var(--v12-primary, #2563eb)" : "transparent";
-          b.style.color = active ? "#ffffff" : "inherit";
+          b.style.borderColor = active ? "var(--primary)" : "var(--line)";
+          b.style.background = active ? "var(--primary)" : "var(--surface-soft)";
+          b.style.color = active ? "#fff" : "var(--text)";
           b.classList.toggle("active", active);
         });
       });
@@ -1026,7 +1026,7 @@
       const result = await createInvite(get("profileInviteRole").value, get("profileInviteHours").value);
       get("profileInviteResult").innerHTML = `
         <div style="padding:12px; background:var(--v12-surface-subtle, rgba(0,0,0,0.03)); border:1px solid var(--v12-border, rgba(0,0,0,0.1)); border-radius:8px; margin-top:8px;">
-          <div style="font-weight:600; color:var(--v12-text-main); margin-bottom:4px;">Invitation code generated (copied to clipboard)</div>
+          <div style="font-weight:600; color:var(--text); margin-bottom:4px;">Invitation code generated (copied to clipboard)</div>
           <code style="display:inline-block; font-size:1.05em; padding:4px 8px; background:var(--v12-bg, #fff); border:1px dashed var(--v12-border); border-radius:4px; letter-spacing:0.5px; word-break:break-all;">${escape(result.code)}</code>
           <p style="margin:8px 0 0 0; font-size:0.85em; opacity:0.9; line-height:1.4;">
             <strong>To complete household access:</strong> Give the invited member this <strong>Invitation code</strong> along with your profile's <strong>Encryption passphrase</strong> (the passphrase you set under Profile encryption when creating this profile). They will enter both under <em>Join a shared profile</em>.
