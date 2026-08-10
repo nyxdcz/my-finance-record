@@ -338,6 +338,7 @@ assert(exists("PROJECT_REVISION_CYCLES_VALIDATION_V13_0_6.md"),"V13.0.9 project 
 assert(exists("FILE_INSPECTION_AND_FIXES_VALIDATION_V13_0_6.md"),"V13.0.6 installer validation report missing");
 
 assert(html.includes('id="settingsOverviewAppStatus">Version 13.0.18<'),"Settings overview version was not updated");
+assert(profiles.includes('function renameProfile') && profiles.includes('id="renameProfileInput"') && profiles.includes('id="renameProfileButton"'), "Profile rename UI and function missing from security-profiles.js");
 
 // Auto-repair maskable icon if Git checkout or line-ending conversion touched binary PNG
 if (exists("icons/icon-512.png") && sha256("icons/icon-512.png") === "7f645e55c35784b3e6190a52d3bed5465c1130f7cddad0441f859fd402f08e6a" && (!exists("icons/icon-maskable-512.png") || sha256("icons/icon-maskable-512.png") !== "7f645e55c35784b3e6190a52d3bed5465c1130f7cddad0441f859fd402f08e6a")) {

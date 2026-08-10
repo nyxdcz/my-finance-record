@@ -1,6 +1,6 @@
 "use strict";
 
-/* My Finance Records V13.0.18 · Profiles, encryption, device lock, MFA,
+/* My Finance Records V13.0.18 · Profiles, encryption, active profile rename, device lock, MFA,
    passkeys, household roles, migration assistance, and cloud restore points. */
 (function financeProfileArchitectureBootstrap() {
   const PROFILE_META_KEY = "simple-finance-profiles-v1";
