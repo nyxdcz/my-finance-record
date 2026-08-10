@@ -993,7 +993,8 @@
       if (activeProfile().encryption.enabled) await unlockProfile(passphrase, mode);
       else await configureEncryption(passphrase, mode);
       get("profileEncryptionPassphrase").value = "";
-      toast("Profile encryption is ready", "success");
+      toast("Profile encryption unlocked & saved", "success");
+      renderPanel();
     }));
     get("lockProfileButton")?.addEventListener("click", lockProfile);
     get("createCloudProfileButton")?.addEventListener("click", () => run(async () => {
