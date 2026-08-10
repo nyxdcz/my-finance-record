@@ -10,6 +10,7 @@
   const APP_LOCK_KEY = "simple-finance-device-lock-v1";
   const APP_LOCK_SESSION_KEY = "simple-finance-device-lock-session-v1";
   const PROFILE_KEY_SESSION_PREFIX = "simple-finance-profile-key-session-v1:";
+  const PROFILE_KEY_LOCAL_PREFIX = "simple-finance-profile-key-local-v1:";
   const KDF_ITERATIONS = 310000;
   const MAX_LOCAL_AUDIT = 500;
   const APP_VERSION_CODE = 130000;
@@ -275,7 +276,7 @@
     return target;
   }
 
-  async function configureEncryption(passphrase) {
+  async function configureEncryption(passphrase, rememberOption = "device") {
     if (String(passphrase || "").length < 10) throw new Error("Use at least 10 characters for the profile encryption passphrase.");
     const profile = activeProfile();
     const salt = randomBytes(16);
@@ -283,23 +284,36 @@
     const check = await encryptJsonWithKey({ marker:"my-finance-profile-key", profileId:profile.id }, key, `profile-check|v13`);
     profile.encryption = { enabled:true, salt:bytesToBase64(salt), iterations:KDF_ITERATIONS, check };
     profile.updatedAt = new Date().toISOString();
-    memoryKeys.set(profile.id, key);
     saveMeta();
-    renderPanel();
+    await unlockProfile(passphrase, rememberOption);
     appendLocalAudit("Profile encryption configured", { algorithm:"AES-256-GCM", kdf:"PBKDF2-SHA-256", iterations:KDF_ITERATIONS });
     return profile.encryption;
   }
 
-  async function unlockProfile(passphrase, rememberSession = false) {
+  async function unlockProfile(passphrase, rememberOption = "device") {
     const profile = activeProfile();
     if (!profile.encryption?.enabled) throw new Error("Configure profile encryption first.");
     const key = await deriveAesKey(passphrase, profile.encryption.salt, profile.encryption.iterations);
     const check = await decryptJsonWithKey(profile.encryption.check, key, `profile-check|v13`);
     if (check?.marker !== "my-finance-profile-key") throw new Error("Incorrect profile encryption passphrase.");
     memoryKeys.set(profile.id, key);
-    if (rememberSession) {
+
+    const isDevice = rememberOption === "device" || rememberOption === "local";
+    const isSession = rememberOption === "session" || rememberOption === true;
+
+    if (isDevice) {
       const raw = await crypto.subtle.exportKey("raw", await deriveAesKey(passphrase, profile.encryption.salt, profile.encryption.iterations, true));
-      sessionStorage.setItem(`${PROFILE_KEY_SESSION_PREFIX}${profile.id}`, bytesToBase64(new Uint8Array(raw)));
+      const b64 = bytesToBase64(new Uint8Array(raw));
+      localStorage.setItem(`${PROFILE_KEY_LOCAL_PREFIX}${profile.id}`, b64);
+      sessionStorage.setItem(`${PROFILE_KEY_SESSION_PREFIX}${profile.id}`, b64);
+    } else if (isSession) {
+      const raw = await crypto.subtle.exportKey("raw", await deriveAesKey(passphrase, profile.encryption.salt, profile.encryption.iterations, true));
+      const b64 = bytesToBase64(new Uint8Array(raw));
+      sessionStorage.setItem(`${PROFILE_KEY_SESSION_PREFIX}${profile.id}`, b64);
+      localStorage.removeItem(`${PROFILE_KEY_LOCAL_PREFIX}${profile.id}`);
+    } else {
+      sessionStorage.removeItem(`${PROFILE_KEY_SESSION_PREFIX}${profile.id}`);
+      localStorage.removeItem(`${PROFILE_KEY_LOCAL_PREFIX}${profile.id}`);
     }
     renderPanel();
     window.dispatchEvent(new CustomEvent("finance:profile-unlocked", { detail:{ profileId:profile.id } }));
@@ -310,7 +324,7 @@
   async function restoreSessionProfileKey() {
     const profile = activeProfile();
     if (!profile.encryption?.enabled || memoryKeys.has(profile.id)) return;
-    const raw = sessionStorage.getItem(`${PROFILE_KEY_SESSION_PREFIX}${profile.id}`);
+    const raw = sessionStorage.getItem(`${PROFILE_KEY_SESSION_PREFIX}${profile.id}`) || localStorage.getItem(`${PROFILE_KEY_LOCAL_PREFIX}${profile.id}`);
     if (!raw) return;
     try {
       const key = await crypto.subtle.importKey("raw", base64ToBytes(raw), { name:"AES-GCM" }, false, ["encrypt", "decrypt"]);
@@ -318,12 +332,14 @@
       memoryKeys.set(profile.id, key);
     } catch (error) {
       sessionStorage.removeItem(`${PROFILE_KEY_SESSION_PREFIX}${profile.id}`);
+      localStorage.removeItem(`${PROFILE_KEY_LOCAL_PREFIX}${profile.id}`);
     }
   }
 
   function lockProfile() {
     memoryKeys.delete(activeProfileId());
     sessionStorage.removeItem(`${PROFILE_KEY_SESSION_PREFIX}${activeProfileId()}`);
+    localStorage.removeItem(`${PROFILE_KEY_LOCAL_PREFIX}${activeProfileId()}`);
     renderPanel();
     window.dispatchEvent(new CustomEvent("finance:profile-locked", { detail:{ profileId:activeProfileId() } }));
   }
@@ -810,6 +826,7 @@
     const profile = activeProfile();
     const appLock = deviceLockConfig();
     const unlocked = memoryKeys.has(profile.id);
+    const isSavedOnDevice = Boolean(localStorage.getItem(`${PROFILE_KEY_LOCAL_PREFIX}${profile.id}`));
     const profiles = meta.profiles.map(item => `<option value="${escape(item.id)}" ${item.id === profile.id ? "selected" : ""}>${escape(item.name)} · ${escape(roleLabel(item.role))}</option>`).join("");
     const audit = loadLocalAudit().slice(0, 12);
     panel.innerHTML = `
@@ -842,10 +859,17 @@
 
         <article class="card">
           <div class="card-header"><div><h3>Profile encryption</h3><p>AES-256-GCM cloud records with a passphrase-derived key</p></div><span class="v13-chip ${unlocked ? "success" : "warning"}">${unlocked ? "Unlocked" : "Locked"}</span></div>
+          ${isSavedOnDevice && unlocked ? `<div style="background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.3); color:var(--v12-text-main); font-size:0.85em; padding:8px 12px; border-radius:6px; margin-bottom:12px; display:flex; align-items:center; gap:6px;"><strong>✓ Saved on device.</strong> Auto-unlocks without entering password.</div>` : ""}
           <div class="field"><label for="profileEncryptionPassphrase">Encryption passphrase</label><input class="input" id="profileEncryptionPassphrase" type="password" autocomplete="new-password" minlength="10" placeholder="At least 10 characters"></div>
-          <label class="profile-check"><input type="checkbox" id="rememberProfileKey"> Remember only until this app window closes</label>
-          <div class="profile-actions"><button class="button button-primary" id="profileEncryptionButton" type="button">${profile.encryption.enabled ? "Unlock encryption" : "Configure encryption"}</button>${unlocked ? `<button class="button button-secondary" id="lockProfileButton" type="button">Lock now</button>` : ""}</div>
-          <p class="v13-help">The passphrase is never uploaded. Losing it makes encrypted cloud records and backups unrecoverable. Collection names and record IDs remain visible to the cloud service.</p>
+          <div class="field" style="margin-top:8px;"><label for="rememberProfileKeyMode">Remember passphrase</label>
+            <select class="select" id="rememberProfileKeyMode">
+              <option value="device" ${isSavedOnDevice || !profile.encryption.enabled ? "selected" : ""}>Remember permanently on this device (enter once)</option>
+              <option value="session">Remember only until browser tab closes</option>
+              <option value="none">Ask every time</option>
+            </select>
+          </div>
+          <div class="profile-actions" style="margin-top:12px;"><button class="button button-primary" id="profileEncryptionButton" type="button">${profile.encryption.enabled ? "Unlock encryption" : "Configure encryption"}</button>${unlocked ? `<button class="button button-secondary" id="lockProfileButton" type="button">Lock now</button>` : ""}</div>
+          <p class="v13-help">The passphrase is never uploaded. "Remember permanently on this device" keeps the key saved locally so you only ever enter it once on this device.</p>
         </article>
       </div>
 
@@ -928,8 +952,9 @@
     }));
     get("profileEncryptionButton")?.addEventListener("click", () => run(async () => {
       const passphrase = get("profileEncryptionPassphrase").value;
-      if (activeProfile().encryption.enabled) await unlockProfile(passphrase, get("rememberProfileKey").checked);
-      else await configureEncryption(passphrase);
+      const mode = get("rememberProfileKeyMode")?.value || "device";
+      if (activeProfile().encryption.enabled) await unlockProfile(passphrase, mode);
+      else await configureEncryption(passphrase, mode);
       get("profileEncryptionPassphrase").value = "";
       toast("Profile encryption is ready", "success");
     }));
