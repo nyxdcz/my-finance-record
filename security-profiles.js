@@ -264,6 +264,17 @@
     return true;
   }
 
+  function renameProfile(profileId, newName) {
+    const name = String(newName || "").trim();
+    if (!name) throw new Error("Enter a valid profile name.");
+    const target = meta.profiles.find(profile => profile.id === profileId);
+    if (!target) throw new Error("Profile not found.");
+    target.name = name;
+    saveMeta();
+    appendLocalAudit("Profile renamed", { id: profileId, name });
+    return target;
+  }
+
   async function configureEncryption(passphrase) {
     if (String(passphrase || "").length < 10) throw new Error("Use at least 10 characters for the profile encryption passphrase.");
     const profile = activeProfile();
@@ -420,6 +431,8 @@
     if (result.error) {
       const message = result.error.message || String(result.error);
       if (/finance_v3_|schema cache|could not find the function/i.test(message)) throw new Error("Cloud Schema V3 is not installed. Run supabase/cloud-profiles-v13.sql first.");
+      if (/owner_required/i.test(message)) throw new Error("Only the profile owner can perform this action.");
+      if (/authentication_required/i.test(message)) throw new Error("Please sign in to your cloud account first.");
       throw result.error;
     }
     return result.data || {};
@@ -431,7 +444,7 @@
 
   async function verifyCloudProfilePassphrase(remoteProfile, passphrase, rememberSession = true) {
     if (!remoteProfile?.profile_id || !remoteProfile?.encryption_salt || !remoteProfile?.encryption_check) throw new Error("The cloud profile encryption metadata is incomplete.");
-    if (String(passphrase || "").length < 10) throw new Error("Enter the shared profile passphrase.");
+    if (String(passphrase || "").length < 10) throw new Error("Please enter the profile encryption passphrase (at least 10 characters).");
     const key = await deriveAesKey(passphrase, remoteProfile.encryption_salt, remoteProfile.kdf_iterations || KDF_ITERATIONS, rememberSession);
     let check;
     try { check = await decryptJsonWithKey(remoteProfile.encryption_check, key, `profile-check|v13`); }
@@ -440,7 +453,7 @@
     return key;
   }
 
-  async function connectCloudProfile(profileId, passphrase, rememberSession = true) {
+  async function connectCloudProfile(profileId, passphrase, rememberSession = true, options = {}) {
     const result = await listCloudProfiles();
     const remote = (result.profiles || []).find(profile => profile.profile_id === profileId);
     if (!remote) throw new Error("This account cannot access that cloud profile.");
@@ -473,10 +486,11 @@
       sessionStorage.setItem(`${PROFILE_KEY_SESSION_PREFIX}${local.id}`, bytesToBase64(raw));
     }
     appendLocalAudit("Existing Cloud Schema V3 profile connected", { cloudProfileId:local.cloudProfileId, role:local.role });
+    window.dispatchEvent(new CustomEvent("finance:cloud-profile-linked", { detail:{ profileId:local.id, cloudProfileId:local.cloudProfileId, auto:Boolean(options?.auto) } }));
     return local;
   }
 
-  async function createCloudProfile({ name, type, passphrase }) {
+  async function createCloudProfile({ name, type, passphrase }, options = {}) {
     if (!activeProfile().encryption?.enabled) await configureEncryption(passphrase);
     else if (!memoryKeys.has(activeProfileId())) await unlockProfile(passphrase);
     const profile = activeProfile();
@@ -498,7 +512,7 @@
     await unlockProfile(passphrase, true);
     appendLocalAudit("Encrypted Cloud Schema V3 profile created", { cloudProfileId:profile.cloudProfileId, type:profile.type });
     renderPanel();
-    window.dispatchEvent(new CustomEvent("finance:cloud-profile-linked", { detail:{ profileId:profile.id, cloudProfileId:profile.cloudProfileId } }));
+    window.dispatchEvent(new CustomEvent("finance:cloud-profile-linked", { detail:{ profileId:profile.id, cloudProfileId:profile.cloudProfileId, auto:Boolean(options?.auto) } }));
     return result;
   }
 
@@ -518,13 +532,36 @@
   }
 
   async function acceptInvite(code, passphrase) {
-    const tokenHash = await sha256Hex(String(code || "").trim());
-    const result = await cloudRpc("finance_v3_accept_invite", { p_token_hash:tokenHash });
-    if (!result.profile_id) throw new Error("The invitation could not be accepted.");
+    const cleanCode = String(code || "").trim();
+    const tokenHash = await sha256Hex(cleanCode);
+    let result;
+    try {
+      result = await cloudRpc("finance_v3_accept_invite", { p_token_hash:tokenHash });
+    } catch (error) {
+      const msg = error.message || String(error);
+      if (/invite_invalid_or_expired/i.test(msg)) {
+        try {
+          const listRes = await listCloudProfiles();
+          const profiles = listRes.profiles || [];
+          for (const remote of profiles) {
+            try {
+              const connected = await connectCloudProfile(remote.profile_id, passphrase, true);
+              return connected;
+            } catch (err) {
+              // Passphrase didn't unlock this profile, try next
+            }
+          }
+        } catch (err) {}
+        throw new Error("This invitation code is invalid, expired, or has already been used. If you have already accepted this invitation, click 'Find existing profiles' to connect using your shared passphrase, or ask the profile owner for a new invitation code.");
+      }
+      throw error;
+    }
+
+    if (!result?.profile_id) throw new Error("The invitation could not be accepted.");
     try {
       return await connectCloudProfile(result.profile_id, passphrase, true);
     } catch (error) {
-      throw new Error(`${error.message || error} The invitation is already accepted in the cloud; use Find existing profiles to connect after confirming the shared passphrase.`);
+      throw new Error(`${error.message || error} The invitation was accepted, but profile connection failed. Click 'Find existing profiles' to connect.`);
     }
   }
 
@@ -769,6 +806,7 @@
   function renderPanel() {
     const panel = document.getElementById("settings-panel-profiles");
     if (!panel) return;
+    delete panel.dataset.simplePresentation;
     const profile = activeProfile();
     const appLock = deviceLockConfig();
     const unlocked = memoryKeys.has(profile.id);
@@ -783,7 +821,14 @@
           <div><span>Cloud profile</span><strong>${profile.cloudProfileId ? "Connected · V3" : "Not connected"}</strong></div>
           <div><span>Encryption</span><strong>${profile.encryption.enabled ? (unlocked ? "Unlocked" : "Locked") : "Not configured"}</strong></div>
         </div>
-        <div class="profile-switch-row"><select class="select" id="profileSwitcher">${profiles}</select><button class="button button-secondary" id="profileSwitchButton" type="button">Switch profile</button></div>
+        <div class="profile-switch-row" style="margin-top:12px; display:flex; gap:8px; align-items:flex-end;">
+          <div class="field" style="flex:1; margin:0;"><label for="renameProfileInput" style="font-size:0.8em; font-weight:600; color:var(--v12-text-main); margin-bottom:4px; display:block;">Rename active profile</label><input class="input" id="renameProfileInput" value="${escape(profile.name)}" maxlength="80"></div>
+          <button class="button button-secondary" id="renameProfileButton" type="button" style="display:inline-flex; align-items:center; gap:6px;">
+            <span class="toolbar-icon" aria-hidden="true" style="display:inline-flex;"><svg viewBox="0 0 24 24" focusable="false" style="width:15px; height:15px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round;"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></span>
+            <span>Rename profile</span>
+          </button>
+        </div>
+        <div class="profile-switch-row" style="margin-top:10px;"><select class="select" id="profileSwitcher">${profiles}</select><button class="button button-secondary" id="profileSwitchButton" type="button">Switch profile</button></div>
         ${profile.role === "viewer" ? `<div class="v13-warning">This is a read-only Viewer profile. Local edits and cloud writes are blocked.</div>` : ""}
       </article>
 
@@ -806,7 +851,7 @@
 
       <article class="card profile-cloud-card">
         <div class="card-header"><div><h3>Cloud Schema V3 &amp; migration assistant</h3><p>Move the active V12 local dataset into an encrypted V13 profile</p></div><span class="v13-chip info">Non-destructive</span></div>
-        <p class="v13-help">The V12 Cloud Schema V2 tables remain untouched for rollback. V13 writes to new profile-scoped tables only.</p>
+        <p class="v13-help">To connect an existing cloud profile, click <strong>Find existing profiles</strong> below and enter its passphrase. To join a shared household profile, use <strong>Invitation code</strong> and <strong>Shared profile passphrase</strong> under Household sharing.</p>
         <div class="profile-actions">
           ${profile.cloudProfileId ? `<button class="button button-secondary" id="refreshCloudProfilesButton" type="button">Refresh membership</button><button class="button button-primary" id="createRestorePointButton" type="button">Create encrypted restore point</button>` : `<button class="button button-primary" id="createCloudProfileButton" type="button">Create encrypted V13 cloud profile</button><button class="button button-secondary" id="findCloudProfilesButton" type="button">Find existing profiles</button>`}
           <button class="button button-secondary" id="refreshRestorePointsButton" type="button">View restore points</button>
@@ -818,12 +863,15 @@
       <div class="profile-two-column">
         <article class="card profile-sharing-card">
           <div class="card-header"><div><h3>Household sharing</h3><p>Invite an authenticated member as Editor or Viewer</p></div></div>
+          <p class="v13-help" style="margin-bottom:12px;">Invitation codes grant database access. The <strong>Shared profile passphrase</strong> is the profile's <strong>Encryption passphrase</strong> (set during profile creation) needed to decrypt records.</p>
           <div class="profile-inline-fields"><div class="field"><label for="profileInviteRole">Role</label><select class="select" id="profileInviteRole"><option value="viewer">Viewer</option><option value="editor">Editor</option></select></div><div class="field"><label for="profileInviteHours">Expires after</label><select class="select" id="profileInviteHours"><option value="24">24 hours</option><option value="72" selected>72 hours</option><option value="168">7 days</option></select></div></div>
           <button class="button button-secondary" id="createProfileInviteButton" type="button" ${profile.role !== "owner" || !profile.cloudProfileId ? "disabled" : ""}>Create invitation code</button>
+          <div id="profileInviteResult" class="profile-result" style="margin-top:8px;"></div>
+          <hr style="margin:16px 0; border:0; border-top:1px solid var(--v12-border, rgba(0,0,0,0.1));">
+          <div style="font-weight:600; font-size:0.9em; margin-bottom:8px;">Join a shared profile</div>
           <div class="field"><label for="profileAcceptInvite">Invitation code</label><input class="input" id="profileAcceptInvite" autocomplete="off" placeholder="MFR3-..."></div>
-          <div class="field"><label for="profileInvitePassphrase">Shared profile passphrase</label><input class="input" id="profileInvitePassphrase" type="password" autocomplete="current-password"></div>
+          <div class="field"><label for="profileInvitePassphrase">Shared profile passphrase</label><input class="input" id="profileInvitePassphrase" type="password" autocomplete="current-password" placeholder="Profile encryption passphrase"></div>
           <button class="button button-primary" id="acceptProfileInviteButton" type="button" disabled>Accept and open shared profile</button>
-          <div id="profileInviteResult" class="profile-result"></div>
         </article>
 
         <article class="card">
@@ -863,6 +911,13 @@
 
   function bindPanelEvents() {
     const get = id => document.getElementById(id);
+    get("renameProfileButton")?.addEventListener("click", () => run(async () => {
+      const input = get("renameProfileInput");
+      const name = input?.value || "";
+      renameProfile(activeProfileId(), name);
+      toast("Profile renamed successfully", "success");
+      renderPanel();
+    }));
     get("profileSwitchButton")?.addEventListener("click", () => {
       const id = get("profileSwitcher")?.value;
       if (id && id !== activeProfileId()) switchProfile(id);
@@ -880,7 +935,12 @@
     }));
     get("lockProfileButton")?.addEventListener("click", lockProfile);
     get("createCloudProfileButton")?.addEventListener("click", () => run(async () => {
-      const passphrase = get("profileEncryptionPassphrase")?.value || prompt("Enter the profile encryption passphrase. It is not uploaded.") || "";
+      let passphrase = get("profileEncryptionPassphrase")?.value;
+      if (!passphrase || passphrase.trim().length < 10) {
+        toast("Please enter a passphrase (at least 10 characters) in the Encryption passphrase field above.", "warning");
+        get("profileEncryptionPassphrase")?.focus();
+        return;
+      }
       const result = await createCloudProfile({ name:activeProfile().name, type:activeProfile().type, passphrase });
       get("cloudProfileResult").textContent = `Cloud profile created: ${result.name || activeProfile().name}. Reloading Cloud Sync 3.0…`;
       setTimeout(() => location.reload(), 700);
@@ -899,8 +959,17 @@
 
     get("createProfileInviteButton")?.addEventListener("click", () => run(async () => {
       const result = await createInvite(get("profileInviteRole").value, get("profileInviteHours").value);
-      get("profileInviteResult").innerHTML = `<strong>Invitation code</strong><code>${escape(result.code)}</code><small>Share the encryption passphrase separately. The code expires automatically.</small>`;
+      get("profileInviteResult").innerHTML = `
+        <div style="padding:12px; background:var(--v12-surface-subtle, rgba(0,0,0,0.03)); border:1px solid var(--v12-border, rgba(0,0,0,0.1)); border-radius:8px; margin-top:8px;">
+          <div style="font-weight:600; color:var(--v12-text-main); margin-bottom:4px;">Invitation code generated (copied to clipboard)</div>
+          <code style="display:inline-block; font-size:1.05em; padding:4px 8px; background:var(--v12-bg, #fff); border:1px dashed var(--v12-border); border-radius:4px; letter-spacing:0.5px; word-break:break-all;">${escape(result.code)}</code>
+          <p style="margin:8px 0 0 0; font-size:0.85em; opacity:0.9; line-height:1.4;">
+            <strong>To complete household access:</strong> Give the invited member this <strong>Invitation code</strong> along with your profile's <strong>Encryption passphrase</strong> (the passphrase you set under Profile encryption when creating this profile). They will enter both under <em>Join a shared profile</em>.
+          </p>
+        </div>
+      `;
       navigator.clipboard?.writeText?.(result.code).catch(() => {});
+      toast("Invitation code created & copied to clipboard", "success");
     }));
     get("acceptProfileInviteButton")?.addEventListener("click", () => run(async () => {
       await acceptInvite(get("profileAcceptInvite").value, get("profileInvitePassphrase").value);
@@ -914,7 +983,13 @@
     get("importEncryptedBackupInput")?.addEventListener("change", event => run(async () => {
       const file = event.target.files?.[0];
       if (!file) return;
-      const passphrase = get("encryptedBackupPassphrase").value || prompt("Enter the encrypted backup passphrase") || "";
+      const passphrase = get("encryptedBackupPassphrase").value;
+      if (!passphrase || passphrase.trim().length < 10) {
+        toast("Please enter the backup passphrase (at least 10 characters) in the Backup passphrase field above.", "warning");
+        get("encryptedBackupPassphrase")?.focus();
+        event.target.value = "";
+        return;
+      }
       if (!confirm("Replace the active profile with this decrypted backup after creating an undo snapshot?")) return;
       await importEncryptedBackup(file, passphrase);
       event.target.value = "";
@@ -928,7 +1003,7 @@
     get("lockDeviceNowButton")?.addEventListener("click", lockDevice);
     get("disableDeviceLockButton")?.addEventListener("click", () => { if (confirm("Disable the local device app lock?")) disableDeviceLock(); });
     get("createRestorePointButton")?.addEventListener("click", () => run(async () => {
-      const label = prompt("Restore point label", `Before changes · ${new Date().toLocaleString()}`) || "Manual restore point";
+      const label = `Restore point · ${new Date().toLocaleString()}`;
       await createCloudRestorePoint(label);
       toast("Encrypted cloud restore point created", "success");
       await renderRestorePoints();
@@ -956,11 +1031,32 @@
     }
     node.innerHTML = profiles.map(remote => {
       const connected = meta.profiles.some(local => local.cloudProfileId === remote.profile_id);
-      return `<div class="profile-cloud-row"><div><strong>${escape(remote.name || "Finance profile")}</strong><small>${escape(remote.profile_type || "personal")} · ${escape(roleLabel(remote.role || "viewer"))}</small></div><button class="button button-secondary button-small" type="button" data-connect-cloud-profile="${escape(remote.profile_id)}" ${connected ? "disabled" : ""}>${connected ? "Connected" : "Connect"}</button></div>`;
+      return `<div class="profile-cloud-row" style="flex-direction:column; align-items:stretch; gap:8px; padding:12px 0; border-bottom:1px solid var(--v12-border, rgba(0,0,0,0.1));">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div><strong>${escape(remote.name || "Finance profile")}</strong> <small>${escape(remote.profile_type || "personal")} · ${escape(roleLabel(remote.role || "viewer"))}</small></div>
+          ${connected ? `<span class="v13-chip success">Connected</span>` : `<span class="v13-chip warning">Not connected</span>`}
+        </div>
+        ${connected ? "" : `
+          <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:4px;">
+            <input class="input input-small" type="password" id="cloudPass_${escape(remote.profile_id)}" placeholder="Enter profile passphrase (at least 10 chars)" style="flex:1; min-width:200px;">
+            <button class="button button-primary button-small" type="button" data-connect-cloud-profile="${escape(remote.profile_id)}">Connect profile</button>
+          </div>
+        `}
+      </div>`;
     }).join("");
     node.querySelectorAll("[data-connect-cloud-profile]").forEach(button => button.addEventListener("click", () => run(async () => {
-      const passphrase = prompt("Enter the encryption passphrase for this cloud profile. It is never uploaded.") || "";
-      await connectCloudProfile(button.dataset.connectCloudProfile, passphrase, true);
+      const pId = button.dataset.connectCloudProfile;
+      const rowInput = document.getElementById(`cloudPass_${pId}`);
+      const mainInput = document.getElementById("profileEncryptionPassphrase");
+      const passphrase = (rowInput?.value || mainInput?.value || "").trim();
+      if (passphrase.length < 10) {
+        toast("Please enter the profile encryption passphrase (at least 10 characters).", "warning");
+        if (rowInput) rowInput.focus();
+        else if (mainInput) mainInput.focus();
+        return;
+      }
+      await connectCloudProfile(pId, passphrase, true);
+      toast("Cloud profile connected!", "success");
       location.reload();
     })));
   }
@@ -1058,7 +1154,7 @@
 
   window.FinanceProfileArchitecture = {
     activeProfile, activeProfileId, cloudProfileId, activeRole, canWrite,
-    persistCurrentData, restoreActiveData, createLocalProfile, switchProfile, deleteLocalProfile,
+    persistCurrentData, restoreActiveData, createLocalProfile, switchProfile, deleteLocalProfile, renameProfile,
     configureEncryption, unlockProfile, lockProfile, isCloudUnlocked,
     encryptCloudPayload, decryptCloudPayload,
     exportEncryptedBackup, importEncryptedBackup, decryptBackup,

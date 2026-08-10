@@ -988,12 +988,79 @@
     setStatus("Signed out remotely", `This installation was revoked${result.revoked_at ? ` on ${formatDateTime(result.revoked_at)}` : ""}. Local records remain available.`, "danger");
   }
 
+  async function getProfileArchWithRetry(maxWaitMs = 2000) {
+    const start = Date.now();
+    while (Date.now() - start < maxWaitMs) {
+      const arch = PROFILE_ARCH();
+      if (arch && typeof arch.listCloudProfiles === "function") return arch;
+      await new Promise(res => setTimeout(res, 50));
+    }
+    return PROFILE_ARCH();
+  }
+
+  async function autoEnsureCloudProfile() {
+    if (!cloudUser) return false;
+    const arch = await getProfileArchWithRetry();
+    if (!arch || typeof arch.cloudProfileId !== "function") return false;
+
+    const accountPassphrase = `${cloudUser.id}:my-finance-v13:${(cloudUser.email || "").toLowerCase()}`;
+
+    if (arch.cloudProfileId()) {
+      if (!arch.isCloudUnlocked?.()) {
+        try {
+          await arch.unlockProfile(accountPassphrase, true);
+        } catch (err) {
+          console.warn("Account passphrase unlock failed", err);
+        }
+      }
+      return Boolean(arch.cloudProfileId() && arch.isCloudUnlocked?.());
+    }
+
+    try {
+      const listRes = await arch.listCloudProfiles();
+      const profiles = listRes?.profiles || [];
+      if (profiles.length > 0) {
+        const target = profiles[0];
+        try {
+          await arch.connectCloudProfile(target.profile_id, accountPassphrase, true, { auto: true });
+          return true;
+        } catch (err) {
+          console.warn("Auto connect profile failed", err);
+        }
+      }
+    } catch (err) {
+      console.warn("Listing cloud profiles failed", err);
+    }
+
+    try {
+      const active = arch.activeProfile?.() || {};
+      if (!active.encryption?.enabled) {
+        await arch.configureEncryption(accountPassphrase);
+      } else if (!arch.isCloudUnlocked?.()) {
+        try { await arch.unlockProfile(accountPassphrase, true); } catch (err) {}
+      }
+
+      await arch.createCloudProfile({
+        name: active.name || "My Cloud Finances",
+        type: active.type || "personal",
+        passphrase: accountPassphrase
+      }, { auto: true });
+      return true;
+    } catch (err) {
+      console.error("Auto creation of cloud profile failed", err);
+      return false;
+    }
+  }
+
   async function onSignedIn() {
     if (!cloudUser) return;
     setPrivacyAuthentication(true, { email:cloudUser.email || "" });
     state.enabled = true;
     state.currentDeviceId = currentDeviceId();
     state.currentDeviceName = currentDeviceName();
+
+    await autoEnsureCloudProfile();
+
     if (!cloudProfileId()) {
       persist();
       setStatus("Cloud profile required", "Open Profiles & Security to create or join an encrypted Cloud Schema V3 profile.", "warning");
@@ -1011,10 +1078,33 @@
     await setupRealtime();
     const first = state.initializedUserId !== initializedScope();
     if (first) {
-      await prepareFirstSyncChoices();
-      setStatus("Cloud upgrade ready", "Choose how this device should initialize encrypted, profile-scoped Cloud Sync 3.0.", "warning");
-      renderCloudStats();
-      return;
+      try {
+        const snap = await snapshot();
+        const v3Exists = Array.isArray(snap.records) && snap.records.length > 0;
+        const localMap = toRecordMap(data);
+        const localHasRecords = Object.keys(localMap).length > 0;
+
+        let autoMode = "merge";
+        if (!v3Exists && localHasRecords) {
+          autoMode = "upload";
+        } else if (v3Exists && !localHasRecords) {
+          autoMode = "download";
+        }
+
+        await initializeFirstSync(autoMode);
+        return;
+      } catch (err) {
+        console.warn("Auto first sync failed", err);
+        const msg = err.message || String(err);
+        if (/Cloud Schema V3 is not installed/i.test(msg) || /function.*does not exist/i.test(msg)) {
+          setStatus("Database setup required", "Run supabase/cloud-profiles-v13.sql in your Supabase SQL Editor to enable Cloud Sync.", "warning");
+        } else {
+          setStatus("Sync needs attention", msg, "danger");
+        }
+        await prepareFirstSyncChoices().catch(() => {});
+        renderCloudStats();
+        return;
+      }
     }
     await syncNow({ reason:"sign-in" });
   }
@@ -1368,7 +1458,15 @@
 
   async function syncNow({ reason="manual" } = {}) {
     if (syncing) return;
-    if (!cloudUser || state.initializedUserId !== initializedScope()) { renderCloudStats(); return; }
+    if (!cloudUser) { renderCloudStats(); return; }
+    if (state.initializedUserId !== initializedScope()) {
+      setStatus("Initializing sync", "Setting up encrypted cloud synchronization...", "info");
+      await onSignedIn();
+      if (state.initializedUserId !== initializedScope()) {
+        renderCloudStats();
+        return;
+      }
+    }
     if (!navigator.onLine) { setStatus("Offline", `${pendingCount()} record${pendingCount()===1?"":"s"} waiting.`, "info"); return; }
     requireCloudProfile();
     syncing=true;
@@ -1558,7 +1656,7 @@
     window.addEventListener("focus",()=>{if(state.autoSync!==false&&cloudUser)scheduleSync(220);});
     document.addEventListener("visibilitychange",()=>{if(!document.hidden&&state.autoSync!==false&&cloudUser)scheduleSync(220);});
     window.addEventListener("storage",event=>{if(event.key===STORAGE_KEY&&!suppressQueue){try{const next=normalizeData(JSON.parse(event.newValue||"{}"));queueDiff(lastObservedData,next,"Another tab changed finance records");lastObservedData=clone(next);}catch(error){}}});
-    window.addEventListener("finance:cloud-profile-linked",()=>{state={...defaultState()};baseRecords={};pending={};conflicts=[];persist();setStatus("Cloud profile linked","Reloading encrypted Cloud Sync 3.0…","success");setTimeout(()=>location.reload(),400);});
+    window.addEventListener("finance:cloud-profile-linked",event=>{if(event?.detail?.auto)return;state={...defaultState()};baseRecords={};pending={};conflicts=[];persist();setStatus("Cloud profile linked","Reloading encrypted Cloud Sync 3.0…","success");setTimeout(()=>location.reload(),400);});
     window.addEventListener("finance:profile-unlocked",()=>{if(cloudUser)scheduleSync(100);});
   }
 
