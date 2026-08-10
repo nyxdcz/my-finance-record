@@ -10,8 +10,8 @@
     "build": "echo 'No build step required'",
     "lint": "echo 'No linting required'",
     "inspect": "node tests/inspect-project.mjs",
-    "test": "node tests/validate-v13-0-18.mjs",
-    "quality": "node tests/validate-v13-0-18.mjs"
+    "test": "node tests/validate-v14-0-0.mjs",
+    "quality": "node tests/validate-v14-0-0.mjs"
   },
   "engines": {
     "node": ">=22"

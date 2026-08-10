@@ -1,5 +1,5 @@
 "use strict";
-const APP_VERSION = "13.0.18";
+const APP_VERSION = "14.0.0";
 const CACHE_VERSION = "finance-v13-20260810-v13018-signed-out-privacy-r1-rename2";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
@@ -14,20 +14,20 @@ const APP_SHELL = [
   asset("./offline.html"),
   asset("./manifest.webmanifest"),
   asset("./version.json"),
-  asset("./privacy-lock.js?v=13.0.18"),
-  asset("./security-profiles.js?v=13.0.18"),
-  asset("./security-profiles.css?v=13.0.18"),
-  asset("./cloud-sync.js?v=13.0.18"),
-  asset("./account-ledger.js?v=13.0.18"),
-  asset("./account-ledger.css?v=13.0.18"),
-  asset("./budget-planning.js?v=13.0.18"),
-  asset("./budget-planning.css?v=13.0.18"),
-  asset("./reports-insights.js?v=13.0.18"),
-  asset("./reports-insights.css?v=13.0.18"),
-  asset("./productivity-tools.js?v=13.0.18"),
-  asset("./productivity-tools.css?v=13.0.18"),
-  asset("./reminders-alerts.js?v=13.0.18"),
-  asset("./reminders-alerts.css?v=13.0.18"),
+  asset("./privacy-lock.js?v=14.0.0"),
+  asset("./security-profiles.js?v=14.0.0"),
+  asset("./security-profiles.css?v=14.0.0"),
+  asset("./cloud-sync.js?v=14.0.0"),
+  asset("./account-ledger.js?v=14.0.0"),
+  asset("./account-ledger.css?v=14.0.0"),
+  asset("./budget-planning.js?v=14.0.0"),
+  asset("./budget-planning.css?v=14.0.0"),
+  asset("./reports-insights.js?v=14.0.0"),
+  asset("./reports-insights.css?v=14.0.0"),
+  asset("./productivity-tools.js?v=14.0.0"),
+  asset("./productivity-tools.css?v=14.0.0"),
+  asset("./reminders-alerts.js?v=14.0.0"),
+  asset("./reminders-alerts.css?v=14.0.0"),
   asset("./projects-calendar-v13.0.20.js"),
   asset("./projects-calendar-v13.0.20.css"),
   asset("./sync-config.js"),
