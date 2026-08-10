@@ -1,3 +1,12 @@
+## 14.0.0 · 2026-08-07
+
+### Added
+- Integrated Project Schedule Calendar events with the primary Dashboard financial calendar.
+- Added real-time event projection and listener callbacks.
+
+### Changed
+- Tightened desktop and mobile calendar layout dimensions, button scaling, and header action padding.
+
 ## 13.0.18 · 2026-08-07
 
 ### Added
