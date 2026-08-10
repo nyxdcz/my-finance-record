@@ -861,17 +861,17 @@
 
         <article class="card profile-encryption-card">
           <div class="card-header"><div><h3>Profile encryption</h3><p>AES-256-GCM cloud records with a passphrase-derived key</p></div><span class="v13-chip ${unlocked ? "success" : "warning"}">${unlocked ? "Unlocked" : "Locked"}</span></div>
-          ${profile.encryption.enabled ? `
-            <div class="v13-encryption-status" style="background:${isSavedOnDevice ? 'rgba(16,185,129,0.12)' : isSavedInSession ? 'rgba(59,130,246,0.12)' : unlocked ? 'rgba(245,158,11,0.12)' : 'rgba(239,68,68,0.12)'}; border:1px solid ${isSavedOnDevice ? 'rgba(16,185,129,0.35)' : isSavedInSession ? 'rgba(59,130,246,0.35)' : unlocked ? 'rgba(245,158,11,0.35)' : 'rgba(239,68,68,0.35)'}; color:var(--v12-text-main, #0f172a); font-size:0.88em; padding:10px 14px; border-radius:8px; margin-bottom:14px; display:flex; align-items:center; gap:8px;">
-              ${isSavedOnDevice
-                ? `<strong>✓ Saved on device.</strong> Auto-unlocks without entering password on this device.`
-                : isSavedInSession
-                ? `<strong>✓ Saved for tab session.</strong> Auto-unlocks until browser tab is closed.`
-                : unlocked
-                ? `<strong>✓ One-time password unlocked.</strong> Password required again when app is reopened or refreshed.`
-                : `<strong>Profile locked.</strong> Enter passphrase below to unlock encryption.`}
-            </div>
-          ` : ''}
+          <div id="profileEncryptionStatusBanner" class="v13-encryption-status" style="background:${isSavedOnDevice ? 'rgba(16,185,129,0.15)' : isSavedInSession ? 'rgba(59,130,246,0.15)' : unlocked ? 'rgba(245,158,11,0.15)' : profile.encryption?.enabled ? 'rgba(239,68,68,0.15)' : 'rgba(100,116,139,0.15)'}; border:1px solid ${isSavedOnDevice ? 'rgba(16,185,129,0.4)' : isSavedInSession ? 'rgba(59,130,246,0.4)' : unlocked ? 'rgba(245,158,11,0.4)' : profile.encryption?.enabled ? 'rgba(239,68,68,0.4)' : 'rgba(100,116,139,0.4)'}; color:var(--v12-text-main, inherit); font-size:0.88em; padding:10px 14px; border-radius:8px; margin-bottom:14px; display:flex; align-items:center; gap:8px;">
+            ${isSavedOnDevice
+              ? `<strong>✓ Saved on device.</strong> Auto-unlocks without entering password on this device.`
+              : isSavedInSession
+              ? `<strong>✓ Saved for tab session.</strong> Auto-unlocks until browser tab is closed.`
+              : unlocked
+              ? `<strong>✓ One-time password unlocked.</strong> Password required again when app is reopened or refreshed.`
+              : profile.encryption?.enabled
+              ? `<strong>Profile locked.</strong> Enter passphrase below to unlock encryption.`
+              : `<strong>Encryption not configured.</strong> Enter a passphrase below to enable encryption.`}
+          </div>
           <div class="field"><label for="profileEncryptionPassphrase">Encryption passphrase</label><input class="input" id="profileEncryptionPassphrase" type="password" autocomplete="new-password" minlength="10" placeholder="At least 10 characters"></div>
           <div class="field" style="margin-top:12px;">
             <label style="font-weight:600; font-size:0.88em; margin-bottom:6px; display:block; color:var(--v12-text-main, #0f172a);">Passphrase Memory Option</label>
