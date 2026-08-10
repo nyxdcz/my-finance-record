@@ -1,4 +1,4 @@
-# My Finance Records · V13.0.18 PWA
+# My Finance Records · V14.0.0 PWA
 
 Local-first profile-based personal and household finance manager with optional encrypted cloud synchronization.
 
@@ -30,6 +30,12 @@ Local-first profile-based personal and household finance manager with optional e
    Navigate to `http://localhost:3000` in your web browser.
 
 ---
+
+## V14.0.0 · Project Schedule Calendar & Dashboard Integration
+
+- **Project Schedule Calendar Integration**: Unified Project Schedule Calendar events with the primary Dashboard financial calendar, rendering schedules (meetings, site visits, deadlines, presentations) as blue markers and event items.
+- **Real-Time Live Updates**: Added real-time event projection and listener callbacks so creating, updating, or deleting a scheduled event instantly updates the Dashboard calendar events list and markers without page reloads.
+- **UI Density & Compact Polish**: Tightened desktop and mobile calendar layout dimensions, button scaling, and header action padding for a refined visual rhythm across all viewports.
 
 ## V13.0.18 · Signed-Out Privacy Lock
 
