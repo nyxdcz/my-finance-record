@@ -11202,7 +11202,7 @@
       const grids = [...panel.querySelectorAll(":scope > .profile-two-column")];
       const firstCards = grids[0] ? [...grids[0].querySelectorAll(":scope > article.card")] : [];
       const createCard = firstCards.find(card => card.querySelector("h3")?.textContent.trim() === "Create local profile");
-      const encryptionCard = firstCards.find(card => card.querySelector("h3")?.textContent.trim() === "Profile encryption");
+      const encryptionCard = panel.querySelector(".profile-encryption-card") || firstCards.find(card => card.querySelector("h3")?.textContent.trim() === "Profile encryption");
       renameSettingsCard(encryptionCard, "Protect cloud records", "Use a passphrase for encrypted cloud records and protected backups");
       const deviceLockCard = grids[2]?.querySelector(":scope > article.card:first-child");
       const securityCard = grids[2]?.querySelector(":scope > article.card:nth-child(2)");

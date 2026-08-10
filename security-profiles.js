@@ -857,7 +857,7 @@
           <button class="button button-primary" id="createLocalProfileButton" type="button">Create and open</button>
         </article>
 
-        <article class="card">
+        <article class="card profile-encryption-card">
           <div class="card-header"><div><h3>Profile encryption</h3><p>AES-256-GCM cloud records with a passphrase-derived key</p></div><span class="v13-chip ${unlocked ? "success" : "warning"}">${unlocked ? "Unlocked" : "Locked"}</span></div>
           ${isSavedOnDevice && unlocked ? `<div style="background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.3); color:var(--v12-text-main); font-size:0.85em; padding:8px 12px; border-radius:6px; margin-bottom:12px; display:flex; align-items:center; gap:6px;"><strong>✓ Saved on device.</strong> Auto-unlocks without entering password.</div>` : ""}
           <div class="field"><label for="profileEncryptionPassphrase">Encryption passphrase</label><input class="input" id="profileEncryptionPassphrase" type="password" autocomplete="new-password" minlength="10" placeholder="At least 10 characters"></div>
