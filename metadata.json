@@ -1,0 +1,8 @@
+{
+  "name": "My Finance Records",
+  "description": "Local-first profile-based personal and household finance app with encrypted sync support.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

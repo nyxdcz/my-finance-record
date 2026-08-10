@@ -1,0 +1,14 @@
+.DS_Store
+Thumbs.db
+node_modules/
+_site/
+coverage/
+*.log
+*.tmp
+*.bak
+*.zip
+*.sha256
+.env
+.env.*
+!.env.example
+supabase/.temp/

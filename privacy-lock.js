@@ -1,0 +1,155 @@
+"use strict";
+(() => {
+  const state = { authenticated:false, resolved:false, email:"" };
+  const allowedSelector = [
+    "[data-page]", "#menuButton", "#sidebarCloseButton", "#overlay",
+    "#previousMonthButton", "#nextMonthButton", "#monthDisplayButton", "#currentMonthButton",
+    "#monthPicker", "#monthPickerPreviousYear", "#monthPickerNextYear", "#monthPickerGrid button",
+    "#topbarToolsMenu > summary", "#themeToggleButton", "#privacySignInButton", ".finance-privacy-signin",
+    "[data-settings-tab='sync']", "[data-settings-tab='app']", "#settingsBackButton", "[data-settings-open='sync']", "[data-settings-open='app']",
+    "#cloudConfigUrl", "#cloudConfigKey", "#saveCloudConfig", "#clearCloudConfig",
+    "#cloudAuthEmail", "#cloudAuthPassword", "#cloudPasswordToggle", "#cloudSignIn", "#cloudCreateAccount", "#cloudForgotPassword", "#cloudTestConnection",
+    "#cloudRecoveryEmail", "#cloudRecoveryCode", "#cloudRecoveryResend", "#cloudVerifyRecoveryCode", "#cloudRecoveryBackToSignIn",
+    "#cloudNewPassword", "#cloudConfirmPassword", "#cloudCompletePasswordReset", "#cloudCancelPasswordReset", "[data-cloud-password-target]",
+    "#installPwaButton", "#checkUpdateButton", "#repairPwaButton", "#clearAppCacheButton", "#applyUpdateButton", "#laterUpdateButton",
+    "label[for='importBackup']", "#importBackup", "#restoreV11BackupButton"
+  ].join(",");
+  const sensitiveDialogIds = new Set([
+    "accountDialog","incomeDialog","expenseDialog","expensePaymentDialog","expenseActionConfirmDialog","dashboardCustomizeDialog",
+    "projectDialog","projectRevisionDialog","projectPaidDialog","savingsGoalDialog","syncReviewDialog","sampleResetDialog"
+  ]);
+
+  function pageLabel(page){
+    const heading=page.querySelector(".page-heading h2, .page-heading h3");
+    return String(heading?.textContent || page.id || "Finance records").trim();
+  }
+
+  function ensurePrivacyViews(){
+    document.querySelectorAll(".page:not(#settings)").forEach(page => {
+      let view=page.querySelector(":scope > .finance-privacy-lock-view");
+      if(!view){
+        view=document.createElement("section");
+        view.className="finance-privacy-lock-view";
+        view.setAttribute("aria-live","polite");
+        view.innerHTML=`
+          <div class="finance-privacy-lock-card">
+            <div class="finance-privacy-lock-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div>
+            <div class="finance-privacy-lock-copy"><span class="finance-privacy-eyebrow">Signed-out privacy</span><h3>Sign in to view ${pageLabel(page)}</h3><p>No accounts, expenses, projects, payments, calendar events, reports, or search suggestions are shown while signed out.</p></div>
+            <div class="finance-privacy-zero-grid" aria-label="Signed-out finance totals">
+              <div><span>Available money</span><strong>₱0.00</strong></div>
+              <div><span>Income</span><strong>₱0.00</strong></div>
+              <div><span>Expenses</span><strong>₱0.00</strong></div>
+              <div><span>Projects</span><strong>0</strong></div>
+            </div>
+            <button class="button button-primary finance-privacy-signin" type="button">Sign in to view records</button>
+            <small>Your local records stay stored on this device. Signing out hides them; it does not delete them.</small>
+          </div>`;
+        page.appendChild(view);
+      }
+    });
+  }
+
+  function ensureTopbarSignIn(){
+    let button=document.getElementById("privacySignInButton");
+    if(button) return button;
+    const actions=document.querySelector(".topbar-actions");
+    const sync=document.getElementById("cloudSyncStatusButton");
+    if(!actions) return null;
+    button=document.createElement("button");
+    button.id="privacySignInButton";
+    button.type="button";
+    button.className="button button-primary privacy-signin-topbar";
+    button.innerHTML='<span class="toolbar-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="8" r="3.5"/><path d="M5.5 20c.7-4 3-6 6.5-6s5.8 2 6.5 6"/></svg></span><span class="privacy-signin-label">Sign in</span>';
+    if(sync) actions.insertBefore(button,sync); else actions.prepend(button);
+    button.addEventListener("click", openSignIn);
+    return button;
+  }
+
+  function openSignIn(){
+    try { if(typeof goToPage==="function") goToPage("settings", { historyMode:"none", smooth:false }); } catch(e){}
+    try { if(typeof activateSettingsPanel==="function") activateSettingsPanel("sync", false); } catch(e){}
+    setTimeout(()=>document.getElementById("cloudAuthEmail")?.focus(),30);
+  }
+
+  function closeSensitiveSurfaces(){
+    document.querySelectorAll("dialog[open]").forEach(dialog=>{
+      if(sensitiveDialogIds.has(dialog.id) || dialog.hasAttribute("data-form-dialog")) {
+        try { dialog.close(); } catch(e) { dialog.removeAttribute("open"); }
+      }
+    });
+    document.querySelectorAll(".topbar-tools-menu[open], .project-dialog-more-footer[open]").forEach(node=>node.removeAttribute("open"));
+    const pop=document.getElementById("cloudSyncToolbarPopover"); if(pop) pop.hidden=true;
+  }
+
+  function updateSettingsForSignedOut(){
+    if(!document.body.classList.contains("finance-signed-out")) return;
+    const settings=document.getElementById("settings");
+    if(!settings?.classList.contains("active")) return;
+    const selected=document.querySelector("[data-settings-tab][aria-selected='true']")?.dataset.settingsTab;
+    if(!["sync","app"].includes(selected)) {
+      try { if(typeof activateSettingsPanel==="function") activateSettingsPanel("sync", false); } catch(e){}
+    }
+  }
+
+  function notifyServiceWorker(){
+    const payload={ type:"FINANCE_AUTH_STATE", authenticated:state.authenticated };
+    try { navigator.serviceWorker?.controller?.postMessage(payload); } catch(e){}
+    try { navigator.serviceWorker?.ready?.then(reg=>reg.active?.postMessage(payload)).catch(()=>{}); } catch(e){}
+  }
+
+  function apply(){
+    ensurePrivacyViews();
+    ensureTopbarSignIn();
+    const locked=!state.authenticated;
+    document.body.classList.toggle("finance-signed-out",locked);
+    document.body.classList.toggle("finance-signed-in",!locked);
+    document.body.classList.toggle("finance-auth-pending",!state.resolved);
+    document.documentElement.dataset.financeAuth=locked?"signed-out":"signed-in";
+    if(locked){ closeSensitiveSurfaces(); updateSettingsForSignedOut(); }
+    notifyServiceWorker();
+  }
+
+  function setAuthenticated(authenticated, detail={}){
+    state.authenticated=Boolean(authenticated);
+    state.resolved=true;
+    state.email=String(detail.email||"");
+    apply();
+    window.dispatchEvent(new CustomEvent("finance:privacy-auth-change",{detail:{authenticated:state.authenticated,email:state.email}}));
+    if(state.authenticated){
+      setTimeout(()=>{ try { if(typeof renderAll==="function") renderAll(false); } catch(e){} },0);
+    }
+  }
+
+  function isAllowed(target){ return Boolean(target?.closest?.(allowedSelector)); }
+  function blockLockedInteraction(event){
+    if(!document.body.classList.contains("finance-signed-out")) return;
+    const target=event.target;
+    if(isAllowed(target)) return;
+    const interactive=target?.closest?.("button, input, select, textarea, form, [contenteditable='true'], [role='button'], [role='menuitem']");
+    if(!interactive) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    try { if(typeof showToast==="function") showToast("Sign in to use finance records.","info"); } catch(e){}
+  }
+
+  document.addEventListener("click",event=>{
+    const signin=event.target.closest?.(".finance-privacy-signin");
+    if(signin){ event.preventDefault(); openSignIn(); return; }
+    blockLockedInteraction(event);
+  },true);
+  document.addEventListener("submit",blockLockedInteraction,true);
+  document.addEventListener("change",event=>{
+    if(document.body.classList.contains("finance-signed-out") && !isAllowed(event.target)) blockLockedInteraction(event);
+  },true);
+  window.addEventListener("finance:page-changed",updateSettingsForSignedOut);
+  window.addEventListener("pageshow",apply);
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",apply,{once:true}); else apply();
+
+  window.FinancePrivacyLock={
+    setAuthenticated,
+    lock:()=>setAuthenticated(false),
+    unlock:detail=>setAuthenticated(true,detail||{}),
+    openSignIn,
+    get status(){ return {...state}; }
+  };
+})();

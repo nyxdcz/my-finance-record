@@ -1,0 +1,65 @@
+name: Quality and GitHub Pages
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Regression quality
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+      - name: Use Node.js 24
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          package-manager-cache: false
+      - name: Install locked project metadata
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Run complete quality validation
+        run: npm run quality
+
+  deploy:
+    name: Deploy validated PWA
+    if: github.event_name != 'pull_request'
+    needs: quality
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v6
+      - name: Prepare production-only site
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p _site/icons _site/vendor
+          cp index.html offline.html manifest.webmanifest version.json sw.js privacy-lock.js security-profiles.js security-profiles.css cloud-sync.js account-ledger.js account-ledger.css budget-planning.js budget-planning.css reports-insights.js reports-insights.css productivity-tools.js productivity-tools.css reminders-alerts.js reminders-alerts.css sync-config.js _site/
+          cp vendor/supabase.min.js _site/vendor/
+          cp icons/* _site/icons/
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: _site
+      - name: Deploy GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
