@@ -827,6 +827,8 @@
     const appLock = deviceLockConfig();
     const unlocked = memoryKeys.has(profile.id);
     const isSavedOnDevice = Boolean(localStorage.getItem(`${PROFILE_KEY_LOCAL_PREFIX}${profile.id}`));
+    const isSavedInSession = Boolean(sessionStorage.getItem(`${PROFILE_KEY_SESSION_PREFIX}${profile.id}`)) && !isSavedOnDevice;
+    const defaultMode = isSavedOnDevice ? "device" : isSavedInSession ? "session" : "none";
     const profiles = meta.profiles.map(item => `<option value="${escape(item.id)}" ${item.id === profile.id ? "selected" : ""}>${escape(item.name)} · ${escape(roleLabel(item.role))}</option>`).join("");
     const audit = loadLocalAudit().slice(0, 12);
     panel.innerHTML = `
@@ -859,17 +861,38 @@
 
         <article class="card profile-encryption-card">
           <div class="card-header"><div><h3>Profile encryption</h3><p>AES-256-GCM cloud records with a passphrase-derived key</p></div><span class="v13-chip ${unlocked ? "success" : "warning"}">${unlocked ? "Unlocked" : "Locked"}</span></div>
-          ${isSavedOnDevice && unlocked ? `<div style="background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.3); color:var(--v12-text-main); font-size:0.85em; padding:8px 12px; border-radius:6px; margin-bottom:12px; display:flex; align-items:center; gap:6px;"><strong>✓ Saved on device.</strong> Auto-unlocks without entering password.</div>` : ""}
+          ${profile.encryption.enabled ? `
+            <div class="v13-encryption-status" style="background:${isSavedOnDevice ? 'rgba(16,185,129,0.12)' : isSavedInSession ? 'rgba(59,130,246,0.12)' : unlocked ? 'rgba(245,158,11,0.12)' : 'rgba(239,68,68,0.12)'}; border:1px solid ${isSavedOnDevice ? 'rgba(16,185,129,0.35)' : isSavedInSession ? 'rgba(59,130,246,0.35)' : unlocked ? 'rgba(245,158,11,0.35)' : 'rgba(239,68,68,0.35)'}; color:var(--v12-text-main, #0f172a); font-size:0.88em; padding:10px 14px; border-radius:8px; margin-bottom:14px; display:flex; align-items:center; gap:8px;">
+              ${isSavedOnDevice
+                ? `<strong>✓ Saved on device.</strong> Auto-unlocks without entering password on this device.`
+                : isSavedInSession
+                ? `<strong>✓ Saved for tab session.</strong> Auto-unlocks until browser tab is closed.`
+                : unlocked
+                ? `<strong>✓ One-time password unlocked.</strong> Password required again when app is reopened or refreshed.`
+                : `<strong>Profile locked.</strong> Enter passphrase below to unlock encryption.`}
+            </div>
+          ` : ''}
           <div class="field"><label for="profileEncryptionPassphrase">Encryption passphrase</label><input class="input" id="profileEncryptionPassphrase" type="password" autocomplete="new-password" minlength="10" placeholder="At least 10 characters"></div>
-          <div class="field" style="margin-top:8px;"><label for="rememberProfileKeyMode">Remember passphrase</label>
-            <select class="select" id="rememberProfileKeyMode">
-              <option value="device" ${isSavedOnDevice || !profile.encryption.enabled ? "selected" : ""}>Remember permanently on this device (enter once)</option>
-              <option value="session">Remember only until browser tab closes</option>
-              <option value="none">Ask every time</option>
-            </select>
+          <div class="field" style="margin-top:12px;">
+            <label style="font-weight:600; font-size:0.88em; margin-bottom:6px; display:block; color:var(--v12-text-main, #0f172a);">Passphrase Memory Option</label>
+            <div class="remember-mode-buttons" id="rememberModeButtonGroup" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:8px;">
+              <button type="button" class="remember-option-btn ${defaultMode === 'device' ? 'active' : ''}" data-mode="device" style="padding:10px 12px; border-radius:8px; border:1px solid ${defaultMode === 'device' ? 'var(--v12-primary, #2563eb)' : 'var(--v12-border, #cbd5e1)'}; background:${defaultMode === 'device' ? 'var(--v12-primary, #2563eb)' : 'transparent'}; color:${defaultMode === 'device' ? '#ffffff' : 'inherit'}; font-size:0.85em; text-align:left; cursor:pointer; display:flex; flex-direction:column; gap:3px; transition:all 0.15s ease;">
+                <strong style="font-size:0.95em;">Permanent Device</strong>
+                <span style="font-size:0.78em; opacity:0.85;">Auto-unlocks on this device</span>
+              </button>
+              <button type="button" class="remember-option-btn ${defaultMode === 'session' ? 'active' : ''}" data-mode="session" style="padding:10px 12px; border-radius:8px; border:1px solid ${defaultMode === 'session' ? 'var(--v12-primary, #2563eb)' : 'var(--v12-border, #cbd5e1)'}; background:${defaultMode === 'session' ? 'var(--v12-primary, #2563eb)' : 'transparent'}; color:${defaultMode === 'session' ? '#ffffff' : 'inherit'}; font-size:0.85em; text-align:left; cursor:pointer; display:flex; flex-direction:column; gap:3px; transition:all 0.15s ease;">
+                <strong style="font-size:0.95em;">Tab Session</strong>
+                <span style="font-size:0.78em; opacity:0.85;">Until browser tab closes</span>
+              </button>
+              <button type="button" class="remember-option-btn ${defaultMode === 'none' ? 'active' : ''}" data-mode="none" style="padding:10px 12px; border-radius:8px; border:1px solid ${defaultMode === 'none' ? 'var(--v12-primary, #2563eb)' : 'var(--v12-border, #cbd5e1)'}; background:${defaultMode === 'none' ? 'var(--v12-primary, #2563eb)' : 'transparent'}; color:${defaultMode === 'none' ? '#ffffff' : 'inherit'}; font-size:0.85em; text-align:left; cursor:pointer; display:flex; flex-direction:column; gap:3px; transition:all 0.15s ease;">
+                <strong style="font-size:0.95em;">One-Time Password</strong>
+                <span style="font-size:0.78em; opacity:0.85;">Ask for password every time</span>
+              </button>
+            </div>
+            <input type="hidden" id="rememberProfileKeyMode" value="${defaultMode}">
           </div>
-          <div class="profile-actions" style="margin-top:12px;"><button class="button button-primary" id="profileEncryptionButton" type="button">${profile.encryption.enabled ? "Unlock encryption" : "Configure encryption"}</button>${unlocked ? `<button class="button button-secondary" id="lockProfileButton" type="button">Lock now</button>` : ""}</div>
-          <p class="v13-help">The passphrase is never uploaded. "Remember permanently on this device" keeps the key saved locally so you only ever enter it once on this device.</p>
+          <div class="profile-actions" style="margin-top:14px;"><button class="button button-primary" id="profileEncryptionButton" type="button">${profile.encryption.enabled ? "Unlock encryption" : "Configure encryption"}</button>${unlocked ? `<button class="button button-secondary" id="lockProfileButton" type="button">Lock now</button>` : ""}</div>
+          <p class="v13-help">The passphrase is never uploaded. "Permanent Device" keeps the encryption key saved locally so you enter it once. "One-Time Password" asks every time.</p>
         </article>
       </div>
 
@@ -935,6 +958,20 @@
 
   function bindPanelEvents() {
     const get = id => document.getElementById(id);
+    document.querySelectorAll("#rememberModeButtonGroup .remember-option-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const mode = btn.dataset.mode;
+        const hiddenInput = get("rememberProfileKeyMode");
+        if (hiddenInput) hiddenInput.value = mode;
+        document.querySelectorAll("#rememberModeButtonGroup .remember-option-btn").forEach(b => {
+          const active = b.dataset.mode === mode;
+          b.style.borderColor = active ? "var(--v12-primary, #2563eb)" : "var(--v12-border, #cbd5e1)";
+          b.style.background = active ? "var(--v12-primary, #2563eb)" : "transparent";
+          b.style.color = active ? "#ffffff" : "inherit";
+          b.classList.toggle("active", active);
+        });
+      });
+    });
     get("renameProfileButton")?.addEventListener("click", () => run(async () => {
       const input = get("renameProfileInput");
       const name = input?.value || "";
