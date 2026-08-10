@@ -826,9 +826,11 @@
     const profile = activeProfile();
     const appLock = deviceLockConfig();
     const unlocked = memoryKeys.has(profile.id);
-    const isSavedOnDevice = Boolean(localStorage.getItem(`${PROFILE_KEY_LOCAL_PREFIX}${profile.id}`));
-    const isSavedInSession = Boolean(sessionStorage.getItem(`${PROFILE_KEY_SESSION_PREFIX}${profile.id}`)) && !isSavedOnDevice;
-    const defaultMode = isSavedOnDevice ? "device" : isSavedInSession ? "session" : "none";
+    const keyMemory = localStorage.getItem(`${PROFILE_KEY_LOCAL_PREFIX}${profile.id}`);
+    const isSavedOnDevice = unlocked && Boolean(keyMemory);
+    const sessionMemory = sessionStorage.getItem(`${PROFILE_KEY_SESSION_PREFIX}${profile.id}`);
+    const isSavedInSession = unlocked && Boolean(sessionMemory) && !isSavedOnDevice;
+    const defaultMode = Boolean(keyMemory) ? "device" : Boolean(sessionMemory) ? "session" : "none";
     const profiles = meta.profiles.map(item => `<option value="${escape(item.id)}" ${item.id === profile.id ? "selected" : ""}>${escape(item.name)} · ${escape(roleLabel(item.role))}</option>`).join("");
     const audit = loadLocalAudit().slice(0, 12);
     panel.innerHTML = `

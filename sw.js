@@ -79,7 +79,7 @@ async function cacheFirst(request) {
 
 async function staleWhileRevalidate(request) {
   const cache = await caches.open(RUNTIME_CACHE);
-  const cached = await cache.match(request);
+  const cached = await cache.match(request, { ignoreSearch: true });
   const network = fetch(request).then(response => {
     if (response && response.ok) cache.put(request, response.clone());
     return response;
