@@ -10,7 +10,7 @@
   "profileArchitectureVersion": 1,
   "encryptionVersion": 1,
   "authSecurityVersion": 1,
-  "cacheVersion": "finance-v13-20260807-v13018-signed-out-privacy-r1",
+  "cacheVersion": "finance-v13-20260810-v13018-signed-out-privacy-r1-rename2",
   "released": "2026-08-07",
   "name": "Signed-Out Privacy Lock",
   "notes": "Hides all finance data while signed out, shows zero-only privacy placeholders, blocks sensitive actions and notifications, prevents startup data flashes, and restores the existing local profile only after cloud authentication succeeds without deleting local records."
