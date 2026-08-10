@@ -515,11 +515,33 @@
       if (text) text.textContent=label;
       top.setAttribute("aria-label",`Cloud sync: ${label}`); top.title=`Cloud sync: ${label}`;
     }
-    const stateNode=document.getElementById("cloudToolbarState"), detailNode=document.getElementById("cloudToolbarDetail"), lastNode=document.getElementById("cloudToolbarLastSync"), syncButton=document.getElementById("cloudToolbarSyncNow");
+    const stateNode=document.getElementById("cloudToolbarState"), detailNode=document.getElementById("cloudToolbarDetail"), lastNode=document.getElementById("cloudToolbarLastSync"), syncButton=document.getElementById("cloudToolbarSyncNow"), fixButton=document.getElementById("cloudToolbarFixIssue");
     if (stateNode) stateNode.textContent=label;
-    if (detailNode) detailNode.textContent=detail || state.status || (label === "Synced" ? "This device matches the latest cloud state." : label === "Cloud off" ? "Cloud sync is not configured on this device." : "Review cloud sync status and settings.");
+    const conflicts = conflictCount();
+    const pendingErrors = Object.values(pending).filter(item => item.status === "error" || item.status === "conflict").length;
+    let activeDetail = detail;
+    if (!activeDetail) {
+      if (conflicts > 0) {
+        activeDetail = `${conflicts} record conflict${conflicts === 1 ? "" : "s"} need resolution.`;
+      } else if (pendingErrors > 0) {
+        activeDetail = `${pendingErrors} pending record change${pendingErrors === 1 ? "" : "s"} failed to sync.`;
+      } else if (state.lastError) {
+        activeDetail = `Sync issue: ${state.lastError}`;
+      } else {
+        activeDetail = state.status || (label === "Synced" ? "This device matches the latest cloud state." : label === "Cloud off" ? "Cloud sync is not configured on this device." : "Review cloud sync status and settings.");
+      }
+    }
+    if (detailNode) detailNode.textContent=activeDetail;
     if (lastNode) lastNode.textContent=formatDateTime(state.lastSyncAt);
     if (syncButton) syncButton.disabled=syncing || !cloudUser || !navigator.onLine || !configStatus().ok;
+    if (fixButton) {
+      if (conflicts > 0 || pendingErrors > 0 || label === "Sync issue" || Boolean(state.lastError)) {
+        fixButton.hidden = false;
+        fixButton.textContent = conflicts > 0 ? `Review ${conflicts} conflict${conflicts === 1 ? "" : "s"}` : pendingErrors > 0 ? `Fix ${pendingErrors} sync issue${pendingErrors === 1 ? "" : "s"}` : "Review & fix issue";
+      } else {
+        fixButton.hidden = true;
+      }
+    }
   }
 
   function closeTopSyncPopover() {
@@ -613,6 +635,21 @@
     const config = getStoredConfig();
     const urlInput = document.getElementById("cloudConfigUrl"); if (urlInput && !urlInput.value) urlInput.value = config.supabaseUrl;
     const keyInput = document.getElementById("cloudConfigKey"); if (keyInput && !keyInput.value) keyInput.value = config.supabasePublishableKey;
+
+    const conflicts = conflictCount();
+    const pendingErrors = Object.values(pending).filter(item => item.status === "error" || item.status === "conflict").length;
+    const overviewFix = document.getElementById("cloudOverviewFixButton");
+    const overviewSync = document.getElementById("cloudOverviewSyncNow");
+    if (overviewFix) {
+      if (conflicts > 0 || pendingErrors > 0 || state.lastError) {
+        overviewFix.hidden = false;
+        overviewFix.textContent = conflicts > 0 ? `Review ${conflicts} conflict${conflicts === 1 ? "" : "s"}` : pendingErrors > 0 ? `Fix ${pendingErrors} sync issue${pendingErrors === 1 ? "" : "s"}` : "Review & fix issue";
+      } else {
+        overviewFix.hidden = true;
+      }
+    }
+    if (overviewSync) overviewSync.disabled = syncing || !cloudUser || !navigator.onLine || !configStatus().ok;
+
     renderSyncHealth();
     renderConflicts();
   }
@@ -1621,6 +1658,30 @@
     document.getElementById("cloudToolbarClose")?.addEventListener("click",closeTopSyncPopover);
     document.getElementById("cloudToolbarSyncNow")?.addEventListener("click",()=>syncNow({reason:"toolbar"}).catch(error=>showToast(error.message,"warning")));
     document.getElementById("cloudToolbarOpenSettings")?.addEventListener("click",()=>{closeTopSyncPopover();goToPage("settings",{smooth:false});activateSettingsPanel("cloud",true);});
+    document.getElementById("cloudToolbarFixIssue")?.addEventListener("click",()=>{
+      closeTopSyncPopover();
+      goToPage("settings",{smooth:false});
+      activateSettingsPanel("cloud",true);
+      setTimeout(()=>{
+        const conflicts = document.getElementById("cloudConflictList");
+        const healthCard = document.getElementById("cloudSyncHealthCard");
+        if (conflicts && conflicts.querySelector(".cloud-conflict-item")) {
+          conflicts.scrollIntoView({ behavior: "smooth", block: "center" });
+        } else if (healthCard) {
+          healthCard.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      }, 100);
+    });
+    document.getElementById("cloudOverviewSyncNow")?.addEventListener("click", () => syncNow({reason:"overview"}).catch(error => showToast(error.message, "warning")));
+    document.getElementById("cloudOverviewFixButton")?.addEventListener("click", () => {
+      const conflicts = document.getElementById("cloudConflictList");
+      const healthCard = document.getElementById("cloudSyncHealthCard");
+      if (conflicts && conflicts.querySelector(".cloud-conflict-item")) {
+        conflicts.scrollIntoView({ behavior: "smooth", block: "center" });
+      } else if (healthCard) {
+        healthCard.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    });
     document.addEventListener("click",event=>{if(!event.target.closest("#cloudSyncToolbarPopover")&&!event.target.closest("#cloudSyncStatusButton"))closeTopSyncPopover();});
     window.addEventListener("resize",()=>{if(!document.getElementById("cloudSyncToolbarPopover")?.hidden&&typeof positionCloudToolbarPopover==="function")positionCloudToolbarPopover();});
     document.getElementById("saveCloudConfig")?.addEventListener("click",()=>{

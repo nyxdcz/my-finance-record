@@ -791,7 +791,18 @@
       if (!button) return;
       const page = button.dataset.openFinanceAlert || "dashboard";
       if (typeof goToPage === "function") goToPage(page, { smooth:false });
-      if (page === "settings" && typeof activateSettingsPanel === "function") activateSettingsPanel("cloud", true);
+      if (page === "settings" && typeof activateSettingsPanel === "function") {
+        activateSettingsPanel("cloud", true);
+        setTimeout(() => {
+          const conflicts = document.getElementById("cloudConflictList");
+          const healthCard = document.getElementById("cloudSyncHealthCard");
+          if (conflicts && conflicts.querySelector(".cloud-conflict-item")) {
+            conflicts.scrollIntoView({ behavior: "smooth", block: "center" });
+          } else if (healthCard) {
+            healthCard.scrollIntoView({ behavior: "smooth", block: "center" });
+          }
+        }, 100);
+      }
     });
     window.addEventListener("focus", () => runReviewCheck(false, { deliver:true, reason:"window focus" }).catch(() => {}));
     window.addEventListener("online", () => runReviewCheck(false, { deliver:true, reason:"online" }).catch(() => {}));
