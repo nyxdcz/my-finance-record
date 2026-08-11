@@ -1,5 +1,5 @@
 {
-  "version": "14.0.4",
+  "version": "14.0.5",
   "schemaVersion": 12,
   "cloudSchemaVersion": 3,
   "ledgerVersion": 1,
@@ -10,8 +10,8 @@
   "profileArchitectureVersion": 1,
   "encryptionVersion": 1,
   "authSecurityVersion": 1,
-  "cacheVersion": "finance-v14-20260811-v1404-agenda-navigation-r1",
+  "cacheVersion": "finance-v14-20260811-v1405-navigation-consistency-r1",
   "released": "2026-08-11",
-  "name": "Agenda Workflow & Responsive Navigation",
-  "notes": "Adds a compact full-view Project Agenda with completion tracking and date urgency colors, safer local-versus-cloud conflict review, and a responsive desktop icon rail while preserving saved records, mobile navigation, and finance schemas."
+  "name": "Desktop Navigation Consistency",
+  "notes": "Standardizes desktop navigation contrast and terminology, removes the duplicate desktop menu toggle, clarifies pin and unpin states, and preserves the mobile drawer, saved navigation preference, records, and finance schemas."
 }

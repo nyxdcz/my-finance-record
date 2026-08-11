@@ -1,4 +1,4 @@
-# My Finance Records · V14.0.4 PWA
+# My Finance Records · V14.0.5 PWA
 
 Local-first profile-based personal and household finance manager with optional encrypted cloud synchronization.
 
@@ -30,6 +30,16 @@ Local-first profile-based personal and household finance manager with optional e
    Navigate to `http://localhost:3000` in your web browser.
 
 ---
+
+## V14.0.5 · Desktop Navigation Consistency
+
+- Uses the same high-contrast mint active state with dark-teal text in light and dark themes.
+- Keeps one visible desktop navigation control by hiding the top-bar hamburger while the icon rail is available.
+- Replaces the rail hamburger with distinct pin and unpin icons plus matching accessible labels.
+- Renames navigation groups to Overview, Finance, Work, and Insights while preserving every destination label and route.
+- Gives collapsed-rail tooltips more time to appear before hover expansion and slightly improves expanded group-label readability.
+- Adds browser coverage for dark-theme contrast, one desktop toggle, group terminology, and preserved mobile drawer controls.
+- Finance Schema 12, Cloud Schema V3, saved records, calculations, and mobile navigation behavior remain unchanged.
 
 ## V14.0.4 · Agenda Workflow & Responsive Navigation
 
@@ -197,16 +207,16 @@ Local-first profile-based personal and household finance manager with optional e
 
 ## macOS File Inspection and Fixes installer
 
-Use the tracked V14.0.4 **File Inspection and Fixes** installer when validating this repository on a Mac.
+Use the tracked V14.0.5 **File Inspection and Fixes** installer when validating this repository on a Mac.
 
 1. Clone or update the repository.
-2. Double-click `Install_V14_0_4.command`.
-3. If macOS reports that the file is not executable, run `chmod +x Install_V14_0_4.command` once and reopen it.
+2. Double-click `Install_V14_0_5.command`.
+3. If macOS reports that the file is not executable, run `chmod +x Install_V14_0_5.command` once and reopen it.
 4. The installer verifies Node.js 22+, installs the locked dependencies with `npm ci`, runs repository inspection, linting, maintainability checks, regression validation, and `git diff --check`.
 5. Set `RUN_BROWSER_TESTS=1` when launching it from Terminal to include the Playwright browser suite after installing Chromium with `npx playwright install chromium`.
 6. The installer **does not commit or push**. Review `git status` and publish only after validation succeeds.
 
-Requirements: macOS, Git, and Node.js 22 or newer. The installer is safe to run repeatedly on V14.0.4.
+Requirements: macOS, Git, and Node.js 22 or newer. The installer is safe to run repeatedly on V14.0.5.
 
 
 ## V13.0.2 · Simplified Settings UI

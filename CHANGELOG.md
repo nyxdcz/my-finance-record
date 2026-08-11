@@ -1,3 +1,16 @@
+## 14.0.5 · 2026-08-11
+
+### Fixed
+- Corrected the dark-theme active-navigation cascade so selected destinations use an accessible mint background with dark-teal text in both themes.
+- Removed the hidden-but-focusable duplicate desktop hamburger by keeping the rail control as the single desktop navigation toggle.
+
+### Changed
+- Replaced the rail hamburger with distinct pin and unpin states and consistent accessible wording.
+- Renamed navigation groups to Overview, Finance, Work, and Insights, increased expanded group-label readability, and lengthened hover expansion to preserve tooltip usefulness.
+
+### Tested
+- Added browser assertions for dark-theme active contrast, one visible desktop navigation toggle, consistent group labels, and the preserved mobile drawer.
+
 ## 14.0.4 · 2026-08-11
 
 ### Added
