@@ -1,5 +1,5 @@
 {
-  "version": "14.0.6",
+  "version": "14.0.7",
   "schemaVersion": 12,
   "cloudSchemaVersion": 3,
   "ledgerVersion": 1,
@@ -10,8 +10,8 @@
   "profileArchitectureVersion": 1,
   "encryptionVersion": 1,
   "authSecurityVersion": 1,
-  "cacheVersion": "finance-v14-20260812-v1406-ui-accessibility-privacy-r1",
+  "cacheVersion": "finance-v14-20260812-v1407-cloud-conflict-resolution-r1",
   "released": "2026-08-12",
-  "name": "UI Accessibility & Privacy Reliability",
-  "notes": "Keeps pinned navigation beside content, restores readable dark-theme contrast, and makes signed-out Settings controls truthful while preserving the existing design, data, and finance schemas."
+  "name": "Cloud Conflict Resolution Reliability",
+  "notes": "Applies the selected cloud or device record transactionally, reports resolution progress and failures, and keeps conflict state recoverable without changing finance or cloud schemas."
 }

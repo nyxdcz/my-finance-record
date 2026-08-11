@@ -1,3 +1,17 @@
+## 14.0.7 · 2026-08-12
+
+### Fixed
+- Persisted the selected remote payload and revision when choosing **Use cloud version**, preventing the previous local base record from remaining active.
+- Rebased **Use this device** on the reviewed cloud revision before scheduling its retry.
+- Replaced silent stale-conflict and browser-storage failures with actionable messages.
+
+### Changed
+- Conflict actions now show a busy state and close only after the selected state transition succeeds.
+- Saved choices survive interface-refresh failures and prompt the user to reload when needed.
+
+### Tested
+- Added state-level regression fixtures for cloud and device choices, including base-record, pending-queue, and conflict-list assertions.
+
 ## 14.0.6 · 2026-08-12
 
 ### Fixed

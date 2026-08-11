@@ -1,9 +1,10 @@
 "use strict";
 
-/* My Finance Records V14.0.6 · Explicit side-by-side Cloud Sync conflict review UI. */
+/* My Finance Records V14.0.7 · Explicit side-by-side Cloud Sync conflict review UI. */
 (function financeCloudConflictReviewBootstrap() {
   let callbacks = {};
   let bound = false;
+  const defaultActionLabels = new Map();
 
   function escapeHtml(value) {
     return String(value ?? "").replace(/[&<>"']/g, character => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#039;" })[character]);
@@ -46,7 +47,16 @@
   function close() {
     const dialog = document.getElementById("cloudConflictReviewDialog");
     if (dialog?.open) dialog.close();
-    if (dialog) { delete dialog.dataset.keyToken; delete dialog.dataset.conflictId; }
+    if (dialog) {
+      dialog.querySelectorAll("[data-conflict-review-action]").forEach(button => {
+        button.disabled = false;
+        if (defaultActionLabels.has(button)) button.textContent = defaultActionLabels.get(button);
+      });
+      const status = dialog.querySelector("#cloudConflictReviewStatus");
+      if (status) { status.hidden = true; status.textContent = ""; status.className = "dialog-action-status"; }
+      delete dialog.dataset.keyToken;
+      delete dialog.dataset.conflictId;
+    }
   }
 
   function ensure() {
@@ -64,9 +74,46 @@
           <div id="cloudConflictComparisonRows"></div>
         </div>
         <p class="cloud-conflict-warning">Using this device will write its pending record over the current cloud record. Using the cloud version will discard this device’s pending record.</p>
+        <p class="dialog-action-status" id="cloudConflictReviewStatus" role="status" aria-live="polite" hidden></p>
       </div>
       <div class="modal-footer cloud-conflict-review-footer"><button class="button button-secondary dialog-secondary-leading" data-conflict-review-action="download" type="button">Download both</button><span class="footer-spacer"></span><button class="button button-secondary" data-conflict-review-action="later" type="button">Resolve later</button><button class="button button-danger" data-conflict-review-action="cloud" type="button">Use cloud version</button><button class="button button-primary" data-conflict-review-action="device" type="button">Use this device</button></div>`;
     document.body.appendChild(dialog);
+  }
+
+  function setActionState(dialog, activeButton, { busy = false, message = "", tone = "info" } = {}) {
+    dialog.querySelectorAll("[data-conflict-review-action]").forEach(button => {
+      if (!defaultActionLabels.has(button)) defaultActionLabels.set(button, button.textContent);
+      button.disabled = busy;
+      button.setAttribute("aria-disabled", busy ? "true" : "false");
+      button.setAttribute("aria-busy", busy && button === activeButton ? "true" : "false");
+      button.textContent = busy && button === activeButton
+        ? (button.dataset.conflictReviewAction === "cloud" ? "Using cloud…" : "Using device…")
+        : defaultActionLabels.get(button);
+    });
+    const status = dialog.querySelector("#cloudConflictReviewStatus");
+    if (status) {
+      status.hidden = !message;
+      status.textContent = message;
+      status.className = `dialog-action-status ${tone}`;
+    }
+  }
+
+  async function runResolutionAction(dialog, button, action) {
+    const callback = action === "cloud" ? callbacks.onUseCloud : callbacks.onUseDevice;
+    if (typeof callback !== "function") {
+      setActionState(dialog, button, { message:"Conflict resolution is unavailable. Reload the app and try again.", tone:"danger" });
+      return;
+    }
+    const keyToken = dialog.dataset.keyToken;
+    setActionState(dialog, button, { busy:true, message:"Applying your choice…" });
+    try {
+      const result = await callback(keyToken);
+      if (result === false) throw new Error("The conflict changed before your choice was applied. Review the latest versions and try again.");
+      close();
+    } catch (error) {
+      setActionState(dialog, button, { message:error?.message || "Could not resolve this conflict. Try again.", tone:"danger" });
+      button.focus();
+    }
   }
 
   function bind(nextCallbacks = {}) {
@@ -75,14 +122,14 @@
     const dialog = document.getElementById("cloudConflictReviewDialog");
     if (!dialog || bound) return;
     bound = true;
-    dialog.addEventListener("click", event => {
-      const action = event.target.closest("[data-conflict-review-action]")?.dataset.conflictReviewAction;
+    dialog.addEventListener("click", async event => {
+      const button = event.target.closest("[data-conflict-review-action]");
+      const action = button?.dataset.conflictReviewAction;
       if (!action) return;
+      event.preventDefault();
       if (action === "later") return close();
       if (action === "download") return callbacks.onDownload?.(dialog.dataset.conflictId);
-      if (action === "cloud") callbacks.onUseCloud?.(dialog.dataset.keyToken);
-      if (action === "device") callbacks.onUseDevice?.(dialog.dataset.keyToken);
-      close();
+      if (action === "cloud" || action === "device") await runResolutionAction(dialog, button, action);
     });
   }
 
@@ -95,8 +142,9 @@
     document.getElementById("cloudConflictReviewTitle").textContent = title;
     document.getElementById("cloudConflictReviewReason").textContent = item.reason || "Both devices changed this record.";
     document.getElementById("cloudConflictComparisonRows").innerHTML = comparisonRows(item).map(row => `<div class="cloud-conflict-comparison-row" role="row"><strong role="rowheader">${escapeHtml(row.label)}</strong><span role="cell">${escapeHtml(row.local)}</span><span role="cell">${escapeHtml(row.remote)}</span></div>`).join("");
+    setActionState(dialog, null);
     dialog.showModal();
   }
 
-  window.FinanceCloudConflictReview = { bind, close, ensure, open, comparisonRows };
+  window.FinanceCloudConflictReview = { bind, close, ensure, open, comparisonRows, runResolutionAction };
 })();
