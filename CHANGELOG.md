@@ -1,3 +1,16 @@
+## 14.0.11 · 2026-08-12
+
+### Added
+- Added persistent, accessible Undo and Redo controls to the desktop header, with matching mobile actions in More tools and standard keyboard shortcuts.
+- Added a compact Settings topic search that opens the correct section and expands its related More options area when needed.
+
+### Changed
+- History actions now explain why they are unavailable, remain disabled while finance data is privacy-locked, and clear redo after a new edit.
+- Settings search is keyboard navigable, responsive, and limited to privacy-safe Sync and App topics while signed out.
+
+### Preserved
+- Existing compact Settings sections, finance records, local-first storage, Cloud Schema V3 synchronization, encryption, profiles, and calculations remain unchanged.
+
 ## 14.0.10 · 2026-08-12
 
 ### Changed

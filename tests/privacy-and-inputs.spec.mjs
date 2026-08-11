@@ -273,6 +273,11 @@ test("Settings overview stays compact and responsive", async ({ page }) => {
   await expect(rows).toHaveCount(5);
   await expect(settings.locator(".settings-nav-group")).toHaveText(["Start", "Your data", "Protection", "App"]);
   await expect(settings.locator(".settings-overview-grid")).toHaveCSS("grid-template-columns", /.+ .+/);
+  await expect(settings.locator("#settingsSearchButton")).toBeVisible();
+  await expect(settings.locator("#settingsSearchPanel")).toBeHidden();
+  await settings.locator("#settingsSearchPanel").evaluate(node => { node.hidden = false; });
+  await expect(settings.locator("#settingsSearchInput")).toBeVisible();
+  await expect(settings.locator(".settings-search-results")).toHaveCSS("grid-template-columns", /.+ .+/);
   for (const row of await rows.all()) {
     await expect(row).toHaveAttribute("type", "button");
     expect((await row.boundingBox())?.height || 0).toBeLessThanOrEqual(100);
@@ -280,7 +285,21 @@ test("Settings overview stays compact and responsive", async ({ page }) => {
 
   await page.setViewportSize({ width:393, height:852 });
   await expect(settings.locator(".settings-overview-grid")).toHaveCSS("grid-template-columns", "1fr");
+  expect(await settings.locator(".settings-search-results").evaluate(node => getComputedStyle(node).gridTemplateColumns.trim().split(/\s+/).length)).toBe(1);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+});
+
+test("history actions stay compact on desktop and move into mobile More tools", async ({ page }) => {
+  await loadStaticApp(page, { width:1200, height:900 });
+  await expect(page.locator("#undoMoneyButton")).toBeVisible();
+  await expect(page.locator("#redoMoneyButton")).toBeVisible();
+  await expect(page.locator("#undoMoneyButton")).toBeDisabled();
+  await expect(page.locator("#redoMoneyButton")).toBeDisabled();
+  await page.setViewportSize({ width:393, height:852 });
+  await expect(page.locator(".topbar-history-actions")).toBeHidden();
+  await page.locator("#topbarToolsMenu").evaluate(node => { node.open = true; });
+  await expect(page.locator("#undoMoneyMenuButton")).toBeVisible();
+  await expect(page.locator("#redoMoneyMenuButton")).toBeVisible();
 });
 
 for (const viewport of [

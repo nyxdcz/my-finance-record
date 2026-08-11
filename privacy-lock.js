@@ -8,6 +8,7 @@
     "#topbarToolsMenu > summary", "#themeToggleButton", "#privacySignInButton", ".finance-privacy-signin",
     "[data-help-key]", "[data-section-help]", "[data-close='sectionHelpDialog']", "[data-close='pwaInstallGuideDialog']",
     "[data-settings-tab='sync']", "[data-settings-tab='app']", "#settingsBackButton", "[data-settings-open='sync']", "[data-settings-open='app']",
+    "#settingsSearchButton", "#settingsSearchInput", "#settingsSearchClear", "[data-settings-search-result]",
     "#cloudConfigUrl", "#cloudConfigKey", "#saveCloudConfig", "#clearCloudConfig",
     "#cloudAuthEmail", "#cloudAuthPassword", "#cloudPasswordToggle", "#cloudSignIn", "#cloudCreateAccount", "#cloudForgotPassword", "#cloudTestConnection",
     "#cloudRecoveryEmail", "#cloudRecoveryCode", "#cloudRecoveryResend", "#cloudVerifyRecoveryCode", "#cloudRecoveryBackToSignIn",
