@@ -4973,31 +4973,30 @@
     /* V13.0.2 simplified Settings UI */
     .settings-mobile-back { display:none; }
     .settings-mobile-back svg { width:18px; height:18px; flex:0 0 auto; }
+    #settings .settings-nav-group { margin:7px 8px 1px; color:var(--muted); font-size:.58rem; font-weight:900; letter-spacing:.08em; text-transform:uppercase; }
     #settings .settings-tablist button { display:grid; gap:1px; align-content:center; }
     #settings .settings-tablist button > span { color:inherit; font-size:.78rem; font-weight:850; }
     #settings .settings-tablist button > small { color:var(--muted); font-size:.62rem; font-weight:650; }
     #settings .settings-tablist button[aria-selected="true"] > small { color:var(--primary-contrast); }
     .settings-overview-panel { align-content:start; }
-    .settings-welcome-card { display:flex; align-items:center; min-height:116px; background:linear-gradient(135deg,color-mix(in srgb,var(--primary) 13%,var(--surface)),var(--surface)); }
-    .settings-eyebrow { display:block; margin-bottom:4px; color:var(--primary); font-size:.66rem; font-weight:900; letter-spacing:.08em; text-transform:uppercase; }
-    .settings-welcome-card h3,.settings-guidance-card h3 { margin:0 0 4px; }
-    .settings-welcome-card p,.settings-guidance-card p { margin:0; color:var(--muted); line-height:1.5; }
+    .settings-overview-heading { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:2px 1px 5px; }
+    .settings-overview-heading h3,.settings-overview-heading p { margin:0; }
+    .settings-overview-heading p { margin-top:2px; color:var(--muted); font-size:.68rem; }
     .settings-overview-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
-    .settings-status-card { min-height:220px; display:flex; flex-direction:column; gap:13px; }
-    .settings-status-card > div:nth-child(2) { display:grid; gap:4px; }
-    .settings-status-card h3,.settings-status-card p { margin:0; }
-    .settings-status-card strong { font-size:.96rem; }
-    .settings-status-card p { color:var(--muted); font-size:.72rem; line-height:1.45; }
-    .settings-status-card .button { margin-top:auto; align-self:flex-start; }
-    .settings-status-card-top { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+    #settings .settings-status-card { min-height:82px; display:grid; grid-template-columns:38px minmax(0,1fr) auto 12px; align-items:center; gap:10px; padding:10px; color:var(--text); text-align:left; cursor:pointer; }
+    #settings .settings-status-card:hover { border-color:color-mix(in srgb,var(--primary) 42%,var(--line)); background:color-mix(in srgb,var(--primary) 5%,var(--surface)); }
+    .settings-status-copy { min-width:0; display:grid; gap:1px; }
+    .settings-status-copy > span { font-size:.7rem; font-weight:850; }
+    .settings-status-copy strong { overflow:hidden; font-size:.82rem; text-overflow:ellipsis; white-space:nowrap; }
+    .settings-status-copy small { overflow:hidden; color:var(--muted); font-size:.62rem; text-overflow:ellipsis; white-space:nowrap; }
     .settings-status-icon { width:38px; height:38px; display:grid; place-items:center; border:1px solid color-mix(in srgb,var(--primary) 34%,var(--line)); border-radius:9px; background:color-mix(in srgb,var(--primary) 10%,var(--surface)); color:var(--primary); }
     .settings-status-icon svg { width:21px; height:21px; }
+    .settings-row-arrow { color:var(--muted); font-size:1.25rem; line-height:1; }
     .settings-state-chip { display:inline-flex; align-items:center; min-height:24px; padding:3px 8px; border:1px solid var(--line); border-radius:999px; font-size:.62rem; font-weight:850; }
     .settings-state-chip.success { border-color:color-mix(in srgb,var(--green) 44%,var(--line)); background:color-mix(in srgb,var(--green) 12%,var(--surface)); color:var(--green); }
     .settings-state-chip.warning { border-color:color-mix(in srgb,var(--orange) 48%,var(--line)); background:color-mix(in srgb,var(--orange) 12%,var(--surface)); color:var(--orange); }
     .settings-state-chip.danger { border-color:color-mix(in srgb,var(--red) 48%,var(--line)); background:color-mix(in srgb,var(--red) 11%,var(--surface)); color:var(--red); }
     .settings-state-chip.neutral { color:var(--muted); }
-    .settings-guidance-card { border-style:dashed; }
 
     .settings-section-intro { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; padding:13px; border:1px solid var(--line); border-radius:9px; background:var(--surface-soft); }
     .settings-section-intro h3,.settings-section-intro p { margin:0; }
@@ -5024,6 +5023,9 @@
     .settings-danger-zone > summary strong { color:var(--red); }
     .settings-danger-actions { display:flex; flex-wrap:wrap; gap:8px; }
     .settings-danger-note { margin:0; color:var(--muted); font-size:.68rem; line-height:1.45; }
+    .settings-walkthrough { display:flex; align-items:center; justify-content:space-between; gap:10px; padding-top:2px; }
+    .settings-walkthrough > span { color:var(--muted); font-size:.66rem; font-weight:800; }
+    .settings-walkthrough > div { display:flex; flex-wrap:wrap; gap:7px; }
     #settings .settings-form-clean button[type="submit"]:disabled { opacity:.52; cursor:not-allowed; }
     #settings .settings-form-save-note { margin:0; color:var(--muted); font-size:.64rem; }
     #settings .settings-panel > .v12-section-heading { display:none; }
@@ -5043,19 +5045,21 @@
       #settings.settings-category-open .settings-mobile-back[hidden] { display:none; }
       #settingsMobileCurrentTitle { padding-right:7px; font-size:.78rem; }
       #settings .settings-overview-grid { grid-template-columns:1fr 1fr; }
-      #settings .settings-status-card { min-height:190px; }
       #settings > .settings-navigation::before,#settings > .settings-navigation::after { display:none !important; }
     }
     @media (max-width:700px) {
       #settings .settings-overview-grid { grid-template-columns:1fr; }
-      #settings .settings-status-card { min-height:0; }
-      #settings .settings-status-card .button { width:100%; }
+      #settings .settings-status-card { min-height:76px; grid-template-columns:38px minmax(0,1fr) auto; }
+      #settings .settings-row-arrow { display:none; }
       #settings .settings-quick-status { grid-template-columns:1fr; }
       #settings .profile-settings-primary { grid-template-columns:1fr; }
       #settings .settings-disclosure > summary { min-height:58px; }
       #settings .settings-disclosure-body { padding:0 8px 8px; }
       #settings .settings-danger-actions { display:grid; grid-template-columns:1fr; }
       #settings .settings-danger-actions .button { width:100%; }
+      #settings .settings-walkthrough { display:grid; }
+      #settings .settings-walkthrough > div { display:grid; grid-template-columns:1fr; }
+      #settings .settings-walkthrough .button { width:100%; }
     }
 
 
