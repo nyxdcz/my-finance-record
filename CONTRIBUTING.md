@@ -45,5 +45,5 @@ Direct pushes to `main` are discouraged. Configure GitHub branch protection to r
 
 1. Merge the validated version change to `main`.
 2. Confirm the hosted application and `version.json` report the intended version.
-3. Create and push an annotated tag matching `package.json`, for example `git tag -a v14.0.2 -m "My Finance Records v14.0.2"` followed by `git push origin v14.0.2`.
+3. Create and push an annotated tag matching `package.json`, for example `git tag -a v14.0.3 -m "My Finance Records v14.0.3"` followed by `git push origin v14.0.3`.
 4. The Tagged Release workflow validates the tag and creates the GitHub release with generated notes.

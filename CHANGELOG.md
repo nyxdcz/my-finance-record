@@ -1,3 +1,19 @@
+## 14.0.3 · 2026-08-11
+
+### Changed
+- Replaced the Projects monthly calendar and month navigation with one complete Project Agenda ordered by date and time.
+- Kept agenda scheduling, editing, deletion, reminders, linked projects, and ICS export available from Projects.
+- Added version-pinned agenda assets to the V14.0.3 offline application shell.
+
+### Fixed
+- Projects every valid agenda date onto the Dashboard monthly calendar using stable agenda identities.
+- Refreshes Dashboard markers and selected-day events after local agenda changes and cross-tab storage updates.
+- Reads the latest stored agenda for Dashboard rendering instead of returning a potentially stale in-memory copy.
+
+### Preserved
+- Existing agenda records remain under `simple-finance-project-calendar-v13.0.20`; no migration or record deletion is performed.
+- Finance Schema 12, Cloud Schema V3, encryption, Supabase tables, financial calculations, and finance records are unchanged.
+
 ## 14.0.2 · 2026-08-11
 
 ### Fixed

@@ -1,7 +1,7 @@
 "use strict";
-const APP_VERSION = "14.0.2";
+const APP_VERSION = "14.0.3";
 self.__FINANCE_APP_VERSION = APP_VERSION;
-const CACHE_VERSION = "finance-v14-20260811-v1402-sync-version-display-r1";
+const CACHE_VERSION = "finance-v14-20260811-v1403-project-agenda-r1";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const DB_NAME = "simple-finance-project-records-v12-db";
@@ -15,23 +15,23 @@ const APP_SHELL = [
   asset("./offline.html"),
   asset("./manifest.webmanifest"),
   asset("./version.json"),
-  asset("./app.css?v=14.0.2"),
-  asset("./privacy-lock.js?v=14.0.2"),
-  asset("./security-profiles.js?v=14.0.2"),
-  asset("./security-profiles.css?v=14.0.2"),
-  asset("./cloud-sync.js?v=14.0.2"),
-  asset("./account-ledger.js?v=14.0.2"),
-  asset("./account-ledger.css?v=14.0.2"),
-  asset("./budget-planning.js?v=14.0.2"),
-  asset("./budget-planning.css?v=14.0.2"),
-  asset("./reports-insights.js?v=14.0.2"),
-  asset("./reports-insights.css?v=14.0.2"),
-  asset("./productivity-tools.js?v=14.0.2"),
-  asset("./productivity-tools.css?v=14.0.2"),
-  asset("./reminders-alerts.js?v=14.0.2"),
-  asset("./reminders-alerts.css?v=14.0.2"),
-  asset("./projects-calendar-v13.0.20.js"),
-  asset("./projects-calendar-v13.0.20.css"),
+  asset("./app.css?v=14.0.3"),
+  asset("./privacy-lock.js?v=14.0.3"),
+  asset("./security-profiles.js?v=14.0.3"),
+  asset("./security-profiles.css?v=14.0.3"),
+  asset("./cloud-sync.js?v=14.0.3"),
+  asset("./account-ledger.js?v=14.0.3"),
+  asset("./account-ledger.css?v=14.0.3"),
+  asset("./budget-planning.js?v=14.0.3"),
+  asset("./budget-planning.css?v=14.0.3"),
+  asset("./reports-insights.js?v=14.0.3"),
+  asset("./reports-insights.css?v=14.0.3"),
+  asset("./productivity-tools.js?v=14.0.3"),
+  asset("./productivity-tools.css?v=14.0.3"),
+  asset("./reminders-alerts.js?v=14.0.3"),
+  asset("./reminders-alerts.css?v=14.0.3"),
+  asset("./projects-calendar-v13.0.20.js?v=14.0.3"),
+  asset("./projects-calendar-v13.0.20.css?v=14.0.3"),
   asset("./sync-config.js"),
   asset("./vendor/supabase.min.js"),
   asset("./icons/icon-192.png"),
