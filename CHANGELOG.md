@@ -1,3 +1,13 @@
+## 14.0.10 · 2026-08-12
+
+### Changed
+- Replaced large Settings overview cards with compact, fully clickable status rows for Accounts, Work & Calendar, Profile & Security, Sync & Backup, and App & About.
+- Grouped Settings navigation into Start, Your data, Protection, and App, with Back to overview and Next section actions for a clearer walkthrough.
+- Consolidated secondary controls into one More options disclosure per section while keeping destructive controls in a separate collapsed Danger zone.
+
+### Preserved
+- Existing settings, saved finance records, local-first storage, Cloud Schema V3 synchronization, encryption, backup, profile, and security behavior remain available.
+
 ## 14.0.9 · 2026-08-12
 
 ### Changed

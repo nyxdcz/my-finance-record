@@ -262,6 +262,27 @@ test("dark theme keeps representative controls and labels readable", async ({ pa
   }
 });
 
+test("Settings overview stays compact and responsive", async ({ page }) => {
+  await loadStaticApp(page, { width:1200, height:900 });
+  await page.evaluate(() => {
+    document.querySelectorAll(".page").forEach(section => section.classList.remove("active"));
+    document.getElementById("settings").classList.add("active");
+  });
+  const settings = page.locator("#settings");
+  const rows = settings.locator(".settings-status-card");
+  await expect(rows).toHaveCount(5);
+  await expect(settings.locator(".settings-nav-group")).toHaveText(["Start", "Your data", "Protection", "App"]);
+  await expect(settings.locator(".settings-overview-grid")).toHaveCSS("grid-template-columns", /.+ .+/);
+  for (const row of await rows.all()) {
+    await expect(row).toHaveAttribute("type", "button");
+    expect((await row.boundingBox())?.height || 0).toBeLessThanOrEqual(100);
+  }
+
+  await page.setViewportSize({ width:393, height:852 });
+  await expect(settings.locator(".settings-overview-grid")).toHaveCSS("grid-template-columns", "1fr");
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+});
+
 for (const viewport of [
   { width: 393, height: 852 },
   { width: 360, height: 800 }
