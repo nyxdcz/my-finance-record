@@ -437,10 +437,6 @@
     events = safeRead();
     render();
 
-    // Make the release visible even though v13.0.20 is loaded as a modular extension.
-    document.title = document.title.replace(/V\d+\.\d+\.\d+/i, `V${VERSION}`);
-    const badge = document.getElementById("buildBadge");
-    if (badge) badge.textContent = `V${VERSION}`;
   }
 
   function bootWhenAuthenticated() {

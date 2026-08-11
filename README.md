@@ -1,4 +1,4 @@
-# My Finance Records · V14.0.1 PWA
+# My Finance Records · V14.0.2 PWA
 
 Local-first profile-based personal and household finance manager with optional encrypted cloud synchronization.
 
@@ -30,6 +30,14 @@ Local-first profile-based personal and household finance manager with optional e
    Navigate to `http://localhost:3000` in your web browser.
 
 ---
+
+## V14.0.2 · Version Display & Sync Conflict Recovery
+
+- Uses the central app version for the browser title, top-bar build badge, Settings overview, offline cache, and release history; the V13.0.20 calendar module no longer overwrites current release metadata.
+- Makes routine account-ledger recalculation pure so startup, rendering, and hourly refreshes do not generate a new settings timestamp or save unchanged finance data.
+- Keeps `ledgerSettings.lastRecalculatedAt` device-local instead of synchronizing it through `settings:preferences`.
+- Sanitizes existing local cloud base, pending, and conflict records and automatically clears or safely rebases conflicts that only involved the derived ledger timestamp. Genuine overlapping preference changes remain available for manual review.
+- Finance Schema 12, Cloud Schema V3, encryption, account balances, ledger entries, and Supabase tables are unchanged.
 
 ## V14.0.1 · Repository Quality & Release Hardening
 
@@ -172,16 +180,16 @@ Local-first profile-based personal and household finance manager with optional e
 
 ## macOS File Inspection and Fixes installer
 
-Use the tracked V14.0.1 **File Inspection and Fixes** installer when validating this repository on a Mac.
+Use the tracked V14.0.2 **File Inspection and Fixes** installer when validating this repository on a Mac.
 
 1. Clone or update the repository.
-2. Double-click `Install_V14_0_1.command`.
-3. If macOS reports that the file is not executable, run `chmod +x Install_V14_0_1.command` once and reopen it.
+2. Double-click `Install_V14_0_2.command`.
+3. If macOS reports that the file is not executable, run `chmod +x Install_V14_0_2.command` once and reopen it.
 4. The installer verifies Node.js 22+, installs the locked dependencies with `npm ci`, runs repository inspection, linting, maintainability checks, regression validation, and `git diff --check`.
 5. Set `RUN_BROWSER_TESTS=1` when launching it from Terminal to include the Playwright browser suite after installing Chromium with `npx playwright install chromium`.
 6. The installer **does not commit or push**. Review `git status` and publish only after validation succeeds.
 
-Requirements: macOS, Git, and Node.js 22 or newer. The installer is safe to run repeatedly on V14.0.1.
+Requirements: macOS, Git, and Node.js 22 or newer. The installer is safe to run repeatedly on V14.0.2.
 
 
 ## V13.0.2 · Simplified Settings UI

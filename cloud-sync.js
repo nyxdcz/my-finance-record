@@ -1,10 +1,10 @@
 "use strict";
 
-/* My Finance Records V14.0.1 · Encrypted profile-scoped Cloud Sync 3.0.
+/* My Finance Records V14.0.2 · Encrypted profile-scoped Cloud Sync 3.0.
    Local storage remains the immediate working copy. Cloud Schema V3 exchanges only
    changed encrypted records, commits related changes atomically, and preserves an immutable audit trail. */
 (function financeCloudSyncV3Bootstrap() {
-  const APP_VERSION_FALLBACK = "14.0.1";
+  const APP_VERSION_FALLBACK = "14.0.2";
   const APP_VERSION_CODE = 130000;
   const CLOUD_SCHEMA_VERSION = 3;
   const CORE_SCHEMA_VERSION = 12;
@@ -160,7 +160,6 @@
     }
     return (hash >>> 0).toString(16).padStart(8, "0");
   }
-
   function same(a, b) { return checksum(a) === checksum(b); }
   function nowIso() { return new Date().toISOString(); }
   function uid(prefix = "sync") { return globalThis.crypto?.randomUUID?.() || `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`; }
@@ -169,7 +168,12 @@
   function keyToken(key) { return encodeURIComponent(String(key || "")); }
   function keyFromToken(token) { try { return decodeURIComponent(String(token || "")); } catch (error) { return String(token || ""); } }
   function isObject(value) { return Boolean(value && typeof value === "object" && !Array.isArray(value)); }
-
+  function isSettingsPreferences(collection, recordId) { return collection === "settings" && recordId === "preferences"; }
+  function sanitizeRecordPayload(collection, recordId, payload) {
+    const output = clone(isObject(payload) ? payload : {});
+    if (!isSettingsPreferences(collection, recordId) || !isObject(output.ledgerSettings)) return output;
+    output.ledgerSettings = clone(output.ledgerSettings); delete output.ledgerSettings.lastRecalculatedAt; return output;
+  }
   function deepMerge(original, incoming) {
     if (!isObject(original) || !isObject(incoming)) return clone(incoming === undefined ? original : incoming);
     const result = clone(original);
@@ -178,7 +182,6 @@
     });
     return result;
   }
-
   function threeWayMerge(baseValue, localValue, remoteValue, path = "", overlap = []) {
     if (same(localValue, remoteValue)) return clone(localValue);
     if (same(localValue, baseValue)) return clone(remoteValue);
@@ -194,45 +197,66 @@
     overlap.push(path || "record");
     return clone(localValue);
   }
-
   function normalizeRecordStore(value) {
     const output = {};
     if (!isObject(value)) return output;
     Object.entries(value).forEach(([key, row]) => {
       if (!row || !row.collection || !row.recordId) return;
       output[key] = {
-        collection:String(row.collection), recordId:String(row.recordId), payload:clone(row.payload || {}),
-        sortIndex:Number(row.sortIndex || 0), revision:Number(row.revision || 0),
-        deletedAt:row.deletedAt || "", updatedAt:row.updatedAt || "",
+        collection:String(row.collection), recordId:String(row.recordId), payload:sanitizeRecordPayload(String(row.collection),String(row.recordId),row.payload),
+        sortIndex:Number(row.sortIndex || 0), revision:Number(row.revision || 0), deletedAt:row.deletedAt || "", updatedAt:row.updatedAt || "",
         updatedByDevice:row.updatedByDevice || "", appVersion:row.appVersion || "",
         appVersionCode:Number(row.appVersionCode || 0), minWriterVersionCode:Number(row.minWriterVersionCode || APP_VERSION_CODE)
       };
     });
     return output;
   }
-
   function normalizeQueue(value) {
     const output = {};
     if (!isObject(value)) return output;
     Object.entries(value).forEach(([key, item]) => {
       if (!item || !item.collection || !item.recordId) return;
       output[key] = {
-        ...item,
-        payload:clone(item.payload || {}),
-        basePayload:item.basePayload === undefined ? null : clone(item.basePayload),
-        baseRevision:Number(item.baseRevision || 0), sortIndex:Number(item.sortIndex || 0),
-        baseSortIndex:Number(item.baseSortIndex || 0), deleted:Boolean(item.deleted),
+        ...item, payload:sanitizeRecordPayload(String(item.collection),String(item.recordId),item.payload),
+        basePayload:item.basePayload == null ? null : sanitizeRecordPayload(String(item.collection),String(item.recordId),item.basePayload),
+        baseRevision:Number(item.baseRevision || 0), sortIndex:Number(item.sortIndex || 0), baseSortIndex:Number(item.baseSortIndex || 0), deleted:Boolean(item.deleted),
         attempts:Number(item.attempts || 0), nextAttemptAt:Number(item.nextAttemptAt || 0),
         status:["pending","retrying","error","conflict"].includes(item.status) ? item.status : "pending"
       };
     });
     return output;
   }
-
   function normalizeConflicts(value) {
-    return (Array.isArray(value) ? value : []).filter(item => item?.id && item?.key).slice(0, MAX_CONFLICTS);
+    return (Array.isArray(value) ? value : []).filter(item => item?.id && item?.key).slice(0, MAX_CONFLICTS).map(item => ({ ...item,
+      localPayload:sanitizeRecordPayload(String(item.collection || ""),String(item.recordId || ""),item.localPayload),
+      remotePayload:sanitizeRecordPayload(String(item.collection || ""),String(item.recordId || ""),item.remotePayload),
+      basePayload:item.basePayload == null ? null : sanitizeRecordPayload(String(item.collection || ""),String(item.recordId || ""),item.basePayload)
+    }));
   }
-
+  function reconcileDerivedSettingsState() {
+    const key = recordKey("settings","preferences"), local = pending[key], base = baseRecords[key], conflict = conflicts.find(item => item.key === key && !item.resolved);
+    if (!local) return false;
+    if (!conflict) {
+      if (!local.deleted && base && !base.deletedAt && same(local.payload,base.payload) && Number(local.sortIndex || 0) === Number(base.sortIndex || 0)) {
+        delete pending[key]; conflicts = conflicts.filter(item => item.key !== key); return true;
+      }
+      return false;
+    }
+    if (local.deleted || conflict.remoteDeletedAt) return false;
+    const remotePayload = sanitizeRecordPayload("settings","preferences",conflict.remotePayload || base?.payload || {});
+    const overlaps = [], merged = threeWayMerge(local.basePayload,local.payload,remotePayload,"",overlaps);
+    if (overlaps.length) return false;
+    const remoteRevision = Math.max(Number(conflict.remoteRevision || 0),Number(base?.revision || 0)), remoteSortIndex = Number(base?.sortIndex || 0);
+    baseRecords[key] = { ...(base || {}), collection:"settings", recordId:"preferences", payload:remotePayload, sortIndex:remoteSortIndex, revision:remoteRevision, deletedAt:"" };
+    if (same(merged,remotePayload) && Number(local.sortIndex || 0) === remoteSortIndex) delete pending[key];
+    else {
+      local.payload = merged; local.basePayload = clone(remotePayload);
+      local.baseRevision = remoteRevision; local.baseSortIndex = remoteSortIndex;
+      local.status = "pending"; local.attempts = 0; local.nextAttemptAt = 0;
+      local.lastError = "Removed device-local ledger metadata and safely merged cloud settings.";
+    }
+    conflicts = conflicts.filter(item => item.key !== key); return true;
+  }
   function currentDeviceId() {
     try {
       if (typeof ensureCurrentDevice === "function") ensureCurrentDevice();
@@ -286,7 +310,7 @@
     const collection = String(row.collection || "");
     const recordId = String(row.record_id ?? row.recordId ?? "");
     return {
-      collection, recordId, payload:clone(row.payload || {}), sortIndex:Number(row.sort_index ?? row.sortIndex ?? 0),
+      collection, recordId, payload:sanitizeRecordPayload(collection,recordId,row.payload), sortIndex:Number(row.sort_index ?? row.sortIndex ?? 0),
       revision:Number(row.revision || 0), deletedAt:row.deleted_at ?? row.deletedAt ?? "",
       updatedAt:row.updated_at ?? row.updatedAt ?? "", updatedByDevice:row.updated_by_device ?? row.updatedByDevice ?? row.device_id ?? "",
       appVersion:row.app_version ?? row.appVersion ?? "", appVersionCode:Number(row.app_version_code ?? row.appVersionCode ?? 0),
@@ -335,7 +359,7 @@
       savingsSettings:clone(source?.savingsSettings || {}),
       projectCalendarSettings:clone(source?.projectCalendarSettings || {}),
       salaryWorkSettings:clone(source?.salaryWorkSettings || {}),
-      ledgerSettings:clone(source?.ledgerSettings || {}),
+      ledgerSettings:sanitizeRecordPayload("settings","preferences",{ ledgerSettings:source?.ledgerSettings || {} }).ledgerSettings,
       budgetSettings:clone(source?.budgetSettings || {}),
       productivitySettings:clone(source?.productivitySettings || {}),
       reminderSettings:clone(source?.reminderSettings || {})
@@ -374,7 +398,10 @@
     output.savingsSettings = clone(settings.savingsSettings || fallback?.savingsSettings || {});
     output.projectCalendarSettings = clone(settings.projectCalendarSettings || fallback?.projectCalendarSettings || {});
     output.salaryWorkSettings = clone(settings.salaryWorkSettings || fallback?.salaryWorkSettings || {});
-    output.ledgerSettings = clone(settings.ledgerSettings || fallback?.ledgerSettings || {});
+    const localLedgerSettings = clone(fallback?.ledgerSettings || {});
+    output.ledgerSettings = clone(settings.ledgerSettings || localLedgerSettings);
+    if (localLedgerSettings.lastRecalculatedAt) output.ledgerSettings.lastRecalculatedAt = localLedgerSettings.lastRecalculatedAt;
+    else delete output.ledgerSettings.lastRecalculatedAt;
     output.budgetSettings = clone(settings.budgetSettings || fallback?.budgetSettings || {});
     output.productivitySettings = clone(settings.productivitySettings || fallback?.productivitySettings || {});
     output.reminderSettings = clone(settings.reminderSettings || fallback?.reminderSettings || {});
@@ -1251,7 +1278,7 @@
   async function toRpcChange(item) {
     return {
       collection:item.collection, record_id:item.recordId,
-      payload:await encryptRecordPayload(item.payload || {}, item.collection, item.recordId),
+      payload:await encryptRecordPayload(sanitizeRecordPayload(item.collection,item.recordId,item.payload), item.collection, item.recordId),
       sort_index:Number(item.sortIndex || 0), deleted:Boolean(item.deleted), base_revision:Number(item.baseRevision || 0),
       min_writer_version_code:Number(item.minWriterVersionCode || APP_VERSION_CODE)
     };
@@ -1388,14 +1415,17 @@
     const merged = local.deleted || row.deletedAt ? clone(local.payload) : threeWayMerge(local.basePayload,local.payload,row.payload,"",overlaps);
     baseRecords[key] = row;
     if (!overlaps.length && !local.deleted && !row.deletedAt) {
-      local.payload=merged;
-      local.basePayload=clone(row.payload);
-      local.baseRevision=row.revision;
-      local.baseSortIndex=row.sortIndex;
-      local.status="pending";
-      local.lastError="Safely merged non-overlapping fields from another device.";
-      local.nextAttemptAt=0;
       conflicts=conflicts.filter(item=>item.key!==key);
+      if (same(merged,row.payload) && Number(local.sortIndex || 0) === Number(row.sortIndex || 0)) delete pending[key];
+      else {
+        local.payload=merged;
+        local.basePayload=clone(row.payload);
+        local.baseRevision=row.revision;
+        local.baseSortIndex=row.sortIndex;
+        local.status="pending";
+        local.lastError="Safely merged non-overlapping fields from another device.";
+        local.nextAttemptAt=0;
+      }
       return;
     }
     local.status="conflict";
@@ -1408,9 +1438,9 @@
     conflicts.unshift({
       id:uid("conflict"), key:input.key, collection:input.collection, recordId:input.recordId,
       reason:input.reason || "Record conflict", createdAt:nowIso(), resolved:false,
-      localPayload:clone(input.localPayload), remotePayload:clone(input.remotePayload),
+      localPayload:sanitizeRecordPayload(input.collection,input.recordId,input.localPayload), remotePayload:sanitizeRecordPayload(input.collection,input.recordId,input.remotePayload),
       remoteRevision:Number(input.remoteRevision || 0), remoteDeletedAt:input.remoteDeletedAt || "",
-      basePayload:clone(input.basePayload), paths:(input.paths || []).slice(0,80)
+      basePayload:input.basePayload == null ? null : sanitizeRecordPayload(input.collection,input.recordId,input.basePayload), paths:(input.paths || []).slice(0,80)
     });
     conflicts=conflicts.slice(0,MAX_CONFLICTS);
     persist();
@@ -1490,7 +1520,9 @@
         basePayload:local.basePayload,paths:[remote?.reason || "atomic_batch_conflict"]
       });
     });
+    const repairedSettings = reconcileDerivedSettingsState();
     persist();
+    if (repairedSettings) applyEffectiveRecords("Device-local ledger metadata removed from cloud settings");
   }
 
   async function syncNow({ reason="manual" } = {}) {
@@ -1732,6 +1764,9 @@
     if(initialized)return;
     initialized=true;
     setPrivacyAuthentication(false);
+    const repairedSettings = reconcileDerivedSettingsState();
+    persist();
+    if (repairedSettings) applyEffectiveRecords("Recovered derived settings sync conflict");
     injectV2Ui(); wrapSaveData(); bindEvents();
     const recoveryRoute = parsePasswordRecoveryUrl();
     if (recoveryRoute.requested) {
@@ -1757,7 +1792,7 @@
     buildRecordMap:()=>toRecordMap(data),
     get status(){return{...state,pendingCount:pendingCount(),conflictCount:conflictCount(),signedIn:Boolean(cloudUser),email:cloudUser?.email||""};}
   };
-  window.FinanceCloudSyncInternals={loadClient,stable,checksum,deepMerge,threeWayMerge,toRecordMap,fromRecordStore,changesBetween,recordKey,keyToken,keyFromToken,retryDelay,detectFinancialOperations,encryptRecordPayload,decryptRecordPayload,toRpcChange,decryptRow,friendlyAuthError,passwordRecoveryRedirect,parsePasswordRecoveryUrl,recoveryErrorMessage,cleanPasswordRecoveryUrl,testCloudConnection,requestPasswordReset,verifyRecoveryCode,completePasswordReset,setPasswordVisibility};
+  window.FinanceCloudSyncInternals={loadClient,stable,checksum,deepMerge,threeWayMerge,toRecordMap,fromRecordStore,changesBetween,recordKey,keyToken,keyFromToken,retryDelay,detectFinancialOperations,encryptRecordPayload,decryptRecordPayload,toRpcChange,decryptRow,sanitizeRecordPayload,reconcileDerivedSettingsState,friendlyAuthError,passwordRecoveryRedirect,parsePasswordRecoveryUrl,recoveryErrorMessage,cleanPasswordRecoveryUrl,testCloudConnection,requestPasswordReset,verifyRecoveryCode,completePasswordReset,setPasswordVisibility};
 
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",()=>initialize().catch(error=>setStatus("Cloud sync unavailable",error.message,"danger")),{once:true});
   else initialize().catch(error=>setStatus("Cloud sync unavailable",error.message,"danger"));
