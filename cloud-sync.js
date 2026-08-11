@@ -1,10 +1,10 @@
 "use strict";
 
-/* My Finance Records V14.0.6 · Encrypted profile-scoped Cloud Sync 3.0.
+/* My Finance Records V14.0.7 · Encrypted profile-scoped Cloud Sync 3.0.
    Local storage remains the immediate working copy. Cloud Schema V3 exchanges only
    changed encrypted records, commits related changes atomically, and preserves an immutable audit trail. */
 (function financeCloudSyncV3Bootstrap() {
-  const APP_VERSION_FALLBACK = "14.0.6";
+  const APP_VERSION_FALLBACK = "14.0.7";
   const APP_VERSION_CODE = 130000;
   const CLOUD_SCHEMA_VERSION = 3;
   const CORE_SCHEMA_VERSION = 12;
@@ -25,9 +25,7 @@
   const MAX_CONFLICTS = 60;
   const RETRY_BASE_MS = 2000;
   const RETRY_MAX_MS = 5 * 60 * 1000;
-
-  const ARRAY_COLLECTIONS = [
-    "expenses", "projects", "incomeRecords", "savingsGoals",
+  const ARRAY_COLLECTIONS = ["expenses", "projects", "incomeRecords", "savingsGoals",
     "accountLedger", "accountReconciliations", "budgetTemplates", "expenseTemplates"
   ];
   const MAP_COLLECTIONS = ["monthlyReports", "monthlyChecklists", "monthlyBudgets", "iconLibrary"];
@@ -138,10 +136,12 @@
   }
 
   function persist() {
-    saveJson(META_KEY, state);
-    saveJson(BASE_KEY, baseRecords);
-    saveJson(QUEUE_KEY, pending);
-    saveJson(CONFLICT_KEY, conflicts.slice(0, MAX_CONFLICTS));
+    return [
+      saveJson(META_KEY, state),
+      saveJson(BASE_KEY, baseRecords),
+      saveJson(QUEUE_KEY, pending),
+      saveJson(CONFLICT_KEY, conflicts.slice(0, MAX_CONFLICTS))
+    ].every(Boolean);
   }
 
   function stable(value) {
@@ -230,7 +230,8 @@
     return (Array.isArray(value) ? value : []).filter(item => item?.id && item?.key).slice(0, MAX_CONFLICTS).map(item => ({ ...item,
       localPayload:sanitizeRecordPayload(String(item.collection || ""),String(item.recordId || ""),item.localPayload),
       remotePayload:sanitizeRecordPayload(String(item.collection || ""),String(item.recordId || ""),item.remotePayload),
-      basePayload:item.basePayload == null ? null : sanitizeRecordPayload(String(item.collection || ""),String(item.recordId || ""),item.basePayload)
+      basePayload:item.basePayload == null ? null : sanitizeRecordPayload(String(item.collection || ""),String(item.recordId || ""),item.basePayload),
+      remoteRevision:Number(item.remoteRevision || 0), remoteSortIndex:item.remoteSortIndex == null ? null : Number(item.remoteSortIndex || 0), remoteMissing:Boolean(item.remoteMissing)
     }));
   }
   function reconcileDerivedSettingsState() {
@@ -1441,6 +1442,7 @@
       reason:input.reason || "Record conflict", createdAt:nowIso(), resolved:false,
       localPayload:sanitizeRecordPayload(input.collection,input.recordId,input.localPayload), remotePayload:sanitizeRecordPayload(input.collection,input.recordId,input.remotePayload),
       remoteRevision:Number(input.remoteRevision || 0), remoteDeletedAt:input.remoteDeletedAt || "",
+      remoteSortIndex:input.remoteSortIndex == null ? null : Number(input.remoteSortIndex || 0), remoteMissing:Boolean(input.remoteMissing),
       basePayload:input.basePayload == null ? null : sanitizeRecordPayload(input.collection,input.recordId,input.basePayload), paths:(input.paths || []).slice(0,80)
     });
     conflicts=conflicts.slice(0,MAX_CONFLICTS);
@@ -1515,9 +1517,10 @@
         : "A related record in the same atomic batch conflicted, so no part of the batch was committed.";
       addConflict({
         key,collection:local.collection,recordId:local.recordId,reason:local.lastError,
-        localPayload:local.payload,remotePayload:remote?.remote_payload || base?.payload || {},
+        localPayload:local.payload,remotePayload:remote ? (remote.remote_payload ?? {}) : (base?.payload || {}),
         remoteRevision:Number(remote?.remote_revision ?? base?.revision ?? local.baseRevision ?? 0),
-        remoteDeletedAt:remote?.remote_deleted_at || base?.deletedAt || "",
+        remoteDeletedAt:remote ? (remote.remote_deleted_at ?? "") : (base?.deletedAt || ""), remoteSortIndex:remote?.remote_sort_index ?? base?.sortIndex ?? local.baseSortIndex ?? null,
+        remoteMissing:remote?.reason === "record_missing",
         basePayload:local.basePayload,paths:[remote?.reason || "atomic_batch_conflict"]
       });
     });
@@ -1652,25 +1655,24 @@
     }
     persist(); renderCloudStats(); scheduleSync(80);
   }
-  function discardLocal(key) {
-    if (!pending[key]) return;
-    delete pending[key];
-    conflicts=conflicts.filter(item=>item.key!==key);
-    persist();
-    applyEffectiveRecords("Local pending change discarded");
-    renderCloudStats();
-    showToast("Local pending version discarded; the cloud version is active.","info");
+  function refreshAfterConflictChoice(message) {
+    try { applyEffectiveRecords(message); } catch (error) {
+      console.error("Conflict choice was saved but the interface could not refresh.",error); try { showToast("Choice saved. Reload the app to refresh the interface.","warning"); } catch (toastError) {}
+    }
+    try { renderCloudStats(); } catch (error) { console.error("Could not refresh Cloud Sync status.",error); }
   }
-  function keepLocal(key) {
+  function resolveConflict(key, choice) {
     const item=pending[key], conflict=conflictForKey(key);
-    if (!item||!conflict) return;
-    item.baseRevision=Number(conflict.remoteRevision||0);
-    item.basePayload=clone(conflict.remotePayload);
-    item.baseSortIndex=Number(baseRecords[key]?.sortIndex||0);
-    item.status="pending"; item.attempts=0; item.nextAttemptAt=0; item.lastError="Explicitly keeping this device’s version.";
-    conflicts=conflicts.filter(entry=>entry.key!==key);
-    persist(); renderCloudStats(); scheduleSync(80);
+    const resolver=window.FinanceCloudConflictResolution;
+    if (!resolver?.apply) throw new Error("Conflict resolution is unavailable. Reload the latest app version and try again.");
+    const result=resolver.apply({key,choice,item,conflict,baseRecords,pending,conflicts,setConflicts:value=>{conflicts=value;},persist,clone,splitKey,nowIso,appVersion:appVersion(),appVersionCode:APP_VERSION_CODE});
+    refreshAfterConflictChoice(choice === "cloud" ? "Cloud version selected for sync conflict" : "Device version selected for sync conflict");
+    if (choice === "device") scheduleSync(80);
+    showToast(choice === "cloud" ? "Cloud version applied on this device." : "This device’s version is queued for cloud sync.","success");
+    return result;
   }
+  function discardLocal(key) { return resolveConflict(key,"cloud"); }
+  function keepLocal(key) { return resolveConflict(key,"device"); }
   function downloadConflict(id) {
     const item=conflicts.find(entry=>entry.id===id);
     if (!item) return;
@@ -1681,7 +1683,6 @@
     const url=URL.createObjectURL(blob), link=document.createElement("a");
     link.href=url; link.download=filename; document.body.appendChild(link); link.click(); link.remove(); setTimeout(()=>URL.revokeObjectURL(url),0);
   }
-
   function bindEvents() {
     document.getElementById("cloudSyncStatusButton")?.addEventListener("click",event=>{event.stopPropagation();toggleTopSyncPopover();});
     document.getElementById("cloudToolbarClose")?.addEventListener("click",closeTopSyncPopover);
@@ -1791,7 +1792,7 @@
     buildRecordMap:()=>toRecordMap(data),
     get status(){return{...state,pendingCount:pendingCount(),conflictCount:conflictCount(),signedIn:Boolean(cloudUser),email:cloudUser?.email||""};}
   };
-  window.FinanceCloudSyncInternals={loadClient,stable,checksum,deepMerge,threeWayMerge,toRecordMap,fromRecordStore,changesBetween,recordKey,keyToken,keyFromToken,retryDelay,detectFinancialOperations,encryptRecordPayload,decryptRecordPayload,toRpcChange,decryptRow,sanitizeRecordPayload,reconcileDerivedSettingsState,friendlyAuthError,passwordRecoveryRedirect,parsePasswordRecoveryUrl,recoveryErrorMessage,cleanPasswordRecoveryUrl,testCloudConnection,requestPasswordReset,verifyRecoveryCode,completePasswordReset,setPasswordVisibility};
+  window.FinanceCloudSyncInternals={loadClient,stable,checksum,deepMerge,threeWayMerge,toRecordMap,fromRecordStore,changesBetween,recordKey,keyToken,keyFromToken,retryDelay,detectFinancialOperations,encryptRecordPayload,decryptRecordPayload,toRpcChange,decryptRow,sanitizeRecordPayload,reconcileDerivedSettingsState,resolveConflict,friendlyAuthError,passwordRecoveryRedirect,parsePasswordRecoveryUrl,recoveryErrorMessage,cleanPasswordRecoveryUrl,testCloudConnection,requestPasswordReset,verifyRecoveryCode,completePasswordReset,setPasswordVisibility};
 
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",()=>initialize().catch(error=>setStatus("Cloud sync unavailable",error.message,"danger")),{once:true});
   else initialize().catch(error=>setStatus("Cloud sync unavailable",error.message,"danger"));
