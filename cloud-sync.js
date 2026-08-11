@@ -1,10 +1,9 @@
 "use strict";
-
-/* My Finance Records V14.0.7 · Encrypted profile-scoped Cloud Sync 3.0.
+/* My Finance Records V14.0.8 · Encrypted profile-scoped Cloud Sync 3.0.
    Local storage remains the immediate working copy. Cloud Schema V3 exchanges only
    changed encrypted records, commits related changes atomically, and preserves an immutable audit trail. */
 (function financeCloudSyncV3Bootstrap() {
-  const APP_VERSION_FALLBACK = "14.0.7";
+  const APP_VERSION_FALLBACK = "14.0.8";
   const APP_VERSION_CODE = 130000;
   const CLOUD_SCHEMA_VERSION = 3;
   const CORE_SCHEMA_VERSION = 12;
@@ -231,6 +230,7 @@
       localPayload:sanitizeRecordPayload(String(item.collection || ""),String(item.recordId || ""),item.localPayload),
       remotePayload:sanitizeRecordPayload(String(item.collection || ""),String(item.recordId || ""),item.remotePayload),
       basePayload:item.basePayload == null ? null : sanitizeRecordPayload(String(item.collection || ""),String(item.recordId || ""),item.basePayload),
+      localSortIndex:item.localSortIndex == null ? null : Number(item.localSortIndex || 0), localDeleted:Boolean(item.localDeleted),
       remoteRevision:Number(item.remoteRevision || 0), remoteSortIndex:item.remoteSortIndex == null ? null : Number(item.remoteSortIndex || 0), remoteMissing:Boolean(item.remoteMissing)
     }));
   }
@@ -1397,19 +1397,22 @@
     if (changed) applyEffectiveRecords("Record-level cloud changes downloaded");
     return changed;
   }
-
   function applyRemoteEvent(event) {
     const row = recordFromRow(event);
     const key = recordKey(row.collection,row.recordId);
     const local = pending[key];
     if (!local) {
       baseRecords[key] = row;
+      const orphan=conflicts.find(item=>item.key===key);
+      if (orphan && row.updatedByDevice === currentDeviceId() && ((!orphan.localDeleted && same(orphan.localPayload,row.payload) && (orphan.localSortIndex == null || Number(orphan.localSortIndex) === Number(row.sortIndex || 0))) || (orphan.localDeleted && row.deletedAt))) conflicts=conflicts.filter(item=>item.key!==key);
       return;
     }
     if (row.updatedByDevice === currentDeviceId() && row.revision >= local.baseRevision) {
       baseRecords[key] = row;
-      if (!local.deleted && same(local.payload,row.payload) && Number(local.sortIndex || 0) === Number(row.sortIndex || 0)) delete pending[key];
-      else if (local.deleted && row.deletedAt) delete pending[key];
+      let confirmed=false;
+      if (!local.deleted && same(local.payload,row.payload) && Number(local.sortIndex || 0) === Number(row.sortIndex || 0)) { delete pending[key]; confirmed=true; }
+      else if (local.deleted && row.deletedAt) { delete pending[key]; confirmed=true; }
+      if (confirmed) conflicts=conflicts.filter(item=>item.key!==key);
       return;
     }
     if (row.revision <= Number(local.baseRevision || 0)) return;
@@ -1432,15 +1435,13 @@
     }
     local.status="conflict";
     local.lastError=row.deletedAt ? "Cloud deleted this record while this device changed it." : local.deleted ? "This device deleted a record that changed in the cloud." : "Both devices changed overlapping fields.";
-    addConflict({ key,collection:row.collection,recordId:row.recordId,reason:local.lastError,localPayload:local.payload,remotePayload:row.payload,remoteRevision:row.revision,remoteDeletedAt:row.deletedAt,basePayload:local.basePayload,paths:overlaps.length?overlaps:["record"] });
+    addConflict({ key,collection:row.collection,recordId:row.recordId,reason:local.lastError,localPayload:local.payload,localSortIndex:local.sortIndex,localDeleted:local.deleted,remotePayload:row.payload,remoteRevision:row.revision,remoteDeletedAt:row.deletedAt,remoteSortIndex:row.sortIndex,basePayload:local.basePayload,paths:overlaps.length?overlaps:["record"] });
   }
-
   function addConflict(input) {
     conflicts = conflicts.filter(item => item.key !== input.key);
     conflicts.unshift({
       id:uid("conflict"), key:input.key, collection:input.collection, recordId:input.recordId,
-      reason:input.reason || "Record conflict", createdAt:nowIso(), resolved:false,
-      localPayload:sanitizeRecordPayload(input.collection,input.recordId,input.localPayload), remotePayload:sanitizeRecordPayload(input.collection,input.recordId,input.remotePayload),
+      reason:input.reason || "Record conflict", createdAt:nowIso(), resolved:false, localPayload:sanitizeRecordPayload(input.collection,input.recordId,input.localPayload), localSortIndex:input.localSortIndex == null ? null : Number(input.localSortIndex || 0), localDeleted:Boolean(input.localDeleted), remotePayload:sanitizeRecordPayload(input.collection,input.recordId,input.remotePayload),
       remoteRevision:Number(input.remoteRevision || 0), remoteDeletedAt:input.remoteDeletedAt || "",
       remoteSortIndex:input.remoteSortIndex == null ? null : Number(input.remoteSortIndex || 0), remoteMissing:Boolean(input.remoteMissing),
       basePayload:input.basePayload == null ? null : sanitizeRecordPayload(input.collection,input.recordId,input.basePayload), paths:(input.paths || []).slice(0,80)
@@ -1448,7 +1449,6 @@
     conflicts=conflicts.slice(0,MAX_CONFLICTS);
     persist();
   }
-
   function detectFinancialOperations(items) {
     const operations=[];
     items.forEach(item => {
@@ -1517,7 +1517,7 @@
         : "A related record in the same atomic batch conflicted, so no part of the batch was committed.";
       addConflict({
         key,collection:local.collection,recordId:local.recordId,reason:local.lastError,
-        localPayload:local.payload,remotePayload:remote ? (remote.remote_payload ?? {}) : (base?.payload || {}),
+        localPayload:local.payload,localSortIndex:local.sortIndex,localDeleted:local.deleted,remotePayload:remote ? (remote.remote_payload ?? {}) : (base?.payload || {}),
         remoteRevision:Number(remote?.remote_revision ?? base?.revision ?? local.baseRevision ?? 0),
         remoteDeletedAt:remote ? (remote.remote_deleted_at ?? "") : (base?.deletedAt || ""), remoteSortIndex:remote?.remote_sort_index ?? base?.sortIndex ?? local.baseSortIndex ?? null,
         remoteMissing:remote?.reason === "record_missing",
@@ -1792,7 +1792,7 @@
     buildRecordMap:()=>toRecordMap(data),
     get status(){return{...state,pendingCount:pendingCount(),conflictCount:conflictCount(),signedIn:Boolean(cloudUser),email:cloudUser?.email||""};}
   };
-  window.FinanceCloudSyncInternals={loadClient,stable,checksum,deepMerge,threeWayMerge,toRecordMap,fromRecordStore,changesBetween,recordKey,keyToken,keyFromToken,retryDelay,detectFinancialOperations,encryptRecordPayload,decryptRecordPayload,toRpcChange,decryptRow,sanitizeRecordPayload,reconcileDerivedSettingsState,resolveConflict,friendlyAuthError,passwordRecoveryRedirect,parsePasswordRecoveryUrl,recoveryErrorMessage,cleanPasswordRecoveryUrl,testCloudConnection,requestPasswordReset,verifyRecoveryCode,completePasswordReset,setPasswordVisibility};
+  window.FinanceCloudSyncInternals={loadClient,stable,checksum,deepMerge,threeWayMerge,toRecordMap,fromRecordStore,changesBetween,recordKey,keyToken,keyFromToken,retryDelay,detectFinancialOperations,encryptRecordPayload,decryptRecordPayload,toRpcChange,decryptRow,sanitizeRecordPayload,reconcileDerivedSettingsState,applyRemoteEvent,resolveConflict,friendlyAuthError,passwordRecoveryRedirect,parsePasswordRecoveryUrl,recoveryErrorMessage,cleanPasswordRecoveryUrl,testCloudConnection,requestPasswordReset,verifyRecoveryCode,completePasswordReset,setPasswordVisibility};
 
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",()=>initialize().catch(error=>setStatus("Cloud sync unavailable",error.message,"danger")),{once:true});
   else initialize().catch(error=>setStatus("Cloud sync unavailable",error.message,"danger"));
