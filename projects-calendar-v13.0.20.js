@@ -1,6 +1,6 @@
 "use strict";
 
-/* My Finance Records V14.0.3 · Project Agenda
+/* My Finance Records V14.0.4 · Project Agenda
    Adds meeting, presentation, site-visit, deadline, and other project events.
    Agenda entries are stored separately from finance records so schedule changes never
    alter account balances, expenses, payments, or project financial values. */
@@ -31,6 +31,14 @@
   const escapeHtml = value => String(value ?? "").replace(/[&<>"']/g, char => ({
     "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
   }[char]));
+  const safeExternalUrl = value => {
+    try {
+      const url = new URL(String(value || ""), location.href);
+      return ["http:", "https:"].includes(url.protocol) ? escapeHtml(url.href) : "";
+    } catch (error) {
+      return "";
+    }
+  };
   const uid = () => `pc-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
 
   function safeRead() {
@@ -101,31 +109,75 @@
     );
   }
 
+  function agendaDateState(event) {
+    if (event.completedAt) return { key:"completed", label:"Completed" };
+    const eventDate = new Date(`${event.date || ""}T00:00:00`);
+    if (Number.isNaN(eventDate.getTime())) return { key:"later", label:"Scheduled" };
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    eventDate.setHours(0, 0, 0, 0);
+    const days = Math.round((eventDate - today) / 86400000);
+    if (days < 0) return { key:"overdue", label:`Overdue by ${Math.abs(days)} day${Math.abs(days) === 1 ? "" : "s"}` };
+    if (days === 0) return { key:"near", label:"Today" };
+    if (days <= 3) return { key:"near", label:`In ${days} day${days === 1 ? "" : "s"}` };
+    if (days <= 7) return { key:"soon", label:`In ${days} days` };
+    return { key:"later", label:"Scheduled" };
+  }
+
+  function eventCard(event, { compact = false } = {}) {
+    const dateState = agendaDateState(event);
+    const completed = Boolean(event.completedAt);
+    const title = escapeHtml(event.title || "Untitled agenda event");
+    const project = event.projectId ? ` · ${escapeHtml(projectName(event.projectId))}` : "";
+    const externalUrl = safeExternalUrl(event.link);
+    const mainTag = compact ? "button" : "div";
+    const mainAttributes = compact ? `type="button" data-pc-edit="${escapeHtml(event.id)}" aria-label="Edit ${title}"` : "";
+    const eventTitle = compact ? `<span class="pc-event-title">${title}</span>` : `<h4>${title}</h4>`;
+    const eventMeta = compact ? `<span class="pc-event-meta">${escapeHtml(formatEventDate(event))}${project}</span>` : `<p>${escapeHtml(formatEventDate(event))}${project}</p>`;
+    const details = compact ? "" : `
+      ${event.location ? `<small>Location · ${escapeHtml(event.location)}</small>` : ""}
+      ${event.attendees ? `<small>Attendees · ${escapeHtml(event.attendees)}</small>` : ""}
+      ${event.reminder && event.reminder !== "none" ? `<small>Reminder · ${escapeHtml(reminderLabel(event.reminder))}</small>` : ""}
+      ${externalUrl ? `<small><a href="${externalUrl}" target="_blank" rel="noopener noreferrer">Open meeting link</a></small>` : ""}
+      ${event.notes ? `<small class="pc-event-notes">${escapeHtml(event.notes)}</small>` : ""}`;
+    return `
+      <article class="pc-event-card pc-type-${escapeHtml(event.type)} pc-date-${dateState.key} ${compact ? "pc-event-compact" : ""}" data-pc-event-card="${escapeHtml(event.id)}">
+        <${mainTag} class="pc-event-main" ${mainAttributes}>
+          <span class="pc-event-topline"><span class="pc-event-type">${escapeHtml(typeLabel(event.type))}</span><span class="pc-event-date-state">${escapeHtml(dateState.label)}</span></span>
+          ${eventTitle}
+          ${eventMeta}
+          ${details}
+        </${mainTag}>
+        <div class="pc-event-actions">
+          <button type="button" class="button ${completed ? "button-secondary" : "button-primary"} button-small" data-pc-complete="${escapeHtml(event.id)}">${completed ? "Reopen" : "Complete"}</button>
+          ${compact ? "" : `<button type="button" class="button button-secondary button-small" data-pc-edit="${escapeHtml(event.id)}">Edit</button><button type="button" class="button button-secondary button-small" data-pc-delete="${escapeHtml(event.id)}">Delete</button><button type="button" class="button button-secondary button-small" data-pc-ics="${escapeHtml(event.id)}">ICS</button>`}
+        </div>
+      </article>`;
+  }
+
   function render() {
     const root = document.getElementById("projectCalendarV13020");
     if (!root) return;
     const agendaEvents = sortedEvents(events);
+    const upcoming = agendaEvents.filter(event => !event.completedAt);
+    const completed = agendaEvents.filter(event => event.completedAt).sort((a, b) => String(b.completedAt).localeCompare(String(a.completedAt)));
+    const preview = upcoming.slice(0, 3);
+    const previewList = root.querySelector("[data-pc-event-list]");
+    previewList.innerHTML = preview.length
+      ? preview.map(event => eventCard(event, { compact:true })).join("")
+      : `<div class="pc-empty"><strong>No upcoming events</strong><span>${completed.length ? "Open the full agenda to review completed work." : "Add a meeting, presentation, site visit, or project deadline."}</span></div>`;
+    const remaining = root.querySelector("[data-pc-remaining]");
+    if (remaining) {
+      remaining.hidden = upcoming.length <= preview.length;
+      remaining.textContent = upcoming.length > preview.length ? `+${upcoming.length - preview.length} more upcoming` : "";
+    }
+    root.querySelector("[data-pc-count]").textContent = `${upcoming.length} upcoming · ${completed.length} completed`;
 
-    const list = root.querySelector("[data-pc-event-list]");
-    list.innerHTML = agendaEvents.length
-      ? agendaEvents.map(event => `
-        <article class="pc-event-card pc-type-${escapeHtml(event.type)}">
-          <div class="pc-event-main">
-            <div class="pc-event-type">${escapeHtml(typeLabel(event.type))}</div>
-            <h4>${escapeHtml(event.title)}</h4>
-            <p>${escapeHtml(formatEventDate(event))}${event.projectId ? ` · ${escapeHtml(projectName(event.projectId))}` : ""}</p>
-            ${event.location ? `<small>📍 ${escapeHtml(event.location)}</small>` : ""}
-            ${event.attendees ? `<small>👥 ${escapeHtml(event.attendees)}</small>` : ""}
-          </div>
-          <div class="pc-event-actions">
-            <button type="button" class="button button-secondary button-small" data-pc-edit="${escapeHtml(event.id)}">Edit</button>
-            <button type="button" class="button button-secondary button-small" data-pc-delete="${escapeHtml(event.id)}">Delete</button>
-            <button type="button" class="button button-secondary button-small" data-pc-ics="${escapeHtml(event.id)}">ICS</button>
-          </div>
-        </article>`).join("")
-      : `<div class="pc-empty"><strong>No scheduled events</strong><span>Add a meeting, presentation, site visit, or project deadline.</span></div>`;
-
-    root.querySelector("[data-pc-count]").textContent = `${agendaEvents.length} event${agendaEvents.length === 1 ? "" : "s"}`;
+    const fullUpcoming = document.querySelector("[data-pc-full-upcoming]");
+    const fullCompleted = document.querySelector("[data-pc-full-completed]");
+    if (fullUpcoming) fullUpcoming.innerHTML = upcoming.length ? upcoming.map(event => eventCard(event)).join("") : `<div class="pc-empty"><strong>No upcoming events</strong><span>Schedule a project date to add it here.</span></div>`;
+    if (fullCompleted) fullCompleted.innerHTML = completed.length ? completed.map(event => eventCard(event)).join("") : `<div class="pc-empty"><strong>No completed events</strong><span>Completed agenda entries will remain available here.</span></div>`;
+    document.querySelectorAll("[data-pc-full-count]").forEach(node => { node.textContent = `${agendaEvents.length} total`; });
   }
 
   function showCalendarMessage(message, type = "info") {
@@ -196,6 +248,7 @@
       attendees: document.getElementById("pcEventAttendees").value.trim().slice(0, 240),
       reminder: document.getElementById("pcEventReminder").value,
       notes: document.getElementById("pcEventNotes").value.trim().slice(0, 1000),
+      completedAt: existing?.completedAt || "",
       updatedAt: new Date().toISOString(),
       createdAt: existing?.createdAt || new Date().toISOString()
     };
@@ -219,6 +272,34 @@
     render();
     notifyAgendaChanged("deleted", id);
     showCalendarMessage("Agenda event deleted.", "success");
+  }
+
+  async function toggleEventCompleted(id) {
+    const event = events.find(item => item.id === id);
+    if (!event) return;
+    const completing = !event.completedAt;
+    if (completing && event.projectId && typeof window.completeProjectFromAgenda === "function") {
+      const accepted = await window.completeProjectFromAgenda(event.projectId, event.title);
+      if (!accepted) return;
+    }
+    const timestamp = new Date().toISOString();
+    const next = events.map(item => item.id === id ? { ...item, completedAt:completing ? timestamp : "", updatedAt:timestamp } : item);
+    if (!safeWrite(next)) return;
+    events = next;
+    render();
+    notifyAgendaChanged(completing ? "completed" : "reopened", id);
+    showCalendarMessage(completing ? "Agenda event completed." : "Agenda event reopened.", "success");
+  }
+
+  function openFullAgenda() {
+    const dialog = document.getElementById("projectAgendaFullDialog");
+    if (!dialog) return;
+    render();
+    dialog.showModal();
+  }
+
+  function closeFullAgenda() {
+    document.getElementById("projectAgendaFullDialog")?.close();
   }
 
   function notifyAgendaChanged(action, id = "") {
@@ -296,12 +377,14 @@
         </div>
         <div class="pc-header-actions">
           <span class="pc-count" data-pc-count>0 events</span>
+          <button type="button" class="button button-secondary button-small" data-pc-view>View full agenda</button>
           <button type="button" class="button button-primary button-small" data-pc-add>+ Schedule event</button>
         </div>
       </div>
-      <div class="pc-agenda">
-        <div class="pc-agenda-heading"><strong>Agenda</strong><small>All scheduled project dates</small></div>
+      <div class="pc-agenda pc-agenda-preview">
+        <div class="pc-agenda-heading"><strong>Next events</strong><small>Click an event to edit</small></div>
         <div class="pc-agenda-list" data-pc-event-list></div>
+        <button type="button" class="pc-agenda-more" data-pc-view data-pc-remaining hidden></button>
       </div>
       <p class="pc-message" data-pc-message aria-live="polite"></p>
     `;
@@ -335,11 +418,28 @@
     `;
     document.body.appendChild(dialog);
 
-    card.addEventListener("click", event => {
-      const add = event.target.closest("[data-pc-add]");
-      if (add) return openDialog();
+    const fullDialog = document.createElement("dialog");
+    fullDialog.id = "projectAgendaFullDialog";
+    fullDialog.className = "app-dialog dialog-utility dialog-extended pc-full-dialog";
+    fullDialog.setAttribute("aria-labelledby", "projectAgendaFullDialogTitle");
+    fullDialog.innerHTML = `
+      <div class="modal-header pc-full-header"><div><h3 id="projectAgendaFullDialogTitle">Project Agenda</h3><small data-pc-full-count>0 total</small></div><div><button type="button" class="button button-primary button-small" data-pc-full-add>+ Schedule event</button><button type="button" class="button button-secondary button-small" data-pc-full-close>Close</button></div></div>
+      <div class="modal-body pc-full-body">
+        <section class="pc-full-section" aria-labelledby="pcUpcomingAgendaTitle"><div class="pc-full-section-heading"><h4 id="pcUpcomingAgendaTitle">Upcoming</h4><small>Ordered by date and time</small></div><div class="pc-agenda-list pc-full-list" data-pc-full-upcoming></div></section>
+        <section class="pc-full-section" aria-labelledby="pcCompletedAgendaTitle"><div class="pc-full-section-heading"><h4 id="pcCompletedAgendaTitle">Completed</h4><small>Kept for project history</small></div><div class="pc-agenda-list pc-full-list" data-pc-full-completed></div></section>
+      </div>
+      <div class="modal-footer"><button type="button" class="button button-secondary" data-pc-full-close>Close</button></div>`;
+    document.body.appendChild(fullDialog);
+
+    const handleAgendaAction = event => {
+      const add = event.target.closest("[data-pc-add], [data-pc-full-add]");
+      if (add) { closeFullAgenda(); return openDialog(); }
+      const view = event.target.closest("[data-pc-view]");
+      if (view) return openFullAgenda();
       const edit = event.target.closest("[data-pc-edit]");
-      if (edit) return openDialog("", edit.dataset.pcEdit);
+      if (edit) { closeFullAgenda(); return openDialog("", edit.dataset.pcEdit); }
+      const complete = event.target.closest("[data-pc-complete]");
+      if (complete) return toggleEventCompleted(complete.dataset.pcComplete);
       const remove = event.target.closest("[data-pc-delete]");
       if (remove) return deleteEvent(remove.dataset.pcDelete);
       const ics = event.target.closest("[data-pc-ics]");
@@ -347,7 +447,11 @@
         const item = events.find(eventItem => eventItem.id === ics.dataset.pcIcs);
         if (item) downloadIcs(item);
       }
-    });
+    };
+
+    card.addEventListener("click", handleAgendaAction);
+    fullDialog.addEventListener("click", handleAgendaAction);
+    fullDialog.querySelectorAll("[data-pc-full-close]").forEach(button => button.addEventListener("click", closeFullAgenda));
 
     dialog.querySelector("#projectCalendarEventForm").addEventListener("submit", saveEvent);
     dialog.querySelectorAll("[data-pc-close]").forEach(button => button.addEventListener("click", closeDialog));

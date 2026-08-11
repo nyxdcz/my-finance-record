@@ -8,8 +8,9 @@ const root = path.resolve(here, "..");
 const privacyScript = path.join(root, "privacy-lock.js");
 const projectAgendaScript = path.join(root, "projects-calendar-v13.0.20.js");
 const appCss = fs.readFileSync(path.join(root, "app.css"), "utf8");
+const projectAgendaCss = fs.readFileSync(path.join(root, "projects-calendar-v13.0.20.css"), "utf8");
 const sourceHtml = fs.readFileSync(path.join(root, "index.html"), "utf8")
-  .replace("</head>", `<style>${appCss}</style></head>`);
+  .replace("</head>", `<style>${appCss}\n${projectAgendaCss}</style></head>`);
 const testHtml = sourceHtml
   .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, "")
   .replace(/<script\b[^>]*\/?\s*>/gi, "")
@@ -78,7 +79,7 @@ for (const viewport of [
   });
 }
 
-test("Projects keeps one complete agenda and refreshes external changes", async ({ page }) => {
+test("Projects provides compact, full-view, completed, and externally refreshed agenda states", async ({ page }) => {
   await page.route("https://app.test/**", route => route.fulfill({
     status: 200,
     contentType: "text/html",
@@ -105,8 +106,8 @@ test("Projects keeps one complete agenda and refreshes external changes", async 
   await expect(agenda.getByRole("heading", { name:"Project Agenda" })).toBeVisible();
   await expect(agenda.locator("[data-pc-calendar-grid], [data-pc-prev], [data-pc-next], [data-pc-today]")).toHaveCount(0);
   await expect(agenda.locator(".pc-event-card")).toHaveCount(2);
-  await expect(agenda.locator(".pc-event-card h4")).toHaveText(["August meeting", "September presentation"]);
-  await expect(agenda.locator("[data-pc-count]")).toHaveText("2 events");
+  await expect(agenda.locator(".pc-event-card .pc-event-title")).toHaveText(["August meeting", "September presentation"]);
+  await expect(agenda.locator("[data-pc-count]")).toHaveText("2 upcoming · 0 completed");
 
   await agenda.locator("[data-pc-add]").click();
   await page.locator("#pcEventTitle").fill("October site visit");
@@ -127,9 +128,39 @@ test("Projects keeps one complete agenda and refreshes external changes", async 
     localStorage.setItem(key, next);
     window.dispatchEvent(new StorageEvent("storage", { key, newValue:next }));
   });
-  await expect(agenda.locator(".pc-event-card")).toHaveCount(4);
-  await expect(agenda.getByText("External deadline", { exact:true })).toBeVisible();
+  await expect(agenda.locator(".pc-event-card")).toHaveCount(3);
+  await expect(agenda.locator("[data-pc-count]")).toHaveText("4 upcoming · 0 completed");
   await expect.poll(() => page.evaluate(() => window.__agendaChanges.at(-1)?.action)).toBe("external-refresh");
+
+  await agenda.locator("[data-pc-view]").first().click();
+  const fullAgenda = page.locator("#projectAgendaFullDialog");
+  await expect(fullAgenda).toBeVisible();
+  await expect(fullAgenda.locator("[data-pc-full-upcoming] .pc-event-card")).toHaveCount(4);
+  await expect(fullAgenda.getByText("External deadline", { exact:true })).toBeVisible();
+  await fullAgenda.locator('[data-pc-complete="agenda-earlier"]').click();
+  await expect(fullAgenda.locator("[data-pc-full-upcoming] .pc-event-card")).toHaveCount(3);
+  await expect(fullAgenda.locator("[data-pc-full-completed] .pc-event-card")).toHaveCount(1);
+  await expect(agenda.locator("[data-pc-count]")).toHaveText("3 upcoming · 1 completed");
+  await expect.poll(() => page.evaluate(() => {
+    const stored = JSON.parse(localStorage.getItem("simple-finance-project-calendar-v13.0.20") || "[]");
+    return Boolean(stored.find(item => item.id === "agenda-earlier")?.completedAt);
+  })).toBe(true);
+});
+
+test("responsive sidebar keeps a 64px desktop rail and the mobile drawer", async ({ page }) => {
+  await loadStaticApp(page, { width:1440, height:900 });
+  const sidebar = page.locator("#sidebar");
+  await expect(sidebar).toHaveCSS("width", "64px");
+  await expect(page.locator(".main")).toHaveCSS("margin-left", "64px");
+  await sidebar.evaluate(node => node.classList.add("desktop-open"));
+  await expect(sidebar).toHaveCSS("width", "245px");
+  await expect(sidebar.locator('.nav-button[data-page="dashboard"] .nav-label')).toHaveCSS("opacity", "1");
+
+  await page.setViewportSize({ width:393, height:852 });
+  await sidebar.evaluate(node => { node.classList.remove("desktop-open"); node.classList.add("open"); });
+  await expect(sidebar).toHaveCSS("width", "245px");
+  await expect(page.locator(".main")).toHaveCSS("margin-left", "0px");
+  await expect(sidebar.locator('.nav-button[data-page="dashboard"] .nav-label')).toHaveCSS("opacity", "1");
 });
 
 for (const viewport of [
