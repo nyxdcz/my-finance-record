@@ -1,3 +1,13 @@
+## 14.0.9 · 2026-08-12
+
+### Changed
+- Replaced the long repository README with a concise product summary and exactly five recent release/fix entries.
+- Aligned repository-facing and in-app release metadata on V14.0.9.
+- Omitted external application links from the README as requested.
+
+### Preserved
+- Finance Schema 12, Cloud Schema V3, encryption, synchronization, saved records, calculations, and application behavior are unchanged.
+
 ## 14.0.8 · 2026-08-12
 
 ### Fixed

@@ -1,6 +1,6 @@
 "use strict";
 
-/* My Finance Records V14.0.8 · Recoverable Cloud Sync conflict state transitions. */
+/* My Finance Records V14.0.9 · Recoverable Cloud Sync conflict state transitions. */
 (function financeCloudConflictResolutionBootstrap() {
   function remoteBase({ key, conflict, existingBase = {}, clone, splitKey, nowIso, appVersion, appVersionCode }) {
     if (!conflict) throw new Error("This conflict is no longer available. Reload the app to review the latest sync state.");
