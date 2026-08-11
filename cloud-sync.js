@@ -1,10 +1,10 @@
 "use strict";
 
-/* My Finance Records V14.0.3 · Encrypted profile-scoped Cloud Sync 3.0.
+/* My Finance Records V14.0.4 · Encrypted profile-scoped Cloud Sync 3.0.
    Local storage remains the immediate working copy. Cloud Schema V3 exchanges only
    changed encrypted records, commits related changes atomically, and preserves an immutable audit trail. */
 (function financeCloudSyncV3Bootstrap() {
-  const APP_VERSION_FALLBACK = "14.0.3";
+  const APP_VERSION_FALLBACK = "14.0.4";
   const APP_VERSION_CODE = 130000;
   const CLOUD_SCHEMA_VERSION = 3;
   const CORE_SCHEMA_VERSION = 12;
@@ -601,6 +601,7 @@
   }
 
   function injectV2Ui() {
+    window.FinanceCloudConflictReview?.ensure?.();
     if (document.getElementById("cloudSyncHealthCard")) return;
     const connected = document.getElementById("cloudConnectedSection");
     if (!connected) return;
@@ -704,7 +705,7 @@
       const items = Object.values(pending).sort((a,b) => String(b.updatedAt).localeCompare(String(a.updatedAt)));
       list.innerHTML = items.length ? items.map(item => {
         const next = item.nextAttemptAt && item.nextAttemptAt > Date.now() ? ` · retry ${formatDateTime(new Date(item.nextAttemptAt).toISOString())}` : "";
-        return `<article class="cloud-pending-item" data-status="${escape(item.status)}"><div><strong>${escape(recordLabel(item.collection,item.payload,item.recordId))}</strong><small>${escape(item.status)} · revision ${Number(item.baseRevision || 0)} · ${Number(item.attempts || 0)} attempt${Number(item.attempts || 0) === 1 ? "" : "s"}${escape(next)}</small>${item.lastError ? `<small>${escape(item.lastError)}</small>` : ""}</div><div class="cloud-pending-actions"><button class="button button-secondary button-small" type="button" data-sync-retry="${escape(keyToken(item.key))}">Retry</button><button class="button button-secondary button-small" type="button" data-sync-discard="${escape(keyToken(item.key))}">Discard local</button>${item.status === "conflict" ? `<button class="button button-primary button-small" type="button" data-sync-keep="${escape(keyToken(item.key))}">Keep this version</button>` : ""}</div></article>`;
+        return `<article class="cloud-pending-item" data-status="${escape(item.status)}"><div><strong>${escape(recordLabel(item.collection,item.payload,item.recordId))}</strong><small>${escape(item.status)} · revision ${Number(item.baseRevision || 0)} · ${Number(item.attempts || 0)} attempt${Number(item.attempts || 0) === 1 ? "" : "s"}${escape(next)}</small>${item.lastError ? `<small>${escape(item.lastError)}</small>` : ""}</div><div class="cloud-pending-actions"><button class="button button-secondary button-small" type="button" data-sync-retry="${escape(keyToken(item.key))}">Retry</button>${item.status === "conflict" ? `<button class="button button-primary button-small" type="button" data-review-cloud-conflict="${escape(keyToken(item.key))}">Review versions</button>` : `<button class="button button-secondary button-small" type="button" data-sync-discard="${escape(keyToken(item.key))}">Discard local</button>`}</div></article>`;
       }).join("") : `<div class="v12-empty">No records are waiting to synchronize.</div>`;
     }
   }
@@ -1627,7 +1628,7 @@
     const unresolved=conflicts.filter(item=>!item.resolved);
     chip.textContent=unresolved.length?`${unresolved.length} to review`:"No conflicts";
     chip.className=`v12-chip ${unresolved.length?"warning":"success"}`;
-    node.innerHTML=unresolved.length?unresolved.map(item=>`<article class="cloud-conflict-item"><div><strong>${escape(recordLabel(item.collection,item.localPayload,item.recordId))}</strong><small>${escape(item.reason)}</small><small>${escape((item.paths||[]).slice(0,3).join(" · "))}</small></div><div class="cloud-conflict-actions"><button class="button button-secondary button-small" type="button" data-download-cloud-conflict="${escape(item.id)}">Download copies</button><button class="button button-secondary button-small" type="button" data-sync-discard="${escape(keyToken(item.key))}">Discard local</button><button class="button button-primary button-small" type="button" data-sync-keep="${escape(keyToken(item.key))}">Keep this version</button></div></article>`).join(""):`<div class="v12-empty">No unresolved record conflicts.</div>`;
+    node.innerHTML=unresolved.length?unresolved.map(item=>`<article class="cloud-conflict-item"><div><strong>${escape(recordLabel(item.collection,item.localPayload,item.recordId))}</strong><small>${escape(item.reason)}</small><small>${escape((item.paths||[]).slice(0,3).join(" · "))}</small></div><div class="cloud-conflict-actions"><button class="button button-secondary button-small" type="button" data-download-cloud-conflict="${escape(item.id)}">Download both</button><button class="button button-primary button-small" type="button" data-review-cloud-conflict="${escape(keyToken(item.key))}">Review versions</button></div></article>`).join(""):`<div class="v12-empty">No unresolved record conflicts.</div>`;
   }
 
   function conflictForKey(key) { return conflicts.find(item=>item.key===key&&!item.resolved) || null; }
@@ -1651,7 +1652,6 @@
     }
     persist(); renderCloudStats(); scheduleSync(80);
   }
-
   function discardLocal(key) {
     if (!pending[key]) return;
     delete pending[key];
@@ -1661,7 +1661,6 @@
     renderCloudStats();
     showToast("Local pending version discarded; the cloud version is active.","info");
   }
-
   function keepLocal(key) {
     const item=pending[key], conflict=conflictForKey(key);
     if (!item||!conflict) return;
@@ -1672,13 +1671,11 @@
     conflicts=conflicts.filter(entry=>entry.key!==key);
     persist(); renderCloudStats(); scheduleSync(80);
   }
-
   function downloadConflict(id) {
     const item=conflicts.find(entry=>entry.id===id);
     if (!item) return;
     downloadJson(`finance-record-conflict-${id}.json`,item);
   }
-
   function downloadJson(filename,value) {
     const blob=new Blob([JSON.stringify(value,null,2)],{type:"application/json"});
     const url=URL.createObjectURL(blob), link=document.createElement("a");
@@ -1744,6 +1741,7 @@
     document.getElementById("cloudDevicesBody")?.addEventListener("click",event=>{const button=event.target.closest("[data-revoke-cloud-device]");if(!button)return;if(!confirm("Sign out this device remotely? It will be blocked from future Cloud Sync 3.0 commits and will clear its cloud session the next time it connects."))return;revokeDevice(button.dataset.revokeCloudDevice,button.dataset.revokeCloudUser).catch(error=>showToast(error.message,"warning"));});
     document.getElementById("cloudPendingList")?.addEventListener("click",handlePendingClick);
     document.getElementById("cloudConflictList")?.addEventListener("click",event=>{const download=event.target.closest("[data-download-cloud-conflict]");if(download)downloadConflict(download.dataset.downloadCloudConflict);else handlePendingClick(event);});
+    window.FinanceCloudConflictReview?.bind?.({onDownload:downloadConflict,onUseCloud:token=>discardLocal(keyFromToken(token)),onUseDevice:token=>keepLocal(keyFromToken(token))});
     window.addEventListener("online",()=>{setStatus("Back online","Checking pending record changes…","info");if(state.autoSync!==false)scheduleSync(120);});
     window.addEventListener("offline",()=>setStatus("Offline",`${pendingCount()} record${pendingCount()===1?"":"s"} waiting.`,"info"));
     window.addEventListener("focus",()=>{if(state.autoSync!==false&&cloudUser)scheduleSync(220);});
@@ -1754,8 +1752,9 @@
   }
 
   function handlePendingClick(event) {
-    const retry=event.target.closest("[data-sync-retry]"),discard=event.target.closest("[data-sync-discard]"),keep=event.target.closest("[data-sync-keep]");
+    const retry=event.target.closest("[data-sync-retry]"),discard=event.target.closest("[data-sync-discard]"),keep=event.target.closest("[data-sync-keep]"),review=event.target.closest("[data-review-cloud-conflict]");
     if(retry)retryRecord(keyFromToken(retry.dataset.syncRetry));
+    if(review){const key=keyFromToken(review.dataset.reviewCloudConflict),item=conflictForKey(key);window.FinanceCloudConflictReview?.open?.({item,keyToken:keyToken(key),title:item?recordLabel(item.collection,item.localPayload,item.recordId):"Review sync difference"});}
     if(discard&&confirm("Discard this device’s pending version and use the cloud-confirmed record?"))discardLocal(keyFromToken(discard.dataset.syncDiscard));
     if(keep&&confirm("Keep this device’s version and write it over the current cloud record? A cloud audit entry will preserve the change."))keepLocal(keyFromToken(keep.dataset.syncKeep));
   }

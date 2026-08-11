@@ -1,3 +1,19 @@
+## 14.0.4 · 2026-08-11
+
+### Added
+- Added a compact three-event Project Agenda preview and a responsive full-agenda popup with Upcoming and Completed sections.
+- Added agenda completion/reopen controls, linked-project completion confirmation, and labeled date-urgency colors on Projects and the Dashboard calendar.
+- Added a local-versus-cloud conflict comparison popup with explicit resolution choices and a non-destructive Resolve later action.
+- Added a persistent desktop icon rail with SVG navigation icons, hover/focus expansion, collapsed labels, and a saved pinned-open state.
+
+### Changed
+- Completed agenda records remain available for history and continue to use the existing agenda storage key.
+- Completing a linked agenda event can move its project to Completed Projects without changing project value, payments, or remaining balance.
+- Mobile navigation retains the existing slide-out drawer and overlay behavior.
+
+### Preserved
+- Existing agenda and finance records, Finance Schema 12, Cloud Schema V3, encrypted synchronization, Supabase tables, ledger behavior, and financial calculations are unchanged.
+
 ## 14.0.3 · 2026-08-11
 
 ### Changed
