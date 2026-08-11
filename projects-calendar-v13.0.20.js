@@ -1,12 +1,11 @@
 "use strict";
 
-/* My Finance Records V13.0.20 · Projects Calendar
+/* My Finance Records V14.0.3 · Project Agenda
    Adds meeting, presentation, site-visit, deadline, and other project events.
-   Events are stored separately from finance records so calendar changes never
+   Agenda entries are stored separately from finance records so schedule changes never
    alter account balances, expenses, payments, or project financial values. */
 (() => {
   const EVENTS_KEY = "simple-finance-project-calendar-v13.0.20";
-  const VERSION = "13.0.20";
   const EVENT_TYPES = [
     ["meeting", "Meeting"],
     ["presentation", "Presentation"],
@@ -25,12 +24,10 @@
   ];
 
   let events = [];
-  let viewDate = new Date();
   let editingId = "";
 
   const pad = value => String(value).padStart(2, "0");
   const dateKey = date => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
-  const monthKey = date => `${date.getFullYear()}-${pad(date.getMonth() + 1)}`;
   const escapeHtml = value => String(value ?? "").replace(/[&<>"']/g, char => ({
     "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
   }[char]));
@@ -46,14 +43,17 @@
     }
   }
 
-  window.getProjectCalendarEvents = () => (events && events.length) ? events : safeRead();
+  // Read through storage every time so the Dashboard never receives a stale
+  // in-memory agenda after another tab changes the shared browser record.
+  window.getProjectAgendaEvents = () => safeRead();
+  window.getProjectCalendarEvents = window.getProjectAgendaEvents;
 
   function safeWrite(next) {
     try {
       localStorage.setItem(EVENTS_KEY, JSON.stringify(next));
       return true;
     } catch (error) {
-      showCalendarMessage("Calendar storage is full. Export your calendar and remove old events.", "error");
+      showCalendarMessage("Agenda storage is full. Export an ICS file or remove old events.", "error");
       return false;
     }
   }
@@ -86,12 +86,6 @@
     return REMINDERS.find(([key]) => key === value)?.[1] || "No reminder";
   }
 
-  function monthLabel(value) {
-    const [year, month] = String(value).split("-").map(Number);
-    if (!year || !month) return "Calendar";
-    return new Intl.DateTimeFormat("en-PH", { month:"long", year:"numeric" }).format(new Date(year, month - 1, 1));
-  }
-
   function formatEventDate(event) {
     const date = new Date(`${event.date}T00:00:00`);
     const dateText = Number.isNaN(date.getTime()) ? event.date : new Intl.DateTimeFormat("en-PH", { month:"short", day:"numeric", year:"numeric" }).format(date);
@@ -107,52 +101,14 @@
     );
   }
 
-  function eventsForMonth(month) {
-    return sortedEvents(events.filter(event => String(event.date || "").startsWith(month)));
-  }
-
-  function currentMonthEvents() {
-    return eventsForMonth(monthKey(viewDate));
-  }
-
-  function buildCalendarGrid(month) {
-    const [year, monthNumber] = month.split("-").map(Number);
-    const first = new Date(year, monthNumber - 1, 1);
-    const last = new Date(year, monthNumber, 0);
-    const startOffset = first.getDay();
-    const totalCells = Math.ceil((startOffset + last.getDate()) / 7) * 7;
-    const today = dateKey(new Date());
-
-    const cells = [];
-    for (let index = 0; index < totalCells; index += 1) {
-      const day = index - startOffset + 1;
-      if (day < 1 || day > last.getDate()) {
-        cells.push(`<div class="pc-calendar-day is-empty" aria-hidden="true"></div>`);
-        continue;
-      }
-      const date = `${month}-${pad(day)}`;
-      const dayEvents = events.filter(event => event.date === date);
-      cells.push(`
-        <button type="button" class="pc-calendar-day${date === today ? " is-today" : ""}${dayEvents.length ? " has-events" : ""}" data-pc-date="${date}" aria-label="${escapeHtml(date)} · ${dayEvents.length} event${dayEvents.length === 1 ? "" : "s"}">
-          <strong>${day}</strong>
-          ${dayEvents.slice(0, 3).map(event => `<span class="pc-dot pc-type-${escapeHtml(event.type)}" title="${escapeHtml(event.title)}"></span>`).join("")}
-          ${dayEvents.length > 3 ? `<small>+${dayEvents.length - 3}</small>` : ""}
-        </button>`);
-    }
-    return cells.join("");
-  }
-
   function render() {
     const root = document.getElementById("projectCalendarV13020");
     if (!root) return;
-    const month = monthKey(viewDate);
-    const monthEvents = eventsForMonth(month);
-    root.querySelector("[data-pc-month-label]").textContent = monthLabel(month);
-    root.querySelector("[data-pc-calendar-grid]").innerHTML = buildCalendarGrid(month);
+    const agendaEvents = sortedEvents(events);
 
     const list = root.querySelector("[data-pc-event-list]");
-    list.innerHTML = monthEvents.length
-      ? monthEvents.map(event => `
+    list.innerHTML = agendaEvents.length
+      ? agendaEvents.map(event => `
         <article class="pc-event-card pc-type-${escapeHtml(event.type)}">
           <div class="pc-event-main">
             <div class="pc-event-type">${escapeHtml(typeLabel(event.type))}</div>
@@ -169,7 +125,7 @@
         </article>`).join("")
       : `<div class="pc-empty"><strong>No scheduled events</strong><span>Add a meeting, presentation, site visit, or project deadline.</span></div>`;
 
-    root.querySelector("[data-pc-count]").textContent = `${monthEvents.length} event${monthEvents.length === 1 ? "" : "s"}`;
+    root.querySelector("[data-pc-count]").textContent = `${agendaEvents.length} event${agendaEvents.length === 1 ? "" : "s"}`;
   }
 
   function showCalendarMessage(message, type = "info") {
@@ -193,7 +149,7 @@
     document.getElementById("pcEventProject").innerHTML = projectOptions(event?.projectId || projectId);
     document.getElementById("pcEventType").value = event?.type || "meeting";
     document.getElementById("pcEventTitle").value = event?.title || "";
-    document.getElementById("pcEventDate").value = event?.date || dateKey(viewDate);
+    document.getElementById("pcEventDate").value = event?.date || dateKey(new Date());
     document.getElementById("pcEventStart").value = event?.startTime || "09:00";
     document.getElementById("pcEventEnd").value = event?.endTime || "10:00";
     document.getElementById("pcEventLocation").value = event?.location || "";
@@ -201,7 +157,7 @@
     document.getElementById("pcEventAttendees").value = event?.attendees || "";
     document.getElementById("pcEventReminder").value = event?.reminder || "P1D";
     document.getElementById("pcEventNotes").value = event?.notes || "";
-    document.getElementById("projectCalendarEventDialogTitle").textContent = event ? "Edit calendar event" : "Schedule project event";
+    document.getElementById("projectCalendarEventDialogTitle").textContent = event ? "Edit agenda event" : "Schedule project event";
     dialog.showModal();
   }
 
@@ -247,11 +203,10 @@
     const next = existing ? events.map(item => item.id === id ? record : item) : [...events, record];
     if (!safeWrite(next)) return;
     events = next;
-    viewDate = new Date(`${date}T00:00:00`);
     closeDialog();
     render();
-    if (typeof window.renderDashboardCalendar === "function") window.renderDashboardCalendar();
-    showCalendarMessage(existing ? "Calendar event updated." : "Calendar event scheduled.", "success");
+    notifyAgendaChanged(existing ? "updated" : "created", id);
+    showCalendarMessage(existing ? "Agenda event updated." : "Agenda event scheduled.", "success");
   }
 
   function deleteEvent(id) {
@@ -262,8 +217,14 @@
     if (!safeWrite(next)) return;
     events = next;
     render();
-    if (typeof window.renderDashboardCalendar === "function") window.renderDashboardCalendar();
-    showCalendarMessage("Calendar event deleted.", "success");
+    notifyAgendaChanged("deleted", id);
+    showCalendarMessage("Agenda event deleted.", "success");
+  }
+
+  function notifyAgendaChanged(action, id = "") {
+    window.dispatchEvent(new CustomEvent("finance:project-agenda-changed", {
+      detail: { action, id, count:events.length }
+    }));
   }
 
   function icsEscape(value) {
@@ -330,29 +291,17 @@
     card.innerHTML = `
       <div class="card-header pc-header">
         <div>
-          <h3>Projects Calendar</h3>
-          <p>Schedule meetings, presentations, site visits, deadlines, and other project events.</p>
+          <h3>Project Agenda</h3>
+          <p>Schedule project dates here and review them on the Dashboard monthly calendar.</p>
         </div>
         <div class="pc-header-actions">
           <span class="pc-count" data-pc-count>0 events</span>
           <button type="button" class="button button-primary button-small" data-pc-add>+ Schedule event</button>
         </div>
       </div>
-      <div class="pc-toolbar">
-        <button type="button" class="button button-secondary button-small" data-pc-prev aria-label="Previous month">‹</button>
-        <strong data-pc-month-label>Month</strong>
-        <button type="button" class="button button-secondary button-small" data-pc-next aria-label="Next month">›</button>
-        <button type="button" class="button button-secondary button-small" data-pc-today>Today</button>
-      </div>
-      <div class="pc-layout">
-        <div>
-          <div class="pc-weekdays"><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span></div>
-          <div class="pc-calendar-grid" data-pc-calendar-grid></div>
-        </div>
-        <div class="pc-agenda">
-          <div class="pc-agenda-heading"><strong>Agenda</strong><small>Meetings and presentations for this month</small></div>
-          <div data-pc-event-list></div>
-        </div>
+      <div class="pc-agenda">
+        <div class="pc-agenda-heading"><strong>Agenda</strong><small>All scheduled project dates</small></div>
+        <div class="pc-agenda-list" data-pc-event-list></div>
       </div>
       <p class="pc-message" data-pc-message aria-live="polite"></p>
     `;
@@ -366,7 +315,7 @@
         <div class="modal-header"><h3 id="projectCalendarEventDialogTitle">Schedule project event</h3><button type="button" class="button button-secondary button-small" data-pc-close>Close</button></div>
         <div class="modal-body">
           <input type="hidden" id="pcEventId">
-          <div class="dialog-context-note">This calendar is separate from project financial records.</div>
+          <div class="dialog-context-note">This agenda is separate from project financial records. Its date appears on the Dashboard monthly calendar.</div>
           <div class="form-grid two-column">
             <div class="field"><label for="pcEventProject">Project</label><select class="select" id="pcEventProject">${projectOptions()}</select></div>
             <div class="field"><label for="pcEventType">Event type</label><select class="select" id="pcEventType">${EVENT_TYPES.map(([value, label]) => `<option value="${value}">${label}</option>`).join("")}</select></div>
@@ -389,11 +338,6 @@
     card.addEventListener("click", event => {
       const add = event.target.closest("[data-pc-add]");
       if (add) return openDialog();
-      if (event.target.closest("[data-pc-prev]")) { viewDate.setMonth(viewDate.getMonth() - 1); return render(); }
-      if (event.target.closest("[data-pc-next]")) { viewDate.setMonth(viewDate.getMonth() + 1); return render(); }
-      if (event.target.closest("[data-pc-today]")) { viewDate = new Date(); return render(); }
-      const day = event.target.closest("[data-pc-date]");
-      if (day) { openDialog("", ""); document.getElementById("pcEventDate").value = day.dataset.pcDate; return; }
       const edit = event.target.closest("[data-pc-edit]");
       if (edit) return openDialog("", edit.dataset.pcEdit);
       const remove = event.target.closest("[data-pc-delete]");
@@ -451,6 +395,13 @@
     if (event.detail?.pageId === "projects") {
       bootWhenAuthenticated();
     }
+  });
+
+  window.addEventListener("storage", event => {
+    if (event.key !== EVENTS_KEY) return;
+    events = safeRead();
+    render();
+    notifyAgendaChanged("external-refresh");
   });
 
   if (document.readyState === "loading") {

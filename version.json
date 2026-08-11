@@ -1,5 +1,5 @@
 {
-  "version": "14.0.2",
+  "version": "14.0.3",
   "schemaVersion": 12,
   "cloudSchemaVersion": 3,
   "ledgerVersion": 1,
@@ -10,8 +10,8 @@
   "profileArchitectureVersion": 1,
   "encryptionVersion": 1,
   "authSecurityVersion": 1,
-  "cacheVersion": "finance-v14-20260811-v1402-sync-version-display-r1",
+  "cacheVersion": "finance-v14-20260811-v1403-project-agenda-r1",
   "released": "2026-08-11",
-  "name": "Version Display & Sync Conflict Recovery",
-  "notes": "Keeps the title and build badge aligned with the current release, prevents derived ledger timestamps from creating cloud settings changes, and safely repairs existing timestamp-only preference conflicts without changing finance or cloud schemas."
+  "name": "Project Agenda & Dashboard Calendar",
+  "notes": "Removes the duplicate Projects month grid, keeps one complete project agenda, projects every valid agenda date onto the Dashboard monthly calendar, and refreshes agenda dates across tabs without changing saved records or finance schemas."
 }
