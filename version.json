@@ -1,5 +1,5 @@
 {
-  "version": "14.0.7",
+  "version": "14.0.8",
   "schemaVersion": 12,
   "cloudSchemaVersion": 3,
   "ledgerVersion": 1,
@@ -10,8 +10,8 @@
   "profileArchitectureVersion": 1,
   "encryptionVersion": 1,
   "authSecurityVersion": 1,
-  "cacheVersion": "finance-v14-20260812-v1407-cloud-conflict-resolution-r1",
+  "cacheVersion": "finance-v14-20260812-v1408-orphan-conflict-recovery-r1",
   "released": "2026-08-12",
-  "name": "Cloud Conflict Resolution Reliability",
-  "notes": "Applies the selected cloud or device record transactionally, reports resolution progress and failures, and keeps conflict state recoverable without changing finance or cloud schemas."
+  "name": "Orphan Conflict Recovery",
+  "notes": "Recovers cloud or device choices from preserved conflict snapshots when a pending queue entry is missing, and clears conflicts after confirmed device writes without changing finance or cloud schemas."
 }

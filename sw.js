@@ -1,7 +1,7 @@
 "use strict";
-const APP_VERSION = "14.0.7";
+const APP_VERSION = "14.0.8";
 self.__FINANCE_APP_VERSION = APP_VERSION;
-const CACHE_VERSION = "finance-v14-20260812-v1407-cloud-conflict-resolution-r1";
+const CACHE_VERSION = "finance-v14-20260812-v1408-orphan-conflict-recovery-r1";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const DB_NAME = "simple-finance-project-records-v12-db";
@@ -15,25 +15,25 @@ const APP_SHELL = [
   asset("./offline.html"),
   asset("./manifest.webmanifest"),
   asset("./version.json"),
-  asset("./app.css?v=14.0.7"),
-  asset("./privacy-lock.js?v=14.0.7"),
-  asset("./security-profiles.js?v=14.0.7"),
-  asset("./security-profiles.css?v=14.0.7"),
-  asset("./cloud-conflict-review.js?v=14.0.7"),
-  asset("./cloud-conflict-resolution.js?v=14.0.7"),
-  asset("./cloud-sync.js?v=14.0.7"),
-  asset("./account-ledger.js?v=14.0.7"),
-  asset("./account-ledger.css?v=14.0.7"),
-  asset("./budget-planning.js?v=14.0.7"),
-  asset("./budget-planning.css?v=14.0.7"),
-  asset("./reports-insights.js?v=14.0.7"),
-  asset("./reports-insights.css?v=14.0.7"),
-  asset("./productivity-tools.js?v=14.0.7"),
-  asset("./productivity-tools.css?v=14.0.7"),
-  asset("./reminders-alerts.js?v=14.0.7"),
-  asset("./reminders-alerts.css?v=14.0.7"),
-  asset("./projects-calendar-v13.0.20.js?v=14.0.7"),
-  asset("./projects-calendar-v13.0.20.css?v=14.0.7"),
+  asset("./app.css?v=14.0.8"),
+  asset("./privacy-lock.js?v=14.0.8"),
+  asset("./security-profiles.js?v=14.0.8"),
+  asset("./security-profiles.css?v=14.0.8"),
+  asset("./cloud-conflict-review.js?v=14.0.8"),
+  asset("./cloud-conflict-resolution.js?v=14.0.8"),
+  asset("./cloud-sync.js?v=14.0.8"),
+  asset("./account-ledger.js?v=14.0.8"),
+  asset("./account-ledger.css?v=14.0.8"),
+  asset("./budget-planning.js?v=14.0.8"),
+  asset("./budget-planning.css?v=14.0.8"),
+  asset("./reports-insights.js?v=14.0.8"),
+  asset("./reports-insights.css?v=14.0.8"),
+  asset("./productivity-tools.js?v=14.0.8"),
+  asset("./productivity-tools.css?v=14.0.8"),
+  asset("./reminders-alerts.js?v=14.0.8"),
+  asset("./reminders-alerts.css?v=14.0.8"),
+  asset("./projects-calendar-v13.0.20.js?v=14.0.8"),
+  asset("./projects-calendar-v13.0.20.css?v=14.0.8"),
   asset("./sync-config.js"),
   asset("./vendor/supabase.min.js"),
   asset("./icons/icon-192.png"),

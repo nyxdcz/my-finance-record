@@ -1,3 +1,16 @@
+## 14.0.8 · 2026-08-12
+
+### Fixed
+- Recovered **Use cloud version** and **Use this device** actions when a conflict snapshot exists without its pending queue entry.
+- Cleared stale conflict records after this device’s committed revision is confirmed by the cloud.
+
+### Changed
+- New conflict snapshots preserve local sort order and deletion intent for faithful recovery.
+- Device-choice recovery reconstructs, rebases, and queues the reviewed local record transactionally.
+
+### Tested
+- Added state-level regressions for both choices using orphaned conflict fixtures.
+
 ## 14.0.7 · 2026-08-12
 
 ### Fixed
