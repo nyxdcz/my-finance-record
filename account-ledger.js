@@ -149,7 +149,7 @@
     return normalized;
   }
 
-  function recalculateBalances(target = data) {
+  function recalculateBalances(target = data, { stamp = false } = {}) {
     if (!target?.accounts || typeof target.accounts !== "object") target.accounts = {};
     const balances = Object.fromEntries(Object.keys(target.accounts).map(name => [name, 0]));
     (target.accountLedger || []).forEach(entry => {
@@ -157,7 +157,7 @@
       balances[entry.account] = roundMoney(balances[entry.account] + Number(entry.amount || 0));
     });
     Object.keys(target.accounts).forEach(name => { target.accounts[name] = roundMoney(balances[name] || 0); });
-    if (target.ledgerSettings) target.ledgerSettings.lastRecalculatedAt = new Date().toISOString();
+    if (stamp && target.ledgerSettings) target.ledgerSettings.lastRecalculatedAt = new Date().toISOString();
     return target.accounts;
   }
 
@@ -181,7 +181,7 @@
       data.accountLedger.push(entry);
       added.push(entry);
     }
-    if (recalculate) recalculateBalances(data);
+    if (recalculate) recalculateBalances(data, { stamp:added.length > 0 });
     return added;
   }
 
@@ -258,7 +258,9 @@
     return ensureLedgerShape(originalNormalizeData(value));
   };
 
+  const ledgerMigrationSnapshot = JSON.stringify(data);
   data = ensureLedgerShape(data);
+  const ledgerMigrationChanged = JSON.stringify(data) !== ledgerMigrationSnapshot;
 
   saveData = function ledgerAwareSaveData(message = "Saved") {
     ensureLedgerShape(data);
@@ -599,7 +601,7 @@
       data.expenses.push(expense);
       const result = applyExpensePayment([expense], account, { auto:false, paidDate:date });
       if (!result.ok) throw new Error(result.reason === "insufficient" ? `${account} has insufficient funds for this purchase.` : "The purchase could not be recorded.");
-      recalculateBalances(data);
+      recalculateBalances(data, { stamp:true });
       const paidRecordReady = Boolean(expense.paid && expense.accountDeducted && expense.paymentTransactionId);
       const matchingLedger = (data.accountLedger || []).filter(entry => entry.transactionId === result.transactionId && entry.expenseId === expense.id && entry.type === "expense-payment" && roundMoney(entry.amount) === roundMoney(-amount));
       const balanceReady = roundMoney(data.accounts?.[account] || 0) === expectedAfter;
@@ -858,7 +860,7 @@
       const openingId = `opening:${uid()}`;
       appendLedgerEntries([{ id:uid(), transactionId:openingId, operationId:openingId, account:newName, type:"opening-balance", amount:targetBalance, date:localDateKey(), description:`Opening balance for ${newName}`, source:"account-create" }]);
     } else appendReconciliation(newName, targetBalance, { note:"Balance changed from Edit account" });
-    recalculateBalances(data);
+    recalculateBalances(data, { stamp:true });
     if (type !== "Savings") (data.savingsGoals || []).forEach(goal => { if (goal.sourceType === "linked" && goal.linkedAccount === newName) { goal.sourceType = "manual"; goal.currentAmount = Number(data.accounts[newName] || 0); goal.linkedAccount = ""; goal.updatedAt = new Date().toISOString(); } });
     if (type === "Savings" && !data.savingsSettings.defaultAccount) data.savingsSettings.defaultAccount = newName;
     if (type !== "Savings" && data.savingsSettings.defaultAccount === newName) data.savingsSettings.defaultAccount = "";
@@ -986,9 +988,10 @@
   ensureAccountSpendUi();
   bindPersistentSpendActionDelegation();
   injectLedgerUi();
-  recalculateBalances(data);
-  if (typeof persistFinanceDataRaw === "function") persistFinanceDataRaw("Account ledger updated");
-  else localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  if (ledgerMigrationChanged) {
+    if (typeof persistFinanceDataRaw === "function") persistFinanceDataRaw("Account ledger migrated");
+    else localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  }
   renderAll(false);
 
   window.FinanceAccountLedger = {

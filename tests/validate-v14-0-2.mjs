@@ -25,7 +25,7 @@ const sql=read("supabase/cloud-profiles-v13.sql");
 const workflow=read(".github/workflows/quality-pages.yml");
 const releaseWorkflow=read(".github/workflows/release.yml");
 const dependabot=read(".github/dependabot.yml");
-const installer=read("Install_V14_0_1.command");
+const installer=read("Install_V14_0_2.command");
 const maintainability=read("tests/check-maintainability.mjs");
 const readme=read("README.md");
 const changelog=read("CHANGELOG.md");
@@ -37,17 +37,25 @@ const uiValidation=read("TOOLBAR_BUDGET_BENTO_VALIDATION_V13_0_2.md");
 const settingsValidation=read("SETTINGS_SIMPLIFICATION_VALIDATION_V13_0_2.md");
 const compactModalValidation=read("COMPACT_MODAL_SVG_ICON_VALIDATION_V13_0_3.md");
 const productivity=read("productivity-tools.js");
+const accountLedger=read("account-ledger.js");
+const projectCalendar=read("projects-calendar-v13.0.20.js");
 const version=JSON.parse(read("version.json"));
 const packageJson=JSON.parse(read("package.json"));
 const packageLock=JSON.parse(read("package-lock.json"));
 
-assert(version.version==="14.0.1","version.json is not V14.0.1");
+assert(version.version==="14.0.2","version.json is not V14.0.2");
 assert(version.schemaVersion===12,"Finance Schema changed from 12");
 assert(version.cloudSchemaVersion===3,"Cloud Schema V3 metadata missing");
 for(const [field,value] of Object.entries({ledgerVersion:1,budgetVersion:1,insightsVersion:1,productivityVersion:1,remindersVersion:1,profileArchitectureVersion:1,encryptionVersion:1,authSecurityVersion:1})) assert(version[field]===value,`${field} metadata mismatch`);
-assert(html.includes('<title>My Finance Records · V14.0.1</title>'),"HTML title mismatch");
-assert(html.includes('const APP_VERSION = "14.0.1";'),"HTML APP_VERSION mismatch");
-assert(read("index.html").includes('./app.css?v=14.0.1')&&worker.includes('asset("./app.css?v=14.0.1")'),"extracted application CSS is not versioned and precached");
+assert(html.includes('<title>My Finance Records · V14.0.2</title>'),"HTML title mismatch");
+assert(html.includes('const APP_VERSION = "14.0.2";'),"HTML APP_VERSION mismatch");
+assert(html.includes('function synchronizeVersionDisplay()')&&html.includes('badge.textContent = `V${APP_VERSION}`'),"central runtime version display updater missing");
+assert(html.includes('{"version":"V14.0.2","title":"Version Display & Sync Conflict Recovery"'),"in-app V14.0.2 history entry missing");
+assert(!projectCalendar.includes("document.title")&&!projectCalendar.includes('getElementById("buildBadge")'),"project calendar still overrides central release metadata");
+assert(accountLedger.includes('function recalculateBalances(target = data, { stamp = false } = {})'),"ledger recalculation is not pure by default");
+assert(accountLedger.includes('if (stamp && target.ledgerSettings) target.ledgerSettings.lastRecalculatedAt = new Date().toISOString();'),"ledger timestamp is not limited to explicit mutations");
+assert(accountLedger.includes("if (ledgerMigrationChanged)")&&!accountLedger.includes('persistFinanceDataRaw("Account ledger updated")'),"ledger startup still persists unchanged data");
+assert(read("index.html").includes('./app.css?v=14.0.2')&&worker.includes('asset("./app.css?v=14.0.2")'),"extracted application CSS is not versioned and precached");
 assert(html.includes('data-settings-tab="profiles"')&&html.includes('id="settings-panel-profiles"'),"Profiles & Security settings panel missing");
 assert(html.includes('security-profiles.css')&&html.includes('security-profiles.js'),"profile architecture assets are not loaded");
 assert(html.includes('{"version": "V13.0.10", "title": "Account Spending from Balance"'),"in-app V13.0.10 history entry missing");
@@ -56,32 +64,32 @@ assert(html.includes('{"version": "V13.0.3", "title": "Compact Modals & SVG Inte
 assert(html.includes('{"version": "V13.0.2", "title": "Toolbar & Budget Bento UI"'),"in-app V13.0.2 history entry missing");
 assert(html.includes('{"version": "V13.0.0", "title": "Major Cloud, Encryption & Profile Architecture"'),"in-app V13.0.0 history entry missing");
 assert(html.includes('{"version": "V12.21.0", "title": "Record-level Cloud Sync 2.0"'),"V12.21 history was rewritten incorrectly");
-assert(worker.includes('const APP_VERSION = "14.0.1";'),"service-worker version mismatch");
+assert(worker.includes('const APP_VERSION = "14.0.2";'),"service-worker version mismatch");
 assert(worker.includes(`const CACHE_VERSION = "${version.cacheVersion}";`),"service-worker cache mismatch");
-assert(worker.includes('asset("./security-profiles.js?v=14.0.1")')&&worker.includes('asset("./security-profiles.css?v=14.0.1")'),"profile assets missing from PWA shell");
+assert(worker.includes('asset("./security-profiles.js?v=14.0.2")')&&worker.includes('asset("./security-profiles.css?v=14.0.2")'),"profile assets missing from PWA shell");
 assert(workflow.includes('security-profiles.js security-profiles.css cloud-sync.js'),"GitHub Pages workflow does not deploy profile assets");
-assert(packageJson.version==="14.0.1"&&packageLock.version==="14.0.1","package version mismatch");
+assert(packageJson.version==="14.0.2"&&packageLock.version==="14.0.2","package version mismatch");
 assert(exists("privacy-lock.js"),"signed-out privacy module missing");
 assert(html.includes('<body class="finance-signed-out finance-auth-pending">'),"app does not start privacy-locked before first render");
 for(const token of ["FinancePrivacyLock","finance-signed-out","finance-auth-pending","finance-privacy-lock-view","₱0.00","privacySignInButton","Sign in to view records"]) assert(html.includes(token)||privacyLock.includes(token),`signed-out privacy safeguard missing: ${token}`);
 for(const token of ["setAuthenticated","closeSensitiveSurfaces","blockLockedInteraction","FINANCE_AUTH_STATE","finance:privacy-auth-change"]) assert(privacyLock.includes(token),`privacy runtime safeguard missing: ${token}`);
 assert(cloud.includes("setPrivacyAuthentication(false)")&&cloud.includes("setPrivacyAuthentication(true"),"cloud auth does not drive privacy lock state");
 assert(worker.includes('let financeAuthState = "signed-out"')&&worker.includes('FINANCE_AUTH_STATE')&&worker.includes('financeAuthState !== "signed-in"'),"service worker does not suppress signed-out finance notifications");
-assert(worker.includes('asset("./privacy-lock.js?v=14.0.1")'),"privacy module missing from service-worker shell");
+assert(worker.includes('asset("./privacy-lock.js?v=14.0.2")'),"privacy module missing from service-worker shell");
 assert(workflow.includes("privacy-lock.js"),"GitHub Pages workflow does not deploy privacy module");
-assert(exists("SIGNED_OUT_PRIVACY_LOCK_VALIDATION_V13_0_18.md"),"V14.0.1 privacy validation report missing");
+assert(exists("SIGNED_OUT_PRIVACY_LOCK_VALIDATION_V13_0_18.md"),"V14.0.2 privacy validation report missing");
 
 assert(packageJson.scripts?.quality==="npm run inspect && npm run lint && npm run maintainability && npm run test","quality script mismatch");
 assert(packageJson.scripts?.inspect==="node tests/inspect-project.mjs"&&exists("tests/inspect-project.mjs"),"repository inspection script missing");
 assert(packageJson.scripts?.lint==="eslint ."&&packageJson.scripts?.["test:browser"]==="playwright test","lint or browser package script missing");
-assert(readme.includes("macOS File Inspection and Fixes installer")&&readme.includes("Install_V14_0_1.command"),"README installer instructions missing");
+assert(readme.includes("macOS File Inspection and Fixes installer")&&readme.includes("Install_V14_0_2.command"),"README installer instructions missing");
 assert(exists("SETTINGS_TOPBAR_UI_VALIDATION_V13_0_4.md"),"V13.0.4 UI validation report missing");
 assert(exists("DASHBOARD_CALENDAR_DEDUP_VALIDATION_V13_0_5.md"),"V13.0.5 calendar validation report missing");
 assert(exists("PROJECT_REVISION_CYCLES_VALIDATION_V13_0_6.md"),"V13.0.9 project revision validation report missing");
 assert(exists("FILE_INSPECTION_AND_FIXES_VALIDATION_V13_0_5.md"),"V13.0.5 installer validation report missing");
-assert(exists("Install_V14_0_1.command")&&(fs.statSync(path.join(root,"Install_V14_0_1.command")).mode&0o100)!==0,"V14.0.1 installer is missing or not executable");
+assert(exists("Install_V14_0_2.command")&&(fs.statSync(path.join(root,"Install_V14_0_2.command")).mode&0o100)!==0,"V14.0.2 installer is missing or not executable");
 assert((fs.statSync(path.join(root,"run_audit.sh")).mode&0o100)!==0,"run_audit.sh is not executable");
-assert(installer.includes("npm ci --ignore-scripts")&&installer.includes("npm run quality")&&installer.includes("git diff --check"),"V14.0.1 installer validation flow is incomplete");
+assert(installer.includes("npm ci --ignore-scripts")&&installer.includes("npm run quality")&&installer.includes("git diff --check"),"V14.0.2 installer validation flow is incomplete");
 assert(workflow.includes("name: Browser privacy and accessibility")&&workflow.includes("npm run audit")&&workflow.includes("npm run test:browser"),"CI hardening is incomplete");
 assert(dependabot.includes("package-ecosystem: npm")&&dependabot.includes("package-ecosystem: github-actions"),"Dependabot does not cover npm and GitHub Actions");
 assert(releaseWorkflow.includes('tags:')&&releaseWorkflow.includes('gh release create'),"tag-driven release workflow is missing");
@@ -91,7 +99,7 @@ assert(exists("FILE_INSPECTION_AND_FIXES_VALIDATION_V13_0_3.md"),"File Inspectio
 assert(exists("CLOUD_AUTH_RECOVERY_VALIDATION_V13_0_15.md"),"V13.0.15 cloud auth validation report missing");
 assert(exists("FILE_INSPECTION_AND_FIXES_VALIDATION_V13_0_15.md"),"V13.0.15 installer validation report missing");
 assert(read("CLOUD_SYNC_SETUP.md").includes("V13.0.16 password-recovery redirect"),"V13.0.15 password-reset redirect setup guidance missing");
-assert(readme.startsWith("# My Finance Records · V14.0.1 PWA"),"README V13.0.15 heading mismatch");
+assert(readme.startsWith("# My Finance Records · V14.0.2 PWA"),"README V13.0.15 heading mismatch");
 assert(readme.includes("active browser working copy in localStorage")&&readme.includes("cannot be recovered"),"README encryption boundaries incomplete");
 assert(changelog.includes("## 13.0.12 · 2026-08-07")&&changelog.includes("## 13.0.10 · 2026-08-07"),"CHANGELOG V13.0.15 entry or V13.0.10 history missing");
 assert(changelog.includes("## 13.0.4 · 2026-08-07"),"CHANGELOG V13.0.4 history missing");
@@ -199,7 +207,11 @@ const cloudArchitecture={
   encryptCloudPayload:async(payload,ctx)=>({__financeEncrypted:true,algorithm:"AES-256-GCM",aad:`${ctx.collection}|${ctx.recordId}`,ciphertext:Buffer.from(JSON.stringify(payload)).toString("base64"),iv:"fixture"}),
   decryptCloudPayload:async(envelope)=>JSON.parse(Buffer.from(envelope.ciphertext,"base64").toString("utf8"))
 };
-const sampleData={accounts:{Cash:500},accountTypes:{Cash:"Cash"},accountOrder:["Cash"],accountIcons:{},expenses:[{id:"expense-1",name:"Rent",amount:100,paid:false,date:"2026-08-01"}],projects:[],incomeRecords:[],savingsGoals:[],accountLedger:[],accountReconciliations:[],budgetTemplates:[],expenseTemplates:[],monthlyReports:{},monthlyChecklists:{},monthlyBudgets:{},iconLibrary:{},expenseRecurrenceSkips:[],savingsSettings:{},projectCalendarSettings:{},salaryWorkSettings:{},ledgerSettings:{version:1},budgetSettings:{version:1},productivitySettings:{version:1},reminderSettings:{version:1}};
+const sampleData={accounts:{Cash:500},accountTypes:{Cash:"Cash"},accountOrder:["Cash"],accountIcons:{},expenses:[{id:"expense-1",name:"Rent",amount:100,paid:false,date:"2026-08-01"}],projects:[],incomeRecords:[],savingsGoals:[],accountLedger:[],accountReconciliations:[],budgetTemplates:[],expenseTemplates:[],monthlyReports:{},monthlyChecklists:{},monthlyBudgets:{},iconLibrary:{},expenseRecurrenceSkips:[],savingsSettings:{},projectCalendarSettings:{},salaryWorkSettings:{},ledgerSettings:{version:1,lastRecalculatedAt:"2026-08-11T09:00:00.000Z"},budgetSettings:{version:1},productivitySettings:{version:1},reminderSettings:{version:1}};
+const settingsKey=`settings\u001fpreferences`;
+cloudMemory.set("simple-finance-cloud-record-base-v3:profile-personal",JSON.stringify({[settingsKey]:{collection:"settings",recordId:"preferences",payload:{savingsSettings:{currency:"PHP"},ledgerSettings:{version:1,lastRecalculatedAt:"2026-08-11T08:00:00.000Z"}},sortIndex:0,revision:4}}));
+cloudMemory.set("simple-finance-cloud-record-queue-v3:profile-personal",JSON.stringify({[settingsKey]:{key:settingsKey,collection:"settings",recordId:"preferences",payload:{savingsSettings:{currency:"PHP"},ledgerSettings:{version:1,lastRecalculatedAt:"2026-08-11T09:00:00.000Z"}},basePayload:{savingsSettings:{currency:"PHP"},ledgerSettings:{version:1,lastRecalculatedAt:"2026-08-11T08:00:00.000Z"}},sortIndex:0,baseSortIndex:0,baseRevision:4,status:"conflict"}}));
+cloudMemory.set("simple-finance-cloud-record-conflicts-v3:profile-personal",JSON.stringify([{id:"conflict-settings",key:settingsKey,collection:"settings",recordId:"preferences",localPayload:{savingsSettings:{currency:"PHP"},ledgerSettings:{version:1,lastRecalculatedAt:"2026-08-11T09:00:00.000Z"}},remotePayload:{savingsSettings:{currency:"PHP"},ledgerSettings:{version:1,lastRecalculatedAt:"2026-08-11T10:00:00.000Z"}},remoteRevision:5,remoteDeletedAt:"",basePayload:{savingsSettings:{currency:"PHP"},ledgerSettings:{version:1,lastRecalculatedAt:"2026-08-11T08:00:00.000Z"}},paths:["atomic_batch_conflict"]}]));
 const cloudSandbox={
   console,structuredClone,crypto:crypto.webcrypto,URL,URLSearchParams,window:null,globalThis:null,FinanceProfileArchitecture:cloudArchitecture,
   localStorage:{getItem:key=>cloudMemory.get(key)??null,setItem:(key,value)=>cloudMemory.set(key,String(value)),removeItem:key=>cloudMemory.delete(key)},
@@ -215,6 +227,8 @@ try{ vm.runInContext(cloud,cloudSandbox,{filename:"cloud-sync.js"}); }catch(erro
 const cloudInternals=cloudSandbox.FinanceCloudSyncInternals;
 assert(Boolean(cloudInternals),"Cloud Sync V3 internals were not exposed");
 if(cloudInternals){
+  assert(cloudInternals.reconcileDerivedSettingsState()===true,"timestamp-only settings conflict was not auto-repaired");
+  assert(cloudSandbox.FinanceCloudSync.status.pendingCount===0&&cloudSandbox.FinanceCloudSync.status.conflictCount===0,"repaired settings conflict remains pending");
   assert(cloudInternals.friendlyAuthError({message:"Invalid login credentials"}).startsWith("Wrong email or password"),"invalid login error was not mapped to plain language");
   assert(cloudInternals.friendlyAuthError({message:"Email not confirmed"}).startsWith("Your email is not confirmed"),"email-confirmation error was not mapped to plain language");
   assert(cloudInternals.passwordRecoveryRedirect()==="https://app.test/index.html?auth=recovery","password recovery redirect did not strip query/hash");
@@ -229,14 +243,17 @@ if(cloudInternals){
   assert(cloudSandbox.__authFixture.updatedPassword==="newpass1","password recovery completion did not update the Supabase user password");
   const map=cloudInternals.toRecordMap(sampleData);
   assert(Object.values(map).some(row=>row.collection==="expenses"&&row.recordId==="expense-1"),"Cloud record map omitted expense");
+  const settingsRecord=Object.values(map).find(row=>row.collection==="settings"&&row.recordId==="preferences");
+  assert(!Object.prototype.hasOwnProperty.call(settingsRecord.payload.ledgerSettings,"lastRecalculatedAt"),"device-local ledger timestamp leaked into cloud preferences");
   const expense=Object.values(map).find(row=>row.collection==="expenses");
   const rpcChange=await cloudInternals.toRpcChange({...expense,baseRevision:0,deleted:false,minWriterVersionCode:130000});
   assert(rpcChange.payload?.__financeEncrypted===true&&!JSON.stringify(rpcChange.payload).includes("Rent"),"outgoing cloud record was not encrypted");
   const row=await cloudInternals.decryptRow({collection:"expenses",record_id:"expense-1",payload:rpcChange.payload,revision:1});
   assert(row.payload.name==="Rent"&&row.payload.amount===100,"incoming cloud record did not decrypt");
   const store=Object.fromEntries(Object.entries(map).map(([key,value])=>[key,{...value,revision:1,deletedAt:"",updatedAt:"2026-08-06T00:00:00Z"}]));
-  const restored=cloudInternals.fromRecordStore(store,{});
+  const restored=cloudInternals.fromRecordStore(store,sampleData);
   assert(restored.accounts?.Cash===500&&restored.expenses?.[0]?.name==="Rent","Cloud record-map round trip failed");
+  assert(restored.ledgerSettings?.lastRecalculatedAt===sampleData.ledgerSettings.lastRecalculatedAt,"cloud restore did not preserve the device-local ledger timestamp");
 }
 
 
@@ -274,7 +291,7 @@ for(const token of [
 assert(read("account-ledger.js").includes('window.simplifyAccountLedgerSettings?.(panel, ledgerCard, reconciliationCard)'),"dynamic account history is not moved into progressive disclosure");
 assert(read("reminders-alerts.js").includes('window.simplifyReminderSettingsCard?.(card)'),"dynamic reminder settings are not moved into progressive disclosure");
 assert(html.includes('Save account updates')&&read("account-ledger.js").includes('Save account updates'),"plain-language account update action is incomplete");
-assert(version.cacheVersion.includes("v1401-repository-hardening-r1"),"V13.0.15 cache revision mismatch");
+assert(version.cacheVersion.includes("v1402-sync-version-display-r1"),"V13.0.15 cache revision mismatch");
 
 // V13.0.3 compact modal and SVG icon safeguards preserved.
 for(const token of [
@@ -349,7 +366,7 @@ assert(changelog.includes("numbered project revision cycles")&&readme.includes("
 assert(exists("PROJECT_REVISION_CYCLES_VALIDATION_V13_0_6.md"),"V13.0.9 project revision report missing");
 assert(exists("FILE_INSPECTION_AND_FIXES_VALIDATION_V13_0_6.md"),"V13.0.6 installer validation report missing");
 
-assert(html.includes('id="settingsOverviewAppStatus">Version 14.0.1<'),"Settings overview version was not updated");
+assert(html.includes('id="settingsOverviewAppStatus">Version 14.0.2<'),"Settings overview version was not updated");
 assert(profiles.includes('function renameProfile') && profiles.includes('id="renameProfileInput"') && profiles.includes('id="renameProfileButton"'), "Profile rename UI and function missing from security-profiles.js");
 
 // Auto-repair maskable icon if Git checkout or line-ending conversion touched binary PNG
@@ -445,7 +462,7 @@ for(const token of [
 assert(html.includes('if (expense.quickSpend && expense.paid && expense.accountDeducted) restoreExpensePayment(expense);'),"quick-spend deletion does not restore its account debit");
 assert(html.includes('Move this paid expense back to unpaid before changing its amount.'),"paid ledger amount edit protection missing");
 assert(!/[🛒💸]/u.test(ledgerSource),"emoji-style system icon introduced in account spending UI");
-assert(version.name==="Repository Quality & Release Hardening", "V13.0.15 version name mismatch");
+assert(version.name==="Version Display & Sync Conflict Recovery", "V13.0.15 version name mismatch");
 assert(readme.includes("Record spending")&&readme.includes("Paid Expenses"),"README V13.0.10 account spending summary missing");
 assert(changelog.includes("direct account spending")&&changelog.includes("expense-payment ledger debit"),"CHANGELOG V13.0.10 account spending details missing");
 
@@ -484,10 +501,10 @@ for(const token of [
 assert(html.includes('Record Spending is intentionally isolated from the account-maintenance form submit path.'),"Parent account form still owns Record Spending submit behavior");
 assert(html.includes('const saved = baseSaveData(message);')&&html.includes('if (saved === false) return false;')&&html.includes('return true;'),"saveData wrapper does not preserve persistence success/failure");
 assert(html.includes('account-spend-status')&&ledgerV1313.includes('accountSpendStatus'),"Inline spending status is missing");
-assert(version.cacheVersion.includes("v1401-repository-hardening-r1"),"V13.0.15 cache revision mismatch");
-assert(readme.startsWith("# My Finance Records · V14.0.1 PWA")&&readme.includes("Brave PWA Install Flow"),"V13.0.15 README metadata missing");
+assert(version.cacheVersion.includes("v1402-sync-version-display-r1"),"V13.0.15 cache revision mismatch");
+assert(readme.startsWith("# My Finance Records · V14.0.2 PWA")&&readme.includes("Brave PWA Install Flow"),"V13.0.15 README metadata missing");
 assert(changelog.includes("## 13.0.15 · 2026-08-07"),"V13.0.15 changelog missing");
-assert(html.includes('?v=14.0.1')&&worker.includes('?v=14.0.1'),"Version-pinned V13.0.15 assets missing");
+assert(html.includes('?v=14.0.2')&&worker.includes('?v=14.0.2'),"Version-pinned V13.0.15 assets missing");
 assert(ledgerV1313.includes('const stored = JSON.parse(storedRaw);'),"V13.0.15 storage verification must inspect the raw persisted ledger");
 assert(!ledgerV1313.includes('window.__spendVerifyDebug'),"Temporary spend verification debug hook remains");
 assert(html.includes('accountLedger:Array.isArray(source.accountLedger)')&&html.includes('accountReconciliations:Array.isArray(source.accountReconciliations)')&&html.includes('ledgerSettings:source.ledgerSettings'),"Base normalization does not preserve persisted ledger/reconciliation fields for reload");
@@ -508,8 +525,8 @@ for (const token of [
 ]) assert(html.includes(token),`V13.0.15 Brave install safeguard missing: ${token}`);
 assert(html.includes('window.addEventListener("beforeinstallprompt"'),"Native beforeinstallprompt support was removed");
 assert(html.includes('window.addEventListener("appinstalled"'),"appinstalled support was removed");
-assert(version.name==="Repository Quality & Release Hardening","V13.0.15 version name mismatch");
-assert(version.cacheVersion.includes("v1401-repository-hardening-r1"),"V13.0.15 cache revision mismatch");
+assert(version.name==="Version Display & Sync Conflict Recovery","V13.0.15 version name mismatch");
+assert(version.cacheVersion.includes("v1402-sync-version-display-r1"),"V13.0.15 cache revision mismatch");
 assert(exists("BRAVE_PWA_INSTALL_VALIDATION_V13_0_14.md"),"V13.0.14 Brave validation report missing");
 assert(readme.includes("Install with Brave")&&readme.includes("Save and Share"),"README Brave install instructions missing");
 assert(changelog.includes("## 13.0.15 · 2026-08-07"),"V13.0.15 changelog entry missing");
@@ -519,26 +536,26 @@ assert(changelog.includes("## 13.0.15 · 2026-08-07"),"V13.0.15 changelog entry 
 for(const token of [
   'id="cloudForgotPassword"','id="cloudTestConnection"','id="cloudPasswordToggle"','id="cloudAuthMessage"','id="cloudConnectionStatus"',
   'id="cloudPasswordRecoveryCard"','id="cloudNewPassword"','id="cloudConfirmPassword"','id="cloudCompletePasswordReset"','id="cloudCancelPasswordReset"'
-]) assert(html.includes(token),`V14.0.1 auth UI safeguard missing: ${token}`);
+]) assert(html.includes(token),`V14.0.2 auth UI safeguard missing: ${token}`);
 for(const token of [
   'friendlyAuthError','requestPasswordReset','resetPasswordForEmail','completePasswordReset','updateUser({ password:next })','PASSWORD_RECOVERY',
   'testCloudConnection','/auth/v1/health','withAuthButtonBusy','setPasswordVisibility','Wrong email or password','local finance records stay stored'
-]) assert(cloud.includes(token),`V14.0.1 auth behavior safeguard missing: ${token}`);
-assert(readme.includes('Forgot password?')&&readme.includes('Test cloud connection'),"README V14.0.1 auth recovery notes missing");
-for(const token of ['id="cloudRecoveryHelpCard"','id="cloudRecoveryEmail"','id="cloudRecoveryCode"','id="cloudRecoveryResend"','id="cloudVerifyRecoveryCode"','id="cloudRecoveryBackToSignIn"']) assert(html.includes(token),`V14.0.1 recovery redirect UI safeguard missing: ${token}`);
-for(const token of ['parsePasswordRecoveryUrl','recoveryErrorMessage','verifyRecoveryCode','verifyOtp({ email:value, token:code, type:"recovery" })','url.searchParams.set("auth", "recovery")','Password reset needs attention']) assert(cloud.includes(token),`V14.0.1 recovery redirect behavior safeguard missing: ${token}`);
-assert(readme.includes('?auth=recovery')&&readme.includes('{{ .Token }}'),"README V14.0.1 recovery redirect/code instructions missing");
-assert(changelog.includes('## 14.0.1 · 2026-08-11'),"V14.0.1 changelog entry missing");
-assert(version.name==='Repository Quality & Release Hardening',"V14.0.1 version name mismatch");
-assert(changelog.includes('## 13.0.15 · 2026-08-07')&&changelog.includes('Password-reset messaging avoids revealing'),"CHANGELOG V14.0.1 auth entry missing");
-assert(version.cacheVersion.includes('v1401-repository-hardening-r1'),"V14.0.1 auth cache revision mismatch");
-assert(packageJson.scripts?.quality==='npm run inspect && npm run lint && npm run maintainability && npm run test',"V14.0.1 quality script mismatch");
+]) assert(cloud.includes(token),`V14.0.2 auth behavior safeguard missing: ${token}`);
+assert(readme.includes('Forgot password?')&&readme.includes('Test cloud connection'),"README V14.0.2 auth recovery notes missing");
+for(const token of ['id="cloudRecoveryHelpCard"','id="cloudRecoveryEmail"','id="cloudRecoveryCode"','id="cloudRecoveryResend"','id="cloudVerifyRecoveryCode"','id="cloudRecoveryBackToSignIn"']) assert(html.includes(token),`V14.0.2 recovery redirect UI safeguard missing: ${token}`);
+for(const token of ['parsePasswordRecoveryUrl','recoveryErrorMessage','verifyRecoveryCode','verifyOtp({ email:value, token:code, type:"recovery" })','url.searchParams.set("auth", "recovery")','Password reset needs attention']) assert(cloud.includes(token),`V14.0.2 recovery redirect behavior safeguard missing: ${token}`);
+assert(readme.includes('?auth=recovery')&&readme.includes('{{ .Token }}'),"README V14.0.2 recovery redirect/code instructions missing");
+assert(changelog.includes('## 14.0.2 · 2026-08-11'),"V14.0.2 changelog entry missing");
+assert(version.name==='Version Display & Sync Conflict Recovery',"V14.0.2 version name mismatch");
+assert(changelog.includes('## 13.0.15 · 2026-08-07')&&changelog.includes('Password-reset messaging avoids revealing'),"CHANGELOG V14.0.2 auth entry missing");
+assert(version.cacheVersion.includes('v1402-sync-version-display-r1'),"V14.0.2 auth cache revision mismatch");
+assert(packageJson.scripts?.quality==='npm run inspect && npm run lint && npm run maintainability && npm run test',"V14.0.2 quality script mismatch");
 
 
-// V14.0.1 iPhone input zoom prevention safeguards.
-assert(version.name==="Repository Quality & Release Hardening","V14.0.1 version name mismatch");
-assert(version.cacheVersion.includes("v1401-repository-hardening-r1"),"V14.0.1 cache revision mismatch");
-assert(readme.includes("iPhone Input Zoom Prevention")&&readme.includes("minimum **16px**"),"README V14.0.1 input-zoom guidance missing");
+// V14.0.2 iPhone input zoom prevention safeguards.
+assert(version.name==="Version Display & Sync Conflict Recovery","V14.0.2 version name mismatch");
+assert(version.cacheVersion.includes("v1402-sync-version-display-r1"),"V14.0.2 cache revision mismatch");
+assert(readme.includes("iPhone Input Zoom Prevention")&&readme.includes("minimum **16px**"),"README V14.0.2 input-zoom guidance missing");
 assert(changelog.includes("## 13.0.17 · 2026-08-07")&&changelog.includes("user-scalable=no"),"CHANGELOG V13.0.17 input-zoom/accessibility notes missing");
 for(const token of [
   "/* V13.0.17 · iPhone input zoom prevention",
@@ -550,16 +567,16 @@ for(const token of [
   "font-size:16px !important",
   "input[inputmode=\"decimal\"]",
   "input[inputmode=\"numeric\"]"
-]) assert(html.includes(token),`V14.0.1 phone input safeguard missing: ${token}`);
-assert(!/<meta[^>]+name=["']viewport["'][^>]+user-scalable\s*=\s*no/i.test(html),"V14.0.1 must not disable user pinch zoom");
-assert(!/<meta[^>]+name=["']viewport["'][^>]+maximum-scale\s*=\s*1/i.test(html),"V14.0.1 must not lock maximum zoom scale");
-assert(exists("IPHONE_INPUT_ZOOM_VALIDATION_V13_0_17.md"),"V14.0.1 input zoom validation report missing");
+]) assert(html.includes(token),`V14.0.2 phone input safeguard missing: ${token}`);
+assert(!/<meta[^>]+name=["']viewport["'][^>]+user-scalable\s*=\s*no/i.test(html),"V14.0.2 must not disable user pinch zoom");
+assert(!/<meta[^>]+name=["']viewport["'][^>]+maximum-scale\s*=\s*1/i.test(html),"V14.0.2 must not lock maximum zoom scale");
+assert(exists("IPHONE_INPUT_ZOOM_VALIDATION_V13_0_17.md"),"V14.0.2 input zoom validation report missing");
 
 if(failures.length){
-  console.error("V14.0.1 Repository Quality & Release Hardening validation failed:\n"+failures.map(item=>`- ${item}`).join("\n"));
+  console.error("V14.0.2 Version Display & Sync Conflict Recovery validation failed:\n"+failures.map(item=>`- ${item}`).join("\n"));
   process.exit(1);
 }
-console.log("V14.0.1 Repository Quality & Release Hardening validation passed.");
+console.log("V14.0.2 Version Display & Sync Conflict Recovery validation passed.");
 console.log(`- ${staticIds.length} static HTML IDs and ${injectedIds.length} injected runtime IDs checked with no duplicates`);
 console.log("- Record Spending is isolated from correction-form validation and requires persistence/storage verification before close");
 console.log("- Finance Schema 12, Cloud Schema V3, ledger, encryption, profile, rollback, and credential safeguards passed");

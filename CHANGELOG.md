@@ -1,3 +1,15 @@
+## 14.0.2 · 2026-08-11
+
+### Fixed
+- Centralized the browser title and top-bar build badge on V14.0.2 so the older project-calendar extension cannot display V13.0.20 over the active release.
+- Stopped normal ledger normalization, rendering, and startup from rewriting `lastRecalculatedAt` and persisting unchanged finance data.
+- Removed the device-local ledger recalculation timestamp from encrypted `settings:preferences` cloud payloads.
+- Added a one-time local queue migration that clears timestamp-only settings conflicts, safely rebases non-overlapping settings changes, and preserves genuine overlapping conflicts for review.
+- Avoided redundant cloud revisions when a safe non-overlapping merge already matches the remote record.
+
+### Preserved
+- Finance Schema 12, Cloud Schema V3, encryption, Supabase tables, account balances, ledger entries, and financial calculations are unchanged.
+
 ## 14.0.1 · 2026-08-11
 
 ### Fixed
