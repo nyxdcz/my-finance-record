@@ -1,6 +1,6 @@
 "use strict";
 
-/* My Finance Records V14.0.5 · Project Agenda
+/* My Finance Records V14.0.6 · Project Agenda
    Adds meeting, presentation, site-visit, deadline, and other project events.
    Agenda entries are stored separately from finance records so schedule changes never
    alter account balances, expenses, payments, or project financial values. */

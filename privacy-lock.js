@@ -6,12 +6,13 @@
     "#previousMonthButton", "#nextMonthButton", "#monthDisplayButton", "#currentMonthButton",
     "#monthPicker", "#monthPickerPreviousYear", "#monthPickerNextYear", "#monthPickerGrid button",
     "#topbarToolsMenu > summary", "#themeToggleButton", "#privacySignInButton", ".finance-privacy-signin",
+    "[data-help-key]", "[data-section-help]", "[data-close='sectionHelpDialog']", "[data-close='pwaInstallGuideDialog']",
     "[data-settings-tab='sync']", "[data-settings-tab='app']", "#settingsBackButton", "[data-settings-open='sync']", "[data-settings-open='app']",
     "#cloudConfigUrl", "#cloudConfigKey", "#saveCloudConfig", "#clearCloudConfig",
     "#cloudAuthEmail", "#cloudAuthPassword", "#cloudPasswordToggle", "#cloudSignIn", "#cloudCreateAccount", "#cloudForgotPassword", "#cloudTestConnection",
     "#cloudRecoveryEmail", "#cloudRecoveryCode", "#cloudRecoveryResend", "#cloudVerifyRecoveryCode", "#cloudRecoveryBackToSignIn",
     "#cloudNewPassword", "#cloudConfirmPassword", "#cloudCompletePasswordReset", "#cloudCancelPasswordReset", "[data-cloud-password-target]",
-    "#installPwaButton", "#checkUpdateButton", "#repairPwaButton", "#clearAppCacheButton", "#applyUpdateButton", "#laterUpdateButton",
+    "#installPwaButton", "#checkUpdateButton", "#repairPwaButton", "#clearAppCacheButton", "#requestPersistenceButton", "#applyUpdateButton", "#laterUpdateButton",
     "label[for='importBackup']", "#importBackup", "#restoreV11BackupButton"
   ].join(",");
   const sensitiveDialogIds = new Set([
@@ -65,6 +66,17 @@
     return button;
   }
 
+  function ensureSettingsPrivacyNote(){
+    const panel=document.querySelector("[data-settings-panel='app']");
+    if(!panel || panel.querySelector(":scope > .finance-settings-privacy-note")) return;
+    const note=document.createElement("section");
+    note.className="finance-settings-privacy-note";
+    note.setAttribute("aria-label","Signed-out Settings privacy");
+    note.innerHTML=`<div><strong>Finance-specific app settings are hidden while signed out.</strong><p>Sign in to manage reminders and offline finance documents. Installation, updates, appearance, app repair, storage protection, and Help remain available.</p></div><button class="button button-primary finance-privacy-signin" type="button">Sign in</button>`;
+    const intro=panel.querySelector(":scope > .settings-section-intro");
+    if(intro) intro.after(note); else panel.prepend(note);
+  }
+
   function openSignIn(){
     try { if(typeof goToPage==="function") goToPage("settings", { historyMode:"none", smooth:false }); } catch(e){}
     try { if(typeof activateSettingsPanel==="function") activateSettingsPanel("sync", false); } catch(e){}
@@ -100,6 +112,7 @@
   function apply(){
     ensurePrivacyViews();
     ensureTopbarSignIn();
+    ensureSettingsPrivacyNote();
     const locked=!state.authenticated;
     document.body.classList.toggle("finance-signed-out",locked);
     document.body.classList.toggle("finance-signed-in",!locked);
@@ -129,7 +142,8 @@
     if(!interactive) return;
     event.preventDefault();
     event.stopImmediatePropagation();
-    try { if(typeof showToast==="function") showToast("Sign in to use finance records.","info"); } catch(e){}
+    const message=interactive.closest("#settings") ? "Sign in to manage this finance setting." : "Sign in to use finance records.";
+    try { if(typeof showToast==="function") showToast(message,"info"); } catch(e){}
   }
 
   document.addEventListener("click",event=>{

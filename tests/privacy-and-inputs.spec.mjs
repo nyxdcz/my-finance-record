@@ -27,12 +27,47 @@ async function loadStaticApp(page, viewport) {
   });
 }
 
+async function contrastRatio(locator) {
+  return locator.evaluate(node => {
+    const parse = value => {
+      const values = (value.match(/[\d.]+/g) || []).map(Number);
+      return { rgb:values.slice(0, 3), alpha:values[3] ?? 1 };
+    };
+    const luminance = rgb => {
+      const channels = rgb.map(value => {
+        const normalized = value / 255;
+        return normalized <= .04045 ? normalized / 12.92 : ((normalized + .055) / 1.055) ** 2.4;
+      });
+      return .2126 * channels[0] + .7152 * channels[1] + .0722 * channels[2];
+    };
+    const foreground = parse(getComputedStyle(node).color).rgb;
+    let backgroundNode = node;
+    let background = parse(getComputedStyle(backgroundNode).backgroundColor);
+    while (background.alpha === 0 && backgroundNode.parentElement) {
+      backgroundNode = backgroundNode.parentElement;
+      background = parse(getComputedStyle(backgroundNode).backgroundColor);
+    }
+    const foregroundLuminance = luminance(foreground);
+    const backgroundLuminance = luminance(background.rgb);
+    return (Math.max(foregroundLuminance, backgroundLuminance) + .05) / (Math.min(foregroundLuminance, backgroundLuminance) + .05);
+  });
+}
+
 for (const viewport of [
   { width: 1440, height: 900 },
   { width: 393, height: 852 }
 ]) {
   test(`signed-out privacy lock at ${viewport.width}px`, async ({ page }) => {
     await loadStaticApp(page, viewport);
+    await page.evaluate(() => {
+      window.__safeSettingsClicks = { help:0, storage:0 };
+      const help = document.createElement("button");
+      help.id = "privacyHelpFixture";
+      help.dataset.helpKey = "settings-page";
+      help.addEventListener("click", () => { window.__safeSettingsClicks.help += 1; });
+      document.body.append(help);
+      document.getElementById("requestPersistenceButton")?.addEventListener("click", () => { window.__safeSettingsClicks.storage += 1; });
+    });
     await page.addScriptTag({ path: privacyScript });
 
     const initial = await page.evaluate(() => ({
@@ -68,6 +103,18 @@ for (const viewport of [
     expect(locked.zeros).toEqual(expect.arrayContaining(["₱0.00", "0"]));
     expect(locked.mutationClicks).toBe(0);
     expect(locked.toast).toContain("Sign in");
+
+    const settingsPrivacy = await page.evaluate(() => {
+      document.getElementById("privacyHelpFixture")?.click();
+      document.getElementById("requestPersistenceButton")?.click();
+      return {
+        safeClicks:window.__safeSettingsClicks,
+        note:Boolean(document.querySelector(".finance-settings-privacy-note")),
+        pdf:getComputedStyle(document.getElementById("pdfPackFile").closest("[data-finance-private-settings]")).display,
+        reminders:getComputedStyle(document.getElementById("reminderStatusChip").closest("[data-finance-private-settings]")).display
+      };
+    });
+    expect(settingsPrivacy).toEqual({ safeClicks:{ help:1, storage:1 }, note:true, pdf:"none", reminders:"none" });
 
     await page.evaluate(() => window.FinancePrivacyLock.setAuthenticated(true, { email: "signed@example.com" }));
     await expect.poll(() => page.evaluate(() => ({
@@ -181,18 +228,38 @@ test("responsive sidebar keeps one consistent desktop control and the mobile dra
   expect(activeContrast.ratio).toBeGreaterThanOrEqual(4.5);
   expect(activeContrast).toMatchObject({ color:"rgb(16, 42, 49)", background:"rgb(223, 244, 232)" });
 
-  await sidebar.evaluate(node => node.classList.add("desktop-open"));
+  await sidebar.evaluate(node => node.classList.add("desktop-open", "sidebar-pinned"));
+  await page.evaluate(() => document.body.classList.add("sidebar-layout-pinned"));
   await expect(sidebar).toHaveCSS("width", "245px");
+  await expect(page.locator(".main")).toHaveCSS("margin-left", "245px");
   await expect(sidebar.locator('.nav-button[data-page="dashboard"] .nav-label')).toHaveCSS("opacity", "1");
   await expect(sidebar.locator(".nav-group-label")).toHaveText(["Overview", "Finance", "Work", "Insights"]);
 
   await page.setViewportSize({ width:393, height:852 });
-  await sidebar.evaluate(node => { node.classList.remove("desktop-open"); node.classList.add("open"); });
+  await sidebar.evaluate(node => { node.classList.remove("desktop-open", "sidebar-pinned"); node.classList.add("open"); });
+  await page.evaluate(() => document.body.classList.remove("sidebar-layout-pinned"));
   await expect(sidebar).toHaveCSS("width", "245px");
   await expect(page.locator(".main")).toHaveCSS("margin-left", "0px");
   await expect(menuButton).toBeVisible();
   await expect(railButton).toBeVisible();
   await expect(sidebar.locator('.nav-button[data-page="dashboard"] .nav-label')).toHaveCSS("opacity", "1");
+});
+
+test("dark theme keeps representative controls and labels readable", async ({ page }) => {
+  await loadStaticApp(page, { width:1440, height:900 });
+  await page.evaluate(() => {
+    document.documentElement.dataset.theme = "dark";
+    document.getElementById("settings-tab-app").setAttribute("aria-selected", "true");
+  });
+  for (const selector of [
+    "#installPwaButton",
+    "#settings-tab-app",
+    "#pwaInstallGuideChip",
+    "label[for='pdfPackFile']",
+    "#resetData"
+  ]) {
+    expect(await contrastRatio(page.locator(selector)), selector).toBeGreaterThanOrEqual(4.5);
+  }
 });
 
 for (const viewport of [

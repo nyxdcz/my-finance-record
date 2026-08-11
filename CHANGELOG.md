@@ -1,3 +1,17 @@
+## 14.0.6 · 2026-08-12
+
+### Fixed
+- Reserved full layout space for pinned desktop navigation so page headings, tabs, and controls are no longer covered.
+- Corrected dark-theme contrast for primary actions, selected Settings controls, field labels, status chips, and danger actions.
+- Restored contextual Help and safe app-maintenance controls while signed out.
+
+### Changed
+- Finance reminders, offline finance documents, and related destructive controls are hidden while signed out with an explicit privacy explanation.
+- Added semantic primary-contrast and field-label tokens without changing the established light-theme brand palette.
+
+### Tested
+- Added browser assertions for pinned main-content geometry, representative dark-theme contrast, safe signed-out controls, and hidden finance-private Settings surfaces.
+
 ## 14.0.5 · 2026-08-11
 
 ### Fixed

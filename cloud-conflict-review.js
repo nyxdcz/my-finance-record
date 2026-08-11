@@ -1,6 +1,6 @@
 "use strict";
 
-/* My Finance Records V14.0.5 · Explicit side-by-side Cloud Sync conflict review UI. */
+/* My Finance Records V14.0.6 · Explicit side-by-side Cloud Sync conflict review UI. */
 (function financeCloudConflictReviewBootstrap() {
   let callbacks = {};
   let bound = false;
