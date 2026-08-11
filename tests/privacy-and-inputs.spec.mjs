@@ -147,19 +147,51 @@ test("Projects provides compact, full-view, completed, and externally refreshed 
   })).toBe(true);
 });
 
-test("responsive sidebar keeps a 64px desktop rail and the mobile drawer", async ({ page }) => {
+test("responsive sidebar keeps one consistent desktop control and the mobile drawer", async ({ page }) => {
   await loadStaticApp(page, { width:1440, height:900 });
   const sidebar = page.locator("#sidebar");
+  const menuButton = page.locator("#menuButton");
+  const railButton = page.locator("#sidebarCloseButton");
   await expect(sidebar).toHaveCSS("width", "64px");
   await expect(page.locator(".main")).toHaveCSS("margin-left", "64px");
+  await expect(menuButton).toBeHidden();
+  await expect(railButton).toBeVisible();
+  await expect(railButton).toHaveAttribute("aria-label", "Pin navigation open");
+  await expect(page.locator("#menuButton:visible, #sidebarCloseButton:visible")).toHaveCount(1);
+
+  await page.evaluate(() => { document.documentElement.dataset.theme = "dark"; });
+  const activeContrast = await sidebar.locator(".nav-button.active").evaluate(node => {
+    const parseRgb = value => (value.match(/[\d.]+/g) || []).slice(0, 3).map(Number);
+    const luminance = rgb => {
+      const channels = rgb.map(value => {
+        const normalized = value / 255;
+        return normalized <= .04045 ? normalized / 12.92 : ((normalized + .055) / 1.055) ** 2.4;
+      });
+      return .2126 * channels[0] + .7152 * channels[1] + .0722 * channels[2];
+    };
+    const style = getComputedStyle(node);
+    const foreground = luminance(parseRgb(style.color));
+    const background = luminance(parseRgb(style.backgroundColor));
+    return {
+      ratio:(Math.max(foreground, background) + .05) / (Math.min(foreground, background) + .05),
+      color:style.color,
+      background:style.backgroundColor
+    };
+  });
+  expect(activeContrast.ratio).toBeGreaterThanOrEqual(4.5);
+  expect(activeContrast).toMatchObject({ color:"rgb(16, 42, 49)", background:"rgb(223, 244, 232)" });
+
   await sidebar.evaluate(node => node.classList.add("desktop-open"));
   await expect(sidebar).toHaveCSS("width", "245px");
   await expect(sidebar.locator('.nav-button[data-page="dashboard"] .nav-label')).toHaveCSS("opacity", "1");
+  await expect(sidebar.locator(".nav-group-label")).toHaveText(["Overview", "Finance", "Work", "Insights"]);
 
   await page.setViewportSize({ width:393, height:852 });
   await sidebar.evaluate(node => { node.classList.remove("desktop-open"); node.classList.add("open"); });
   await expect(sidebar).toHaveCSS("width", "245px");
   await expect(page.locator(".main")).toHaveCSS("margin-left", "0px");
+  await expect(menuButton).toBeVisible();
+  await expect(railButton).toBeVisible();
   await expect(sidebar.locator('.nav-button[data-page="dashboard"] .nav-label')).toHaveCSS("opacity", "1");
 });
 

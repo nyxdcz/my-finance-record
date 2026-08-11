@@ -5349,13 +5349,22 @@
       .finance-privacy-lock-card .button { min-height:44px; }
     }
 
-    /* V14.0.4 · responsive icon-rail navigation */
+    /* V14.0.5 · desktop navigation contrast and control consistency */
+    :root {
+      --nav-active-bg:#dff4e8;
+      --nav-active-text:#102a31;
+      --nav-active-icon-bg:#c8ead8;
+    }
     .sidebar-close-button svg,.nav-icon svg,.brand-mark svg { width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+    .sidebar-unpin-icon,.sidebar-mobile-close-icon { display:none; }
+    .sidebar.sidebar-pinned .sidebar-pin-icon { display:none; }
+    .sidebar.sidebar-pinned .sidebar-unpin-icon { display:block; }
     .nav-icon { flex:0 0 28px; width:28px; height:28px; }
     .nav-icon svg { width:16px; height:16px; }
     .brand-mark svg { width:22px; height:22px; }
     @media (min-width:851px) {
       :root { --sidebar-rail-width:64px; }
+      #menuButton { display:none; }
       .sidebar { width:var(--sidebar-rail-width); padding:10px 8px; transform:none; overflow:visible; box-shadow:7px 0 20px rgba(16,24,40,.11); transition:width .22s ease,box-shadow .22s ease; }
       .sidebar.desktop-open,.sidebar.sidebar-pinned { width:var(--sidebar-width); transform:none; box-shadow:18px 0 45px rgba(16,24,40,.2); }
       .main { margin-left:var(--sidebar-rail-width); }
@@ -5368,20 +5377,22 @@
       .sidebar-navigation { margin-top:48px; gap:4px; }
       .sidebar.desktop-open .sidebar-navigation,.sidebar.sidebar-pinned .sidebar-navigation { margin-top:0; gap:10px; }
       .sidebar .nav-group-label { display:none; }
-      .sidebar.desktop-open .nav-group-label,.sidebar.sidebar-pinned .nav-group-label { display:block; }
+      .sidebar.desktop-open .nav-group-label,.sidebar.sidebar-pinned .nav-group-label { display:block; font-size:.66rem; }
       .sidebar .nav-button { position:relative; width:48px; min-height:44px; padding:8px 10px; gap:9px; overflow:visible; }
       .sidebar.desktop-open .nav-button,.sidebar.sidebar-pinned .nav-button { width:100%; }
       .sidebar .nav-label { width:0; opacity:0; overflow:hidden; pointer-events:none; }
       .sidebar.desktop-open .nav-label,.sidebar.sidebar-pinned .nav-label { width:auto; opacity:1; overflow:hidden; pointer-events:auto; transition:opacity .16s ease .04s; }
       .sidebar:not(.desktop-open):not(.sidebar-pinned) .nav-button::after { content:attr(data-nav-label); position:absolute; left:calc(100% + 9px); top:50%; z-index:80; transform:translate(5px,-50%); padding:5px 8px; border:1px solid rgba(255,255,255,.12); border-radius:6px; background:var(--nav); color:#fff; box-shadow:var(--shadow); font-size:.65rem; font-weight:750; white-space:nowrap; opacity:0; visibility:hidden; pointer-events:none; transition:opacity .14s ease,transform .14s ease,visibility .14s; }
       .sidebar:not(.desktop-open):not(.sidebar-pinned) .nav-button:hover::after,.sidebar:not(.desktop-open):not(.sidebar-pinned) .nav-button:focus-visible::after { opacity:1; visibility:visible; transform:translate(0,-50%); }
-      .sidebar .nav-button.active { background:rgba(255,255,255,.94); color:var(--nav); }
-      .sidebar .nav-button.active .nav-icon { background:color-mix(in srgb,var(--primary) 15%,#fff); color:var(--primary-dark); }
+      .sidebar .nav-button.active,html[data-theme="dark"] .sidebar .nav-button.active { background:var(--nav-active-bg); color:var(--nav-active-text); }
+      .sidebar .nav-button.active .nav-icon,html[data-theme="dark"] .sidebar .nav-button.active .nav-icon { background:var(--nav-active-icon-bg); color:var(--nav-active-text); }
       .sidebar-settings-bottom { padding-top:8px; }
       .sidebar:not(.desktop-open):not(.sidebar-pinned) .sidebar-settings-bottom { border-top-color:rgba(255,255,255,.16); }
     }
     @media (max-width:850px) {
       .sidebar { width:var(--sidebar-width); padding:22px 16px; transform:translateX(-100%); overflow:auto; }
+      .sidebar-pin-icon,.sidebar-unpin-icon { display:none!important; }
+      .sidebar-mobile-close-icon { display:block; }
       .sidebar.open { transform:translateX(0); }
       .sidebar .brand { display:flex; }
       .sidebar .nav-label { width:auto; opacity:1; }
