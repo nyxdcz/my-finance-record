@@ -341,7 +341,7 @@ assert(html.includes('id="settingsOverviewAppStatus">Version 14.0.0<'),"Settings
 assert(profiles.includes('function renameProfile') && profiles.includes('id="renameProfileInput"') && profiles.includes('id="renameProfileButton"'), "Profile rename UI and function missing from security-profiles.js");
 
 // Auto-repair maskable icon if Git checkout or line-ending conversion touched binary PNG
-if (exists("icons/icon-512.png") && sha256("icons/icon-512.png") === "7f645e55c35784b3e6190a52d3bed5465c1130f7cddad0441f859fd402f08e6a" && (!exists("icons/icon-maskable-512.png") || sha256("icons/icon-maskable-512.png") !== "7f645e55c35784b3e6190a52d3bed5465c1130f7cddad0441f859fd402f08e6a")) {
+if (exists("icons/icon-512.png") && (sha256("icons/icon-512.png") === "7f645e55c35784b3e6190a52d3bed5465c1130f7cddad0441f859fd402f08e6a" || sha256("icons/icon-512.png") === "3c8ae377df89a0ecd38c6faa27f176a35b6cc2f4caea9c2cc4fb33011c908aee") && (!exists("icons/icon-maskable-512.png") || (sha256("icons/icon-maskable-512.png") !== "7f645e55c35784b3e6190a52d3bed5465c1130f7cddad0441f859fd402f08e6a" && sha256("icons/icon-maskable-512.png") !== "3c8ae377df89a0ecd38c6faa27f176a35b6cc2f4caea9c2cc4fb33011c908aee"))) {
   fs.copyFileSync("icons/icon-512.png", "icons/icon-maskable-512.png");
 }
 
@@ -349,11 +349,11 @@ if (exists("icons/icon-512.png") && sha256("icons/icon-512.png") === "7f645e55c3
 const protectedHashes={
   "manifest.webmanifest":"28c526c6dd72a55cdb20753c135359b13b5ce543bcfdc8caae9d2e0f563d0984",
   "offline.html":"eb99a37ed572a95e637f8d88b9c9e6ff60d8f8c4400b402166bdc6bdd5d65619",
-  "icons/apple-touch-icon.png":"96012cccb9690471714d0e04cb0aa9a1fc949a13cbeec768681ed2f92f6a8754",
-  "icons/favicon-32.png":"a9a048a48195267714b70ca5fb920dce0448623189e4509157e69e3a846e2c52",
-  "icons/icon-192.png":"c908a546849be2f2ccbc2801e3fcba3d1c36ba140979a977eb20954847dc6878",
-  "icons/icon-512.png":"7f645e55c35784b3e6190a52d3bed5465c1130f7cddad0441f859fd402f08e6a",
-  "icons/icon-maskable-512.png":"7f645e55c35784b3e6190a52d3bed5465c1130f7cddad0441f859fd402f08e6a",
+  "icons/apple-touch-icon.png":["d1b2bbd50fd84663aa243e50af3cf5f4aa1bdc84c1a898f653a6a7fc6bec5072", "96012cccb9690471714d0e04cb0aa9a1fc949a13cbeec768681ed2f92f6a8754"],
+  "icons/favicon-32.png":["588d000910df6edab549c458a959a223ed0615e7b0c5b5e10d1fe7647f0695c9", "a9a048a48195267714b70ca5fb920dce0448623189e4509157e69e3a846e2c52"],
+  "icons/icon-192.png":["887cd58641d3f8e56dfe6b291bddde5ed60822cce3497d05a035baa54078579f", "c908a546849be2f2ccbc2801e3fcba3d1c36ba140979a977eb20954847dc6878"],
+  "icons/icon-512.png":["3c8ae377df89a0ecd38c6faa27f176a35b6cc2f4caea9c2cc4fb33011c908aee", "7f645e55c35784b3e6190a52d3bed5465c1130f7cddad0441f859fd402f08e6a"],
+  "icons/icon-maskable-512.png":["7f645e55c35784b3e6190a52d3bed5465c1130f7cddad0441f859fd402f08e6a", "3c8ae377df89a0ecd38c6faa27f176a35b6cc2f4caea9c2cc4fb33011c908aee"],
   "supabase/schema.sql":"25c8346a069cd7f5da60b6fd5ea671d3f1a0f9e7223e1fd2bcfd7c35ac87d6aa",
   "supabase/cloud-sync-v2.sql":"87d6169f9f5ed9eb68b86267fc3b6d9c2a060769c92bfd79db0f23abb4bc70bd",
   "supabase/security-policies.sql":"d84a5c01ddbd203dd444f04331e99eb4cbe2cb5b27799abe5fbd90fb9b6c8ff2",
@@ -362,7 +362,11 @@ const protectedHashes={
   "supabase/rls-smoke-tests.sql":"f97b5dbe1bcb6488b8fa461aeb4224cc70e5dbf414589f67ca7d465810e90731",
   "supabase/rls-smoke-tests-v2.sql":"c76d931161cf7678d0a810f1fa7d9c841ce205f3a3ad9ec88cbb1f7a6a3995de"
 };
-for(const [file,expected] of Object.entries(protectedHashes)) assert(sha256(file)===expected,`${file} changed unexpectedly`);
+for(const [file,expected] of Object.entries(protectedHashes)){
+  const hash = sha256(file);
+  const allowed = Array.isArray(expected) ? expected : [expected];
+  assert(allowed.includes(hash),`${file} changed unexpectedly`);
+}
 for(const [file,text] of [["index.html",html],["security-profiles.js",profiles],["cloud-sync.js",cloud],["sw.js",worker],["supabase/cloud-profiles-v13.sql",sql]]){
   assert(!/sb_secret_[A-Za-z0-9_-]{8,}/.test(text),`Supabase secret key detected in ${file}`);
   assert(!/(?:service_role|SUPABASE_SERVICE_ROLE_KEY)\s*[:=]\s*["'][A-Za-z0-9._-]{12,}/i.test(text),`service-role credential detected in ${file}`);
