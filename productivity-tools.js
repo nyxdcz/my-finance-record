@@ -219,14 +219,17 @@
     return result;
   };
 
+  const baseUndoLastChange = undoLastChange;
   undoLastChange = function productivityUndoLastChange() {
-    if (!undoState?.data) { showToast("No change to undo", "info"); return; }
-    const restored = normalizeData(clone(undoState.data));
-    undoState = null;
-    localStorage.removeItem(UNDO_KEY);
-    data = restored;
-    saveData("Last change undone");
-    updateUndoButton();
+    const result = baseUndoLastChange();
+    renderProductivityPanels();
+    return result;
+  };
+  const baseRedoLastChange = redoLastChange;
+  redoLastChange = function productivityRedoLastChange() {
+    const result = baseRedoLastChange();
+    renderProductivityPanels();
+    return result;
   };
 
   const baseSaveData = saveData;
@@ -938,6 +941,7 @@
       if (command && event.shiftKey && key === "i") { event.preventDefault(); openIncomeDialog(); return; }
       if (command && event.shiftKey && key === "p") { event.preventDefault(); openProjectDialog(); return; }
       if (command && key === "z" && !event.shiftKey && !editableTarget(event.target) && !document.querySelector("dialog[open]")) { event.preventDefault(); undoLastChange(); return; }
+      if (command && ((key === "z" && event.shiftKey) || (key === "y" && !event.shiftKey)) && !editableTarget(event.target) && !document.querySelector("dialog[open]")) { event.preventDefault(); redoLastChange(); return; }
       if (!command && !event.altKey && key === "/" && !editableTarget(event.target) && !document.querySelector("dialog[open]")) { event.preventDefault(); openGlobalSearch(); return; }
       if (!command && !event.altKey && key === "?" && !editableTarget(event.target) && !document.querySelector("dialog[open]")) { event.preventDefault(); openProductivityCenter("shortcuts"); }
     });
