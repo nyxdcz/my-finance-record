@@ -1,0 +1,34 @@
+name: Tagged Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Validate and publish release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+      - name: Use Node.js 24
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          package-manager-cache: false
+      - name: Install locked project metadata
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Require tag and package versions to match
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: node -e 'const p=require("./package.json"); if(process.env.RELEASE_TAG !== `v${p.version}`){ console.error(`Tag ${process.env.RELEASE_TAG} does not match package v${p.version}`); process.exit(1); }'
+      - name: Run release quality validation
+        run: npm run quality
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" --verify-tag --generate-notes --title "My Finance Records $GITHUB_REF_NAME"

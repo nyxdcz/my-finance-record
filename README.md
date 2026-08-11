@@ -1,11 +1,11 @@
-# My Finance Records · V14.0.0 PWA
+# My Finance Records · V14.0.1 PWA
 
 Local-first profile-based personal and household finance manager with optional encrypted cloud synchronization.
 
 ## 🚀 Quick Start & Installation
 
 ### Prerequisites
-- [Node.js](https://nodejs.org/) (v18 or higher recommended)
+- [Node.js](https://nodejs.org/) 22 or newer
 - `npm` (comes with Node.js)
 
 ### Installation
@@ -31,13 +31,22 @@ Local-first profile-based personal and household finance manager with optional e
 
 ---
 
+## V14.0.1 · Repository Quality & Release Hardening
+
+- Restored executable permissions for the macOS installer and audit script, with automated permission checks to prevent regressions.
+- Replaced the no-op lint command with ESLint and added portable Playwright privacy/input tests to CI.
+- Extracted more than 5,300 lines of inline styling from `index.html` into a versioned `app.css` asset and added growth limits for both files.
+- Aligned app, cache, installer, README, changelog, package, and validation metadata on V14.0.1.
+- Added npm Dependabot coverage, maintainability limits, conventional commit guidance, and a tag-driven GitHub release workflow.
+- Finance Schema 12, Cloud Schema V3, encryption, profiles, ledger behavior, calculations, and stored records are unchanged.
+
 ## V14.0.0 · Project Schedule Calendar & Dashboard Integration
 
 - **Project Schedule Calendar Integration**: Unified Project Schedule Calendar events with the primary Dashboard financial calendar, rendering schedules (meetings, site visits, deadlines, presentations) as blue markers and event items.
 - **Real-Time Live Updates**: Added real-time event projection and listener callbacks so creating, updating, or deleting a scheduled event instantly updates the Dashboard calendar events list and markers without page reloads.
 - **UI Density & Compact Polish**: Tightened desktop and mobile calendar layout dimensions, button scaling, and header action padding for a refined visual rhythm across all viewports.
 
-## V14.0.0 · Signed-Out Privacy Lock
+## V13.0.18 · Signed-Out Privacy Lock
 
 - Signed-out and auth-pending states show zero-only privacy placeholders instead of accounts, expenses, projects, payments, reports, calendar events, search suggestions, or notifications.
 - Local finance records remain stored on the device and are not deleted by sign-out; the UI unlocks only after a valid cloud-auth session is restored or created.
@@ -163,16 +172,16 @@ Local-first profile-based personal and household finance manager with optional e
 
 ## macOS File Inspection and Fixes installer
 
-Use the V14.0.0 **File Inspection and Fixes** installer when updating this repository on a Mac.
+Use the tracked V14.0.1 **File Inspection and Fixes** installer when validating this repository on a Mac.
 
-1. Extract `My_Finance_Records_V13_0_18_File_Inspection_and_Fixes_Installer.zip`.
-2. Double-click `Install_V13_0_18.command`.
-3. The installer uses `~/Documents/My_Finance_Records` by default, cloning the GitHub repository there when needed.
-4. It checks the current Git state, required files, local asset paths, package metadata, permissions, and configuration before applying the V14.0.0 payload.
-5. It preserves the repository copy of `sync-config.js`, installs locked npm metadata with `npm ci`, then runs `npm run inspect`, `npm run quality`, and `git diff --check`.
-6. The installer **does not commit or push**. Review `git status` and publish only after the checks report success.
+1. Clone or update the repository.
+2. Double-click `Install_V14_0_1.command`.
+3. If macOS reports that the file is not executable, run `chmod +x Install_V14_0_1.command` once and reopen it.
+4. The installer verifies Node.js 22+, installs the locked dependencies with `npm ci`, runs repository inspection, linting, maintainability checks, regression validation, and `git diff --check`.
+5. Set `RUN_BROWSER_TESTS=1` when launching it from Terminal to include the Playwright browser suite after installing Chromium with `npx playwright install chromium`.
+6. The installer **does not commit or push**. Review `git status` and publish only after validation succeeds.
 
-Requirements: macOS, Git, and Node.js 22 or newer. The installer is safe to run again; an already-applied V14.0.0 working tree is revalidated instead of reapplied.
+Requirements: macOS, Git, and Node.js 22 or newer. The installer is safe to run repeatedly on V14.0.1.
 
 
 ## V13.0.2 · Simplified Settings UI

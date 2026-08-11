@@ -1,3 +1,19 @@
+## 14.0.1 · 2026-08-11
+
+### Fixed
+- Restored executable Git modes for the macOS installer and audit entry point.
+- Aligned V14 release, installer, cache, README, package, and validation metadata.
+
+### Changed
+- Replaced no-op linting with a configured ESLint validation pass.
+- Added portable Playwright privacy and phone-input browser coverage to CI.
+- Added repository inspection, maintainability checks, dependency audit, npm Dependabot updates, and tag-driven release automation.
+- Extracted the application stylesheet from `index.html` into a versioned, precached `app.css` asset.
+- Added branch, commit, pull-request, and release guidance for safer changes to `main`.
+
+### Preserved
+- Finance Schema 12, Cloud Schema V3, encryption, profiles, ledgers, calculations, PWA behavior, and stored finance records are unchanged.
+
 ## 14.0.0 · 2026-08-07
 
 ### Added

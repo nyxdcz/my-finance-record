@@ -49,7 +49,7 @@
   const compactText = (value, limit = 120) => String(value || "").trim().slice(0, limit);
   const parseAmount = value => {
     if (typeof value === "number") return Number.isFinite(value) ? value : 0;
-    const cleaned = String(value || "").replace(/[^0-9.\-]/g, "");
+    const cleaned = String(value || "").replace(/[^0-9.-]/g, "");
     const parsed = Number(cleaned);
     return Number.isFinite(parsed) ? parsed : 0;
   };

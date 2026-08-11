@@ -1,6 +1,7 @@
 "use strict";
-const APP_VERSION = "14.0.0";
-const CACHE_VERSION = "finance-v13-20260810-v13018-signed-out-privacy-r1-rename2";
+const APP_VERSION = "14.0.1";
+self.__FINANCE_APP_VERSION = APP_VERSION;
+const CACHE_VERSION = "finance-v14-20260811-v1401-repository-hardening-r1";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const DB_NAME = "simple-finance-project-records-v12-db";
@@ -14,20 +15,21 @@ const APP_SHELL = [
   asset("./offline.html"),
   asset("./manifest.webmanifest"),
   asset("./version.json"),
-  asset("./privacy-lock.js?v=14.0.0"),
-  asset("./security-profiles.js?v=14.0.0"),
-  asset("./security-profiles.css?v=14.0.0"),
-  asset("./cloud-sync.js?v=14.0.0"),
-  asset("./account-ledger.js?v=14.0.0"),
-  asset("./account-ledger.css?v=14.0.0"),
-  asset("./budget-planning.js?v=14.0.0"),
-  asset("./budget-planning.css?v=14.0.0"),
-  asset("./reports-insights.js?v=14.0.0"),
-  asset("./reports-insights.css?v=14.0.0"),
-  asset("./productivity-tools.js?v=14.0.0"),
-  asset("./productivity-tools.css?v=14.0.0"),
-  asset("./reminders-alerts.js?v=14.0.0"),
-  asset("./reminders-alerts.css?v=14.0.0"),
+  asset("./app.css?v=14.0.1"),
+  asset("./privacy-lock.js?v=14.0.1"),
+  asset("./security-profiles.js?v=14.0.1"),
+  asset("./security-profiles.css?v=14.0.1"),
+  asset("./cloud-sync.js?v=14.0.1"),
+  asset("./account-ledger.js?v=14.0.1"),
+  asset("./account-ledger.css?v=14.0.1"),
+  asset("./budget-planning.js?v=14.0.1"),
+  asset("./budget-planning.css?v=14.0.1"),
+  asset("./reports-insights.js?v=14.0.1"),
+  asset("./reports-insights.css?v=14.0.1"),
+  asset("./productivity-tools.js?v=14.0.1"),
+  asset("./productivity-tools.css?v=14.0.1"),
+  asset("./reminders-alerts.js?v=14.0.1"),
+  asset("./reminders-alerts.css?v=14.0.1"),
   asset("./projects-calendar-v13.0.20.js"),
   asset("./projects-calendar-v13.0.20.css"),
   asset("./sync-config.js"),
@@ -51,7 +53,7 @@ self.addEventListener("install", event => {
 self.addEventListener("activate", event => {
   event.waitUntil((async () => {
     const keys = await caches.keys();
-    await Promise.all(keys.filter(key => /^finance-v(?:12|13)-/.test(key) && ![SHELL_CACHE, RUNTIME_CACHE].includes(key)).map(key => caches.delete(key)));
+    await Promise.all(keys.filter(key => /^finance-v(?:12|13|14)-/.test(key) && ![SHELL_CACHE, RUNTIME_CACHE].includes(key)).map(key => caches.delete(key)));
     await self.clients.claim();
   })());
 });
@@ -62,7 +64,7 @@ async function navigationResponse(request) {
     const cache = await caches.open(RUNTIME_CACHE);
     cache.put(request, response.clone());
     return response;
-  } catch (error) {
+  } catch {
     return (await caches.match(request)) || (await caches.match(asset("./index.html"))) || (await caches.match(asset("./offline.html")));
   }
 }
@@ -108,7 +110,7 @@ self.addEventListener("message", event => {
   if (event.data?.type === "SKIP_WAITING") self.skipWaiting();
   if (event.data?.type === "PRECACHE") event.waitUntil(precache());
   if (event.data?.type === "CLEAR_CACHES") {
-    event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(key => /^finance-v(?:12|13)-/.test(key)).map(key => caches.delete(key)))).then(precache));
+    event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(key => /^finance-v(?:12|13|14)-/.test(key)).map(key => caches.delete(key)))).then(precache));
   }
   if (event.data?.type === "FINANCE_ALERT_NOTIFY") {
     event.waitUntil(showFinanceNotification(event.data.payload || {}, { force:true }));

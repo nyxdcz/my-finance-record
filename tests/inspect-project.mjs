@@ -15,10 +15,12 @@ const fail = message => errors.push(message);
 const warn = message => warnings.push(message);
 
 const requiredFiles = [
-  "index.html", "offline.html", "manifest.webmanifest", "version.json", "sw.js",
+  "index.html", "app.css", "offline.html", "manifest.webmanifest", "version.json", "sw.js",
   "package.json", "package-lock.json", "README.md", ".gitignore",
   ".github/workflows/quality-pages.yml", "vendor/supabase.min.js",
-  "sync-config.js", "sync-config.example.js", "privacy-lock.js", "projects-calendar-v13.0.20.js", "projects-calendar-v13.0.20.css", "tests/validate-v14-0-0.mjs", "tests/validate-v13-0-18.mjs"
+  "sync-config.js", "sync-config.example.js", "privacy-lock.js", "projects-calendar-v13.0.20.js", "projects-calendar-v13.0.20.css",
+  "Install_V14_0_1.command", "run_audit.sh", "eslint.config.js", "playwright.config.mjs",
+  "tests/validate-v14-0-1.mjs", "tests/privacy-and-inputs.spec.mjs", "tests/check-maintainability.mjs"
 ];
 for (const file of requiredFiles) if (!exists(file)) fail(`Missing required file: ${file}`);
 
@@ -65,10 +67,14 @@ try { lock = JSON.parse(read("package-lock.json")); } catch (error) { fail(`pack
 try { version = JSON.parse(read("version.json")); } catch (error) { fail(`version.json is invalid JSON: ${error.message}`); }
 if (pkg.version !== lock.version) fail(`package.json (${pkg.version}) and package-lock.json (${lock.version}) versions differ`);
 if (pkg.version !== version.version) fail(`package.json (${pkg.version}) and version.json (${version.version}) versions differ`);
-const quality = pkg.scripts?.quality || "";
-const qualityTarget = quality.match(/^node\s+(\S+)/)?.[1];
-if (!qualityTarget || !exists(qualityTarget)) fail(`Quality script target is missing: ${quality || "(not configured)"}`);
+for (const script of ["inspect", "lint", "maintainability", "test", "test:browser", "quality", "quality:ci"]) {
+  if (!pkg.scripts?.[script]) fail(`Required package script is missing: ${script}`);
+}
+const testTarget = String(pkg.scripts?.test || "").match(/^node\s+(\S+)/)?.[1];
+if (!testTarget || !exists(testTarget)) fail(`Test script target is missing: ${pkg.scripts?.test || "(not configured)"}`);
 if (!String(pkg.engines?.node || "").includes("22")) warn(`Node engine is ${pkg.engines?.node || "not set"}; project validation expects Node 22+`);
+if (pkg.version !== "14.0.1") fail(`Expected current package version 14.0.1, found ${pkg.version || "(missing)"}`);
+if (!read("README.md").startsWith("# My Finance Records · V14.0.1 PWA")) fail("README release heading is not V14.0.1");
 
 const syncConfig = read("sync-config.js");
 const syncConfigCode = syncConfig.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|\s)\/\/.*$/gm, "$1");
@@ -76,6 +82,9 @@ if (/sb_secret_/i.test(syncConfigCode) || /service_role/i.test(syncConfigCode)) 
 if (!/sb_publishable_|anon/i.test(syncConfigCode)) warn("sync-config.js does not appear to contain a publishable/anon key; cloud sync may require device setup");
 
 if (process.platform !== "win32") {
+  for (const file of ["Install_V14_0_1.command", "run_audit.sh"]) {
+    if ((fs.statSync(path.join(root, file)).mode & 0o100) === 0) fail(`Executable entry point lost its user-executable bit: ${file}`);
+  }
   const visit = directory => {
     for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
       if ([".git", "node_modules", "_site"].includes(entry.name)) continue;

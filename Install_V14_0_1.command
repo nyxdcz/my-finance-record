@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# My Finance Records V13.0.18 · File Inspection & Fixes macOS Installer
+# My Finance Records V14.0.1 · File Inspection & Fixes macOS Installer
 # Idempotent macOS automated environment check, dependency sync, and build validator.
 
-set -e
+set -euo pipefail
 
 echo "================================================================"
-echo "  My Finance Records · V13.0.18 macOS Installer & Inspector"
+echo "  My Finance Records · V14.0.1 macOS Installer & Inspector"
 echo "================================================================"
 echo ""
 
@@ -27,6 +27,12 @@ fi
 
 NODE_VER=$(node -v)
 echo "   ✓ Node.js version: $NODE_VER"
+NODE_MAJOR="${NODE_VER#v}"
+NODE_MAJOR="${NODE_MAJOR%%.*}"
+if [ "$NODE_MAJOR" -lt 22 ]; then
+  echo "❌ Error: Node.js 22 or newer is required."
+  exit 1
+fi
 
 if ! command -v git >/dev/null 2>&1; then
   echo "❌ Error: Git is not installed or not in PATH."
@@ -44,43 +50,37 @@ fi
 echo "   ✓ npm version: $(npm -v)"
 echo ""
 
-# 3. Automatically fix permissions and binary file integrity
-echo "🛠️  [2/5] Repairing file permissions, binary assets, and file flags..."
+# 3. Verify executable entry points
+echo "🛠️  [2/5] Verifying executable entry points..."
 chmod +x "$0" 2>/dev/null || true
-if [ -d "tests" ]; then
-  chmod -R 755 tests/ 2>/dev/null || true
-fi
+chmod +x "run_audit.sh" 2>/dev/null || true
 
-# Auto-repair maskable icon if Git checkout or line-ending conversion touched binary PNG
-if [ -f "icons/icon-512.png" ]; then
-  cp "icons/icon-512.png" "icons/icon-maskable-512.png" 2>/dev/null || true
-fi
-
-echo "   ✓ File permissions and binary icon assets verified and repaired."
+echo "   ✓ Installer and audit entry points are executable."
 echo ""
 
 # 4. Sync & Install Dependencies safely
 echo "📦 [3/5] Inspecting & syncing npm dependencies..."
-npm install --no-audit --no-fund --quiet
+npm ci --ignore-scripts --no-audit --no-fund
 echo "   ✓ Dependencies synced successfully."
 echo ""
 
-# 5. Run Repository Inspection
-echo "🔎 [4/5] Running automated repository inspection (inspect-project.mjs)..."
-npm run inspect
-echo "   ✓ Repository structure, hashes, and configuration verified."
-echo ""
-
-# 6. Run Quality & Integrity Validation Suite
-echo "🧪 [5/5] Executing full V13.0.18 quality validation test..."
+# 5. Run Quality & Integrity Validation Suite
+echo "🧪 [4/5] Executing full V14.0.1 quality validation..."
 npm run quality
 echo ""
 
+echo "🔎 [5/5] Checking patch cleanliness..."
+git diff --check
+if [ "${RUN_BROWSER_TESTS:-0}" = "1" ]; then
+  npm run test:browser
+fi
+echo ""
+
 echo "================================================================"
-echo "  SUCCESS: My Finance Records V13.0.18 Installation & Audit Passed!"
+echo "  SUCCESS: My Finance Records V14.0.1 Installation & Audit Passed!"
 echo "================================================================"
-echo "  All static HTML IDs, injected runtime IDs, integrity hashes,"
-echo "  and privacy safeguards were verified successfully."
+echo "  Repository inspection, lint, maintainability, regression,"
+echo "  permissions, metadata, and optional browser checks passed."
 echo ""
 echo "  You can run this installer anytime to audit and verify your setup."
 echo "================================================================"
