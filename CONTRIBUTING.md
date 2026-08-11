@@ -5,18 +5,25 @@ This repository contains a personal finance application. Changes must prioritize
 ## Workflow
 
 1. Start from the latest `main` branch.
-2. Create a short feature or fix branch.
+2. Create a focused branch such as `fix/installer-permissions` or `feat/budget-export`.
 3. Change only the approved scope.
-4. Update the release number, cache key, README, changelog, and validation file when behavior changes.
-5. Run:
+4. Use a Conventional Commit subject such as `fix: restore installer permissions`; avoid subjects such as `fix`, `update`, or `f`.
+5. Update the release number, cache key, README, changelog, and validation file when behavior changes.
+6. Run:
 
 ```bash
 npm ci --ignore-scripts --no-audit --no-fund
 npm run quality
+npx playwright install chromium
+npm run test:browser
 ```
 
-6. Open a pull request and complete the safety checklist.
-7. Merge only after the quality workflow passes.
+7. Open a pull request with a Conventional Commit title and complete the safety checklist.
+8. Merge only after repository, lint, browser, audit, and deployment prerequisites pass.
+
+Direct pushes to `main` are discouraged. Configure GitHub branch protection to require the **Regression quality** and **Browser privacy and accessibility** checks and at least one pull-request approval when collaborators are present.
+
+`package-lock.json` is the canonical dependency lock. Use `npm ci` for validation and do not add a second package-manager lock without updating CI and contributor documentation.
 
 ## Compatibility rules
 
@@ -33,3 +40,10 @@ npm run quality
 - Patch: reliability, documentation, security, or compatible UI fixes.
 - Minor: new compatible finance features.
 - Major: migrations or architecture changes that require explicit user action.
+
+## Releases
+
+1. Merge the validated version change to `main`.
+2. Confirm the hosted application and `version.json` report the intended version.
+3. Create and push an annotated tag matching `package.json`, for example `git tag -a v14.0.1 -m "My Finance Records v14.0.1"` followed by `git push origin v14.0.1`.
+4. The Tagged Release workflow validates the tag and creates the GitHub release with generated notes.

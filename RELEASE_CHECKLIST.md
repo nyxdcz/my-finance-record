@@ -37,6 +37,9 @@
 
 - [ ] `npm ci --ignore-scripts --no-audit --no-fund` succeeds.
 - [ ] `npm run quality` succeeds.
+- [ ] `npm run test:browser` succeeds with Chromium installed.
+- [ ] `npm run audit` reports no production dependency vulnerabilities.
+- [ ] Installer and audit scripts retain executable Git modes.
 - [ ] JavaScript and service-worker syntax pass.
 - [ ] No duplicate HTML IDs exist.
 - [ ] Protected storage keys and finance formulas remain intact.
@@ -129,8 +132,12 @@
 
 ## Publication
 
+- [ ] Work was reviewed on a focused branch rather than pushed directly to `main`.
+- [ ] Commit and pull-request titles describe the change using Conventional Commit format.
 - [ ] Pull-request checks are green.
 - [ ] Only approved files changed.
 - [ ] The GitHub Pages deployment succeeds from `main`.
 - [ ] The hosted app shows the expected version.
 - [ ] MacBook and iPhone load and sync the released version.
+- [ ] An annotated `vX.Y.Z` tag matching `package.json` was pushed.
+- [ ] The Tagged Release workflow created the GitHub release.

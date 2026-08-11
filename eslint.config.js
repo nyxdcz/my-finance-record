@@ -1,51 +1,72 @@
 import js from "@eslint/js";
+import globals from "globals";
+
+const legacyBrowserFiles = [
+  "account-ledger.js",
+  "budget-planning.js",
+  "cloud-sync.js",
+  "privacy-lock.js",
+  "productivity-tools.js",
+  "projects-calendar-v13.0.20.js",
+  "reminders-alerts.js",
+  "reports-insights.js",
+  "security-profiles.js",
+  "sync-config.js",
+  "sync-config.example.js"
+];
 
 export default [
-    js.configs.recommended,
-    {
-        languageOptions: {
-            globals: {
-                window: "readonly",
-                document: "readonly",
-                localStorage: "readonly",
-                sessionStorage: "readonly",
-                fetch: "readonly",
-                console: "readonly",
-                setTimeout: "readonly",
-                clearTimeout: "readonly",
-                setInterval: "readonly",
-                clearInterval: "readonly",
-                navigator: "readonly",
-                crypto: "readonly",
-                TextEncoder: "readonly",
-                TextDecoder: "readonly",
-                URL: "readonly",
-                Blob: "readonly",
-                File: "readonly",
-                FileReader: "readonly",
-                location: "readonly",
-                process: "readonly",
-                module: "readonly",
-                globalThis: "readonly",
-                btoa: "readonly",
-                atob: "readonly",
-                import: "readonly",
-                alert: "readonly",
-                confirm: "readonly",
-                prompt: "readonly",
-                Worker: "readonly",
-                ServiceWorker: "readonly",
-                indexedDB: "readonly",
-                Event: "readonly",
-                CustomEvent: "readonly",
-                AbortController: "readonly"
-            },
-            ecmaVersion: 2022,
-            sourceType: "module"
-        },
-        rules: {
-            "no-undef": "error",
-            "no-unused-vars": "warn"
-        }
+  {
+    ignores: [
+      "node_modules/**", "vendor/**", "_site/**", "coverage/**",
+      "tests/validate-v12-*.mjs", "tests/validate-v13-*.mjs"
+    ]
+  },
+  {
+    files: ["eslint.config.js", "playwright.config.mjs", "server.js", "tests/**/*.mjs"],
+    languageOptions: {
+      ecmaVersion: "latest",
+      sourceType: "module",
+      globals: {
+        ...globals.node,
+        ...globals.browser
+      }
+    },
+    rules: {
+      ...js.configs.recommended.rules,
+      "no-unused-vars": ["error", { argsIgnorePattern: "^_", caughtErrors: "none" }]
     }
+  },
+  {
+    files: legacyBrowserFiles,
+    languageOptions: {
+      ecmaVersion: "latest",
+      sourceType: "script",
+      globals: globals.browser
+    },
+    rules: {
+      ...js.configs.recommended.rules,
+      // These scripts intentionally share the global scope with index.html.
+      "no-undef": "off",
+      "no-unused-vars": "off",
+      "no-useless-assignment": "off",
+      "no-empty": ["error", { allowEmptyCatch: true }],
+      "preserve-caught-error": "off"
+    }
+  },
+  {
+    files: ["sw.js"],
+    languageOptions: {
+      ecmaVersion: "latest",
+      sourceType: "script",
+      globals: {
+        ...globals.browser,
+        ...globals.serviceworker
+      }
+    },
+    rules: {
+      ...js.configs.recommended.rules,
+      "no-unused-vars": "error"
+    }
+  }
 ];

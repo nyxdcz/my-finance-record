@@ -1,6 +1,6 @@
 {
   "name": "my-finance-record",
-  "version": "14.0.0",
+  "version": "14.0.1",
   "private": true,
   "description": "Local-first profile-based personal and household finance PWA with encrypted Supabase synchronization.",
   "type": "module",
@@ -8,15 +8,25 @@
     "dev": "node server.js",
     "start": "node server.js",
     "build": "echo 'No build step required'",
-    "lint": "echo 'No linting required'",
+    "lint": "eslint .",
     "inspect": "node tests/inspect-project.mjs",
-    "test": "node tests/validate-v14-0-0.mjs",
-    "quality": "node tests/validate-v14-0-0.mjs"
+    "test": "node tests/validate-v14-0-1.mjs",
+    "test:browser": "playwright test",
+    "maintainability": "node tests/check-maintainability.mjs",
+    "audit": "npm audit --omit=dev",
+    "quality": "npm run inspect && npm run lint && npm run maintainability && npm run test",
+    "quality:ci": "npm run quality && npm run test:browser && npm run audit"
   },
   "engines": {
     "node": ">=22"
   },
   "dependencies": {
     "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.62.1",
+    "eslint": "^10.8.1",
+    "globals": "^17.9.0"
   }
 }
