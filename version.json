@@ -1,5 +1,5 @@
 {
-  "version": "14.0.13",
+  "version": "14.0.14",
   "schemaVersion": 12,
   "cloudSchemaVersion": 3,
   "ledgerVersion": 1,
@@ -10,8 +10,8 @@
   "profileArchitectureVersion": 1,
   "encryptionVersion": 1,
   "authSecurityVersion": 1,
-  "cacheVersion": "finance-v14-20260812-v1413-sidebar-manila-r1",
+  "cacheVersion": "finance-v14-20260812-v1414-sidebar-labels-r1",
   "released": "2026-08-12",
-  "name": "Sidebar & Manila Theme",
-  "notes": "Clarifies the four primary sidebar destinations and schedules automatic day and night appearance using Philippine time."
+  "name": "Sidebar Label Cleanup",
+  "notes": "Removes duplicated uppercase sidebar group headings while preserving the four icon destinations and their accessible labels."
 }

@@ -1,3 +1,15 @@
+## 14.0.14 · 2026-08-12
+
+### Changed
+- Removed the duplicated uppercase Overview, Finance, Work, and Insights headings from expanded desktop and mobile navigation.
+- Kept one clear icon-and-label destination for each route and tightened the spacing between the four primary navigation rows.
+
+### Tested
+- Updated responsive browser coverage to require zero duplicate group headings and a compact four-pixel expanded navigation gap.
+
+### Preserved
+- Sidebar routes, compact icon tooltips, keyboard navigation, active states, Settings placement, Finance Schema 12, Cloud Schema V3, records, and calculations remain unchanged.
+
 ## 14.0.13 · 2026-08-12
 
 ### Changed

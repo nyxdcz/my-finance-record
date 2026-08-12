@@ -242,7 +242,8 @@ test("responsive sidebar keeps one consistent desktop control and the mobile dra
   await expect(sidebar).toHaveCSS("width", "245px");
   await expect(page.locator(".main")).toHaveCSS("margin-left", "245px");
   await expect(sidebar.locator('.nav-button[data-page="dashboard"] .nav-label')).toHaveCSS("opacity", "1");
-  await expect(sidebar.locator(".nav-group-label")).toHaveText(["Overview", "Finance", "Work", "Insights"]);
+  await expect(sidebar.locator(".nav-group-label")).toHaveCount(0);
+  await expect(sidebar.locator(".sidebar-navigation")).toHaveCSS("gap", "4px");
 
   await page.setViewportSize({ width:393, height:852 });
   await sidebar.evaluate(node => { node.classList.remove("desktop-open", "sidebar-pinned"); node.classList.add("open"); });
