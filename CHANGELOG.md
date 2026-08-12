@@ -1,3 +1,16 @@
+## 14.0.13 · 2026-08-12
+
+### Changed
+- Renamed the four primary sidebar destinations and compact-rail tooltips to Overview, Finance, Work, and Insights while preserving their existing routes.
+- Replaced operating-system theme following with an automatic Asia/Manila schedule: Day from 7:01 AM through 5:59 PM and Night from 6:00 PM through 7:00 AM.
+- Kept manual Light and Dark choices and refreshed the automatic appearance at minute boundaries and when the app becomes visible.
+
+### Tested
+- Added timezone-independent boundary coverage for 7:00 AM, 7:01 AM, 5:59 PM, and 6:00 PM Philippine time.
+
+### Preserved
+- Finance Schema 12, Cloud Schema V3, records, calculations, existing sidebar routes, manual appearance choices, and saved automatic-theme preferences remain unchanged.
+
 ## 14.0.12 · 2026-08-12
 
 ### Changed
