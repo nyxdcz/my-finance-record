@@ -6,11 +6,13 @@ import { fileURLToPath } from "node:url";
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, "..");
 const privacyScript = path.join(root, "privacy-lock.js");
+const interactionScript = path.join(root, "interaction-patterns.js");
 const projectAgendaScript = path.join(root, "projects-calendar-v13.0.20.js");
 const appCss = fs.readFileSync(path.join(root, "app.css"), "utf8");
+const dashboardInteractionCss = fs.readFileSync(path.join(root, "dashboard-interactions.css"), "utf8");
 const projectAgendaCss = fs.readFileSync(path.join(root, "projects-calendar-v13.0.20.css"), "utf8");
 const sourceHtml = fs.readFileSync(path.join(root, "index.html"), "utf8")
-  .replace("</head>", `<style>${appCss}\n${projectAgendaCss}</style></head>`);
+  .replace("</head>", `<style>${appCss}\n${dashboardInteractionCss}\n${projectAgendaCss}</style></head>`);
 const testHtml = sourceHtml
   .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, "")
   .replace(/<script\b[^>]*\/?\s*>/gi, "")
@@ -19,11 +21,30 @@ const testHtml = sourceHtml
 async function loadStaticApp(page, viewport) {
   await page.setViewportSize(viewport);
   await page.setContent(testHtml, { waitUntil: "domcontentloaded" });
+  await page.addScriptTag({ path:interactionScript });
   await page.evaluate(() => {
     window.__privacyNav = [];
     window.goToPage = pageId => window.__privacyNav.push(pageId);
     window.activateSettingsPanel = panel => window.__privacyNav.push(`settings:${panel}`);
     window.showToast = message => { window.__privacyToast = message; };
+
+    const patterns = window.FinanceInteractionPatterns;
+    patterns.setupOverflowMenus();
+    const weekTrack = document.getElementById("dashboardWeekMarqueeTrack");
+    const weekDays = Array.from({ length:7 }, (_, index) => `<span class="dashboard-week-day">Day ${index + 1}</span>`).join("");
+    patterns.renderDuplicatedMarquee(weekTrack, weekDays);
+
+    const dashboard = document.getElementById("dashboard");
+    const grid = document.getElementById("dashboardCardGrid");
+    const cards = [...grid.querySelectorAll("[data-dashboard-card]")];
+    const order = cards.map(card => card.dataset.dashboardCard);
+    const labels = Object.fromEntries(cards.map(card => [card.dataset.dashboardCard, card.querySelector("h3")?.textContent?.trim() || card.dataset.dashboardCard]));
+    const dragController = patterns.createDashboardDragController({
+      dashboard, grid, labels, getOrder:() => order,
+      commitMove:() => {}, announcer:document.getElementById("dashboardDragAnnouncer")
+    });
+    cards.forEach(card => dragController.createHandle(card, card.dataset.dashboardCard));
+    window.__dashboardDragController = dragController;
   });
 }
 
