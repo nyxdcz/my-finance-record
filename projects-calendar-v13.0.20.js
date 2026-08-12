@@ -343,4 +343,174 @@
       "CALSCALE:GREGORIAN", "METHOD:PUBLISH", "BEGIN:VEVENT",
       `UID:${icsEscape(event.id)}@my-finance-records.local`,
       `DTSTAMP:${new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d{3}Z$/, "Z")}`,
-      `DTSTART
+      `DTSTART;TZID=Asia/Manila:${start}`,
+      `DTEND;TZID=Asia/Manila:${end}`,
+      `SUMMARY:${icsEscape(event.title)}`,
+      `DESCRIPTION:${icsEscape(description)}`,
+      event.location ? `LOCATION:${icsEscape(event.location)}` : "",
+      event.link ? `URL:${icsEscape(event.link)}` : "",
+      ...alarm,
+      "END:VEVENT", "END:VCALENDAR"
+    ].filter(Boolean);
+    const blob = new Blob([lines.join("\r\n") + "\r\n"], { type:"text/calendar;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = `${String(event.title).replace(/[^a-z0-9]+/gi, "_").replace(/^_+|_+$/g, "").slice(0, 60) || "calendar-event"}.ics`;
+    anchor.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  function buildUi() {
+    const projectsPage = document.getElementById("projects");
+    const heading = projectsPage?.querySelector(".page-heading");
+    if (!projectsPage || !heading || document.getElementById("projectCalendarV13020")) return;
+
+    const card = document.createElement("article");
+    card.className = "card project-calendar-v13020";
+    card.id = "projectCalendarV13020";
+    card.innerHTML = `
+      <div class="card-header pc-header">
+        <div>
+          <h3>Project Agenda</h3>
+          <p>Schedule project dates here and review them on the Dashboard monthly calendar.</p>
+        </div>
+        <div class="pc-header-actions">
+          <span class="pc-count" data-pc-count>0 events</span>
+          <button type="button" class="button button-secondary button-small" data-pc-view>View full agenda</button>
+          <button type="button" class="button button-primary button-small" data-pc-add>+ Schedule event</button>
+        </div>
+      </div>
+      <div class="pc-agenda pc-agenda-preview">
+        <div class="pc-agenda-heading"><strong>Next events</strong><small>Click an event to edit</small></div>
+        <div class="pc-agenda-list" data-pc-event-list></div>
+        <button type="button" class="pc-agenda-more" data-pc-view data-pc-remaining hidden></button>
+      </div>
+      <p class="pc-message" data-pc-message aria-live="polite"></p>
+    `;
+    heading.insertAdjacentElement("afterend", card);
+
+    const dialog = document.createElement("dialog");
+    dialog.id = "projectCalendarEventDialog";
+    dialog.className = "app-dialog dialog-form dialog-standard";
+    dialog.innerHTML = `
+      <form id="projectCalendarEventForm">
+        <div class="modal-header"><h3 id="projectCalendarEventDialogTitle">Schedule project event</h3><button type="button" class="button button-secondary button-small" data-pc-close>Close</button></div>
+        <div class="modal-body">
+          <input type="hidden" id="pcEventId">
+          <div class="dialog-context-note">This agenda is separate from project financial records. Its date appears on the Dashboard monthly calendar.</div>
+          <div class="form-grid two-column">
+            <div class="field"><label for="pcEventProject">Project</label><select class="select" id="pcEventProject">${projectOptions()}</select></div>
+            <div class="field"><label for="pcEventType">Event type</label><select class="select" id="pcEventType">${EVENT_TYPES.map(([value, label]) => `<option value="${value}">${label}</option>`).join("")}</select></div>
+            <div class="field field-full"><label for="pcEventTitle">Title <span class="required-mark">*</span></label><input class="input" id="pcEventTitle" maxlength="120" required placeholder="Example: Client presentation"></div>
+            <div class="field"><label for="pcEventDate">Date <span class="required-mark">*</span></label><input class="input" id="pcEventDate" type="date" required></div>
+            <div class="field"><label for="pcEventReminder">Reminder</label><select class="select" id="pcEventReminder">${REMINDERS.map(([value, label]) => `<option value="${value}">${label}</option>`).join("")}</select></div>
+            <div class="field"><label for="pcEventStart">Start time</label><input class="input" id="pcEventStart" type="time"></div>
+            <div class="field"><label for="pcEventEnd">End time</label><input class="input" id="pcEventEnd" type="time"></div>
+            <div class="field field-full"><label for="pcEventLocation">Location</label><input class="input" id="pcEventLocation" maxlength="180" placeholder="Office, site, café, or online"></div>
+            <div class="field field-full"><label for="pcEventLink">Meeting / presentation link</label><input class="input" id="pcEventLink" type="url" maxlength="500" placeholder="https://..."></div>
+            <div class="field field-full"><label for="pcEventAttendees">Client / attendees</label><input class="input" id="pcEventAttendees" maxlength="240" placeholder="Client name, team, or attendees"></div>
+            <div class="field field-full"><label for="pcEventNotes">Notes</label><textarea class="textarea" id="pcEventNotes" rows="3" maxlength="1000" placeholder="Agenda, presentation notes, site instructions, or reminders"></textarea></div>
+          </div>
+        </div>
+        <div class="modal-footer form-action-footer"><span class="footer-spacer"></span><button type="button" class="button button-secondary" data-pc-close>Cancel</button><button type="submit" class="button button-primary">Save event</button></div>
+      </form>
+    `;
+    document.body.appendChild(dialog);
+
+    const fullDialog = document.createElement("dialog");
+    fullDialog.id = "projectAgendaFullDialog";
+    fullDialog.className = "app-dialog dialog-utility dialog-extended pc-full-dialog";
+    fullDialog.setAttribute("aria-labelledby", "projectAgendaFullDialogTitle");
+    fullDialog.innerHTML = `
+      <div class="modal-header pc-full-header"><div><h3 id="projectAgendaFullDialogTitle">Project Agenda</h3><small data-pc-full-count>0 total</small></div><div><button type="button" class="button button-primary button-small" data-pc-full-add>+ Schedule event</button><button type="button" class="button button-secondary button-small" data-pc-full-close>Close</button></div></div>
+      <div class="modal-body pc-full-body">
+        <section class="pc-full-section" aria-labelledby="pcUpcomingAgendaTitle"><div class="pc-full-section-heading"><h4 id="pcUpcomingAgendaTitle">Upcoming</h4><small>Ordered by date and time</small></div><div class="pc-agenda-list pc-full-list" data-pc-full-upcoming></div></section>
+        <section class="pc-full-section" aria-labelledby="pcCompletedAgendaTitle"><div class="pc-full-section-heading"><h4 id="pcCompletedAgendaTitle">Completed</h4><small>Kept for project history</small></div><div class="pc-agenda-list pc-full-list" data-pc-full-completed></div></section>
+      </div>
+      <div class="modal-footer"><button type="button" class="button button-secondary" data-pc-full-close>Close</button></div>`;
+    document.body.appendChild(fullDialog);
+
+    const handleAgendaAction = event => {
+      const add = event.target.closest("[data-pc-add], [data-pc-full-add]");
+      if (add) { closeFullAgenda(); return openDialog(); }
+      const view = event.target.closest("[data-pc-view]");
+      if (view) return openFullAgenda();
+      const edit = event.target.closest("[data-pc-edit]");
+      if (edit) { closeFullAgenda(); return openDialog("", edit.dataset.pcEdit); }
+      const complete = event.target.closest("[data-pc-complete]");
+      if (complete) return toggleEventCompleted(complete.dataset.pcComplete);
+      const remove = event.target.closest("[data-pc-delete]");
+      if (remove) return deleteEvent(remove.dataset.pcDelete);
+      const ics = event.target.closest("[data-pc-ics]");
+      if (ics) {
+        const item = events.find(eventItem => eventItem.id === ics.dataset.pcIcs);
+        if (item) downloadIcs(item);
+      }
+    };
+
+    card.addEventListener("click", handleAgendaAction);
+    fullDialog.addEventListener("click", handleAgendaAction);
+    fullDialog.querySelectorAll("[data-pc-full-close]").forEach(button => button.addEventListener("click", closeFullAgenda));
+
+    dialog.querySelector("#projectCalendarEventForm").addEventListener("submit", saveEvent);
+    dialog.querySelectorAll("[data-pc-close]").forEach(button => button.addEventListener("click", closeDialog));
+
+    // Add a Schedule button to each rendered project without modifying the core project renderer.
+    const observeProjects = () => {
+      document.querySelectorAll("#activeProjectList .project-record, #completedProjectList .project-record").forEach(row => {
+        if (row.querySelector("[data-pc-project-schedule]")) return;
+        const projectId = row.querySelector("[data-edit-project]")?.dataset.editProject;
+        if (!projectId) return;
+        const actions = row.querySelector(".project-row-actions, .desktop-record-actions");
+        if (!actions) return;
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "button button-secondary button-small project-compact-action";
+        button.dataset.pcProjectSchedule = projectId;
+        button.textContent = "Schedule";
+        button.addEventListener("click", () => openDialog(projectId));
+        actions.prepend(button);
+      });
+    };
+    new MutationObserver(observeProjects).observe(document.getElementById("projects"), { subtree:true, childList:true });
+    observeProjects();
+
+    // Keep the project selector current when projects are added/renamed.
+    document.addEventListener("click", () => {
+      const select = document.getElementById("pcEventProject");
+      if (select && !document.getElementById("projectCalendarEventDialog")?.open) select.innerHTML = projectOptions(select.value);
+    });
+
+    events = safeRead();
+    render();
+
+  }
+
+  function bootWhenAuthenticated() {
+    if (document.documentElement.dataset.financeAuth === "signed-in" && !document.body.classList.contains("finance-signed-out")) {
+      buildUi();
+    }
+  }
+
+  window.addEventListener("finance:privacy-auth-change", bootWhenAuthenticated);
+
+  window.addEventListener("finance:page-changed", event => {
+    if (event.detail?.pageId === "projects") {
+      bootWhenAuthenticated();
+    }
+  });
+
+  window.addEventListener("storage", event => {
+    if (event.key !== EVENTS_KEY) return;
+    events = safeRead();
+    render();
+    notifyAgendaChanged("external-refresh");
+  });
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", bootWhenAuthenticated, { once:true });
+  } else {
+    bootWhenAuthenticated();
+  }
+})();
