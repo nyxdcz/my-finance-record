@@ -27,7 +27,7 @@ const sql=read("supabase/cloud-profiles-v13.sql");
 const workflow=read(".github/workflows/quality-pages.yml");
 const releaseWorkflow=read(".github/workflows/release.yml");
 const dependabot=read(".github/dependabot.yml");
-const installer=read("Install_V14_0_13.command");
+const installer=read("Install_V14_0_14.command");
 const maintainability=read("tests/check-maintainability.mjs");
 const readme=read("README.md");
 const changelog=read("CHANGELOG.md");
@@ -46,15 +46,15 @@ const version=JSON.parse(read("version.json"));
 const packageJson=JSON.parse(read("package.json"));
 const packageLock=JSON.parse(read("package-lock.json"));
 
-assert(version.version==="14.0.13","version.json is not V14.0.13");
+assert(version.version==="14.0.14","version.json is not V14.0.14");
 assert(version.schemaVersion===12,"Finance Schema changed from 12");
 assert(version.cloudSchemaVersion===3,"Cloud Schema V3 metadata missing");
 for(const [field,value] of Object.entries({ledgerVersion:1,budgetVersion:1,insightsVersion:1,productivityVersion:1,remindersVersion:1,profileArchitectureVersion:1,encryptionVersion:1,authSecurityVersion:1})) assert(version[field]===value,`${field} metadata mismatch`);
-assert(html.includes('<title>My Finance Records · V14.0.13</title>'),"HTML title mismatch");
-assert(html.includes('const APP_VERSION = "14.0.13";'),"HTML APP_VERSION mismatch");
-assert(html.includes('const APP_RELEASE_NAME = "Sidebar & Manila Theme";'),"HTML release name mismatch");
+assert(html.includes('<title>My Finance Records · V14.0.14</title>'),"HTML title mismatch");
+assert(html.includes('const APP_VERSION = "14.0.14";'),"HTML APP_VERSION mismatch");
+assert(html.includes('const APP_RELEASE_NAME = "Sidebar Label Cleanup";'),"HTML release name mismatch");
 assert(html.includes('function synchronizeVersionDisplay()')&&html.includes('badge.textContent = `V${APP_VERSION}`'),"central runtime version display updater missing");
-assert(html.includes('{"version":"V14.0.13","title":"Sidebar & Manila Theme"'),"in-app V14.0.13 history entry missing");
+assert(html.includes('{"version":"V14.0.14","title":"Sidebar Label Cleanup"'),"in-app V14.0.14 history entry missing");
 assert(!projectCalendar.includes("document.title")&&!projectCalendar.includes('getElementById("buildBadge")'),"project calendar still overrides central release metadata");
 assert(projectCalendar.includes("<h3>Project Agenda</h3>")&&projectCalendar.includes("Next events")&&projectCalendar.includes("View full agenda"),"compact Project Agenda interface is missing");
 for(const removedToken of ["buildCalendarGrid", "data-pc-calendar-grid", "data-pc-month-label", "data-pc-prev", "data-pc-next", "data-pc-today", "data-pc-date"]) {
@@ -115,19 +115,18 @@ await reviewDialog.listeners.click?.({target:{closest:()=>reviewButtons[3]},prev
 assert(reviewDialog.open&&!reviewStatus.hidden&&reviewStatus.textContent==="Storage unavailable"&&reviewButtons[3].focused,"Use this device failure was not kept visible and focusable");
 for(const token of [
   'data-nav-label="Overview"', 'data-nav-label="Finance"', 'data-nav-label="Work"', 'data-nav-label="Insights"',
-  '>Overview</div>', '>Finance</div>', '>Work</div>', '>Insights</div>',
   'aria-label="Pin navigation open"', 'class="sidebar-pin-icon"', 'class="sidebar-unpin-icon"', 'class="sidebar-mobile-close-icon"',
   'const SIDEBAR_PINNED_KEY = "simple-finance-sidebar-pinned-v1"', "function scheduleSidebarExpand(delay = 420)", "function setSidebarPinned", "function applyResponsiveSidebarState",
   ".sidebar.sidebar-pinned", "--sidebar-rail-width:64px", "#menuButton { display:none; }", "--nav-active-bg:#dff4e8", "--nav-active-text:#102a31", "prefers-reduced-motion:reduce"
 ]) assert(html.includes(token),`responsive icon-rail navigation missing: ${token}`);
-assert(html.includes('./projects-calendar-v13.0.20.js?v=14.0.13')&&html.includes('./projects-calendar-v13.0.20.css?v=14.0.13'),"Project Agenda assets are not version-pinned in HTML");
-assert(worker.includes('asset("./projects-calendar-v13.0.20.js?v=14.0.13")')&&worker.includes('asset("./projects-calendar-v13.0.20.css?v=14.0.13")'),"Project Agenda assets are not version-pinned in the offline shell");
-assert(html.includes('./cloud-conflict-review.js?v=14.0.13')&&worker.includes('asset("./cloud-conflict-review.js?v=14.0.13")'),"Cloud conflict review module is not loaded and precached");
-assert(html.includes('./cloud-conflict-resolution.js?v=14.0.13')&&worker.includes('asset("./cloud-conflict-resolution.js?v=14.0.13")'),"Cloud conflict resolution module is not loaded and precached");
+assert(html.includes('./projects-calendar-v13.0.20.js?v=14.0.14')&&html.includes('./projects-calendar-v13.0.20.css?v=14.0.14'),"Project Agenda assets are not version-pinned in HTML");
+assert(worker.includes('asset("./projects-calendar-v13.0.20.js?v=14.0.14")')&&worker.includes('asset("./projects-calendar-v13.0.20.css?v=14.0.14")'),"Project Agenda assets are not version-pinned in the offline shell");
+assert(html.includes('./cloud-conflict-review.js?v=14.0.14')&&worker.includes('asset("./cloud-conflict-review.js?v=14.0.14")'),"Cloud conflict review module is not loaded and precached");
+assert(html.includes('./cloud-conflict-resolution.js?v=14.0.14')&&worker.includes('asset("./cloud-conflict-resolution.js?v=14.0.14")'),"Cloud conflict resolution module is not loaded and precached");
 assert(accountLedger.includes('function recalculateBalances(target = data, { stamp = false } = {})'),"ledger recalculation is not pure by default");
 assert(accountLedger.includes('if (stamp && target.ledgerSettings) target.ledgerSettings.lastRecalculatedAt = new Date().toISOString();'),"ledger timestamp is not limited to explicit mutations");
 assert(accountLedger.includes("if (ledgerMigrationChanged)")&&!accountLedger.includes('persistFinanceDataRaw("Account ledger updated")'),"ledger startup still persists unchanged data");
-assert(read("index.html").includes('./app.css?v=14.0.13')&&worker.includes('asset("./app.css?v=14.0.13")'),"extracted application CSS is not versioned and precached");
+assert(read("index.html").includes('./app.css?v=14.0.14')&&worker.includes('asset("./app.css?v=14.0.14")'),"extracted application CSS is not versioned and precached");
 assert(html.includes('data-settings-tab="profiles"')&&html.includes('id="settings-panel-profiles"'),"Profiles & Security settings panel missing");
 assert(html.includes('security-profiles.css')&&html.includes('security-profiles.js'),"profile architecture assets are not loaded");
 assert(html.includes('{"version": "V13.0.10", "title": "Account Spending from Balance"'),"in-app V13.0.10 history entry missing");
@@ -136,34 +135,34 @@ assert(html.includes('{"version": "V13.0.3", "title": "Compact Modals & SVG Inte
 assert(html.includes('{"version": "V13.0.2", "title": "Toolbar & Budget Bento UI"'),"in-app V13.0.2 history entry missing");
 assert(html.includes('{"version": "V13.0.0", "title": "Major Cloud, Encryption & Profile Architecture"'),"in-app V13.0.0 history entry missing");
 assert(html.includes('{"version": "V12.21.0", "title": "Record-level Cloud Sync 2.0"'),"V12.21 history was rewritten incorrectly");
-assert(worker.includes('const APP_VERSION = "14.0.13";'),"service-worker version mismatch");
+assert(worker.includes('const APP_VERSION = "14.0.14";'),"service-worker version mismatch");
 assert(worker.includes(`const CACHE_VERSION = "${version.cacheVersion}";`),"service-worker cache mismatch");
-assert(worker.includes('asset("./security-profiles.js?v=14.0.13")')&&worker.includes('asset("./security-profiles.css?v=14.0.13")'),"profile assets missing from PWA shell");
+assert(worker.includes('asset("./security-profiles.js?v=14.0.14")')&&worker.includes('asset("./security-profiles.css?v=14.0.14")'),"profile assets missing from PWA shell");
 assert(workflow.includes('security-profiles.js security-profiles.css cloud-conflict-review.js cloud-conflict-resolution.js cloud-sync.js'),"GitHub Pages workflow does not deploy profile and conflict-resolution assets");
-assert(packageJson.version==="14.0.13"&&packageLock.version==="14.0.13","package version mismatch");
+assert(packageJson.version==="14.0.14"&&packageLock.version==="14.0.14","package version mismatch");
 assert(exists("privacy-lock.js"),"signed-out privacy module missing");
 assert(html.includes('<body class="finance-signed-out finance-auth-pending">'),"app does not start privacy-locked before first render");
 for(const token of ["FinancePrivacyLock","finance-signed-out","finance-auth-pending","finance-privacy-lock-view","₱0.00","privacySignInButton","Sign in to view records"]) assert(html.includes(token)||privacyLock.includes(token),`signed-out privacy safeguard missing: ${token}`);
 for(const token of ["setAuthenticated","closeSensitiveSurfaces","blockLockedInteraction","FINANCE_AUTH_STATE","finance:privacy-auth-change"]) assert(privacyLock.includes(token),`privacy runtime safeguard missing: ${token}`);
 assert(cloud.includes("setPrivacyAuthentication(false)")&&cloud.includes("setPrivacyAuthentication(true"),"cloud auth does not drive privacy lock state");
 assert(worker.includes('let financeAuthState = "signed-out"')&&worker.includes('FINANCE_AUTH_STATE')&&worker.includes('financeAuthState !== "signed-in"'),"service worker does not suppress signed-out finance notifications");
-assert(worker.includes('asset("./privacy-lock.js?v=14.0.13")'),"privacy module missing from service-worker shell");
+assert(worker.includes('asset("./privacy-lock.js?v=14.0.14")'),"privacy module missing from service-worker shell");
 assert(workflow.includes("privacy-lock.js"),"GitHub Pages workflow does not deploy privacy module");
-assert(exists("SIGNED_OUT_PRIVACY_LOCK_VALIDATION_V13_0_18.md"),"V14.0.13 privacy validation report missing");
+assert(exists("SIGNED_OUT_PRIVACY_LOCK_VALIDATION_V13_0_18.md"),"V14.0.14 privacy validation report missing");
 
 assert(packageJson.scripts?.quality==="npm run inspect && npm run lint && npm run maintainability && npm run test","quality script mismatch");
 assert(packageJson.scripts?.inspect==="node tests/inspect-project.mjs"&&exists("tests/inspect-project.mjs"),"repository inspection script missing");
 assert(packageJson.scripts?.lint==="eslint ."&&packageJson.scripts?.["test:browser"]==="playwright test","lint or browser package script missing");
-const recentReadmeVersions=["V14.0.13","V14.0.12","V14.0.11","V14.0.10","V14.0.9"];
+const recentReadmeVersions=["V14.0.14","V14.0.13","V14.0.12","V14.0.11","V14.0.10"];
 assert(readme.trim().split(/\r?\n/).length<=12&&recentReadmeVersions.every(entry=>readme.includes(entry))&&!readme.includes("V14.0.4"),"README is not the requested concise five-version overview");
 assert(!/https?:\/\//.test(readme),"README unexpectedly contains a live-app link");
 assert(exists("SETTINGS_TOPBAR_UI_VALIDATION_V13_0_4.md"),"V13.0.4 UI validation report missing");
 assert(exists("DASHBOARD_CALENDAR_DEDUP_VALIDATION_V13_0_5.md"),"V13.0.5 calendar validation report missing");
 assert(exists("PROJECT_REVISION_CYCLES_VALIDATION_V13_0_6.md"),"V13.0.9 project revision validation report missing");
 assert(exists("FILE_INSPECTION_AND_FIXES_VALIDATION_V13_0_5.md"),"V13.0.5 installer validation report missing");
-assert(exists("Install_V14_0_13.command")&&(fs.statSync(path.join(root,"Install_V14_0_13.command")).mode&0o100)!==0,"V14.0.13 installer is missing or not executable");
+assert(exists("Install_V14_0_14.command")&&(fs.statSync(path.join(root,"Install_V14_0_14.command")).mode&0o100)!==0,"V14.0.14 installer is missing or not executable");
 assert((fs.statSync(path.join(root,"run_audit.sh")).mode&0o100)!==0,"run_audit.sh is not executable");
-assert(installer.includes("npm ci --ignore-scripts")&&installer.includes("npm run quality")&&installer.includes("git diff --check"),"V14.0.13 installer validation flow is incomplete");
+assert(installer.includes("npm ci --ignore-scripts")&&installer.includes("npm run quality")&&installer.includes("git diff --check"),"V14.0.14 installer validation flow is incomplete");
 assert(workflow.includes("name: Browser privacy and accessibility")&&workflow.includes("npm run audit")&&workflow.includes("npm run test:browser"),"CI hardening is incomplete");
 assert(dependabot.includes("package-ecosystem: npm")&&dependabot.includes("package-ecosystem: github-actions"),"Dependabot does not cover npm and GitHub Actions");
 assert(releaseWorkflow.includes('tags:')&&releaseWorkflow.includes('gh release create'),"tag-driven release workflow is missing");
@@ -173,7 +172,7 @@ assert(exists("FILE_INSPECTION_AND_FIXES_VALIDATION_V13_0_3.md"),"File Inspectio
 assert(exists("CLOUD_AUTH_RECOVERY_VALIDATION_V13_0_15.md"),"V13.0.15 cloud auth validation report missing");
 assert(exists("FILE_INSPECTION_AND_FIXES_VALIDATION_V13_0_15.md"),"V13.0.15 installer validation report missing");
 assert(read("CLOUD_SYNC_SETUP.md").includes("V13.0.16 password-recovery redirect"),"V13.0.15 password-reset redirect setup guidance missing");
-assert(readme.startsWith("# My Finance Records · V14.0.13"),"README release heading mismatch");
+assert(readme.startsWith("# My Finance Records · V14.0.14"),"README release heading mismatch");
 assert(changelog.includes("## 13.0.12 · 2026-08-07")&&changelog.includes("## 13.0.10 · 2026-08-07"),"CHANGELOG V13.0.15 entry or V13.0.10 history missing");
 assert(changelog.includes("## 13.0.4 · 2026-08-07"),"CHANGELOG V13.0.4 history missing");
 assert(security.includes("AES-256-GCM")&&security.includes("does not cover the active localStorage working copy"),"SECURITY boundaries incomplete");
@@ -311,7 +310,7 @@ const cloudSandbox={
   FINANCE_SYNC_CONFIG:{supabaseUrl:"https://fixture.supabase.co",supabasePublishableKey:"sb_publishable_abcdefghijklmnopqrstuvwxyz012345"},
   __authFixture:{reset:null,updatedPassword:"",verifiedOtp:null},
   financeLoadSupabase:async()=>({createClient:()=>({auth:{onAuthStateChange(){return{data:{subscription:{unsubscribe(){}}}}},async resetPasswordForEmail(email,options){cloudSandbox.__authFixture.reset={email,options};return{data:{},error:null}},async verifyOtp(input){cloudSandbox.__authFixture.verifiedOtp=input;return{data:{user:{id:"fixture-user",email:"fixture@example.com"},session:{user:{id:"fixture-user",email:"fixture@example.com"}}},error:null}},async updateUser({password}){cloudSandbox.__authFixture.updatedPassword=password;return{data:{user:{id:"fixture-user",email:"fixture@example.com"}},error:null}}}})}),
-  data:structuredClone(sampleData),APP_VERSION:"14.0.13",normalizeData:value=>value,saveData(){return true;},renderAll(){},showToast(message,tone){cloudSandbox.__lastToast={message,tone};},STORAGE_KEY:"finance",setInterval(){return 0;},clearInterval(){},setTimeout(){return 0;},clearTimeout(){}
+  data:structuredClone(sampleData),APP_VERSION:"14.0.14",normalizeData:value=>value,saveData(){return true;},renderAll(){},showToast(message,tone){cloudSandbox.__lastToast={message,tone};},STORAGE_KEY:"finance",setInterval(){return 0;},clearInterval(){},setTimeout(){return 0;},clearTimeout(){}
 };
 cloudSandbox.window=cloudSandbox; cloudSandbox.globalThis=cloudSandbox; cloudSandbox.window.addEventListener=()=>{};
 vm.createContext(cloudSandbox);
@@ -400,7 +399,7 @@ assert((html.match(/settingsDisclosure\("More options"/g)||[]).length>=4,"Settin
 assert(read("account-ledger.js").includes('window.simplifyAccountLedgerSettings?.(panel, ledgerCard, reconciliationCard)'),"dynamic account history is not moved into progressive disclosure");
 assert(read("reminders-alerts.js").includes('window.simplifyReminderSettingsCard?.(card)'),"dynamic reminder settings are not moved into progressive disclosure");
 assert(html.includes('Save account updates')&&read("account-ledger.js").includes('Save account updates'),"plain-language account update action is incomplete");
-assert(version.cacheVersion.includes("v1413-sidebar-manila-r1"),"V13.0.15 cache revision mismatch");
+assert(version.cacheVersion.includes("v1414-sidebar-labels-r1"),"V13.0.15 cache revision mismatch");
 
 // V13.0.3 compact modal and SVG icon safeguards preserved.
 for(const token of [
@@ -475,7 +474,7 @@ assert(changelog.includes("numbered project revision cycles"),"V13.0.9 project r
 assert(exists("PROJECT_REVISION_CYCLES_VALIDATION_V13_0_6.md"),"V13.0.9 project revision report missing");
 assert(exists("FILE_INSPECTION_AND_FIXES_VALIDATION_V13_0_6.md"),"V13.0.6 installer validation report missing");
 
-assert(html.includes('id="settingsOverviewAppStatus">Version 14.0.13<'),"Settings overview version was not updated");
+assert(html.includes('id="settingsOverviewAppStatus">Version 14.0.14<'),"Settings overview version was not updated");
 assert(profiles.includes('function renameProfile') && profiles.includes('id="renameProfileInput"') && profiles.includes('id="renameProfileButton"'), "Profile rename UI and function missing from security-profiles.js");
 
 // Auto-repair maskable icon if Git checkout or line-ending conversion touched binary PNG
@@ -571,7 +570,7 @@ for(const token of [
 assert(html.includes('if (expense.quickSpend && expense.paid && expense.accountDeducted) restoreExpensePayment(expense);'),"quick-spend deletion does not restore its account debit");
 assert(html.includes('Move this paid expense back to unpaid before changing its amount.'),"paid ledger amount edit protection missing");
 assert(!/[🛒💸]/u.test(ledgerSource),"emoji-style system icon introduced in account spending UI");
-assert(version.name==="Sidebar & Manila Theme", "V14.0.13 version name mismatch");
+assert(version.name==="Sidebar Label Cleanup", "V14.0.14 version name mismatch");
 assert(changelog.includes("direct account spending")&&changelog.includes("expense-payment ledger debit"),"CHANGELOG V13.0.10 account spending details missing");
 
 // V13.0.15 interaction reliability and project mobile cleanup safeguards.
@@ -609,10 +608,10 @@ for(const token of [
 assert(html.includes('Record Spending is intentionally isolated from the account-maintenance form submit path.'),"Parent account form still owns Record Spending submit behavior");
 assert(html.includes('const saved = baseSaveData(message);')&&html.includes('if (saved === false) return false;')&&html.includes('return true;'),"saveData wrapper does not preserve persistence success/failure");
 assert(html.includes('account-spend-status')&&ledgerV1313.includes('accountSpendStatus'),"Inline spending status is missing");
-assert(version.cacheVersion.includes("v1413-sidebar-manila-r1"),"V13.0.15 cache revision mismatch");
-assert(readme.startsWith("# My Finance Records · V14.0.13"),"V14.0.13 README metadata missing");
+assert(version.cacheVersion.includes("v1414-sidebar-labels-r1"),"V13.0.15 cache revision mismatch");
+assert(readme.startsWith("# My Finance Records · V14.0.14"),"V14.0.14 README metadata missing");
 assert(changelog.includes("## 13.0.15 · 2026-08-07"),"V13.0.15 changelog missing");
-assert(html.includes('?v=14.0.13')&&worker.includes('?v=14.0.13'),"Version-pinned V13.0.15 assets missing");
+assert(html.includes('?v=14.0.14')&&worker.includes('?v=14.0.14'),"Version-pinned V13.0.15 assets missing");
 assert(ledgerV1313.includes('const stored = JSON.parse(storedRaw);'),"V13.0.15 storage verification must inspect the raw persisted ledger");
 assert(!ledgerV1313.includes('window.__spendVerifyDebug'),"Temporary spend verification debug hook remains");
 assert(html.includes('accountLedger:Array.isArray(source.accountLedger)')&&html.includes('accountReconciliations:Array.isArray(source.accountReconciliations)')&&html.includes('ledgerSettings:source.ledgerSettings'),"Base normalization does not preserve persisted ledger/reconciliation fields for reload");
@@ -633,8 +632,8 @@ for (const token of [
 ]) assert(html.includes(token),`V13.0.15 Brave install safeguard missing: ${token}`);
 assert(html.includes('window.addEventListener("beforeinstallprompt"'),"Native beforeinstallprompt support was removed");
 assert(html.includes('window.addEventListener("appinstalled"'),"appinstalled support was removed");
-assert(version.name==="Sidebar & Manila Theme","V14.0.13 version name mismatch");
-assert(version.cacheVersion.includes("v1413-sidebar-manila-r1"),"V13.0.15 cache revision mismatch");
+assert(version.name==="Sidebar Label Cleanup","V14.0.14 version name mismatch");
+assert(version.cacheVersion.includes("v1414-sidebar-labels-r1"),"V13.0.15 cache revision mismatch");
 assert(exists("BRAVE_PWA_INSTALL_VALIDATION_V13_0_14.md"),"V13.0.14 Brave validation report missing");
 assert(changelog.includes("Brave-aware PWA install detection")&&changelog.includes("Save and Share"),"Brave install history missing from CHANGELOG");
 assert(changelog.includes("## 13.0.15 · 2026-08-07"),"V13.0.15 changelog entry missing");
@@ -644,26 +643,26 @@ assert(changelog.includes("## 13.0.15 · 2026-08-07"),"V13.0.15 changelog entry 
 for(const token of [
   'id="cloudForgotPassword"','id="cloudTestConnection"','id="cloudPasswordToggle"','id="cloudAuthMessage"','id="cloudConnectionStatus"',
   'id="cloudPasswordRecoveryCard"','id="cloudNewPassword"','id="cloudConfirmPassword"','id="cloudCompletePasswordReset"','id="cloudCancelPasswordReset"'
-]) assert(html.includes(token),`V14.0.13 auth UI safeguard missing: ${token}`);
+]) assert(html.includes(token),`V14.0.14 auth UI safeguard missing: ${token}`);
 for(const token of [
   'friendlyAuthError','requestPasswordReset','resetPasswordForEmail','completePasswordReset','updateUser({ password:next })','PASSWORD_RECOVERY',
   'testCloudConnection','/auth/v1/health','withAuthButtonBusy','setPasswordVisibility','Wrong email or password','local finance records stay stored'
-]) assert(cloud.includes(token),`V14.0.13 auth behavior safeguard missing: ${token}`);
+]) assert(cloud.includes(token),`V14.0.14 auth behavior safeguard missing: ${token}`);
 assert(changelog.includes('Forgot password')&&changelog.includes('Test cloud connection'),"CHANGELOG auth recovery notes missing");
-for(const token of ['id="cloudRecoveryHelpCard"','id="cloudRecoveryEmail"','id="cloudRecoveryCode"','id="cloudRecoveryResend"','id="cloudVerifyRecoveryCode"','id="cloudRecoveryBackToSignIn"']) assert(html.includes(token),`V14.0.13 recovery redirect UI safeguard missing: ${token}`);
-for(const token of ['parsePasswordRecoveryUrl','recoveryErrorMessage','verifyRecoveryCode','verifyOtp({ email:value, token:code, type:"recovery" })','url.searchParams.set("auth", "recovery")','Password reset needs attention']) assert(cloud.includes(token),`V14.0.13 recovery redirect behavior safeguard missing: ${token}`);
+for(const token of ['id="cloudRecoveryHelpCard"','id="cloudRecoveryEmail"','id="cloudRecoveryCode"','id="cloudRecoveryResend"','id="cloudVerifyRecoveryCode"','id="cloudRecoveryBackToSignIn"']) assert(html.includes(token),`V14.0.14 recovery redirect UI safeguard missing: ${token}`);
+for(const token of ['parsePasswordRecoveryUrl','recoveryErrorMessage','verifyRecoveryCode','verifyOtp({ email:value, token:code, type:"recovery" })','url.searchParams.set("auth", "recovery")','Password reset needs attention']) assert(cloud.includes(token),`V14.0.14 recovery redirect behavior safeguard missing: ${token}`);
 assert(read("CLOUD_SYNC_SETUP.md").includes('?auth=recovery')&&read("CLOUD_SYNC_SETUP.md").includes('{{ .Token }}'),"Cloud recovery redirect/code instructions missing");
-assert(changelog.includes('## 14.0.13 · 2026-08-12'),"V14.0.13 changelog entry missing");
-assert(version.name==='Sidebar & Manila Theme',"V14.0.13 version name mismatch");
-assert(changelog.includes('## 13.0.15 · 2026-08-07')&&changelog.includes('Password-reset messaging avoids revealing'),"CHANGELOG V14.0.13 auth entry missing");
-assert(version.cacheVersion.includes('v1413-sidebar-manila-r1'),"V14.0.13 auth cache revision mismatch");
-assert(packageJson.scripts?.quality==='npm run inspect && npm run lint && npm run maintainability && npm run test',"V14.0.13 quality script mismatch");
+assert(changelog.includes('## 14.0.14 · 2026-08-12'),"V14.0.14 changelog entry missing");
+assert(version.name==='Sidebar Label Cleanup',"V14.0.14 version name mismatch");
+assert(changelog.includes('## 13.0.15 · 2026-08-07')&&changelog.includes('Password-reset messaging avoids revealing'),"CHANGELOG V14.0.14 auth entry missing");
+assert(version.cacheVersion.includes('v1414-sidebar-labels-r1'),"V14.0.14 auth cache revision mismatch");
+assert(packageJson.scripts?.quality==='npm run inspect && npm run lint && npm run maintainability && npm run test',"V14.0.14 quality script mismatch");
 
 
-// V14.0.13 iPhone input zoom prevention safeguards.
-assert(version.name==="Sidebar & Manila Theme","V14.0.13 version name mismatch");
-assert(version.cacheVersion.includes("v1413-sidebar-manila-r1"),"V14.0.13 cache revision mismatch");
-assert(read("IPHONE_INPUT_ZOOM_VALIDATION_V13_0_17.md").includes("16px"),"V14.0.13 input-zoom guidance missing");
+// V14.0.14 iPhone input zoom prevention safeguards.
+assert(version.name==="Sidebar Label Cleanup","V14.0.14 version name mismatch");
+assert(version.cacheVersion.includes("v1414-sidebar-labels-r1"),"V14.0.14 cache revision mismatch");
+assert(read("IPHONE_INPUT_ZOOM_VALIDATION_V13_0_17.md").includes("16px"),"V14.0.14 input-zoom guidance missing");
 assert(changelog.includes("## 13.0.17 · 2026-08-07")&&changelog.includes("user-scalable=no"),"CHANGELOG V13.0.17 input-zoom/accessibility notes missing");
 for(const token of [
   "/* V13.0.17 · iPhone input zoom prevention",
@@ -675,12 +674,12 @@ for(const token of [
   "font-size:16px !important",
   "input[inputmode=\"decimal\"]",
   "input[inputmode=\"numeric\"]"
-]) assert(html.includes(token),`V14.0.13 phone input safeguard missing: ${token}`);
-assert(!/<meta[^>]+name=["']viewport["'][^>]+user-scalable\s*=\s*no/i.test(html),"V14.0.13 must not disable user pinch zoom");
-assert(!/<meta[^>]+name=["']viewport["'][^>]+maximum-scale\s*=\s*1/i.test(html),"V14.0.13 must not lock maximum zoom scale");
-assert(exists("IPHONE_INPUT_ZOOM_VALIDATION_V13_0_17.md"),"V14.0.13 input zoom validation report missing");
+]) assert(html.includes(token),`V14.0.14 phone input safeguard missing: ${token}`);
+assert(!/<meta[^>]+name=["']viewport["'][^>]+user-scalable\s*=\s*no/i.test(html),"V14.0.14 must not disable user pinch zoom");
+assert(!/<meta[^>]+name=["']viewport["'][^>]+maximum-scale\s*=\s*1/i.test(html),"V14.0.14 must not lock maximum zoom scale");
+assert(exists("IPHONE_INPUT_ZOOM_VALIDATION_V13_0_17.md"),"V14.0.14 input zoom validation report missing");
 
-// V14.0.13 UI accessibility and signed-out Settings reliability safeguards.
+// V14.0.14 UI accessibility and signed-out Settings reliability safeguards.
 for(const token of [
   "--primary-contrast: #ffffff",
   "--primary-contrast:#102a31",
@@ -689,20 +688,20 @@ for(const token of [
   "body.finance-signed-out [data-finance-private-settings] { display:none !important; }",
   "html[data-theme=\"dark\"] .v12-chip.info",
   "html[data-theme=\"dark\"] .button-danger"
-]) assert(html.includes(token),`V14.0.13 visual safeguard missing: ${token}`);
+]) assert(html.includes(token),`V14.0.14 visual safeguard missing: ${token}`);
 for(const token of [
   "document.body.classList.toggle(\"sidebar-layout-pinned\"",
   "document.body.classList.remove(\"sidebar-layout-pinned\")",
   "data-finance-private-settings",
   "Header History & Settings Search"
-]) assert(html.includes(token),`V14.0.13 interface safeguard missing: ${token}`);
+]) assert(html.includes(token),`V14.0.14 interface safeguard missing: ${token}`);
 for(const token of [
   "[data-help-key]",
   "#requestPersistenceButton",
   "ensureSettingsPrivacyNote",
   "Finance-specific app settings are hidden while signed out.",
   "Sign in to manage this finance setting."
-]) assert(privacyLock.includes(token),`V14.0.13 privacy safeguard missing: ${token}`);
+]) assert(privacyLock.includes(token),`V14.0.14 privacy safeguard missing: ${token}`);
 const browserCoverage=read("tests/privacy-and-inputs.spec.mjs");
 for(const token of [
   'toHaveCSS("margin-left", "245px")',
@@ -710,18 +709,18 @@ for(const token of [
   'Settings overview stays compact and responsive',
   'safeClicks:{ help:1, storage:1 }',
   'pdf:"none", reminders:"none"'
-]) assert(browserCoverage.includes(token),`V14.0.13 browser coverage missing: ${token}`);
-assert(readme.includes("**V14.0.13 · Sidebar & Manila Theme**"),"README V14.0.13 release notes missing");
+]) assert(browserCoverage.includes(token),`V14.0.14 browser coverage missing: ${token}`);
+assert(readme.includes("**V14.0.14 · Sidebar Label Cleanup**"),"README V14.0.14 release notes missing");
 for(const token of [
   'id="undoMoneyButton"', 'id="redoMoneyButton"', 'data-history-action="undo"', 'data-history-action="redo"',
   'const REDO_KEY = `${STORAGE_KEY}-redo`', "function redoLastChange()", "saveHistoryState(REDO_KEY", "Last change redone",
   'id="settingsSearchButton"', 'id="settingsSearchInput"', 'id="settingsSearchResults"', "SETTINGS_SEARCH_ITEMS", "openSettingsSearchResult",
   'calendarMore.dataset.settingsMoreOptions = "calendar"', 'syncMore.dataset.settingsMoreOptions = "sync"', 'profileMore.dataset.settingsMoreOptions = "profiles"'
-]) assert(html.includes(token),`V14.0.13 history or Settings search safeguard missing: ${token}`);
-for(const token of ["baseRedoLastChange", 'key === "y"', 'key === "z" && event.shiftKey']) assert(productivity.includes(token),`V14.0.13 redo shortcut safeguard missing: ${token}`);
-for(const token of ['#settingsSearchButton', '#settingsSearchInput', '[data-settings-search-result]']) assert(privacyLock.includes(token),`V14.0.13 signed-out Settings search safeguard missing: ${token}`);
+]) assert(html.includes(token),`V14.0.14 history or Settings search safeguard missing: ${token}`);
+for(const token of ["baseRedoLastChange", 'key === "y"', 'key === "z" && event.shiftKey']) assert(productivity.includes(token),`V14.0.14 redo shortcut safeguard missing: ${token}`);
+for(const token of ['#settingsSearchButton', '#settingsSearchInput', '[data-settings-search-result]']) assert(privacyLock.includes(token),`V14.0.14 signed-out Settings search safeguard missing: ${token}`);
 
-// V14.0.13 approved Dashboard arrangement and temporary compact-rail expansion.
+// V14.0.14 approved Dashboard arrangement and temporary compact-rail expansion.
 const expectedDashboardOrder=["cash-flow","calendar","due-soon","expense-schedule","savings-goals","savings-trend","payment-progress","accounts","projects","activity"];
 const expectedDashboardSizes={"cash-flow":"wide","calendar":"wide","due-soon":"large","expense-schedule":"large","savings-goals":"large","savings-trend":"wide","payment-progress":"wide","accounts":"large","projects":"large","activity":"large"};
 const dashboardOrderSource=read("index.html").match(/const DEFAULT_DASHBOARD_ORDER = (\[[^;]+\]);/)?.[1];
@@ -736,7 +735,7 @@ for(const token of [
   "if (previewExpandedRail) openMenu(true)",
   "max-width:170px",
   "transition:max-width .26s cubic-bezier(.2,.8,.2,1)"
-]) assert(html.includes(token),`V14.0.13 Dashboard or rail behavior missing: ${token}`);
+]) assert(html.includes(token),`V14.0.14 Dashboard or rail behavior missing: ${token}`);
 
 const dashboardModule=read("index.html").match(/const DASHBOARD_PREFS_KEY = `[\s\S]*?let dashboardPreferences = readDashboardPreferences\(\);/)?.[0] || "";
 function evaluateDashboardPreferences(saved){
@@ -757,11 +756,11 @@ try{
   assert(uncustomized.preferences.order.join("|")===expectedDashboardOrder.join("|")&&uncustomized.preferences.sizes["cash-flow"]==="wide","saved uncustomized Dashboard preferences were not refreshed");
   assert(customized.preferences.order.join("|")===customOrder.join("|")&&customized.preferences.sizes["cash-flow"]==="large","explicitly customized Dashboard preferences were overwritten");
 }catch(error){ failures.push(`Dashboard preference migration fixture failed: ${error.stack||error}`); }
-assert(changelog.includes("approved Dashboard card sequence")&&changelog.includes("saved pin state"),"V14.0.13 changelog scope is incomplete");
+assert(changelog.includes("approved Dashboard card sequence")&&changelog.includes("saved pin state"),"V14.0.14 changelog scope is incomplete");
 
-// V14.0.13 primary navigation labels and Philippine-time appearance schedule.
+// V14.0.14 primary navigation labels and Philippine-time appearance schedule.
 for(const [page,label] of Object.entries({dashboard:"Overview",money:"Finance",projects:"Work",reports:"Insights"})) {
-  assert(html.includes(`data-page="${page}" data-nav-label="${label}"`),`V14.0.13 sidebar label missing for ${page}`);
+  assert(html.includes(`data-page="${page}" data-nav-label="${label}"`),`V14.0.14 sidebar label missing for ${page}`);
 }
 for(const token of [
   'timeZone:"Asia/Manila"',
@@ -772,7 +771,7 @@ for(const token of [
   'Philippine time · ${resolved === "light" ? "Day" : "Night"}',
   'function schedulePhilippineThemeRefresh()',
   'document.addEventListener("visibilitychange"'
-]) assert(html.includes(token),`V14.0.13 Philippine-time theme safeguard missing: ${token}`);
+]) assert(html.includes(token),`V14.0.14 Philippine-time theme safeguard missing: ${token}`);
 assert(!html.includes('matchMedia("(prefers-color-scheme: dark)")'),"automatic appearance still follows the device system theme");
 
 const themeFunctionSource=read("index.html").match(/window\.financePhilippineThemeAt = value => \{[\s\S]*?\n {8}\};/)?.[0] || "";
@@ -792,13 +791,25 @@ try {
 } catch(error) {
   failures.push(`Philippine theme boundary fixture failed: ${error.stack||error}`);
 }
-assert(changelog.includes("Asia/Manila")&&changelog.includes("7:01 AM")&&changelog.includes("6:00 PM"),"V14.0.13 Manila schedule documentation is incomplete");
+assert(changelog.includes("Asia/Manila")&&changelog.includes("7:01 AM")&&changelog.includes("6:00 PM"),"V14.0.14 Manila schedule documentation is incomplete");
+
+// V14.0.14 duplicate sidebar group-heading removal.
+assert(!html.includes("nav-group-label"),"duplicated uppercase sidebar group headings remain in markup or styles");
+for(const legacyId of ["nav-overview-label","nav-money-label","nav-projects-label","nav-reports-label"]) {
+  assert(!html.includes(legacyId),`obsolete sidebar heading ID remains: ${legacyId}`);
+}
+assert((html.match(/class="nav-group"/g)||[]).length===4,"the four primary sidebar destination groups were not preserved");
+for(const token of [
+  'await expect(sidebar.locator(".nav-group-label")).toHaveCount(0)',
+  'await expect(sidebar.locator(".sidebar-navigation")).toHaveCSS("gap", "4px")'
+]) assert(browserCoverage.includes(token),`V14.0.14 responsive sidebar coverage missing: ${token}`);
+assert(changelog.includes("duplicated uppercase Overview, Finance, Work, and Insights headings"),"V14.0.14 sidebar cleanup documentation is incomplete");
 
 if(failures.length){
-  console.error("V14.0.13 Sidebar & Manila Theme validation failed:\n"+failures.map(item=>`- ${item}`).join("\n"));
+  console.error("V14.0.14 Sidebar Label Cleanup validation failed:\n"+failures.map(item=>`- ${item}`).join("\n"));
   process.exit(1);
 }
-console.log("V14.0.13 Sidebar & Manila Theme validation passed.");
+console.log("V14.0.14 Sidebar Label Cleanup validation passed.");
 console.log(`- ${staticIds.length} static HTML IDs and ${injectedIds.length} injected runtime IDs checked with no duplicates`);
 console.log("- Record Spending is isolated from correction-form validation and requires persistence/storage verification before close");
 console.log("- Finance Schema 12, Cloud Schema V3, ledger, encryption, profile, rollback, and credential safeguards passed");
