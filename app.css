@@ -5377,7 +5377,6 @@
     :root {
       --nav-active-bg:#dff4e8;
       --nav-active-text:#102a31;
-      --nav-active-icon-bg:#c8ead8;
     }
     .sidebar-close-button svg,.nav-icon svg,.brand-mark svg { width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
     .sidebar-unpin-icon,.sidebar-mobile-close-icon { display:none; }
@@ -5408,7 +5407,7 @@
       .sidebar:not(.desktop-open):not(.sidebar-pinned) .nav-button::after { content:attr(data-nav-label); position:absolute; left:calc(100% + 9px); top:50%; z-index:80; transform:translate(5px,-50%); padding:5px 8px; border:1px solid rgba(255,255,255,.12); border-radius:6px; background:var(--nav); color:#fff; box-shadow:var(--shadow); font-size:.65rem; font-weight:750; white-space:nowrap; opacity:0; visibility:hidden; pointer-events:none; transition:opacity .14s ease,transform .14s ease,visibility .14s; }
       .sidebar:not(.desktop-open):not(.sidebar-pinned) .nav-button:hover::after,.sidebar:not(.desktop-open):not(.sidebar-pinned) .nav-button:focus-visible::after { opacity:1; visibility:visible; transform:translate(0,-50%); }
       .sidebar .nav-button.active,html[data-theme="dark"] .sidebar .nav-button.active { background:var(--nav-active-bg); color:var(--nav-active-text); }
-      .sidebar .nav-button.active .nav-icon,html[data-theme="dark"] .sidebar .nav-button.active .nav-icon { background:var(--nav-active-icon-bg); color:var(--nav-active-text); }
+      .sidebar .nav-button.active .nav-icon,html[data-theme="dark"] .sidebar .nav-button.active .nav-icon { background:transparent; color:var(--nav-active-text); }
       .sidebar-settings-bottom { padding-top:8px; }
       .sidebar:not(.desktop-open):not(.sidebar-pinned) .sidebar-settings-bottom { border-top-color:rgba(255,255,255,.16); }
     }

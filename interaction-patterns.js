@@ -1,5 +1,7 @@
 "use strict";
 (() => {
+  let overflowMenusReady = false;
+
   function closeOverflowMenu(menu, returnFocus = false) {
     if (!menu) return;
     const trigger = menu.querySelector(":scope > .overflow-menu-trigger, :scope > .topbar-tools-trigger");
@@ -30,6 +32,8 @@
   }
 
   function setupOverflowMenus() {
+    if (overflowMenusReady) return;
+    overflowMenusReady = true;
     document.addEventListener("click", event => {
       const trigger = event.target.closest(".overflow-menu-trigger, .topbar-tools-trigger");
       if (trigger) {
@@ -158,4 +162,6 @@
   }
 
   window.FinanceInteractionPatterns = { closeOverflowMenu, setupOverflowMenus, renderDuplicatedMarquee, middleTruncateFilename, createDashboardDragController };
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", setupOverflowMenus, { once:true });
+  else setupOverflowMenus();
 })();
