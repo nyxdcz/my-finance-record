@@ -228,6 +228,15 @@ test("responsive sidebar keeps one consistent desktop control and the mobile dra
   expect(activeContrast.ratio).toBeGreaterThanOrEqual(4.5);
   expect(activeContrast).toMatchObject({ color:"rgb(16, 42, 49)", background:"rgb(223, 244, 232)" });
 
+  const dashboardLabel = sidebar.locator('.nav-button[data-page="dashboard"] .nav-label');
+  await expect(dashboardLabel).toHaveCSS("max-width", "0px");
+  await sidebar.evaluate(node => node.classList.add("desktop-open"));
+  await expect(sidebar).toHaveCSS("width", "245px");
+  await expect(page.locator(".main")).toHaveCSS("margin-left", "64px");
+  await expect(dashboardLabel).toHaveCSS("max-width", "170px");
+  expect(await dashboardLabel.evaluate(node => getComputedStyle(node).transitionDuration)).not.toBe("0s");
+  await sidebar.evaluate(node => node.classList.remove("desktop-open"));
+
   await sidebar.evaluate(node => node.classList.add("desktop-open", "sidebar-pinned"));
   await page.evaluate(() => document.body.classList.add("sidebar-layout-pinned"));
   await expect(sidebar).toHaveCSS("width", "245px");
