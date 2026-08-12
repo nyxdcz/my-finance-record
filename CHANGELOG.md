@@ -1,3 +1,21 @@
+## 14.0.15 · 2026-08-12
+
+### Added
+- Added a one-week Dashboard calendar marquee below the heading using exactly duplicated content and a CSS `translateX(-50%)` loop.
+- Added Dashboard card drag-and-drop while customization is active, with visible drag and resize handles, a drag preview, insertion feedback, saved order, keyboard alternatives, and ARIA live announcements.
+
+### Changed
+- Replaced contextual More disclosures with semantic horizontal meatballs and vertical kebab menu buttons using `aria-haspopup="menu"`, `aria-controls`, and synchronized `aria-expanded`; retained the navigation hamburger with `aria-controls="sidebar"`.
+- Replaced visual-only completion tracks with native `<progress>` elements and added indeterminate spinners for unknown migration and cloud-sync work.
+- Added single-line ellipsis, two-line WebKit clamping, extension-preserving JavaScript filename truncation, logical decorative borders, and semantic menu separators.
+
+### Accessibility
+- The marquee pauses on hover or focus and stops under `prefers-reduced-motion`; duplicated content is hidden from assistive technology.
+- Overflow menus support Arrow keys, Home, End, Escape, outside-click closing, focus return, and correctly grouped menu separators.
+
+### Preserved
+- Finance Schema 12, Cloud Schema V3, records, calculations, saved Dashboard layouts, manual Move Up/Down actions, and the full Monthly Calendar remain unchanged.
+
 ## 14.0.14 · 2026-08-12
 
 ### Changed

@@ -5,7 +5,7 @@
     "[data-page]", "#menuButton", "#sidebarCloseButton", "#overlay",
     "#previousMonthButton", "#nextMonthButton", "#monthDisplayButton", "#currentMonthButton",
     "#monthPicker", "#monthPickerPreviousYear", "#monthPickerNextYear", "#monthPickerGrid button",
-    "#topbarToolsMenu > summary", "#themeToggleButton", "#privacySignInButton", ".finance-privacy-signin",
+    "#topbarToolsTrigger", "#themeToggleButton", "#privacySignInButton", ".finance-privacy-signin",
     "[data-help-key]", "[data-section-help]", "[data-close='sectionHelpDialog']", "[data-close='pwaInstallGuideDialog']",
     "[data-settings-tab='sync']", "[data-settings-tab='app']", "#settingsBackButton", "[data-settings-open='sync']", "[data-settings-open='app']",
     "#settingsSearchButton", "#settingsSearchInput", "#settingsSearchClear", "[data-settings-search-result]",
@@ -90,7 +90,13 @@
         try { dialog.close(); } catch(e) { dialog.removeAttribute("open"); }
       }
     });
-    document.querySelectorAll(".topbar-tools-menu[open], .project-dialog-more-footer[open]").forEach(node=>node.removeAttribute("open"));
+    document.querySelectorAll(".topbar-tools-menu.is-open, .project-dialog-more-footer.is-open, .overflow-menu.is-open").forEach(node=>{
+      node.classList.remove("is-open");
+      const trigger=node.querySelector(":scope > [aria-haspopup='menu']");
+      trigger?.setAttribute("aria-expanded","false");
+      const panel=trigger?document.getElementById(trigger.getAttribute("aria-controls")):null;
+      if(panel) panel.hidden=true;
+    });
     const pop=document.getElementById("cloudSyncToolbarPopover"); if(pop) pop.hidden=true;
   }
 

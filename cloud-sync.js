@@ -541,7 +541,7 @@
       top.dataset.syncState=topSyncStateKey(label);
       const text=top.querySelector(".cloud-sync-label") || top.querySelector("span:last-child");
       if (text) text.textContent=label;
-      top.setAttribute("aria-label",`Cloud sync: ${label}`); top.title=`Cloud sync: ${label}`;
+      top.setAttribute("aria-label",`Cloud sync: ${label}`); top.title=`Cloud sync: ${label}`; top.setAttribute("aria-busy", syncing ? "true" : "false");
     }
     const stateNode=document.getElementById("cloudToolbarState"), detailNode=document.getElementById("cloudToolbarDetail"), lastNode=document.getElementById("cloudToolbarLastSync"), syncButton=document.getElementById("cloudToolbarSyncNow"), fixButton=document.getElementById("cloudToolbarFixIssue");
     if (stateNode) stateNode.textContent=label;
