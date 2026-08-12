@@ -29,7 +29,6 @@ async function loadStaticApp(page, viewport) {
     window.showToast = message => { window.__privacyToast = message; };
 
     const patterns = window.FinanceInteractionPatterns;
-    patterns.setupOverflowMenus();
     const weekTrack = document.getElementById("dashboardWeekMarqueeTrack");
     const weekDays = Array.from({ length:7 }, (_, index) => `<span class="dashboard-week-day">Day ${index + 1}</span>`).join("");
     patterns.renderDuplicatedMarquee(weekTrack, weekDays);
@@ -248,6 +247,7 @@ test("responsive sidebar keeps one consistent desktop control and the mobile dra
   });
   expect(activeContrast.ratio).toBeGreaterThanOrEqual(4.5);
   expect(activeContrast).toMatchObject({ color:"rgb(16, 42, 49)", background:"rgb(223, 244, 232)" });
+  await expect(sidebar.locator(".nav-button.active .nav-icon")).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
 
   const dashboardLabel = sidebar.locator('.nav-button[data-page="dashboard"] .nav-label');
   await expect(dashboardLabel).toHaveCSS("max-width", "0px");
