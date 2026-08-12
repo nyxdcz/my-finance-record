@@ -1882,12 +1882,12 @@
       .chart-svg { min-height:210px; }
       .chart-axis-label { font-size:13px; }
       .settings-about-grid { grid-template-columns:1fr; }
-      .dashboard-default-layout [data-dashboard-card="due-soon"] { order:1; }
-      .dashboard-default-layout [data-dashboard-card="expense-schedule"] { order:2; }
-      .dashboard-default-layout [data-dashboard-card="calendar"] { order:3; }
-      .dashboard-default-layout [data-dashboard-card="savings-trend"] { order:4; }
+      .dashboard-default-layout [data-dashboard-card="cash-flow"] { order:1; }
+      .dashboard-default-layout [data-dashboard-card="calendar"] { order:2; }
+      .dashboard-default-layout [data-dashboard-card="due-soon"] { order:3; }
+      .dashboard-default-layout [data-dashboard-card="expense-schedule"] { order:4; }
       .dashboard-default-layout [data-dashboard-card="savings-goals"] { order:5; }
-      .dashboard-default-layout [data-dashboard-card="cash-flow"] { order:6; }
+      .dashboard-default-layout [data-dashboard-card="savings-trend"] { order:6; }
       .dashboard-default-layout [data-dashboard-card="payment-progress"] { order:7; }
       .dashboard-default-layout [data-dashboard-card="accounts"] { order:8; }
       .dashboard-default-layout [data-dashboard-card="projects"] { order:9; }
@@ -1986,12 +1986,12 @@
       .savings-goal-head, .savings-goal-amounts { display:grid; grid-template-columns:1fr; }
       .savings-goal-amounts small { text-align:left; }
       .savings-goal-actions .button { flex:1 1 130px; }
-      .dashboard-default-layout [data-dashboard-card="due-soon"] { order:1; }
-      .dashboard-default-layout [data-dashboard-card="expense-schedule"] { order:2; }
-      .dashboard-default-layout [data-dashboard-card="calendar"] { order:3; }
-      .dashboard-default-layout [data-dashboard-card="savings-trend"] { order:4; }
+      .dashboard-default-layout [data-dashboard-card="cash-flow"] { order:1; }
+      .dashboard-default-layout [data-dashboard-card="calendar"] { order:2; }
+      .dashboard-default-layout [data-dashboard-card="due-soon"] { order:3; }
+      .dashboard-default-layout [data-dashboard-card="expense-schedule"] { order:4; }
       .dashboard-default-layout [data-dashboard-card="savings-goals"] { order:5; }
-      .dashboard-default-layout [data-dashboard-card="cash-flow"] { order:6; }
+      .dashboard-default-layout [data-dashboard-card="savings-trend"] { order:6; }
       .dashboard-default-layout [data-dashboard-card="payment-progress"] { order:7; }
       .dashboard-default-layout [data-dashboard-card="accounts"] { order:8; }
       .dashboard-default-layout [data-dashboard-card="projects"] { order:9; }
@@ -5453,3 +5453,25 @@
     .settings-search-results strong { font-size:.72rem; }.settings-search-results small,.settings-search-status { color:var(--muted); font-size:.62rem; line-height:1.35; }.settings-search-status { margin:0; }
     @media (max-width:850px) { .topbar-history-actions { display:none!important; }.topbar-history-menu-item { display:flex!important; } }
     @media (max-width:700px) { .settings-page-heading { align-items:stretch; }.settings-search-toggle { width:100%; min-height:44px; justify-content:center; }.settings-search-results { grid-template-columns:1fr; }.settings-search-field { min-height:44px; } }
+
+    /* V14.0.12 · approved Dashboard defaults and compact-rail motion */
+    @media (min-width:851px) {
+      .sidebar { transition:width .26s cubic-bezier(.2,.8,.2,1),box-shadow .26s ease; }
+      .sidebar .nav-label {
+        width:auto;
+        max-width:0;
+        opacity:0;
+        transform:translateX(-6px);
+        white-space:nowrap;
+        transition:max-width .26s cubic-bezier(.2,.8,.2,1),opacity .16s ease,transform .26s cubic-bezier(.2,.8,.2,1);
+      }
+      .sidebar.desktop-open .nav-label,.sidebar.sidebar-pinned .nav-label {
+        width:auto;
+        max-width:170px;
+        opacity:1;
+        transform:translateX(0);
+      }
+    }
+    @media (prefers-reduced-motion:reduce) {
+      .sidebar,.sidebar .nav-label { transition:none!important; }
+    }

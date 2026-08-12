@@ -1,3 +1,29 @@
+## 14.0.13 · 2026-08-12
+
+### Changed
+- Renamed the four primary sidebar destinations and compact-rail tooltips to Overview, Finance, Work, and Insights while preserving their existing routes.
+- Replaced operating-system theme following with an automatic Asia/Manila schedule: Day from 7:01 AM through 5:59 PM and Night from 6:00 PM through 7:00 AM.
+- Kept manual Light and Dark choices and refreshed the automatic appearance at minute boundaries and when the app becomes visible.
+
+### Tested
+- Added timezone-independent boundary coverage for 7:00 AM, 7:01 AM, 5:59 PM, and 6:00 PM Philippine time.
+
+### Preserved
+- Finance Schema 12, Cloud Schema V3, records, calculations, existing sidebar routes, manual appearance choices, and saved automatic-theme preferences remain unchanged.
+
+## 14.0.12 · 2026-08-12
+
+### Changed
+- Made the approved Dashboard card sequence and widths the default for new users and Reset Dashboard.
+- Refreshed previously saved uncustomized layouts while preserving every explicitly customized card arrangement.
+- Expanded the compact desktop navigation smoothly after an icon selection without changing its saved pin state.
+
+### Tested
+- Added regression coverage for all ten default card positions and sizes, reset migration behavior, desktop rail preview behavior, release metadata, and PWA cache pinning.
+
+### Preserved
+- Finance Schema 12, Cloud Schema V3, records, calculations, mobile navigation, pinned desktop navigation, and user-customized Dashboard layouts remain unchanged.
+
 ## 14.0.11 · 2026-08-12
 
 ### Added
