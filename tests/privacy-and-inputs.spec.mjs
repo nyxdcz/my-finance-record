@@ -307,9 +307,49 @@ test("history actions stay compact on desktop and move into mobile More tools", 
   await expect(page.locator("#redoMoneyButton")).toBeDisabled();
   await page.setViewportSize({ width:393, height:852 });
   await expect(page.locator(".topbar-history-actions")).toBeHidden();
-  await page.locator("#topbarToolsMenu").evaluate(node => { node.open = true; });
+  await page.locator("#topbarToolsTrigger").click();
+  await expect(page.locator("#topbarToolsTrigger")).toHaveAttribute("aria-expanded", "true");
   await expect(page.locator("#undoMoneyMenuButton")).toBeVisible();
   await expect(page.locator("#redoMoneyMenuButton")).toBeVisible();
+});
+
+test("Dashboard marquee, menu controls, progress, and drag handles use accessible semantics", async ({ page }) => {
+  await loadStaticApp(page, { width:1200, height:900 });
+
+  const hamburger = page.locator("#menuButton");
+  await expect(hamburger).toHaveAttribute("aria-controls", "sidebar");
+  await expect(hamburger).toHaveAttribute("aria-expanded", "false");
+
+  const more = page.locator("#topbarToolsTrigger");
+  await expect(more).toHaveAttribute("aria-haspopup", "menu");
+  await expect(more).toHaveAttribute("aria-controls", "topbarToolsPanel");
+  await more.click();
+  await expect(page.locator("#topbarToolsPanel")).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(more).toHaveAttribute("aria-expanded", "false");
+  await expect(more).toBeFocused();
+
+  const groups = page.locator("#dashboardWeekMarqueeTrack > .dashboard-week-marquee-group");
+  await expect(groups).toHaveCount(2);
+  const duplicated = await groups.evaluateAll(nodes => nodes.length === 2 && nodes[0].innerHTML === nodes[1].innerHTML);
+  expect(duplicated).toBe(true);
+  await expect(groups.nth(1)).toHaveAttribute("aria-hidden", "true");
+  await expect(page.locator("#dashPaymentProgress")).toHaveJSProperty("tagName", "PROGRESS");
+
+  const handles = page.locator("[data-dashboard-drag]");
+  await expect(handles).toHaveCount(10);
+  for (const handle of await handles.all()) {
+    await expect(handle).toHaveAttribute("draggable", "true");
+    await expect(handle).not.toHaveAttribute("aria-grabbed", /.+/);
+  }
+  await expect(page.locator("#dashboardDragAnnouncer")).toHaveAttribute("aria-live", "polite");
+});
+
+test("reduced motion stops the one-week marquee", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion:"reduce" });
+  await loadStaticApp(page, { width:1200, height:900 });
+  await expect(page.locator("#dashboardWeekMarqueeTrack")).toHaveCSS("animation-name", "none");
+  await expect(page.locator("#dashboardWeekMarqueeTrack > [aria-hidden='true']")).toBeHidden();
 });
 
 for (const viewport of [
