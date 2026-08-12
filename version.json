@@ -1,5 +1,5 @@
 {
-  "version": "14.0.15",
+  "version": "14.0.16",
   "schemaVersion": 12,
   "cloudSchemaVersion": 3,
   "ledgerVersion": 1,
@@ -10,8 +10,8 @@
   "profileArchitectureVersion": 1,
   "encryptionVersion": 1,
   "authSecurityVersion": 1,
-  "cacheVersion": "finance-v14-20260812-v1415-interactions-r1",
+  "cacheVersion": "finance-v14-20260812-v1416-live-ui-cache-r1",
   "released": "2026-08-12",
-  "name": "Accessible Dashboard Interactions",
-  "notes": "Adds the one-week calendar marquee, accessible Dashboard drag-and-drop, semantic overflow menus and progress indicators, safe truncation, and correctly classified separators."
+  "name": "Live UI Cache Refresh",
+  "notes": "Publishes the repaired More menu and simplified active navigation through new asset URLs and a fresh PWA cache, so installed and previously visited clients receive the interface update."
 }

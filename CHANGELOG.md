@@ -1,3 +1,16 @@
+## 14.0.16 · 2026-08-12
+
+### Fixed
+- Published the repaired top-bar More menu initialization through a new JavaScript asset URL so previously cached clients receive the working control.
+- Published the simplified active-navigation icon treatment through a new stylesheet URL so selected destinations use one mint surface instead of nested color blocks.
+
+### Changed
+- Rotated the service-worker shell and runtime cache identifiers and repinned every first-party stylesheet and script to V14.0.16.
+- Added release validation that rejects stale V14.0.15 asset pins and verifies both live-interface fixes are present.
+
+### Preserved
+- Finance Schema 12, Cloud Schema V3, records, accounts, expenses, projects, completed projects, calculations, and saved interface preferences remain unchanged.
+
 ## 14.0.15 · 2026-08-12
 
 ### Added
