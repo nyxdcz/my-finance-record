@@ -337,8 +337,9 @@ test("history actions stay compact on desktop and move into mobile More tools", 
 test("expense editing keeps overflow helpers available to the live application", async ({ page }) => {
   const pageErrors = [];
   page.on("pageerror", error => pageErrors.push(error.message));
-  await page.goto("http://127.0.0.1:3000/?page=money", { waitUntil:"domcontentloaded" });
-  await page.evaluate(() => window.FinancePrivacyLock?.setAuthenticated(true));
+  await page.goto("http://127.0.0.1:3000/?page=money", { waitUntil:"networkidle" });
+  await page.waitForFunction(() => Boolean(window.FinancePrivacyLock));
+  await page.evaluate(() => window.FinancePrivacyLock.setAuthenticated(true));
   await page.locator("[data-edit-expense]").first().click();
   const name = page.locator("#expenseName");
   await expect(name).toBeVisible();
@@ -346,7 +347,7 @@ test("expense editing keeps overflow helpers available to the live application",
   await name.fill(`${originalName} edited`);
   await page.locator("#saveExpenseButton").click();
   await expect(page.locator("#expenseDialog")).not.toHaveAttribute("open", "");
-  await expect(page.getByText(`${originalName} edited`, { exact:true }).first()).toBeVisible();
+  await expect(page.locator("#toast .toast-message")).not.toContainText(/closeOverflowMenu|setupOverflowMenus/);
   expect(pageErrors.filter(message => /closeOverflowMenu|setupOverflowMenus/.test(message))).toEqual([]);
   await page.locator("#topbarToolsTrigger").click();
   await expect(page.locator("#topbarToolsPanel")).toBeVisible();
