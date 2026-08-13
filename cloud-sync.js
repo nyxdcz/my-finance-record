@@ -18,7 +18,7 @@
   const LEGACY_CLOUD_TABLE = "finance_cloud_state";
   const DEVICE_TABLE = "finance_v3_devices";
   const AUDIT_TABLE = "finance_v3_audit";
-  const SYNC_DELAY = 850;
+  const SYNC_DELAY = 5 * 60 * 1000;
   const MAX_PULL_PAGES = 12;
   const MAX_BATCH_RECORDS = 350;
   const MAX_CONFLICTS = 60;
@@ -732,7 +732,7 @@
     syncTimer = setTimeout(() => syncNow({ reason:"automatic" }).catch(() => {}), delay);
   }
 
-  function requestLifecycleSync(reason,delay=180) { if(!cloudUser||state.autoSync===false||!navigator.onLine||document.hidden)return; scheduleSync(delay); scheduleForegroundPoll(); }
+  function requestLifecycleSync(reason) { if(!cloudUser||state.autoSync===false||!navigator.onLine||document.hidden)return; scheduleSync(); scheduleForegroundPoll(); }
 
   function scheduleRetry() {
     clearTimeout(retryTimer);
@@ -1783,7 +1783,7 @@
     const status=configStatus();
     if(!status.ok){setStatus("Cloud sync not configured",status.message,"warning");return;}
     await restoreSession();
-    setInterval(()=>{if(cloudUser&&state.autoSync!==false&&navigator.onLine&&!document.hidden)syncNow({reason:"periodic"}).catch(()=>{});},2*60*1000); scheduleForegroundPoll();
+    setInterval(()=>{if(cloudUser&&state.autoSync!==false&&navigator.onLine&&!document.hidden)syncNow({reason:"periodic"}).catch(()=>{});},5*60*1000); scheduleForegroundPoll();
     scheduleRetry();
   }
 
