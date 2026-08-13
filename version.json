@@ -1,5 +1,5 @@
 {
-  "version": "14.0.22",
+  "version": "14.0.23",
   "schemaVersion": 12,
   "cloudSchemaVersion": 3,
   "ledgerVersion": 1,
@@ -10,8 +10,8 @@
   "profileArchitectureVersion": 1,
   "encryptionVersion": 1,
   "authSecurityVersion": 1,
-  "cacheVersion": "finance-v14-20260813-v1422-marquee-sidebar-stability-r2",
+  "cacheVersion": "finance-v14-20260813-v1423-phone-sync-recovery-r1",
   "released": "2026-08-13",
-  "name": "Marquee & Sidebar Stability",
-  "notes": "Aligns the 43px marquee, hides phone marquees, stabilizes sidebar icons, compacts the collapsed budget plan, and adds accessible pausable Toast feedback."
+  "name": "Phone UI & Sync Conflict Recovery",
+  "notes": "Compacts phone finance and Settings layouts and repairs conflict-choice persistence when browser storage is constrained."
 }

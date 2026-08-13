@@ -141,7 +141,7 @@
     dialog.dataset.conflictId = item.id;
     document.getElementById("cloudConflictReviewTitle").textContent = title;
     document.getElementById("cloudConflictReviewReason").textContent = item.reason || "Both devices changed this record.";
-    document.getElementById("cloudConflictComparisonRows").innerHTML = comparisonRows(item).map(row => `<div class="cloud-conflict-comparison-row" role="row"><strong role="rowheader">${escapeHtml(row.label)}</strong><span role="cell">${escapeHtml(row.local)}</span><span role="cell">${escapeHtml(row.remote)}</span></div>`).join("");
+    document.getElementById("cloudConflictComparisonRows").innerHTML = comparisonRows(item).map(row => `<div class="cloud-conflict-comparison-row" role="row"><strong role="rowheader">${escapeHtml(row.label)}</strong><span role="cell" data-label="This device">${escapeHtml(row.local)}</span><span role="cell" data-label="Cloud version">${escapeHtml(row.remote)}</span></div>`).join("");
     setActionState(dialog, null);
     dialog.showModal();
   }
