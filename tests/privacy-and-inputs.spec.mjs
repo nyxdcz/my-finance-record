@@ -436,8 +436,11 @@ test("Dashboard marquee, menu controls, progress, and drag handles use accessibl
 
 test("desktop marquees match the Finance tabs and phone layouts remove them", async ({ page }) => {
   await loadStaticApp(page, { width:1200, height:900 });
+  await page.evaluate(() => document.body.classList.remove("finance-signed-out", "finance-auth-pending"));
   const financeTabs = page.locator("#money .money-workspace-switcher");
   const financeMarquee = page.locator("#financeWeekMarquee");
+  await expect(financeTabs).toBeVisible();
+  await expect(financeMarquee).toBeVisible();
   await expect(financeTabs).toHaveCSS("height", "43px");
   await expect(financeMarquee).toHaveCSS("height", "43px");
   const [tabsBox, marqueeBox] = await Promise.all([financeTabs.boundingBox(), financeMarquee.boundingBox()]);
