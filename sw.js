@@ -1,7 +1,7 @@
 "use strict";
-const APP_VERSION = "14.0.17";
+const APP_VERSION = "14.0.18";
 self.__FINANCE_APP_VERSION = APP_VERSION;
-const CACHE_VERSION = "finance-v14-20260813-v1417-expense-menu-scope-r1";
+const CACHE_VERSION = "finance-v14-20260813-v1418-finance-marquee-focus-ui-r1";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const DB_NAME = "simple-finance-project-records-v12-db";
@@ -15,27 +15,27 @@ const APP_SHELL = [
   asset("./offline.html"),
   asset("./manifest.webmanifest"),
   asset("./version.json"),
-  asset("./app.css?v=14.0.17"),
-  asset("./dashboard-interactions.css?v=14.0.17"),
-  asset("./interaction-patterns.js?v=14.0.17"),
-  asset("./privacy-lock.js?v=14.0.17"),
-  asset("./security-profiles.js?v=14.0.17"),
-  asset("./security-profiles.css?v=14.0.17"),
-  asset("./cloud-conflict-review.js?v=14.0.17"),
-  asset("./cloud-conflict-resolution.js?v=14.0.17"),
-  asset("./cloud-sync.js?v=14.0.17"),
-  asset("./account-ledger.js?v=14.0.17"),
-  asset("./account-ledger.css?v=14.0.17"),
-  asset("./budget-planning.js?v=14.0.17"),
-  asset("./budget-planning.css?v=14.0.17"),
-  asset("./reports-insights.js?v=14.0.17"),
-  asset("./reports-insights.css?v=14.0.17"),
-  asset("./productivity-tools.js?v=14.0.17"),
-  asset("./productivity-tools.css?v=14.0.17"),
-  asset("./reminders-alerts.js?v=14.0.17"),
-  asset("./reminders-alerts.css?v=14.0.17"),
-  asset("./projects-calendar-v13.0.20.js?v=14.0.17"),
-  asset("./projects-calendar-v13.0.20.css?v=14.0.17"),
+  asset("./app.css?v=14.0.18"),
+  asset("./dashboard-interactions.css?v=14.0.18"),
+  asset("./interaction-patterns.js?v=14.0.18"),
+  asset("./privacy-lock.js?v=14.0.18"),
+  asset("./security-profiles.js?v=14.0.18"),
+  asset("./security-profiles.css?v=14.0.18"),
+  asset("./cloud-conflict-review.js?v=14.0.18"),
+  asset("./cloud-conflict-resolution.js?v=14.0.18"),
+  asset("./cloud-sync.js?v=14.0.18"),
+  asset("./account-ledger.js?v=14.0.18"),
+  asset("./account-ledger.css?v=14.0.18"),
+  asset("./budget-planning.js?v=14.0.18"),
+  asset("./budget-planning.css?v=14.0.18"),
+  asset("./reports-insights.js?v=14.0.18"),
+  asset("./reports-insights.css?v=14.0.18"),
+  asset("./productivity-tools.js?v=14.0.18"),
+  asset("./productivity-tools.css?v=14.0.18"),
+  asset("./reminders-alerts.js?v=14.0.18"),
+  asset("./reminders-alerts.css?v=14.0.18"),
+  asset("./projects-calendar-v13.0.20.js?v=14.0.18"),
+  asset("./projects-calendar-v13.0.20.css?v=14.0.18"),
   asset("./sync-config.js"),
   asset("./vendor/supabase.min.js"),
   asset("./icons/icon-192.png"),
