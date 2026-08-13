@@ -11,20 +11,20 @@
     .kebab-icon { display:block; font-size:1.35rem; line-height:.75; font-weight:900; }
     .project-dialog-more-footer > .overflow-menu-trigger { width:100%; justify-content:center; }
 
-    .dashboard-week-marquee { display:grid; grid-template-columns:auto minmax(0,1fr); align-items:center; gap:10px; margin-bottom:10px; padding:8px 10px; border:1px solid var(--line); border-radius:8px; background:var(--surface); overflow:hidden; }
-    .dashboard-week-marquee-heading { min-width:112px; display:grid; gap:1px; }
-    .dashboard-week-marquee-heading strong { font-size:.72rem; }
-    .dashboard-week-marquee-heading span { color:var(--muted); font-size:.59rem; }
+    .dashboard-week-marquee { display:grid; grid-template-columns:auto minmax(0,1fr); align-items:center; gap:7px; margin-bottom:7px; padding:5px 8px; border:1px solid var(--line); border-radius:7px; background:var(--surface); overflow:hidden; }
+    .dashboard-week-marquee-heading { min-width:88px; display:grid; gap:0; }
+    .dashboard-week-marquee-heading strong { font-size:.68rem; }
+    .dashboard-week-marquee-heading span { color:var(--muted); font-size:.54rem; }
     .dashboard-week-marquee-window { min-width:0; overflow:hidden; -webkit-mask-image:linear-gradient(to right,transparent,black 7%,black 93%,transparent); mask-image:linear-gradient(to right,transparent,black 7%,black 93%,transparent); }
     .dashboard-week-marquee-window:focus-visible { outline:auto; outline-offset:3px; border-radius:6px; }
     .dashboard-week-marquee-track { width:max-content; display:flex; animation:dashboard-week-marquee 34s linear infinite; will-change:transform; }
-    .dashboard-week-marquee-group { display:flex; flex:none; gap:7px; padding-right:7px; }
-    .dashboard-week-day { width:176px; min-width:176px; display:grid; grid-template-columns:auto minmax(0,1fr); gap:8px; align-items:center; padding:7px 9px; border:1px solid var(--line); border-radius:7px; background:var(--surface-soft); color:var(--text); }
-    .dashboard-week-date { display:grid; place-items:center; align-content:center; width:34px; min-height:38px; border-inline-end:1px solid var(--line); padding-inline-end:8px; }
-    .dashboard-week-date strong { font-size:.8rem; }.dashboard-week-date span { color:var(--muted); font-size:.56rem; text-transform:uppercase; }
+    .dashboard-week-marquee-group { display:flex; flex:none; gap:5px; padding-right:5px; }
+    .dashboard-week-day { width:148px; min-width:148px; display:grid; grid-template-columns:auto minmax(0,1fr); gap:6px; align-items:center; padding:4px 6px; border:1px solid var(--line); border-radius:6px; background:var(--surface-soft); color:var(--text); }
+    .dashboard-week-date { display:grid; place-items:center; align-content:center; width:28px; min-height:30px; border-inline-end:1px solid var(--line); padding-inline-end:6px; }
+    .dashboard-week-date strong { font-size:.74rem; }.dashboard-week-date span { color:var(--muted); font-size:.52rem; text-transform:uppercase; }
     .dashboard-week-copy { min-width:0; display:grid; gap:2px; }
-    .dashboard-week-copy strong { overflow:hidden; white-space:nowrap; text-overflow:ellipsis; font-size:.66rem; }
-    .dashboard-week-copy small { display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; overflow:hidden; color:var(--muted); font-size:.56rem; line-height:1.25; }
+    .dashboard-week-copy strong { overflow:hidden; white-space:nowrap; text-overflow:ellipsis; font-size:.62rem; }
+    .dashboard-week-copy small { display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:1; overflow:hidden; color:var(--muted); font-size:.52rem; line-height:1.2; }
     .filename-middle-truncated { display:inline-block; max-width:100%; overflow:hidden; white-space:nowrap; color:var(--muted); vertical-align:bottom; }
     .dashboard-week-marquee-window:hover .dashboard-week-marquee-track,
     .dashboard-week-marquee-window:focus-within .dashboard-week-marquee-track { animation-play-state:paused; }
@@ -67,7 +67,7 @@
     @media (max-width:700px) {
       .dashboard-week-marquee { grid-template-columns:1fr; gap:6px; }
       .dashboard-week-marquee-heading { display:flex; justify-content:space-between; align-items:baseline; }
-      .dashboard-week-day { width:154px; min-width:154px; }
+      .dashboard-week-day { width:136px; min-width:136px; }
       .topbar-tools-trigger { width:44px; min-width:44px; height:44px; min-height:44px; }
       #projects .project-mobile-actions > .overflow-menu > .overflow-menu-trigger { min-width:44px; min-height:44px; }
     }

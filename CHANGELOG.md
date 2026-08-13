@@ -1,3 +1,17 @@
+## 14.0.21 · 2026-08-13
+
+### Changed
+- Moved a more compact one-week marquee above Monthly overview and above the shared Income, Budget & Expenses, and Paid Expenses tabs.
+- Changed routine encrypted cloud synchronization, foreground polling, and periodic synchronization to a five-minute cadence while keeping manual sync and incoming Realtime changes immediate.
+- Made desktop sidebar expansion click-only, replaced Overview, Finance, Work, and Settings with the supplied PNG artwork, and removed the Insights icon while retaining its expanded navigation label.
+- Shortened the month action and status from Current month to Current.
+
+### Tested
+- Added desktop and phone coverage for all three Finance marquees, reduced motion, supplied navigation icons, icon-free Insights navigation, compact month controls, and the five-minute sync constants.
+
+### Preserved
+- Finance Schema 12, Cloud Schema V3, encrypted records, expenses, completed projects, calculations, manual synchronization, Realtime incoming updates, and saved preferences remain unchanged.
+
 ## 14.0.20 · 2026-08-13
 
 ### Fixed

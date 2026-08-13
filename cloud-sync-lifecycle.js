@@ -1,7 +1,7 @@
 "use strict";
 /* Visible-device polling and Realtime recovery for encrypted Cloud Sync. */
 (function financeCloudSyncLifecycleBootstrap() {
-  const FOREGROUND_POLL_MS = 30 * 1000;
+  const FOREGROUND_POLL_MS = 5 * 60 * 1000;
   const REALTIME_RETRY_MAX_MS = 30 * 1000;
 
   function create({ canPoll, canRetry, pull, reconnect }) {

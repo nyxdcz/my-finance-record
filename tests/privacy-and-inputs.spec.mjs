@@ -32,7 +32,7 @@ async function loadStaticApp(page, viewport) {
     const weekTrack = document.getElementById("dashboardWeekMarqueeTrack");
     const weekDays = Array.from({ length:7 }, (_, index) => `<span class="dashboard-week-day">Day ${index + 1}</span>`).join("");
     patterns.renderDuplicatedMarquee(weekTrack, weekDays);
-    patterns.renderDuplicatedMarquee(document.getElementById("financeWeekMarqueeTrack"), weekDays);
+    ["incomeFinanceWeekMarqueeTrack","financeWeekMarqueeTrack","paidFinanceWeekMarqueeTrack"].forEach(id => patterns.renderDuplicatedMarquee(document.getElementById(id), weekDays));
 
     const dashboard = document.getElementById("dashboard");
     const grid = document.getElementById("dashboardCardGrid");
@@ -249,11 +249,15 @@ test("responsive sidebar keeps one consistent desktop control and the mobile dra
   expect(activeContrast.ratio).toBeGreaterThanOrEqual(4.5);
   expect(activeContrast).toMatchObject({ color:"rgb(16, 42, 49)", background:"rgb(223, 244, 232)" });
   await expect(sidebar.locator(".nav-button.active .nav-icon")).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+  await expect(sidebar.locator(".nav-icon-image")).toHaveCount(4);
+  await expect(sidebar.locator('.nav-button[data-page="reports"] .nav-icon')).toHaveCount(0);
+  await expect(sidebar.locator('.nav-button[data-page="reports"]')).toBeHidden();
 
   const dashboardLabel = sidebar.locator('.nav-button[data-page="dashboard"] .nav-label');
   await expect(dashboardLabel).toHaveCSS("max-width", "0px");
   await sidebar.evaluate(node => node.classList.add("desktop-open"));
   await expect(sidebar).toHaveCSS("width", "245px");
+  await expect(sidebar.locator('.nav-button[data-page="reports"]')).toBeVisible();
   await expect(page.locator(".main")).toHaveCSS("margin-left", "64px");
   await expect(dashboardLabel).toHaveCSS("max-width", "170px");
   expect(await dashboardLabel.evaluate(node => getComputedStyle(node).transitionDuration)).not.toBe("0s");
@@ -395,6 +399,8 @@ test("Dashboard marquee, menu controls, progress, and drag handles use accessibl
   const financeGroups = page.locator("#financeWeekMarqueeTrack > .dashboard-week-marquee-group");
   await expect(financeGroups).toHaveCount(2);
   expect(await financeGroups.evaluateAll(nodes => nodes[0].innerHTML === nodes[1].innerHTML)).toBe(true);
+  await expect(page.locator("#incomeFinanceWeekMarqueeTrack > .dashboard-week-marquee-group")).toHaveCount(2);
+  await expect(page.locator("#paidFinanceWeekMarqueeTrack > .dashboard-week-marquee-group")).toHaveCount(2);
   await expect(page.locator("#dashPaymentProgress")).toHaveJSProperty("tagName", "PROGRESS");
 
   const handles = page.locator("[data-dashboard-drag]");
@@ -413,6 +419,8 @@ test("reduced motion stops the one-week marquee", async ({ page }) => {
   await expect(page.locator("#dashboardWeekMarqueeTrack > [aria-hidden='true']")).toBeHidden();
   await expect(page.locator("#financeWeekMarqueeTrack")).toHaveCSS("animation-name", "none");
   await expect(page.locator("#financeWeekMarqueeTrack > [aria-hidden='true']")).toBeHidden();
+  await expect(page.locator("#incomeFinanceWeekMarqueeTrack")).toHaveCSS("animation-name", "none");
+  await expect(page.locator("#paidFinanceWeekMarqueeTrack")).toHaveCSS("animation-name", "none");
 });
 
 for (const viewport of [
