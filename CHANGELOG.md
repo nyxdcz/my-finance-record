@@ -1,3 +1,17 @@
+## 14.0.22 · 2026-08-13
+
+### Changed
+- Matched the Dashboard and Finance weekly marquees to the 43px desktop/tablet tab-strip height and placed the Budget & Expenses marquee beside its workspace tabs.
+- Removed weekly marquees from phone layouts at 700px and below so the finance workspace stays compact.
+- Kept the desktop sidebar expanded after an icon click until the pointer leaves, without scroll or page-navigation retraction.
+- Fixed the expand/retract geometry so navigation icons and the sidebar control remain in the same location while only the rail width and labels animate.
+
+### Tested
+- Added desktop, tablet, and phone assertions for exact marquee height, tab alignment, phone visibility, pointer-exit retraction, and stable sidebar icon coordinates.
+
+### Preserved
+- Finance Schema 12, Cloud Schema V3, encrypted records, five-minute routine sync, manual sync, Realtime updates, completed projects, calculations, and pinned/mobile navigation remain unchanged.
+
 ## 14.0.21 · 2026-08-13
 
 ### Changed

@@ -254,12 +254,19 @@ test("responsive sidebar keeps one consistent desktop control and the mobile dra
   await expect(sidebar.locator('.nav-button[data-page="reports"]')).toBeHidden();
 
   const dashboardLabel = sidebar.locator('.nav-button[data-page="dashboard"] .nav-label');
+  const overviewIcon = sidebar.locator('.nav-button[data-page="dashboard"] .nav-icon-image');
+  const compactIconBox = await overviewIcon.boundingBox();
+  const compactRailControlBox = await railButton.boundingBox();
   await expect(dashboardLabel).toHaveCSS("max-width", "0px");
   await sidebar.evaluate(node => node.classList.add("desktop-open"));
   await expect(sidebar).toHaveCSS("width", "245px");
   await expect(sidebar.locator('.nav-button[data-page="reports"]')).toBeVisible();
   await expect(page.locator(".main")).toHaveCSS("margin-left", "64px");
   await expect(dashboardLabel).toHaveCSS("max-width", "170px");
+  const expandedIconBox = await overviewIcon.boundingBox();
+  const expandedRailControlBox = await railButton.boundingBox();
+  expect(expandedIconBox).toMatchObject({ x:compactIconBox.x, y:compactIconBox.y });
+  expect(expandedRailControlBox).toMatchObject({ x:compactRailControlBox.x, y:compactRailControlBox.y });
   expect(await dashboardLabel.evaluate(node => getComputedStyle(node).transitionDuration)).not.toBe("0s");
   await sidebar.evaluate(node => node.classList.remove("desktop-open"));
 
@@ -375,6 +382,21 @@ test("expense editing keeps overflow helpers available to the live application",
   await expect(page.locator("#topbarToolsPanel")).toBeVisible();
 });
 
+test("desktop sidebar stays expanded until the pointer leaves", async ({ page }) => {
+  await page.setViewportSize({ width:1200, height:900 });
+  await page.goto("http://127.0.0.1:3000/?page=money", { waitUntil:"networkidle" });
+  await page.waitForFunction(() => Boolean(window.FinancePrivacyLock));
+  await page.evaluate(() => window.FinancePrivacyLock.setAuthenticated(true));
+  const sidebar = page.locator("#sidebar");
+  await expect(sidebar).toHaveCSS("width", "64px");
+  await sidebar.locator('.nav-button[data-page="dashboard"]').click();
+  await expect(sidebar).toHaveCSS("width", "245px");
+  await page.evaluate(() => window.scrollTo(0, 500));
+  await expect(sidebar).toHaveCSS("width", "245px");
+  await page.mouse.move(700, 400);
+  await expect(sidebar).toHaveCSS("width", "64px");
+});
+
 test("Dashboard marquee, menu controls, progress, and drag handles use accessible semantics", async ({ page }) => {
   await loadStaticApp(page, { width:1200, height:900 });
 
@@ -410,6 +432,30 @@ test("Dashboard marquee, menu controls, progress, and drag handles use accessibl
     await expect(handle).not.toHaveAttribute("aria-grabbed", /.+/);
   }
   await expect(page.locator("#dashboardDragAnnouncer")).toHaveAttribute("aria-live", "polite");
+});
+
+test("desktop marquees match the Finance tabs and phone layouts remove them", async ({ page }) => {
+  await loadStaticApp(page, { width:1200, height:900 });
+  await page.evaluate(() => document.body.classList.remove("finance-signed-out", "finance-auth-pending"));
+  const financeTabs = page.locator("#money .money-workspace-switcher");
+  const financeMarquee = page.locator("#financeWeekMarquee");
+  await expect(financeTabs).toBeVisible();
+  await expect(financeMarquee).toBeVisible();
+  await expect(financeTabs).toHaveCSS("height", "43px");
+  await expect(financeMarquee).toHaveCSS("height", "43px");
+  const [tabsBox, marqueeBox] = await Promise.all([financeTabs.boundingBox(), financeMarquee.boundingBox()]);
+  expect(marqueeBox.y).toBe(tabsBox.y);
+
+  await page.evaluate(() => {
+    document.getElementById("money").classList.remove("active");
+    document.getElementById("dashboard").classList.add("active");
+  });
+  await expect(page.locator("#dashboardWeekMarquee")).toHaveCSS("height", "43px");
+
+  await page.setViewportSize({ width:393, height:852 });
+  for (const id of ["dashboardWeekMarquee","incomeFinanceWeekMarquee","financeWeekMarquee","paidFinanceWeekMarquee"]) {
+    await expect(page.locator(`#${id}`)).toBeHidden();
+  }
 });
 
 test("reduced motion stops the one-week marquee", async ({ page }) => {
