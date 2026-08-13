@@ -1,3 +1,15 @@
+## 14.0.17 · 2026-08-13
+
+### Fixed
+- Bound the shared overflow-menu helpers in the main application script so saving an edited expense no longer raises `closeOverflowMenu is not defined`.
+- Kept the contextual More menu behavior intact after expense changes and re-renders.
+
+### Tested
+- Added live browser coverage that edits and saves an expense, verifies the updated row, and reopens the top-bar More menu.
+
+### Preserved
+- Finance records, completed projects such as Taburi and Maderoza, calculations, cloud data, and saved preferences are unchanged.
+
 ## 14.0.16 · 2026-08-12
 
 ### Fixed

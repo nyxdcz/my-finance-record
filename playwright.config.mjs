@@ -8,6 +8,11 @@ export default defineConfig({
   retries: process.env.CI ? 1 : 0,
   workers: process.env.CI ? 2 : undefined,
   reporter: process.env.CI ? "github" : "list",
+  webServer: {
+    command: "npm run start",
+    url: "http://127.0.0.1:3000",
+    reuseExistingServer: !process.env.CI
+  },
   use: {
     ...devices["Desktop Chrome"],
     headless: true,

@@ -334,6 +334,24 @@ test("history actions stay compact on desktop and move into mobile More tools", 
   await expect(page.locator("#redoMoneyMenuButton")).toBeVisible();
 });
 
+test("expense editing keeps overflow helpers available to the live application", async ({ page }) => {
+  const pageErrors = [];
+  page.on("pageerror", error => pageErrors.push(error.message));
+  await page.goto("http://127.0.0.1:3000/?page=money", { waitUntil:"domcontentloaded" });
+  await page.evaluate(() => window.FinancePrivacyLock?.setAuthenticated(true));
+  await page.locator("[data-edit-expense]").first().click();
+  const name = page.locator("#expenseName");
+  await expect(name).toBeVisible();
+  const originalName = await name.inputValue();
+  await name.fill(`${originalName} edited`);
+  await page.locator("#saveExpenseButton").click();
+  await expect(page.locator("#expenseDialog")).not.toHaveAttribute("open", "");
+  await expect(page.getByText(`${originalName} edited`, { exact:true }).first()).toBeVisible();
+  expect(pageErrors.filter(message => /closeOverflowMenu|setupOverflowMenus/.test(message))).toEqual([]);
+  await page.locator("#topbarToolsTrigger").click();
+  await expect(page.locator("#topbarToolsPanel")).toBeVisible();
+});
+
 test("Dashboard marquee, menu controls, progress, and drag handles use accessible semantics", async ({ page }) => {
   await loadStaticApp(page, { width:1200, height:900 });
 
