@@ -1,3 +1,16 @@
+## 14.0.19 · 2026-08-13
+
+### Fixed
+- Routed every shared Finance persistence event into the encrypted record queue, including expense duplication, recurring-record generation, automatic payments, report snapshots, restores, migrations, and rollback writes that previously bypassed `saveData()`.
+- Added phone resume, `pageshow`, foreground, and reconnect pulls so a visible mobile app checks for MacBook changes without waiting for a successful Realtime notification.
+- Added Realtime channel recovery with bounded exponential backoff and a 30-second visible-device polling fallback.
+
+### Tested
+- Added regression coverage for direct-persistence queueing, deduplication, mobile lifecycle triggers, Realtime recovery states, and the existing manual Sync now controls.
+
+### Preserved
+- Finance Schema 12, Cloud Schema V3, encryption, records, accounts, expenses, completed projects, calculations, conflicts, and saved preferences remain unchanged.
+
 ## 14.0.18 · 2026-08-13
 
 ### Added
