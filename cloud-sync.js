@@ -1,9 +1,9 @@
 "use strict";
-/* My Finance Records V14.0.12 · Encrypted profile-scoped Cloud Sync 3.0.
+/* My Finance Records V14.0.19 · Encrypted profile-scoped Cloud Sync 3.0.
    Local storage remains the immediate working copy. Cloud Schema V3 exchanges only
    changed encrypted records, commits related changes atomically, and preserves an immutable audit trail. */
 (function financeCloudSyncV3Bootstrap() {
-  const APP_VERSION_FALLBACK = "14.0.12";
+  const APP_VERSION_FALLBACK = "14.0.19";
   const APP_VERSION_CODE = 130000;
   const CLOUD_SCHEMA_VERSION = 3;
   const CORE_SCHEMA_VERSION = 12;
@@ -76,7 +76,8 @@
   let baseRecords = normalizeRecordStore(loadJson(BASE_KEY, {}));
   let pending = normalizeQueue(loadJson(QUEUE_KEY, {}));
   let conflicts = normalizeConflicts(loadJson(CONFLICT_KEY, []));
-
+  const lifecycle = window.FinanceCloudSyncLifecycle?.create?.({canPoll:()=>Boolean(cloudUser&&state.autoSync!==false&&navigator.onLine&&!document.hidden),canRetry:()=>Boolean(cloudUser&&state.autoSync!==false),pull:reason=>syncNow({reason}),reconnect:()=>setupRealtime()});
+  if(!lifecycle)throw new Error("Cloud Sync lifecycle support is unavailable. Reload the latest app version."); const {clearForegroundPoll,scheduleForegroundPoll,clearRealtimeRetry,scheduleRealtimeRecovery,noteRealtimeSubscribed}=lifecycle;
   function appVersion() {
     return typeof APP_VERSION !== "undefined" ? APP_VERSION : APP_VERSION_FALLBACK;
   }
@@ -502,16 +503,17 @@
     if (saveWrapped || typeof saveData !== "function") return;
     const original = saveData;
     saveData = function recordAwareSaveData(message = "Saved") {
-      const before = clone(lastObservedData);
       const result = original(message);
+      if (result === false) return result;
       const after = clone(data);
-      queueDiff(before, after, message);
-      lastObservedData = after;
+      // Fallback for integrations that replace saveData without dispatching finance:data-persisted.
+      if(!same(lastObservedData,after)){queueDiff(lastObservedData,after,message);lastObservedData=after;}
       return result;
     };
     saveWrapped = true;
   }
 
+  function handlePersistedData(event) { const next=normalizeData(clone(event?.detail?.data??(typeof data!=="undefined"?data:{}))); if(!suppressQueue)queueDiff(lastObservedData,next,String(event?.detail?.action||"Finance data updated")); lastObservedData=clone(next); }
   function pendingCount() { return Object.keys(pending).length; }
   function conflictCount() { return conflicts.filter(item => !item.resolved).length; }
 
@@ -729,6 +731,8 @@
     clearTimeout(syncTimer);
     syncTimer = setTimeout(() => syncNow({ reason:"automatic" }).catch(() => {}), delay);
   }
+
+  function requestLifecycleSync(reason,delay=180) { if(!cloudUser||state.autoSync===false||!navigator.onLine||document.hidden)return; scheduleSync(delay); scheduleForegroundPoll(); }
 
   function scheduleRetry() {
     clearTimeout(retryTimer);
@@ -1026,6 +1030,7 @@
     session = null; cloudUser = null;
     setPrivacyAuthentication(false);
     passwordRecoveryActive = false;
+    clearForegroundPoll(); clearRealtimeRetry({resetAttempts:true});
     if (realtimeChannel && client) client.removeChannel(realtimeChannel).catch(() => {});
     realtimeChannel = null;
     setStatus("Not connected", "Local finance records remain on this device.", "info");
@@ -1564,27 +1569,22 @@
     } catch (error) {
       setStatus("Sync needs attention", error.message || "Cloud synchronization failed.", "danger");
       throw error;
-    } finally { syncing=false; updateTopSyncUi(); renderCloudStats(); scheduleRetry(); }
+    } finally { syncing=false; updateTopSyncUi(); renderCloudStats(); scheduleRetry(); scheduleForegroundPoll(); }
   }
 
   async function setupRealtime() {
-    if (!client || !cloudUser) return;
-    if (realtimeChannel) await client.removeChannel(realtimeChannel);
-    realtimeChannel = client.channel(`finance-sync-v3-${cloudProfileId()}-${cloudUser.id}`)
+    if(!client||!cloudUser)return;
+    if(realtimeChannel){const previous=realtimeChannel;realtimeChannel=null;await client.removeChannel(previous);}
+    const channel=client.channel(`finance-sync-v3-${cloudProfileId()}-${cloudUser.id}`); realtimeChannel=channel
       .on("postgres_changes", { event:"INSERT", schema:"public", table:AUDIT_TABLE, filter:`profile_id=eq.${cloudProfileId()}` }, payload => {
-        const source=payload?.new?.device_id;
-        const auditId=Number(payload?.new?.id || 0);
-        if (source===currentDeviceId() || auditId<=Number(state.lastAuditId||0)) return;
-        state.realtimeStatus="Change received";
-        persist();
-        setStatus("Cloud change received", "Downloading changed records from another device…", "info");
-        scheduleSync(220);
+        const source=payload?.new?.device_id,auditId=Number(payload?.new?.id||0);if(source===currentDeviceId()||auditId<=Number(state.lastAuditId||0))return;
+        state.realtimeStatus="Change received";persist();setStatus("Cloud change received","Downloading changed records from another device…","info");scheduleSync(220);
       })
-      .on("postgres_changes", { event:"UPDATE", schema:"public", table:DEVICE_TABLE, filter:`profile_id=eq.${cloudProfileId()}` }, payload => {
-        if (payload?.new?.device_id===currentDeviceId() && payload?.new?.revoked_at) handleRevoked(payload.new).catch(()=>{});
-      })
-      .subscribe(status => { state.realtimeStatus=String(status || "Connecting"); persist(); renderSyncHealth(); });
+      .on("postgres_changes",{event:"UPDATE",schema:"public",table:DEVICE_TABLE,filter:`profile_id=eq.${cloudProfileId()}`},payload=>{if(payload?.new?.device_id===currentDeviceId()&&payload?.new?.revoked_at)handleRevoked(payload.new).catch(()=>{});})
+      .subscribe(status=>{if(realtimeChannel!==channel)return;const normalized=String(status||"Connecting");state.realtimeStatus=normalized;persist();renderSyncHealth();if(normalized==="SUBSCRIBED"){noteRealtimeSubscribed();requestLifecycleSync("realtime-subscribed",0);}else if(["CHANNEL_ERROR","TIMED_OUT","CLOSED"].includes(normalized)){scheduleRealtimeRecovery(normalized);scheduleForegroundPoll(1000);}});
   }
+
+  async function ensureRealtime(){if(realtimeChannel&&state.realtimeStatus==="SUBSCRIBED")return;await setupRealtime();}
 
   async function loadDevices() {
     if (!client || !cloudUser) return renderDevices([]);
@@ -1735,7 +1735,7 @@
     document.getElementById("cloudCancelPasswordReset")?.addEventListener("click",async()=>{passwordRecoveryActive=false;passwordRecoveryRouteActive=false;passwordRecoveryError=null;cleanPasswordRecoveryUrl({keepRoute:false});try{const sdk=await loadClient();await sdk.auth.signOut({scope:"local"});}catch(error){}onSignedOut();renderCloudStats();});
     document.getElementById("cloudSyncNow")?.addEventListener("click",()=>syncNow({reason:"manual"}).catch(error=>showToast(error.message,"warning")));
     document.getElementById("cloudSignOut")?.addEventListener("click",()=>signOut().catch(error=>showToast(error.message,"warning")));
-    document.getElementById("cloudAutoSync")?.addEventListener("change",event=>{state.autoSync=Boolean(event.target.checked);persist();if(state.autoSync)scheduleSync(100);renderCloudStats();});
+    document.getElementById("cloudAutoSync")?.addEventListener("change",event=>{state.autoSync=Boolean(event.target.checked);persist();if(state.autoSync){requestLifecycleSync("auto-sync-enabled",100);ensureRealtime().catch(()=>scheduleRealtimeRecovery("CHANNEL_ERROR"));}else{clearForegroundPoll();clearRealtimeRetry();}renderCloudStats();});
     document.getElementById("cloudInitialConfirm")?.addEventListener("click",async()=>{const mode=document.querySelector('input[name="cloudInitialMode"]:checked')?.value||"upload";try{await initializeFirstSync(mode);}catch(error){setStatus("Cloud initialization failed",error.message,"danger");}});
     document.getElementById("cloudExportBeforeFirst")?.addEventListener("click",()=>downloadJson(`my-finance-before-cloud-v3-${new Date().toISOString().slice(0,10)}.json`,recoveryPoint("Manual pre-cloud-v3 export")));
     document.getElementById("cloudSaveDeviceName")?.addEventListener("click",async()=>{const value=document.getElementById("cloudDeviceName").value.trim().slice(0,60);if(!value)return showToast("Enter a device name.","warning");state.currentDeviceName=value;persist();try{const id=currentDeviceId();if(typeof appMeta!=="undefined"&&appMeta.devices?.[id]){appMeta.devices[id].name=value;if(typeof writeMeta==="function")writeMeta();}}catch(error){}try{await registerDevice();await loadDevices();setStatus("Device renamed",value,"success");}catch(error){setStatus("Rename needs sync",error.message,"warning");}});
@@ -1743,13 +1743,13 @@
     document.getElementById("cloudPendingList")?.addEventListener("click",handlePendingClick);
     document.getElementById("cloudConflictList")?.addEventListener("click",event=>{const download=event.target.closest("[data-download-cloud-conflict]");if(download)downloadConflict(download.dataset.downloadCloudConflict);else handlePendingClick(event);});
     window.FinanceCloudConflictReview?.bind?.({onDownload:downloadConflict,onUseCloud:token=>discardLocal(keyFromToken(token)),onUseDevice:token=>keepLocal(keyFromToken(token))});
-    window.addEventListener("online",()=>{setStatus("Back online","Checking pending record changes…","info");if(state.autoSync!==false)scheduleSync(120);});
-    window.addEventListener("offline",()=>setStatus("Offline",`${pendingCount()} record${pendingCount()===1?"":"s"} waiting.`,"info"));
-    window.addEventListener("focus",()=>{if(state.autoSync!==false&&cloudUser)scheduleSync(220);});
-    document.addEventListener("visibilitychange",()=>{if(!document.hidden&&state.autoSync!==false&&cloudUser)scheduleSync(220);});
+    window.addEventListener("finance:data-persisted",handlePersistedData); window.addEventListener("online",()=>{setStatus("Back online","Checking pending record changes…","info");if(state.autoSync!==false){ensureRealtime().catch(()=>scheduleRealtimeRecovery("CHANNEL_ERROR"));requestLifecycleSync("online",120);}});
+    window.addEventListener("offline",()=>{clearForegroundPoll();setStatus("Offline",`${pendingCount()} record${pendingCount()===1?"":"s"} waiting.`,"info");}); window.addEventListener("focus",()=>requestLifecycleSync("focus",220));
+    window.addEventListener("pageshow",()=>{if(state.autoSync!==false&&cloudUser){ensureRealtime().catch(()=>scheduleRealtimeRecovery("CHANNEL_ERROR"));requestLifecycleSync("pageshow",80);}});
+    window.addEventListener("pagehide",clearForegroundPoll); document.addEventListener("visibilitychange",()=>{if(document.hidden)clearForegroundPoll();else if(state.autoSync!==false&&cloudUser){ensureRealtime().catch(()=>scheduleRealtimeRecovery("CHANNEL_ERROR"));requestLifecycleSync("visible",80);}});
     window.addEventListener("storage",event=>{if(event.key===STORAGE_KEY&&!suppressQueue){try{const next=normalizeData(JSON.parse(event.newValue||"{}"));queueDiff(lastObservedData,next,"Another tab changed finance records");lastObservedData=clone(next);}catch(error){}}});
     window.addEventListener("finance:cloud-profile-linked",event=>{if(event?.detail?.auto)return;state={...defaultState()};baseRecords={};pending={};conflicts=[];persist();setStatus("Cloud profile linked","Reloading encrypted Cloud Sync 3.0…","success");setTimeout(()=>location.reload(),400);});
-    window.addEventListener("finance:profile-unlocked",()=>{if(cloudUser)scheduleSync(100);});
+    window.addEventListener("finance:profile-unlocked",()=>{if(cloudUser)requestLifecycleSync("profile-unlocked",100);});
   }
 
   function handlePendingClick(event) {
@@ -1783,7 +1783,7 @@
     const status=configStatus();
     if(!status.ok){setStatus("Cloud sync not configured",status.message,"warning");return;}
     await restoreSession();
-    setInterval(()=>{if(cloudUser&&state.autoSync!==false&&navigator.onLine&&!document.hidden)syncNow({reason:"periodic"}).catch(()=>{});},2*60*1000);
+    setInterval(()=>{if(cloudUser&&state.autoSync!==false&&navigator.onLine&&!document.hidden)syncNow({reason:"periodic"}).catch(()=>{});},2*60*1000); scheduleForegroundPoll();
     scheduleRetry();
   }
 
@@ -1792,7 +1792,7 @@
     buildRecordMap:()=>toRecordMap(data),
     get status(){return{...state,pendingCount:pendingCount(),conflictCount:conflictCount(),signedIn:Boolean(cloudUser),email:cloudUser?.email||""};}
   };
-  window.FinanceCloudSyncInternals={loadClient,stable,checksum,deepMerge,threeWayMerge,toRecordMap,fromRecordStore,changesBetween,recordKey,keyToken,keyFromToken,retryDelay,detectFinancialOperations,encryptRecordPayload,decryptRecordPayload,toRpcChange,decryptRow,sanitizeRecordPayload,reconcileDerivedSettingsState,applyRemoteEvent,resolveConflict,friendlyAuthError,passwordRecoveryRedirect,parsePasswordRecoveryUrl,recoveryErrorMessage,cleanPasswordRecoveryUrl,testCloudConnection,requestPasswordReset,verifyRecoveryCode,completePasswordReset,setPasswordVisibility};
+  window.FinanceCloudSyncInternals={loadClient,stable,checksum,deepMerge,threeWayMerge,toRecordMap,fromRecordStore,changesBetween,recordKey,keyToken,keyFromToken,retryDelay,detectFinancialOperations,encryptRecordPayload,decryptRecordPayload,toRpcChange,decryptRow,sanitizeRecordPayload,reconcileDerivedSettingsState,applyRemoteEvent,resolveConflict,handlePersistedData,requestLifecycleSync,scheduleForegroundPoll,scheduleRealtimeRecovery,ensureRealtime,friendlyAuthError,passwordRecoveryRedirect,parsePasswordRecoveryUrl,recoveryErrorMessage,cleanPasswordRecoveryUrl,testCloudConnection,requestPasswordReset,verifyRecoveryCode,completePasswordReset,setPasswordVisibility};
 
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",()=>initialize().catch(error=>setStatus("Cloud sync unavailable",error.message,"danger")),{once:true});
   else initialize().catch(error=>setStatus("Cloud sync unavailable",error.message,"danger"));
