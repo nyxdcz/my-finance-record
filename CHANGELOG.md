@@ -5,9 +5,11 @@
 - Removed weekly marquees from phone layouts at 700px and below so the finance workspace stays compact.
 - Kept the desktop sidebar expanded after an icon click until the pointer leaves, without scroll or page-navigation retraction.
 - Fixed the expand/retract geometry so navigation icons and the sidebar control remain in the same location while only the rail width and labels animate.
+- Reduced the collapsed Monthly budget plan to a concise three-value summary while preserving the full planner and its saved disclosure state.
+- Kept persistent choices native and upgraded Toast feedback with pausable success timing plus dismissible persistent warnings and errors.
 
 ### Tested
-- Added desktop, tablet, and phone assertions for exact marquee height, tab alignment, phone visibility, pointer-exit retraction, and stable sidebar icon coordinates.
+- Added desktop, tablet, and phone assertions for marquee geometry, sidebar stability, compact budget states, native control semantics, and pausable live Toast feedback.
 
 ### Preserved
 - Finance Schema 12, Cloud Schema V3, encrypted records, five-minute routine sync, manual sync, Realtime updates, completed projects, calculations, and pinned/mobile navigation remain unchanged.

@@ -10,8 +10,8 @@
   "profileArchitectureVersion": 1,
   "encryptionVersion": 1,
   "authSecurityVersion": 1,
-  "cacheVersion": "finance-v14-20260813-v1422-marquee-sidebar-stability-r1",
+  "cacheVersion": "finance-v14-20260813-v1422-marquee-sidebar-stability-r2",
   "released": "2026-08-13",
   "name": "Marquee & Sidebar Stability",
-  "notes": "Aligns the 43px desktop marquee with the Budget & Expenses tabs, hides marquees on phones, and keeps sidebar icons fixed until pointer exit."
+  "notes": "Aligns the 43px marquee, hides phone marquees, stabilizes sidebar icons, compacts the collapsed budget plan, and adds accessible pausable Toast feedback."
 }

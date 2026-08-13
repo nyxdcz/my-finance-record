@@ -50,7 +50,7 @@ const packageJson=JSON.parse(read("package.json"));
 const packageLock=JSON.parse(read("package-lock.json"));
 
 assert(version.version==="14.0.22","version.json is not V14.0.22");
-assert(version.cacheVersion==="finance-v14-20260813-v1422-marquee-sidebar-stability-r1","V14.0.22 cache identifier mismatch");
+assert(version.cacheVersion==="finance-v14-20260813-v1422-marquee-sidebar-stability-r2","V14.0.22 cache identifier mismatch");
 assert(version.schemaVersion===12,"Finance Schema changed from 12");
 assert(version.cloudSchemaVersion===3,"Cloud Schema V3 metadata missing");
 for(const [field,value] of Object.entries({ledgerVersion:1,budgetVersion:1,insightsVersion:1,productivityVersion:1,remindersVersion:1,profileArchitectureVersion:1,encryptionVersion:1,authSecurityVersion:1})) assert(version[field]===value,`${field} metadata mismatch`);
@@ -472,7 +472,7 @@ assert((html.match(/settingsDisclosure\("More options"/g)||[]).length>=4,"Settin
 assert(read("account-ledger.js").includes('window.simplifyAccountLedgerSettings?.(panel, ledgerCard, reconciliationCard)'),"dynamic account history is not moved into progressive disclosure");
 assert(read("reminders-alerts.js").includes('window.simplifyReminderSettingsCard?.(card)'),"dynamic reminder settings are not moved into progressive disclosure");
 assert(html.includes('Save account updates')&&read("account-ledger.js").includes('Save account updates'),"plain-language account update action is incomplete");
-assert(version.cacheVersion.includes("v1422-marquee-sidebar-stability-r1"),"V14.0.22 cache revision mismatch");
+assert(version.cacheVersion.includes("v1422-marquee-sidebar-stability-r2"),"V14.0.22 cache revision mismatch");
 
 // V13.0.3 compact modal and SVG icon safeguards preserved.
 for(const token of [
@@ -591,8 +591,12 @@ for (const token of [
 ]) assert(budgetSource.includes(token),`V13.0.9 budget-plan collapse safeguard missing: ${token}`);
 for (const token of [
   ".budget-planner-card.is-planner-collapsed","grid-template-columns:repeat(3,minmax(0,1fr))","margin-block:12px",
-  ".budget-planner-card.is-planner-collapsed .budget-plan-kpi:nth-child(2)","width:44px","min-height:44px"
+  ".budget-planner-card.is-planner-collapsed .budget-plan-kpi:nth-child(2)","width:44px","min-height:44px",
+  "grid-template-columns:minmax(150px,.55fr) minmax(0,1.45fr)",".budget-planner-card.is-planner-collapsed .budget-plan-kpi small { display:none; }"
 ]) assert(budgetCss.includes(token),`V13.0.9 compact budget CSS safeguard missing: ${token}`);
+assert(budgetSource.includes('toggle.setAttribute("aria-expanded", String(!collapsed))')&&budgetSource.includes('templateSelect.value=data.budgetTemplates.some'),"collapsed budget semantics or native selected-value behavior is missing");
+assert(budgetSource.includes('<select class="select" id="budgetTemplateSelect"')&&!budgetSource.includes('role="combobox"'),"Budget template is not using native persistent-selection semantics");
+for(const token of ['id="openBudgetSettings" type="button">Plan settings…','id="addBudgetItem" type="button">+ Add category…','id="saveBudgetTemplate" type="button">Save current…','showToast("Monthly budget CSV exported", "success")']) assert(budgetSource.includes(token),`Budget command or success feedback safeguard missing: ${token}`);
 assert(changelog.includes("complete Monthly budget plan"),"Inherited V13.0.7 documentation incomplete");
 assert(exists("BUDGET_PLAN_COMPACT_LAYOUT_VALIDATION_V13_0_7.md"),"V13.0.9 budget layout validation report missing");
 assert(exists("FILE_INSPECTION_AND_FIXES_VALIDATION_V13_0_7.md"),"V13.0.9 installer validation report missing");
@@ -681,7 +685,7 @@ for(const token of [
 assert(html.includes('Record Spending is intentionally isolated from the account-maintenance form submit path.'),"Parent account form still owns Record Spending submit behavior");
 assert(html.includes('const saved = baseSaveData(message);')&&html.includes('if (saved === false) return false;')&&html.includes('return true;'),"saveData wrapper does not preserve persistence success/failure");
 assert(html.includes('account-spend-status')&&ledgerV1313.includes('accountSpendStatus'),"Inline spending status is missing");
-assert(version.cacheVersion.includes("v1422-marquee-sidebar-stability-r1"),"V14.0.22 cache revision mismatch");
+assert(version.cacheVersion.includes("v1422-marquee-sidebar-stability-r2"),"V14.0.22 cache revision mismatch");
 assert(readme.startsWith("# My Finance Records · V14.0.22"),"V14.0.22 README metadata missing");
 assert(changelog.includes("## 13.0.15 · 2026-08-07"),"V13.0.15 changelog missing");
 assert(html.includes('?v=14.0.22')&&worker.includes('?v=14.0.22'),"Version-pinned V13.0.15 assets missing");
@@ -706,7 +710,7 @@ for (const token of [
 assert(html.includes('window.addEventListener("beforeinstallprompt"'),"Native beforeinstallprompt support was removed");
 assert(html.includes('window.addEventListener("appinstalled"'),"appinstalled support was removed");
 assert(version.name==="Marquee & Sidebar Stability","V14.0.22 version name mismatch");
-assert(version.cacheVersion.includes("v1422-marquee-sidebar-stability-r1"),"V14.0.22 cache revision mismatch");
+assert(version.cacheVersion.includes("v1422-marquee-sidebar-stability-r2"),"V14.0.22 cache revision mismatch");
 assert(exists("BRAVE_PWA_INSTALL_VALIDATION_V13_0_14.md"),"V13.0.14 Brave validation report missing");
 assert(changelog.includes("Brave-aware PWA install detection")&&changelog.includes("Save and Share"),"Brave install history missing from CHANGELOG");
 assert(changelog.includes("## 13.0.15 · 2026-08-07"),"V13.0.15 changelog entry missing");
@@ -728,13 +732,13 @@ assert(read("CLOUD_SYNC_SETUP.md").includes('?auth=recovery')&&read("CLOUD_SYNC_
 assert(changelog.includes('## 14.0.22 · 2026-08-13'),"V14.0.22 changelog entry missing");
 assert(version.name==='Marquee & Sidebar Stability',"V14.0.22 version name mismatch");
 assert(changelog.includes('## 13.0.15 · 2026-08-07')&&changelog.includes('Password-reset messaging avoids revealing'),"CHANGELOG V14.0.22 auth entry missing");
-assert(version.cacheVersion.includes('v1422-marquee-sidebar-stability-r1'),"V14.0.22 auth cache revision mismatch");
+assert(version.cacheVersion.includes('v1422-marquee-sidebar-stability-r2'),"V14.0.22 auth cache revision mismatch");
 assert(packageJson.scripts?.quality==='npm run inspect && npm run lint && npm run maintainability && npm run test',"V14.0.22 quality script mismatch");
 
 
 // V14.0.22 iPhone input zoom prevention safeguards.
 assert(version.name==="Marquee & Sidebar Stability","V14.0.22 version name mismatch");
-assert(version.cacheVersion.includes("v1422-marquee-sidebar-stability-r1"),"V14.0.22 cache revision mismatch");
+assert(version.cacheVersion.includes("v1422-marquee-sidebar-stability-r2"),"V14.0.22 cache revision mismatch");
 assert(read("IPHONE_INPUT_ZOOM_VALIDATION_V13_0_17.md").includes("16px"),"V14.0.22 input-zoom guidance missing");
 assert(changelog.includes("## 13.0.17 · 2026-08-07")&&changelog.includes("user-scalable=no"),"CHANGELOG V13.0.17 input-zoom/accessibility notes missing");
 for(const token of [
@@ -936,6 +940,10 @@ for(const token of ['position:absolute; top:10px; left:64px','sidebar.desktop-op
 assert(html.includes('id="monthStatusChip">Current</span>')&&html.includes('aria-label="Go to current month"')&&css.includes('min-width:66px'),"compact Current control is incomplete");
 assert(cloud.includes('const SYNC_DELAY = 5 * 60 * 1000')&&cloud.includes('},5*60*1000); scheduleForegroundPoll();')&&!cloud.includes('const SYNC_DELAY = 850'),"routine cloud sync is not five minutes");
 assert(changelog.includes("43px desktop/tablet")&&changelog.includes("pointer leaves")&&changelog.includes("same location"),"V14.0.22 release documentation is incomplete");
+for(const token of ['id="toast" role="status" aria-live="polite" aria-atomic="true"','id="toastDismissButton"','aria-label="Dismiss notification"','const TOAST_AUTO_DISMISS_MS = 4000','function pauseToastDismiss()','function resumeToastDismiss()','toast.dataset.persistent = String(resolvedType === "warning" || resolvedType === "error")']) assert(html.includes(token),`accessible Toast safeguard missing: ${token}`);
+for(const token of ['.toast.show { opacity: 1; transform: translateY(0) scale(1); pointer-events:auto; }','.toast-dismiss {']) assert(css.includes(token),`interactive Toast style missing: ${token}`);
+for(const token of ['collapsed Monthly budget plan is compact and keeps native control semantics','Toast uses a pausable live status and persistent warnings','await toast.hover()','await dismiss.focus()']) assert(browserCoverage.includes(token),`V14.0.22 budget or Toast browser coverage missing: ${token}`);
+assert(changelog.includes("collapsed Monthly budget plan")&&changelog.includes("pausable success timing")&&changelog.includes("persistent warnings and errors"),"V14.0.22 compact budget or Toast documentation is incomplete");
 
 if(failures.length){
   console.error("V14.0.22 Marquee & Sidebar Stability validation failed:\n"+failures.map(item=>`- ${item}`).join("\n"));
