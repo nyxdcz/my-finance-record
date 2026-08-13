@@ -354,6 +354,9 @@ test("expense editing keeps overflow helpers available to the live application",
   await expect(page.locator(".record-row .ui-tag").first()).toBeVisible();
   await expect(page.locator(".record-row .ui-pill").first()).toBeVisible();
   await page.locator("#topbarToolsTrigger").focus();
+  await page.keyboard.press("Tab");
+  await page.keyboard.press("Shift+Tab");
+  await expect(page.locator("#topbarToolsTrigger")).toBeFocused();
   expect(await page.locator("#topbarToolsTrigger").evaluate(node => getComputedStyle(node).outlineStyle)).not.toBe("none");
   await page.locator("[data-edit-expense]").first().click();
   const name = page.locator("#expenseName");
