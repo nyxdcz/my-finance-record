@@ -382,6 +382,63 @@ test("expense editing keeps overflow helpers available to the live application",
   await expect(page.locator("#topbarToolsPanel")).toBeVisible();
 });
 
+test("collapsed Monthly budget plan is compact and keeps native control semantics", async ({ page }) => {
+  await page.setViewportSize({ width:1200, height:900 });
+  await page.goto("http://127.0.0.1:3000/?page=money", { waitUntil:"networkidle" });
+  await page.waitForFunction(() => Boolean(window.FinancePrivacyLock));
+  await page.evaluate(() => window.FinancePrivacyLock.setAuthenticated(true));
+  const card = page.locator("#monthlyBudgetPlannerCard");
+  const toggle = page.locator("#monthlyBudgetPlannerToggle");
+  const body = page.locator("#monthlyBudgetPlannerBody");
+  if (await toggle.getAttribute("aria-expanded") === "true") await toggle.click();
+  await expect(card).toHaveClass(/is-planner-collapsed/);
+  await expect(toggle).toHaveAttribute("aria-expanded", "false");
+  await expect(toggle).toHaveAttribute("aria-controls", "monthlyBudgetPlannerBody");
+  await expect(body).toBeVisible();
+  await expect(card.locator(".budget-planner-grid")).toBeHidden();
+  expect((await card.boundingBox())?.height || Infinity).toBeLessThanOrEqual(90);
+  await expect(card.locator(".budget-plan-kpi:visible")).toHaveCount(3);
+  expect(await card.locator(".budget-plan-kpi:visible small").evaluateAll(nodes => nodes.every(node => getComputedStyle(node).display === "none"))).toBe(true);
+  await toggle.click();
+  await expect(card.locator(".budget-planner-grid")).toBeVisible();
+  await expect(page.locator("#budgetTemplateSelect")).toHaveJSProperty("tagName", "SELECT");
+  await expect(page.locator('label[for="budgetTemplateSelect"]')).toHaveText("Budget template");
+  await expect(page.locator("#buildBudgetFromExpenses")).toHaveJSProperty("tagName", "BUTTON");
+  await expect(page.locator("#addBudgetItem")).toHaveJSProperty("tagName", "BUTTON");
+
+  await toggle.click();
+  await page.setViewportSize({ width:393, height:852 });
+  await expect(toggle).toHaveCSS("width", "44px");
+  await expect(toggle).toHaveCSS("height", "44px");
+  expect((await card.boundingBox())?.height || Infinity).toBeLessThanOrEqual(130);
+  await expect(card.locator(".budget-plan-kpi:visible")).toHaveCount(3);
+});
+
+test("Toast uses a pausable live status and persistent warnings", async ({ page }) => {
+  await page.goto("http://127.0.0.1:3000/", { waitUntil:"networkidle" });
+  const toast = page.locator("#toast");
+  const dismiss = page.locator("#toastDismissButton");
+  await expect(toast).toHaveAttribute("role", "status");
+  await expect(toast).toHaveAttribute("aria-live", "polite");
+  await expect(dismiss).toHaveAttribute("aria-label", "Dismiss notification");
+  await page.evaluate(() => window.showToast("Budget saved", "success"));
+  await expect(toast).toHaveClass(/show/);
+  await expect(toast).toHaveAttribute("data-persistent", "false");
+  await toast.hover();
+  await page.waitForTimeout(4300);
+  await expect(toast).toHaveClass(/show/);
+  await page.mouse.move(10, 10);
+  await expect(toast).not.toHaveClass(/show/, { timeout:4500 });
+  await page.evaluate(() => window.showToast("Review this warning", "warning"));
+  await expect(toast).toHaveAttribute("data-persistent", "true");
+  await page.waitForTimeout(4300);
+  await expect(toast).toHaveClass(/show/);
+  await dismiss.focus();
+  await expect(dismiss).toBeFocused();
+  await dismiss.click();
+  await expect(toast).not.toHaveClass(/show/);
+});
+
 test("desktop sidebar stays expanded until the pointer leaves", async ({ page }) => {
   await page.setViewportSize({ width:1200, height:900 });
   await page.goto("http://127.0.0.1:3000/?page=money", { waitUntil:"networkidle" });

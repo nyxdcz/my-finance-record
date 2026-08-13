@@ -1,7 +1,7 @@
 "use strict";
 const APP_VERSION = "14.0.22";
 self.__FINANCE_APP_VERSION = APP_VERSION;
-const CACHE_VERSION = "finance-v14-20260813-v1422-marquee-sidebar-stability-r1";
+const CACHE_VERSION = "finance-v14-20260813-v1422-marquee-sidebar-stability-r2";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const DB_NAME = "simple-finance-project-records-v12-db";

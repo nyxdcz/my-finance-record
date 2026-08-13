@@ -1582,7 +1582,7 @@
     <div class="pwa-update-inner"><div><strong>App update available</strong><p>The new version is ready. Your current data stays in browser storage.</p></div><div class="pwa-update-actions"><button class="button button-secondary" id="laterUpdateButton" type="button">Later</button><button class="button button-primary" id="applyUpdateButton" type="button">Update now</button></div></div>
   </div>
 
-  <div class="toast toast-info" id="toast" role="status" aria-live="polite" aria-atomic="true"><span class="toast-icon" aria-hidden="true">i</span><span class="toast-message">Ready</span></div>
+  <div class="toast toast-info" id="toast" role="status" aria-live="polite" aria-atomic="true"><span class="toast-icon" aria-hidden="true">i</span><span class="toast-message"></span><button class="toast-dismiss" id="toastDismissButton" type="button" aria-label="Dismiss notification" title="Dismiss notification">×</button></div>
   <div class="sr-error-announcer" id="errorAnnouncer" role="alert" aria-live="assertive" aria-atomic="true"></div>
   <div class="sr-only" id="dashboardDragAnnouncer" role="status" aria-live="polite" aria-atomic="true"></div>
 
@@ -3531,7 +3531,32 @@
       if (/undo|moved back|cleared|month changed|generated|downloaded/.test(value)) return "info";
       return "success";
     }
-
+    const TOAST_AUTO_DISMISS_MS = 4000;
+    function hideToast() {
+      const toast = document.getElementById("toast");
+      if (!toast) return;
+      clearTimeout(showToast.timer); showToast.timer = 0; showToast.deadline = 0;
+      showToast.remaining = TOAST_AUTO_DISMISS_MS;
+      toast.classList.remove("show");
+      if (toast.contains(document.activeElement)) document.activeElement.blur();
+    }
+    function scheduleToastDismiss(delay = TOAST_AUTO_DISMISS_MS) {
+      const toast = document.getElementById("toast");
+      if (!toast || toast.dataset.persistent === "true") return;
+      clearTimeout(showToast.timer);
+      showToast.remaining = Math.max(250, Number(delay) || TOAST_AUTO_DISMISS_MS);
+      showToast.deadline = Date.now() + showToast.remaining; showToast.timer = setTimeout(hideToast, showToast.remaining);
+    }
+    function pauseToastDismiss() {
+      if (!showToast.timer) return;
+      showToast.remaining = Math.max(250, showToast.deadline - Date.now());
+      clearTimeout(showToast.timer); showToast.timer = 0;
+    }
+    function resumeToastDismiss() {
+      const toast = document.getElementById("toast");
+      if (!toast?.classList.contains("show") || toast.dataset.persistent === "true" || toast.matches(":hover") || toast.contains(document.activeElement)) return;
+      scheduleToastDismiss(showToast.remaining);
+    }
     function showToast(message, type = "") {
       const toast = document.getElementById("toast");
       if (!toast) return;
@@ -3541,6 +3566,7 @@
       toast.className = `toast toast-${resolvedType}`;
       toast.querySelector(".toast-icon").textContent = iconMap[resolvedType] || "i";
       toast.querySelector(".toast-message").textContent = message;
+      toast.dataset.persistent = String(resolvedType === "warning" || resolvedType === "error");
       toast.classList.add("show");
       if (resolvedType === "error") {
         const announcer = document.getElementById("errorAnnouncer");
@@ -3549,10 +3575,14 @@
           requestAnimationFrame(() => { announcer.textContent = String(message || "An error occurred"); });
         }
       }
-      clearTimeout(showToast.timer);
-      showToast.timer = setTimeout(() => toast.classList.remove("show"), 3000);
+      clearTimeout(showToast.timer); showToast.timer = 0;
+      showToast.remaining = TOAST_AUTO_DISMISS_MS;
+      if (toast.dataset.persistent !== "true") scheduleToastDismiss();
     }
-
+    const toastElement = document.getElementById("toast");
+    document.getElementById("toastDismissButton")?.addEventListener("click", hideToast);
+    toastElement?.addEventListener("mouseenter", pauseToastDismiss); toastElement?.addEventListener("mouseleave", resumeToastDismiss);
+    toastElement?.addEventListener("focusin", pauseToastDismiss); toastElement?.addEventListener("focusout", () => requestAnimationFrame(resumeToastDismiss));
     function readCollapsedSections() {
       try {
         const saved = JSON.parse(localStorage.getItem(COLLAPSE_STATE_KEY) || "{}");

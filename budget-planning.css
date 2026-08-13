@@ -111,7 +111,19 @@
 .budget-planner-card.is-planner-collapsed .budget-planner-summary { grid-template-columns:repeat(3,minmax(0,1fr)); margin-bottom:10px; }
 .budget-planner-card.is-planner-collapsed .budget-plan-kpi:nth-child(2),
 .budget-planner-card.is-planner-collapsed .budget-plan-kpi:nth-child(3) { display:none; }
-.budget-planner-card.is-planner-collapsed .budget-plan-kpi { min-height:58px; }
+.budget-planner-card.is-planner-collapsed .budget-plan-kpi { min-height:44px; }
+@media (min-width:701px) {
+  .budget-planner-card.is-planner-collapsed { position:relative; display:grid; grid-template-columns:minmax(150px,.55fr) minmax(0,1.45fr); align-items:center; gap:10px; padding:6px 52px 6px 12px; }
+  .budget-planner-card.is-planner-collapsed .budget-planner-header { display:block; min-width:0; padding:0; }
+  .budget-planner-card.is-planner-collapsed .budget-planner-heading-copy p { display:none; }
+  .budget-planner-card.is-planner-collapsed .budget-planner-actions { position:absolute; top:50%; right:8px; margin:0; transform:translateY(-50%); }
+  .budget-planner-card.is-planner-collapsed .budget-planner-body { min-width:0; }
+  .budget-planner-card.is-planner-collapsed .budget-planner-summary { margin:0; gap:6px; }
+  .budget-planner-card.is-planner-collapsed .budget-plan-kpi { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:6px; padding:5px 8px; }
+  .budget-planner-card.is-planner-collapsed .budget-plan-kpi span { overflow:hidden; white-space:nowrap; text-overflow:ellipsis; font-size:.6rem; }
+  .budget-planner-card.is-planner-collapsed .budget-plan-kpi strong { margin:0; font-size:.8rem; text-align:right; }
+  .budget-planner-card.is-planner-collapsed .budget-plan-kpi small { display:none; }
+}
 @media (max-width:1100px) {
   .budget-planner-actions { max-width:560px; }
   .budget-planner-card.is-planner-collapsed .budget-planner-summary { grid-template-columns:repeat(3,minmax(0,1fr)); }
@@ -128,8 +140,15 @@
   .budget-planner-grid { padding:0 10px 10px; gap:7px; }
   .budget-panel-heading { display:flex; min-height:56px; padding:7px 9px; }
   .budget-panel-collapse { width:44px; min-width:44px; height:44px; min-height:44px; }
-  .budget-planner-card.is-planner-collapsed .budget-planner-summary { grid-template-columns:1fr; margin-bottom:8px; }
-  .budget-planner-card.is-planner-collapsed .budget-plan-kpi { min-height:52px; }
+  .budget-planner-card.is-planner-collapsed .budget-planner-header { min-height:52px; padding:7px 62px 5px 10px; }
+  .budget-planner-card.is-planner-collapsed .budget-planner-heading-copy p { display:none; }
+  .budget-planner-card.is-planner-collapsed .budget-planner-actions { margin-top:0; }
+  .budget-planner-card.is-planner-collapsed .budget-planner-toggle { top:6px; }
+  .budget-planner-card.is-planner-collapsed .budget-planner-summary { grid-template-columns:repeat(3,minmax(0,1fr)); margin:4px 8px 8px; gap:4px; }
+  .budget-planner-card.is-planner-collapsed .budget-plan-kpi { min-height:48px; padding:5px 6px; }
+  .budget-planner-card.is-planner-collapsed .budget-plan-kpi span { display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; overflow:hidden; font-size:.56rem; line-height:1.15; }
+  .budget-planner-card.is-planner-collapsed .budget-plan-kpi strong { margin-top:2px; font-size:.76rem; }
+  .budget-planner-card.is-planner-collapsed .budget-plan-kpi small { display:none; }
   .budget-planner-card.is-planner-collapsed .budget-plan-kpi:last-child { grid-column:auto; }
 }
 @media (max-width:700px) {
