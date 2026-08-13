@@ -156,7 +156,7 @@ test("phone paid rows, Settings devices, and conflict review stay compact and re
     document.getElementById("paid-expenses").classList.add("active");
     document.getElementById("paidExpenseList").innerHTML = `<div class="record-row" data-paid-expense-row="fixture"><div class="record-title"><strong>Gloan</strong><div class="record-statuses"><span class="status-badge ui-pill">Paid</span><span class="status-badge">One-time</span></div></div><div data-label="Paid date">Aug 3, 2026</div><div data-label="Paid from">Wallet</div><div class="amount" data-label="Amount">₱3,447.00</div><div class="mobile-record-actions"><button class="button">Move to unpaid</button><div class="record-more-menu"><button class="button overflow-menu-trigger" aria-label="More actions for Gloan" aria-haspopup="menu">⋮</button></div></div></div>`;
     const settings = document.getElementById("settings");
-    settings.insertAdjacentHTML("beforeend", `<table class="cloud-device-table"><thead><tr><th>Device</th></tr></thead><tbody><tr><td data-label="Device"><strong>nyco's iPhone</strong><details class="device-platform-details"><summary>Browser details</summary><small>Long mobile browser identification string</small></details></td><td data-label="Status"><span class="v12-chip">Current</span></td><td data-label="App">V14.0.23</td><td data-label="Last seen">Aug 13, 2026</td><td data-label="Action">—</td></tr></tbody></table>`);
+    settings.insertAdjacentHTML("beforeend", `<table class="cloud-device-table" id="phoneDeviceFixture"><thead><tr><th>Device</th></tr></thead><tbody><tr><td data-label="Device"><strong>nyco's iPhone</strong><details class="device-platform-details"><summary>Browser details</summary><small>Long mobile browser identification string</small></details></td><td data-label="Status"><span class="v12-chip">Current</span></td><td data-label="App">V14.0.23</td><td data-label="Last seen">Aug 13, 2026</td><td data-label="Action">—</td></tr></tbody></table>`);
     document.body.insertAdjacentHTML("beforeend", `<dialog class="cloud-conflict-review-dialog" open><div class="modal-header"><strong>Account: Metrobank</strong><button class="button">Resolve later</button></div><div class="modal-body"><div class="cloud-conflict-comparison"><div class="cloud-conflict-comparison-head">Header</div><div class="cloud-conflict-comparison-row"><strong>Icon</strong><span data-label="This device">Local icon</span><span data-label="Cloud version">Cloud icon</span></div></div></div><div class="cloud-conflict-review-footer"><button class="button">Download both</button><button class="button">Resolve later</button><button class="button">Use cloud version</button><button class="button">Use this device</button></div></dialog>`);
   });
 
@@ -170,7 +170,7 @@ test("phone paid rows, Settings devices, and conflict review stay compact and re
     document.getElementById("paid-expenses").classList.remove("active");
     document.getElementById("settings").classList.add("active");
   });
-  const deviceTable = page.locator("#settings .cloud-device-table");
+  const deviceTable = page.locator("#phoneDeviceFixture");
   await expect(deviceTable.locator("thead")).toBeHidden();
   expect(await deviceTable.evaluate(node => node.scrollWidth <= node.clientWidth + 1)).toBe(true);
   await expect(deviceTable.locator("summary")).toHaveText("Browser details");
