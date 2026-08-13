@@ -76,6 +76,17 @@
     track.innerHTML = `<div class="dashboard-week-marquee-group">${groupContent}</div><div class="dashboard-week-marquee-group" aria-hidden="true">${groupContent}</div>`;
   }
 
+  function renderActiveFilterChips(container, filters, onRemove) {
+    if (!container) return;
+    const active = filters.filter(Boolean);
+    container.hidden = active.length === 0;
+    container.innerHTML = active.map(({ key, label }) => `<span class="ui-chip"><span>${String(label).replace(/[&<>"']/g, character => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" })[character])}</span><button class="ui-chip-remove" type="button" data-remove-filter="${key}" aria-label="Remove ${String(label).replace(/[&<>"']/g, character => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" })[character])} filter">×</button></span>`).join("");
+    container.onclick = event => {
+      const button = event.target.closest("[data-remove-filter]");
+      if (button) onRemove(button.dataset.removeFilter);
+    };
+  }
+
   function middleTruncateFilename(filename, maxLength = 34) {
     const value = String(filename || "");
     if (value.length <= maxLength) return value;
@@ -161,7 +172,7 @@
     return { announce, cancel, createHandle };
   }
 
-  window.FinanceInteractionPatterns = { closeOverflowMenu, setupOverflowMenus, renderDuplicatedMarquee, middleTruncateFilename, createDashboardDragController };
+  window.FinanceInteractionPatterns = { closeOverflowMenu, setupOverflowMenus, renderDuplicatedMarquee, renderActiveFilterChips, middleTruncateFilename, createDashboardDragController };
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", setupOverflowMenus, { once:true });
   else setupOverflowMenus();
 })();

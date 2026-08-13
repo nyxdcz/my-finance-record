@@ -32,6 +32,7 @@ async function loadStaticApp(page, viewport) {
     const weekTrack = document.getElementById("dashboardWeekMarqueeTrack");
     const weekDays = Array.from({ length:7 }, (_, index) => `<span class="dashboard-week-day">Day ${index + 1}</span>`).join("");
     patterns.renderDuplicatedMarquee(weekTrack, weekDays);
+    patterns.renderDuplicatedMarquee(document.getElementById("financeWeekMarqueeTrack"), weekDays);
 
     const dashboard = document.getElementById("dashboard");
     const grid = document.getElementById("dashboardCardGrid");
@@ -340,6 +341,20 @@ test("expense editing keeps overflow helpers available to the live application",
   await page.goto("http://127.0.0.1:3000/?page=money", { waitUntil:"networkidle" });
   await page.waitForFunction(() => Boolean(window.FinancePrivacyLock));
   await page.evaluate(() => window.FinancePrivacyLock.setAuthenticated(true));
+  const financeGroups = page.locator("#financeWeekMarqueeTrack > .dashboard-week-marquee-group");
+  await expect(financeGroups).toHaveCount(2);
+  await expect(page.locator("#financeWeekMarqueeTrack")).toHaveCSS("animation-name", "dashboard-week-marquee");
+  await page.locator("#expenseCategoryFilter").selectOption("Subscriptions");
+  const activeChip = page.locator("#expenseActiveFilterChips .ui-chip");
+  await expect(activeChip).toContainText("Category: Subscriptions");
+  await expect(page.locator("#expenseFiltersPanel .ui-badge")).toHaveJSProperty("tagName", "SPAN");
+  await expect(activeChip.locator(".ui-chip-remove")).toHaveAttribute("aria-label", "Remove Category: Subscriptions filter");
+  await activeChip.locator(".ui-chip-remove").click();
+  await expect(page.locator("#expenseCategoryFilter")).toHaveValue("");
+  await expect(page.locator(".record-row .ui-tag").first()).toBeVisible();
+  await expect(page.locator(".record-row .ui-pill").first()).toBeVisible();
+  await page.locator("#topbarToolsTrigger").focus();
+  expect(await page.locator("#topbarToolsTrigger").evaluate(node => getComputedStyle(node).outlineStyle)).not.toBe("none");
   await page.locator("[data-edit-expense]").first().click();
   const name = page.locator("#expenseName");
   await expect(name).toBeVisible();
@@ -374,6 +389,9 @@ test("Dashboard marquee, menu controls, progress, and drag handles use accessibl
   const duplicated = await groups.evaluateAll(nodes => nodes.length === 2 && nodes[0].innerHTML === nodes[1].innerHTML);
   expect(duplicated).toBe(true);
   await expect(groups.nth(1)).toHaveAttribute("aria-hidden", "true");
+  const financeGroups = page.locator("#financeWeekMarqueeTrack > .dashboard-week-marquee-group");
+  await expect(financeGroups).toHaveCount(2);
+  expect(await financeGroups.evaluateAll(nodes => nodes[0].innerHTML === nodes[1].innerHTML)).toBe(true);
   await expect(page.locator("#dashPaymentProgress")).toHaveJSProperty("tagName", "PROGRESS");
 
   const handles = page.locator("[data-dashboard-drag]");
@@ -390,6 +408,8 @@ test("reduced motion stops the one-week marquee", async ({ page }) => {
   await loadStaticApp(page, { width:1200, height:900 });
   await expect(page.locator("#dashboardWeekMarqueeTrack")).toHaveCSS("animation-name", "none");
   await expect(page.locator("#dashboardWeekMarqueeTrack > [aria-hidden='true']")).toBeHidden();
+  await expect(page.locator("#financeWeekMarqueeTrack")).toHaveCSS("animation-name", "none");
+  await expect(page.locator("#financeWeekMarqueeTrack > [aria-hidden='true']")).toBeHidden();
 });
 
 for (const viewport of [

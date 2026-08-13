@@ -1,3 +1,16 @@
+## 14.0.18 · 2026-08-13
+
+### Added
+- Added the existing reduced-motion-safe one-week calendar marquee below the Finance / Budget & Expenses heading.
+- Added dismissible active-filter Chips, compact numeric Badges, fully rounded status Pills, and category Tags with accessible labels.
+
+### Accessibility
+- Restored native browser focus rings for keyboard-focused controls and retained enough outline offset to prevent the first responder indicator from being replaced by a custom border.
+- Added an accessible name to every icon-only filter-removal button.
+
+### Preserved
+- Finance Schema 12, Cloud Schema V3, records, accounts, expenses, completed projects, calculations, cloud data, and saved preferences are unchanged.
+
 ## 14.0.17 · 2026-08-13
 
 ### Fixed
