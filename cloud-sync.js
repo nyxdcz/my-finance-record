@@ -3,7 +3,7 @@
    Local storage remains the immediate working copy. Cloud Schema V3 exchanges only
    changed encrypted records, commits related changes atomically, and preserves an immutable audit trail. */
 (function financeCloudSyncV3Bootstrap() {
-  const APP_VERSION_FALLBACK = "14.0.20";
+  const APP_VERSION_FALLBACK = "14.0.23";
   const APP_VERSION_CODE = 130000;
   const CLOUD_SCHEMA_VERSION = 3;
   const CORE_SCHEMA_VERSION = 12;
@@ -135,13 +135,12 @@
     catch (error) { return false; }
   }
 
-  function persist() {
-    return [
-      saveJson(META_KEY, state),
-      saveJson(BASE_KEY, baseRecords),
-      saveJson(QUEUE_KEY, pending),
-      saveJson(CONFLICT_KEY, conflicts.slice(0, MAX_CONFLICTS))
-    ].every(Boolean);
+  function persist({ reclaimFirst = false } = {}) {
+    const stores = reclaimFirst
+      ? [[QUEUE_KEY, pending], [CONFLICT_KEY, conflicts.slice(0, MAX_CONFLICTS)], [BASE_KEY, baseRecords], [META_KEY, state]]
+      : [[META_KEY, state], [BASE_KEY, baseRecords], [QUEUE_KEY, pending], [CONFLICT_KEY, conflicts.slice(0, MAX_CONFLICTS)]];
+    const write = () => stores.map(([key, value]) => saveJson(key, value)).every(Boolean);
+    return write() || (reclaimFirst && write());
   }
 
   function stable(value) {
@@ -1603,7 +1602,7 @@
       const revoked=Boolean(device.revoked_at);
       const status=revoked?"Revoked":current?"Current":"Connected";
       const tone=revoked?"danger":current?"success":"info";
-      return `<tr><td><strong>${escape(device.device_name||"Device")}</strong><br><small>${escape(device.platform||"Browser")}</small></td><td><span class="v12-chip ${tone}">${status}</span></td><td>V${escape(device.app_version||"Unknown")}<br><small>Cloud V${Number(device.cloud_schema_version||1)}</small></td><td>${escape(formatDateTime(device.last_seen_at))}</td><td>${current||revoked?"—":`<button class="button button-secondary button-small" type="button" data-revoke-cloud-device="${escape(device.device_id)}" data-revoke-cloud-user="${escape(device.user_id || cloudUser?.id || "")}">Sign out remotely</button>`}</td></tr>`;
+      return `<tr><td data-label="Device"><strong>${escape(device.device_name||"Device")}</strong><details class="device-platform-details"><summary>Browser details</summary><small>${escape(device.platform||"Browser")}</small></details></td><td data-label="Status"><span class="v12-chip ${tone}">${status}</span></td><td data-label="App">V${escape(device.app_version||"Unknown")}<br><small>Cloud V${Number(device.cloud_schema_version||1)}</small></td><td data-label="Last seen">${escape(formatDateTime(device.last_seen_at))}</td><td data-label="Action">${current||revoked?"—":`<button class="button button-secondary button-small" type="button" data-revoke-cloud-device="${escape(device.device_id)}" data-revoke-cloud-user="${escape(device.user_id || cloudUser?.id || "")}">Sign out remotely</button>`}</td></tr>`;
     }).join(""):`<tr><td colspan="5"><div class="v12-empty">No cloud devices are listed yet.</div></td></tr>`;
   }
 
@@ -1665,7 +1664,7 @@
     const item=pending[key], conflict=conflictForKey(key);
     const resolver=window.FinanceCloudConflictResolution;
     if (!resolver?.apply) throw new Error("Conflict resolution is unavailable. Reload the latest app version and try again.");
-    const result=resolver.apply({key,choice,item,conflict,baseRecords,pending,conflicts,setConflicts:value=>{conflicts=value;},persist,clone,splitKey,nowIso,appVersion:appVersion(),appVersionCode:APP_VERSION_CODE});
+    const result=resolver.apply({key,choice,item,conflict,baseRecords,pending,conflicts,setConflicts:value=>{conflicts=value;},persist:()=>persist({reclaimFirst:true}),clone,splitKey,nowIso,appVersion:appVersion(),appVersionCode:APP_VERSION_CODE});
     refreshAfterConflictChoice(choice === "cloud" ? "Cloud version selected for sync conflict" : "Device version selected for sync conflict");
     if (choice === "device") scheduleSync(80);
     showToast(choice === "cloud" ? "Cloud version applied on this device." : "This device’s version is queued for cloud sync.","success");
@@ -1792,7 +1791,7 @@
     buildRecordMap:()=>toRecordMap(data),
     get status(){return{...state,pendingCount:pendingCount(),conflictCount:conflictCount(),signedIn:Boolean(cloudUser),email:cloudUser?.email||""};}
   };
-  window.FinanceCloudSyncInternals={loadClient,stable,checksum,deepMerge,threeWayMerge,toRecordMap,fromRecordStore,changesBetween,recordKey,keyToken,keyFromToken,retryDelay,detectFinancialOperations,encryptRecordPayload,decryptRecordPayload,toRpcChange,decryptRow,sanitizeRecordPayload,reconcileDerivedSettingsState,reconcileUnqueuedLocalChanges,seedBaseFromSnapshot,applyRemoteEvent,resolveConflict,handlePersistedData,requestLifecycleSync,scheduleForegroundPoll,scheduleRealtimeRecovery,ensureRealtime,friendlyAuthError,passwordRecoveryRedirect,parsePasswordRecoveryUrl,recoveryErrorMessage,cleanPasswordRecoveryUrl,testCloudConnection,requestPasswordReset,verifyRecoveryCode,completePasswordReset,setPasswordVisibility};
+  window.FinanceCloudSyncInternals={loadClient,stable,checksum,deepMerge,threeWayMerge,toRecordMap,fromRecordStore,changesBetween,recordKey,keyToken,keyFromToken,retryDelay,detectFinancialOperations,encryptRecordPayload,decryptRecordPayload,toRpcChange,decryptRow,sanitizeRecordPayload,reconcileDerivedSettingsState,reconcileUnqueuedLocalChanges,seedBaseFromSnapshot,applyRemoteEvent,resolveConflict,persist,handlePersistedData,requestLifecycleSync,scheduleForegroundPoll,scheduleRealtimeRecovery,ensureRealtime,friendlyAuthError,passwordRecoveryRedirect,parsePasswordRecoveryUrl,recoveryErrorMessage,cleanPasswordRecoveryUrl,testCloudConnection,requestPasswordReset,verifyRecoveryCode,completePasswordReset,setPasswordVisibility};
 
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",()=>initialize().catch(error=>setStatus("Cloud sync unavailable",error.message,"danger")),{once:true});
   else initialize().catch(error=>setStatus("Cloud sync unavailable",error.message,"danger"));

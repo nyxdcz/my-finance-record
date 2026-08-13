@@ -78,7 +78,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p _site/icons _site/vendor
-          cp index.html offline.html manifest.webmanifest version.json sw.js app.css dashboard-interactions.css interaction-patterns.js privacy-lock.js security-profiles.js security-profiles.css cloud-conflict-review.js cloud-conflict-resolution.js cloud-sync-lifecycle.js cloud-sync.js account-ledger.js account-ledger.css budget-planning.js budget-planning.css reports-insights.js reports-insights.css productivity-tools.js productivity-tools.css reminders-alerts.js reminders-alerts.css projects-calendar-v13.0.20.js projects-calendar-v13.0.20.css sync-config.js _site/
+          cp index.html offline.html manifest.webmanifest version.json sw.js app.css dashboard-interactions.css mobile-v14-0-23.css interaction-patterns.js privacy-lock.js security-profiles.js security-profiles.css cloud-conflict-review.js cloud-conflict-resolution.js cloud-sync-lifecycle.js cloud-sync.js account-ledger.js account-ledger.css budget-planning.js budget-planning.css reports-insights.js reports-insights.css productivity-tools.js productivity-tools.css reminders-alerts.js reminders-alerts.css projects-calendar-v13.0.20.js projects-calendar-v13.0.20.css sync-config.js _site/
           cp vendor/supabase.min.js _site/vendor/
           cp icons/* _site/icons/
       - name: Upload GitHub Pages artifact

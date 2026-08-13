@@ -1,3 +1,17 @@
+## 14.0.23 · 2026-08-13
+
+### Fixed
+- Reordered conflict-resolution persistence to reclaim obsolete queue and conflict storage before saving the chosen baseline, with one safe retry for constrained iPhone browser storage.
+- Reworked phone Paid Expenses rows into compact cards with one contextual More menu and no stray punctuation.
+- Prevented Settings forms, cloud configuration, connected-device lists, and pending-sync cards from overflowing narrow screens.
+
+### Accessibility
+- Stacked conflict comparisons on phones with visible local/cloud labels and retained 44px action targets.
+- Collapsed long browser identification into an optional disclosure while preserving device status and actions.
+
+### Preserved
+- Finance Schema 12, Cloud Schema V3, encryption, five-minute routine sync, manual sync, Realtime updates, completed projects, calculations, and saved preferences remain unchanged.
+
 ## 14.0.22 · 2026-08-13
 
 ### Changed
