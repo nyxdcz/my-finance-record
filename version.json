@@ -1,5 +1,5 @@
 {
-  "version": "14.0.19",
+  "version": "14.0.20",
   "schemaVersion": 12,
   "cloudSchemaVersion": 3,
   "ledgerVersion": 1,
@@ -10,8 +10,8 @@
   "profileArchitectureVersion": 1,
   "encryptionVersion": 1,
   "authSecurityVersion": 1,
-  "cacheVersion": "finance-v14-20260813-v1419-cross-device-sync-r1",
+  "cacheVersion": "finance-v14-20260813-v1420-existing-sync-repair-r1",
   "released": "2026-08-13",
-  "name": "Cross-Device Sync Reliability",
-  "notes": "Queues every persisted Finance change for encrypted cloud upload, refreshes visible phones every 30 seconds, and recovers synchronization after mobile resume or Realtime channel failures."
+  "name": "Existing Sync State Repair",
+  "notes": "Reconciles Finance records that diverged before V14.0.19, queues missed desktop changes before cloud pulls, and safely updates phones without allowing stale records to overwrite newer revisions."
 }

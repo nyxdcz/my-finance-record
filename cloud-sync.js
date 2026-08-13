@@ -1,9 +1,9 @@
 "use strict";
-/* My Finance Records V14.0.19 · Encrypted profile-scoped Cloud Sync 3.0.
+/* My Finance Records V14.0.20 · Encrypted profile-scoped Cloud Sync 3.0.
    Local storage remains the immediate working copy. Cloud Schema V3 exchanges only
    changed encrypted records, commits related changes atomically, and preserves an immutable audit trail. */
 (function financeCloudSyncV3Bootstrap() {
-  const APP_VERSION_FALLBACK = "14.0.19";
+  const APP_VERSION_FALLBACK = "14.0.20";
   const APP_VERSION_CODE = 130000;
   const CLOUD_SCHEMA_VERSION = 3;
   const CORE_SCHEMA_VERSION = 12;
@@ -512,8 +512,8 @@
     };
     saveWrapped = true;
   }
-
   function handlePersistedData(event) { const next=normalizeData(clone(event?.detail?.data??(typeof data!=="undefined"?data:{}))); if(!suppressQueue)queueDiff(lastObservedData,next,String(event?.detail?.action||"Finance data updated")); lastObservedData=clone(next); }
+  function reconcileUnqueuedLocalChanges(reason="Recovered unqueued local Finance changes") { if(suppressQueue||!profileCanWrite()||state.initializedUserId!==initializedScope()||!Object.keys(baseRecords).length||typeof data==="undefined")return[]; const tracked=fromRecordStore(effectiveRecordStore(),data),before=toRecordMap(tracked),after=toRecordMap(data),keys=[...new Set([...Object.keys(before),...Object.keys(after)])].filter(key=>{const prior=before[key],next=after[key];return!prior||!next||!same(prior.payload,next.payload)||Number(prior.sortIndex||0)!==Number(next.sortIndex||0);}); if(keys.length)queueDiff(tracked,data,reason); return keys; }
   function pendingCount() { return Object.keys(pending).length; }
   function conflictCount() { return conflicts.filter(item => !item.resolved).length; }
 
@@ -1550,7 +1550,7 @@
     syncing=true;
     setStatus("Syncing", `Checking record-level changes (${reason})…`, "info");
     try {
-      if (!await registerDevice()) return;
+      if (!await registerDevice()) return; const recovered=reconcileUnqueuedLocalChanges(); if(recovered.length)setStatus("Recovering local changes",`${recovered.length} previously missed Finance record${recovered.length===1?"":"s"} will be reconciled safely.`,"warning");
       await pullChanges();
       let guard=0;
       while (Object.values(pending).some(item=>item.status!=="conflict"&&Number(item.nextAttemptAt||0)<=Date.now()) && guard<6) {
@@ -1792,7 +1792,7 @@
     buildRecordMap:()=>toRecordMap(data),
     get status(){return{...state,pendingCount:pendingCount(),conflictCount:conflictCount(),signedIn:Boolean(cloudUser),email:cloudUser?.email||""};}
   };
-  window.FinanceCloudSyncInternals={loadClient,stable,checksum,deepMerge,threeWayMerge,toRecordMap,fromRecordStore,changesBetween,recordKey,keyToken,keyFromToken,retryDelay,detectFinancialOperations,encryptRecordPayload,decryptRecordPayload,toRpcChange,decryptRow,sanitizeRecordPayload,reconcileDerivedSettingsState,applyRemoteEvent,resolveConflict,handlePersistedData,requestLifecycleSync,scheduleForegroundPoll,scheduleRealtimeRecovery,ensureRealtime,friendlyAuthError,passwordRecoveryRedirect,parsePasswordRecoveryUrl,recoveryErrorMessage,cleanPasswordRecoveryUrl,testCloudConnection,requestPasswordReset,verifyRecoveryCode,completePasswordReset,setPasswordVisibility};
+  window.FinanceCloudSyncInternals={loadClient,stable,checksum,deepMerge,threeWayMerge,toRecordMap,fromRecordStore,changesBetween,recordKey,keyToken,keyFromToken,retryDelay,detectFinancialOperations,encryptRecordPayload,decryptRecordPayload,toRpcChange,decryptRow,sanitizeRecordPayload,reconcileDerivedSettingsState,reconcileUnqueuedLocalChanges,seedBaseFromSnapshot,applyRemoteEvent,resolveConflict,handlePersistedData,requestLifecycleSync,scheduleForegroundPoll,scheduleRealtimeRecovery,ensureRealtime,friendlyAuthError,passwordRecoveryRedirect,parsePasswordRecoveryUrl,recoveryErrorMessage,cleanPasswordRecoveryUrl,testCloudConnection,requestPasswordReset,verifyRecoveryCode,completePasswordReset,setPasswordVisibility};
 
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",()=>initialize().catch(error=>setStatus("Cloud sync unavailable",error.message,"danger")),{once:true});
   else initialize().catch(error=>setStatus("Cloud sync unavailable",error.message,"danger"));
