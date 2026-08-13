@@ -1,3 +1,17 @@
+## 14.0.20 · 2026-08-13
+
+### Fixed
+- Added a pre-pull reconciliation pass that compares this device's Finance data with its last confirmed cloud baseline and queues records that diverged before V14.0.19.
+- Preserved base revisions for recovered account updates, additions, and deletions so a stale phone cannot silently overwrite newer desktop records.
+- Kept genuine same-record changes on two devices in the existing conflict-review flow instead of choosing a winner automatically.
+
+### Tested
+- Added the reported phone-versus-desktop account fixture, including mismatched Wallet, UnionBank, and RCBC balances plus the Metrobank-to-GoTyme account change.
+- Confirmed already-matching devices produce no repair queue entries and all existing persistence, Realtime, lifecycle, encryption, and browser checks remain active.
+
+### Preserved
+- Finance Schema 12, Cloud Schema V3, encrypted payloads, expenses, completed projects, calculations, and saved preferences remain unchanged.
+
 ## 14.0.19 · 2026-08-13
 
 ### Fixed
