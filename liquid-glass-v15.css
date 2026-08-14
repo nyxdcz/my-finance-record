@@ -306,3 +306,94 @@ form,
     background:var(--liquid-glass-surface-strong);
   }
 }
+
+/* V15.0.0 · compact dashboard and chrome cleanup. */
+.topbar {
+  background:var(--surface)!important;
+  border-bottom:1px solid var(--line)!important;
+  box-shadow:none!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+}
+
+/* Keep calculations alive while removing the redundant top Dashboard summaries. */
+#dashboard > .grid.kpi-grid,
+#dashboard > .month-insights-card.month-comparison-only {
+  display:none!important;
+}
+#dashboard #dashboardCardGrid { margin-top:0!important; }
+
+/* Remove the divider above exact cash-flow values while preserving the disclosure. */
+#dashboard .chart-data-details {
+  margin-top:4px!important;
+  border-top:0!important;
+  padding-top:0!important;
+}
+
+/* Keep the Savings Goals action compact and contained. */
+#dashboard #addSavingsGoalButton {
+  width:auto!important;
+  min-width:0!important;
+  max-width:max-content!important;
+  min-height:32px!important;
+  padding:5px 8px!important;
+  gap:5px!important;
+  flex:0 0 auto!important;
+  white-space:nowrap!important;
+}
+#dashboard #addSavingsGoalButton::before {
+  width:16px!important;
+  height:16px!important;
+  flex:0 0 16px!important;
+}
+#dashboard #addSavingsGoalButton::after {
+  font-size:.7rem!important;
+  line-height:1!important;
+  white-space:nowrap!important;
+}
+
+/* Remove the expense-mode explanation without disturbing the existing type-switching logic. */
+#expenseDialog #expenseFormModeNote { display:none!important; }
+#expenseDialog .required-note { margin-bottom:5px!important; }
+
+/* Compact status toasts without changing live-region or dismissal behavior. */
+.toast {
+  width:max-content!important;
+  min-width:0!important;
+  max-width:min(320px,calc(100vw - 24px))!important;
+  padding:7px 9px!important;
+  gap:6px!important;
+  font-size:.74rem!important;
+  box-shadow:0 8px 22px rgba(16,24,40,.18)!important;
+}
+.toast .toast-icon {
+  width:18px!important;
+  height:18px!important;
+  flex:0 0 18px!important;
+  font-size:.62rem!important;
+}
+.toast .toast-message {
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+  line-height:1.25!important;
+}
+.toast .toast-dismiss {
+  width:22px!important;
+  min-width:22px!important;
+  height:22px!important;
+  min-height:22px!important;
+  font-size:.9rem!important;
+}
+
+@media (max-width:700px) {
+  #dashboard #addSavingsGoalButton {
+    min-height:40px!important;
+    padding:7px 9px!important;
+  }
+  .toast {
+    max-width:calc(100vw - 20px)!important;
+  }
+}
