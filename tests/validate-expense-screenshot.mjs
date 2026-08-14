@@ -92,7 +92,7 @@ assert.doesNotMatch(syncConfig, /OPENAI_API_KEY/, "browser sync config must not 
 const aiClient = fs.readFileSync(path.join(root, "expense-screenshot-ai.js"), "utf8");
 assert.match(aiClient, /Detect with AI/, "AI detector should expose a Detect with AI action");
 assert.match(aiClient, /Improve with AI/, "AI detector should reuse the latest local screenshot for optional improvement");
-assert.match(aiClient, /FinanceExpenseScreenshot\?\.showResult/, "AI results should reuse the existing review and apply flow");
+assert.match(aiClient, /screenshotApi\(\)\?\.showResult/, "AI results should reuse the existing review and apply flow");
 assert.match(aiClient, /\/functions\/v1\/detect-payment/, "AI detector should use the authenticated Supabase Edge Function");
 assert.match(aiClient, /getSession\(\)/, "AI detector should require the existing signed-in Supabase session");
 assert.doesNotMatch(aiClient, /OPENAI_API_KEY/, "OpenAI API key must never be present in browser code");
