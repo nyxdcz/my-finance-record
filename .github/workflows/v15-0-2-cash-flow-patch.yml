@@ -1,0 +1,260 @@
+name: V15.0.2 Cash-flow Chart Patch
+
+on:
+  push:
+    branches:
+      - agent/v15-0-2-cash-flow-chart
+    paths:
+      - .github/workflows/v15-0-2-cash-flow-patch.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/v15-0-2-cash-flow-chart
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - name: Apply V15.0.2 patch
+        shell: bash
+        run: |
+          python <<'PY'
+          from pathlib import Path
+          import json, re
+
+          def read(path):
+              return Path(path).read_text()
+
+          def write(path, text):
+              Path(path).write_text(text)
+
+          def replace_once(text, old, new, label):
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f"{label}: expected exactly 1 match, found {count}")
+              return text.replace(old, new, 1)
+
+          def regex_once(text, pattern, repl, label, flags=0):
+              updated, count = re.subn(pattern, repl, text, count=1, flags=flags)
+              if count != 1:
+                  raise SystemExit(f"{label}: expected exactly 1 regex match, found {count}")
+              return updated
+
+          # Core Dashboard markup + cash-flow renderer.
+          index = read("index.html")
+          index = replace_once(index, "<title>My Finance Records · V15.0.1</title>", "<title>My Finance Records · V15.0.2</title>", "browser title")
+          index = replace_once(index, 'title="V15.0.1 · Liquid Glass Interface · August 15, 2026">V15.0.1</small>', 'title="V15.0.2 · Liquid Glass Interface · August 15, 2026">V15.0.2</small>', "build badge")
+          index = replace_once(index, 'const APP_VERSION = "15.0.1";', 'const APP_VERSION = "15.0.2";', "APP_VERSION")
+          index = replace_once(index, 'id="settingsOverviewAppStatus">Version 15.0.1<', 'id="settingsOverviewAppStatus">Version 15.0.2<', "Settings app status")
+          index = index.replace("?v=15.0.1", "?v=15.0.2")
+
+          history_marker = '    VERSION_HISTORY.unshift({"version":"V15.0.1"'
+          history_insert = '    VERSION_HISTORY.unshift({"version":"V15.0.2","title":"Cash-flow Chart Focus","changes":["Removes the exact cash-flow disclosure and selected-month/forecast value boxes from the Dashboard cash-flow bento.","Expands both coordinated cash-flow chart plotting areas inside the existing bento dimensions without changing Dashboard card sizing.","Refreshes V15 PWA delivery and release metadata while preserving Finance Schema 12, Cloud Schema V3, calculations, records, and sync behavior."]},{"version":"V15.0.1"'
+          index = replace_once(index, history_marker, history_insert, "V15.0.2 version history")
+
+          summary_markup = '''              <div class="cash-flow-summary chart-sensitive">
+                <div><span>Selected-month income</span><strong class="text-green" id="dashCashIncome">₱0.00</strong></div>
+                <div><span>Selected-month expenses</span><strong class="text-red" id="dashCashExpenses">₱0.00</strong></div>
+                <div><span>Balance</span><strong id="dashCashNet">₱0.00</strong></div>
+              </div>
+'''
+          index = replace_once(index, summary_markup, "", "cash-flow summary markup")
+          index = replace_once(index, "const verticalWidth = 620, verticalHeight = 220, verticalLeft = 58, verticalRight = 16, verticalTop = 16, verticalBottom = 38;", "const verticalWidth = 620, verticalHeight = 320, verticalLeft = 58, verticalRight = 16, verticalTop = 16, verticalBottom = 38;", "vertical chart plotting height")
+          index = replace_once(index, "const horizontalWidth = 620, horizontalHeight = 220, horizontalLeft = 58, horizontalRight = 16, horizontalTop = 16, horizontalBottom = 38;", "const horizontalWidth = 620, horizontalHeight = 320, horizontalLeft = 58, horizontalRight = 16, horizontalTop = 16, horizontalBottom = 38;", "horizontal chart plotting height")
+          index = regex_once(index, r'\n\s*const dataRows = rows\.map\(row => .*?\)\.join\(""\);\n', '\n', "exact-values row builder")
+          details_markup = '<details class="chart-data-details"><summary>View exact cash-flow values</summary><div class="chart-data-table-wrap"><table><thead><tr><th>Month</th><th>Income</th><th>Expenses</th><th>Balance</th></tr></thead><tbody>${dataRows}</tbody></table></div></details>'
+          index = replace_once(index, details_markup, "", "exact cash-flow disclosure")
+          selected_block = '''      const selected = monthlyCashFlow(selectedMonth());
+      document.getElementById("dashCashIncome").textContent = money(selected.income);
+      document.getElementById("dashCashExpenses").textContent = money(selected.expenses);
+      const net = document.getElementById("dashCashNet");
+      net.textContent = money(selected.net);
+      setMoneyState(net, selected.net);
+'''
+          index = replace_once(index, selected_block, "", "selected-month cash-flow summary updater")
+          write("index.html", index)
+
+          # Stop the monthly-budget module from injecting another row of Dashboard forecast boxes.
+          budget = read("budget-planning.js")
+          budget = regex_once(
+              budget,
+              r'\n\s*if \(!document\.getElementById\("budgetDashboardForecast"\)\) \{\n\s*document\.querySelector\(\'\[data-dashboard-card="cash-flow"\] \.cash-flow-summary\'\)\?\.insertAdjacentHTML\("afterend", `.*?`\);\n\s*\}\n',
+              '\n',
+              "budget Dashboard forecast injection",
+              re.S,
+          )
+          budget = replace_once(budget, "    renderDashboardBudgetForecast(metrics);\n", "", "budget Dashboard forecast render call")
+          budget = regex_once(
+              budget,
+              r'\n  function renderDashboardBudgetForecast\(metrics = planMetrics\(selectedMonth\(\)\)\) \{.*?\n  \}\n',
+              '\n',
+              "budget Dashboard forecast renderer",
+              re.S,
+          )
+          write("budget-planning.js", budget)
+
+          # Chart-only fitting. This changes child plotting space only; the bento/card itself gets no size rule.
+          glass = read("liquid-glass-v15.css")
+          glass += '''
+
+/* V15.0.2 · cash-flow chart focus inside the existing bento size. */
+#dashboard [data-dashboard-card="cash-flow"] :is(.cash-flow-summary,.budget-dashboard-forecast,.chart-data-details) {
+  display:none!important;
+}
+@media (min-width:1101px) {
+  #dashboard [data-dashboard-card="cash-flow"][data-size="wide"] .card-header {
+    margin-bottom:7px!important;
+  }
+  #dashboard [data-dashboard-card="cash-flow"][data-size="wide"] .chart-shell {
+    gap:6px!important;
+    min-height:0!important;
+    align-content:start!important;
+  }
+  #dashboard [data-dashboard-card="cash-flow"][data-size="wide"] .cash-flow-chart-grid {
+    gap:8px!important;
+    align-items:stretch!important;
+  }
+  #dashboard [data-dashboard-card="cash-flow"][data-size="wide"] .cash-flow-chart-panel {
+    padding:7px!important;
+    min-height:0!important;
+  }
+  #dashboard [data-dashboard-card="cash-flow"][data-size="wide"] .cash-flow-chart-panel h4 {
+    margin-bottom:4px!important;
+    font-size:.68rem!important;
+    line-height:1.15!important;
+  }
+  #dashboard [data-dashboard-card="cash-flow"][data-size="wide"] .cash-flow-chart-panel .chart-svg {
+    width:100%!important;
+    height:168px!important;
+    min-height:168px!important;
+    max-height:168px!important;
+  }
+  #dashboard [data-dashboard-card="cash-flow"][data-size="wide"] .chart-legend {
+    margin-top:5px!important;
+    gap:9px!important;
+    font-size:.62rem!important;
+    line-height:1.15!important;
+  }
+  #dashboard [data-dashboard-card="cash-flow"][data-size="wide"] .chart-note {
+    margin:3px 0 0!important;
+    font-size:.59rem!important;
+    line-height:1.22!important;
+  }
+}
+'''
+          write("liquid-glass-v15.css", glass)
+
+          # Release metadata.
+          version_path = Path("version.json")
+          version = json.loads(version_path.read_text())
+          version["version"] = "15.0.2"
+          version["cacheVersion"] = "finance-v15-20260815-liquid-glass-r6"
+          version["notes"] = "Removes the Dashboard exact cash-flow values and forecast boxes, expands both cash-flow charts inside the unchanged bento size, and refreshes V15 PWA delivery without changing finance or cloud schemas."
+          version_path.write_text(json.dumps(version, indent=2, ensure_ascii=False) + "\n")
+
+          for path in ["package.json", "package-lock.json"]:
+              text = read(path).replace('"version": "15.0.1"', '"version": "15.0.2"')
+              text = text.replace("validate-v15-0-1.mjs", "validate-v15-0-2.mjs")
+              write(path, text)
+
+          cloud = read("cloud-sync.js")
+          cloud = replace_once(cloud, 'const APP_VERSION_FALLBACK = "15.0.1";', 'const APP_VERSION_FALLBACK = "15.0.2";', "Cloud Sync release fallback")
+          write("cloud-sync.js", cloud)
+
+          sync = read("sync-config.js")
+          sync = replace_once(sync, 'const VERSION = "15.0.1";', 'const VERSION = "15.0.2";', "runtime release version")
+          sync = sync.replace("?v=15.0.1", "?v=15.0.2")
+          write("sync-config.js", sync)
+
+          worker = read("sw.js")
+          worker = replace_once(worker, 'const APP_VERSION = "15.0.1";', 'const APP_VERSION = "15.0.2";', "service worker version")
+          worker = replace_once(worker, 'const CACHE_VERSION = "finance-v15-20260815-liquid-glass-r5";', 'const CACHE_VERSION = "finance-v15-20260815-liquid-glass-r6";', "service worker cache generation")
+          worker = worker.replace("?v=15.0.1", "?v=15.0.2")
+          worker = worker.replace("forced shell refresh", "forced shell refresh; V15.0.2 cash-flow chart focus")
+          write("sw.js", worker)
+
+          # README + changelog.
+          readme = read("README.md")
+          readme = replace_once(readme, "# My Finance Records · V15.0.1", "# My Finance Records · V15.0.2", "README heading")
+          recent = "## Recent updates\n\n"
+          readme = replace_once(readme, recent, recent + "- **V15.0.2 · Cash-flow Chart Focus** — Removes the exact cash-flow values/forecast boxes and expands both coordinated cash-flow charts inside the existing Dashboard bento size.\n", "README recent update")
+          write("README.md", readme)
+
+          changelog = read("CHANGELOG.md")
+          entry = """## 15.0.2 · 2026-08-15
+
+- Removed the Dashboard “View exact cash-flow values” disclosure, selected-month value cards, and injected budget forecast cards from the Income versus expenses bento.
+- Expanded the vertical and horizontal cash-flow plotting areas while preserving the existing Dashboard bento size, position, calculations, and neighboring calendar geometry.
+- Rotated the V15 PWA cache to r6 and updated release metadata, installer, README, and validation without changing Finance Schema 12, Cloud Schema V3, or Cloud Sync behavior.
+
+"""
+          if not changelog.startswith("## 15.0.1 · 2026-08-15"):
+              raise SystemExit("CHANGELOG does not begin with V15.0.1")
+          write("CHANGELOG.md", entry + changelog)
+
+          # Rename installer and current release validator, then update their contents.
+          Path("Install_V15_0_1.command").rename("Install_V15_0_2.command")
+          installer = read("Install_V15_0_2.command").replace("V15.0.1", "V15.0.2").replace("validate-v15-0-1.mjs", "validate-v15-0-2.mjs")
+          write("Install_V15_0_2.command", installer)
+
+          Path("tests/validate-v15-0-1.mjs").rename("tests/validate-v15-0-2.mjs")
+          validator = read("tests/validate-v15-0-2.mjs")
+          validator = validator.replace("15.0.1", "15.0.2").replace("V15_0_1", "V15_0_2").replace("v15-0-1", "v15-0-2").replace("liquid-glass-r5", "liquid-glass-r6")
+          validator = validator.replace('const dashboardInteractions = read("dashboard-interactions.css");', 'const dashboardInteractions = read("dashboard-interactions.css");\nconst budgetPlanning = read("budget-planning.js");')
+          validator = replace_once(validator, 'assert.match(index, /"version":"V15\\.0\\.2","title":"Sidebar Header Maintenance"/, "Version History must begin with the V15.0.2 maintenance release");', 'assert.match(index, /"version":"V15\\.0\\.2","title":"Cash-flow Chart Focus"/, "Version History must begin with the V15.0.2 cash-flow release");', "validator version-history title")
+          validator = regex_once(validator, r'assert\.match\(glass, /#dashboard \\.chart-data-details.*?\n', '', "old chart-data-details validator")
+          validator = regex_once(validator, r'assert\.match\(glass, /chart-data-table-wrap.*?\n', '', "old cash-flow table containment validator")
+          validator = regex_once(validator, r'assert\.match\(glass, /cash-flow-chart-panel \\.chart-svg.*?\n', '', "old 104px chart validator")
+          cash_assertions = '''assert.doesNotMatch(index, /View exact cash-flow values/, "Dashboard cash-flow must not render the exact-values disclosure");
+assert.doesNotMatch(index, /class="cash-flow-summary chart-sensitive"/, "Dashboard cash-flow must not render selected-month value cards");
+assert.doesNotMatch(index, /id="dashCashIncome"|id="dashCashExpenses"|id="dashCashNet"/, "removed cash-flow summary nodes must not remain in the Dashboard markup");
+assert.doesNotMatch(budgetPlanning, /budgetDashboardForecast|dashPlannedBudget|dashReservedBudget|dashForecastMonthEnd/, "budget planning must not inject Dashboard forecast value boxes into cash-flow");
+assert.match(index, /verticalHeight = 320/, "vertical cash-flow plot must receive the larger V15.0.2 plotting height");
+assert.match(index, /horizontalHeight = 320/, "horizontal cash-flow plot must receive the larger V15.0.2 plotting height");
+assert.match(glass, /V15\\.0\\.2 · cash-flow chart focus inside the existing bento size/, "V15.0.2 cash-flow fitting override must be present");
+assert.match(glass, /cash-flow-chart-panel \\.chart-svg[\\s\\S]*height:168px!important;[\\s\\S]*min-height:168px!important;[\\s\\S]*max-height:168px!important;/, "wide cash-flow charts must use the freed vertical space without changing the bento size");
+'''
+          anchor = 'assert.match(appCss, /\\.nav-icon \\{ flex:0 0 28px; width:28px; height:28px; \\}/, "all sidebar navigation icons must share the same 28px alignment slot");\n'
+          validator = replace_once(validator, anchor, cash_assertions + "\n" + anchor, "new cash-flow regression assertions")
+          validator = validator.replace("V15.0.2 · expanded sidebar Records header cleanup", "V15.0.1 · expanded sidebar Records header cleanup")
+          validator = validator.replace('console.log("V15.0.2 validation passed: release metadata, 7px Liquid Glass controls, glass marquees, compact Dashboard chrome, supplied Customize icon, cash-flow bento fitting, aligned collapsed Insights rail, expanded-only Pin control, forced fresh PWA shell delivery, accessible compact toasts, Cloud Sync compatibility, opaque finance content, and deployment packaging are consistent.");', 'console.log("V15.0.2 validation passed: chart-only cash-flow bento fitting, unchanged Dashboard card geometry, release metadata, sidebar behavior, PWA delivery, Cloud Sync compatibility, opaque finance content, and deployment packaging are consistent.");')
+          write("tests/validate-v15-0-2.mjs", validator)
+
+          # Current repository inspectors and companion validators follow the new patch release.
+          for path in ["tests/inspect-project.mjs", "tests/validate-cloud-authority.mjs", "tests/validate-expense-screenshot.mjs"]:
+              text = read(path).replace("15.0.1", "15.0.2").replace("V15_0_1", "V15_0_2").replace("v15-0-1", "v15-0-2").replace("liquid-glass-r5", "liquid-glass-r6")
+              write(path, text)
+
+          # Guardrails: requested visual removal only; finance/cloud schemas remain unchanged.
+          final_index = read("index.html")
+          final_budget = read("budget-planning.js")
+          final_glass = read("liquid-glass-v15.css")
+          assert "View exact cash-flow values" not in final_index
+          assert 'class="cash-flow-summary chart-sensitive"' not in final_index
+          assert "budgetDashboardForecast" not in final_budget
+          assert 'verticalHeight = 320' in final_index and 'horizontalHeight = 320' in final_index
+          v15_block = final_glass.split("/* V15.0.2 · cash-flow chart focus inside the existing bento size. */", 1)[1]
+          assert not re.search(r'\[data-dashboard-card="cash-flow"\]\[data-size="wide"\]\s*\{[^}]*\b(?:height|min-height|max-height)\s*:', v15_block)
+          assert json.loads(read("version.json"))["schemaVersion"] == 12
+          assert json.loads(read("version.json"))["cloudSchemaVersion"] == 3
+          PY
+
+          chmod +x Install_V15_0_2.command
+          npm ci
+          npm run quality
+      - name: Commit V15.0.2
+        shell: bash
+        run: |
+          rm .github/workflows/v15-0-2-cash-flow-patch.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "release: V15.0.2 cash-flow chart focus"
+          git push origin HEAD:agent/v15-0-2-cash-flow-chart
