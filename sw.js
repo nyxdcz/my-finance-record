@@ -1,7 +1,7 @@
 "use strict";
 const APP_VERSION = "14.0.23";
 self.__FINANCE_APP_VERSION = APP_VERSION;
-const CACHE_VERSION = "finance-v14-20260814-v1423-expense-ai-r1-sidebar-direct-r1";
+const CACHE_VERSION = "finance-v14-20260814-v1423-expense-ai-r1-pages-cache-r1";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const DB_NAME = "simple-finance-project-records-v12-db";
@@ -53,6 +53,11 @@ const APP_SHELL = [
   asset("./icons/sidebar-finance.png"),
   asset("./icons/sidebar-work.png"),
   asset("./icons/sidebar-settings.png"),
+  asset("./icons/sidebar-overview-v14-0-24.png"),
+  asset("./icons/sidebar-finance-v14-0-24.png"),
+  asset("./icons/sidebar-work-v14-0-24.png"),
+  asset("./icons/sidebar-insights-v14-0-24.png"),
+  asset("./icons/sidebar-settings-v14-0-24.png"),
   asset("./icons/action-add-record.png"),
   asset("./icons/action-add-widget.png"),
   asset("./icons/theme-moon.png"),
