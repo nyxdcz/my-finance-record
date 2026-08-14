@@ -338,3 +338,43 @@ html[data-theme="dark"] .dashboard-week-day{
     line-height:1.12!important;
   }
 }
+
+/* V15.0.0 · collapsed sidebar: Insights stays available; Pin appears only after expansion. */
+@media(min-width:851px){
+  .sidebar:not(.desktop-open):not(.sidebar-pinned) .sidebar-close-button{
+    display:none!important;
+  }
+  .sidebar.desktop-open .sidebar-close-button,
+  .sidebar.sidebar-pinned .sidebar-close-button{
+    display:grid!important;
+  }
+  .sidebar:not(.desktop-open):not(.sidebar-pinned) .insights-nav-button{
+    display:flex!important;
+    width:48px!important;
+    min-width:48px!important;
+    max-width:48px!important;
+    min-height:44px!important;
+    padding:8px 10px!important;
+    gap:9px!important;
+    align-items:center!important;
+    justify-content:flex-start!important;
+  }
+  .sidebar:not(.desktop-open):not(.sidebar-pinned) .insights-nav-button::before{
+    display:block!important;
+    width:28px!important;
+    height:28px!important;
+    flex:0 0 28px!important;
+    background-size:20px 20px!important;
+  }
+  .sidebar:not(.desktop-open):not(.sidebar-pinned) .insights-nav-button .nav-label{
+    width:0!important;
+    opacity:0!important;
+    overflow:hidden!important;
+    pointer-events:none!important;
+  }
+  .sidebar.desktop-open .insights-nav-button,
+  .sidebar.sidebar-pinned .insights-nav-button{
+    display:flex!important;
+    padding-inline-start:10px!important;
+  }
+}
