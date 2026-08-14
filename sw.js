@@ -1,7 +1,7 @@
 "use strict";
 const APP_VERSION = "14.0.23";
 self.__FINANCE_APP_VERSION = APP_VERSION;
-const CACHE_VERSION = "finance-v14-20260814-v1423-expense-ai-r1-pages-cache-r1";
+const CACHE_VERSION = "finance-v14-20260814-v1423-expense-ai-r1-ui-refresh-r1";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const DB_NAME = "simple-finance-project-records-v12-db";
@@ -67,7 +67,13 @@ const APP_SHELL = [
   asset("./icons/utility-menu-list.png"),
   asset("./icons/utility-savings.png"),
   asset("./icons/utility-search.png"),
-  asset("./icons/utility-sync-status.png")
+  asset("./icons/utility-sync-status.png"),
+  asset("./icons/sync-syncing-v14-0-23.png"),
+  asset("./icons/sync-error-v14-0-23.png"),
+  asset("./icons/sync-success-v14-0-23.png"),
+  asset("./icons/theme-night-v14-0-23.png"),
+  asset("./icons/theme-day-v14-0-23.png"),
+  asset("./icons/theme-auto-v14-0-23.png")
 ];
 
 async function precache() {
