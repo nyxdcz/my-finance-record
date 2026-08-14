@@ -252,17 +252,19 @@ test("Projects provides compact, full-view, completed, and externally refreshed 
   })).toBe(true);
 });
 
-test("responsive sidebar keeps one consistent desktop control and the mobile drawer", async ({ page }) => {
+test("responsive sidebar hides collapsed Pin, keeps Insights available, and preserves the mobile drawer", async ({ page }) => {
   await loadStaticApp(page, { width:1440, height:900 });
   const sidebar = page.locator("#sidebar");
   const menuButton = page.locator("#menuButton");
   const railButton = page.locator("#sidebarCloseButton");
+  const insightsButton = sidebar.locator('.nav-button[data-page="reports"]');
   await expect(sidebar).toHaveCSS("width", "64px");
   await expect(page.locator(".main")).toHaveCSS("margin-left", "64px");
   await expect(menuButton).toBeHidden();
-  await expect(railButton).toBeVisible();
-  await expect(railButton).toHaveAttribute("aria-label", "Pin navigation open");
-  await expect(page.locator("#menuButton:visible, #sidebarCloseButton:visible")).toHaveCount(1);
+  await expect(railButton).toBeHidden();
+  await expect(insightsButton).toBeVisible();
+  await expect(insightsButton.locator(".nav-label")).toHaveCSS("opacity", "0");
+  await expect(page.locator("#menuButton:visible, #sidebarCloseButton:visible")).toHaveCount(0);
 
   await page.evaluate(() => { document.documentElement.dataset.theme = "dark"; });
   const activeContrast = await sidebar.locator(".nav-button.active").evaluate(node => {
@@ -287,29 +289,36 @@ test("responsive sidebar keeps one consistent desktop control and the mobile dra
   expect(activeContrast).toMatchObject({ color:"rgb(16, 42, 49)", background:"rgb(223, 244, 232)" });
   await expect(sidebar.locator(".nav-button.active .nav-icon")).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
   await expect(sidebar.locator(".nav-icon-image")).toHaveCount(4);
-  await expect(sidebar.locator('.nav-button[data-page="reports"] .nav-icon')).toHaveCount(0);
-  await expect(sidebar.locator('.nav-button[data-page="reports"]')).toBeHidden();
+  await expect(insightsButton.locator(".nav-icon")).toHaveCount(0);
+  await expect(insightsButton).toBeVisible();
 
   const dashboardLabel = sidebar.locator('.nav-button[data-page="dashboard"] .nav-label');
   const overviewIcon = sidebar.locator('.nav-button[data-page="dashboard"] .nav-icon-image');
   const compactIconBox = await overviewIcon.boundingBox();
-  const compactRailControlBox = await railButton.boundingBox();
+  const compactInsightsBox = await insightsButton.boundingBox();
   await expect(dashboardLabel).toHaveCSS("max-width", "0px");
   await sidebar.evaluate(node => node.classList.add("desktop-open"));
   await expect(sidebar).toHaveCSS("width", "245px");
-  await expect(sidebar.locator('.nav-button[data-page="reports"]')).toBeVisible();
+  await expect(railButton).toBeVisible();
+  await expect(railButton).toHaveAttribute("aria-label", "Pin navigation open");
+  await expect(page.locator("#menuButton:visible, #sidebarCloseButton:visible")).toHaveCount(1);
+  await expect(insightsButton).toBeVisible();
+  await expect(insightsButton.locator(".nav-label")).toHaveCSS("opacity", "1");
   await expect(page.locator(".main")).toHaveCSS("margin-left", "64px");
   await expect(dashboardLabel).toHaveCSS("max-width", "170px");
   const expandedIconBox = await overviewIcon.boundingBox();
-  const expandedRailControlBox = await railButton.boundingBox();
+  const expandedInsightsBox = await insightsButton.boundingBox();
   expect(expandedIconBox).toMatchObject({ x:compactIconBox.x, y:compactIconBox.y });
-  expect(expandedRailControlBox).toMatchObject({ x:compactRailControlBox.x, y:compactRailControlBox.y });
+  expect(expandedInsightsBox.y).toBe(compactInsightsBox.y);
   expect(await dashboardLabel.evaluate(node => getComputedStyle(node).transitionDuration)).not.toBe("0s");
   await sidebar.evaluate(node => node.classList.remove("desktop-open"));
+  await expect(railButton).toBeHidden();
+  await expect(insightsButton).toBeVisible();
 
   await sidebar.evaluate(node => node.classList.add("desktop-open", "sidebar-pinned"));
   await page.evaluate(() => document.body.classList.add("sidebar-layout-pinned"));
   await expect(sidebar).toHaveCSS("width", "245px");
+  await expect(railButton).toBeVisible();
   await expect(page.locator(".main")).toHaveCSS("margin-left", "245px");
   await expect(sidebar.locator('.nav-button[data-page="dashboard"] .nav-label')).toHaveCSS("opacity", "1");
   await expect(sidebar.locator(".nav-group-label")).toHaveCount(0);
