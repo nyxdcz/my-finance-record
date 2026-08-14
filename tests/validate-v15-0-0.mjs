@@ -24,7 +24,7 @@ assert.equal(version.schemaVersion, 12, "V15 must preserve Finance Schema 12");
 assert.equal(version.cloudSchemaVersion, 3, "V15 must preserve Cloud Schema V3");
 assert.equal(version.name, "Liquid Glass Interface");
 assert.equal(version.released, "2026-08-15");
-assert.equal(version.cacheVersion, "finance-v15-20260815-liquid-glass-r2");
+assert.equal(version.cacheVersion, "finance-v15-20260815-liquid-glass-r3");
 
 assert.match(index, /<title>My Finance Records · V15\.0\.0<\/title>/, "browser title must be V15.0.0 before boot");
 assert.match(index, /id="buildBadge"[^>]*V15\.0\.0 · Liquid Glass Interface · August 15, 2026[^>]*>V15\.0\.0<\/small>/, "build badge must be V15.0.0");
@@ -35,7 +35,7 @@ assert.match(index, /"version":"V15\.0\.0","title":"Liquid Glass Interface"/, "V
 assert.match(index, /id="settingsOverviewAppStatus">Version 15\.0\.0</, "Settings overview must identify V15");
 
 assert.match(worker, /const APP_VERSION = "15\.0\.0";/, "service worker APP_VERSION must be V15");
-assert.match(worker, /const CACHE_VERSION = "finance-v15-20260815-liquid-glass-r2";/, "service-worker cache must rotate to current V15 generation");
+assert.match(worker, /const CACHE_VERSION = "finance-v15-20260815-liquid-glass-r3";/, "service-worker cache must rotate to current V15 generation");
 assert.match(worker, /asset\("\.\/liquid-glass-v15\.css\?v=15\.0\.0"\)/, "Liquid Glass CSS must be precached");
 assert.match(worker, /expense-screenshot-parser\.js\?v=15\.0\.0/, "changed screenshot loader URLs must use V15 cache pins");
 assert.match(worker, /\^finance-v\(\?:12\|13\|14\|15\)-/, "cache cleanup must include V15 generations");
