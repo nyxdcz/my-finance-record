@@ -85,11 +85,30 @@ assert.match(syncConfig, /expenseScreenshotLauncherButton/, "Add Expense should 
 assert.match(syncConfig, /📷<\/span> Upload Screenshot|📷<\/span> Preparing scanner/, "launcher should be clearly labeled Upload Screenshot");
 assert.match(syncConfig, /expenseFormModeNote/, "launcher should be positioned after the expense mode note");
 assert.match(syncConfig, /expense-screenshot-parser\.js\?v=14\.0\.23/, "screenshot parser should load from the app shell");
-assert.match(syncConfig, /expense-screenshot-detect\.js\?v=14\.0\.23/, "screenshot detector should load from the app shell");
+assert.match(syncConfig, /expense-screenshot-detect\.js\?v=14\.0\.23/, "local screenshot detector should remain loaded from the app shell");
+assert.match(syncConfig, /expense-screenshot-ai\.js\?v=14\.0\.23/, "optional AI screenshot detector should load after the local detector");
+assert.doesNotMatch(syncConfig, /OPENAI_API_KEY/, "browser sync config must not contain an OpenAI API key");
+
+const aiClient = fs.readFileSync(path.join(root, "expense-screenshot-ai.js"), "utf8");
+assert.match(aiClient, /Detect with AI/, "AI detector should expose a Detect with AI action");
+assert.match(aiClient, /Improve with AI/, "AI detector should reuse the latest local screenshot for optional improvement");
+assert.match(aiClient, /screenshotApi\(\)\?\.showResult/, "AI results should reuse the existing review and apply flow");
+assert.match(aiClient, /\/functions\/v1\/detect-payment/, "AI detector should use the authenticated Supabase Edge Function");
+assert.match(aiClient, /getSession\(\)/, "AI detector should require the existing signed-in Supabase session");
+assert.doesNotMatch(aiClient, /OPENAI_API_KEY/, "OpenAI API key must never be present in browser code");
+
+const edgeFunction = fs.readFileSync(path.join(root, "supabase/functions/detect-payment/index.ts"), "utf8");
+assert.match(edgeFunction, /Deno\.env\.get\("OPENAI_API_KEY"\)/, "Edge Function should read the OpenAI key only from server secrets");
+assert.match(edgeFunction, /gpt-5\.6-terra/, "Edge Function should default to GPT-5.6 Terra");
+assert.match(edgeFunction, /https:\/\/api\.openai\.com\/v1\/responses/, "Edge Function should use the OpenAI Responses API");
+assert.match(edgeFunction, /type:"input_image"/, "Edge Function should send the screenshot as image input");
+assert.match(edgeFunction, /type:"json_schema"/, "Edge Function should request a structured detector result");
+assert.match(edgeFunction, /store:false/, "AI screenshot response should disable response storage");
 
 const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
-assert.match(worker, /v1423-expense-upload-r1/, "service worker cache should be refreshed for the upload-button release");
+assert.match(worker, /v1423-expense-ai-r1/, "service worker cache should be refreshed for the optional AI detector");
 assert.match(worker, /expense-screenshot-parser\.js\?v=14\.0\.23/, "service worker should precache the screenshot parser");
-assert.match(worker, /expense-screenshot-detect\.js\?v=14\.0\.23/, "service worker should precache the screenshot detector");
+assert.match(worker, /expense-screenshot-detect\.js\?v=14\.0\.23/, "service worker should precache the local screenshot detector");
+assert.match(worker, /expense-screenshot-ai\.js\?v=14\.0\.23/, "service worker should precache the optional AI client");
 
-console.log("Expense screenshot parser and upload-button validation passed.");
+console.log("Expense screenshot local and optional AI detector validation passed.");

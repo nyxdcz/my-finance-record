@@ -7,6 +7,7 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, "..");
 const parserScript = path.join(root, "expense-screenshot-parser.js");
 const detectorScript = path.join(root, "expense-screenshot-detect.js");
+const aiScript = path.join(root, "expense-screenshot-ai.js");
 const appCss = fs.readFileSync(path.join(root, "app.css"), "utf8");
 const sourceHtml = fs.readFileSync(path.join(root, "index.html"), "utf8")
   .replace("</head>", `<style>${appCss}</style></head>`);
@@ -30,6 +31,7 @@ async function loadExpenseDialog(page, viewport = { width:900, height:760 }) {
   });
   await page.addScriptTag({ path:parserScript });
   await page.addScriptTag({ path:detectorScript });
+  await page.addScriptTag({ path:aiScript });
   await page.evaluate(() => document.getElementById("expenseDialog").showModal());
   await expect(page.locator("#expenseScreenshotPanel")).toBeVisible();
 }
@@ -52,6 +54,41 @@ test("detected screenshot details fill an empty Add Expense form after review", 
   await expect(page.locator("#expenseAmount")).toHaveValue("599.00");
   await expect(page.locator("#expenseAccount")).toHaveValue("GCash");
   await expect(page.locator("#expenseScreenshotStatusText")).toContainText("3 detected details applied");
+});
+
+test("optional AI detector keeps local scan and reuses the same review flow", async ({ page }) => {
+  await loadExpenseDialog(page);
+  await expect(page.locator("#expenseScreenshotChoose")).toBeVisible();
+  await expect(page.locator("#expenseScreenshotAiButton")).toBeVisible();
+  await expect(page.locator("#expenseScreenshotAiButton")).toHaveText("✨ Detect with AI");
+
+  await page.evaluate(async () => {
+    window.FINANCE_SYNC_CONFIG = { supabaseUrl:"https://example.supabase.co", supabasePublishableKey:"sb_publishable_test" };
+    window.FinanceCloudSyncInternals = {
+      loadClient:async () => ({ auth:{ getSession:async () => ({ data:{ session:{ access_token:"test-token" } }, error:null }) } })
+    };
+    window.fetch = async () => ({
+      ok:true,
+      status:200,
+      json:async () => ({ detection:{
+        name:"AI MERCHANT",
+        amount:725.5,
+        institution:"GCash",
+        matched_account:"GCash",
+        confidence:{ name:0.96, amount:0.99, account:0.94 }
+      } })
+    });
+    const file = new File([new Uint8Array([137, 80, 78, 71])], "ai-payment.png", { type:"image/png" });
+    await window.FinanceExpenseScreenshotAI.detectWithAi(file);
+  });
+
+  await expect(page.locator("#expenseScreenshotReview")).toBeVisible();
+  await expect(page.locator("#expenseScreenshotFileName")).toHaveText("AI · ai-payment.png");
+  await expect(page.locator("#expenseScreenshotResultList")).toContainText("AI MERCHANT");
+  await expect(page.locator("#expenseScreenshotResultList")).toContainText("₱725.50");
+  await expect(page.locator("#expenseScreenshotResultList")).toContainText("GCash");
+  await expect(page.locator("#expenseScreenshotChoose")).toBeVisible();
+  await expect(page.locator("#expenseScreenshotAiButton")).toHaveText("✨ Improve with AI");
 });
 
 test("existing expense values stay protected until the user explicitly selects replacements", async ({ page }) => {

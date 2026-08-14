@@ -7,6 +7,7 @@ const legacyBrowserFiles = [
   "cloud-sync.js",
   "expense-screenshot-detect.js",
   "expense-screenshot-parser.js",
+  "expense-screenshot-ai.js",
   "privacy-lock.js",
   "productivity-tools.js",
   "projects-calendar-v13.0.20.js",
