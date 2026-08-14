@@ -10,8 +10,8 @@
   "profileArchitectureVersion": 1,
   "encryptionVersion": 1,
   "authSecurityVersion": 1,
-  "cacheVersion": "finance-v15-20260815-liquid-glass-r1",
+  "cacheVersion": "finance-v15-20260815-liquid-glass-r2",
   "released": "2026-08-15",
   "name": "Liquid Glass Interface",
-  "notes": "Introduces an adaptive Liquid Glass control layer for navigation, toolbars, menus, popovers, modal chrome, and toasts while preserving opaque finance content and existing data schemas."
+  "notes": "Introduces an adaptive Liquid Glass control layer for navigation, toolbars, menus, popovers, modal chrome, toasts, and weekly marquees while preserving opaque finance content and existing data schemas."
 }
