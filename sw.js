@@ -1,7 +1,7 @@
 "use strict";
-const APP_VERSION = "14.0.23";
+const APP_VERSION = "15.0.0";
 self.__FINANCE_APP_VERSION = APP_VERSION;
-const CACHE_VERSION = "finance-v14-20260814-v1423-expense-ai-r1-add-toolbar-r1";
+const CACHE_VERSION = "finance-v15-20260815-liquid-glass-r1";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const DB_NAME = "simple-finance-project-records-v12-db";
@@ -18,6 +18,7 @@ const APP_SHELL = [
   asset("./app.css?v=14.0.23"),
   asset("./dashboard-interactions.css?v=14.0.23"),
   asset("./dashboard-interactions-core-v14-0-23.css"),
+  asset("./liquid-glass-v15.css?v=15.0.0"),
   asset("./mobile-v14-0-23.css?v=14.0.23"),
   asset("./interaction-patterns.js?v=14.0.23"),
   asset("./privacy-lock.js?v=14.0.23"),
@@ -40,9 +41,9 @@ const APP_SHELL = [
   asset("./projects-calendar-v13.0.20.js?v=14.0.23"),
   asset("./projects-calendar-v13.0.20.css?v=14.0.23"),
   asset("./sync-config.js"),
-  asset("./expense-screenshot-parser.js?v=14.0.23"),
-  asset("./expense-screenshot-detect.js?v=14.0.23"),
-  asset("./expense-screenshot-ai.js?v=14.0.23"),
+  asset("./expense-screenshot-parser.js?v=15.0.0"),
+  asset("./expense-screenshot-detect.js?v=15.0.0"),
+  asset("./expense-screenshot-ai.js?v=15.0.0"),
   asset("./vendor/supabase.min.js"),
   asset("./icons/icon-192.png"),
   asset("./icons/icon-512.png"),
@@ -89,7 +90,7 @@ self.addEventListener("install", event => {
 self.addEventListener("activate", event => {
   event.waitUntil((async () => {
     const keys = await caches.keys();
-    await Promise.all(keys.filter(key => /^finance-v(?:12|13|14)-/.test(key) && ![SHELL_CACHE, RUNTIME_CACHE].includes(key)).map(key => caches.delete(key)));
+    await Promise.all(keys.filter(key => /^finance-v(?:12|13|14|15)-/.test(key) && ![SHELL_CACHE, RUNTIME_CACHE].includes(key)).map(key => caches.delete(key)));
     await self.clients.claim();
   })());
 });
@@ -146,7 +147,7 @@ self.addEventListener("message", event => {
   if (event.data?.type === "SKIP_WAITING") self.skipWaiting();
   if (event.data?.type === "PRECACHE") event.waitUntil(precache());
   if (event.data?.type === "CLEAR_CACHES") {
-    event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(key => /^finance-v(?:12|13|14)-/.test(key)).map(key => caches.delete(key)))).then(precache));
+    event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(key => /^finance-v(?:12|13|14|15)-/.test(key)).map(key => caches.delete(key)))).then(precache));
   }
   if (event.data?.type === "FINANCE_ALERT_NOTIFY") {
     event.waitUntil(showFinanceNotification(event.data.payload || {}, { force:true }));
