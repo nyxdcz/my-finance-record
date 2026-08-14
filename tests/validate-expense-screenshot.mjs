@@ -80,4 +80,16 @@ assert.equal(
   JSON.stringify({ name:false, amount:false, account:false })
 );
 
-console.log("Expense screenshot parser validation passed.");
+const syncConfig = fs.readFileSync(path.join(root, "sync-config.js"), "utf8");
+assert.match(syncConfig, /expenseScreenshotLauncherButton/, "Add Expense should expose a visible screenshot launcher");
+assert.match(syncConfig, /📷<\/span> Upload Screenshot|📷<\/span> Preparing scanner/, "launcher should be clearly labeled Upload Screenshot");
+assert.match(syncConfig, /expenseFormModeNote/, "launcher should be positioned after the expense mode note");
+assert.match(syncConfig, /expense-screenshot-parser\.js\?v=14\.0\.23/, "screenshot parser should load from the app shell");
+assert.match(syncConfig, /expense-screenshot-detect\.js\?v=14\.0\.23/, "screenshot detector should load from the app shell");
+
+const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
+assert.match(worker, /v1423-expense-upload-r1/, "service worker cache should be refreshed for the upload-button release");
+assert.match(worker, /expense-screenshot-parser\.js\?v=14\.0\.23/, "service worker should precache the screenshot parser");
+assert.match(worker, /expense-screenshot-detect\.js\?v=14\.0\.23/, "service worker should precache the screenshot detector");
+
+console.log("Expense screenshot parser and upload-button validation passed.");
