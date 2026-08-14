@@ -24,7 +24,7 @@ assert.equal(version.schemaVersion, 12, "V15 must preserve Finance Schema 12");
 assert.equal(version.cloudSchemaVersion, 3, "V15 must preserve Cloud Schema V3");
 assert.equal(version.name, "Liquid Glass Interface");
 assert.equal(version.released, "2026-08-15");
-assert.equal(version.cacheVersion, "finance-v15-20260815-liquid-glass-r1");
+assert.equal(version.cacheVersion, "finance-v15-20260815-liquid-glass-r2");
 
 assert.match(index, /<title>My Finance Records · V15\.0\.0<\/title>/, "browser title must be V15.0.0 before boot");
 assert.match(index, /id="buildBadge"[^>]*V15\.0\.0 · Liquid Glass Interface · August 15, 2026[^>]*>V15\.0\.0<\/small>/, "build badge must be V15.0.0");
@@ -35,7 +35,7 @@ assert.match(index, /"version":"V15\.0\.0","title":"Liquid Glass Interface"/, "V
 assert.match(index, /id="settingsOverviewAppStatus">Version 15\.0\.0</, "Settings overview must identify V15");
 
 assert.match(worker, /const APP_VERSION = "15\.0\.0";/, "service worker APP_VERSION must be V15");
-assert.match(worker, /const CACHE_VERSION = "finance-v15-20260815-liquid-glass-r1";/, "service-worker cache must rotate to V15");
+assert.match(worker, /const CACHE_VERSION = "finance-v15-20260815-liquid-glass-r2";/, "service-worker cache must rotate to current V15 generation");
 assert.match(worker, /asset\("\.\/liquid-glass-v15\.css\?v=15\.0\.0"\)/, "Liquid Glass CSS must be precached");
 assert.match(worker, /expense-screenshot-parser\.js\?v=15\.0\.0/, "changed screenshot loader URLs must use V15 cache pins");
 assert.match(worker, /\^finance-v\(\?:12\|13\|14\|15\)-/, "cache cleanup must include V15 generations");
@@ -73,8 +73,10 @@ for (const token of [
   "@supports not"
 ]) assert.ok(glass.includes(token), `Liquid Glass stylesheet is missing ${token}`);
 
-assert.match(glass, /\.dashboard-week-marquee,[\s\S]*\.expense-screenshot-panel\s*\{[\s\S]*backdrop-filter:none;/, "finance/content surfaces must explicitly remain non-glass");
-assert.match(glass, /\.dashboard-week-marquee,[\s\S]*\.work-week-marquee\s*\{\s*background:var\(--surface\)!important;/, "weekly marquee content must remain opaque");
+assert.match(glass, /--liquid-glass-radius:7px;/, "rectangular Liquid Glass surfaces must use the shared 7px radius");
+assert.match(glass, /\.card,[\s\S]*\.expense-screenshot-panel\s*\{[\s\S]*backdrop-filter:none;/, "finance/content surfaces must explicitly remain non-glass");
+assert.match(glass, /\.dashboard-week-marquee,[\s\S]*\.work-week-marquee\s*\{[\s\S]*background:linear-gradient\(180deg,var\(--liquid-glass-surface-soft\),color-mix\(in srgb,var\(--liquid-glass-surface\) 84%,transparent\)\);[\s\S]*backdrop-filter:blur\(16px\) saturate\(135%\);/, "weekly marquees must use the shared V15 glass material");
+assert.match(glass, /\.dashboard-week-marquee,[\s\S]*\.work-week-marquee\s*\{[\s\S]*min-height:43px;[\s\S]*height:43px;/, "weekly marquees must remain 43px high");
 assert.match(glass, /:focus-visible/, "glass controls must keep explicit keyboard focus visibility");
 
 assert.match(workflow, /dashboard-interactions-core-v14-0-23\.css liquid-glass-v15\.css mobile-v14-0-23\.css/, "Pages bundle must include Liquid Glass CSS");
@@ -84,4 +86,4 @@ assert.ok(changelog.startsWith("## 15.0.0 · 2026-08-15"));
 assert.match(installer, /My Finance Records · V15\.0\.0 macOS Installer & Inspector/);
 assert.match(installer, /Executing full V15\.0\.0 quality validation/);
 
-console.log("V15.0.0 validation passed: release metadata, Liquid Glass scope, fallbacks, PWA cache, Cloud Sync compatibility, opaque content surfaces, and deployment packaging are consistent.");
+console.log("V15.0.0 validation passed: release metadata, 7px Liquid Glass controls, glass marquees, fallbacks, PWA cache, Cloud Sync compatibility, opaque finance content, and deployment packaging are consistent.");
