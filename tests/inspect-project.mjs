@@ -19,7 +19,7 @@ const requiredFiles = [
   "package.json", "package-lock.json", "README.md", ".gitignore",
   ".github/workflows/quality-pages.yml", "vendor/supabase.min.js",
   "sync-config.js", "sync-config.example.js", "privacy-lock.js", "cloud-conflict-review.js", "cloud-conflict-resolution.js", "cloud-sync-lifecycle.js", "projects-calendar-v13.0.20.js", "projects-calendar-v13.0.20.css",
-  "expense-screenshot-parser.js", "expense-screenshot-detect.js",
+  "expense-screenshot-parser.js", "expense-screenshot-detect.js", "expense-screenshot-ai.js", "supabase/functions/detect-payment/index.ts", "AI_SCREENSHOT_DETECTOR_SETUP.md",
   "Install_V14_0_23.command", "run_audit.sh", "eslint.config.js", "playwright.config.mjs",
   "tests/validate-v14-0-23.mjs", "tests/validate-expense-screenshot.mjs", "tests/expense-screenshot.spec.mjs", "tests/privacy-and-inputs.spec.mjs", "tests/check-maintainability.mjs"
 ];
@@ -82,6 +82,7 @@ const syncConfig = read("sync-config.js");
 const syncConfigCode = syncConfig.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|\s)\/\/.*$/gm, "$1");
 if (/sb_secret_/i.test(syncConfigCode) || /service_role/i.test(syncConfigCode)) fail("sync-config.js contains a secret/service-role key pattern");
 if (!/sb_publishable_|anon/i.test(syncConfigCode)) warn("sync-config.js does not appear to contain a publishable/anon key; cloud sync may require device setup");
+if (/OPENAI_API_KEY\s*[:=]\s*["'][^"']+/i.test(syncConfigCode)) fail("sync-config.js must never contain an OpenAI API key");
 
 if (process.platform !== "win32") {
   for (const file of ["Install_V14_0_23.command", "run_audit.sh"]) {
