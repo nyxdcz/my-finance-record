@@ -1,7 +1,7 @@
 "use strict";
 const APP_VERSION = "15.0.0";
 self.__FINANCE_APP_VERSION = APP_VERSION;
-// V15 dashboard/chrome cleanup refresh · flat toolbar/toast pass: changing this worker forces installed PWAs to precache the updated V15 stylesheet without changing the release version or cache namespace.
+// V15 dashboard/chrome cleanup refresh · flat toolbar/toast pass · dashboard spacing/sidebar edge pass: changing this worker forces installed PWAs to precache the updated V15 stylesheet without changing the release version or cache namespace.
 const CACHE_VERSION = "finance-v15-20260815-liquid-glass-r2";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
