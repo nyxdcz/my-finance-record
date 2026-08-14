@@ -6,6 +6,53 @@ window.FINANCE_SYNC_CONFIG = window.FINANCE_SYNC_CONFIG || {
   supabasePublishableKey: "sb_publishable_Rq4T07FdPXCm4OARCIjhwg_sGAPoXSD"
 };
 
+(function applyV15ReleaseLayer() {
+  const VERSION = "15.0.0";
+  const RELEASE_NAME = "Liquid Glass Interface";
+  const RELEASE_DATE = "August 15, 2026";
+  window.FINANCE_APP_VERSION_OVERRIDE = VERSION;
+  window.FINANCE_RELEASE_OVERRIDE = { version:VERSION, name:RELEASE_NAME, released:"2026-08-15" };
+
+  function ensureLiquidGlassStyles() {
+    if (document.getElementById("financeLiquidGlassStyles")) return;
+    const link = document.createElement("link");
+    link.id = "financeLiquidGlassStyles";
+    link.rel = "stylesheet";
+    link.href = `./liquid-glass-v15.css?v=${VERSION}`;
+    document.head.appendChild(link);
+  }
+
+  function synchronizeV15ReleaseDisplay() {
+    document.documentElement.dataset.appVersion = VERSION;
+    document.title = `My Finance Records · V${VERSION}`;
+    const badge = document.getElementById("buildBadge");
+    if (badge) {
+      badge.textContent = `V${VERSION}`;
+      badge.title = `V${VERSION} · ${RELEASE_NAME} · ${RELEASE_DATE}`;
+    }
+  }
+
+  function bootReleaseLayer() {
+    ensureLiquidGlassStyles();
+    synchronizeV15ReleaseDisplay();
+    const title = document.querySelector("title");
+    if (title && title.dataset.v15ObserveBound !== "true") {
+      title.dataset.v15ObserveBound = "true";
+      new MutationObserver(synchronizeV15ReleaseDisplay).observe(title, { childList:true, characterData:true, subtree:true });
+    }
+    const badge = document.getElementById("buildBadge");
+    if (badge && badge.dataset.v15ObserveBound !== "true") {
+      badge.dataset.v15ObserveBound = "true";
+      new MutationObserver(() => {
+        if (badge.textContent !== `V${VERSION}`) synchronizeV15ReleaseDisplay();
+      }).observe(badge, { childList:true, characterData:true, subtree:true, attributes:true, attributeFilter:["title"] });
+    }
+  }
+
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", bootReleaseLayer, { once:true });
+  else bootReleaseLayer();
+})();
+
 (function loadExpenseScreenshotTools() {
   // Legacy validation marker for the unchanged detector test contract: <span>📷</span> Upload Screenshot
   let toolsPromise = null;
@@ -351,9 +398,9 @@ window.FINANCE_SYNC_CONFIG = window.FINANCE_SYNC_CONFIG || {
   async function start() {
     if (toolsPromise) return toolsPromise;
     toolsPromise = (async () => {
-      await loadScript("./expense-screenshot-parser.js?v=14.0.23", "expenseScreenshotParserScript");
-      await loadScript("./expense-screenshot-detect.js?v=14.0.23", "expenseScreenshotDetectScript");
-      await loadScript("./expense-screenshot-ai.js?v=14.0.23", "expenseScreenshotAiScript");
+      await loadScript("./expense-screenshot-parser.js?v=15.0.0", "expenseScreenshotParserScript");
+      await loadScript("./expense-screenshot-detect.js?v=15.0.0", "expenseScreenshotDetectScript");
+      await loadScript("./expense-screenshot-ai.js?v=15.0.0", "expenseScreenshotAiScript");
       window.FinanceExpenseScreenshot?.ensurePanel?.();
       window.FinanceExpenseScreenshotAI?.ensureAiControls?.();
       ensureCompactScreenshotUi();
