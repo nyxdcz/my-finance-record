@@ -40,6 +40,7 @@ assert.match(worker, /asset\("\.\/liquid-glass-v15\.css\?v=15\.0\.0"\)/, "Liquid
 assert.match(worker, /expense-screenshot-parser\.js\?v=15\.0\.0/, "changed screenshot loader URLs must use V15 cache pins");
 assert.match(worker, /\^finance-v\(\?:12\|13\|14\|15\)-/, "cache cleanup must include V15 generations");
 assert.match(worker, /dashboard\/chrome cleanup refresh/, "service worker must refresh installed PWAs for the dashboard cleanup");
+assert.match(worker, /customize-dashboard-v15\.png/, "service worker must precache the supplied Customize Dashboard icon");
 
 assert.match(cloud, /const APP_VERSION_FALLBACK = "15\.0\.0";/, "Cloud Sync fallback must be V15");
 assert.match(cloud, /const APP_VERSION_CODE = 130000;/, "visual V15 release must not change the Cloud Schema writer code");
@@ -87,6 +88,9 @@ assert.match(glass, /#dashboard #addSavingsGoalButton\s*\{[\s\S]*max-width:max-c
 assert.match(glass, /#expenseDialog #expenseFormModeNote\s*\{\s*display:none!important;\s*\}/, "expense mode explanation must be removed from the visible form without breaking type switching");
 assert.match(glass, /\.toast\s*\{[\s\S]*width:max-content!important;[\s\S]*min-width:0!important;[\s\S]*padding:7px 9px!important;/, "status toast must use compact content-sized geometry");
 assert.match(glass, /\.toast \.toast-message\s*\{[\s\S]*background:transparent!important;[\s\S]*box-shadow:none!important;/, "toast message text must not render a nested glass panel");
+assert.match(glass, /customize-dashboard-v15\.png/, "Customize Dashboard must use the supplied icon asset");
+assert.match(glass, /chart-data-table-wrap[\s\S]*max-height:68px!important;/, "expanded exact cash-flow values must stay contained inside the existing bento height");
+assert.match(glass, /cash-flow-chart-panel \.chart-svg[\s\S]*height:104px!important;/, "wide cash-flow charts must compact vertically without changing the bento height");
 
 assert.match(workflow, /dashboard-interactions-core-v14-0-23\.css liquid-glass-v15\.css mobile-v14-0-23\.css/, "Pages bundle must include Liquid Glass CSS");
 assert.match(workflow, /test -f _site\/liquid-glass-v15\.css/, "Pages preparation must verify the V15 stylesheet");
@@ -95,4 +99,4 @@ assert.ok(changelog.startsWith("## 15.0.0 · 2026-08-15"));
 assert.match(installer, /My Finance Records · V15\.0\.0 macOS Installer & Inspector/);
 assert.match(installer, /Executing full V15\.0\.0 quality validation/);
 
-console.log("V15.0.0 validation passed: release metadata, 7px Liquid Glass controls, glass marquees, compact Dashboard chrome, accessible compact toasts, PWA cache, Cloud Sync compatibility, opaque finance content, and deployment packaging are consistent.");
+console.log("V15.0.0 validation passed: release metadata, 7px Liquid Glass controls, glass marquees, compact Dashboard chrome, supplied Customize icon, cash-flow bento fitting, accessible compact toasts, PWA cache, Cloud Sync compatibility, opaque finance content, and deployment packaging are consistent.");
