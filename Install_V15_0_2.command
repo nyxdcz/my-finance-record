@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# My Finance Records V15.0.1 · File Inspection & Fixes macOS Installer
+# My Finance Records V15.0.2 · File Inspection & Fixes macOS Installer
 # Idempotent macOS automated environment check, dependency sync, and build validator.
 
 set -euo pipefail
 
 echo "================================================================"
-echo "  My Finance Records · V15.0.1 macOS Installer & Inspector"
+echo "  My Finance Records · V15.0.2 macOS Installer & Inspector"
 echo "================================================================"
 echo ""
 
@@ -65,7 +65,7 @@ echo "   ✓ Dependencies synced successfully."
 echo ""
 
 # 5. Run Quality & Integrity Validation Suite
-echo "🧪 [4/5] Executing full V15.0.1 quality validation..."
+echo "🧪 [4/5] Executing full V15.0.2 quality validation..."
 npm run quality
 echo ""
 
@@ -77,7 +77,7 @@ fi
 echo ""
 
 echo "================================================================"
-echo "  SUCCESS: My Finance Records V15.0.1 Installation & Audit Passed!"
+echo "  SUCCESS: My Finance Records V15.0.2 Installation & Audit Passed!"
 echo "================================================================"
 echo "  Repository inspection, lint, maintainability, regression,"
 echo "  permissions, metadata, and optional browser checks passed."
