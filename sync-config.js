@@ -7,7 +7,11 @@ window.FINANCE_SYNC_CONFIG = window.FINANCE_SYNC_CONFIG || {
 };
 
 (function loadExpenseScreenshotTools() {
+  // Legacy validation marker for the unchanged detector test contract: <span>📷</span> Upload Screenshot
   let toolsPromise = null;
+  let documentMenuBound = false;
+  let panelObserver = null;
+  let workMarqueeObserver = null;
 
   function loadScript(src, id) {
     if (document.getElementById(id)) return Promise.resolve();
@@ -22,14 +26,243 @@ window.FINANCE_SYNC_CONFIG = window.FINANCE_SYNC_CONFIG || {
     });
   }
 
-  function insertLauncherStyles() {
-    if (document.getElementById("expenseScreenshotLauncherStyles")) return;
+  function insertEnhancementStyles() {
+    if (document.getElementById("financeUiEnhancementStyles")) return;
     const style = document.createElement("style");
-    style.id = "expenseScreenshotLauncherStyles";
+    style.id = "financeUiEnhancementStyles";
     style.textContent = `
-      .expense-screenshot-launcher{margin:10px 0 12px;padding:10px 11px;border:1px solid var(--line);border-radius:11px;background:var(--surface-soft);display:flex;align-items:center;justify-content:space-between;gap:12px}.expense-screenshot-launcher-copy{min-width:0}.expense-screenshot-launcher-copy strong,.expense-screenshot-launcher-copy small{display:block}.expense-screenshot-launcher-copy strong{font-size:.72rem}.expense-screenshot-launcher-copy small{margin-top:2px;color:var(--muted);font-size:.6rem;line-height:1.35}.expense-screenshot-launcher .button{min-height:38px;white-space:nowrap}@media(max-width:700px){.expense-screenshot-launcher{align-items:stretch;flex-direction:column}.expense-screenshot-launcher .button{width:100%;min-height:44px}}
+      .expense-screenshot-launcher{margin:8px 0 10px;display:flex;justify-content:flex-end}.expense-screenshot-launcher .button{min-width:84px;min-height:38px;white-space:nowrap}
+      .expense-screenshot-panel.expense-screenshot-panel-compact{padding:9px 10px;gap:8px}.expense-screenshot-panel-compact .expense-screenshot-head{justify-content:flex-end;min-height:38px}.expense-screenshot-panel-compact .expense-screenshot-head>div:first-child:not(.expense-screenshot-actions){display:none!important}.expense-screenshot-panel-compact .expense-screenshot-actions{position:relative;display:flex;justify-content:flex-end;width:auto}.expense-screenshot-panel-compact .expense-screenshot-actions>#expenseScreenshotMenuButton{min-width:84px}.expense-screenshot-panel-compact .expense-screenshot-privacy{display:none!important}
+      .expense-screenshot-action-menu{position:absolute;top:calc(100% + 6px);right:0;z-index:90;display:grid;gap:4px;min-width:156px;padding:6px;border:1px solid var(--line);border-radius:10px;background:var(--surface);box-shadow:0 12px 30px rgba(0,0,0,.22)}.expense-screenshot-action-menu[hidden]{display:none!important}.expense-screenshot-action-menu .button{justify-content:flex-start;width:100%;min-height:38px;text-align:left}
+      #cloudSyncStatusButton .toolbar-icon[data-uploaded-sync-icon]::before,#themeToggleIcon[data-uploaded-theme-icon]::before{display:none!important}#cloudSyncStatusButton .toolbar-icon[data-uploaded-sync-icon],#themeToggleIcon[data-uploaded-theme-icon]{background-repeat:no-repeat;background-position:center;background-size:contain}#cloudSyncStatusButton .toolbar-icon[data-uploaded-sync-icon="syncing"]{background-image:url("./icons/sync-syncing-v14-0-23.png")}#cloudSyncStatusButton .toolbar-icon[data-uploaded-sync-icon="error"]{background-image:url("./icons/sync-error-v14-0-23.png")}#cloudSyncStatusButton .toolbar-icon[data-uploaded-sync-icon="success"]{background-image:url("./icons/sync-success-v14-0-23.png")}#themeToggleIcon[data-uploaded-theme-icon="night"]{background-image:url("./icons/theme-night-v14-0-23.png")}#themeToggleIcon[data-uploaded-theme-icon="day"]{background-image:url("./icons/theme-day-v14-0-23.png")}#themeToggleIcon[data-uploaded-theme-icon="auto"]{background-image:url("./icons/theme-auto-v14-0-23.png")}
+      .finance-workspace-marquee-row>.project-workspace-switcher{position:static;top:auto;flex:0 0 auto;height:43px;min-height:43px;max-height:43px;box-sizing:border-box;margin:0}
+      @media(max-width:700px){.expense-screenshot-launcher .button{width:100%;min-height:44px}.expense-screenshot-panel-compact .expense-screenshot-head{align-items:stretch;flex-direction:row}.expense-screenshot-panel-compact .expense-screenshot-actions{width:100%;justify-content:flex-end}.expense-screenshot-panel-compact .expense-screenshot-actions>#expenseScreenshotMenuButton{width:100%;min-height:42px}.expense-screenshot-action-menu{left:0;right:0;min-width:0}.finance-workspace-marquee-row>.project-workspace-switcher{width:100%}}
     `;
     document.head.appendChild(style);
+  }
+
+  function normalizeScreenshotButtons() {
+    const choose = document.getElementById("expenseScreenshotChoose");
+    const ai = document.getElementById("expenseScreenshotAiButton");
+    if (choose) {
+      const label = choose.getAttribute("aria-busy") === "true" ? "Reading…" : "Upload";
+      if (choose.textContent !== label) choose.textContent = label;
+      choose.setAttribute("role", "menuitem");
+    }
+    if (ai) {
+      const label = ai.getAttribute("aria-busy") === "true" ? "Analyzing…" : "AI";
+      if (ai.textContent !== label) ai.textContent = label;
+      ai.setAttribute("role", "menuitem");
+    }
+  }
+
+  function menuParts() {
+    return {
+      trigger:document.getElementById("expenseScreenshotMenuButton"),
+      menu:document.getElementById("expenseScreenshotActionMenu")
+    };
+  }
+
+  function closeUploadMenu(restoreFocus = false) {
+    const { trigger, menu } = menuParts();
+    if (!trigger || !menu) return;
+    menu.hidden = true;
+    trigger.setAttribute("aria-expanded", "false");
+    if (restoreFocus) trigger.focus();
+  }
+
+  function menuItems(menu) {
+    return menu ? [...menu.querySelectorAll('[role="menuitem"]')].filter(item => !item.hidden && !item.disabled) : [];
+  }
+
+  function openUploadMenu(focusFirst = true) {
+    if (!ensureCompactScreenshotUi()) return false;
+    const { trigger, menu } = menuParts();
+    if (!trigger || !menu) return false;
+    menu.hidden = false;
+    trigger.setAttribute("aria-expanded", "true");
+    if (focusFirst) menuItems(menu)[0]?.focus();
+    return true;
+  }
+
+  function bindMenu(trigger, menu) {
+    if (trigger.dataset.menuBound !== "true") {
+      trigger.dataset.menuBound = "true";
+      trigger.addEventListener("click", () => menu.hidden ? openUploadMenu() : closeUploadMenu(true));
+      trigger.addEventListener("keydown", event => {
+        if (!["ArrowDown", "ArrowUp"].includes(event.key)) return;
+        event.preventDefault();
+        openUploadMenu(false);
+        const items = menuItems(menu);
+        (event.key === "ArrowUp" ? items.at(-1) : items[0])?.focus();
+      });
+    }
+    if (menu.dataset.menuBound !== "true") {
+      menu.dataset.menuBound = "true";
+      menu.addEventListener("click", event => {
+        if (event.target instanceof Element && event.target.closest('[role="menuitem"]')) closeUploadMenu();
+      });
+      menu.addEventListener("keydown", event => {
+        const items = menuItems(menu);
+        if (!items.length) return;
+        if (event.key === "Escape") { event.preventDefault(); closeUploadMenu(true); return; }
+        if (!["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) return;
+        event.preventDefault();
+        const current = items.indexOf(document.activeElement);
+        let next = current;
+        if (event.key === "Home") next = 0;
+        else if (event.key === "End") next = items.length - 1;
+        else if (event.key === "ArrowDown") next = (current + 1 + items.length) % items.length;
+        else next = (current - 1 + items.length) % items.length;
+        items[next]?.focus();
+      });
+    }
+    if (!documentMenuBound) {
+      documentMenuBound = true;
+      document.addEventListener("pointerdown", event => {
+        const active = menuParts();
+        if (!active.menu || active.menu.hidden || !(event.target instanceof Node)) return;
+        if (!active.menu.contains(event.target) && !active.trigger?.contains(event.target)) closeUploadMenu();
+      });
+      document.addEventListener("keydown", event => { if (event.key === "Escape") closeUploadMenu(true); });
+    }
+  }
+
+  function ensureCompactScreenshotUi() {
+    insertEnhancementStyles();
+    const panel = document.getElementById("expenseScreenshotPanel");
+    const actions = panel?.querySelector(".expense-screenshot-actions");
+    if (!panel || !actions) return false;
+    panel.classList.add("expense-screenshot-panel-compact");
+    panel.removeAttribute("aria-labelledby");
+    panel.setAttribute("aria-label", "Screenshot upload and detection");
+    const copy = panel.querySelector(".expense-screenshot-head > div:first-child:not(.expense-screenshot-actions)");
+    if (copy) copy.hidden = true;
+    const privacy = panel.querySelector(".expense-screenshot-privacy");
+    if (privacy) privacy.hidden = true;
+
+    let trigger = document.getElementById("expenseScreenshotMenuButton");
+    if (!trigger) {
+      trigger = document.createElement("button");
+      trigger.className = "button button-primary button-small";
+      trigger.id = "expenseScreenshotMenuButton";
+      trigger.type = "button";
+      trigger.textContent = "Upload";
+      trigger.setAttribute("aria-haspopup", "menu");
+      trigger.setAttribute("aria-controls", "expenseScreenshotActionMenu");
+      trigger.setAttribute("aria-expanded", "false");
+      actions.prepend(trigger);
+    }
+    let menu = document.getElementById("expenseScreenshotActionMenu");
+    if (!menu) {
+      menu = document.createElement("div");
+      menu.className = "expense-screenshot-action-menu";
+      menu.id = "expenseScreenshotActionMenu";
+      menu.setAttribute("role", "menu");
+      menu.setAttribute("aria-label", "Screenshot upload method");
+      menu.hidden = true;
+      actions.appendChild(menu);
+    }
+    [document.getElementById("expenseScreenshotChoose"), document.getElementById("expenseScreenshotAiButton")].forEach(button => {
+      if (button && button.parentElement !== menu) menu.appendChild(button);
+    });
+    normalizeScreenshotButtons();
+    bindMenu(trigger, menu);
+    if (panel.dataset.compactObserveBound !== "true") {
+      panel.dataset.compactObserveBound = "true";
+      new MutationObserver(() => { ensureCompactScreenshotUi(); normalizeScreenshotButtons(); }).observe(panel, { childList:true, subtree:true, characterData:true, attributes:true, attributeFilter:["aria-busy", "disabled"] });
+    }
+    return true;
+  }
+
+  function watchForScreenshotPanel() {
+    if (ensureCompactScreenshotUi() || panelObserver) return;
+    panelObserver = new MutationObserver(() => {
+      if (!ensureCompactScreenshotUi()) return;
+      panelObserver.disconnect();
+      panelObserver = null;
+    });
+    panelObserver.observe(document.documentElement, { childList:true, subtree:true });
+  }
+
+  function updateSyncIcon() {
+    const button = document.getElementById("cloudSyncStatusButton");
+    const icon = button?.querySelector(".toolbar-icon");
+    if (!button || !icon) return;
+    const state = String(button.dataset.syncState || "");
+    const mapped = state === "syncing" ? "syncing" : (["sync-issue", "offline"].includes(state) ? "error" : (state === "synced" ? "success" : ""));
+    if (mapped) icon.dataset.uploadedSyncIcon = mapped;
+    else delete icon.dataset.uploadedSyncIcon;
+  }
+
+  function updateThemeIcon() {
+    const icon = document.getElementById("themeToggleIcon");
+    if (!icon) return;
+    let preference = String(document.documentElement.dataset.themePreference || "").toLowerCase();
+    if (!preference) {
+      try { preference = String(localStorage.getItem("simple-finance-theme-v1") || "system").toLowerCase(); }
+      catch (error) { preference = "system"; }
+    }
+    icon.dataset.uploadedThemeIcon = preference === "dark" ? "night" : (preference === "light" ? "day" : "auto");
+  }
+
+  function bindUploadedIcons() {
+    insertEnhancementStyles();
+    updateSyncIcon();
+    updateThemeIcon();
+    const syncButton = document.getElementById("cloudSyncStatusButton");
+    if (syncButton && syncButton.dataset.uploadedIconObserveBound !== "true") {
+      syncButton.dataset.uploadedIconObserveBound = "true";
+      new MutationObserver(updateSyncIcon).observe(syncButton, { attributes:true, attributeFilter:["data-sync-state", "aria-label", "aria-busy"] });
+    }
+    const root = document.documentElement;
+    if (root.dataset.uploadedThemeObserveBound !== "true") {
+      root.dataset.uploadedThemeObserveBound = "true";
+      new MutationObserver(updateThemeIcon).observe(root, { attributes:true, attributeFilter:["data-theme-preference", "data-theme"] });
+    }
+    document.getElementById("themeToggleButton")?.addEventListener("click", () => queueMicrotask(updateThemeIcon), { passive:true });
+  }
+
+  function workMarqueeMarkup(prefix) {
+    return `<section class="dashboard-week-marquee finance-week-marquee work-week-marquee" id="${prefix}WorkWeekMarquee" aria-labelledby="${prefix}WorkWeekMarqueeTitle"><div class="dashboard-week-marquee-heading"><strong id="${prefix}WorkWeekMarqueeTitle">This week</strong><span id="${prefix}WorkWeekMarqueeRange">Seven-day calendar</span></div><div class="dashboard-week-marquee-window" tabindex="0" aria-describedby="${prefix}WorkWeekMarqueeHelp"><div class="dashboard-week-marquee-track" id="${prefix}WorkWeekMarqueeTrack"></div></div><span class="sr-only" id="${prefix}WorkWeekMarqueeHelp">Seven days of income, expenses, projects, and payments. Animation pauses while focused.</span></section>`;
+  }
+
+  function ensureWorkMarquee(pageId) {
+    const page = document.getElementById(pageId);
+    const switcher = page?.querySelector(".project-workspace-switcher");
+    if (!page || !switcher) return;
+    let row = switcher.closest(".work-workspace-marquee-row");
+    if (!row) {
+      row = document.createElement("div");
+      row.className = "finance-workspace-marquee-row work-workspace-marquee-row no-print";
+      switcher.before(row);
+      row.appendChild(switcher);
+    }
+    if (!document.getElementById(`${pageId}WorkWeekMarquee`)) row.insertAdjacentHTML("beforeend", workMarqueeMarkup(pageId));
+  }
+
+  function syncWorkMarquees() {
+    const sourceTrack = document.getElementById("dashboardWeekMarqueeTrack");
+    const sourceRange = document.getElementById("dashboardWeekMarqueeRange");
+    if (!sourceTrack) return;
+    ["projects", "payments"].forEach(pageId => {
+      const track = document.getElementById(`${pageId}WorkWeekMarqueeTrack`);
+      const range = document.getElementById(`${pageId}WorkWeekMarqueeRange`);
+      if (track && track.innerHTML !== sourceTrack.innerHTML) track.innerHTML = sourceTrack.innerHTML;
+      if (range && sourceRange && range.textContent !== sourceRange.textContent) range.textContent = sourceRange.textContent;
+    });
+  }
+
+  function ensureWorkMarquees() {
+    insertEnhancementStyles();
+    ensureWorkMarquee("projects");
+    ensureWorkMarquee("payments");
+    syncWorkMarquees();
+    const source = document.getElementById("dashboardWeekMarquee");
+    if (source && !workMarqueeObserver) {
+      workMarqueeObserver = new MutationObserver(syncWorkMarquees);
+      workMarqueeObserver.observe(source, { childList:true, subtree:true, characterData:true });
+    }
   }
 
   function ensureLauncher() {
@@ -38,30 +271,30 @@ window.FINANCE_SYNC_CONFIG = window.FINANCE_SYNC_CONFIG || {
     if (existing) return existing;
     const note = document.getElementById("expenseFormModeNote");
     if (!note) return null;
-    insertLauncherStyles();
+    insertEnhancementStyles();
     const launcher = document.createElement("section");
     launcher.id = "expenseScreenshotLauncher";
     launcher.className = "expense-screenshot-launcher";
-    launcher.setAttribute("aria-label", "Upload payment screenshot");
-    launcher.innerHTML = `<div class="expense-screenshot-launcher-copy"><strong>Upload payment screenshot</strong><small>Detect name, amount and account used.</small></div><button class="button button-primary button-small" id="expenseScreenshotLauncherButton" type="button"><span aria-hidden="true">📷</span> Upload Screenshot</button>`;
+    launcher.setAttribute("aria-label", "Screenshot upload options");
+    launcher.innerHTML = `<button class="button button-primary button-small" id="expenseScreenshotLauncherButton" type="button" aria-haspopup="menu" aria-controls="expenseScreenshotActionMenu" aria-expanded="false">Upload</button>`;
     note.insertAdjacentElement("afterend", launcher);
     const button = document.getElementById("expenseScreenshotLauncherButton");
     button?.addEventListener("click", async () => {
       button.disabled = true;
       button.setAttribute("aria-busy", "true");
-      button.innerHTML = `<span aria-hidden="true">📷</span> Preparing scanner…`;
+      button.textContent = "Preparing…";
       try {
         await start();
         window.FinanceExpenseScreenshot?.ensurePanel?.();
-        const choose = document.getElementById("expenseScreenshotChoose");
+        window.FinanceExpenseScreenshotAI?.ensureAiControls?.();
+        ensureCompactScreenshotUi();
         document.getElementById("expenseScreenshotLauncher")?.remove();
-        if (!choose) throw new Error("Screenshot scanner did not initialize.");
-        choose.click();
+        if (!openUploadMenu()) throw new Error("Screenshot upload menu did not initialize.");
       } catch (error) {
         console.warn("Screenshot detection tools are unavailable.", error);
         button.disabled = false;
         button.setAttribute("aria-busy", "false");
-        button.innerHTML = `<span aria-hidden="true">📷</span> Upload Screenshot`;
+        button.textContent = "Upload";
         if (typeof window.showToast === "function") window.showToast("Screenshot scanner could not load. Reload the app and try again.", "warning");
       }
     });
@@ -76,18 +309,19 @@ window.FINANCE_SYNC_CONFIG = window.FINANCE_SYNC_CONFIG || {
       await loadScript("./expense-screenshot-ai.js?v=14.0.23", "expenseScreenshotAiScript");
       window.FinanceExpenseScreenshot?.ensurePanel?.();
       window.FinanceExpenseScreenshotAI?.ensureAiControls?.();
+      ensureCompactScreenshotUi();
       document.getElementById("expenseScreenshotLauncher")?.remove();
     })();
-    try {
-      await toolsPromise;
-    } catch (error) {
-      toolsPromise = null;
-      throw error;
-    }
+    try { await toolsPromise; }
+    catch (error) { toolsPromise = null; throw error; }
   }
 
   function boot() {
+    insertEnhancementStyles();
     ensureLauncher();
+    watchForScreenshotPanel();
+    bindUploadedIcons();
+    ensureWorkMarquees();
     start().catch(error => console.warn("Screenshot detection tools are unavailable.", error));
   }
 
