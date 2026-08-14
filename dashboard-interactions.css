@@ -178,3 +178,85 @@ html[data-theme="dark"] .sidebar .nav-button.active .nav-icon-image{
   }
   #dashboard>:not(.page-heading):not(#dashboardWeekMarquee){grid-column:1/-1}
 }
+
+/* V14.0.24 · Add labels without plus signs, currentColor sparkle masks, and compact Customize. */
+#quickAddExpense .toolbar-icon{
+  background-image:none!important;
+  background-color:transparent!important;
+}
+#quickAddExpense .toolbar-icon::before{
+  content:""!important;
+  display:inline-block!important;
+  width:20px!important;
+  height:20px!important;
+  flex:0 0 20px!important;
+  background:currentColor!important;
+  -webkit-mask-image:url("./icons/action-add-sparkle-v14-0-23.png")!important;
+  mask-image:url("./icons/action-add-sparkle-v14-0-23.png")!important;
+  -webkit-mask-repeat:no-repeat!important;
+  mask-repeat:no-repeat!important;
+  -webkit-mask-position:center!important;
+  mask-position:center!important;
+  -webkit-mask-size:contain!important;
+  mask-size:contain!important;
+}
+#quickAddExpense[data-action-kind="project"]::before{content:none!important;display:none!important}
+
+#addAccountButton,#addSavingsGoalButton,[data-pc-add],[data-pc-full-add]{
+  gap:6px!important;
+  font-size:0!important;
+}
+#addAccountButton::before,#addSavingsGoalButton::before,[data-pc-add]::before,[data-pc-full-add]::before{
+  content:""!important;
+  display:inline-block!important;
+  width:18px!important;
+  height:18px!important;
+  flex:0 0 18px!important;
+  background:currentColor!important;
+  -webkit-mask-image:url("./icons/action-add-sparkle-v14-0-23.png")!important;
+  mask-image:url("./icons/action-add-sparkle-v14-0-23.png")!important;
+  -webkit-mask-repeat:no-repeat!important;
+  mask-repeat:no-repeat!important;
+  -webkit-mask-position:center!important;
+  mask-position:center!important;
+  -webkit-mask-size:contain!important;
+  mask-size:contain!important;
+}
+#addAccountButton::after{content:"Add account";font-size:.76rem;line-height:1.2}
+#addSavingsGoalButton::after{content:"Add goal";font-size:.76rem;line-height:1.2}
+[data-pc-add]::after,[data-pc-full-add]::after{content:"Schedule event";font-size:.76rem;line-height:1.2}
+
+#customizeDashboardButton[data-dashboard-toolbar-action]{
+  width:38px!important;
+  min-width:38px!important;
+  max-width:38px!important;
+  height:38px!important;
+  min-height:38px!important;
+  max-height:38px!important;
+  flex:0 0 38px!important;
+  padding:0!important;
+  gap:0!important;
+  font-size:0!important;
+  line-height:0!important;
+  display:inline-grid!important;
+  place-items:center!important;
+}
+#customizeDashboardButton[data-dashboard-toolbar-action]::before{
+  width:20px!important;
+  height:20px!important;
+  margin:0!important;
+  background:currentColor!important;
+}
+
+@media(max-width:700px){
+  #customizeDashboardButton[data-dashboard-toolbar-action]{
+    width:44px!important;
+    min-width:44px!important;
+    max-width:44px!important;
+    height:44px!important;
+    min-height:44px!important;
+    max-height:44px!important;
+    flex-basis:44px!important;
+  }
+  #customizeDashboardButton[data-dashboard-toolbar-action]::before{width:19px!important;height:19px!important}
+}
