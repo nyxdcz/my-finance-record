@@ -42,4 +42,4 @@ jobs:
           git add -A
           git commit -m "release: V15.0.2 cash-flow chart focus"
           git push origin HEAD:agent/v15-0-2-cash-flow-chart
-          echo "V15.0.2 patch committed after full repository quality validation."
+          echo "V15.0.2 chart-only cash-flow patch committed after full quality validation."
