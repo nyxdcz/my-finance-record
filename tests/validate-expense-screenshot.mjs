@@ -81,9 +81,12 @@ assert.equal(
 );
 
 const syncConfig = fs.readFileSync(path.join(root, "sync-config.js"), "utf8");
-assert.match(syncConfig, /expenseScreenshotLauncherButton/, "Add Expense should expose a visible screenshot launcher");
-assert.match(syncConfig, /📷<\/span> Upload Screenshot|📷<\/span> Preparing scanner/, "launcher should be clearly labeled Upload Screenshot");
-assert.match(syncConfig, /expenseFormModeNote/, "launcher should be positioned after the expense mode note");
+assert.match(syncConfig, /expenseScreenshotHeaderActions/, "Add Expense should expose screenshot actions in the modal header");
+assert.match(syncConfig, /expenseScreenshotLauncherButton/, "Add Expense should expose an initial Upload launcher in the modal header");
+assert.match(syncConfig, /expenseScreenshotMenuButton/, "loaded screenshot tools should keep the Upload menu trigger in the modal header");
+assert.match(syncConfig, /button\.textContent = "Upload"/, "screenshot launcher should use the compact Upload label");
+assert.match(syncConfig, /"Analyzing…" : "AI"/, "optional AI screenshot action should use the compact AI label");
+assert.match(syncConfig, /header\.insertBefore\(shell, close\)/, "screenshot actions should be positioned immediately before the expense dialog Close button");
 assert.match(syncConfig, /expense-screenshot-parser\.js\?v=14\.0\.23/, "screenshot parser should load from the app shell");
 assert.match(syncConfig, /expense-screenshot-detect\.js\?v=14\.0\.23/, "local screenshot detector should remain loaded from the app shell");
 assert.match(syncConfig, /expense-screenshot-ai\.js\?v=14\.0\.23/, "optional AI screenshot detector should load after the local detector");
