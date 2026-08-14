@@ -1,6 +1,6 @@
 {
   "name": "my-finance-record",
-  "version": "15.0.1",
+  "version": "15.0.2",
   "private": true,
   "description": "Local-first profile-based personal and household finance PWA with encrypted Supabase synchronization.",
   "type": "module",
@@ -10,7 +10,7 @@
     "build": "echo 'No build step required'",
     "lint": "eslint .",
     "inspect": "node tests/inspect-project.mjs",
-    "test": "node tests/validate-cloud-authority.mjs && node tests/validate-expense-screenshot.mjs && node tests/validate-v15-0-1.mjs",
+    "test": "node tests/validate-cloud-authority.mjs && node tests/validate-expense-screenshot.mjs && node tests/validate-v15-0-2.mjs",
     "test:browser": "playwright test",
     "maintainability": "node tests/check-maintainability.mjs",
     "audit": "npm audit --omit=dev",

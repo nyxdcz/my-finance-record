@@ -507,87 +507,50 @@ html[data-theme="dark"] #customizeDashboardButton[data-dashboard-toolbar-action]
   filter:none;
 }
 
-/* V15.0.0 · fit cash-flow content inside the existing calendar-height bento. */
+/* V15.0.2 · cash-flow chart focus inside the existing bento size. */
+#dashboard [data-dashboard-card="cash-flow"] :is(.cash-flow-summary,.budget-dashboard-forecast,.chart-data-details) {
+  display:none!important;
+}
 @media (min-width:1101px) {
   #dashboard [data-dashboard-card="cash-flow"][data-size="wide"] {
     overflow:hidden;
   }
   #dashboard [data-dashboard-card="cash-flow"][data-size="wide"] .card-header {
-    margin-bottom:5px!important;
+    margin-bottom:7px!important;
   }
   #dashboard [data-dashboard-card="cash-flow"][data-size="wide"] .chart-shell {
-    gap:4px!important;
+    gap:6px!important;
     min-height:0!important;
+    align-content:start!important;
   }
   #dashboard [data-dashboard-card="cash-flow"][data-size="wide"] .cash-flow-chart-grid {
-    gap:6px!important;
+    gap:8px!important;
+    align-items:stretch!important;
   }
   #dashboard [data-dashboard-card="cash-flow"][data-size="wide"] .cash-flow-chart-panel {
-    padding:5px!important;
+    padding:7px!important;
+    min-height:0!important;
   }
   #dashboard [data-dashboard-card="cash-flow"][data-size="wide"] .cash-flow-chart-panel h4 {
-    margin-bottom:2px!important;
-    font-size:.64rem!important;
+    margin-bottom:4px!important;
+    font-size:.68rem!important;
     line-height:1.15!important;
   }
   #dashboard [data-dashboard-card="cash-flow"][data-size="wide"] .cash-flow-chart-panel .chart-svg {
-    height:104px!important;
-    min-height:104px!important;
-    max-height:104px!important;
+    width:100%!important;
+    height:168px!important;
+    min-height:168px!important;
+    max-height:168px!important;
   }
   #dashboard [data-dashboard-card="cash-flow"][data-size="wide"] .chart-legend {
-    margin-top:2px!important;
-    gap:7px!important;
-    font-size:.58rem!important;
-    line-height:1.1!important;
+    margin-top:5px!important;
+    gap:9px!important;
+    font-size:.62rem!important;
+    line-height:1.15!important;
   }
   #dashboard [data-dashboard-card="cash-flow"][data-size="wide"] .chart-note {
-    margin:1px 0 0!important;
-    font-size:.56rem!important;
-    line-height:1.18!important;
-  }
-  #dashboard [data-dashboard-card="cash-flow"][data-size="wide"] .chart-data-details {
-    margin-top:0!important;
-    padding-top:0!important;
-  }
-  #dashboard [data-dashboard-card="cash-flow"][data-size="wide"] .chart-data-details > summary {
-    min-height:20px!important;
-    padding:0!important;
-    font-size:.61rem!important;
-    line-height:1!important;
-  }
-  #dashboard [data-dashboard-card="cash-flow"][data-size="wide"] .chart-data-details[open] > summary {
-    margin-bottom:2px!important;
-  }
-  #dashboard [data-dashboard-card="cash-flow"][data-size="wide"] .chart-data-table-wrap {
-    max-height:68px!important;
-    overflow:auto!important;
-    border-radius:6px!important;
-  }
-  #dashboard [data-dashboard-card="cash-flow"][data-size="wide"] .chart-data-table-wrap table {
-    font-size:.58rem!important;
-  }
-  #dashboard [data-dashboard-card="cash-flow"][data-size="wide"] .chart-data-table-wrap th,
-  #dashboard [data-dashboard-card="cash-flow"][data-size="wide"] .chart-data-table-wrap td {
-    padding:3px 5px!important;
-    line-height:1.1!important;
-  }
-  #dashboard [data-dashboard-card="cash-flow"][data-size="wide"] .cash-flow-summary {
-    grid-template-columns:repeat(3,minmax(0,1fr))!important;
-    gap:4px!important;
-    margin-top:2px!important;
-  }
-  #dashboard [data-dashboard-card="cash-flow"][data-size="wide"] .cash-flow-summary > div {
-    min-height:0!important;
-    padding:3px 5px!important;
-  }
-  #dashboard [data-dashboard-card="cash-flow"][data-size="wide"] .cash-flow-summary span {
-    font-size:.50rem!important;
-    line-height:1.05!important;
-  }
-  #dashboard [data-dashboard-card="cash-flow"][data-size="wide"] .cash-flow-summary strong {
-    margin-top:1px!important;
-    font-size:.64rem!important;
-    line-height:1.05!important;
+    margin:3px 0 0!important;
+    font-size:.59rem!important;
+    line-height:1.22!important;
   }
 }

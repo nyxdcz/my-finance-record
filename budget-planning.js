@@ -176,9 +176,6 @@
         </div>
       </article>`);
     }
-    if (!document.getElementById("budgetDashboardForecast")) {
-      document.querySelector('[data-dashboard-card="cash-flow"] .cash-flow-summary')?.insertAdjacentHTML("afterend", `<div class="budget-dashboard-forecast chart-sensitive" id="budgetDashboardForecast"><div><span>Planned budget</span><strong id="dashPlannedBudget">₱0.00</strong></div><div><span>Reserved to allocate</span><strong id="dashReservedBudget">₱0.00</strong></div><div><span>Forecast month-end</span><strong id="dashForecastMonthEnd">₱0.00</strong></div></div>`);
-    }
     if (!document.getElementById("monthlyBudgetReportCard")) {
       const reports = document.getElementById("reports");
       const anchor = reports?.querySelector("#report-account-section") || reports?.lastElementChild;
@@ -369,16 +366,9 @@
       ["Overdue unpaid",metrics.overdue]
     ].map(([label,value])=>`<div><span>${label}</span><strong>${money(value)}</strong></div>`).join("");
     document.getElementById("budgetForecastAlerts").innerHTML=lowBalanceAlerts(metrics).map(item=>`<div class="budget-alert ${item.tone}">${escapeHtml(item.text)}</div>`).join("");
-    renderDashboardBudgetForecast(metrics);
     renderBudgetReport(metrics);
   }
 
-  function renderDashboardBudgetForecast(metrics = planMetrics(selectedMonth())) {
-    const planned=document.getElementById("dashPlannedBudget"), reserved=document.getElementById("dashReservedBudget"), forecast=document.getElementById("dashForecastMonthEnd");
-    if(planned) planned.textContent=money(metrics.planned);
-    if(reserved) reserved.textContent=money(metrics.reservedUnassigned+metrics.allocation);
-    if(forecast){forecast.textContent=money(metrics.forecast);forecast.className=metrics.forecast<0?"text-red":"text-green";}
-  }
 
   function renderBudgetReport(metrics = planMetrics(selectedMonth())) {
     const subtitle=document.getElementById("budgetReportSubtitle"); if(subtitle) subtitle.textContent=`${monthName(selectedMonth())} plan performance and month-end forecast`;

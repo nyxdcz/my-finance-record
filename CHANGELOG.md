@@ -1,3 +1,9 @@
+## 15.0.2 · 2026-08-15
+
+- Removed the Dashboard “View exact cash-flow values” disclosure, selected-month value cards, and injected budget forecast cards from the Income versus expenses bento.
+- Expanded the vertical and horizontal cash-flow plotting areas while preserving the existing Dashboard bento size, position, calculations, and neighboring calendar geometry.
+- Rotated the V15 PWA cache to r6 and updated release metadata, installer, README, and validation without changing Finance Schema 12, Cloud Schema V3, or Cloud Sync behavior.
+
 ## 15.0.1 · 2026-08-15
 
 ### Changed

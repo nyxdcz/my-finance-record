@@ -1,9 +1,10 @@
-# My Finance Records · V15.0.1
+# My Finance Records · V15.0.2
 
 Local-first personal finance PWA with multi-profile support and optional encrypted cloud synchronization.
 
 ## Recent updates
 
+- **V15.0.2 · Cash-flow Chart Focus** — Removes the exact cash-flow values/forecast boxes and expands both coordinated cash-flow charts inside the existing Dashboard bento size.
 - **V15.0.1 · Sidebar Header Maintenance** — Simplifies the expanded sidebar to a larger Records title, preserves collapsed Insights/expanded-only Pin behavior, and refreshes PWA cache delivery without changing finance or cloud schemas.
 - **V15.0.0 · Liquid Glass Interface** — Adds an adaptive Liquid Glass control layer to navigation, toolbars, menus, popovers, modal chrome, and toasts while keeping finance content opaque and readable.
 - **V14.0.23 · Phone UI & Sync Conflict Recovery** — Compacts phone Finance and Settings screens and repairs conflict-choice saving on storage-constrained devices.
