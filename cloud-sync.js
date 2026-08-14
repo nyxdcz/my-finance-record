@@ -3,7 +3,7 @@
    For connected profiles, the current cloud record is authoritative. This device refreshes
    cloud changes before queued local changes may upload, while preserving offline editing. */
 (function financeCloudSyncV3Bootstrap() {
-  const APP_VERSION_FALLBACK = "15.0.0";
+  const APP_VERSION_FALLBACK = "15.0.1";
   const APP_VERSION_CODE = 130000;
   const CLOUD_SCHEMA_VERSION = 3;
   const CORE_SCHEMA_VERSION = 12;

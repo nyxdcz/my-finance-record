@@ -16,49 +16,49 @@ const dashboardInteractions = read("dashboard-interactions.css");
 const workflow = read(".github/workflows/quality-pages.yml");
 const readme = read("README.md");
 const changelog = read("CHANGELOG.md");
-const installer = read("Install_V15_0_0.command");
+const installer = read("Install_V15_0_1.command");
 
-assert.equal(version.version, "15.0.0", "version.json must identify V15.0.0");
-assert.equal(pkg.version, "15.0.0", "package.json must identify V15.0.0");
-assert.equal(lock.version, "15.0.0", "package-lock.json must identify V15.0.0");
-assert.equal(lock.packages?.[""]?.version, "15.0.0", "package-lock root package must identify V15.0.0");
+assert.equal(version.version, "15.0.1", "version.json must identify V15.0.1");
+assert.equal(pkg.version, "15.0.1", "package.json must identify V15.0.1");
+assert.equal(lock.version, "15.0.1", "package-lock.json must identify V15.0.1");
+assert.equal(lock.packages?.[""]?.version, "15.0.1", "package-lock root package must identify V15.0.1");
 assert.equal(version.schemaVersion, 12, "V15 must preserve Finance Schema 12");
 assert.equal(version.cloudSchemaVersion, 3, "V15 must preserve Cloud Schema V3");
 assert.equal(version.name, "Liquid Glass Interface");
 assert.equal(version.released, "2026-08-15");
-assert.equal(version.cacheVersion, "finance-v15-20260815-liquid-glass-r4");
+assert.equal(version.cacheVersion, "finance-v15-20260815-liquid-glass-r5");
 
-assert.match(index, /<title>My Finance Records · V15\.0\.0<\/title>/, "browser title must be V15.0.0 before boot");
-assert.match(index, /id="buildBadge"[^>]*V15\.0\.0 · Liquid Glass Interface · August 15, 2026[^>]*>V15\.0\.0<\/small>/, "build badge must be V15.0.0");
-assert.match(index, /const APP_VERSION = "15\.0\.0";/, "index APP_VERSION must be V15.0.0");
+assert.match(index, /<title>My Finance Records · V15\.0\.1<\/title>/, "browser title must be V15.0.1 before boot");
+assert.match(index, /id="buildBadge"[^>]*V15\.0\.1 · Liquid Glass Interface · August 15, 2026[^>]*>V15\.0\.1<\/small>/, "build badge must be V15.0.1");
+assert.match(index, /const APP_VERSION = "15\.0\.1";/, "index APP_VERSION must be V15.0.1");
 assert.match(index, /const APP_RELEASE_NAME = "Liquid Glass Interface";/);
 assert.match(index, /const APP_RELEASE_DATE = "August 15, 2026";/);
-assert.match(index, /"version":"V15\.0\.0","title":"Liquid Glass Interface"/, "Version History must begin with a V15 release entry");
-assert.match(index, /id="settingsOverviewAppStatus">Version 15\.0\.0</, "Settings overview must identify V15");
+assert.match(index, /"version":"V15\.0\.1","title":"Sidebar Header Maintenance"/, "Version History must begin with the V15.0.1 maintenance release");
+assert.match(index, /id="settingsOverviewAppStatus">Version 15\.0\.1</, "Settings overview must identify V15.0.1");
 
-assert.match(worker, /const APP_VERSION = "15\.0\.0";/, "service worker APP_VERSION must be V15");
-assert.match(worker, /const CACHE_VERSION = "finance-v15-20260815-liquid-glass-r4";/, "service-worker cache must rotate to current V15 generation");
+assert.match(worker, /const APP_VERSION = "15\.0\.1";/, "service worker APP_VERSION must be V15.0.1");
+assert.match(worker, /const CACHE_VERSION = "finance-v15-20260815-liquid-glass-r5";/, "service-worker cache must rotate to current V15 generation");
 assert.match(worker, /new Request\(url, \{ cache:"reload" \}\)/, "V15 shell refresh must bypass stale browser HTTP cache");
-assert.match(worker, /asset\("\.\/liquid-glass-v15\.css\?v=15\.0\.0"\)/, "Liquid Glass CSS must be precached");
-assert.match(worker, /expense-screenshot-parser\.js\?v=15\.0\.0/, "changed screenshot loader URLs must use V15 cache pins");
+assert.match(worker, /asset\("\.\/liquid-glass-v15\.css\?v=15\.0\.1"\)/, "Liquid Glass CSS must be precached");
+assert.match(worker, /expense-screenshot-parser\.js\?v=15\.0\.1/, "changed screenshot loader URLs must use V15 cache pins");
 assert.match(worker, /\^finance-v\(\?:12\|13\|14\|15\)-/, "cache cleanup must include V15 generations");
 assert.match(worker, /dashboard\/chrome cleanup refresh/, "service worker must refresh installed PWAs for the dashboard cleanup");
 assert.match(worker, /customize-dashboard-v15\.png/, "service worker must precache the supplied Customize Dashboard icon");
 assert.match(worker, /collapsed sidebar Insights\/Pin state refresh/, "service worker must refresh installed PWAs for the sidebar state change");
 assert.match(worker, /forced shell refresh/, "service worker must document the stale-shell refresh pass");
 
-assert.match(cloud, /const APP_VERSION_FALLBACK = "15\.0\.0";/, "Cloud Sync fallback must be V15");
+assert.match(cloud, /const APP_VERSION_FALLBACK = "15\.0\.1";/, "Cloud Sync fallback must identify V15.0.1");
 assert.match(cloud, /const APP_VERSION_CODE = 130000;/, "visual V15 release must not change the Cloud Schema writer code");
 assert.match(cloud, /const CLOUD_SCHEMA_VERSION = 3;/);
 assert.match(cloud, /const CORE_SCHEMA_VERSION = 12;/);
 assert.match(cloud, /window\.FINANCE_APP_VERSION_OVERRIDE \|\| \(typeof APP_VERSION !== "undefined" \? APP_VERSION : APP_VERSION_FALLBACK\)/, "Cloud Sync must prefer the V15 runtime release override");
 
-assert.match(syncConfig, /const VERSION = "15\.0\.0";/, "runtime release layer must identify V15");
+assert.match(syncConfig, /const VERSION = "15\.0\.1";/, "runtime release layer must identify V15.0.1");
 assert.match(syncConfig, /Liquid Glass Interface/);
 assert.match(syncConfig, /\.\/liquid-glass-v15\.css\?v=\$\{VERSION\}/, "runtime must load the Liquid Glass CSS after legacy styles");
-assert.match(syncConfig, /expense-screenshot-parser\.js\?v=15\.0\.0/);
-assert.match(syncConfig, /expense-screenshot-detect\.js\?v=15\.0\.0/);
-assert.match(syncConfig, /expense-screenshot-ai\.js\?v=15\.0\.0/);
+assert.match(syncConfig, /expense-screenshot-parser\.js\?v=15\.0\.1/);
+assert.match(syncConfig, /expense-screenshot-detect\.js\?v=15\.0\.1/);
+assert.match(syncConfig, /expense-screenshot-ai\.js\?v=15\.0\.1/);
 
 for (const token of [
   "backdrop-filter",
@@ -104,12 +104,16 @@ assert.ok(dashboardInteractions.includes("width:48px!important;\n    min-width:4
 assert.ok(dashboardInteractions.includes("width:28px!important;\n    height:28px!important;\n    flex:0 0 28px!important;"), "Insights must use the same 28px icon slot as Overview, Finance, Work, and Settings");
 assert.ok(dashboardInteractions.includes(".sidebar.desktop-open .sidebar-close-button,\n  .sidebar.sidebar-pinned .sidebar-close-button{\n    display:grid!important;"), "expanded desktop sidebar must restore the Pin/Unpin control");
 assert.match(dashboardInteractions, /sidebar-insights-v14-0-24\.png/, "Insights must continue using the supplied sidebar icon asset");
+assert.match(index, /<div class="brand">\s*<strong>Records<\/strong>\s*<\/div>/, "expanded sidebar header must contain only the Records title");
+assert.doesNotMatch(index, /Expenses and projects/, "sidebar header subtitle must be removed");
+assert.match(dashboardInteractions, /V15\.0\.1 · expanded sidebar Records header cleanup/, "sidebar header maintenance CSS must be present");
+assert.match(dashboardInteractions, /brand strong[\s\S]*font-size:1\.08rem!important/, "expanded Records title must be slightly larger");
 
 assert.match(workflow, /dashboard-interactions-core-v14-0-23\.css liquid-glass-v15\.css mobile-v14-0-23\.css/, "Pages bundle must include Liquid Glass CSS");
 assert.match(workflow, /test -f _site\/liquid-glass-v15\.css/, "Pages preparation must verify the V15 stylesheet");
-assert.ok(readme.startsWith("# My Finance Records · V15.0.0"));
-assert.ok(changelog.startsWith("## 15.0.0 · 2026-08-15"));
-assert.match(installer, /My Finance Records · V15\.0\.0 macOS Installer & Inspector/);
-assert.match(installer, /Executing full V15\.0\.0 quality validation/);
+assert.ok(readme.startsWith("# My Finance Records · V15.0.1"));
+assert.ok(changelog.startsWith("## 15.0.1 · 2026-08-15"));
+assert.match(installer, /My Finance Records · V15\.0\.1 macOS Installer & Inspector/);
+assert.match(installer, /Executing full V15\.0\.1 quality validation/);
 
-console.log("V15.0.0 validation passed: release metadata, 7px Liquid Glass controls, glass marquees, compact Dashboard chrome, supplied Customize icon, cash-flow bento fitting, aligned collapsed Insights rail, expanded-only Pin control, forced fresh PWA shell delivery, accessible compact toasts, Cloud Sync compatibility, opaque finance content, and deployment packaging are consistent.");
+console.log("V15.0.1 validation passed: release metadata, 7px Liquid Glass controls, glass marquees, compact Dashboard chrome, supplied Customize icon, cash-flow bento fitting, aligned collapsed Insights rail, expanded-only Pin control, forced fresh PWA shell delivery, accessible compact toasts, Cloud Sync compatibility, opaque finance content, and deployment packaging are consistent.");

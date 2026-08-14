@@ -1,8 +1,8 @@
 "use strict";
-const APP_VERSION = "15.0.0";
+const APP_VERSION = "15.0.1";
 self.__FINANCE_APP_VERSION = APP_VERSION;
 // V15 dashboard/chrome cleanup refresh · flat toolbar/toast pass · dashboard spacing/sidebar edge pass · calendar-height sync · cash-flow fit · Customize icon refresh · collapsed sidebar Insights/Pin state refresh · forced shell refresh: changing this worker forces installed PWAs to precache the updated dashboard stylesheet and supplied icon without changing the release version.
-const CACHE_VERSION = "finance-v15-20260815-liquid-glass-r4";
+const CACHE_VERSION = "finance-v15-20260815-liquid-glass-r5";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const DB_NAME = "simple-finance-project-records-v12-db";
@@ -19,7 +19,7 @@ const APP_SHELL = [
   asset("./app.css?v=14.0.23"),
   asset("./dashboard-interactions.css?v=14.0.23"),
   asset("./dashboard-interactions-core-v14-0-23.css"),
-  asset("./liquid-glass-v15.css?v=15.0.0"),
+  asset("./liquid-glass-v15.css?v=15.0.1"),
   asset("./mobile-v14-0-23.css?v=14.0.23"),
   asset("./interaction-patterns.js?v=14.0.23"),
   asset("./privacy-lock.js?v=14.0.23"),
@@ -28,7 +28,7 @@ const APP_SHELL = [
   asset("./cloud-conflict-review.js?v=14.0.23"),
   asset("./cloud-conflict-resolution.js?v=14.0.23"),
   asset("./cloud-sync-lifecycle.js?v=14.0.23"),
-  asset("./cloud-sync.js?v=15.0.0"),
+  asset("./cloud-sync.js?v=15.0.1"),
   asset("./account-ledger.js?v=14.0.23"),
   asset("./account-ledger.css?v=14.0.23"),
   asset("./budget-planning.js?v=14.0.23"),
@@ -41,10 +41,10 @@ const APP_SHELL = [
   asset("./reminders-alerts.css?v=14.0.23"),
   asset("./projects-calendar-v13.0.20.js?v=14.0.23"),
   asset("./projects-calendar-v13.0.20.css?v=14.0.23"),
-  asset("./sync-config.js"),
-  asset("./expense-screenshot-parser.js?v=15.0.0"),
-  asset("./expense-screenshot-detect.js?v=15.0.0"),
-  asset("./expense-screenshot-ai.js?v=15.0.0"),
+  asset("./sync-config.js?v=15.0.1"),
+  asset("./expense-screenshot-parser.js?v=15.0.1"),
+  asset("./expense-screenshot-detect.js?v=15.0.1"),
+  asset("./expense-screenshot-ai.js?v=15.0.1"),
   asset("./vendor/supabase.min.js"),
   asset("./icons/icon-192.png"),
   asset("./icons/icon-512.png"),

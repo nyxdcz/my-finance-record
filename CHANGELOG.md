@@ -1,3 +1,13 @@
+## 15.0.1 · 2026-08-15
+
+### Changed
+- Simplified the expanded desktop sidebar header to a larger **Records** title with no decorative chart icon or subtitle.
+- Preserved Overview, Finance, Work, Insights, and Settings positions, including collapsed Insights visibility and expanded-only Pin/Unpin controls.
+- Rotated the V15 PWA cache and release pins so the maintenance update reaches installed and previously visited clients.
+
+### Preserved
+- Dashboard and bento layouts, Finance Schema 12, Cloud Schema V3, encrypted records, calculations, five-minute sync behavior, and saved navigation preferences remain unchanged.
+
 ## 15.0.0 · 2026-08-15
 
 ### Changed

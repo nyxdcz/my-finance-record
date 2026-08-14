@@ -7,7 +7,7 @@ window.FINANCE_SYNC_CONFIG = window.FINANCE_SYNC_CONFIG || {
 };
 
 (function applyV15ReleaseLayer() {
-  const VERSION = "15.0.0";
+  const VERSION = "15.0.1";
   const RELEASE_NAME = "Liquid Glass Interface";
   const RELEASE_DATE = "August 15, 2026";
   window.FINANCE_APP_VERSION_OVERRIDE = VERSION;
@@ -398,9 +398,9 @@ window.FINANCE_SYNC_CONFIG = window.FINANCE_SYNC_CONFIG || {
   async function start() {
     if (toolsPromise) return toolsPromise;
     toolsPromise = (async () => {
-      await loadScript("./expense-screenshot-parser.js?v=15.0.0", "expenseScreenshotParserScript");
-      await loadScript("./expense-screenshot-detect.js?v=15.0.0", "expenseScreenshotDetectScript");
-      await loadScript("./expense-screenshot-ai.js?v=15.0.0", "expenseScreenshotAiScript");
+      await loadScript("./expense-screenshot-parser.js?v=15.0.1", "expenseScreenshotParserScript");
+      await loadScript("./expense-screenshot-detect.js?v=15.0.1", "expenseScreenshotDetectScript");
+      await loadScript("./expense-screenshot-ai.js?v=15.0.1", "expenseScreenshotAiScript");
       window.FinanceExpenseScreenshot?.ensurePanel?.();
       window.FinanceExpenseScreenshotAI?.ensureAiControls?.();
       ensureCompactScreenshotUi();
