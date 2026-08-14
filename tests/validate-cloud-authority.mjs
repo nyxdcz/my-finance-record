@@ -35,8 +35,8 @@ const firstPull = cloud.indexOf("await pullChanges();", syncStart);
 const pushLoop = cloud.indexOf("while (Object.values(pending)", syncStart);
 assert(syncStart >= 0 && firstPull > syncStart && pushLoop > firstPull, "sync does not pull cloud before attempting queued device uploads");
 
-assert(worker.includes('finance-v14-20260814-v1423-'), "PWA cache generation is not current for V14.0.23");
-assert(worker.includes('asset("./cloud-sync.js?v=14.0.23")'), "cloud sync asset is missing from the offline shell");
+assert(worker.includes('finance-v15-20260815-liquid-glass-r1'), "PWA cache generation is not current for V15.0.0");
+assert(worker.includes('asset("./cloud-sync.js?v=15.0.0")'), "V15 cloud sync asset is missing from the offline shell");
 
 if (failures.length) {
   console.error(`Cloud-authority validation failed (${failures.length}):`);

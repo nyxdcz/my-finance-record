@@ -1,3 +1,17 @@
+## 15.0.0 · 2026-08-15
+
+### Changed
+- Introduced an adaptive Liquid Glass control layer across navigation, toolbar controls, workspace switchers, floating menus and popovers, modal chrome, and Toast feedback.
+- Kept finance content surfaces opaque so KPI cards, tables, charts, forms, and weekly marquee content retain contrast and hierarchy.
+- Updated the browser/runtime release identity and PWA cache generation to V15.0.0.
+
+### Accessibility
+- Added solid or near-opaque fallbacks for unsupported backdrop filters, reduced transparency, reduced motion, and forced-colors environments.
+- Preserved visible keyboard focus, the 43px Finance and Work strip geometry, and existing 44px phone touch targets.
+
+### Preserved
+- Finance Schema 12, Cloud Schema V3, encryption, finance records, calculations, five-minute synchronization, uploaded utility icons, and saved interface preferences remain unchanged.
+
 ## 14.0.23 · 2026-08-13
 
 ### Fixed

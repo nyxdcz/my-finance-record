@@ -1,0 +1,269 @@
+/* My Finance Records · V15.0.0 · Liquid Glass Interface
+   Applies translucent material to navigation and controls only.
+   Finance content, tables, cards, charts, forms, and marquee content remain opaque. */
+
+:root {
+  --liquid-glass-surface:rgba(248,251,255,.66);
+  --liquid-glass-surface-strong:rgba(249,252,255,.82);
+  --liquid-glass-surface-soft:rgba(255,255,255,.44);
+  --liquid-glass-border:rgba(255,255,255,.72);
+  --liquid-glass-edge:rgba(255,255,255,.92);
+  --liquid-glass-shadow:0 12px 34px rgba(20,44,70,.14),inset 0 1px 0 rgba(255,255,255,.82),inset 0 -1px 0 rgba(28,55,82,.05);
+  --liquid-glass-shadow-soft:0 7px 20px rgba(20,44,70,.11),inset 0 1px 0 rgba(255,255,255,.72);
+  --liquid-glass-active:rgba(220,246,235,.84);
+  --liquid-glass-hover:rgba(255,255,255,.68);
+  --liquid-glass-blur:22px;
+  --liquid-glass-saturate:145%;
+}
+
+html[data-theme="dark"] {
+  --liquid-glass-surface:rgba(14,28,43,.68);
+  --liquid-glass-surface-strong:rgba(16,31,47,.84);
+  --liquid-glass-surface-soft:rgba(35,53,70,.48);
+  --liquid-glass-border:rgba(211,230,245,.16);
+  --liquid-glass-edge:rgba(238,247,255,.22);
+  --liquid-glass-shadow:0 14px 36px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.12),inset 0 -1px 0 rgba(0,0,0,.2);
+  --liquid-glass-shadow-soft:0 8px 22px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.1);
+  --liquid-glass-active:rgba(79,150,125,.46);
+  --liquid-glass-hover:rgba(75,96,116,.46);
+}
+
+/* Primary floating navigation layer. */
+.topbar {
+  background:linear-gradient(180deg,var(--liquid-glass-surface-strong),var(--liquid-glass-surface));
+  border-bottom:1px solid var(--liquid-glass-border);
+  box-shadow:0 8px 26px rgba(20,44,70,.08),inset 0 1px 0 var(--liquid-glass-edge);
+  -webkit-backdrop-filter:blur(var(--liquid-glass-blur)) saturate(var(--liquid-glass-saturate));
+  backdrop-filter:blur(var(--liquid-glass-blur)) saturate(var(--liquid-glass-saturate));
+}
+
+.topbar :is(.cloud-sync-toolbar-button,.month-nav-button,.month-display-button,.month-current-button,.topbar-history-button,.topbar-add-button,#customizeDashboardButton,.topbar-tools-trigger),
+.sidebar :is(.sidebar-close-button,.nav-button),
+.workspace-switcher,
+.finance-workspace-marquee-row>.workspace-switcher {
+  border-color:var(--liquid-glass-border);
+  background:linear-gradient(180deg,var(--liquid-glass-surface-soft),color-mix(in srgb,var(--liquid-glass-surface) 84%,transparent));
+  box-shadow:var(--liquid-glass-shadow-soft);
+  -webkit-backdrop-filter:blur(16px) saturate(135%);
+  backdrop-filter:blur(16px) saturate(135%);
+}
+
+.topbar :is(.month-navigator,.topbar-history-actions) {
+  border:1px solid var(--liquid-glass-border);
+  border-radius:999px;
+  background:linear-gradient(180deg,var(--liquid-glass-surface-soft),color-mix(in srgb,var(--liquid-glass-surface) 78%,transparent));
+  box-shadow:var(--liquid-glass-shadow-soft);
+  -webkit-backdrop-filter:blur(18px) saturate(140%);
+  backdrop-filter:blur(18px) saturate(140%);
+}
+
+.topbar .month-navigator :is(.month-nav-button,.month-display-button,.month-current-button),
+.topbar .topbar-history-actions .topbar-history-button {
+  box-shadow:none;
+  border-color:transparent;
+  background:transparent;
+  -webkit-backdrop-filter:none;
+  backdrop-filter:none;
+}
+
+.topbar :is(.cloud-sync-toolbar-button,.month-nav-button,.month-display-button,.month-current-button,.topbar-history-button,#customizeDashboardButton,.topbar-tools-trigger):not(:disabled):hover,
+.sidebar :is(.sidebar-close-button,.nav-button):not(:disabled):hover,
+.workspace-switcher button:not(:disabled):hover {
+  background:var(--liquid-glass-hover);
+  border-color:var(--liquid-glass-edge);
+}
+
+.topbar :is(.cloud-sync-toolbar-button,.month-nav-button,.month-display-button,.month-current-button,.topbar-history-button,.topbar-add-button,#customizeDashboardButton,.topbar-tools-trigger),
+.sidebar :is(.sidebar-close-button,.nav-button),
+.workspace-switcher button {
+  transition:background-color .14s ease,border-color .14s ease,box-shadow .14s ease,transform .14s ease;
+}
+
+.topbar :is(.cloud-sync-toolbar-button,.month-nav-button,.month-display-button,.month-current-button,.topbar-history-button,.topbar-add-button,#customizeDashboardButton,.topbar-tools-trigger):not(:disabled):active,
+.sidebar :is(.sidebar-close-button,.nav-button):not(:disabled):active,
+.workspace-switcher button:not(:disabled):active {
+  transform:scale(.975);
+}
+
+/* Primary Add actions retain stronger identity without becoming a flat opaque block. */
+.topbar .topbar-add-button {
+  background:linear-gradient(180deg,color-mix(in srgb,var(--primary) 78%,rgba(255,255,255,.28)),color-mix(in srgb,var(--primary) 88%,transparent));
+  border-color:color-mix(in srgb,var(--primary) 76%,var(--liquid-glass-edge));
+  box-shadow:0 8px 20px color-mix(in srgb,var(--primary) 20%,transparent),inset 0 1px 0 rgba(255,255,255,.36);
+  -webkit-backdrop-filter:blur(16px) saturate(145%);
+  backdrop-filter:blur(16px) saturate(145%);
+}
+
+/* Sidebar is a navigation material, not a translucent content surface. */
+.sidebar {
+  background:linear-gradient(180deg,var(--liquid-glass-surface-strong),var(--liquid-glass-surface));
+  border-right:1px solid var(--liquid-glass-border);
+  box-shadow:10px 0 30px rgba(20,44,70,.08),inset -1px 0 0 rgba(255,255,255,.24);
+  -webkit-backdrop-filter:blur(24px) saturate(145%);
+  backdrop-filter:blur(24px) saturate(145%);
+}
+
+.sidebar .nav-button {
+  box-shadow:none;
+  background:transparent;
+  border-color:transparent;
+}
+
+.sidebar .nav-button.active {
+  background:linear-gradient(180deg,color-mix(in srgb,var(--liquid-glass-active) 92%,white 8%),var(--liquid-glass-active));
+  border-color:color-mix(in srgb,var(--nav-active-text) 18%,var(--liquid-glass-edge));
+  box-shadow:0 8px 18px rgba(20,44,70,.08),inset 0 1px 0 rgba(255,255,255,.42);
+}
+
+/* Segmented workspace navigation. The marquee beside it remains opaque below. */
+.workspace-switcher,
+.finance-workspace-marquee-row>.workspace-switcher {
+  border-radius:12px;
+  padding:3px;
+  overflow:hidden;
+}
+
+.workspace-switcher button {
+  border:1px solid transparent;
+  border-radius:9px;
+  background:transparent;
+  box-shadow:none;
+}
+
+.workspace-switcher button.active,
+.workspace-switcher button[aria-selected="true"] {
+  background:var(--liquid-glass-active);
+  border-color:var(--liquid-glass-edge);
+  box-shadow:0 5px 13px rgba(20,44,70,.08),inset 0 1px 0 rgba(255,255,255,.4);
+}
+
+/* Floating menus and popovers use the stronger glass material. */
+:is(.cloud-sync-toolbar-popover,.month-picker-popover,.topbar-tools-panel,.expense-screenshot-action-menu,.overflow-menu,.context-menu,.menu-popover,.popover) {
+  background:linear-gradient(180deg,var(--liquid-glass-surface-strong),var(--liquid-glass-surface));
+  border:1px solid var(--liquid-glass-border);
+  box-shadow:var(--liquid-glass-shadow);
+  -webkit-backdrop-filter:blur(26px) saturate(150%);
+  backdrop-filter:blur(26px) saturate(150%);
+}
+
+:is(.topbar-tools-panel,.expense-screenshot-action-menu,.overflow-menu,.context-menu,.menu-popover) :is(button,[role="menuitem"]):not(:disabled):hover {
+  background:var(--liquid-glass-hover);
+}
+
+.month-picker-popover :is(.month-picker-year-button,button[role="gridcell"]):not(:disabled):hover {
+  background:var(--liquid-glass-hover);
+}
+
+/* Dialog bodies remain opaque. Only modal chrome receives material. */
+:is(dialog,.modal,.dialog) :is(.modal-header,.dialog-header,.modal-footer,.dialog-footer,.modal-actions,.dialog-actions),
+:is(.pc-full-dialog,.project-calendar-dialog) :is(.modal-header,.dialog-header,.pc-dialog-header,.modal-actions,.dialog-actions) {
+  background:linear-gradient(180deg,var(--liquid-glass-surface-strong),var(--liquid-glass-surface));
+  border-color:var(--liquid-glass-border);
+  -webkit-backdrop-filter:blur(20px) saturate(140%);
+  backdrop-filter:blur(20px) saturate(140%);
+}
+
+:is(dialog,.modal,.dialog) :is(.modal-header,.dialog-header,.pc-dialog-header) {
+  box-shadow:inset 0 1px 0 var(--liquid-glass-edge),0 6px 16px rgba(20,44,70,.05);
+}
+
+/* Toasts / snackbars float above content without obscuring it. */
+:is(.toast,.snackbar,.toast-message,[role="status"].toast,[role="status"].snackbar) {
+  background:linear-gradient(180deg,var(--liquid-glass-surface-strong),var(--liquid-glass-surface));
+  border:1px solid var(--liquid-glass-border);
+  box-shadow:var(--liquid-glass-shadow);
+  -webkit-backdrop-filter:blur(22px) saturate(145%);
+  backdrop-filter:blur(22px) saturate(145%);
+}
+
+/* Keep data/content surfaces deliberately opaque. */
+.dashboard-week-marquee,
+.finance-week-marquee,
+.work-week-marquee,
+.card,
+.dashboard-card,
+.summary-card,
+.settings-card,
+.table-wrap,
+table,
+form,
+.expense-screenshot-panel {
+  -webkit-backdrop-filter:none;
+  backdrop-filter:none;
+}
+
+.dashboard-week-marquee,
+.finance-week-marquee,
+.work-week-marquee {
+  background:var(--surface)!important;
+}
+
+/* Preserve strong focus visibility over translucent material. */
+.topbar :is(button,[role="button"]):focus-visible,
+.sidebar :is(button,[role="button"]):focus-visible,
+.workspace-switcher button:focus-visible,
+:is(.cloud-sync-toolbar-popover,.month-picker-popover,.topbar-tools-panel,.expense-screenshot-action-menu) :is(button,[role="menuitem"]):focus-visible {
+  outline:2px solid var(--focus-ring,var(--primary));
+  outline-offset:2px;
+}
+
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))) {
+  .topbar,
+  .sidebar,
+  :is(.cloud-sync-toolbar-popover,.month-picker-popover,.topbar-tools-panel,.expense-screenshot-action-menu,.overflow-menu,.context-menu,.menu-popover,.popover),
+  :is(dialog,.modal,.dialog) :is(.modal-header,.dialog-header,.modal-footer,.dialog-footer,.modal-actions,.dialog-actions),
+  :is(.toast,.snackbar,.toast-message,[role="status"].toast,[role="status"].snackbar) {
+    background:var(--surface);
+  }
+}
+
+@media (prefers-reduced-transparency:reduce) {
+  :root {
+    --liquid-glass-surface:rgba(248,251,255,.96);
+    --liquid-glass-surface-strong:rgba(248,251,255,.99);
+    --liquid-glass-surface-soft:rgba(248,251,255,.94);
+  }
+  html[data-theme="dark"] {
+    --liquid-glass-surface:rgba(14,28,43,.97);
+    --liquid-glass-surface-strong:rgba(14,28,43,.995);
+    --liquid-glass-surface-soft:rgba(24,40,56,.96);
+  }
+  .topbar,.sidebar,
+  :is(.cloud-sync-toolbar-popover,.month-picker-popover,.topbar-tools-panel,.expense-screenshot-action-menu,.overflow-menu,.context-menu,.menu-popover,.popover) {
+    -webkit-backdrop-filter:none;
+    backdrop-filter:none;
+  }
+}
+
+@media (prefers-reduced-motion:reduce) {
+  .topbar :is(button,[role="button"]),
+  .sidebar :is(button,[role="button"]),
+  .workspace-switcher button {
+    transition:none!important;
+    transform:none!important;
+  }
+}
+
+@media (forced-colors:active) {
+  .topbar,.sidebar,
+  :is(.cloud-sync-toolbar-popover,.month-picker-popover,.topbar-tools-panel,.expense-screenshot-action-menu,.overflow-menu,.context-menu,.menu-popover,.popover),
+  .workspace-switcher {
+    background:Canvas;
+    border-color:CanvasText;
+    box-shadow:none;
+    -webkit-backdrop-filter:none;
+    backdrop-filter:none;
+  }
+}
+
+@media (max-width:700px) {
+  .topbar {
+    --liquid-glass-blur:18px;
+  }
+  .sidebar {
+    background:linear-gradient(180deg,color-mix(in srgb,var(--liquid-glass-surface-strong) 96%,transparent),var(--liquid-glass-surface-strong));
+  }
+  :is(.cloud-sync-toolbar-popover,.month-picker-popover,.topbar-tools-panel,.expense-screenshot-action-menu) {
+    background:var(--liquid-glass-surface-strong);
+  }
+}

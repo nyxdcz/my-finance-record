@@ -3,7 +3,7 @@
    For connected profiles, the current cloud record is authoritative. This device refreshes
    cloud changes before queued local changes may upload, while preserving offline editing. */
 (function financeCloudSyncV3Bootstrap() {
-  const APP_VERSION_FALLBACK = "14.0.23";
+  const APP_VERSION_FALLBACK = "15.0.0";
   const APP_VERSION_CODE = 130000;
   const CLOUD_SCHEMA_VERSION = 3;
   const CORE_SCHEMA_VERSION = 12;
@@ -79,7 +79,7 @@
   const lifecycle = window.FinanceCloudSyncLifecycle?.create?.({canPoll:()=>Boolean(cloudUser&&state.autoSync!==false&&navigator.onLine&&!document.hidden),canRetry:()=>Boolean(cloudUser&&state.autoSync!==false),pull:reason=>syncNow({reason}),reconnect:()=>setupRealtime()});
   if(!lifecycle)throw new Error("Cloud Sync lifecycle support is unavailable. Reload the latest app version."); const {clearForegroundPoll,scheduleForegroundPoll,clearRealtimeRetry,scheduleRealtimeRecovery,noteRealtimeSubscribed}=lifecycle;
   function appVersion() {
-    return typeof APP_VERSION !== "undefined" ? APP_VERSION : APP_VERSION_FALLBACK;
+    return window.FINANCE_APP_VERSION_OVERRIDE || (typeof APP_VERSION !== "undefined" ? APP_VERSION : APP_VERSION_FALLBACK);
   }
 
   function cloudProfileId() { return String(PROFILE_ARCH()?.cloudProfileId?.() || ""); }
