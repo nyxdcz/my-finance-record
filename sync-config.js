@@ -12,6 +12,7 @@ window.FINANCE_SYNC_CONFIG = window.FINANCE_SYNC_CONFIG || {
   let documentMenuBound = false;
   let panelObserver = null;
   let workMarqueeObserver = null;
+  let dashboardActionObserver = null;
 
   function loadScript(src, id) {
     if (document.getElementById(id)) return Promise.resolve();
@@ -31,14 +32,32 @@ window.FINANCE_SYNC_CONFIG = window.FINANCE_SYNC_CONFIG || {
     const style = document.createElement("style");
     style.id = "financeUiEnhancementStyles";
     style.textContent = `
-      .expense-screenshot-launcher{margin:8px 0 10px;display:flex;justify-content:flex-end}.expense-screenshot-launcher .button{min-width:84px;min-height:38px;white-space:nowrap}
-      .expense-screenshot-panel.expense-screenshot-panel-compact{padding:9px 10px;gap:8px}.expense-screenshot-panel-compact .expense-screenshot-head{justify-content:flex-end;min-height:38px}.expense-screenshot-panel-compact .expense-screenshot-head>div:first-child:not(.expense-screenshot-actions){display:none!important}.expense-screenshot-panel-compact .expense-screenshot-actions{position:relative;display:flex;justify-content:flex-end;width:auto}.expense-screenshot-panel-compact .expense-screenshot-actions>#expenseScreenshotMenuButton{min-width:84px}.expense-screenshot-panel-compact .expense-screenshot-privacy{display:none!important}
-      .expense-screenshot-action-menu{position:absolute;top:calc(100% + 6px);right:0;z-index:90;display:grid;gap:4px;min-width:156px;padding:6px;border:1px solid var(--line);border-radius:10px;background:var(--surface);box-shadow:0 12px 30px rgba(0,0,0,.22)}.expense-screenshot-action-menu[hidden]{display:none!important}.expense-screenshot-action-menu .button{justify-content:flex-start;width:100%;min-height:38px;text-align:left}
+      .expense-screenshot-header-actions{position:relative;display:flex;align-items:center;gap:6px;margin-left:auto}.expense-screenshot-header-actions .button{min-width:84px;min-height:38px;white-space:nowrap}
+      .expense-screenshot-panel.expense-screenshot-panel-compact{padding:9px 10px;gap:8px;margin-top:8px}.expense-screenshot-panel-compact .expense-screenshot-head{display:none!important}.expense-screenshot-panel-compact .expense-screenshot-privacy{display:none!important}
+      .expense-screenshot-action-menu{position:absolute;top:calc(100% + 6px);right:0;z-index:190;display:grid;gap:4px;min-width:156px;padding:6px;border:1px solid var(--line);border-radius:10px;background:var(--surface);box-shadow:0 12px 30px rgba(0,0,0,.22)}.expense-screenshot-action-menu[hidden]{display:none!important}.expense-screenshot-action-menu .button{justify-content:flex-start;width:100%;min-height:38px;text-align:left}
       #cloudSyncStatusButton .toolbar-icon[data-uploaded-sync-icon]::before,#themeToggleIcon[data-uploaded-theme-icon]::before{display:none!important}#cloudSyncStatusButton .toolbar-icon[data-uploaded-sync-icon],#themeToggleIcon[data-uploaded-theme-icon]{background-repeat:no-repeat;background-position:center;background-size:contain}#cloudSyncStatusButton .toolbar-icon[data-uploaded-sync-icon="syncing"]{background-image:url("./icons/sync-syncing-v14-0-23.png")}#cloudSyncStatusButton .toolbar-icon[data-uploaded-sync-icon="error"]{background-image:url("./icons/sync-error-v14-0-23.png")}#cloudSyncStatusButton .toolbar-icon[data-uploaded-sync-icon="success"]{background-image:url("./icons/sync-success-v14-0-23.png")}#themeToggleIcon[data-uploaded-theme-icon="night"]{background-image:url("./icons/theme-night-v14-0-23.png")}#themeToggleIcon[data-uploaded-theme-icon="day"]{background-image:url("./icons/theme-day-v14-0-23.png")}#themeToggleIcon[data-uploaded-theme-icon="auto"]{background-image:url("./icons/theme-auto-v14-0-23.png")}
       .finance-workspace-marquee-row>.project-workspace-switcher{position:static;top:auto;flex:0 0 auto;height:43px;min-height:43px;max-height:43px;box-sizing:border-box;margin:0}
-      @media(max-width:700px){.expense-screenshot-launcher .button{width:100%;min-height:44px}.expense-screenshot-panel-compact .expense-screenshot-head{align-items:stretch;flex-direction:row}.expense-screenshot-panel-compact .expense-screenshot-actions{width:100%;justify-content:flex-end}.expense-screenshot-panel-compact .expense-screenshot-actions>#expenseScreenshotMenuButton{width:100%;min-height:42px}.expense-screenshot-action-menu{left:0;right:0;min-width:0}.finance-workspace-marquee-row>.project-workspace-switcher{width:100%}}
+      #customizeDashboardButton[data-dashboard-toolbar-action]{align-self:center;white-space:nowrap}
+      @media(min-width:701px){#dashboard.page.active{display:block!important}#dashboard>.page-heading{display:none!important}#dashboard>#dashboardWeekMarquee{display:grid!important;width:100%!important;height:43px!important;min-height:43px!important;max-height:43px!important;margin:0 0 10px!important}}
+      @media(max-width:700px){.expense-screenshot-header-actions .button{min-height:38px}.expense-screenshot-action-menu{right:0;min-width:150px}.finance-workspace-marquee-row>.project-workspace-switcher{width:100%}#dashboard>.page-heading{display:none!important}#customizeDashboardButton[data-dashboard-toolbar-action]{width:44px;min-width:44px;height:44px;padding:0;font-size:0;justify-content:center}}
     `;
     document.head.appendChild(style);
+  }
+
+  function ensureExpenseHeaderShell() {
+    const header = document.querySelector("#expenseDialog .modal-header");
+    const close = header?.querySelector('[data-close="expenseDialog"]');
+    if (!header || !close) return null;
+    let shell = document.getElementById("expenseScreenshotHeaderActions");
+    if (!shell) {
+      shell = document.createElement("div");
+      shell.id = "expenseScreenshotHeaderActions";
+      shell.className = "expense-screenshot-header-actions";
+      header.insertBefore(shell, close);
+    } else if (shell.parentElement !== header || shell.nextElementSibling !== close) {
+      header.insertBefore(shell, close);
+    }
+    return shell;
   }
 
   function normalizeScreenshotButtons() {
@@ -132,15 +151,17 @@ window.FINANCE_SYNC_CONFIG = window.FINANCE_SYNC_CONFIG || {
     insertEnhancementStyles();
     const panel = document.getElementById("expenseScreenshotPanel");
     const actions = panel?.querySelector(".expense-screenshot-actions");
-    if (!panel || !actions) return false;
+    const shell = ensureExpenseHeaderShell();
+    if (!panel || !actions || !shell) return false;
     panel.classList.add("expense-screenshot-panel-compact");
     panel.removeAttribute("aria-labelledby");
-    panel.setAttribute("aria-label", "Screenshot upload and detection");
+    panel.setAttribute("aria-label", "Screenshot upload and detection results");
     const copy = panel.querySelector(".expense-screenshot-head > div:first-child:not(.expense-screenshot-actions)");
     if (copy) copy.hidden = true;
     const privacy = panel.querySelector(".expense-screenshot-privacy");
     if (privacy) privacy.hidden = true;
 
+    document.getElementById("expenseScreenshotLauncherButton")?.remove();
     let trigger = document.getElementById("expenseScreenshotMenuButton");
     if (!trigger) {
       trigger = document.createElement("button");
@@ -151,7 +172,9 @@ window.FINANCE_SYNC_CONFIG = window.FINANCE_SYNC_CONFIG || {
       trigger.setAttribute("aria-haspopup", "menu");
       trigger.setAttribute("aria-controls", "expenseScreenshotActionMenu");
       trigger.setAttribute("aria-expanded", "false");
-      actions.prepend(trigger);
+      shell.appendChild(trigger);
+    } else if (trigger.parentElement !== shell) {
+      shell.appendChild(trigger);
     }
     let menu = document.getElementById("expenseScreenshotActionMenu");
     if (!menu) {
@@ -161,7 +184,9 @@ window.FINANCE_SYNC_CONFIG = window.FINANCE_SYNC_CONFIG || {
       menu.setAttribute("role", "menu");
       menu.setAttribute("aria-label", "Screenshot upload method");
       menu.hidden = true;
-      actions.appendChild(menu);
+      shell.appendChild(menu);
+    } else if (menu.parentElement !== shell) {
+      shell.appendChild(menu);
     }
     [document.getElementById("expenseScreenshotChoose"), document.getElementById("expenseScreenshotAiButton")].forEach(button => {
       if (button && button.parentElement !== menu) menu.appendChild(button);
@@ -223,6 +248,27 @@ window.FINANCE_SYNC_CONFIG = window.FINANCE_SYNC_CONFIG || {
     document.getElementById("themeToggleButton")?.addEventListener("click", () => queueMicrotask(updateThemeIcon), { passive:true });
   }
 
+  function syncDashboardToolbarAction() {
+    const dashboard = document.getElementById("dashboard");
+    const button = document.getElementById("customizeDashboardButton");
+    const toolsMenu = document.getElementById("topbarToolsMenu");
+    if (!dashboard || !button || !toolsMenu) return;
+    if (button.parentElement !== toolsMenu.parentElement || button.nextElementSibling !== toolsMenu) toolsMenu.before(button);
+    button.dataset.dashboardToolbarAction = "true";
+    button.setAttribute("aria-label", "Customize dashboard");
+    button.title = "Customize dashboard";
+    button.hidden = !dashboard.classList.contains("active");
+  }
+
+  function bindDashboardToolbarAction() {
+    insertEnhancementStyles();
+    syncDashboardToolbarAction();
+    const dashboard = document.getElementById("dashboard");
+    if (!dashboard || dashboardActionObserver) return;
+    dashboardActionObserver = new MutationObserver(syncDashboardToolbarAction);
+    dashboardActionObserver.observe(dashboard, { attributes:true, attributeFilter:["class"] });
+  }
+
   function workMarqueeMarkup(prefix) {
     return `<section class="dashboard-week-marquee finance-week-marquee work-week-marquee" id="${prefix}WorkWeekMarquee" aria-labelledby="${prefix}WorkWeekMarqueeTitle"><div class="dashboard-week-marquee-heading"><strong id="${prefix}WorkWeekMarqueeTitle">This week</strong><span id="${prefix}WorkWeekMarqueeRange">Seven-day calendar</span></div><div class="dashboard-week-marquee-window" tabindex="0" aria-describedby="${prefix}WorkWeekMarqueeHelp"><div class="dashboard-week-marquee-track" id="${prefix}WorkWeekMarqueeTrack"></div></div><span class="sr-only" id="${prefix}WorkWeekMarqueeHelp">Seven days of income, expenses, projects, and payments. Animation pauses while focused.</span></section>`;
   }
@@ -266,20 +312,22 @@ window.FINANCE_SYNC_CONFIG = window.FINANCE_SYNC_CONFIG || {
   }
 
   function ensureLauncher() {
-    if (document.getElementById("expenseScreenshotPanel")) return null;
-    const existing = document.getElementById("expenseScreenshotLauncher");
-    if (existing) return existing;
-    const note = document.getElementById("expenseFormModeNote");
-    if (!note) return null;
+    const shell = ensureExpenseHeaderShell();
+    if (!shell) return null;
+    if (document.getElementById("expenseScreenshotMenuButton")) return shell;
+    const existing = document.getElementById("expenseScreenshotLauncherButton");
+    if (existing) return shell;
     insertEnhancementStyles();
-    const launcher = document.createElement("section");
-    launcher.id = "expenseScreenshotLauncher";
-    launcher.className = "expense-screenshot-launcher";
-    launcher.setAttribute("aria-label", "Screenshot upload options");
-    launcher.innerHTML = `<button class="button button-primary button-small" id="expenseScreenshotLauncherButton" type="button" aria-haspopup="menu" aria-controls="expenseScreenshotActionMenu" aria-expanded="false">Upload</button>`;
-    note.insertAdjacentElement("afterend", launcher);
-    const button = document.getElementById("expenseScreenshotLauncherButton");
-    button?.addEventListener("click", async () => {
+    const button = document.createElement("button");
+    button.className = "button button-primary button-small";
+    button.id = "expenseScreenshotLauncherButton";
+    button.type = "button";
+    button.textContent = "Upload";
+    button.setAttribute("aria-haspopup", "menu");
+    button.setAttribute("aria-controls", "expenseScreenshotActionMenu");
+    button.setAttribute("aria-expanded", "false");
+    shell.appendChild(button);
+    button.addEventListener("click", async () => {
       button.disabled = true;
       button.setAttribute("aria-busy", "true");
       button.textContent = "Preparing…";
@@ -288,7 +336,6 @@ window.FINANCE_SYNC_CONFIG = window.FINANCE_SYNC_CONFIG || {
         window.FinanceExpenseScreenshot?.ensurePanel?.();
         window.FinanceExpenseScreenshotAI?.ensureAiControls?.();
         ensureCompactScreenshotUi();
-        document.getElementById("expenseScreenshotLauncher")?.remove();
         if (!openUploadMenu()) throw new Error("Screenshot upload menu did not initialize.");
       } catch (error) {
         console.warn("Screenshot detection tools are unavailable.", error);
@@ -298,7 +345,7 @@ window.FINANCE_SYNC_CONFIG = window.FINANCE_SYNC_CONFIG || {
         if (typeof window.showToast === "function") window.showToast("Screenshot scanner could not load. Reload the app and try again.", "warning");
       }
     });
-    return launcher;
+    return shell;
   }
 
   async function start() {
@@ -310,7 +357,7 @@ window.FINANCE_SYNC_CONFIG = window.FINANCE_SYNC_CONFIG || {
       window.FinanceExpenseScreenshot?.ensurePanel?.();
       window.FinanceExpenseScreenshotAI?.ensureAiControls?.();
       ensureCompactScreenshotUi();
-      document.getElementById("expenseScreenshotLauncher")?.remove();
+      document.getElementById("expenseScreenshotLauncherButton")?.remove();
     })();
     try { await toolsPromise; }
     catch (error) { toolsPromise = null; throw error; }
@@ -321,6 +368,7 @@ window.FINANCE_SYNC_CONFIG = window.FINANCE_SYNC_CONFIG || {
     ensureLauncher();
     watchForScreenshotPanel();
     bindUploadedIcons();
+    bindDashboardToolbarAction();
     ensureWorkMarquees();
     start().catch(error => console.warn("Screenshot detection tools are unavailable.", error));
   }
