@@ -19,8 +19,9 @@ const requiredFiles = [
   "package.json", "package-lock.json", "README.md", ".gitignore",
   ".github/workflows/quality-pages.yml", "vendor/supabase.min.js",
   "sync-config.js", "sync-config.example.js", "privacy-lock.js", "cloud-conflict-review.js", "cloud-conflict-resolution.js", "cloud-sync-lifecycle.js", "projects-calendar-v13.0.20.js", "projects-calendar-v13.0.20.css",
+  "expense-screenshot-parser.js", "expense-screenshot-detect.js",
   "Install_V14_0_23.command", "run_audit.sh", "eslint.config.js", "playwright.config.mjs",
-  "tests/validate-v14-0-23.mjs", "tests/privacy-and-inputs.spec.mjs", "tests/check-maintainability.mjs"
+  "tests/validate-v14-0-23.mjs", "tests/validate-expense-screenshot.mjs", "tests/expense-screenshot.spec.mjs", "tests/privacy-and-inputs.spec.mjs", "tests/check-maintainability.mjs"
 ];
 for (const file of requiredFiles) if (!exists(file)) fail(`Missing required file: ${file}`);
 
@@ -70,8 +71,9 @@ if (pkg.version !== version.version) fail(`package.json (${pkg.version}) and ver
 for (const script of ["inspect", "lint", "maintainability", "test", "test:browser", "quality", "quality:ci"]) {
   if (!pkg.scripts?.[script]) fail(`Required package script is missing: ${script}`);
 }
-const testTarget = String(pkg.scripts?.test || "").match(/^node\s+(\S+)/)?.[1];
-if (!testTarget || !exists(testTarget)) fail(`Test script target is missing: ${pkg.scripts?.test || "(not configured)"}`);
+const testTargets = [...String(pkg.scripts?.test || "").matchAll(/\bnode\s+(\S+)/g)].map(match => match[1]);
+if (!testTargets.length) fail(`Test script target is missing: ${pkg.scripts?.test || "(not configured)"}`);
+for (const target of testTargets) if (!exists(target)) fail(`Test script target is missing: ${target}`);
 if (!String(pkg.engines?.node || "").includes("22")) warn(`Node engine is ${pkg.engines?.node || "not set"}; project validation expects Node 22+`);
 if (pkg.version !== "14.0.23") fail(`Expected current package version 14.0.23, found ${pkg.version || "(missing)"}`);
 if (!read("README.md").startsWith("# My Finance Records · V14.0.23")) fail("README release heading is not V14.0.23");

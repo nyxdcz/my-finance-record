@@ -10,7 +10,7 @@
     "build": "echo 'No build step required'",
     "lint": "eslint .",
     "inspect": "node tests/inspect-project.mjs",
-    "test": "node tests/validate-cloud-authority.mjs",
+    "test": "node tests/validate-cloud-authority.mjs && node tests/validate-expense-screenshot.mjs",
     "test:browser": "playwright test",
     "maintainability": "node tests/check-maintainability.mjs",
     "audit": "npm audit --omit=dev",
