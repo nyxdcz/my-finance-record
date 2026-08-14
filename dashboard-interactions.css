@@ -260,3 +260,22 @@ html[data-theme="dark"] .sidebar .nav-button.active .nav-icon-image{
   }
   #customizeDashboardButton[data-dashboard-toolbar-action]::before{width:19px!important;height:19px!important}
 }
+
+/* V14.0.24 · unify weekly marquee with the Finance workspace glass surface. */
+.workspace-switcher,
+.dashboard-week-marquee{
+  border-color:var(--line);
+  border-radius:8px;
+  background:color-mix(in srgb,var(--surface) 96%,transparent);
+  -webkit-backdrop-filter:blur(12px);
+  backdrop-filter:blur(12px);
+  box-shadow:0 1px 2px rgba(15,23,42,.045);
+}
+.dashboard-week-day{
+  border-color:color-mix(in srgb,var(--line) 88%,transparent);
+  background:color-mix(in srgb,var(--surface) 78%,transparent);
+  box-shadow:inset 0 1px 0 color-mix(in srgb,#fff 8%,transparent);
+}
+html[data-theme="dark"] .dashboard-week-day{
+  background:rgba(255,255,255,.045);
+}
