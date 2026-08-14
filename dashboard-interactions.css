@@ -102,3 +102,79 @@ html[data-theme="dark"] .sidebar .nav-button.active .nav-icon-image{
   .dashboard-week-marquee-track{width:auto;max-width:100%;overflow-x:auto;animation:none!important;will-change:auto}
   .dashboard-week-marquee-group[aria-hidden="true"]{display:none}
 }
+
+/* V14.0.24 · Dashboard header alignment, supplied Add artwork, and static sync status. */
+.cloud-sync-toolbar-button[data-sync-state="syncing"] .toolbar-icon[data-uploaded-sync-icon="syncing"]{
+  border:0!important;
+  border-radius:0!important;
+  animation:none!important;
+  transform:none!important;
+}
+#quickAddExpense .toolbar-icon::before{display:none!important}
+#quickAddExpense .toolbar-icon{
+  background-image:url("./icons/action-add-sparkle-v14-0-23.png")!important;
+  background-repeat:no-repeat!important;
+  background-position:center!important;
+  background-size:20px 20px!important;
+}
+#addAccountButton::before,#addSavingsGoalButton::before,[data-pc-add]::before,[data-pc-full-add]::before{
+  content:""!important;
+  display:inline-block!important;
+  width:18px!important;
+  height:18px!important;
+  flex:0 0 18px!important;
+  background:transparent url("./icons/action-add-sparkle-v14-0-23.png") center/contain no-repeat!important;
+  -webkit-mask-image:none!important;
+  mask-image:none!important;
+}
+#addAccountButton,#addSavingsGoalButton,[data-pc-add],[data-pc-full-add]{gap:6px}
+
+@media(min-width:701px){
+  #dashboard.page.active{
+    display:grid;
+    grid-template-columns:minmax(200px,220px) minmax(0,1fr) minmax(320px,auto);
+    column-gap:8px;
+    align-items:stretch;
+  }
+  #dashboard>.page-heading{
+    grid-column:1/-1;
+    grid-row:1;
+    display:grid;
+    grid-template-columns:minmax(200px,220px) minmax(0,1fr) minmax(320px,auto);
+    align-items:center;
+    gap:8px;
+    height:43px;
+    min-height:43px;
+    max-height:43px;
+    margin-bottom:10px;
+    pointer-events:none;
+  }
+  #dashboard>.page-heading>div:first-child{
+    grid-column:1;
+    min-width:0;
+    align-self:center;
+    pointer-events:auto;
+  }
+  #dashboard>.page-heading h2{margin:0 0 2px;font-size:1.15rem;line-height:1.05}
+  #dashboard>.page-heading p{margin:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:.61rem;line-height:1.1}
+  #dashboard>.page-heading>.dashboard-heading-actions{
+    grid-column:3;
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    gap:6px;
+    min-width:0;
+    pointer-events:auto;
+  }
+  #dashboard>.page-heading>.dashboard-heading-actions .button{min-width:0;padding:5px 7px;font-size:.68rem;white-space:nowrap}
+  #dashboard>#dashboardWeekMarquee{
+    grid-column:2;
+    grid-row:1;
+    z-index:2;
+    height:43px;
+    min-height:43px;
+    max-height:43px;
+    margin:0 0 10px;
+  }
+  #dashboard>:not(.page-heading):not(#dashboardWeekMarquee){grid-column:1/-1}
+}
