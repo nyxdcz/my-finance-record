@@ -397,3 +397,29 @@ form,
     max-width:calc(100vw - 20px)!important;
   }
 }
+
+/* V15.0.0 · flat top toolbar and toast cleanup. */
+.topbar :is(.month-navigator,.topbar-history-actions),
+.topbar :is(.cloud-sync-toolbar-button,#customizeDashboardButton,.topbar-tools-trigger) {
+  background:var(--surface)!important;
+  border-color:var(--line)!important;
+  box-shadow:none!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+}
+
+.topbar .topbar-add-button {
+  background:var(--primary)!important;
+  border-color:var(--primary)!important;
+  box-shadow:none!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+}
+
+.toast {
+  background:var(--surface)!important;
+  border:1px solid var(--line)!important;
+  box-shadow:none!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+}
