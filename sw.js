@@ -1,7 +1,7 @@
 "use strict";
 const APP_VERSION = "15.0.0";
 self.__FINANCE_APP_VERSION = APP_VERSION;
-// V15 dashboard/chrome cleanup refresh · flat toolbar/toast pass · dashboard spacing/sidebar edge pass · calendar-height sync: changing this worker forces installed PWAs to precache the updated dashboard stylesheet without changing the release version.
+// V15 dashboard/chrome cleanup refresh · flat toolbar/toast pass · dashboard spacing/sidebar edge pass · calendar-height sync · cash-flow fit and Customize icon refresh: changing this worker forces installed PWAs to precache the updated dashboard stylesheet and supplied icon without changing the release version.
 const CACHE_VERSION = "finance-v15-20260815-liquid-glass-r3";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
@@ -62,6 +62,7 @@ const APP_SHELL = [
   asset("./icons/sidebar-settings-v14-0-24.png"),
   asset("./icons/action-add-record.png"),
   asset("./icons/action-add-widget.png"),
+  asset("./icons/customize-dashboard-v15.png"),
   asset("./icons/action-add-sparkle-v14-0-23.png"),
   asset("./icons/theme-moon.png"),
   asset("./icons/theme-sun.png"),
