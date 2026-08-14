@@ -25,7 +25,7 @@ html[data-theme="dark"] #themeToggleIcon::before{-webkit-mask-image:url("./icons
 #cloudSyncStatusButton .toolbar-icon,#quickAddExpense .toolbar-icon,#globalSearchButton .toolbar-icon,#productivityCenterButton .toolbar-icon,#themeToggleIcon{display:inline-grid;place-items:center;width:22px;height:22px;flex:0 0 22px}
 .cloud-sync-toolbar-button[data-sync-state="syncing"] .toolbar-icon::before{display:none}
 
-/* V14.0.24 · supplied sidebar navigation icons · direct PNG rendering */
+/* V14.0.24 · supplied sidebar navigation icons · cache-safe rendering */
 .sidebar .nav-icon-image{
   display:block!important;
   width:20px!important;
@@ -34,6 +34,10 @@ html[data-theme="dark"] #themeToggleIcon::before{-webkit-mask-image:url("./icons
   opacity:.94!important;
   filter:none!important;
 }
+.sidebar .nav-button[data-page="dashboard"] .nav-icon-image{content:url("./icons/sidebar-overview-v14-0-24.png")}
+.sidebar .nav-button[data-page="money"] .nav-icon-image{content:url("./icons/sidebar-finance-v14-0-24.png")}
+.sidebar .nav-button[data-page="projects"] .nav-icon-image{content:url("./icons/sidebar-work-v14-0-24.png")}
+.sidebar .settings-nav-button .nav-icon-image{content:url("./icons/sidebar-settings-v14-0-24.png")}
 .sidebar .nav-button.active .nav-icon-image,
 html[data-theme="dark"] .sidebar .nav-button.active .nav-icon-image{
   filter:brightness(0) saturate(100%)!important;
@@ -50,7 +54,7 @@ html[data-theme="dark"] .sidebar .nav-button.active .nav-icon-image{
   width:28px;
   height:28px;
   flex:0 0 28px;
-  background-image:url("./icons/utility-badge.png");
+  background-image:url("./icons/sidebar-insights-v14-0-24.png");
   background-repeat:no-repeat;
   background-position:center;
   background-size:20px 20px;
@@ -65,8 +69,24 @@ html[data-theme="dark"] .sidebar .nav-button.active .nav-icon-image{
   .sidebar.open .insights-nav-button{padding-inline-start:12px!important}
 }
 
-/* Keep the compact marquee contract available when this wrapper is inlined by tests. */
-.dashboard-week-marquee{box-sizing:border-box;height:43px;min-height:43px;max-height:43px}
+/* V14.0.24 · self-contained compact marquee fallback for production Pages. */
+.dashboard-week-marquee{box-sizing:border-box;height:43px;min-height:43px;max-height:43px;display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:6px;margin-bottom:7px;padding:3px 6px;border:1px solid var(--line);border-radius:7px;background:var(--surface);overflow:hidden}
+.dashboard-week-marquee-heading{min-width:78px;display:grid;gap:0}
+.dashboard-week-marquee-heading strong{font-size:.68rem}
+.dashboard-week-marquee-heading span{color:var(--muted);font-size:.54rem}
+.dashboard-week-marquee-window{min-width:0;overflow:hidden;-webkit-mask-image:linear-gradient(to right,transparent,black 7%,black 93%,transparent);mask-image:linear-gradient(to right,transparent,black 7%,black 93%,transparent)}
+.dashboard-week-marquee-window:focus-visible{outline:auto;outline-offset:3px;border-radius:6px}
+.dashboard-week-marquee-track{width:max-content;display:flex;animation:dashboard-week-marquee 34s linear infinite;will-change:transform}
+.dashboard-week-marquee-group{display:flex;flex:none;gap:5px;padding-right:5px}
+.dashboard-week-day{box-sizing:border-box;width:148px;min-width:148px;height:35px;min-height:35px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:5px;align-items:center;padding:2px 5px;border:1px solid var(--line);border-radius:6px;background:var(--surface-soft);color:var(--text)}
+.dashboard-week-date{display:grid;place-items:center;align-content:center;width:27px;min-height:29px;border-inline-end:1px solid var(--line);padding-inline-end:5px}
+.dashboard-week-date strong{font-size:.74rem}.dashboard-week-date span{color:var(--muted);font-size:.52rem;text-transform:uppercase}
+.dashboard-week-copy{min-width:0;display:grid;gap:2px}
+.dashboard-week-copy strong{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:.62rem}
+.dashboard-week-copy small{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:1;overflow:hidden;color:var(--muted);font-size:.52rem;line-height:1.2}
+.dashboard-week-marquee-window:hover .dashboard-week-marquee-track,.dashboard-week-marquee-window:focus-within .dashboard-week-marquee-track{animation-play-state:paused}
+@keyframes dashboard-week-marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
 .finance-workspace-marquee-row{position:sticky;top:71px;z-index:23;display:flex;align-items:stretch;gap:8px;margin-bottom:10px}
 .finance-workspace-marquee-row>.money-workspace-switcher{position:static;top:auto;flex:0 0 auto;height:43px;min-height:43px;max-height:43px;box-sizing:border-box;margin:0}
 .finance-workspace-marquee-row>.finance-week-marquee{flex:1 1 auto;min-width:0;margin:0}
@@ -77,4 +97,8 @@ html[data-theme="dark"] .sidebar .nav-button.active .nav-icon-image{
   .dashboard-week-marquee{display:none!important}
   .finance-workspace-marquee-row{top:65px}
   .finance-workspace-marquee-row>.money-workspace-switcher{width:100%}
+}
+@media(prefers-reduced-motion:reduce){
+  .dashboard-week-marquee-track{width:auto;max-width:100%;overflow-x:auto;animation:none!important;will-change:auto}
+  .dashboard-week-marquee-group[aria-hidden="true"]{display:none}
 }
