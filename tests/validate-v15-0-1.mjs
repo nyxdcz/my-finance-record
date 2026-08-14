@@ -104,6 +104,10 @@ assert.ok(dashboardInteractions.includes("width:48px!important;\n    min-width:4
 assert.ok(dashboardInteractions.includes("width:28px!important;\n    height:28px!important;\n    flex:0 0 28px!important;"), "Insights must use the same 28px icon slot as Overview, Finance, Work, and Settings");
 assert.ok(dashboardInteractions.includes(".sidebar.desktop-open .sidebar-close-button,\n  .sidebar.sidebar-pinned .sidebar-close-button{\n    display:grid!important;"), "expanded desktop sidebar must restore the Pin/Unpin control");
 assert.match(dashboardInteractions, /sidebar-insights-v14-0-24\.png/, "Insights must continue using the supplied sidebar icon asset");
+assert.match(index, /<div class="brand">\s*<strong>Records<\/strong>\s*<\/div>/, "expanded sidebar header must contain only the Records title");
+assert.doesNotMatch(index, /Expenses and projects/, "sidebar header subtitle must be removed");
+assert.match(dashboardInteractions, /V15\.0\.1 · expanded sidebar Records header cleanup/, "sidebar header maintenance CSS must be present");
+assert.match(dashboardInteractions, /brand strong[\s\S]*font-size:1\.08rem!important/, "expanded Records title must be slightly larger");
 
 assert.match(workflow, /dashboard-interactions-core-v14-0-23\.css liquid-glass-v15\.css mobile-v14-0-23\.css/, "Pages bundle must include Liquid Glass CSS");
 assert.match(workflow, /test -f _site\/liquid-glass-v15\.css/, "Pages preparation must verify the V15 stylesheet");
