@@ -11,6 +11,7 @@ const worker = read("sw.js");
 const cloud = read("cloud-sync.js");
 const syncConfig = read("sync-config.js");
 const glass = read("liquid-glass-v15.css");
+const appCss = read("app.css");
 const dashboardInteractions = read("dashboard-interactions.css");
 const workflow = read(".github/workflows/quality-pages.yml");
 const readme = read("README.md");
@@ -25,7 +26,7 @@ assert.equal(version.schemaVersion, 12, "V15 must preserve Finance Schema 12");
 assert.equal(version.cloudSchemaVersion, 3, "V15 must preserve Cloud Schema V3");
 assert.equal(version.name, "Liquid Glass Interface");
 assert.equal(version.released, "2026-08-15");
-assert.equal(version.cacheVersion, "finance-v15-20260815-liquid-glass-r3");
+assert.equal(version.cacheVersion, "finance-v15-20260815-liquid-glass-r4");
 
 assert.match(index, /<title>My Finance Records · V15\.0\.0<\/title>/, "browser title must be V15.0.0 before boot");
 assert.match(index, /id="buildBadge"[^>]*V15\.0\.0 · Liquid Glass Interface · August 15, 2026[^>]*>V15\.0\.0<\/small>/, "build badge must be V15.0.0");
@@ -36,13 +37,15 @@ assert.match(index, /"version":"V15\.0\.0","title":"Liquid Glass Interface"/, "V
 assert.match(index, /id="settingsOverviewAppStatus">Version 15\.0\.0</, "Settings overview must identify V15");
 
 assert.match(worker, /const APP_VERSION = "15\.0\.0";/, "service worker APP_VERSION must be V15");
-assert.match(worker, /const CACHE_VERSION = "finance-v15-20260815-liquid-glass-r3";/, "service-worker cache must rotate to current V15 generation");
+assert.match(worker, /const CACHE_VERSION = "finance-v15-20260815-liquid-glass-r4";/, "service-worker cache must rotate to current V15 generation");
+assert.match(worker, /new Request\(url, \{ cache:"reload" \}\)/, "V15 shell refresh must bypass stale browser HTTP cache");
 assert.match(worker, /asset\("\.\/liquid-glass-v15\.css\?v=15\.0\.0"\)/, "Liquid Glass CSS must be precached");
 assert.match(worker, /expense-screenshot-parser\.js\?v=15\.0\.0/, "changed screenshot loader URLs must use V15 cache pins");
 assert.match(worker, /\^finance-v\(\?:12\|13\|14\|15\)-/, "cache cleanup must include V15 generations");
 assert.match(worker, /dashboard\/chrome cleanup refresh/, "service worker must refresh installed PWAs for the dashboard cleanup");
 assert.match(worker, /customize-dashboard-v15\.png/, "service worker must precache the supplied Customize Dashboard icon");
 assert.match(worker, /collapsed sidebar Insights\/Pin state refresh/, "service worker must refresh installed PWAs for the sidebar state change");
+assert.match(worker, /forced shell refresh/, "service worker must document the stale-shell refresh pass");
 
 assert.match(cloud, /const APP_VERSION_FALLBACK = "15\.0\.0";/, "Cloud Sync fallback must be V15");
 assert.match(cloud, /const APP_VERSION_CODE = 130000;/, "visual V15 release must not change the Cloud Schema writer code");
@@ -94,8 +97,11 @@ assert.match(glass, /customize-dashboard-v15\.png/, "Customize Dashboard must us
 assert.match(glass, /chart-data-table-wrap[\s\S]*max-height:68px!important;/, "expanded exact cash-flow values must stay contained inside the existing bento height");
 assert.match(glass, /cash-flow-chart-panel \.chart-svg[\s\S]*height:104px!important;/, "wide cash-flow charts must compact vertically without changing the bento height");
 
+assert.match(appCss, /\.nav-icon \{ flex:0 0 28px; width:28px; height:28px; \}/, "all sidebar navigation icons must share the same 28px alignment slot");
 assert.ok(dashboardInteractions.includes(".sidebar:not(.desktop-open):not(.sidebar-pinned) .sidebar-close-button{\n    display:none!important;"), "collapsed desktop sidebar must hide the Pin control");
 assert.ok(dashboardInteractions.includes(".sidebar:not(.desktop-open):not(.sidebar-pinned) .insights-nav-button{\n    display:flex!important;"), "collapsed desktop sidebar must keep the Insights icon visible");
+assert.ok(dashboardInteractions.includes("width:48px!important;\n    min-width:48px!important;\n    max-width:48px!important;"), "collapsed Insights must use the same 48px rail button width as the other navigation items");
+assert.ok(dashboardInteractions.includes("width:28px!important;\n    height:28px!important;\n    flex:0 0 28px!important;"), "Insights must use the same 28px icon slot as Overview, Finance, Work, and Settings");
 assert.ok(dashboardInteractions.includes(".sidebar.desktop-open .sidebar-close-button,\n  .sidebar.sidebar-pinned .sidebar-close-button{\n    display:grid!important;"), "expanded desktop sidebar must restore the Pin/Unpin control");
 assert.match(dashboardInteractions, /sidebar-insights-v14-0-24\.png/, "Insights must continue using the supplied sidebar icon asset");
 
@@ -106,4 +112,4 @@ assert.ok(changelog.startsWith("## 15.0.0 · 2026-08-15"));
 assert.match(installer, /My Finance Records · V15\.0\.0 macOS Installer & Inspector/);
 assert.match(installer, /Executing full V15\.0\.0 quality validation/);
 
-console.log("V15.0.0 validation passed: release metadata, 7px Liquid Glass controls, glass marquees, compact Dashboard chrome, supplied Customize icon, cash-flow bento fitting, collapsed Insights rail, expanded-only Pin control, accessible compact toasts, PWA cache, Cloud Sync compatibility, opaque finance content, and deployment packaging are consistent.");
+console.log("V15.0.0 validation passed: release metadata, 7px Liquid Glass controls, glass marquees, compact Dashboard chrome, supplied Customize icon, cash-flow bento fitting, aligned collapsed Insights rail, expanded-only Pin control, forced fresh PWA shell delivery, accessible compact toasts, Cloud Sync compatibility, opaque finance content, and deployment packaging are consistent.");
