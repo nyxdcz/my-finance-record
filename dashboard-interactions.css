@@ -279,3 +279,62 @@ html[data-theme="dark"] .sidebar .nav-button.active .nav-icon-image{
 html[data-theme="dark"] .dashboard-week-day{
   background:rgba(255,255,255,.045);
 }
+
+/* V15.0.0 · make cash flow follow the calendar row height without resizing the calendar. */
+@media(min-width:1101px){
+  #dashboard [data-dashboard-card="cash-flow"][data-size="wide"]{
+    align-self:stretch!important;
+    min-height:0!important;
+    height:auto!important;
+    contain:size;
+  }
+  #dashboard [data-dashboard-card="cash-flow"][data-size="wide"] .cash-flow-chart-grid{
+    gap:8px!important;
+  }
+  #dashboard [data-dashboard-card="cash-flow"][data-size="wide"] .cash-flow-chart-panel{
+    padding:7px!important;
+  }
+  #dashboard [data-dashboard-card="cash-flow"][data-size="wide"] .cash-flow-chart-panel h4{
+    margin-bottom:3px!important;
+    font-size:.68rem!important;
+  }
+  #dashboard [data-dashboard-card="cash-flow"][data-size="wide"] .cash-flow-chart-panel .chart-svg{
+    min-height:116px!important;
+  }
+  #dashboard [data-dashboard-card="cash-flow"][data-size="wide"] .chart-legend{
+    margin-top:4px!important;
+    gap:8px!important;
+  }
+  #dashboard [data-dashboard-card="cash-flow"][data-size="wide"] .chart-note{
+    margin-top:2px!important;
+    margin-bottom:0!important;
+    font-size:.60rem!important;
+    line-height:1.22!important;
+  }
+  #dashboard [data-dashboard-card="cash-flow"][data-size="wide"] .chart-data-details{
+    margin-top:1px!important;
+    padding-top:0!important;
+  }
+  #dashboard [data-dashboard-card="cash-flow"][data-size="wide"] .chart-data-details>summary{
+    min-height:24px!important;
+    padding:0!important;
+  }
+  #dashboard [data-dashboard-card="cash-flow"][data-size="wide"] .cash-flow-summary{
+    grid-template-columns:repeat(6,minmax(0,1fr))!important;
+    gap:4px!important;
+    margin-top:3px!important;
+  }
+  #dashboard [data-dashboard-card="cash-flow"][data-size="wide"] .cash-flow-summary>div{
+    min-height:0!important;
+    padding:4px 5px!important;
+  }
+  #dashboard [data-dashboard-card="cash-flow"][data-size="wide"] .cash-flow-summary span{
+    font-size:.52rem!important;
+    line-height:1.12!important;
+  }
+  #dashboard [data-dashboard-card="cash-flow"][data-size="wide"] .cash-flow-summary strong{
+    margin-top:1px!important;
+    font-size:.66rem!important;
+    line-height:1.12!important;
+  }
+}
