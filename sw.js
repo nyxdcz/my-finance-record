@@ -1,7 +1,7 @@
 "use strict";
 const APP_VERSION = "14.0.23";
 self.__FINANCE_APP_VERSION = APP_VERSION;
-const CACHE_VERSION = "finance-v14-20260814-v1423-cloud-authority-r2";
+const CACHE_VERSION = "finance-v14-20260814-v1423-expense-upload-r1";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const DB_NAME = "simple-finance-project-records-v12-db";
@@ -39,6 +39,8 @@ const APP_SHELL = [
   asset("./projects-calendar-v13.0.20.js?v=14.0.23"),
   asset("./projects-calendar-v13.0.20.css?v=14.0.23"),
   asset("./sync-config.js"),
+  asset("./expense-screenshot-parser.js?v=14.0.23"),
+  asset("./expense-screenshot-detect.js?v=14.0.23"),
   asset("./vendor/supabase.min.js"),
   asset("./icons/icon-192.png"),
   asset("./icons/icon-512.png"),
