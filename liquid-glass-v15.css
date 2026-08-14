@@ -1,6 +1,6 @@
 /* My Finance Records · V15.0.0 · Liquid Glass Interface
-   Applies translucent material to navigation and controls only.
-   Finance content, tables, cards, charts, forms, and marquee content remain opaque. */
+   Applies translucent material to navigation and control chrome only.
+   Finance content, tables, cards, charts, and forms remain opaque. */
 
 :root {
   --liquid-glass-surface:rgba(248,251,255,.66);
@@ -14,6 +14,7 @@
   --liquid-glass-hover:rgba(255,255,255,.68);
   --liquid-glass-blur:22px;
   --liquid-glass-saturate:145%;
+  --liquid-glass-radius:7px;
 }
 
 html[data-theme="dark"] {
@@ -37,10 +38,14 @@ html[data-theme="dark"] {
   backdrop-filter:blur(var(--liquid-glass-blur)) saturate(var(--liquid-glass-saturate));
 }
 
+/* Shared V15 glass material for rectangular navigation and action surfaces. */
 .topbar :is(.cloud-sync-toolbar-button,.month-nav-button,.month-display-button,.month-current-button,.topbar-history-button,.topbar-add-button,#customizeDashboardButton,.topbar-tools-trigger),
 .sidebar :is(.sidebar-close-button,.nav-button),
 .workspace-switcher,
-.finance-workspace-marquee-row>.workspace-switcher {
+.finance-workspace-marquee-row>.workspace-switcher,
+.dashboard-week-marquee,
+.finance-week-marquee,
+.work-week-marquee {
   border-color:var(--liquid-glass-border);
   background:linear-gradient(180deg,var(--liquid-glass-surface-soft),color-mix(in srgb,var(--liquid-glass-surface) 84%,transparent));
   box-shadow:var(--liquid-glass-shadow-soft);
@@ -50,7 +55,7 @@ html[data-theme="dark"] {
 
 .topbar :is(.month-navigator,.topbar-history-actions) {
   border:1px solid var(--liquid-glass-border);
-  border-radius:999px;
+  border-radius:var(--liquid-glass-radius);
   background:linear-gradient(180deg,var(--liquid-glass-surface-soft),color-mix(in srgb,var(--liquid-glass-surface) 78%,transparent));
   box-shadow:var(--liquid-glass-shadow-soft);
   -webkit-backdrop-filter:blur(18px) saturate(140%);
@@ -64,6 +69,19 @@ html[data-theme="dark"] {
   background:transparent;
   -webkit-backdrop-filter:none;
   backdrop-filter:none;
+}
+
+.topbar :is(.cloud-sync-toolbar-button,.month-nav-button,.month-display-button,.month-current-button,.topbar-history-button,.topbar-add-button,#customizeDashboardButton,.topbar-tools-trigger),
+.sidebar :is(.sidebar-close-button,.nav-button),
+.workspace-switcher,
+.workspace-switcher button,
+.finance-workspace-marquee-row>.workspace-switcher,
+.dashboard-week-marquee,
+.finance-week-marquee,
+.work-week-marquee,
+:is(.cloud-sync-toolbar-popover,.month-picker-popover,.topbar-tools-panel,.expense-screenshot-action-menu,.overflow-menu,.context-menu,.menu-popover,.popover),
+:is(.toast,.snackbar,.toast-message,[role="status"].toast,[role="status"].snackbar) {
+  border-radius:var(--liquid-glass-radius);
 }
 
 .topbar :is(.cloud-sync-toolbar-button,.month-nav-button,.month-display-button,.month-current-button,.topbar-history-button,#customizeDashboardButton,.topbar-tools-trigger):not(:disabled):hover,
@@ -115,17 +133,15 @@ html[data-theme="dark"] {
   box-shadow:0 8px 18px rgba(20,44,70,.08),inset 0 1px 0 rgba(255,255,255,.42);
 }
 
-/* Segmented workspace navigation. The marquee beside it remains opaque below. */
+/* Segmented workspace navigation. */
 .workspace-switcher,
 .finance-workspace-marquee-row>.workspace-switcher {
-  border-radius:12px;
   padding:3px;
   overflow:hidden;
 }
 
 .workspace-switcher button {
   border:1px solid transparent;
-  border-radius:9px;
   background:transparent;
   box-shadow:none;
 }
@@ -137,7 +153,16 @@ html[data-theme="dark"] {
   box-shadow:0 5px 13px rgba(20,44,70,.08),inset 0 1px 0 rgba(255,255,255,.4);
 }
 
-/* Floating menus and popovers use the stronger glass material. */
+/* Dashboard, Finance, and Work marquees use the same V15 glass shell. */
+.dashboard-week-marquee,
+.finance-week-marquee,
+.work-week-marquee {
+  min-height:43px;
+  height:43px;
+  overflow:hidden;
+}
+
+/* Floating menus, upload/AI actions, and popovers use the stronger glass material. */
 :is(.cloud-sync-toolbar-popover,.month-picker-popover,.topbar-tools-panel,.expense-screenshot-action-menu,.overflow-menu,.context-menu,.menu-popover,.popover) {
   background:linear-gradient(180deg,var(--liquid-glass-surface-strong),var(--liquid-glass-surface));
   border:1px solid var(--liquid-glass-border);
@@ -159,6 +184,7 @@ html[data-theme="dark"] {
 :is(.pc-full-dialog,.project-calendar-dialog) :is(.modal-header,.dialog-header,.pc-dialog-header,.modal-actions,.dialog-actions) {
   background:linear-gradient(180deg,var(--liquid-glass-surface-strong),var(--liquid-glass-surface));
   border-color:var(--liquid-glass-border);
+  border-radius:var(--liquid-glass-radius);
   -webkit-backdrop-filter:blur(20px) saturate(140%);
   backdrop-filter:blur(20px) saturate(140%);
 }
@@ -177,9 +203,6 @@ html[data-theme="dark"] {
 }
 
 /* Keep data/content surfaces deliberately opaque. */
-.dashboard-week-marquee,
-.finance-week-marquee,
-.work-week-marquee,
 .card,
 .dashboard-card,
 .summary-card,
@@ -190,12 +213,6 @@ form,
 .expense-screenshot-panel {
   -webkit-backdrop-filter:none;
   backdrop-filter:none;
-}
-
-.dashboard-week-marquee,
-.finance-week-marquee,
-.work-week-marquee {
-  background:var(--surface)!important;
 }
 
 /* Preserve strong focus visibility over translucent material. */
@@ -210,6 +227,9 @@ form,
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))) {
   .topbar,
   .sidebar,
+  .dashboard-week-marquee,
+  .finance-week-marquee,
+  .work-week-marquee,
   :is(.cloud-sync-toolbar-popover,.month-picker-popover,.topbar-tools-panel,.expense-screenshot-action-menu,.overflow-menu,.context-menu,.menu-popover,.popover),
   :is(dialog,.modal,.dialog) :is(.modal-header,.dialog-header,.modal-footer,.dialog-footer,.modal-actions,.dialog-actions),
   :is(.toast,.snackbar,.toast-message,[role="status"].toast,[role="status"].snackbar) {
@@ -229,6 +249,7 @@ form,
     --liquid-glass-surface-soft:rgba(24,40,56,.96);
   }
   .topbar,.sidebar,
+  .dashboard-week-marquee,.finance-week-marquee,.work-week-marquee,
   :is(.cloud-sync-toolbar-popover,.month-picker-popover,.topbar-tools-panel,.expense-screenshot-action-menu,.overflow-menu,.context-menu,.menu-popover,.popover) {
     -webkit-backdrop-filter:none;
     backdrop-filter:none;
@@ -246,6 +267,7 @@ form,
 
 @media (forced-colors:active) {
   .topbar,.sidebar,
+  .dashboard-week-marquee,.finance-week-marquee,.work-week-marquee,
   :is(.cloud-sync-toolbar-popover,.month-picker-popover,.topbar-tools-panel,.expense-screenshot-action-menu,.overflow-menu,.context-menu,.menu-popover,.popover),
   .workspace-switcher {
     background:Canvas;
