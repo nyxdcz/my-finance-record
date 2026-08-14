@@ -73,7 +73,9 @@ window.FINANCE_SYNC_CONFIG = window.FINANCE_SYNC_CONFIG || {
     toolsPromise = (async () => {
       await loadScript("./expense-screenshot-parser.js?v=14.0.23", "expenseScreenshotParserScript");
       await loadScript("./expense-screenshot-detect.js?v=14.0.23", "expenseScreenshotDetectScript");
+      await loadScript("./expense-screenshot-ai.js?v=14.0.23", "expenseScreenshotAiScript");
       window.FinanceExpenseScreenshot?.ensurePanel?.();
+      window.FinanceExpenseScreenshotAI?.ensureAiControls?.();
       document.getElementById("expenseScreenshotLauncher")?.remove();
     })();
     try {
