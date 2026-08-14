@@ -25,29 +25,38 @@ html[data-theme="dark"] #themeToggleIcon::before{-webkit-mask-image:url("./icons
 #cloudSyncStatusButton .toolbar-icon,#quickAddExpense .toolbar-icon,#globalSearchButton .toolbar-icon,#productivityCenterButton .toolbar-icon,#themeToggleIcon{display:inline-grid;place-items:center;width:22px;height:22px;flex:0 0 22px}
 .cloud-sync-toolbar-button[data-sync-state="syncing"] .toolbar-icon::before{display:none}
 
-/* V14.0.24 · supplied sidebar navigation icons */
-.sidebar .nav-button[data-page="dashboard"] .nav-icon-image,
-.sidebar .nav-button[data-page="money"] .nav-icon-image,
-.sidebar .nav-button[data-page="projects"] .nav-icon-image,
-.sidebar .settings-nav-button .nav-icon-image{opacity:0!important;grid-area:1/1;pointer-events:none}
-
-.sidebar .nav-button[data-page="dashboard"] .nav-icon::before,
-.sidebar .nav-button[data-page="money"] .nav-icon::before,
-.sidebar .nav-button[data-page="projects"] .nav-icon::before,
-.sidebar .settings-nav-button .nav-icon::before,
-.sidebar .insights-nav-button::before{
-  content:"";display:block;background:currentColor;
-  -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-position:center;mask-position:center;-webkit-mask-size:16px 16px;mask-size:16px 16px
+/* V14.0.24 · supplied sidebar navigation icons · direct PNG rendering */
+.sidebar .nav-icon-image{
+  display:block!important;
+  width:20px!important;
+  height:20px!important;
+  object-fit:contain;
+  opacity:.94!important;
+  filter:none!important;
+}
+.sidebar .nav-button.active .nav-icon-image,
+html[data-theme="dark"] .sidebar .nav-button.active .nav-icon-image{
+  filter:brightness(0) saturate(100%)!important;
+  opacity:1!important;
 }
 .sidebar .nav-button[data-page="dashboard"] .nav-icon::before,
 .sidebar .nav-button[data-page="money"] .nav-icon::before,
 .sidebar .nav-button[data-page="projects"] .nav-icon::before,
-.sidebar .settings-nav-button .nav-icon::before{grid-area:1/1}
-.sidebar .nav-button[data-page="dashboard"] .nav-icon::before{-webkit-mask-image:url("./icons/action-add-widget.png");mask-image:url("./icons/action-add-widget.png");width:16px;height:16px}
-.sidebar .nav-button[data-page="money"] .nav-icon::before{-webkit-mask-image:url("./icons/utility-savings.png");mask-image:url("./icons/utility-savings.png");width:16px;height:16px}
-.sidebar .nav-button[data-page="projects"] .nav-icon::before{-webkit-mask-image:url("./icons/action-add-record.png");mask-image:url("./icons/action-add-record.png");width:16px;height:16px}
-.sidebar .settings-nav-button .nav-icon::before{-webkit-mask-image:url("./icons/utility-controls.png");mask-image:url("./icons/utility-controls.png");width:16px;height:16px}
-.sidebar .insights-nav-button::before{-webkit-mask-image:url("./icons/utility-badge.png");mask-image:url("./icons/utility-badge.png");width:28px;height:28px;flex:0 0 28px}
+.sidebar .settings-nav-button .nav-icon::before{content:none!important}
+
+.sidebar .insights-nav-button::before{
+  content:"";
+  display:block;
+  width:28px;
+  height:28px;
+  flex:0 0 28px;
+  background-image:url("./icons/utility-badge.png");
+  background-repeat:no-repeat;
+  background-position:center;
+  background-size:20px 20px;
+  opacity:.94;
+}
+.sidebar .insights-nav-button.active::before{filter:brightness(0) saturate(100%);opacity:1}
 
 @media(min-width:851px){
   .sidebar.desktop-open .insights-nav-button,.sidebar.sidebar-pinned .insights-nav-button{padding-inline-start:10px!important}
