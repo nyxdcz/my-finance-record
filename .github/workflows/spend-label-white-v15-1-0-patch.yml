@@ -1,0 +1,47 @@
+name: V15.1.0 Spend Label Patch
+
+on:
+  push:
+    branches:
+      - fix/spend-label-white-v15-1-0
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out patch branch
+        uses: actions/checkout@v7
+        with:
+          ref: fix/spend-label-white-v15-1-0
+          fetch-depth: 0
+      - name: Use Node.js 24
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          package-manager-cache: false
+      - name: Apply Spend label patch
+        run: python .github/patch-spend-label-white-v15-1-0.py
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Run repository quality
+        run: npm run quality
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Run browser regressions
+        run: npm run test:browser
+      - name: Remove generated browser state
+        run: rm -rf test-results playwright-report
+      - name: Commit validated app and test changes
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add black-canvas-v15-1-0.css index.html sw.js version.json package.json tests/
+          git diff --cached --check
+          git commit -m "style: make Available money Spend label white"
+          git push origin HEAD:fix/spend-label-white-v15-1-0
