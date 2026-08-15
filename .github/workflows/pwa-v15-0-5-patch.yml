@@ -26,6 +26,7 @@ jobs:
         run: |
           python .github/patch-v15-0-5.py
           python .github/patch-v15-0-5-maint.py
+          python .github/patch-v15-0-5-inherited-tests.py
       - name: Install locked dependencies
         run: npm ci --ignore-scripts --no-audit --no-fund
       - name: Run repository quality
@@ -38,7 +39,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          rm -f .github/patch-v15-0-5.py .github/patch-v15-0-5-maint.py .github/workflows/pwa-v15-0-5-patch.yml
+          rm -f .github/patch-v15-0-5.py .github/patch-v15-0-5-maint.py .github/patch-v15-0-5-inherited-tests.py .github/workflows/pwa-v15-0-5-patch.yml
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
