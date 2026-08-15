@@ -34,25 +34,28 @@ jobs:
               text = text.replace("ui-icon-alignment-v15-0-5.css?v=15.0.5-ui2", "ui-icon-alignment-v15-0-5.css?v=15.1.0-ui2")
               text = text.replace("privacy-lock.js?v=15.0.5-ui1", "privacy-lock.js?v=15.1.0-ui1")
               path.write_text(text)
-          Path("tests/black-canvas-v15-1-0.spec.mjs").write_text('''import { test, expect } from "@playwright/test";
-for (const theme of ["light","dark"]) {
-  test(`V15.1.0 Black Canvas uses exact palette in ${theme} appearance`, async ({ browser }) => {
-    const context = await browser.newContext({ javaScriptEnabled:false });
-    const page = await context.newPage();
-    await page.goto("http://127.0.0.1:3000/index.html?page=settings", { waitUntil:"networkidle" });
-    await page.locator("html").evaluate((element, value) => { element.dataset.theme = value; }, theme);
-    const result = await page.evaluate(() => {
-      const root = getComputedStyle(document.documentElement);
-      const body = getComputedStyle(document.body);
-      return { bg:root.getPropertyValue("--bg").trim(), primary:root.getPropertyValue("--primary").trim(), bodyBg:body.backgroundColor };
-    });
-    expect(result.bg).toBe("#000000");
-    expect(result.primary).toBe("#173e76");
-    expect(result.bodyBg).toBe("rgb(0, 0, 0)");
-    await context.close();
-  });
-}
-''')
+          spec = "\n".join([
+              'import { test, expect } from "@playwright/test";',
+              'for (const theme of ["light","dark"]) {',
+              '  test(`V15.1.0 Black Canvas uses exact palette in ${theme} appearance`, async ({ browser }) => {',
+              '    const context = await browser.newContext({ javaScriptEnabled:false });',
+              '    const page = await context.newPage();',
+              '    await page.goto("http://127.0.0.1:3000/index.html?page=settings", { waitUntil:"networkidle" });',
+              '    await page.locator("html").evaluate((element, value) => { element.dataset.theme = value; }, theme);',
+              '    const result = await page.evaluate(() => {',
+              '      const root = getComputedStyle(document.documentElement);',
+              '      const body = getComputedStyle(document.body);',
+              '      return { bg:root.getPropertyValue("--bg").trim(), primary:root.getPropertyValue("--primary").trim(), bodyBg:body.backgroundColor };',
+              '    });',
+              '    expect(result.bg).toBe("#000000");',
+              '    expect(result.primary).toBe("#173e76");',
+              '    expect(result.bodyBg).toBe("rgb(0, 0, 0)");',
+              '    await context.close();',
+              '  });',
+              '}',
+              ''
+          ])
+          Path("tests/black-canvas-v15-1-0.spec.mjs").write_text(spec)
           PY
       - name: Install locked dependencies
         run: npm ci --ignore-scripts --no-audit --no-fund
