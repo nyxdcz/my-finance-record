@@ -1,0 +1,140 @@
+name: Apply desktop UX quick wins V15.2.1 r4
+
+on:
+  push:
+    branches:
+      - agent/desktop-ux-quick-wins-v15-2-1
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply-and-validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/desktop-ux-quick-wins-v15-2-1
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Reuse approved source patch and release alignment
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import textwrap
+
+          def execute_step(workflow_path, section_label=None):
+              workflow = Path(workflow_path).read_text(encoding='utf-8')
+              if section_label:
+                  workflow = workflow[workflow.index(section_label):]
+              marker = "          python3 - <<'PY'\n"
+              start = workflow.index(marker) + len(marker)
+              end = workflow.index("\n          PY\n", start)
+              code = textwrap.dedent(workflow[start:end])
+              exec(compile(code, workflow_path, 'exec'), {})
+
+          execute_step('.github/workflows/apply-desktop-ux-quick-wins-v15-2-1.yml')
+          execute_step('.github/workflows/apply-desktop-ux-quick-wins-v15-2-1-r3.yml', '- name: Align V15.2.1 release metadata and validators')
+          PY
+
+      - name: Extract new interaction helpers from index
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          def read(path): return Path(path).read_text(encoding='utf-8')
+          def write(path, text): Path(path).write_text(text, encoding='utf-8')
+          def one(path, old, new):
+              text = read(path)
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f'{path}: expected one match, found {count}: {old[:120]!r}')
+              write(path, text.replace(old, new, 1))
+
+          path = 'interaction-patterns.js'
+          one(path, '''  function setupInteractionPatterns() {\n    setupOverflowMenus();\n  }''', '''  function renderIncomeFilterChips() {\n    const container = document.getElementById("incomeActiveFilterChips");\n    const searchInput = document.getElementById("incomeSearch");\n    const categoryInput = document.getElementById("incomeCategoryFilter");\n    if (!container || !searchInput || !categoryInput) return;\n    const search = searchInput.value.trim();\n    const category = categoryInput.value;\n    renderActiveFilterChips(container, [\n      search ? { key:"search", label:`Search: ${search}` } : null,\n      category ? { key:"category", label:`Category: ${category}` } : null\n    ], key => {\n      if (key === "search") searchInput.value = "";\n      if (key === "category") categoryInput.value = "";\n      globalThis.renderIncomePage?.();\n    });\n  }\n\n  function setupEmptyStateActions() {\n    if (document.documentElement.dataset.emptyStateActionsReady === "true") return;\n    document.documentElement.dataset.emptyStateActionsReady = "true";\n    document.addEventListener("click", event => {\n      const button = event.target.closest?.("[data-empty-action]");\n      if (!button) return;\n      const action = button.dataset.emptyAction;\n      if (action === "clear-income-filters") {\n        const search = document.getElementById("incomeSearch"), category = document.getElementById("incomeCategoryFilter");\n        if (search) search.value = ""; if (category) category.value = ""; globalThis.renderIncomePage?.(); return;\n      }\n      if (action === "add-income") { globalThis.openIncomeDialog?.(); return; }\n      if (action === "clear-expense-filters") {\n        const search = document.getElementById("expenseSearch"), category = document.getElementById("expenseCategoryFilter");\n        if (search) search.value = ""; if (category) category.value = ""; globalThis.renderMoneyPage?.(); return;\n      }\n      if (action === "add-expense") { globalThis.openExpenseDialog?.(); return; }\n      if (action === "clear-project-filters") {\n        ["projectSearch", "projectStatusFilter", "projectTypeFilter", "projectSourceFilter"].forEach(id => { const node = document.getElementById(id); if (node) node.value = ""; });\n        globalThis.renderProjects?.(); return;\n      }\n      if (action === "add-project") globalThis.openProjectDialog?.();\n    });\n  }\n\n  function setupInteractionPatterns() {\n    setupOverflowMenus();\n    setupEmptyStateActions();\n  }''')
+          one(path, '''  window.FinanceInteractionPatterns = { closeOverflowMenu, setupOverflowMenus, renderDuplicatedMarquee, renderActiveFilterChips, middleTruncateFilename, createDashboardDragController };''', '''  window.FinanceInteractionPatterns = { closeOverflowMenu, setupOverflowMenus, renderDuplicatedMarquee, renderActiveFilterChips, renderIncomeFilterChips, setupEmptyStateActions, middleTruncateFilename, createDashboardDragController };''')
+
+          path = 'index.html'
+          one(path, '''      window.FinanceInteractionPatterns?.renderActiveFilterChips?.(document.getElementById("incomeActiveFilterChips"), [\n        search ? { key:"search", label:`Search: ${document.getElementById("incomeSearch").value.trim()}` } : null,\n        category ? { key:"category", label:`Category: ${category}` } : null\n      ], key => {\n        if (key === "search") document.getElementById("incomeSearch").value = "";\n        if (key === "category") document.getElementById("incomeCategoryFilter").value = "";\n        renderIncomePage();\n      });''', '''      window.FinanceInteractionPatterns?.renderIncomeFilterChips?.();''')
+          one(path, '''    document.getElementById("clearIncomeFilters").addEventListener("click", () => { document.getElementById("incomeSearch").value=""; document.getElementById("incomeCategoryFilter").value=""; renderIncomePage(); });\n    document.addEventListener("click", event => {\n      const action = event.target.closest("[data-empty-action]");\n      if (!action) return;\n      if (action.dataset.emptyAction === "clear-income-filters") { document.getElementById("incomeSearch").value=""; document.getElementById("incomeCategoryFilter").value=""; renderIncomePage(); }\n      if (action.dataset.emptyAction === "add-income") openIncomeDialog();\n      if (action.dataset.emptyAction === "clear-expense-filters") { document.getElementById("expenseSearch").value=""; document.getElementById("expenseCategoryFilter").value=""; renderMoneyPage(); }\n      if (action.dataset.emptyAction === "add-expense") openExpenseDialog();\n      if (action.dataset.emptyAction === "clear-project-filters") { document.getElementById("projectSearch").value=""; document.getElementById("projectStatusFilter").value=""; document.getElementById("projectTypeFilter").value=""; document.getElementById("projectSourceFilter").value=""; renderProjects(); }\n      if (action.dataset.emptyAction === "add-project") openProjectDialog();\n    });''', '''    document.getElementById("clearIncomeFilters").addEventListener("click", () => { document.getElementById("incomeSearch").value=""; document.getElementById("incomeCategoryFilter").value=""; renderIncomePage(); });''')
+          one(path, '''      }).join("") : (summary.manual.length && (search || category)\n        ? emptyHtml("No income matches these filters", "Try removing a search or category filter.", { label:"Clear filters", action:"clear-income-filters" })\n        : emptyHtml("No income records", "Add salary, bonus, gifts, refunds, or other income for this month.", { label:"Add income", action:"add-income" }));''', '''      }).join("") : (summary.manual.length && (search || category) ? emptyHtml("No income matches these filters", "Try removing a search or category filter.", { label:"Clear filters", action:"clear-income-filters" }) : emptyHtml("No income records", "Add salary, bonus, gifts, refunds, or other income for this month.", { label:"Add income", action:"add-income" }));''')
+          one(path, '''      }).join("") : ((search || category) && items.length\n        ? emptyHtml("No expenses match these filters", "Try clearing the active expense filters.", { label:"Clear filters", action:"clear-expense-filters" })\n        : emptyHtml("No expenses here", "Add an expense for this section.", { label:"Add expense", action:"add-expense" }));''', '''      }).join("") : ((search || category) && items.length ? emptyHtml("No expenses match these filters", "Try clearing the active expense filters.", { label:"Clear filters", action:"clear-expense-filters" }) : emptyHtml("No expenses here", "Add an expense for this section.", { label:"Add expense", action:"add-expense" }));''')
+
+          one(path, 'interaction-patterns.js?v=15.1.0-finance-marquee1', 'interaction-patterns.js?v=15.2.1-ux1')
+          one('sw.js', 'interaction-patterns.js?v=15.1.0-finance-marquee1', 'interaction-patterns.js?v=15.2.1-ux1')
+
+          test = read('tests/v15-2-1-desktop-ux-quick-wins.spec.mjs')
+          test = test.replace("expect(index).toContain('action:\"clear-income-filters\"');", "expect(index).toContain('action:\"clear-income-filters\"');\n  expect(source(\"interaction-patterns.js\")).toContain(\"renderIncomeFilterChips\");\n  expect(source(\"interaction-patterns.js\")).toContain(\"setupEmptyStateActions\");")
+          write('tests/v15-2-1-desktop-ux-quick-wins.spec.mjs', test)
+          PY
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Quality
+        run: npm run quality
+
+      - name: Dependency audit
+        run: npm run audit
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Browser regression suite
+        run: npm run test:browser
+
+      - name: Diff safety checks
+        shell: bash
+        run: |
+          git diff --check
+          if git diff --name-only | grep -q '^mobile-v14-0-23.css$'; then
+            echo 'Mobile stylesheet must remain unchanged in this desktop pass.' >&2
+            exit 1
+          fi
+          if git diff --name-only | grep -E '^(account-ledger|cloud-conflict|cloud-sync-lifecycle|privacy-lock|mobile-v14-0-23)'; then
+            echo 'Unexpected finance/sync/mobile implementation file changed.' >&2
+            exit 1
+          fi
+          git diff --name-only
+
+      - name: Package validated patch
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-ux-quick-wins-v15-2-1-r4
+          path: |
+            index.html
+            interaction-patterns.js
+            projects-calendar-v13.0.20.js
+            budget-planning.js
+            desktop-ux-v15-2-0.css
+            cloud-sync.js
+            sync-config.js
+            sw.js
+            version.json
+            package.json
+            package-lock.json
+            Install_V15_2_0.command
+            README.md
+            CHANGELOG.md
+            tests/inspect-project.mjs
+            tests/validate-v15-2-0-desktop-ux.mjs
+            tests/v15-2-1-desktop-ux-quick-wins.spec.mjs
+
+      - name: Commit validated changes
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html interaction-patterns.js projects-calendar-v13.0.20.js budget-planning.js desktop-ux-v15-2-0.css cloud-sync.js sync-config.js sw.js version.json package.json package-lock.json Install_V15_2_0.command README.md CHANGELOG.md tests/inspect-project.mjs tests/validate-v15-2-0-desktop-ux.mjs tests/v15-2-1-desktop-ux-quick-wins.spec.mjs
+          git commit -m "feat: refine desktop UX quick wins"
+          git push origin HEAD:agent/desktop-ux-quick-wins-v15-2-1
