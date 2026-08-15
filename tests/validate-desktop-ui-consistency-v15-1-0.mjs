@@ -17,7 +17,7 @@ const version = JSON.parse(read("version.json"));
 assert.equal(version.version, "15.1.0");
 assert.equal(version.schemaVersion, 12);
 assert.equal(version.cloudSchemaVersion, 3);
-assert.equal(version.cacheVersion, "finance-v15-20260815-finance-marquee-r24");
+assert.equal(version.cacheVersion, "finance-v15-20260815-desktop-ui-r25");
 assert.match(app, /--workspace-card-radius:\s*9px/);
 assert.match(app, /--workspace-control-height:\s*38px/);
 assert.match(app, /--workspace-compact-control-height:\s*35px/);
@@ -41,22 +41,22 @@ assert.match(liquid, /prefers-reduced-transparency:reduce[\s\S]*html\[data-theme
 assert.match(dashboard, /V15\.1\.0 · desktop Dashboard\/workspace geometry owned by static CSS/);
 assert.doesNotMatch(sync, /@media\(min-width:701px\)\{#dashboard\.page\.active/);
 for (const pin of [
-  "app.css?v=15.1.0-desktop1",
-  "dashboard-interactions.css?v=15.1.0-desktop1",
-  "security-profiles.css?v=15.1.0-desktop1",
+  "app.css?v=15.1.0-desktop2",
+  "dashboard-interactions.css?v=15.1.0-desktop2",
+  "security-profiles.css?v=15.1.0-desktop2",
   "reports-insights.css?v=15.1.0-desktop1",
-  "budget-planning.css?v=15.1.0-desktop1",
-  "projects-calendar-v13.0.20.css?v=15.1.0-desktop1",
+  "budget-planning.css?v=15.1.0-desktop2",
+  "projects-calendar-v13.0.20.css?v=15.1.0-desktop2",
   "sync-config.js?v=15.1.0-desktop1"
 ]) assert.ok(index.includes(pin), `index missing ${pin}`);
-assert.ok(sw.includes("finance-v15-20260815-finance-marquee-r24"));
+assert.ok(sw.includes("finance-v15-20260815-desktop-ui-r25"));
 for (const pin of [
-  "app.css?v=15.1.0-desktop1",
-  "dashboard-interactions.css?v=15.1.0-desktop1",
-  "security-profiles.css?v=15.1.0-desktop1",
+  "app.css?v=15.1.0-desktop2",
+  "dashboard-interactions.css?v=15.1.0-desktop2",
+  "security-profiles.css?v=15.1.0-desktop2",
   "reports-insights.css?v=15.1.0-desktop1",
-  "budget-planning.css?v=15.1.0-desktop1",
-  "projects-calendar-v13.0.20.css?v=15.1.0-desktop1",
+  "budget-planning.css?v=15.1.0-desktop2",
+  "projects-calendar-v13.0.20.css?v=15.1.0-desktop2",
   "sync-config.js?v=15.1.0-desktop1",
   "liquid-glass-v15.css?v=15.1.0-monthnav1"
 ]) assert.ok(sw.includes(pin), `service worker missing ${pin}`);

@@ -2,7 +2,7 @@
 const APP_VERSION = "15.1.0";
 self.__FINANCE_APP_VERSION = APP_VERSION;
 // V15.0.4 UI alignment delivery refresh · forces installed PWAs to fetch the cascade-safe icon alignment rules while preserving finance and sync behavior.
-const CACHE_VERSION = "finance-v15-20260815-finance-marquee-r24";
+const CACHE_VERSION = "finance-v15-20260815-desktop-ui-r25";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const DB_NAME = "simple-finance-project-records-v12-db";
@@ -16,10 +16,10 @@ const APP_SHELL = [
   asset("./offline.html"),
   asset("./manifest.webmanifest"),
   asset("./version.json"),
-  asset("./app.css?v=15.1.0-desktop1"),
-  asset("./dashboard-interactions.css?v=15.1.0-desktop1"),
+  asset("./app.css?v=15.1.0-desktop2"),
+  asset("./dashboard-interactions.css?v=15.1.0-desktop2"),
   asset("./ui-icon-alignment-v15-0-5.css?v=15.1.0-ui3"),
-  asset("./black-canvas-v15-1-0.css?v=15.1.0-periodradius1"),
+  asset("./black-canvas-v15-1-0.css?v=15.1.0-desktop2"),
   asset("./pwa-update-v15-0-5.js?v=15.1.0"),
   asset("./dashboard-interactions-core-v14-0-23.css"),
   asset("./liquid-glass-v15.css?v=15.1.0-monthnav1"),
@@ -27,7 +27,7 @@ const APP_SHELL = [
   asset("./interaction-patterns.js?v=15.1.0-finance-marquee1"),
   asset("./privacy-lock.js?v=15.1.0-ui1"),
   asset("./security-profiles.js?v=14.0.23"),
-  asset("./security-profiles.css?v=15.1.0-desktop1"),
+  asset("./security-profiles.css?v=15.1.0-desktop2"),
   asset("./cloud-conflict-review.js?v=14.0.23"),
   asset("./cloud-conflict-resolution.js?v=14.0.23"),
   asset("./cloud-sync-lifecycle.js?v=14.0.23"),
@@ -35,7 +35,7 @@ const APP_SHELL = [
   asset("./account-ledger.js?v=15.0.4"),
   asset("./account-ledger.css?v=14.0.23"),
   asset("./budget-planning.js?v=15.0.4"),
-  asset("./budget-planning.css?v=15.1.0-desktop1"),
+  asset("./budget-planning.css?v=15.1.0-desktop2"),
   asset("./reports-insights.js?v=14.0.23"),
   asset("./reports-insights.css?v=15.1.0-desktop1"),
   asset("./productivity-tools.js?v=14.0.23"),
@@ -43,7 +43,7 @@ const APP_SHELL = [
   asset("./reminders-alerts.js?v=14.0.23"),
   asset("./reminders-alerts.css?v=14.0.23"),
   asset("./projects-calendar-v13.0.20.js?v=14.0.23"),
-  asset("./projects-calendar-v13.0.20.css?v=15.1.0-desktop1"),
+  asset("./projects-calendar-v13.0.20.css?v=15.1.0-desktop2"),
   asset("./sync-config.js?v=15.1.0-desktop1"),
   asset("./expense-screenshot-parser.js?v=15.0.3"),
   asset("./expense-screenshot-detect.js?v=15.0.3"),

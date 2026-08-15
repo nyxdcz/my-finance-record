@@ -149,14 +149,14 @@ for(const token of [
   'const SIDEBAR_PINNED_KEY = "simple-finance-sidebar-pinned-v1"', "function setSidebarPinned", "function applyResponsiveSidebarState",
   ".sidebar.sidebar-pinned", "--sidebar-rail-width:64px", "#menuButton { display:none; }", "--nav-active-bg:#dff4e8", "--nav-active-text:#102a31", "prefers-reduced-motion:reduce"
 ]) assert(html.includes(token),`responsive icon-rail navigation missing: ${token}`);
-assert(html.includes('./projects-calendar-v13.0.20.js?v=14.0.23')&&html.includes('./projects-calendar-v13.0.20.css?v=15.1.0-desktop1'),"Project Agenda assets are not version-pinned in HTML");
-assert(worker.includes('asset("./projects-calendar-v13.0.20.js?v=14.0.23")')&&worker.includes('asset("./projects-calendar-v13.0.20.css?v=15.1.0-desktop1")'),"Project Agenda assets are not version-pinned in the offline shell");
+assert(html.includes('./projects-calendar-v13.0.20.js?v=14.0.23')&&html.includes('./projects-calendar-v13.0.20.css?v=15.1.0-desktop2'),"Project Agenda assets are not version-pinned in HTML");
+assert(worker.includes('asset("./projects-calendar-v13.0.20.js?v=14.0.23")')&&worker.includes('asset("./projects-calendar-v13.0.20.css?v=15.1.0-desktop2")'),"Project Agenda assets are not version-pinned in the offline shell");
 assert(html.includes('./cloud-conflict-review.js?v=14.0.23')&&worker.includes('asset("./cloud-conflict-review.js?v=14.0.23")'),"Cloud conflict review module is not loaded and precached");
 assert(html.includes('./cloud-conflict-resolution.js?v=14.0.23')&&worker.includes('asset("./cloud-conflict-resolution.js?v=14.0.23")'),"Cloud conflict resolution module is not loaded and precached");
 assert(accountLedger.includes('function recalculateBalances(target = data, { stamp = false } = {})'),"ledger recalculation is not pure by default");
 assert(accountLedger.includes('if (stamp && target.ledgerSettings) target.ledgerSettings.lastRecalculatedAt = new Date().toISOString();'),"ledger timestamp is not limited to explicit mutations");
 assert(accountLedger.includes("if (ledgerMigrationChanged)")&&!accountLedger.includes('persistFinanceDataRaw("Account ledger updated")'),"ledger startup still persists unchanged data");
-assert(read("index.html").includes('./app.css?v=15.1.0-desktop1')&&worker.includes('asset("./app.css?v=15.1.0-desktop1")'),"extracted application CSS is not versioned and precached");
+assert(read("index.html").includes('./app.css?v=15.1.0-desktop2')&&worker.includes('asset("./app.css?v=15.1.0-desktop2")'),"extracted application CSS is not versioned and precached");
 assert(html.includes('data-settings-tab="profiles"')&&html.includes('id="settings-panel-profiles"'),"Profiles & Security settings panel missing");
 assert(html.includes('security-profiles.css')&&html.includes('security-profiles.js'),"profile architecture assets are not loaded");
 assert(html.includes('{"version": "V13.0.10", "title": "Account Spending from Balance"'),"in-app V13.0.10 history entry missing");
@@ -167,7 +167,7 @@ assert(html.includes('{"version": "V13.0.0", "title": "Major Cloud, Encryption &
 assert(html.includes('{"version": "V12.21.0", "title": "Record-level Cloud Sync 2.0"'),"V12.21 history was rewritten incorrectly");
 assert(worker.includes('const APP_VERSION = "14.0.23";'),"service-worker version mismatch");
 assert(worker.includes(`const CACHE_VERSION = "${version.cacheVersion}";`),"service-worker cache mismatch");
-assert(worker.includes('asset("./security-profiles.js?v=14.0.23")')&&worker.includes('asset("./security-profiles.css?v=15.1.0-desktop1")'),"profile assets missing from PWA shell");
+assert(worker.includes('asset("./security-profiles.js?v=14.0.23")')&&worker.includes('asset("./security-profiles.css?v=15.1.0-desktop2")'),"profile assets missing from PWA shell");
 assert(workflow.includes('security-profiles.js security-profiles.css cloud-conflict-review.js cloud-conflict-resolution.js cloud-sync-lifecycle.js cloud-sync.js'),"GitHub Pages workflow does not deploy profile and conflict-resolution assets");
 assert(packageJson.version==="14.0.23"&&packageLock.version==="14.0.23","package version mismatch");
 assert(exists("privacy-lock.js"),"signed-out privacy module missing");

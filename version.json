@@ -10,8 +10,8 @@
   "profileArchitectureVersion": 1,
   "encryptionVersion": 1,
   "authSecurityVersion": 1,
-  "cacheVersion": "finance-v15-20260815-finance-marquee-r24",
+  "cacheVersion": "finance-v15-20260815-desktop-ui-r25",
   "released": "2026-08-15",
   "name": "Black Canvas UI",
-  "notes": "Black Canvas UI with a source-level Finance marquee alignment delivery refresh: Income and Paid Expenses now use the same tabs-left, weekly-marquee-right row as Budget & Expenses while preserving 43px desktop/tablet geometry, phone marquee hiding, Finance Schema 12, Cloud Schema V3, records, calculations, and sync behavior."
+  "notes": "Desktop UI consistency refresh with shared desktop geometry, consistent 72px sticky offsets and controls, restored light mode with #efefef background, dark-safe semantic surfaces, and preserved Finance Schema 12, Cloud Schema V3, records, calculations, sync behavior, and phone layout."
 }
