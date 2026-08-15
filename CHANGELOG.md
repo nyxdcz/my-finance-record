@@ -1,3 +1,9 @@
+## V15.1.1 - 2026-08-15
+
+- Aligns Income and Paid Expenses with the Budget & Expenses Finance workspace row directly in source HTML: tabs left, weekly marquee right.
+- Keeps the existing 43px desktop/tablet row geometry and hides the Finance weekly marquee on phone.
+- Bumps the PWA shell cache so installed clients fetch the corrected interaction script and layout instead of reporting stale files as current.
+
 ## 15.1.0 · 2026-08-15
 - Rounded Finance period headers and expense rows to 9px so the First half, Second half, Other expenses, and individual expense surfaces match the compact Black Canvas card language.
 - Normalized desktop topbar controls to the 38px Synced reference while preserving the existing 44px mobile touch targets.
