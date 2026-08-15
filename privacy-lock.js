@@ -5,7 +5,7 @@
     "[data-page]", "#menuButton", "#sidebarCloseButton", "#overlay",
     "#previousMonthButton", "#nextMonthButton", "#monthDisplayButton", "#currentMonthButton",
     "#monthPicker", "#monthPickerPreviousYear", "#monthPickerNextYear", "#monthPickerGrid button",
-    "#topbarToolsTrigger", "#themeToggleButton", "#privacySignInButton", ".finance-privacy-signin",
+    "#topbarToolsTrigger", "#themeToggleButton", ".finance-privacy-signin",
     "[data-help-key]", "[data-section-help]", "[data-close='sectionHelpDialog']", "[data-close='pwaInstallGuideDialog']",
     "[data-settings-tab='sync']", "[data-settings-tab='app']", "#settingsBackButton", "[data-settings-open='sync']", "[data-settings-open='app']",
     "#settingsSearchButton", "#settingsSearchInput", "#settingsSearchClear", "[data-settings-search-result]",
@@ -51,20 +51,8 @@
     });
   }
 
-  function ensureTopbarSignIn(){
-    let button=document.getElementById("privacySignInButton");
-    if(button) return button;
-    const actions=document.querySelector(".topbar-actions");
-    const sync=document.getElementById("cloudSyncStatusButton");
-    if(!actions) return null;
-    button=document.createElement("button");
-    button.id="privacySignInButton";
-    button.type="button";
-    button.className="button button-primary privacy-signin-topbar";
-    button.innerHTML='<span class="toolbar-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="8" r="3.5"/><path d="M5.5 20c.7-4 3-6 6.5-6s5.8 2 6.5 6"/></svg></span><span class="privacy-signin-label">Sign in</span>';
-    if(sync) actions.insertBefore(button,sync); else actions.prepend(button);
-    button.addEventListener("click", openSignIn);
-    return button;
+  function removeTopbarSignIn(){
+    document.getElementById("privacySignInButton")?.remove();
   }
 
   function ensureSettingsPrivacyNote(){
@@ -118,7 +106,7 @@
 
   function apply(){
     ensurePrivacyViews();
-    ensureTopbarSignIn();
+    removeTopbarSignIn();
     ensureSettingsPrivacyNote();
     const locked=!state.authenticated;
     document.body.classList.toggle("finance-signed-out",locked);

@@ -2,7 +2,7 @@
 const APP_VERSION = "15.0.5";
 self.__FINANCE_APP_VERSION = APP_VERSION;
 // V15.0.4 UI alignment delivery refresh · forces installed PWAs to fetch the cascade-safe icon alignment rules while preserving finance and sync behavior.
-const CACHE_VERSION = "finance-v15-20260815-pwa-update-r13";
+const CACHE_VERSION = "finance-v15-20260815-header-ui-r14";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const DB_NAME = "simple-finance-project-records-v12-db";
@@ -18,13 +18,13 @@ const APP_SHELL = [
   asset("./version.json"),
   asset("./app.css?v=14.0.23"),
   asset("./dashboard-interactions.css?v=14.0.23"),
-  asset("./ui-icon-alignment-v15-0-5.css?v=15.0.5-ui1"),
+  asset("./ui-icon-alignment-v15-0-5.css?v=15.0.5-ui2"),
   asset("./pwa-update-v15-0-5.js?v=15.0.5"),
   asset("./dashboard-interactions-core-v14-0-23.css"),
   asset("./liquid-glass-v15.css?v=15.0.5"),
   asset("./mobile-v14-0-23.css?v=14.0.23"),
   asset("./interaction-patterns.js?v=14.0.23"),
-  asset("./privacy-lock.js?v=14.0.23"),
+  asset("./privacy-lock.js?v=15.0.5-ui1"),
   asset("./security-profiles.js?v=14.0.23"),
   asset("./security-profiles.css?v=14.0.23"),
   asset("./cloud-conflict-review.js?v=14.0.23"),

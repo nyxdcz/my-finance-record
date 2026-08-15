@@ -10,7 +10,7 @@
     "build": "echo 'No build step required'",
     "lint": "eslint .",
     "inspect": "node tests/inspect-project.mjs",
-    "test": "node tests/validate-pwa-updater-v15-0-5.mjs && node tests/validate-record-spending-v15-0-4.mjs && node tests/validate-safe-multidevice-sync.mjs && node tests/validate-expense-screenshot.mjs && node tests/validate-v15-0-5.mjs",
+    "test": "node tests/validate-header-ui-v15-0-5.mjs && node tests/validate-pwa-updater-v15-0-5.mjs && node tests/validate-record-spending-v15-0-4.mjs && node tests/validate-safe-multidevice-sync.mjs && node tests/validate-expense-screenshot.mjs && node tests/validate-v15-0-5.mjs",
     "test:browser": "playwright test",
     "maintainability": "node tests/check-maintainability.mjs",
     "audit": "npm audit --omit=dev",
