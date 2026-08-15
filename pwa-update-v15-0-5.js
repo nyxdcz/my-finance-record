@@ -129,7 +129,10 @@
       const target = doc.getElementById("dashCashFlowChart");
       if (!target) return;
       upgradeCashFlowLayout();
-      const observer = new MutationObserver(() => root.queueMicrotask?.(upgradeCashFlowLayout) || upgradeCashFlowLayout());
+      const observer = new MutationObserver(() => {
+        if (typeof root.queueMicrotask === "function") root.queueMicrotask(upgradeCashFlowLayout);
+        else upgradeCashFlowLayout();
+      });
       observer.observe(target, { childList:true });
     };
     if (doc.readyState === "loading") doc.addEventListener("DOMContentLoaded", start, { once:true });
