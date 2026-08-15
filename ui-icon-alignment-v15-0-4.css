@@ -1,8 +1,8 @@
 /* My Finance Records · V15.0.4 · cascade-safe icon alignment hotfix */
 /*
- * This file intentionally loads before some legacy interaction CSS.
- * Use stronger selectors for the approved alignment rules so later legacy
- * declarations cannot recreate the build icon or widen icon/label spacing.
+ * This file is the final visual layer after legacy interaction CSS.
+ * Strong selectors remain intentional so future legacy declarations cannot
+ * recreate the build icon or widen icon/label spacing.
  */
 
 /* Keep the build badge text-only and compact. */

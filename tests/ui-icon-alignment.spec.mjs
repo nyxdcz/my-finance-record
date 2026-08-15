@@ -7,7 +7,7 @@ test("production V15.0.4 UI alignment uses the final ui2 stylesheet", async ({ b
 
   const styles = await page.locator('link[rel="stylesheet"]').evaluateAll(nodes => nodes.map(node => node.getAttribute("href") || ""));
   const dashboardCss = styles.findIndex(href => href.includes("dashboard-interactions.css?v=14.0.23"));
-  const ui2Css = styles.findIndex(href => href.includes("ui-icon-alignment-v15-0-4.css?v=15.0.4-ui2"));
+  const ui2Css = styles.findIndex(href => href.includes("ui-icon-alignment-v15-0-4.css?v=15.0.4-ui3"));
   expect(dashboardCss).toBeGreaterThanOrEqual(0);
   expect(ui2Css).toBeGreaterThan(dashboardCss);
   expect(styles.some(href => href.includes("ui-icon-alignment-v15-0-4.css?v=15.0.4-ui1"))).toBe(false);
