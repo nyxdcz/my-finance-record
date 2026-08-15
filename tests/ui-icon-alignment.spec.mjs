@@ -6,7 +6,7 @@ test("production V15.1.0 UI alignment uses the delivered final stylesheet", asyn
   await page.goto("http://127.0.0.1:3000/index.html?page=dashboard", { waitUntil:"networkidle" });
 
   const styles = await page.locator('link[rel="stylesheet"]').evaluateAll(nodes => nodes.map(node => node.getAttribute("href") || ""));
-  const dashboardCss = styles.findIndex(href => href.includes("dashboard-interactions.css?v=15.1.0-desktop2"));
+  const dashboardCss = styles.findIndex(href => href.includes("dashboard-interactions.css?v=15.1.0-desktop3"));
   const uiCss = styles.findIndex(href => href.includes("ui-icon-alignment-v15-0-5.css?v=15.1.0-ui3"));
   expect(dashboardCss).toBeGreaterThanOrEqual(0);
   expect(uiCss).toBeGreaterThan(dashboardCss);

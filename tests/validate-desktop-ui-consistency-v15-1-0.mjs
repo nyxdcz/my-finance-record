@@ -18,17 +18,17 @@ const version = JSON.parse(read("version.json"));
 assert.equal(version.version, "15.1.0");
 assert.equal(version.schemaVersion, 12);
 assert.equal(version.cloudSchemaVersion, 3);
-assert.equal(version.cacheVersion, "finance-v15-20260815-light-chrome-r26");
-assert.match(app, /--desktop-header-height:\s*72px/);
+assert.equal(version.cacheVersion, "finance-v15-20260815-desktop-consistency-r27");
+assert.match(app, /--desktop-header-height:\s*64px/);
 assert.match(app, /--desktop-page-gutter:\s*24px/);
 assert.match(app, /--workspace-card-radius:\s*9px/);
 assert.match(app, /--workspace-card-padding:\s*13px/);
 assert.match(app, /--workspace-control-height:\s*38px/);
 assert.match(app, /--workspace-compact-control-height:\s*35px/);
-assert.match(app, /\.dashboard-view \.topbar \{ min-height: 72px;/);
+assert.match(app, /\.dashboard-view \.topbar \{ min-height: var\(--desktop-header-height\);/);
 assert.match(app, /\.dashboard-view \.content \{ padding: 18px var\(--desktop-page-gutter\) 34px; \}/);
 assert.match(app, /\.content \{ padding:18px var\(--desktop-page-gutter\) 34px; \}/);
-assert.doesNotMatch(app, /\.dashboard-view \.topbar \{ min-height: 64px/);
+assert.doesNotMatch(app, /top:71px|top:74px/);
 assert.match(app, /#projects \.project-summary-strip > \* \{ min-height:70px/);
 assert.match(app, /#payments \.kpi-card \{ min-height:70px/);
 assert.match(app, /#reports \.report-section-nav button \{ min-height:35px/);
@@ -46,27 +46,30 @@ assert.match(blackCanvas,/html\[data-theme="dark"\][\s\S]*--bg:#000000/);
 assert.doesNotMatch(liquid, /\.workspace-switcher,\n\.workspace-switcher button,/);
 assert.match(liquid, /--liquid-glass-radius:7px/);
 assert.match(dashboard, /\.finance-workspace-marquee-row\{[^}]*top:var\(--desktop-header-height,72px\)/);
+assert.match(index, /data-page="reports"[^>]*data-nav-label="Insights"[\s\S]*?<span class="nav-icon"><img class="nav-icon-image" src="\.\/icons\/sidebar-insights-v14-0-24\.png"/);
+assert.match(dashboard, /data-page="reports"\] \.nav-icon-image\{content:url\("\.\/icons\/sidebar-insights-v14-0-24\.png"\)\}/);
+assert.doesNotMatch(dashboard, /insights-nav-button\{padding-inline-start:46px/);
 assert.doesNotMatch(dashboard, /\.sidebar \.insights-nav-button::before\{/);
 assert.match(dashboard, /#customizeDashboardButton\[data-dashboard-toolbar-action\]\{[\s\S]*width:38px!important;[\s\S]*height:38px!important;/);
 assert.doesNotMatch(sync, /@media\(min-width:701px\)\{#dashboard\.page\.active/);
 for (const pin of [
-  "app.css?v=15.1.0-desktop2",
-  "dashboard-interactions.css?v=15.1.0-desktop2",
+  "app.css?v=15.1.0-desktop3",
+  "dashboard-interactions.css?v=15.1.0-desktop3",
   "security-profiles.css?v=15.1.0-desktop2",
   "reports-insights.css?v=15.1.0-desktop1",
-  "budget-planning.css?v=15.1.0-desktop2",
+  "budget-planning.css?v=15.1.0-desktop3",
   "projects-calendar-v13.0.20.css?v=15.1.0-desktop2",
   "black-canvas-v15-1-0.css?v=15.1.0-light1",
   "sync-config.js?v=15.1.0-light1"
 ]) assert.ok(index.includes(pin), `index missing ${pin}`);
-assert.ok(index.includes('const APP_CACHE_VERSION = "finance-v15-20260815-light-chrome-r26";'));
-assert.ok(sw.includes("finance-v15-20260815-light-chrome-r26"));
+assert.ok(index.includes('const APP_CACHE_VERSION = "finance-v15-20260815-desktop-consistency-r27";'));
+assert.ok(sw.includes("finance-v15-20260815-desktop-consistency-r27"));
 for (const pin of [
-  "app.css?v=15.1.0-desktop2",
-  "dashboard-interactions.css?v=15.1.0-desktop2",
+  "app.css?v=15.1.0-desktop3",
+  "dashboard-interactions.css?v=15.1.0-desktop3",
   "security-profiles.css?v=15.1.0-desktop2",
   "reports-insights.css?v=15.1.0-desktop1",
-  "budget-planning.css?v=15.1.0-desktop2",
+  "budget-planning.css?v=15.1.0-desktop3",
   "projects-calendar-v13.0.20.css?v=15.1.0-desktop2",
   "black-canvas-v15-1-0.css?v=15.1.0-light1",
   "sync-config.js?v=15.1.0-light1",

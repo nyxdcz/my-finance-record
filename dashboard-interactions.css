@@ -37,6 +37,7 @@ html[data-theme="dark"] #themeToggleIcon::before{-webkit-mask-image:url("./icons
 .sidebar .nav-button[data-page="dashboard"] .nav-icon-image{content:url("./icons/sidebar-overview-v14-0-24.png")}
 .sidebar .nav-button[data-page="money"] .nav-icon-image{content:url("./icons/sidebar-finance-v14-0-24.png")}
 .sidebar .nav-button[data-page="projects"] .nav-icon-image{content:url("./icons/sidebar-work-v14-0-24.png")}
+.sidebar .nav-button[data-page="reports"] .nav-icon-image{content:url("./icons/sidebar-insights-v14-0-24.png")}
 .sidebar .settings-nav-button .nav-icon-image{content:url("./icons/sidebar-settings-v14-0-24.png")}
 .sidebar .nav-button.active .nav-icon-image,
 html[data-theme="dark"] .sidebar .nav-button.active .nav-icon-image{
@@ -46,15 +47,9 @@ html[data-theme="dark"] .sidebar .nav-button.active .nav-icon-image{
 .sidebar .nav-button[data-page="dashboard"] .nav-icon::before,
 .sidebar .nav-button[data-page="money"] .nav-icon::before,
 .sidebar .nav-button[data-page="projects"] .nav-icon::before,
+.sidebar .nav-button[data-page="reports"] .nav-icon::before,
 .sidebar .settings-nav-button .nav-icon::before{content:none!important}
 
-
-@media(min-width:851px){
-  .sidebar.desktop-open .insights-nav-button,.sidebar.sidebar-pinned .insights-nav-button{padding-inline-start:46px!important}
-}
-@media(max-width:850px){
-  .sidebar.open .insights-nav-button{padding-inline-start:46px!important}
-}
 
 /* V14.0.24 · self-contained compact marquee fallback for production Pages. */
 .dashboard-week-marquee{box-sizing:border-box;height:43px;min-height:43px;max-height:43px;display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:6px;margin-bottom:7px;padding:3px 6px;border:1px solid var(--line);border-radius:7px;background:var(--surface);overflow:hidden}
