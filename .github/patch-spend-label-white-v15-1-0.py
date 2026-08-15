@@ -4,6 +4,8 @@ OLD_CACHE = "finance-v15-20260815-mark-paid-primary-r16"
 NEW_CACHE = "finance-v15-20260815-spend-label-white-r17"
 OLD_CANVAS_PIN = "black-canvas-v15-1-0.css?v=15.1.0-paid1"
 NEW_CANVAS_PIN = "black-canvas-v15-1-0.css?v=15.1.0-spend1"
+OLD_CANVAS_REGEX = r"black-canvas-v15-1-0\.css\?v=15\.1\.0-paid1"
+NEW_CANVAS_REGEX = r"black-canvas-v15-1-0\.css\?v=15\.1\.0-spend1"
 
 # 1) Scope the requested pure-white color to the visible Spend label only.
 css_path = Path("black-canvas-v15-1-0.css")
@@ -30,10 +32,13 @@ new_notes = '"notes": "Introduces the Black Canvas UI with a #000000 app backgro
 assert old_notes in version
 version_path.write_text(version.replace(old_notes, new_notes))
 
-# 4) Align inherited cache/pin assertions in tests.
+# 4) Align inherited cache/pin assertions in tests, including regex-escaped URLs.
 for path in Path("tests").glob("*.mjs"):
     text = path.read_text()
-    updated = text.replace(OLD_CACHE, NEW_CACHE).replace(OLD_CANVAS_PIN, NEW_CANVAS_PIN)
+    updated = (text
+        .replace(OLD_CACHE, NEW_CACHE)
+        .replace(OLD_CANVAS_PIN, NEW_CANVAS_PIN)
+        .replace(OLD_CANVAS_REGEX, NEW_CANVAS_REGEX))
     if updated != text:
         path.write_text(updated)
 
