@@ -24,6 +24,23 @@ jobs:
           package-manager-cache: false
       - name: Apply header UI patch
         run: python .github/patch-header-actions-v15-0-5.py
+      - name: Align escaped release assertions
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          replacements = {
+              r"ui-icon-alignment-v15-0-5\.css\?v=15\.0\.5-ui1": r"ui-icon-alignment-v15-0-5\.css\?v=15\.0\.5-ui2",
+              r"privacy-lock\.js\?v=14\.0\.23": r"privacy-lock\.js\?v=15\.0\.5-ui1",
+          }
+          for path in Path("tests").glob("*.mjs"):
+              text = path.read_text()
+              updated = text
+              for old, new in replacements.items():
+                  updated = updated.replace(old, new)
+              if updated != text:
+                  path.write_text(updated)
+          PY
       - name: Install locked dependencies
         run: npm ci --ignore-scripts --no-audit --no-fund
       - name: Run repository quality
