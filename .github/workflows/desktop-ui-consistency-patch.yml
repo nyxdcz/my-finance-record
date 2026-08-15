@@ -30,7 +30,7 @@ jobs:
               'replaceRegex(app, /(\\.button\\s*\\{[\\s\\S]*?min-height:\\s*)40px;/, "$1var(--desktop-control-height);");': 'replaceRegex(app, /(^    \\.button\\s*\\{[^}]*?min-height:\\s*)40px;/m, "$1var(--desktop-control-height);");',
               'replaceRegex(app, /(\\.card\\s*\\{[\\s\\S]*?padding:\\s*)18px;/, "$1var(--desktop-card-padding);");': 'replaceRegex(app, /(^    \\.card\\s*\\{[^}]*?padding:\\s*)18px;/m, "$1var(--desktop-card-padding);");',
               'replaceRegex(app, /(\\.dashboard-customize-toolbar\\s*\\{[\\s\\S]*?top:)68px;/, "$1var(--desktop-header-height);");': 'replaceRegex(app, /(^    \\.dashboard-customize-toolbar\\s*\\{[^}]*?top:)68px;/m, "$1var(--desktop-header-height);");',
-              'replaceRegex(interactions, /#customizeDashboardButton\\[data-dashboard-toolbar-action\\]\\{[\\s\\S]*?\\n\\}/, block => {': 'replaceRegex(interactions, /(^#customizeDashboardButton\\[data-dashboard-toolbar-action\\]\\{[^}]*\\})/m, block => {'
+              'replaceRegex(interactions, /#customizeDashboardButton\\[data-dashboard-toolbar-action\\]\\{[\\s\\S]*?\\n\\}/, block => {': 'replaceRegex(interactions, /(^#customizeDashboardButton\\[data-dashboard-toolbar-action\\]\\{(?=[^}]*38px)[^}]*\\})/m, block => {'
           }
           for old, new in replacements.items():
               if old not in text:
