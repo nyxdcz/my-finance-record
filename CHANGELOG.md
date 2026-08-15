@@ -1,3 +1,17 @@
+## 15.0.3 · 2026-08-15
+
+### Fixed
+- Stopped newer cloud revisions from silently deleting pending local Finance edits on MacBook or iPhone.
+- Rebased and three-way merged non-overlapping concurrent changes while preserving same-field changes as explicit conflicts.
+- Restored **Use this device** so it keeps and uploads the selected device record instead of behaving like **Use cloud version**.
+
+### Recovery
+- Added a protected **Make this device the current cloud copy** action that creates a local recovery point, refreshes cloud revisions, and only then writes this device’s current Finance records.
+- Kept pull-before-push ordering so a stale phone cannot blindly overwrite newer cloud data.
+
+### Preserved
+- Finance Schema 12, Cloud Schema V3, client-side encryption, five-minute routine sync, Realtime updates, and existing finance calculations remain unchanged.
+
 ## 15.0.2 · 2026-08-15
 
 - Removed the Dashboard “View exact cash-flow values” disclosure, selected-month value cards, and injected budget forecast cards from the Income versus expenses bento.
