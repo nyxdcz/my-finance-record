@@ -89,3 +89,37 @@ test("V15.1.0 desktop topbar controls match the Synced 38px height", async ({ pa
     expect(await heightOf(selector), `${selector} should match Synced height`).toBe(reference);
   }
 });
+
+
+test("V15.1.0 desktop month navigation removes its surrounding line", async ({ page }) => {
+  await page.setViewportSize({ width:1440, height:900 });
+  await page.goto("http://127.0.0.1:3000/index.html?page=dashboard", { waitUntil:"networkidle" });
+  await page.evaluate(() => window.FinancePrivacyLock?.unlock?.({ email:"month-nav-border-test@example.invalid" }));
+
+  const shell = page.locator(".topbar-actions .month-navigator");
+  await expect(shell).toBeVisible();
+  const shellStyle = await shell.evaluate(element => {
+    const style = getComputedStyle(element);
+    const rect = element.getBoundingClientRect();
+    return {
+      height:rect.height,
+      borderColor:style.borderTopColor,
+      background:style.backgroundColor,
+      shadow:style.boxShadow
+    };
+  });
+  expect(shellStyle.height).toBe(38);
+  expect(shellStyle.borderColor).toBe("rgba(0, 0, 0, 0)");
+  expect(shellStyle.background).toBe("rgba(0, 0, 0, 0)");
+  expect(shellStyle.shadow).toBe("none");
+
+  for (const selector of ["#previousMonthButton", "#monthControl", "#nextMonthButton"]) {
+    const borderWidth = await page.locator(selector).evaluate(element => getComputedStyle(element).borderTopWidth);
+    expect(borderWidth, `${selector} should not show a surrounding border`).toBe("0px");
+  }
+
+  const current = page.locator("#currentMonthButton:not([hidden]), #monthStatusChip:not([hidden])").first();
+  await expect(current).toBeVisible();
+  const currentBorderWidth = await current.evaluate(element => getComputedStyle(element).borderTopWidth);
+  expect(currentBorderWidth).toBe("0px");
+});
