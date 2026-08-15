@@ -13,11 +13,13 @@ if marker not in css:
     css += '''\n\n/* V15.1.0 Mark Paid primary-action hotfix. */\n.button-paid {\n  background:var(--primary) !important;\n  color:var(--primary-contrast) !important;\n  border-color:var(--primary) !important;\n}\n.button-paid:hover {\n  background:var(--primary-dark) !important;\n  border-color:var(--primary-dark) !important;\n}\n'''
 css_path.write_text(css)
 
-# Fresh CSS pin in the live document.
+# Fresh CSS pin and matching runtime cache identity in the live document.
 index_path = Path("index.html")
 index = index_path.read_text()
 assert OLD_STYLE in index, "Black Canvas stylesheet pin missing from index.html"
-index_path.write_text(index.replace(OLD_STYLE, NEW_STYLE))
+assert OLD_CACHE in index, "Old runtime cache generation missing from index.html"
+index = index.replace(OLD_STYLE, NEW_STYLE).replace(OLD_CACHE, NEW_CACHE)
+index_path.write_text(index)
 
 # Fresh PWA shell generation and matching stylesheet pin.
 sw_path = Path("sw.js")
