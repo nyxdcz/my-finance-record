@@ -10,8 +10,8 @@
   "profileArchitectureVersion": 1,
   "encryptionVersion": 1,
   "authSecurityVersion": 1,
-  "cacheVersion": "finance-v15-20260815-black-canvas-r15",
+  "cacheVersion": "finance-v15-20260815-mark-paid-primary-r16",
   "released": "2026-08-15",
   "name": "Black Canvas UI",
-  "notes": "Introduces the Black Canvas UI with a #000000 app background and #173e76 primary color across both appearance modes, PWA chrome, and Liquid Glass controls while preserving Finance Schema 12, Cloud Schema V3, records, calculations, and sync behavior."
+  "notes": "Introduces the Black Canvas UI with a #000000 app background and #173e76 primary color across both appearance modes, PWA chrome, Liquid Glass controls, and Expense Mark paid actions while preserving Finance Schema 12, Cloud Schema V3, records, calculations, and sync behavior."
 }

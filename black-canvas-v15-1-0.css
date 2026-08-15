@@ -32,3 +32,15 @@ textarea:focus-visible,
 .button-primary { background:var(--primary); color:var(--primary-contrast); }
 .button-primary:hover { background:var(--primary-dark); }
 input[type="checkbox"], input[type="radio"], progress { accent-color:var(--primary); }
+
+
+/* V15.1.0 Mark Paid primary-action hotfix. */
+.button-paid {
+  background:var(--primary) !important;
+  color:var(--primary-contrast) !important;
+  border-color:var(--primary) !important;
+}
+.button-paid:hover {
+  background:var(--primary-dark) !important;
+  border-color:var(--primary-dark) !important;
+}
