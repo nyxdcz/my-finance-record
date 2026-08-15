@@ -72,9 +72,9 @@ test("signed-out Settings expose safe capabilities but hide finance backup acces
     await expect(card).toBeHidden();
   }
   await expect(page.locator(".finance-settings-privacy-note").first()).toContainText("backups");
+  await expect(page.locator("#requestPersistenceButton")).toBeVisible();
 
   await page.evaluate(() => window.activateSettingsPanel?.("app", false));
   await expect(page.locator("#installPwaButton")).toBeVisible();
-  await expect(page.locator("#requestPersistenceButton")).toBeVisible();
   await expect(page.locator("#settings [data-settings-panel='app'] [data-section-help], #settings [data-settings-panel='app'] [data-help-key]").first()).toBeVisible();
 });
