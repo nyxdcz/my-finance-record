@@ -19,6 +19,25 @@ jobs:
         with:
           ref: agent/desktop-ui-consistency-v15-1-0
           fetch-depth: 0
+      - name: Tighten one-time patch selectors
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path("scripts/patch-desktop-ui-consistency.mjs")
+          text = p.read_text()
+          replacements = {
+              'replaceRegex(app, /(\\.topbar\\s*\\{[\\s\\S]*?min-height:\\s*)72px;/, "$1var(--desktop-header-height);");': 'replaceRegex(app, /(^    \\.topbar\\s*\\{[^}]*?min-height:\\s*)72px;/m, "$1var(--desktop-header-height);");',
+              'replaceRegex(app, /(\\.button\\s*\\{[\\s\\S]*?min-height:\\s*)40px;/, "$1var(--desktop-control-height);");': 'replaceRegex(app, /(^    \\.button\\s*\\{[^}]*?min-height:\\s*)40px;/m, "$1var(--desktop-control-height);");',
+              'replaceRegex(app, /(\\.card\\s*\\{[\\s\\S]*?padding:\\s*)18px;/, "$1var(--desktop-card-padding);");': 'replaceRegex(app, /(^    \\.card\\s*\\{[^}]*?padding:\\s*)18px;/m, "$1var(--desktop-card-padding);");',
+              'replaceRegex(app, /(\\.dashboard-customize-toolbar\\s*\\{[\\s\\S]*?top:)68px;/, "$1var(--desktop-header-height);");': 'replaceRegex(app, /(^    \\.dashboard-customize-toolbar\\s*\\{[^}]*?top:)68px;/m, "$1var(--desktop-header-height);");',
+              'replaceRegex(interactions, /#customizeDashboardButton\\[data-dashboard-toolbar-action\\]\\{[\\s\\S]*?\\n\\}/, block => {': 'replaceRegex(interactions, /(^#customizeDashboardButton\\[data-dashboard-toolbar-action\\]\\{[^}]*\\})/m, block => {'
+          }
+          for old, new in replacements.items():
+              if old not in text:
+                  raise SystemExit(f"patch selector source not found: {old[:90]}")
+              text = text.replace(old, new)
+          p.write_text(text)
+          PY
       - name: Apply validated desktop patch
         run: node scripts/patch-desktop-ui-consistency.mjs
       - name: Verify scoped source changes
