@@ -26,14 +26,22 @@ jobs:
           node-version: 22
           cache: npm
 
-      - name: Repair patch-script typo
+      - name: Repair patch-script inputs
         shell: bash
         run: |
           python3 - <<'PY'
           from pathlib import Path
+          import re
           path = Path('scripts/apply-safe-multidevice-sync-v15-0-3.py')
           text = path.read_text(encoding='utf-8')
           text = text.replace('lock = read("package-lock.json")n = lock.count', 'lock = read("package-lock.json")\nn = lock.count')
+          pattern = r"version_history_entry = '.*?'\nindex, history_count = re\.subn\(.*?\nif history_count != 1:\n    raise SystemExit\(.*?\)\n"
+          replacement = '''version_history_entry = '{"version":"V15.0.3","title":"Safe Multi-device Sync","changes":["Preserves pending device edits when cloud records change instead of silently discarding them.","Automatically three-way merges non-overlapping changes and pauses same-field conflicts for explicit review.","Adds a protected Make this device the current cloud copy recovery action with a local recovery point."]},'
+          index = replace_once(index, '    VERSION_HISTORY.unshift(', '    VERSION_HISTORY.unshift(' + version_history_entry, "version history insertion")
+          '''
+          text, count = re.subn(pattern, replacement, text, count=1, flags=re.S)
+          if count != 1:
+              raise SystemExit(f'Could not repair version-history patch block: {count} matches')
           path.write_text(text, encoding='utf-8')
           PY
           python3 -m py_compile scripts/apply-safe-multidevice-sync-v15-0-3.py
