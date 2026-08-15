@@ -3,17 +3,14 @@ from pathlib import Path
 root = Path(__file__).resolve().parents[1]
 
 
-def replace(path, old, new, count=None, required=True):
+def replace(path, old, new, count=None):
     file = root / path
     text = file.read_text()
     if old in text:
         text = text.replace(old, new, count if count is not None else -1)
         file.write_text(text)
-        return
-    if new in text:
-        return
-    if required:
-        raise SystemExit(f"Missing release contract in {path}: {old}")
+        return True
+    return new in text
 
 
 # Release-facing documentation and static Settings version text.
@@ -30,19 +27,37 @@ if mobile_update not in text:
 
 replace("index.html", 'id="settingsOverviewAppStatus">Version 15.2.1</strong>', 'id="settingsOverviewAppStatus">Version 15.2.2</strong>', 1)
 
-# Repository inspection must track the new semantic release.
-replace("tests/inspect-project.mjs", 'if (pkg.version !== "15.2.1") fail(`Expected current package version 15.2.1, found ${pkg.version || "(missing)"}`);', 'if (pkg.version !== "15.2.2") fail(`Expected current package version 15.2.2, found ${pkg.version || "(missing)"}`);', 1)
-replace("tests/inspect-project.mjs", 'if (!read("README.md").startsWith("# My Finance Records · V15.2.1")) fail("README release heading is not V15.2.1");', 'if (!read("README.md").startsWith("# My Finance Records · V15.2.2")) fail("README release heading is not V15.2.2");', 1)
-replace("tests/inspect-project.mjs", 'if (!read("CHANGELOG.md").startsWith("## 15.2.1 · 2026-08-16")) fail("CHANGELOG latest entry is not V15.2.1");', 'if (!read("CHANGELOG.md").startsWith("## 15.2.2 · 2026-08-16")) fail("CHANGELOG latest entry is not V15.2.2");', 1)
-replace("tests/inspect-project.mjs", 'console.log("Repository inspection passed: V15.2.1 release files, local paths, deploy paths, package metadata, permissions, and public sync configuration are consistent.");', 'console.log("Repository inspection passed: V15.2.2 release files, local paths, deploy paths, package metadata, permissions, and public sync configuration are consistent.");', 1)
+# Repository inspection must track the new semantic release. The first patcher may
+# already have changed generic title strings, so these replacements are intentionally idempotent.
+replace("tests/inspect-project.mjs", 'pkg.version !== "15.2.1"', 'pkg.version !== "15.2.2"')
+replace("tests/inspect-project.mjs", "Expected current package version 15.2.1", "Expected current package version 15.2.2")
+replace("tests/inspect-project.mjs", '# My Finance Records · V15.2.1', '# My Finance Records · V15.2.2')
+replace("tests/inspect-project.mjs", "README release heading is not V15.2.1", "README release heading is not V15.2.2")
+replace("tests/inspect-project.mjs", "## 15.2.1 · 2026-08-16", "## 15.2.2 · 2026-08-16")
+replace("tests/inspect-project.mjs", "CHANGELOG latest entry is not V15.2.1", "CHANGELOG latest entry is not V15.2.2")
+replace("tests/inspect-project.mjs", "Repository inspection passed: V15.2.1 release files", "Repository inspection passed: V15.2.2 release files")
 
 # Preserve the desktop UX contract while allowing the V15.2.2 release wrapper/cache.
-replace("tests/validate-v15-2-0-desktop-ux.mjs", '[sw.includes(\'const APP_VERSION = "15.2.1"\') && sw.includes(version.cacheVersion), "service worker delivery matches release"]', '[sw.includes(\'const APP_VERSION = "15.2.2"\') && sw.includes(version.cacheVersion), "service worker delivery matches release"]', 1)
-replace("tests/validate-v15-2-0-desktop-ux.mjs", '[read("sync-config.js").includes(\'const VERSION = "15.2.1"\') && read("sync-config.js").includes(\'const RELEASE_NAME = "Desktop UX Quick Wins"\'), "release override matches V15.2.1"]', '[read("sync-config.js").includes(\'const VERSION = "15.2.2"\') && read("sync-config.js").includes(\'const RELEASE_NAME = "Mobile UI & UX"\'), "release override matches V15.2.2"]', 1)
-replace("tests/validate-v15-2-0-desktop-ux.mjs", 'console.log("V15.2.1 desktop UX source contract passed");', 'console.log("V15.2.2 release preserves the desktop UX source contract");', 1)
+replace("tests/validate-v15-2-0-desktop-ux.mjs", 'sw.includes(\'const APP_VERSION = "15.2.1"\')', 'sw.includes(\'const APP_VERSION = "15.2.2"\')')
+replace("tests/validate-v15-2-0-desktop-ux.mjs", 'read("sync-config.js").includes(\'const VERSION = "15.2.1"\')', 'read("sync-config.js").includes(\'const VERSION = "15.2.2"\')')
+replace("tests/validate-v15-2-0-desktop-ux.mjs", 'read("sync-config.js").includes(\'const RELEASE_NAME = "Desktop UX Quick Wins"\')', 'read("sync-config.js").includes(\'const RELEASE_NAME = "Mobile UI & UX"\')')
+replace("tests/validate-v15-2-0-desktop-ux.mjs", "release override matches V15.2.1", "release override matches V15.2.2")
+replace("tests/validate-v15-2-0-desktop-ux.mjs", 'console.log("V15.2.1 desktop UX source contract passed");', 'console.log("V15.2.2 release preserves the desktop UX source contract");')
 
 # Static release text that deliberately changed, while keeping V15.2.1 asset pins intact.
-replace("tests/validate-desktop-ui-phase1-v15-1-0.mjs", 'id="settingsOverviewAppStatus">Version 15.2.1</strong>', 'id="settingsOverviewAppStatus">Version 15.2.2</strong>', 1)
-replace("tests/v15-2-1-desktop-ux-quick-wins.spec.mjs", 'expect(index).toContain("V15.2.1");', 'expect(index).toContain("V15.2.2");', 1)
+replace("tests/validate-desktop-ui-phase1-v15-1-0.mjs", 'id="settingsOverviewAppStatus">Version 15.2.1</strong>', 'id="settingsOverviewAppStatus">Version 15.2.2</strong>')
+replace("tests/v15-2-1-desktop-ux-quick-wins.spec.mjs", 'expect(index).toContain("V15.2.1");', 'expect(index).toContain("V15.2.2");')
+
+# Verify the critical release-facing expectations now exist.
+checks = {
+    "README.md": "# My Finance Records · V15.2.2",
+    "index.html": 'id="settingsOverviewAppStatus">Version 15.2.2</strong>',
+    "tests/inspect-project.mjs": 'pkg.version !== "15.2.2"',
+    "tests/validate-v15-2-0-desktop-ux.mjs": 'const RELEASE_NAME = "Mobile UI & UX"',
+    "tests/validate-desktop-ui-phase1-v15-1-0.mjs": 'Version 15.2.2</strong>',
+}
+for path, token in checks.items():
+    if token not in (root / path).read_text():
+        raise SystemExit(f"V15.2.2 alignment check failed for {path}: {token}")
 
 print("Aligned V15.2.2 release documentation and regression pins")
