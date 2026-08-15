@@ -8,11 +8,26 @@ for (const theme of ["light","dark"]) {
     const result = await page.evaluate(() => {
       const root = getComputedStyle(document.documentElement);
       const body = getComputedStyle(document.body);
-      return { bg:root.getPropertyValue("--bg").trim(), primary:root.getPropertyValue("--primary").trim(), bodyBg:body.backgroundColor };
+      const paid = document.createElement("button");
+      paid.className = "button button-paid";
+      paid.textContent = "Mark paid";
+      document.body.appendChild(paid);
+      const paidStyle = getComputedStyle(paid);
+      return {
+        bg:root.getPropertyValue("--bg").trim(),
+        primary:root.getPropertyValue("--primary").trim(),
+        bodyBg:body.backgroundColor,
+        paidBg:paidStyle.backgroundColor,
+        paidBorder:paidStyle.borderTopColor,
+        paidColor:paidStyle.color
+      };
     });
     expect(result.bg).toBe("#000000");
     expect(result.primary).toBe("#173e76");
     expect(result.bodyBg).toBe("rgb(0, 0, 0)");
+    expect(result.paidBg).toBe("rgb(23, 62, 118)");
+    expect(result.paidBorder).toBe("rgb(23, 62, 118)");
+    expect(result.paidColor).toBe("rgb(255, 255, 255)");
     await context.close();
   });
 }
