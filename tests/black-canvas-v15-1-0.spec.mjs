@@ -21,8 +21,12 @@ for (const theme of ["light","dark"]) {
       spendLabel.textContent = "Spend";
       spend.appendChild(spendLabel);
       available.appendChild(spend);
+      const accountCard = document.createElement("article");
+      accountCard.className = "account-card";
+      available.appendChild(accountCard);
       document.body.appendChild(available);
       const spendStyle = getComputedStyle(spendLabel);
+      const accountStyle = getComputedStyle(accountCard);
       return {
         bg:root.getPropertyValue("--bg").trim(),
         primary:root.getPropertyValue("--primary").trim(),
@@ -30,7 +34,8 @@ for (const theme of ["light","dark"]) {
         paidBg:paidStyle.backgroundColor,
         paidBorder:paidStyle.borderTopColor,
         paidColor:paidStyle.color,
-        spendColor:spendStyle.color
+        spendColor:spendStyle.color,
+        accountBorder:accountStyle.borderTopColor
       };
     });
     expect(result.bg).toBe("#000000");
@@ -40,6 +45,7 @@ for (const theme of ["light","dark"]) {
     expect(result.paidBorder).toBe("rgb(23, 62, 118)");
     expect(result.paidColor).toBe("rgb(255, 255, 255)");
     expect(result.spendColor).toBe("rgb(255, 255, 255)");
+    expect(result.accountBorder).toBe("rgba(207, 231, 213, 0.42)");
     await context.close();
   });
 }

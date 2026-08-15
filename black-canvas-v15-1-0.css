@@ -50,3 +50,9 @@ input[type="checkbox"], input[type="radio"], progress { accent-color:var(--prima
 #availableMoneySection .account-spend-button span {
   color:#ffffff !important;
 }
+
+
+/* V15.1.0 Available money account-border softening. */
+#availableMoneySection .account-card {
+  border-color:rgba(207,231,213,.42) !important;
+}
