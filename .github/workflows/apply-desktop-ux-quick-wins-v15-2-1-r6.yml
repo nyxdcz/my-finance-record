@@ -1,0 +1,142 @@
+name: Apply desktop UX quick wins V15.2.1 r6
+
+on:
+  push:
+    branches:
+      - agent/desktop-ux-quick-wins-v15-2-1
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply-and-validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/desktop-ux-quick-wins-v15-2-1
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Reuse validated patch stages
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import textwrap
+          def execute_step(workflow_path, section_label=None):
+              workflow = Path(workflow_path).read_text(encoding='utf-8')
+              if section_label: workflow = workflow[workflow.index(section_label):]
+              marker = "          python3 - <<'PY'\n"
+              start = workflow.index(marker) + len(marker)
+              end = workflow.index("\n          PY\n", start)
+              exec(compile(textwrap.dedent(workflow[start:end]), workflow_path, 'exec'), {})
+          execute_step('.github/workflows/apply-desktop-ux-quick-wins-v15-2-1.yml')
+          execute_step('.github/workflows/apply-desktop-ux-quick-wins-v15-2-1-r3.yml', '- name: Align V15.2.1 release metadata and validators')
+          execute_step('.github/workflows/apply-desktop-ux-quick-wins-v15-2-1-r4.yml', '- name: Extract new interaction helpers from index')
+          execute_step('.github/workflows/apply-desktop-ux-quick-wins-v15-2-1-r5.yml', '- name: Finish cohesive interaction extraction')
+          PY
+
+      - name: Align current-shell regression expectations
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          OLD_VERSION='15.2.0'
+          NEW_VERSION='15.2.1'
+          OLD_CACHE='finance-v15-20260816-desktop-ux-r29'
+          NEW_CACHE='finance-v15-20260816-desktop-ux-quick-wins-r30'
+
+          def read(path): return Path(path).read_text(encoding='utf-8')
+          def write(path,text): Path(path).write_text(text,encoding='utf-8')
+          def replace(path, old, new, minimum=1):
+              text=read(path); count=text.count(old)
+              if count < minimum: raise SystemExit(f'{path}: missing expected pin {old!r}')
+              write(path,text.replace(old,new))
+
+          # Static live-shell identifiers that must match the release override/service worker.
+          replace('index.html', 'id="settingsOverviewAppStatus">Version 15.2.0</strong>', 'id="settingsOverviewAppStatus">Version 15.2.1</strong>')
+          replace('sw.js', 'liquid-glass-v15.css?v=15.2.0-light1', 'liquid-glass-v15.css?v=15.2.1-light1')
+
+          # Older feature regressions keep their behavior checks but follow the current shell identity.
+          files = [
+            'tests/validate-finance-marquee-source-v15-1-0.mjs',
+            'tests/validate-desktop-ui-phase1-v15-1-0.mjs',
+            'tests/validate-month-navigation-borderless-v15-1-0.mjs',
+            'tests/validate-desktop-ui-consistency-v15-1-0.mjs',
+            'tests/validate-available-money-border-v15-1-0.mjs',
+            'tests/validate-spend-label-v15-1-0.mjs',
+            'tests/validate-black-canvas-v15-1-0.mjs',
+            'tests/validate-header-ui-v15-0-5.mjs',
+            'tests/validate-pwa-updater-v15-0-5.mjs',
+            'tests/validate-record-spending-v15-0-4.mjs',
+            'tests/validate-safe-multidevice-sync.mjs',
+            'tests/validate-expense-screenshot.mjs'
+          ]
+          for path in files:
+              text=read(path)
+              text=text.replace(OLD_CACHE,NEW_CACHE).replace('V15.2.0','V15.2.1').replace('"15.2.0"','"15.2.1"').replace('15\\.2\\.0','15\\.2\\.1')
+              write(path,text)
+
+          # Changed first-party assets receive the V15.2.1 cache-busted query.
+          replace('tests/validate-finance-marquee-source-v15-1-0.mjs', 'const interactionQuery = "15.1.0-finance-marquee1";', 'const interactionQuery = "15.2.1-ux1";')
+          replace('tests/validate-record-spending-v15-0-4.mjs', 'budget-planning\\.js\\?v=15\\.0\\.4', 'budget-planning\\.js\\?v=15\\.2\\.1-ux1', 2)
+          replace('tests/validate-desktop-ui-consistency-v15-1-0.mjs', 'sync-config.js?v=15.2.0-ux1', 'sync-config.js?v=15.2.1-ux1', 2)
+          replace('tests/validate-desktop-ui-consistency-v15-1-0.mjs', 'liquid-glass-v15.css?v=15.2.0-light1', 'liquid-glass-v15.css?v=15.2.1-light1')
+          replace('tests/validate-safe-multidevice-sync.mjs', 'cloud-sync.js?v=15.2.0-ux1', 'cloud-sync.js?v=15.2.1-ux1')
+
+          # Browser fixture should reference the current desktop UX asset query while preserving the same CSS behavior checks.
+          path='tests/v15-2-0-desktop-ux.spec.mjs'; text=read(path).replace('V15.2.0','V15.2.1').replace('desktop-ux-v15-2-0.css?v=15.2.0','desktop-ux-v15-2-0.css?v=15.2.1'); write(path,text)
+          PY
+
+      - name: Install dependencies
+        run: npm ci
+      - name: Quality
+        run: npm run quality
+      - name: Dependency audit
+        run: npm run audit
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Browser regression suite
+        run: npm run test:browser
+      - name: Diff safety checks
+        shell: bash
+        run: |
+          git diff --check
+          if git diff --name-only | grep -q '^mobile-v14-0-23.css$'; then echo 'Mobile stylesheet changed.' >&2; exit 1; fi
+          if git diff --name-only | grep -E '^(account-ledger|cloud-conflict|cloud-sync-lifecycle|privacy-lock|mobile-v14-0-23)'; then echo 'Unexpected finance/sync/mobile implementation file changed.' >&2; exit 1; fi
+          git diff --name-only
+      - name: Package validated patch
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-ux-quick-wins-v15-2-1-r6
+          path: |
+            index.html
+            interaction-patterns.js
+            projects-calendar-v13.0.20.js
+            budget-planning.js
+            desktop-ux-v15-2-0.css
+            cloud-sync.js
+            sync-config.js
+            sw.js
+            version.json
+            package.json
+            package-lock.json
+            Install_V15_2_0.command
+            README.md
+            CHANGELOG.md
+            tests/*.mjs
+      - name: Commit validated changes
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html interaction-patterns.js projects-calendar-v13.0.20.js budget-planning.js desktop-ux-v15-2-0.css cloud-sync.js sync-config.js sw.js version.json package.json package-lock.json Install_V15_2_0.command README.md CHANGELOG.md tests/*.mjs
+          git commit -m "feat: refine desktop UX quick wins"
+          git push origin HEAD:agent/desktop-ux-quick-wins-v15-2-1
