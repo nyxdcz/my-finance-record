@@ -173,11 +173,61 @@
     return { announce, cancel, createHandle };
   }
 
-  function setupInteractionPatterns() {
-    setupOverflowMenus();
+  function emptyStateHtml(title, text, action = null) {
+    const escape = value => String(value ?? "").replace(/[&<>"']/g, character => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" })[character]);
+    const label = String(action?.label || "");
+    const actionHtml = label ? `<div class="empty-state-actions"><button class="button button-secondary button-small" type="button"${action?.go ? ` data-go="${escape(action.go)}"` : ""}${action?.action ? ` data-empty-action="${escape(action.action)}"` : ""}>${escape(label)}</button></div>` : "";
+    return `<div class="empty-state"><strong>${escape(title)}</strong>${escape(text)}${actionHtml}</div>`;
   }
 
-  window.FinanceInteractionPatterns = { closeOverflowMenu, setupOverflowMenus, renderDuplicatedMarquee, renderActiveFilterChips, middleTruncateFilename, createDashboardDragController };
+  function renderIncomeFilterChips() {
+    const container = document.getElementById("incomeActiveFilterChips");
+    const searchInput = document.getElementById("incomeSearch");
+    const categoryInput = document.getElementById("incomeCategoryFilter");
+    if (!container || !searchInput || !categoryInput) return;
+    const search = searchInput.value.trim();
+    const category = categoryInput.value;
+    renderActiveFilterChips(container, [
+      search ? { key:"search", label:`Search: ${search}` } : null,
+      category ? { key:"category", label:`Category: ${category}` } : null
+    ], key => {
+      if (key === "search") searchInput.value = "";
+      if (key === "category") categoryInput.value = "";
+      globalThis.renderIncomePage?.();
+    });
+  }
+
+  function setupEmptyStateActions() {
+    if (document.documentElement.dataset.emptyStateActionsReady === "true") return;
+    document.documentElement.dataset.emptyStateActionsReady = "true";
+    document.addEventListener("click", event => {
+      const button = event.target.closest?.("[data-empty-action]");
+      if (!button) return;
+      const action = button.dataset.emptyAction;
+      if (action === "clear-income-filters") {
+        const search = document.getElementById("incomeSearch"), category = document.getElementById("incomeCategoryFilter");
+        if (search) search.value = ""; if (category) category.value = ""; globalThis.renderIncomePage?.(); return;
+      }
+      if (action === "add-income") { globalThis.openIncomeDialog?.(); return; }
+      if (action === "clear-expense-filters") {
+        const search = document.getElementById("expenseSearch"), category = document.getElementById("expenseCategoryFilter");
+        if (search) search.value = ""; if (category) category.value = ""; globalThis.renderMoneyPage?.(); return;
+      }
+      if (action === "add-expense") { globalThis.openExpenseDialog?.(); return; }
+      if (action === "clear-project-filters") {
+        ["projectSearch", "projectStatusFilter", "projectTypeFilter", "projectSourceFilter"].forEach(id => { const node = document.getElementById(id); if (node) node.value = ""; });
+        globalThis.renderProjects?.(); return;
+      }
+      if (action === "add-project") globalThis.openProjectDialog?.();
+    });
+  }
+
+  function setupInteractionPatterns() {
+    setupOverflowMenus();
+    setupEmptyStateActions();
+  }
+
+  window.FinanceInteractionPatterns = { closeOverflowMenu, setupOverflowMenus, renderDuplicatedMarquee, renderActiveFilterChips, emptyStateHtml, renderIncomeFilterChips, setupEmptyStateActions, middleTruncateFilename, createDashboardDragController };
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", setupInteractionPatterns, { once:true });
   else setupInteractionPatterns();
 })();

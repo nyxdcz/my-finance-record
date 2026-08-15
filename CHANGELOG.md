@@ -1,3 +1,8 @@
+## 15.2.1 · 2026-08-16
+- Added actionable empty and filtered states across Income, Budget & Expenses, Paid Expenses, and Projects, including removable Income filter chips and direct next-step actions.
+- Standardized Project Agenda field-level validation and deletion confirmation, and moved Agenda ICS/Delete plus Budget Plan Settings/Export into accessible More menus.
+- Clarified Budget & Expenses page copy and released the desktop-only UX quick wins with PWA cache `finance-v15-20260816-desktop-ux-quick-wins-r30`; Finance Schema 12, Cloud Schema V3, calculations, saved records, five-minute sync cadence, and phone layout remain unchanged.
+
 ## 15.2.0 · 2026-08-16
 - Desktop UX consistency: month changes now explicitly report recurring-item checks, filter changes clearly report when an active expense selection is reset, Income/Account forms focus and explain the first invalid field, and harmless filter clears no longer create extra toasts.
 - Replaced native Productivity destructive confirmations and text prompts with app dialogs, added per-action busy states for long Settings operations, exposed Search keyboard shortcuts, and simplified Cloud Sync error copy with optional technical details.

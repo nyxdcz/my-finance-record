@@ -1,8 +1,13 @@
-/* My Finance Records · V15.2.0 desktop UX consistency */
+/* My Finance Records · V15.2.1 desktop UX quick wins */
 @media (min-width:851px){
   .cloud-sync-technical-details{margin-top:8px;padding-top:8px;border-top:1px solid var(--line);font-size:.72rem;color:var(--muted)}
   .cloud-sync-technical-details summary{cursor:pointer;font-weight:700;color:var(--text)}
   .cloud-sync-technical-details code{display:block;margin-top:6px;max-height:88px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;font:inherit}
   button[aria-busy="true"]{cursor:progress}
   .productivity-text-dialog{width:min(440px,calc(100vw - 48px))}
+
+  .income-active-filter-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .empty-state-actions{display:flex;justify-content:center;gap:8px;margin-top:10px}
+  .budget-planner-more-menu,.pc-event-more-menu{position:relative}
+  .budget-planner-more-panel,.pc-event-more-panel{min-width:180px}
 }

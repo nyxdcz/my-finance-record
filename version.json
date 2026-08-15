@@ -1,5 +1,5 @@
 {
-  "version": "15.2.0",
+  "version": "15.2.1",
   "schemaVersion": 12,
   "cloudSchemaVersion": 3,
   "ledgerVersion": 1,
@@ -10,8 +10,8 @@
   "profileArchitectureVersion": 1,
   "encryptionVersion": 1,
   "authSecurityVersion": 1,
-  "cacheVersion": "finance-v15-20260816-desktop-ux-r29",
+  "cacheVersion": "finance-v15-20260816-desktop-ux-quick-wins-r30",
   "released": "2026-08-16",
-  "name": "Desktop UX Consistency",
-  "notes": "V15.2.0 desktop UX consistency: clearer month-navigation and filter-selection feedback, inline form validation, unified destructive confirmations, per-action Settings busy states, discoverable Search shortcuts, and plain-language Cloud Sync recovery messaging. Finance Schema 12, Cloud Schema V3, saved records, calculations, account balances, budgets, projects, five-minute sync cadence, and phone layout remain unchanged."
+  "name": "Desktop UX Quick Wins",
+  "notes": "V15.2.1 desktop UX quick wins: actionable empty and filtered states, visible removable Income filter chips, clearer Budget & Expenses copy, lower-noise Budget Plan and Agenda actions, Project Agenda inline validation, and unified Agenda deletion confirmation. Finance Schema 12, Cloud Schema V3, saved records, calculations, account balances, budgets, projects, five-minute sync cadence, and phone layout remain unchanged."
 }

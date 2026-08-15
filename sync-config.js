@@ -7,8 +7,8 @@ window.FINANCE_SYNC_CONFIG = window.FINANCE_SYNC_CONFIG || {
 };
 
 (function applyV15ReleaseLayer() {
-  const VERSION = "15.2.0";
-  const RELEASE_NAME = "Desktop UX Consistency";
+  const VERSION = "15.2.1";
+  const RELEASE_NAME = "Desktop UX Quick Wins";
   const RELEASE_DATE = "August 16, 2026";
   window.FINANCE_APP_VERSION_OVERRIDE = VERSION;
   window.FINANCE_RELEASE_OVERRIDE = { version:VERSION, name:RELEASE_NAME, released:"2026-08-16" };
