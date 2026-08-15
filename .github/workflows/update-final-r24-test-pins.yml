@@ -1,0 +1,46 @@
+name: Update final r24 test pins
+
+on:
+  push:
+    branches:
+      - fix/finance-marquee-source-cache
+    paths:
+      - scripts/update-final-r24-test-pins.py
+      - .github/workflows/update-final-r24-test-pins.yml
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out patch branch
+        uses: actions/checkout@v7
+        with:
+          ref: fix/finance-marquee-source-cache
+          fetch-depth: 0
+
+      - name: Update exact cache pins
+        run: python3 scripts/update-final-r24-test-pins.py
+
+      - name: Verify old cache pin is absent from active test chain
+        run: |
+          if grep -n "finance-v15-20260815-month-nav-borderless-r23" \
+            tests/validate-safe-multidevice-sync.mjs \
+            tests/validate-expense-screenshot.mjs; then
+            exit 1
+          fi
+
+      - name: Remove one-time helper
+        run: rm -f scripts/update-final-r24-test-pins.py .github/workflows/update-final-r24-test-pins.yml
+
+      - name: Commit exact test pin update
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git commit -m "test: finish Finance marquee r24 cache pins"
+          git push origin HEAD:fix/finance-marquee-source-cache
