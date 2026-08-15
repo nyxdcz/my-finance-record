@@ -1,3 +1,14 @@
+## 15.0.4 · 2026-08-15
+
+### Fixed
+- Removed the stale `renderDashboardBudgetForecast()` call left behind after the Dashboard cash-flow forecast boxes were intentionally removed.
+- Restored **Record spending** and related expense saves that were rolling back with `renderDashboardBudgetForecast is not defined`.
+- Protected a successfully persisted spending transaction from being undone solely because a later interface refresh throws.
+
+### Delivery
+- Pinned `account-ledger.js` and `budget-planning.js` to V15.0.4 and rotated the PWA cache so phones and installed PWAs receive the repaired modules.
+- Finance Schema 12, Cloud Schema V3, ledger rules, expense calculations, and five-minute Cloud Sync cadence are unchanged.
+
 ## 15.0.3 · 2026-08-15
 
 ### Fixed

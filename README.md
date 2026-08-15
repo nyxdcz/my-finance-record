@@ -1,9 +1,10 @@
-# My Finance Records · V15.0.3
+# My Finance Records · V15.0.4
 
 Local-first personal finance PWA with multi-profile support and optional encrypted cloud synchronization.
 
 ## Recent updates
 
+- **V15.0.4 · Record Spending Reliability** — Fixes Record spending/Add Expense refresh failures, protects verified saved spends from render-only rollback, and refreshes the repaired account-ledger/budget modules on desktop and phone.
 - **V15.0.3 · Safe Multi-device Sync** — Preserves concurrent device edits, auto-merges non-overlapping changes, stops silent cloud-over-device replacement, restores a real Use this device conflict choice, and adds protected device-to-cloud recovery.
 - **V15.0.2 · Cash-flow Chart Focus** — Removes the exact cash-flow values/forecast boxes and expands both coordinated cash-flow charts inside the existing Dashboard bento size.
 - **V15.0.1 · Sidebar Header Maintenance** — Simplifies the expanded sidebar to a larger Records title, preserves collapsed Insights/expanded-only Pin behavior, and refreshes PWA cache delivery without changing finance or cloud schemas.

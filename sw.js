@@ -1,8 +1,8 @@
 "use strict";
-const APP_VERSION = "15.0.3";
+const APP_VERSION = "15.0.4";
 self.__FINANCE_APP_VERSION = APP_VERSION;
-// V15.0.3 safe multi-device sync refresh · preserves pending device edits, reviews overlapping conflicts, adds protected device-to-cloud recovery, and forces installed PWAs to fetch the repaired sync client.
-const CACHE_VERSION = "finance-v15-20260815-safe-multidevice-sync-r7";
+// V15.0.4 record-spending reliability refresh · removes the obsolete budget forecast renderer, protects verified spend persistence from render-only failures, and forces installed PWAs to fetch repaired finance modules.
+const CACHE_VERSION = "finance-v15-20260815-record-spending-r8";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const DB_NAME = "simple-finance-project-records-v12-db";
@@ -28,10 +28,10 @@ const APP_SHELL = [
   asset("./cloud-conflict-review.js?v=14.0.23"),
   asset("./cloud-conflict-resolution.js?v=14.0.23"),
   asset("./cloud-sync-lifecycle.js?v=14.0.23"),
-  asset("./cloud-sync.js?v=15.0.3"),
-  asset("./account-ledger.js?v=14.0.23"),
+  asset("./cloud-sync.js?v=15.0.4"),
+  asset("./account-ledger.js?v=15.0.4"),
   asset("./account-ledger.css?v=14.0.23"),
-  asset("./budget-planning.js?v=14.0.23"),
+  asset("./budget-planning.js?v=15.0.4"),
   asset("./budget-planning.css?v=14.0.23"),
   asset("./reports-insights.js?v=14.0.23"),
   asset("./reports-insights.css?v=14.0.23"),
@@ -41,7 +41,7 @@ const APP_SHELL = [
   asset("./reminders-alerts.css?v=14.0.23"),
   asset("./projects-calendar-v13.0.20.js?v=14.0.23"),
   asset("./projects-calendar-v13.0.20.css?v=14.0.23"),
-  asset("./sync-config.js?v=15.0.3"),
+  asset("./sync-config.js?v=15.0.4"),
   asset("./expense-screenshot-parser.js?v=15.0.3"),
   asset("./expense-screenshot-detect.js?v=15.0.3"),
   asset("./expense-screenshot-ai.js?v=15.0.3"),

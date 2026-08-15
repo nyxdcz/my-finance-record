@@ -471,7 +471,7 @@
   if (window.__FINANCE_BUDGET_TEST__) return;
 
   renderMoneyPage = function budgetRenderMoneyPage(...args) { const result=originalRenderMoneyPage(...args); renderBudgetWorkspace(); return result; };
-  renderDashboard = function budgetRenderDashboard(...args) { const result=originalRenderDashboard(...args); injectUi(); renderDashboardBudgetForecast(); return result; };
+  renderDashboard = function budgetRenderDashboard(...args) { const result=originalRenderDashboard(...args); injectUi(); return result; };
   renderReports = function budgetRenderReports(...args) { const result=originalRenderReports(...args); injectUi(); renderBudgetReport(); return result; };
   PAGE_RENDERERS.money = renderMoneyPage;
   PAGE_RENDERERS.dashboard = () => { renderDashboard(); renderMonthInsights(); };

@@ -1,5 +1,5 @@
 {
-  "version": "15.0.3",
+  "version": "15.0.4",
   "schemaVersion": 12,
   "cloudSchemaVersion": 3,
   "ledgerVersion": 1,
@@ -10,8 +10,8 @@
   "profileArchitectureVersion": 1,
   "encryptionVersion": 1,
   "authSecurityVersion": 1,
-  "cacheVersion": "finance-v15-20260815-safe-multidevice-sync-r7",
+  "cacheVersion": "finance-v15-20260815-record-spending-r8",
   "released": "2026-08-15",
-  "name": "Safe Multi-device Sync",
-  "notes": "Preserves pending device edits across cloud revision changes, auto-merges non-overlapping edits, requires explicit review for overlapping conflicts, and adds a protected device-to-cloud recovery action without changing Finance Schema 12 or Cloud Schema V3."
+  "name": "Record Spending Reliability",
+  "notes": "Fixes Record spending and Add Expense refresh failures by removing the obsolete Dashboard forecast renderer, protects already-saved spend transactions from render-only rollback, and refreshes the PWA asset cache without changing Finance Schema 12 or Cloud Schema V3."
 }
