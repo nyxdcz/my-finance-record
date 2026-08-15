@@ -3,7 +3,7 @@
    Safe multi-device sync refreshes cloud revisions before upload, preserves concurrent device edits,
    merges non-overlapping changes, and pauses overlapping changes for explicit review. */
 (function financeCloudSyncV3Bootstrap() {
-  const APP_VERSION_FALLBACK = "15.0.4";
+  const APP_VERSION_FALLBACK = "15.0.5";
   const APP_VERSION_CODE = 130000;
   const CLOUD_SCHEMA_VERSION = 3;
   const CORE_SCHEMA_VERSION = 12;

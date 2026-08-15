@@ -7,8 +7,8 @@ window.FINANCE_SYNC_CONFIG = window.FINANCE_SYNC_CONFIG || {
 };
 
 (function applyV15ReleaseLayer() {
-  const VERSION = "15.0.4";
-  const RELEASE_NAME = "Record Spending Reliability";
+  const VERSION = "15.0.5";
+  const RELEASE_NAME = "PWA Update Recovery";
   const RELEASE_DATE = "August 15, 2026";
   window.FINANCE_APP_VERSION_OVERRIDE = VERSION;
   window.FINANCE_RELEASE_OVERRIDE = { version:VERSION, name:RELEASE_NAME, released:"2026-08-15" };

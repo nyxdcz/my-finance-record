@@ -1,0 +1,55 @@
+/* My Finance Records · V15.0.5 · delivered icon alignment layer */
+/*
+ * This file is the final visual layer after legacy interaction CSS and ships under a new V15.0.5 URL.
+ * Strong selectors remain intentional so future legacy declarations cannot
+ * recreate the build icon or widen icon/label spacing.
+ */
+
+/* Keep the build badge text-only and compact. */
+html body #buildBadge {
+  background-image:none !important;
+}
+html body #buildBadge::before,
+html body #buildBadge::after {
+  content:none !important;
+  display:none !important;
+  width:0 !important;
+  height:0 !important;
+  margin:0 !important;
+  background:none !important;
+  -webkit-mask-image:none !important;
+  mask-image:none !important;
+}
+
+/* Keep shared icon + label controls compact without changing their hit areas. */
+html body .button {
+  gap:4px !important;
+}
+html body #addAccountButton,
+html body #addSavingsGoalButton,
+html body #quickAddExpense,
+html body .topbar-add-button,
+html body [data-pc-add],
+html body [data-pc-full-add],
+html body .button:has(> .toolbar-icon) {
+  gap:4px !important;
+}
+
+/* Center the Dashboard utility/customize icon inside its existing square hit area. */
+html body #customizeDashboardButton[data-dashboard-toolbar-action],
+html body .topbar-actions > button:not(.cloud-sync-toolbar-button):not(.topbar-add-button) {
+  display:inline-grid !important;
+  place-items:center !important;
+  padding-inline:0 !important;
+  text-align:center !important;
+}
+html body #customizeDashboardButton[data-dashboard-toolbar-action]::before {
+  margin:0 !important;
+  justify-self:center !important;
+  align-self:center !important;
+}
+html body .topbar-actions > button:not(.cloud-sync-toolbar-button):not(.topbar-add-button) > :is(svg,img,.toolbar-icon) {
+  margin:0 !important;
+  justify-self:center !important;
+  align-self:center !important;
+}

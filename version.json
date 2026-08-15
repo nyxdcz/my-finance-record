@@ -1,5 +1,5 @@
 {
-  "version": "15.0.4",
+  "version": "15.0.5",
   "schemaVersion": 12,
   "cloudSchemaVersion": 3,
   "ledgerVersion": 1,
@@ -10,8 +10,8 @@
   "profileArchitectureVersion": 1,
   "encryptionVersion": 1,
   "authSecurityVersion": 1,
-  "cacheVersion": "finance-v15-20260815-ui-align-r12",
+  "cacheVersion": "finance-v15-20260815-pwa-update-r13",
   "released": "2026-08-15",
-  "name": "Record Spending Reliability",
-  "notes": "Fixes Record spending and Add Expense refresh failures, preserves safe multi-device Finance behavior, and closes the GitHub Pages production artifact so the final UI alignment stylesheet is actually deployed and precached without changing Finance Schema 12 or Cloud Schema V3."
+  "name": "PWA Update Recovery",
+  "notes": "Repairs V15 PWA update detection and stale-cache cleanup so existing V15.0.4 desktop and phone clients reliably load the delivered text-only badge and compact icon alignment while preserving Finance Schema 12, Cloud Schema V3, records, calculations, and sync behavior."
 }
