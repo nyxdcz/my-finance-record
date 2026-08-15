@@ -1,0 +1,35 @@
+name: Prevalidate Black Canvas browser fix
+
+on:
+  push:
+    branches:
+      - agent/desktop-ui-consistency-v15-1-0
+    paths:
+      - .github/workflows/prevalidate-black-canvas-test.yml
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/desktop-ui-consistency-v15-1-0
+      - name: Use Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          package-manager-cache: false
+      - name: Install locked project metadata
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Run repository quality suite
+        run: npm run quality
+      - name: Audit production dependencies
+        run: npm run audit
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Run full browser suite
+        run: npm run test:browser
