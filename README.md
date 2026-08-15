@@ -1,9 +1,10 @@
-# My Finance Records · V15.2.1
+# My Finance Records · V15.2.2
 
 Local-first personal finance PWA with multi-profile support and optional encrypted cloud synchronization.
 
 ## Recent updates
 
+- **V15.2.2 · Mobile UI & UX** — Refines phone layouts across 320–428px, fixes sticky Finance tabs, standardizes key 44px touch targets, and makes mobile overflow actions safer without changing finance logic, sync cadence, or the completed desktop interface.
 - **V15.2.1 · Desktop UX Quick Wins** — Makes empty/filter states actionable, adds removable Income filter chips, simplifies Budget Plan and Agenda secondary actions, and standardizes Agenda validation/deletion feedback without changing finance logic, sync cadence, or phone layout.
 - **V15.2.0 · Desktop UX Consistency** — Clarifies month and filter state changes, standardizes validation and destructive confirmations, adds per-action busy feedback, improves Search shortcut discovery, and makes Cloud Sync errors easier to recover from while preserving phone layout and finance/sync behavior.
 - **V15.1.0 · Black Canvas UI** — Changes the app canvas to #000000 and the primary interface color to #173e76 across desktop, phone, PWA chrome, and Liquid Glass controls while preserving finance and sync behavior.

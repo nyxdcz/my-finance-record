@@ -1,3 +1,8 @@
+## 15.2.2 · 2026-08-16
+- Refined the phone UI across 320–428px with corrected sticky workspace navigation, 44px touch targets, safer overflow menus, and a narrow Paid Expenses fallback.
+- Added deliberate mobile treatment for V15.2.1 filter chips, empty/search recovery actions, Budget Plan actions, and Project Agenda menus while preserving the completed desktop interface.
+- Added portrait, landscape, and short-screen browser regression coverage and rotated the PWA cache to `finance-v15-20260816-mobile-ui-ux-r32`; Finance Schema 12, Cloud Schema V3, calculations, saved records, and five-minute sync cadence are unchanged.
+
 ## 15.2.1 · 2026-08-16
 - Added actionable empty and filtered states across Income, Budget & Expenses, Paid Expenses, and Projects, including removable Income filter chips and direct next-step actions.
 - Added a Clear search recovery action when global Search returns no matching finance records.

@@ -82,3 +82,162 @@
   #settings .account-setting-row > * { grid-column: 1; }
   .cloud-conflict-review-dialog .cloud-conflict-review-footer { grid-template-columns: 1fr !important; }
 }
+
+
+/* My Finance Records V15.2.2 · mobile UI + UX consistency */
+@media (max-width: 850px) {
+  body .workspace-switcher {
+    top: var(--mobile-topbar-offset, calc(env(safe-area-inset-top) + 112px));
+  }
+  .sidebar .sidebar-close-button {
+    top: 10px;
+    right: 10px;
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
+    min-height: 44px;
+  }
+}
+
+@media (max-width: 700px) {
+  body .toast {
+    left: 12px;
+    right: 12px;
+    bottom: max(12px, calc(env(safe-area-inset-bottom) + 10px));
+    width: auto;
+    min-width: 0;
+    max-width: none;
+  }
+  .toast .toast-dismiss {
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
+    min-height: 44px;
+    margin: -8px -8px -8px auto;
+  }
+
+  #income .income-active-filter-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+  }
+  #income .income-active-filter-chips .ui-chip,
+  #income .income-active-filter-chips button {
+    min-height: 44px;
+  }
+  #income .income-active-filter-chips button {
+    min-width: 44px;
+  }
+
+  .page .empty-state-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .page .empty-state-actions .button {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .budget-planner-card .budget-planner-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 7px;
+  }
+  .budget-planner-card .budget-planner-actions > .button,
+  .budget-planner-card .budget-planner-more-menu,
+  .budget-planner-card .budget-planner-more-menu > .overflow-menu-trigger {
+    width: 100%;
+    min-width: 0;
+    min-height: 44px;
+  }
+  .budget-planner-card #addBudgetItem { order: 1; }
+  .budget-planner-card .budget-planner-more-menu { order: 2; }
+  .budget-planner-card #buildBudgetFromExpenses { order: 3; }
+  .budget-planner-card #copyPreviousBudget { order: 4; }
+
+  .budget-planner-card .budget-planner-more-panel,
+  .pc-event-more-menu .pc-event-more-panel {
+    left: auto !important;
+    right: 0 !important;
+    top: calc(100% + 6px);
+    bottom: auto !important;
+    width: min(240px, calc(100vw - 28px));
+    min-width: 0;
+    max-width: calc(100vw - 28px);
+    max-height: min(60dvh, 360px);
+    overflow: auto;
+    overscroll-behavior: contain;
+  }
+  .budget-planner-card .budget-planner-more-panel [role="menuitem"],
+  .pc-event-more-menu .pc-event-more-panel [role="menuitem"] {
+    width: 100%;
+    min-height: 44px;
+    justify-content: flex-start;
+    white-space: normal;
+    text-align: left;
+  }
+  .pc-event-more-menu > .overflow-menu-trigger,
+  .pc-event-more-menu > button[aria-haspopup="menu"] {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .productivity-empty .empty-state-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .productivity-empty .empty-state-actions .button {
+    width: 100%;
+    min-height: 44px;
+  }
+  .productivity-search-results {
+    min-width: 0;
+    max-width: 100%;
+  }
+  .productivity-search-result {
+    min-width: 0;
+  }
+  .productivity-search-copy strong,
+  .productivity-search-copy small {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 340px) {
+  #paid-expenses [data-paid-expense-row] {
+    grid-template-columns: 1fr !important;
+  }
+  #paid-expenses [data-paid-expense-row] > .record-title,
+  #paid-expenses [data-paid-expense-row] > [data-label],
+  #paid-expenses [data-paid-expense-row] > .amount[data-label],
+  #paid-expenses [data-paid-expense-row] > .mobile-record-actions {
+    grid-column: 1 !important;
+  }
+}
+
+@media (min-width: 701px) and (max-width: 850px) and (max-height: 520px),
+       (min-width: 701px) and (max-width: 850px) and (pointer: coarse) {
+  .app-dialog .input,
+  .app-dialog .select,
+  .app-dialog .textarea,
+  .app-dialog .button,
+  .workspace-switcher-button,
+  .toast .toast-dismiss,
+  .budget-planner-card .budget-planner-more-panel [role="menuitem"],
+  .pc-event-more-menu .pc-event-more-panel [role="menuitem"] {
+    min-height: 44px;
+  }
+  .toast .toast-dismiss {
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
+  }
+  .budget-planner-card .budget-planner-more-panel,
+  .pc-event-more-menu .pc-event-more-panel {
+    max-width: calc(100vw - 28px);
+  }
+}

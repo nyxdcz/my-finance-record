@@ -1,0 +1,37 @@
+import assert from "node:assert/strict";
+import fs from "node:fs";
+
+const read = path => fs.readFileSync(path, "utf8");
+const index = read("index.html");
+const mobile = read("mobile-v14-0-23.css");
+const sw = read("sw.js");
+const sync = read("sync-config.js");
+const cloud = read("cloud-sync.js");
+const version = JSON.parse(read("version.json"));
+const pkg = JSON.parse(read("package.json"));
+
+assert.equal(version.version, "15.2.2");
+assert.equal(pkg.version, "15.2.2");
+assert.equal(version.schemaVersion, 12);
+assert.equal(version.cloudSchemaVersion, 3);
+assert.equal(version.cacheVersion, "finance-v15-20260816-mobile-ui-ux-r32");
+assert.match(index, /My Finance Records · V15\.2\.2/);
+assert.match(index, /mobile-v14-0-23\.css\?v=15\.2\.2-mobile1/);
+assert.match(index, /sync-config\.js\?v=15\.2\.2-mobile1/);
+assert.match(index, /const APP_VERSION = "15\.2\.2";/);
+assert.match(sw, /const APP_VERSION = "15\.2\.2";/);
+assert.match(sw, /finance-v15-20260816-mobile-ui-ux-r32/);
+assert.match(sw, /mobile-v14-0-23\.css\?v=15\.2\.2-mobile1/);
+assert.match(sw, /liquid-glass-v15\.css\?v=15\.2\.2-light1/);
+assert.match(sw, /sync-config\.js\?v=15\.2\.2-mobile1/);
+assert.match(sync, /const VERSION = "15\.2\.2";/);
+assert.match(sync, /const RELEASE_NAME = "Mobile UI & UX";/);
+assert.match(mobile, /V15\.2\.2 · mobile UI \+ UX consistency/);
+assert.match(mobile, /body \.workspace-switcher[\s\S]*var\(--mobile-topbar-offset/);
+assert.match(mobile, /\.toast \.toast-dismiss[\s\S]*min-width:\s*44px/);
+assert.match(mobile, /\.sidebar \.sidebar-close-button[\s\S]*min-width:\s*44px/);
+assert.match(mobile, /\.budget-planner-more-panel[\s\S]*max-width:\s*calc\(100vw - 28px\)/);
+assert.match(mobile, /@media \(max-width: 340px\)[\s\S]*data-paid-expense-row/);
+assert.match(mobile, /max-height: 520px/);
+assert.match(cloud, /5\*60\*1000/);
+console.log("V15.2.2 mobile UI/UX source regression passed.");

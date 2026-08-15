@@ -16,8 +16,8 @@ const version = JSON.parse(read("version.json"));
 if (!html.includes('href="./desktop-ui-phase1-v15-1-0.css?v=15.1.0-phase1"')) fail("Production HTML does not load the desktop Phase 1 stylesheet.");
 if (!worker.includes('asset("./desktop-ui-phase1-v15-1-0.css?v=15.1.0-phase1")')) fail("Service worker does not precache the desktop Phase 1 stylesheet.");
 if (!workflow.includes("desktop-ui-phase1-v15-1-0.css")) fail("GitHub Pages packaging omits the desktop Phase 1 stylesheet.");
-if (version.cacheVersion !== "finance-v15-20260816-desktop-ux-quick-wins-r31") fail(`Unexpected cache version: ${version.cacheVersion}`);
-if (!worker.includes('const CACHE_VERSION = "finance-v15-20260816-desktop-ux-quick-wins-r31";')) fail("Service worker cache version is not V15.2.1 desktop UX r29.");
+if (version.cacheVersion !== "finance-v15-20260816-mobile-ui-ux-r32") fail(`Unexpected cache version: ${version.cacheVersion}`);
+if (!worker.includes('const CACHE_VERSION = "finance-v15-20260816-mobile-ui-ux-r32";')) fail("Service worker cache version is not V15.2.1 desktop UX r29.");
 
 for (const token of [
   '#income > .page-heading',
@@ -36,7 +36,7 @@ for (const token of [
 if (!css.includes('@media (min-width:851px)')) fail("Desktop Phase 1 CSS is not explicitly desktop-scoped.");
 if (/max-width\s*:\s*700px/.test(css)) fail("Desktop Phase 1 stylesheet must not own phone layout rules.");
 
-if (!html.includes('id="settingsOverviewAppStatus">Version 15.2.1</strong>')) fail("Settings overview starts with a stale app version.");
+if (!html.includes('id="settingsOverviewAppStatus">Version 15.2.2</strong>')) fail("Settings overview starts with a stale app version.");
 if (!html.includes('class="paid-expenses-info-note"')) fail("Paid Expenses contextual behavior note is missing.");
 if (!html.includes('class="advanced-settings-disclosure"')) fail("Advanced cloud connection disclosure is missing.");
 if (!html.includes('id="reportExportMenuPanel" role="menu"')) fail("Report export menu panel is missing.");
