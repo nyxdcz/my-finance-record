@@ -1,0 +1,26 @@
+#!/usr/bin/env node
+import assert from "node:assert/strict";
+import fs from "node:fs";
+const read = file => fs.readFileSync(file,"utf8");
+const css = read("black-canvas-v15-1-0.css");
+const liquid = read("liquid-glass-v15.css");
+const index = read("index.html");
+const offline = read("offline.html");
+const manifest = JSON.parse(read("manifest.webmanifest"));
+const version = JSON.parse(read("version.json"));
+const worker = read("sw.js");
+assert.match(css,/--bg:#000000/);
+assert.match(css,/--primary:#173e76/);
+assert.match(css,/html\[data-theme="light"\]/);
+assert.match(css,/html\[data-theme="dark"\]/);
+assert.match(css,/--nav-active-bg:#173e76/);
+assert.match(liquid,/--liquid-glass-active:rgba\(23,62,118,/);
+assert.match(index,/<meta name="theme-color" content="#173e76">/);
+assert.match(index,/black-canvas-v15-1-0\.css\?v=15\.1\.0/);
+assert.equal(manifest.background_color,"#000000");
+assert.equal(manifest.theme_color,"#173e76");
+assert.match(offline,/background:#000000/);
+assert.equal(version.version,"15.1.0");
+assert.equal(version.cacheVersion,"finance-v15-20260815-black-canvas-r15");
+assert.match(worker,/black-canvas-v15-1-0\.css\?v=15\.1\.0/);
+console.log("V15.1.0 Black Canvas palette regression passed.");

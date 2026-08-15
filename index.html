@@ -3,7 +3,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="A local-first income, expense, budget, account ledger, transfer, reconciliation, project, payment, cash-flow, financial insights, quick-entry, productivity, reminders, and scheduled-alert manager with optional MacBook and iPhone cloud sync.">
-  <meta name="theme-color" content="#173b67">
+  <meta name="theme-color" content="#173e76">
   <meta name="application-name" content="My Finance Records">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -41,11 +41,12 @@
     })();
   </script>
 
-  <title>My Finance Records · V15.0.5</title>
+  <title>My Finance Records · V15.1.0</title>
   <link rel="stylesheet" href="./app.css?v=14.0.23">
   <link rel="stylesheet" href="./dashboard-interactions.css?v=14.0.23">
-  <link rel="stylesheet" href="./ui-icon-alignment-v15-0-5.css?v=15.0.5-ui2">
-  <script src="./pwa-update-v15-0-5.js?v=15.0.5"></script>
+  <link rel="stylesheet" href="./ui-icon-alignment-v15-0-5.css?v=15.1.0-ui2">
+  <link rel="stylesheet" href="./black-canvas-v15-1-0.css?v=15.1.0">
+  <script src="./pwa-update-v15-0-5.js?v=15.1.0"></script>
 </head>
 <body class="finance-signed-out finance-auth-pending">
   <div class="app">
@@ -87,7 +88,7 @@
           <div>
             <h1 id="topTitle">Budget &amp; Expenses</h1>
             <p id="todayLabel">Tuesday, July 21, 2026</p>
-            <small id="buildBadge" title="V15.0.5 · PWA Update Recovery · August 15, 2026">V15.0.5</small>
+            <small id="buildBadge" title="V15.1.0 · Black Canvas UI · August 15, 2026">V15.1.0</small>
           </div>
         </div>
         <div class="topbar-actions">
@@ -8190,10 +8191,10 @@
     });
 
     // ---------------- V12.10.0 PWA, Phase 11 interface refinement, Phase 10 calculator number inputs, projects, savings goals, and number inputs, Phase 7 secure reset, Phase 6 savings + dashboard insights, Phase 5 reports + dark mode, Phase 4 dashboard + Apple Calendar, Phase 3 monthly navigation, Phase 2 expense workflow, device registry, sync history, offline packs, reminders, and migration ----------------
-    const APP_VERSION = "15.0.5";
-    const APP_RELEASE_NAME = "PWA Update Recovery";
+    const APP_VERSION = "15.1.0";
+    const APP_RELEASE_NAME = "Black Canvas UI";
     const APP_RELEASE_DATE = "August 15, 2026";
-    const APP_CACHE_VERSION = "finance-v15-20260815-header-ui-r14";
+    const APP_CACHE_VERSION = "finance-v15-20260815-black-canvas-r15";
 
     function synchronizeVersionDisplay() {
       document.title = `My Finance Records · V${APP_VERSION}`;
@@ -9476,11 +9477,11 @@
     setInterval(() => { renderAll(false); }, 60 * 60 * 1000);
   </script>
   <script src="./vendor/supabase.min.js"></script>
-  <script src="./sync-config.js?v=15.0.5"></script>
-  <script src="./privacy-lock.js?v=15.0.5-ui1"></script>
+  <script src="./sync-config.js?v=15.1.0"></script>
+  <script src="./privacy-lock.js?v=15.1.0-ui1"></script>
   <script src="./security-profiles.js?v=14.0.23"></script>
   <script src="./cloud-conflict-review.js?v=14.0.23"></script>
-  <script src="./cloud-conflict-resolution.js?v=14.0.23"></script><script src="./cloud-sync-lifecycle.js?v=14.0.23"></script><script src="./cloud-sync.js?v=15.0.5"></script>
+  <script src="./cloud-conflict-resolution.js?v=14.0.23"></script><script src="./cloud-sync-lifecycle.js?v=14.0.23"></script><script src="./cloud-sync.js?v=15.1.0"></script>
   <script src="./account-ledger.js?v=15.0.4"></script>
   <script src="./budget-planning.js?v=15.0.4"></script>
   <script src="./reports-insights.js?v=14.0.23"></script>
