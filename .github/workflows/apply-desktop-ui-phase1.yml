@@ -57,14 +57,21 @@ jobs:
               'paid expenses contextual note'
           )
 
-          old_export = '''            <div class="toolbar" style="margin-bottom:0">
-              <button class="button button-primary" type="button" onclick="window.print()">Print / Save PDF</button>
-              <button class="button button-secondary" id="exportMonthlyReportCsv">Export report CSV</button>
-              <button class="button button-secondary" id="exportMonthlyReportJson">Export report JSON</button>
-              <button class="button button-secondary" id="exportIncomeReportCsv">Export income CSV</button><button class="button button-secondary" id="exportExpensesCsv">Export all expenses CSV</button>
-              <button class="button button-secondary" id="exportProjectsCsv">Export all projects CSV</button>
-            </div>'''
-          new_export = '''            <div class="toolbar report-export-actions" style="margin-bottom:0">
+          export_card_marker = '<article class="card report-export-card">'
+          export_start = text.find(export_card_marker)
+          export_end = text.find('</article>', export_start)
+          if export_start < 0 or export_end < 0:
+              raise SystemExit('report export card markers not found')
+          export_end += len('</article>')
+          export_block = text[export_start:export_end]
+          toolbar_marker = '<div class="toolbar" style="margin-bottom:0">'
+          toolbar_start = export_block.find(toolbar_marker)
+          toolbar_end = export_block.find('</div>', toolbar_start)
+          if toolbar_start < 0 or toolbar_end < 0:
+              raise SystemExit('report export toolbar markers not found')
+          toolbar_end += len('</div>')
+          indent = '            '
+          new_toolbar = '''<div class="toolbar report-export-actions" style="margin-bottom:0">
               <button class="button button-primary" type="button" onclick="window.print()">Print / Save PDF</button>
               <div class="overflow-menu report-export-menu">
                 <button class="button button-secondary overflow-menu-trigger" type="button" aria-haspopup="menu" aria-controls="reportExportMenuPanel" aria-expanded="false">Export <span aria-hidden="true">▾</span></button>
@@ -77,7 +84,8 @@ jobs:
                 </div>
               </div>
             </div>'''
-          replace_exact(old_export, new_export, 'report export actions')
+          export_block = export_block[:toolbar_start] + new_toolbar + export_block[toolbar_end:]
+          text = text[:export_start] + export_block + text[export_end:]
 
           config_start = '              <article class="card cloud-config-card" id="cloudConfigCard">'
           next_card = '              <article class="card" id="cloudDisconnectedSection" hidden>'
@@ -94,12 +102,12 @@ jobs:
               '                <details class="advanced-settings-disclosure">\n                  <summary><span>Connection details</span><small>Supabase URL and publishable key</small></summary>\n                  <div class="advanced-settings-content">\n' + grid_marker,
               1
           )
-          closing = '                <p class="v12-help">A hosted `sync-config.js` can configure both devices automatically. Secret and service-role keys are rejected and must never be placed in this PWA.</p>\n              </article>\n\n'
-          if block.count(closing) != 1:
-              raise SystemExit(f'cloud config closing: expected 1 match, found {block.count(closing)}')
+          help_marker = '                <p class="v12-help">A hosted `sync-config.js` can configure both devices automatically. Secret and service-role keys are rejected and must never be placed in this PWA.</p>'
+          if block.count(help_marker) != 1:
+              raise SystemExit(f'cloud config help: expected 1 match, found {block.count(help_marker)}')
           block = block.replace(
-              closing,
-              '                <p class="v12-help">A hosted `sync-config.js` can configure both devices automatically. Secret and service-role keys are rejected and must never be placed in this PWA.</p>\n                  </div>\n                </details>\n              </article>\n\n',
+              help_marker,
+              help_marker + '\n                  </div>\n                </details>',
               1
           )
           text = text[:start] + block + text[end:]
