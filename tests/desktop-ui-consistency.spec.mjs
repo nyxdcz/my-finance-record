@@ -8,8 +8,8 @@ const css = [
   "security-profiles.css?v=15.1.0-desktop2",
   "projects-calendar-v13.0.20.css?v=15.1.0-desktop2",
   "dashboard-interactions.css?v=15.1.0-desktop2",
-  "liquid-glass-v15.css?v=15.1.0-monthnav1",
-  "black-canvas-v15-1-0.css?v=15.1.0-desktop2"
+  "liquid-glass-v15.css?v=15.1.0-light1",
+  "black-canvas-v15-1-0.css?v=15.1.0-light1"
 ];
 
 async function fixture(page, width, theme) {

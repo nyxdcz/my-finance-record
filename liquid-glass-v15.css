@@ -558,3 +558,91 @@ html[data-theme="dark"] #customizeDashboardButton[data-dashboard-toolbar-action]
     line-height:1.22!important;
   }
 }
+
+
+/* V15.1.0 · Light mode chrome correction r26 */
+html[data-theme="light"] {
+  --liquid-glass-surface:rgba(255,255,255,.82);
+  --liquid-glass-surface-strong:rgba(255,255,255,.96);
+  --liquid-glass-surface-soft:rgba(247,249,252,.88);
+  --liquid-glass-border:rgba(23,59,103,.14);
+  --liquid-glass-edge:rgba(255,255,255,.92);
+  --liquid-glass-shadow:0 14px 36px rgba(16,24,40,.12),inset 0 1px 0 rgba(255,255,255,.96),inset 0 -1px 0 rgba(16,24,40,.06);
+  --liquid-glass-shadow-soft:0 8px 22px rgba(16,24,40,.09),inset 0 1px 0 rgba(255,255,255,.92);
+  --liquid-glass-active:rgba(23,59,103,.94);
+  --liquid-glass-hover:rgba(23,59,103,.08);
+  --nav:#ffffff;
+  --nav-active-bg:var(--primary);
+  --nav-active-text:#ffffff;
+}
+html[data-theme="light"] .sidebar { color:var(--text); }
+html[data-theme="light"] .sidebar :is(.sidebar-close-button,.nav-button) { color:var(--text); }
+html[data-theme="light"] .sidebar .nav-icon {
+  background:color-mix(in srgb,var(--primary) 7%,var(--surface));
+  color:var(--text);
+}
+html[data-theme="light"] .sidebar .nav-icon-image {
+  filter:brightness(0) saturate(100%) !important;
+  opacity:.78 !important;
+}
+html[data-theme="light"] .sidebar .nav-button.active { color:#ffffff; }
+html[data-theme="light"] .sidebar .nav-button.active .nav-icon { background:transparent; color:#ffffff; }
+html[data-theme="light"] .sidebar .nav-button.active .nav-icon-image {
+  filter:brightness(0) invert(1) !important;
+  opacity:1 !important;
+}
+html[data-theme="light"] .sidebar :is(.brand small,.sidebar-note) { color:var(--muted); }
+html[data-theme="light"] .sidebar:not(.desktop-open):not(.sidebar-pinned) .nav-button::after {
+  border-color:var(--line);
+  background:var(--surface);
+  color:var(--text);
+}
+html[data-theme="light"] .workspace-switcher button.active,
+html[data-theme="light"] .workspace-switcher button[aria-selected="true"] { color:#ffffff; }
+html[data-theme="light"] :is(.dashboard-week-marquee,.finance-week-marquee,.work-week-marquee),
+html[data-theme="light"] :is(.dashboard-week-marquee,.finance-week-marquee,.work-week-marquee) .dashboard-week-day,
+html[data-theme="light"] .topbar :is(.month-nav-button,.month-display-button,.month-current-button,.topbar-history-button),
+html[data-theme="light"] :is(dialog,.modal,.dialog) :is(.modal-header,.dialog-header,.modal-footer,.dialog-footer,.modal-actions,.dialog-actions) {
+  color:var(--text);
+}
+@media (prefers-reduced-transparency:reduce) {
+  html[data-theme="light"] {
+    --liquid-glass-surface:rgba(255,255,255,.98);
+    --liquid-glass-surface-strong:#ffffff;
+    --liquid-glass-surface-soft:rgba(247,249,252,.98);
+  }
+}
+
+
+/* V15.1.0 · explicit Light visible surfaces r26 */
+html[data-theme="light"] .sidebar {
+  background:linear-gradient(180deg,var(--liquid-glass-surface-strong),var(--liquid-glass-surface)) !important;
+  color:var(--text) !important;
+}
+html[data-theme="light"] :is(.dashboard-week-marquee,.finance-week-marquee,.work-week-marquee) {
+  background:linear-gradient(180deg,var(--liquid-glass-surface-soft),color-mix(in srgb,var(--liquid-glass-surface) 84%,transparent)) !important;
+  color:var(--text) !important;
+}
+html[data-theme="light"] :is(.dashboard-week-marquee,.finance-week-marquee,.work-week-marquee) .dashboard-week-day {
+  background:linear-gradient(180deg,var(--liquid-glass-surface-soft),color-mix(in srgb,var(--liquid-glass-surface) 84%,transparent)) !important;
+  color:var(--text) !important;
+}
+html[data-theme="light"] .topbar .month-navigator .month-control {
+  background:var(--surface-soft) !important;
+  color:var(--text) !important;
+}
+html[data-theme="light"] .topbar .month-navigator .month-nav-button,
+html[data-theme="light"] .topbar .topbar-history-actions .topbar-history-button {
+  background:var(--surface) !important;
+  border-color:var(--line) !important;
+  color:var(--text) !important;
+}
+html[data-theme="light"] .topbar .month-navigator .month-nav-button:not(:disabled):hover,
+html[data-theme="light"] .topbar .topbar-history-actions .topbar-history-button:not(:disabled):hover {
+  background:var(--surface-soft) !important;
+}
+html[data-theme="light"] :is(dialog,.modal,.dialog) :is(.modal-header,.dialog-header,.modal-footer,.dialog-footer,.modal-actions,.dialog-actions) {
+  background:linear-gradient(180deg,var(--liquid-glass-surface-strong),var(--liquid-glass-surface)) !important;
+  border-color:var(--liquid-glass-border) !important;
+  color:var(--text) !important;
+}

@@ -5,7 +5,7 @@ for (const theme of ["light", "dark"]) {
     await page.setViewportSize({ width:1440, height:900 });
     await page.setContent(`<!doctype html><html data-theme="${theme}"><head>
       <link rel="stylesheet" href="http://127.0.0.1:3000/app.css?v=15.1.0-desktop2">
-      <link rel="stylesheet" href="http://127.0.0.1:3000/black-canvas-v15-1-0.css?v=15.1.0-desktop2">
+      <link rel="stylesheet" href="http://127.0.0.1:3000/black-canvas-v15-1-0.css?v=15.1.0-light1">
       <style>*,*::before,*::after{animation:none!important;transition:none!important}</style>
     </head><body>
       <button class="button button-paid" id="paid">Mark paid</button>
@@ -49,6 +49,6 @@ for (const theme of ["light", "dark"]) {
       expect(result.accountBorder).toBe("rgba(207, 231, 213, 0.24)");
     }
     expect(result.paidColor).toBe("rgb(255, 255, 255)");
-    expect(result.spendColor).toBe("rgb(255, 255, 255)");
+    expect(result.spendColor).toBe(theme === "light" ? "rgb(24, 34, 48)" : "rgb(255, 255, 255)");
   });
 }
