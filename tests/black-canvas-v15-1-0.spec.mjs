@@ -4,7 +4,7 @@ for (const theme of ["light", "dark"]) {
   test(`V15.1.0 appearance uses the expected ${theme} palette`, async ({ browser }) => {
     const context = await browser.newContext({ javaScriptEnabled:false });
     const page = await context.newPage();
-    await page.goto("http://127.0.0.1:3000/index.html?page=settings", { waitUntil:"networkidle" });
+    await page.goto("http://127.0.0.1:3000/index.html?page=settings", { waitUntil:"domcontentloaded" });
     await page.addStyleTag({ content:"*,*::before,*::after{animation:none!important;transition:none!important}" });
     await page.locator("html").evaluate((element, value) => { element.dataset.theme = value; }, theme);
 
