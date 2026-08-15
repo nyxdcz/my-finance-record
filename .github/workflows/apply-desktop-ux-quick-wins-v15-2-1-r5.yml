@@ -1,0 +1,131 @@
+name: Apply desktop UX quick wins V15.2.1 r5
+
+on:
+  push:
+    branches:
+      - agent/desktop-ux-quick-wins-v15-2-1
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply-and-validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/desktop-ux-quick-wins-v15-2-1
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Reuse validated patch stages
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import textwrap
+
+          def execute_step(workflow_path, section_label=None):
+              workflow = Path(workflow_path).read_text(encoding='utf-8')
+              if section_label: workflow = workflow[workflow.index(section_label):]
+              marker = "          python3 - <<'PY'\n"
+              start = workflow.index(marker) + len(marker)
+              end = workflow.index("\n          PY\n", start)
+              exec(compile(textwrap.dedent(workflow[start:end]), workflow_path, 'exec'), {})
+
+          execute_step('.github/workflows/apply-desktop-ux-quick-wins-v15-2-1.yml')
+          execute_step('.github/workflows/apply-desktop-ux-quick-wins-v15-2-1-r3.yml', '- name: Align V15.2.1 release metadata and validators')
+          execute_step('.github/workflows/apply-desktop-ux-quick-wins-v15-2-1-r4.yml', '- name: Extract new interaction helpers from index')
+          PY
+
+      - name: Finish cohesive interaction extraction
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          def read(path): return Path(path).read_text(encoding='utf-8')
+          def write(path, text): Path(path).write_text(text, encoding='utf-8')
+          def one(path, old, new):
+              text = read(path)
+              count = text.count(old)
+              if count != 1: raise SystemExit(f'{path}: expected one match, found {count}: {old[:120]!r}')
+              write(path, text.replace(old, new, 1))
+
+          one('interaction-patterns.js', '''  function renderIncomeFilterChips() {''', '''  function emptyStateHtml(title, text, action = null) {\n    const escape = value => String(value ?? "").replace(/[&<>"']/g, character => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" })[character]);\n    const label = String(action?.label || "");\n    const actionHtml = label ? `<div class="empty-state-actions"><button class="button button-secondary button-small" type="button"${action?.go ? ` data-go="${escape(action.go)}"` : ""}${action?.action ? ` data-empty-action="${escape(action.action)}"` : ""}>${escape(label)}</button></div>` : "";\n    return `<div class="empty-state"><strong>${escape(title)}</strong>${escape(text)}${actionHtml}</div>`;\n  }\n\n  function renderIncomeFilterChips() {''')
+          one('interaction-patterns.js', 'window.FinanceInteractionPatterns = { closeOverflowMenu, setupOverflowMenus, renderDuplicatedMarquee, renderActiveFilterChips, renderIncomeFilterChips, setupEmptyStateActions, middleTruncateFilename, createDashboardDragController };', 'window.FinanceInteractionPatterns = { closeOverflowMenu, setupOverflowMenus, renderDuplicatedMarquee, renderActiveFilterChips, emptyStateHtml, renderIncomeFilterChips, setupEmptyStateActions, middleTruncateFilename, createDashboardDragController };')
+
+          one('index.html', '''    function emptyHtml(title, text, action = null) {\n      const label = String(action?.label || "");\n      const actionHtml = label ? `<div class="empty-state-actions"><button class="button button-secondary button-small" type="button"${action?.go ? ` data-go="${escapeHtml(action.go)}"` : ""}${action?.action ? ` data-empty-action="${escapeHtml(action.action)}"` : ""}>${escapeHtml(label)}</button></div>` : "";\n      return `<div class="empty-state"><strong>${escapeHtml(title)}</strong>${escapeHtml(text)}${actionHtml}</div>`;\n    }''', '''    function emptyHtml(title, text, action = null) { return window.FinanceInteractionPatterns?.emptyStateHtml?.(title, text, action) || `<div class="empty-state"><strong>${escapeHtml(title)}</strong>${escapeHtml(text)}</div>`; }''')
+          one('index.html', '''      const sourceFilter = document.getElementById("projectSourceFilter").value;\n      const hasProjectFilters = Boolean(search || statusFilter || typeFilter || sourceFilter);''', '''      const sourceFilter = document.getElementById("projectSourceFilter").value, hasProjectFilters = Boolean(search || statusFilter || typeFilter || sourceFilter);''')
+
+          test = read('tests/v15-2-1-desktop-ux-quick-wins.spec.mjs')
+          test = test.replace('expect(source("interaction-patterns.js")).toContain("renderIncomeFilterChips");', 'expect(source("interaction-patterns.js")).toContain("emptyStateHtml");\n  expect(source("interaction-patterns.js")).toContain("renderIncomeFilterChips");')
+          write('tests/v15-2-1-desktop-ux-quick-wins.spec.mjs', test)
+          PY
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Quality
+        run: npm run quality
+
+      - name: Dependency audit
+        run: npm run audit
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Browser regression suite
+        run: npm run test:browser
+
+      - name: Diff safety checks
+        shell: bash
+        run: |
+          git diff --check
+          if git diff --name-only | grep -q '^mobile-v14-0-23.css$'; then
+            echo 'Mobile stylesheet must remain unchanged in this desktop pass.' >&2
+            exit 1
+          fi
+          if git diff --name-only | grep -E '^(account-ledger|cloud-conflict|cloud-sync-lifecycle|privacy-lock|mobile-v14-0-23)'; then
+            echo 'Unexpected finance/sync/mobile implementation file changed.' >&2
+            exit 1
+          fi
+          git diff --name-only
+
+      - name: Package validated patch
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-ux-quick-wins-v15-2-1-r5
+          path: |
+            index.html
+            interaction-patterns.js
+            projects-calendar-v13.0.20.js
+            budget-planning.js
+            desktop-ux-v15-2-0.css
+            cloud-sync.js
+            sync-config.js
+            sw.js
+            version.json
+            package.json
+            package-lock.json
+            Install_V15_2_0.command
+            README.md
+            CHANGELOG.md
+            tests/inspect-project.mjs
+            tests/validate-v15-2-0-desktop-ux.mjs
+            tests/v15-2-1-desktop-ux-quick-wins.spec.mjs
+
+      - name: Commit validated changes
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html interaction-patterns.js projects-calendar-v13.0.20.js budget-planning.js desktop-ux-v15-2-0.css cloud-sync.js sync-config.js sw.js version.json package.json package-lock.json Install_V15_2_0.command README.md CHANGELOG.md tests/inspect-project.mjs tests/validate-v15-2-0-desktop-ux.mjs tests/v15-2-1-desktop-ux-quick-wins.spec.mjs
+          git commit -m "feat: refine desktop UX quick wins"
+          git push origin HEAD:agent/desktop-ux-quick-wins-v15-2-1
