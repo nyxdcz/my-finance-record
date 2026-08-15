@@ -10,8 +10,8 @@
   "profileArchitectureVersion": 1,
   "encryptionVersion": 1,
   "authSecurityVersion": 1,
-  "cacheVersion": "finance-v15-20260815-ui-align-r9",
+  "cacheVersion": "finance-v15-20260815-ui-align-r10",
   "released": "2026-08-15",
   "name": "Record Spending Reliability",
-  "notes": "Fixes Record spending and Add Expense refresh failures by removing the obsolete Dashboard forecast renderer, protects already-saved spend transactions from render-only rollback, and refreshes the PWA asset cache without changing Finance Schema 12 or Cloud Schema V3."
+  "notes": "Fixes Record spending and Add Expense refresh failures, preserves safe multi-device Finance behavior, and refreshes the cascade-safe V15.0.4 UI alignment shell without changing Finance Schema 12 or Cloud Schema V3."
 }

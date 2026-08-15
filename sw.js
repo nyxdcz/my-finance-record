@@ -1,8 +1,8 @@
 "use strict";
 const APP_VERSION = "15.0.4";
 self.__FINANCE_APP_VERSION = APP_VERSION;
-// V15.0.4 record-spending reliability refresh · removes the obsolete budget forecast renderer, protects verified spend persistence from render-only failures, and forces installed PWAs to fetch repaired finance modules.
-const CACHE_VERSION = "finance-v15-20260815-ui-align-r9";
+// V15.0.4 UI alignment delivery refresh · forces installed PWAs to fetch the cascade-safe icon alignment rules while preserving finance and sync behavior.
+const CACHE_VERSION = "finance-v15-20260815-ui-align-r10";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const DB_NAME = "simple-finance-project-records-v12-db";
