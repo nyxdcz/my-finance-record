@@ -30,6 +30,8 @@ jobs:
           new_cache = "finance-v15-20260815-toolbar-height-r20"
           old_pin = "ui-icon-alignment-v15-0-5.css?v=15.1.0-ui2"
           new_pin = "ui-icon-alignment-v15-0-5.css?v=15.1.0-ui3"
+          old_pin_regex = r"ui-icon-alignment-v15-0-5\.css\?v=15\.1\.0-ui2"
+          new_pin_regex = r"ui-icon-alignment-v15-0-5\.css\?v=15\.1\.0-ui3"
 
           css_path = Path("ui-icon-alignment-v15-0-5.css")
           css = css_path.read_text()
@@ -89,7 +91,10 @@ jobs:
           tests_dir = Path("tests")
           for path in tests_dir.glob("*.mjs"):
               text = path.read_text()
-              updated = text.replace(old_cache, new_cache).replace(old_pin, new_pin)
+              updated = (text
+                  .replace(old_cache, new_cache)
+                  .replace(old_pin, new_pin)
+                  .replace(old_pin_regex, new_pin_regex))
               if updated != text:
                   path.write_text(updated)
 
@@ -137,7 +142,6 @@ jobs:
               changelog = changelog.replace(heading, heading + "\n" + bullet, 1)
               changelog_path.write_text(changelog)
 
-          # Add a static assertion to the V15.1.0 release validator so the geometry rule remains release-gated.
           validator_path = Path("tests/validate-v15-1-0.mjs")
           validator = validator_path.read_text()
           assertion = 'assert.match(uiCss,/@media \\(min-width:851px\\)[\\s\\S]*month-navigator[\\s\\S]*height:38px !important/);'
@@ -148,13 +152,13 @@ jobs:
               validator = validator.replace(needle, needle + "\n" + assertion, 1)
               validator_path.write_text(validator)
 
-          # Confirm every previous production cache reference in release/test files was rotated.
           remaining = []
           for path in [Path("index.html"), Path("sw.js"), Path("version.json"), *tests_dir.glob("*.mjs")]:
-              if old_cache in path.read_text():
+              text = path.read_text()
+              if old_cache in text or old_pin in text or old_pin_regex in text:
                   remaining.append(str(path))
           if remaining:
-              raise SystemExit(f"Stale cache token remains in: {remaining}")
+              raise SystemExit(f"Stale delivery token remains in: {remaining}")
           PY
       - name: Install dependencies
         run: npm ci
