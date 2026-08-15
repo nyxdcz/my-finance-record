@@ -23,7 +23,9 @@ jobs:
           node-version: 24
           package-manager-cache: false
       - name: Apply V15.1.0 patch
-        run: python .github/patch-v15-1-0-black-canvas.py
+        run: |
+          python .github/patch-v15-1-0-black-canvas.py
+          chmod +x Install_V15_1_0.command
       - name: Install locked dependencies
         run: npm ci --ignore-scripts --no-audit --no-fund
       - name: Run repository quality
