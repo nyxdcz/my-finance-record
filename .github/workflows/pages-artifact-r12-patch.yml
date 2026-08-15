@@ -27,10 +27,10 @@ jobs:
           python - <<'PY'
           from pathlib import Path
           import json
+          import textwrap
 
           root = Path('.')
 
-          # Force a brand-new request for the alignment stylesheet and shell.
           index = root / 'index.html'
           s = index.read_text()
           if 'ui-icon-alignment-v15-0-4.css?v=15.0.4-ui2' not in s:
@@ -59,7 +59,6 @@ jobs:
           )
           ui.write_text(s)
 
-          # Keep existing release validators aligned with the delivery-only cache refresh.
           for p in (root / 'tests').glob('*.mjs'):
               s = p.read_text()
               s = s.replace('finance-v15-20260815-ui-align-r11', 'finance-v15-20260815-ui-align-r12')
@@ -76,37 +75,38 @@ jobs:
           s = s.replace(required_old, required_new, 1)
 
           marker = 'let pkg = {}, lock = {}, version = {};\n'
-          guard = r'''// Ensure every local asset referenced by production HTML or the service worker is packaged by GitHub Pages.
-const deploySources = new Set();
-const deployPrefixes = [];
-for (const line of workflow.split(/\r?\n/)) {
-  const trimmed = line.trim();
-  if (!trimmed.startsWith("cp ") || !trimmed.includes(" _site")) continue;
-  const sources = trimmed.slice(3).split(" _site", 1)[0].trim().split(/\s+/);
-  for (const source of sources) {
-    const normalized = source.replace(/^\.\//, "");
-    if (normalized.includes("*")) deployPrefixes.push(normalized.slice(0, normalized.indexOf("*")));
-    else deploySources.add(normalized);
-  }
-}
-const deployedByPages = assetPath => deploySources.has(assetPath) || deployPrefixes.some(prefix => assetPath.startsWith(prefix));
-const productionAssets = new Set();
-for (const match of html.matchAll(/\b(?:src|href)="([^"]+)"/g)) {
-  const value = match[1];
-  if (/^(?:https?:|data:|#|javascript:|\$\{)/.test(value)) continue;
-  const local = value.split(/[?#]/, 1)[0].replace(/^\.\//, "");
-  if (local) productionAssets.add(local);
-}
-for (const match of worker.matchAll(/asset\("([^"]+)"\)/g)) {
-  const local = match[1].split(/[?#]/, 1)[0].replace(/^\.\//, "");
-  if (local) productionAssets.add(local);
-}
-for (const assetPath of productionAssets) {
-  if (!deployedByPages(assetPath)) fail(`GitHub Pages deploy omits production asset: ${assetPath}`);
-}
-if (!deploySources.has("ui-icon-alignment-v15-0-4.css")) fail("GitHub Pages must package ui-icon-alignment-v15-0-4.css");
+          guard = textwrap.dedent(r'''
+          // Ensure every local asset referenced by production HTML or the service worker is packaged by GitHub Pages.
+          const deploySources = new Set();
+          const deployPrefixes = [];
+          for (const line of workflow.split(/\r?\n/)) {
+            const trimmed = line.trim();
+            if (!trimmed.startsWith("cp ") || !trimmed.includes(" _site")) continue;
+            const sources = trimmed.slice(3).split(" _site", 1)[0].trim().split(/\s+/);
+            for (const source of sources) {
+              const normalized = source.replace(/^\.\//, "");
+              if (normalized.includes("*")) deployPrefixes.push(normalized.slice(0, normalized.indexOf("*")));
+              else deploySources.add(normalized);
+            }
+          }
+          const deployedByPages = assetPath => deploySources.has(assetPath) || deployPrefixes.some(prefix => assetPath.startsWith(prefix));
+          const productionAssets = new Set();
+          for (const match of html.matchAll(/\b(?:src|href)="([^"]+)"/g)) {
+            const value = match[1];
+            if (/^(?:https?:|data:|#|javascript:|\$\{)/.test(value)) continue;
+            const local = value.split(/[?#]/, 1)[0].replace(/^\.\//, "");
+            if (local) productionAssets.add(local);
+          }
+          for (const match of worker.matchAll(/asset\("([^"]+)"\)/g)) {
+            const local = match[1].split(/[?#]/, 1)[0].replace(/^\.\//, "");
+            if (local) productionAssets.add(local);
+          }
+          for (const assetPath of productionAssets) {
+            if (!deployedByPages(assetPath)) fail(`GitHub Pages deploy omits production asset: ${assetPath}`);
+          }
+          if (!deploySources.has("ui-icon-alignment-v15-0-4.css")) fail("GitHub Pages must package ui-icon-alignment-v15-0-4.css");
 
-'''
+          ''')
           if 'GitHub Pages deploy omits production asset:' not in s:
               if marker not in s:
                   raise SystemExit('inspector deployment guard insertion anchor not found')
