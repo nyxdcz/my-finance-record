@@ -1,8 +1,8 @@
 "use strict";
 const APP_VERSION = "15.2.1";
 self.__FINANCE_APP_VERSION = APP_VERSION;
-// V15.2.1 desktop UX quick-win delivery · improves action hierarchy, empty states, and Agenda feedback without changing finance schemas, saved data, sync cadence, or phone layout.
-const CACHE_VERSION = "finance-v15-20260816-desktop-ux-quick-wins-r30";
+// V15.2.1 desktop UX quick-win delivery r31 · adds Search no-results recovery while preserving finance schemas, saved data, sync cadence, and phone layout.
+const CACHE_VERSION = "finance-v15-20260816-desktop-ux-quick-wins-r31";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const DB_NAME = "simple-finance-project-records-v12-db";
@@ -40,7 +40,7 @@ const APP_SHELL = [
   asset("./budget-planning.css?v=15.1.0-desktop3"),
   asset("./reports-insights.js?v=14.0.23"),
   asset("./reports-insights.css?v=15.1.0-desktop1"),
-  asset("./productivity-tools.js?v=15.2.1-ux1"),
+  asset("./productivity-tools.js?v=15.2.1-ux2"),
   asset("./productivity-tools.css?v=14.0.23"),
   asset("./reminders-alerts.js?v=14.0.23"),
   asset("./reminders-alerts.css?v=14.0.23"),

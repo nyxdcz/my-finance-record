@@ -663,7 +663,7 @@
     resultsNode.dataset.resultCount = String(results.length);
     resultsNode._financeResults = results;
     document.getElementById("globalSearchCount").textContent = input.value.trim() ? `${results.length} matching record${results.length === 1 ? "" : "s"}` : "Start typing to search";
-    resultsNode.innerHTML = !input.value.trim() ? `<div class="productivity-empty">Search by name, category, account, amount, date, status, note, or record type.</div>` : results.length ? results.map((item,index) => `<button class="productivity-search-result" type="button" role="option" aria-selected="${index===searchSelection}" data-global-search-index="${index}"><span class="productivity-search-copy"><strong><span class="productivity-type-badge">${esc(item.type)}</span>${esc(item.label)}</strong><small>${esc(item.detail)}</small></span><span class="productivity-search-value">${esc(item.value || "Open")}</span></button>`).join("") : `<div class="productivity-empty">No matching finance records.</div>`;
+    resultsNode.innerHTML = !input.value.trim() ? `<div class="productivity-empty">Search by name, category, account, amount, date, status, note, or record type.</div>` : results.length ? results.map((item,index) => `<button class="productivity-search-result" type="button" role="option" aria-selected="${index===searchSelection}" data-global-search-index="${index}"><span class="productivity-search-copy"><strong><span class="productivity-type-badge">${esc(item.type)}</span>${esc(item.label)}</strong><small>${esc(item.detail)}</small></span><span class="productivity-search-value">${esc(item.value || "Open")}</span></button>`).join("") : `<div class="productivity-empty">No matching finance records.<div class="empty-state-actions"><button class="button button-secondary button-small" type="button" data-clear-global-search>Clear search</button></div></div>`;
     resultsNode.querySelector('[aria-selected="true"]')?.scrollIntoView({block:"nearest"});
   }
 
@@ -994,6 +994,7 @@
       const recent = event.target.closest("[data-open-recent-record]"); if (recent) { openRecentRecord(recent.dataset.openRecentRecord); return; }
       const restore = event.target.closest("[data-restore-undo-snapshot]"); if (restore) { restoreUndoSnapshot(restore.dataset.restoreUndoSnapshot); return; }
       const searchResult = event.target.closest("[data-global-search-index]"); if (searchResult) { openSearchResult(searchResult.dataset.globalSearchIndex); return; }
+      if (event.target.closest("[data-clear-global-search]")) { const input=document.getElementById("globalSearchInput"); if(input){input.value="";searchSelection=0;renderGlobalSearch();input.focus();} return; }
       const duplicate = event.target.closest("[data-duplicate-previous-expense]"); if (duplicate) { duplicatePreviousExpense(duplicate.dataset.duplicatePreviousExpense); return; }
       const filterButton = event.target.closest("[data-open-advanced-filters]"); if (filterButton) { openAdvancedFilters(filterButton.dataset.openAdvancedFilters); return; }
       const paidCheckbox = event.target.closest("[data-select-paid-expense]"); if (paidCheckbox) { const id=paidCheckbox.dataset.selectPaidExpense; paidCheckbox.checked ? paidSelection.add(id) : paidSelection.delete(id); updatePaidBulkToolbar(); return; }
