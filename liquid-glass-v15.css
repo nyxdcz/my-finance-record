@@ -73,7 +73,6 @@ html[data-theme="dark"] {
 
 .topbar :is(.cloud-sync-toolbar-button,.month-nav-button,.month-display-button,.month-current-button,.topbar-history-button,.topbar-add-button,#customizeDashboardButton,.topbar-tools-trigger),
 .sidebar :is(.sidebar-close-button,.nav-button),
-.workspace-switcher,
 .workspace-switcher button,
 .finance-workspace-marquee-row>.workspace-switcher,
 .dashboard-week-marquee,
@@ -253,15 +252,12 @@ form,
 }
 
 @media (prefers-reduced-transparency:reduce) {
-  :root {
-    --liquid-glass-surface:rgba(248,251,255,.96);
-    --liquid-glass-surface-strong:rgba(248,251,255,.99);
-    --liquid-glass-surface-soft:rgba(248,251,255,.94);
-  }
+  :root,
+  html[data-theme="light"],
   html[data-theme="dark"] {
-    --liquid-glass-surface:rgba(14,28,43,.97);
-    --liquid-glass-surface-strong:rgba(14,28,43,.995);
-    --liquid-glass-surface-soft:rgba(24,40,56,.96);
+    --liquid-glass-surface:rgba(4,8,14,.97);
+    --liquid-glass-surface-strong:rgba(7,12,20,.995);
+    --liquid-glass-surface-soft:rgba(18,27,41,.96);
   }
   .topbar,.sidebar,
   .dashboard-week-marquee,.finance-week-marquee,.work-week-marquee,

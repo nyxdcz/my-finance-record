@@ -7,18 +7,18 @@
 .report-insights-filters { display:grid; grid-template-columns:minmax(145px,.9fr) minmax(138px,.8fr) minmax(138px,.8fr) minmax(150px,1fr) minmax(150px,1fr) auto; gap:8px; align-items:end; padding:10px; border:1px solid var(--line); border-radius:10px; background:var(--surface-soft); }
 .report-insights-filters .field { margin:0; }
 .report-insights-filters label { display:block; margin-bottom:4px; color:var(--muted); font-size:.62rem; font-weight:750; }
-.report-insights-filters .input,.report-insights-filters .select { min-height:37px; height:37px; font-size:.72rem; }
+.report-insights-filters .input,.report-insights-filters .select { min-height:35px; height:35px; font-size:.72rem; }
 .report-insights-filter-actions { display:flex; gap:6px; }
-.report-insights-filter-actions .button { min-height:37px; }
+.report-insights-filter-actions .button { min-height:35px; }
 .report-insights-note { margin:8px 1px 0; color:var(--muted); font-size:.64rem; line-height:1.4; }
 .report-insights-kpis { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:8px; margin:11px 0; }
-.report-insights-kpis > div { min-width:0; padding:9px 10px; border:1px solid var(--line); border-radius:9px; background:var(--surface-soft); }
+.report-insights-kpis > div { min-width:0; padding:9px 10px; border:1px solid var(--line); border-radius:8px; background:var(--surface-soft); }
 .report-insights-kpis span,.report-insights-kpis strong,.report-insights-kpis small { display:block; }
 .report-insights-kpis span { color:var(--muted); font-size:.62rem; font-weight:720; }
 .report-insights-kpis strong { margin-top:3px; font-size:.9rem; line-height:1.2; }
 .report-insights-kpis small { margin-top:3px; color:var(--muted); font-size:.58rem; line-height:1.3; }
 .report-insights-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
-.report-insight-panel { min-width:0; padding:11px; border:1px solid var(--line); border-radius:10px; background:var(--surface); }
+.report-insight-panel { min-width:0; padding:11px; border:1px solid var(--line); border-radius:9px; background:var(--surface); }
 .report-insight-wide { grid-column:1/-1; }
 .report-insight-panel-heading { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:9px; }
 .report-insight-panel-heading h4 { margin:0; font-size:.8rem; }

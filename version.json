@@ -10,8 +10,8 @@
   "profileArchitectureVersion": 1,
   "encryptionVersion": 1,
   "authSecurityVersion": 1,
-  "cacheVersion": "finance-v15-20260815-period-radius-r21",
+  "cacheVersion": "finance-v15-20260815-desktop-consistency-r22",
   "released": "2026-08-15",
   "name": "Black Canvas UI",
-  "notes": "Introduces the Black Canvas UI with a #000000 app background and #173e76 primary color across both appearance modes, PWA chrome, Liquid Glass controls, Expense Mark paid actions, a pure-white Available money Spend label, softer Available money account-card outlines, consistent 38px desktop topbar controls using Synced as the height reference, and 9px rounded Finance period headers and expense rows while preserving 44px mobile touch targets, Finance Schema 12, Cloud Schema V3, records, calculations, and sync behavior."
+  "notes": "Black Canvas UI desktop consistency pass: normalizes desktop page framing, card/control geometry, Finance/Reports/Work/Settings component tiers, Black Canvas surfaces, and static Dashboard layout ownership across 1024\u20131920px while preserving mobile behavior, Finance Schema 12, Cloud Schema V3, records, calculations, and sync behavior."
 }

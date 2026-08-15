@@ -95,7 +95,7 @@
 .budget-planner-toggle { flex:0 0 34px; }
 .budget-planner-body { min-width:0; }
 .budget-planner-summary { gap:7px; margin:8px 12px 10px; }
-.budget-plan-kpi { padding:8px 9px; border-radius:8px; min-height:66px; }
+.budget-plan-kpi { padding:8px 9px; border-radius:8px; min-height:70px; }
 .budget-plan-kpi strong { margin-top:2px; font-size:.9rem; }
 .budget-plan-kpi small { margin-top:2px; font-size:.59rem; line-height:1.25; }
 .budget-planner-grid { gap:8px; padding:0 12px 12px; }
