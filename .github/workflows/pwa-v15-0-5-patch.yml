@@ -35,14 +35,16 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Run browser regressions
         run: npm run test:browser
-      - name: Commit validated patch and remove temporary runner
+      - name: Commit validated app patch
         shell: bash
         run: |
           set -euo pipefail
-          rm -f .github/patch-v15-0-5.py .github/patch-v15-0-5-maint.py .github/patch-v15-0-5-inherited-tests.py .github/workflows/pwa-v15-0-5-patch.yml
+          rm -f .github/patch-v15-0-5.py .github/patch-v15-0-5-maint.py .github/patch-v15-0-5-inherited-tests.py
+          rm -rf test-results playwright-report
+          git restore .github/workflows/quality-pages.yml .github/workflows/pwa-v15-0-5-patch.yml
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
+          git add -A -- ':!.github/workflows/*'
           git diff --cached --check
           git commit -m "fix: repair V15.0.5 PWA update recovery"
           git push origin HEAD:fix/pwa-updater-v15-0-5
