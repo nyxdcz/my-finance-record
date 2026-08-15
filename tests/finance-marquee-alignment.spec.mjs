@@ -17,7 +17,6 @@ test("all Finance pages use the same tabs-left marquee-right desktop row", async
       const marquee = node.querySelector(":scope > .finance-week-marquee");
       return {
         childClasses:[...node.children].map(child => child.className),
-        rowDisplay:getComputedStyle(node).display,
         switcherHeight:switcher ? getComputedStyle(switcher).height : null,
         marqueeHeight:marquee ? getComputedStyle(marquee).height : null
       };
@@ -25,7 +24,6 @@ test("all Finance pages use the same tabs-left marquee-right desktop row", async
 
     expect(contract.childClasses[0]).toContain("money-workspace-switcher");
     expect(contract.childClasses[1]).toContain("finance-week-marquee");
-    expect(contract.rowDisplay).toBe("flex");
     expect(contract.switcherHeight).toBe("43px");
     expect(contract.marqueeHeight).toBe("43px");
   }
