@@ -1,5 +1,5 @@
 {
-  "version": "15.1.1",
+  "version": "15.1.0",
   "schemaVersion": 12,
   "cloudSchemaVersion": 3,
   "ledgerVersion": 1,
@@ -12,6 +12,6 @@
   "authSecurityVersion": 1,
   "cacheVersion": "finance-v15-20260815-finance-marquee-r24",
   "released": "2026-08-15",
-  "name": "Finance marquee source alignment",
-  "notes": "Moves the Income and Paid Expenses weekly marquees into the same source-level Finance workspace row as Budget & Expenses, preserves the 43px desktop/tablet geometry and phone marquee hiding, and refreshes the PWA shell so installed clients receive the corrected layout."
+  "name": "Black Canvas UI",
+  "notes": "Black Canvas UI with a source-level Finance marquee alignment delivery refresh: Income and Paid Expenses now use the same tabs-left, weekly-marquee-right row as Budget & Expenses while preserving 43px desktop/tablet geometry, phone marquee hiding, Finance Schema 12, Cloud Schema V3, records, calculations, and sync behavior."
 }
