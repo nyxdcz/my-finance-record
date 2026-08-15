@@ -9,6 +9,7 @@ const calendar = read("projects-calendar-v13.0.20.css");
 const security = read("security-profiles.css");
 const liquid = read("liquid-glass-v15.css");
 const dashboard = read("dashboard-interactions.css");
+const blackCanvas = read("black-canvas-v15-1-0.css");
 const sync = read("sync-config.js");
 const index = read("index.html");
 const sw = read("sw.js");
@@ -17,12 +18,16 @@ const version = JSON.parse(read("version.json"));
 assert.equal(version.version, "15.1.0");
 assert.equal(version.schemaVersion, 12);
 assert.equal(version.cloudSchemaVersion, 3);
-assert.equal(version.cacheVersion, "finance-v15-20260815-finance-marquee-r24");
+assert.equal(version.cacheVersion, "finance-v15-20260815-desktop-ui-r25");
+assert.match(app, /--desktop-header-height:\s*72px/);
+assert.match(app, /--desktop-page-gutter:\s*24px/);
 assert.match(app, /--workspace-card-radius:\s*9px/);
+assert.match(app, /--workspace-card-padding:\s*13px/);
 assert.match(app, /--workspace-control-height:\s*38px/);
 assert.match(app, /--workspace-compact-control-height:\s*35px/);
 assert.match(app, /\.dashboard-view \.topbar \{ min-height: 72px;/);
-assert.match(app, /\.dashboard-view \.content \{ padding: 18px 22px 34px; \}/);
+assert.match(app, /\.dashboard-view \.content \{ padding: 18px var\(--desktop-page-gutter\) 34px; \}/);
+assert.match(app, /\.content \{ padding:18px var\(--desktop-page-gutter\) 34px; \}/);
 assert.doesNotMatch(app, /\.dashboard-view \.topbar \{ min-height: 64px/);
 assert.match(app, /#projects \.project-summary-strip > \* \{ min-height:70px/);
 assert.match(app, /#payments \.kpi-card \{ min-height:70px/);
@@ -36,27 +41,34 @@ assert.match(calendar, /\.pc-event-card \{[^}]*border-radius:8px/s);
 assert.match(calendar, /\.pc-event-actions \.button \{ min-height:32px;/);
 assert.match(security, /\.v13-chip\{[^}]*min-height:23px/);
 assert.match(security, /profile-status-grid>div\{[^}]*border-radius:8px/);
+assert.match(blackCanvas,/html\[data-theme="light"\][\s\S]*--bg:#efefef/);
+assert.match(blackCanvas,/html\[data-theme="dark"\][\s\S]*--bg:#000000/);
 assert.doesNotMatch(liquid, /\.workspace-switcher,\n\.workspace-switcher button,/);
-assert.match(liquid, /prefers-reduced-transparency:reduce[\s\S]*html\[data-theme="light"\][\s\S]*rgba\(4,8,14,.97\)/);
-assert.match(dashboard, /V15\.1\.0 · desktop Dashboard\/workspace geometry owned by static CSS/);
+assert.match(liquid, /--liquid-glass-radius:7px/);
+assert.match(dashboard, /\.finance-workspace-marquee-row\{[^}]*top:var\(--desktop-header-height,72px\)/);
+assert.doesNotMatch(dashboard, /\.sidebar \.insights-nav-button::before\{/);
+assert.match(dashboard, /#customizeDashboardButton\[data-dashboard-toolbar-action\]\{[\s\S]*width:38px!important;[\s\S]*height:38px!important;/);
 assert.doesNotMatch(sync, /@media\(min-width:701px\)\{#dashboard\.page\.active/);
 for (const pin of [
-  "app.css?v=15.1.0-desktop1",
-  "dashboard-interactions.css?v=15.1.0-desktop1",
-  "security-profiles.css?v=15.1.0-desktop1",
+  "app.css?v=15.1.0-desktop2",
+  "dashboard-interactions.css?v=15.1.0-desktop2",
+  "security-profiles.css?v=15.1.0-desktop2",
   "reports-insights.css?v=15.1.0-desktop1",
-  "budget-planning.css?v=15.1.0-desktop1",
-  "projects-calendar-v13.0.20.css?v=15.1.0-desktop1",
+  "budget-planning.css?v=15.1.0-desktop2",
+  "projects-calendar-v13.0.20.css?v=15.1.0-desktop2",
+  "black-canvas-v15-1-0.css?v=15.1.0-desktop2",
   "sync-config.js?v=15.1.0-desktop1"
 ]) assert.ok(index.includes(pin), `index missing ${pin}`);
-assert.ok(sw.includes("finance-v15-20260815-finance-marquee-r24"));
+assert.ok(index.includes('const APP_CACHE_VERSION = "finance-v15-20260815-desktop-ui-r25";'));
+assert.ok(sw.includes("finance-v15-20260815-desktop-ui-r25"));
 for (const pin of [
-  "app.css?v=15.1.0-desktop1",
-  "dashboard-interactions.css?v=15.1.0-desktop1",
-  "security-profiles.css?v=15.1.0-desktop1",
+  "app.css?v=15.1.0-desktop2",
+  "dashboard-interactions.css?v=15.1.0-desktop2",
+  "security-profiles.css?v=15.1.0-desktop2",
   "reports-insights.css?v=15.1.0-desktop1",
-  "budget-planning.css?v=15.1.0-desktop1",
-  "projects-calendar-v13.0.20.css?v=15.1.0-desktop1",
+  "budget-planning.css?v=15.1.0-desktop2",
+  "projects-calendar-v13.0.20.css?v=15.1.0-desktop2",
+  "black-canvas-v15-1-0.css?v=15.1.0-desktop2",
   "sync-config.js?v=15.1.0-desktop1",
   "liquid-glass-v15.css?v=15.1.0-monthnav1"
 ]) assert.ok(sw.includes(pin), `service worker missing ${pin}`);

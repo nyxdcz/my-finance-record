@@ -1,10 +1,16 @@
 import { test, expect } from "@playwright/test";
-for (const theme of ["light","dark"]) {
-  test(`V15.1.0 Black Canvas uses exact palette in ${theme} appearance`, async ({ browser }) => {
+
+for (const theme of ["light", "dark"]) {
+  test(`V15.1.0 appearance uses the expected ${theme} palette`, async ({ browser }) => {
     const context = await browser.newContext({ javaScriptEnabled:false });
     const page = await context.newPage();
     await page.goto("http://127.0.0.1:3000/index.html?page=settings", { waitUntil:"networkidle" });
+    await page.addStyleTag({ content:"*,*::before,*::after{animation:none!important;transition:none!important}" });
     await page.locator("html").evaluate((element, value) => { element.dataset.theme = value; }, theme);
+
+    const expectedBg = theme === "light" ? "#efefef" : "#000000";
+    await expect.poll(() => page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue("--bg").trim())).toBe(expectedBg);
+
     const result = await page.evaluate(() => {
       const root = getComputedStyle(document.documentElement);
       const body = getComputedStyle(document.body);
@@ -13,6 +19,7 @@ for (const theme of ["light","dark"]) {
       paid.textContent = "Mark paid";
       document.body.appendChild(paid);
       const paidStyle = getComputedStyle(paid);
+
       const available = document.createElement("section");
       available.id = "availableMoneySection";
       const spend = document.createElement("button");
@@ -25,8 +32,7 @@ for (const theme of ["light","dark"]) {
       accountCard.className = "account-card";
       available.appendChild(accountCard);
       document.body.appendChild(available);
-      const spendStyle = getComputedStyle(spendLabel);
-      const accountStyle = getComputedStyle(accountCard);
+
       return {
         bg:root.getPropertyValue("--bg").trim(),
         primary:root.getPropertyValue("--primary").trim(),
@@ -34,18 +40,28 @@ for (const theme of ["light","dark"]) {
         paidBg:paidStyle.backgroundColor,
         paidBorder:paidStyle.borderTopColor,
         paidColor:paidStyle.color,
-        spendColor:spendStyle.color,
-        accountBorder:accountStyle.borderTopColor
+        spendColor:getComputedStyle(spendLabel).color,
+        accountBorder:getComputedStyle(accountCard).borderTopColor
       };
     });
-    expect(result.bg).toBe("#000000");
-    expect(result.primary).toBe("#173e76");
-    expect(result.bodyBg).toBe("rgb(0, 0, 0)");
-    expect(result.paidBg).toBe("rgb(23, 62, 118)");
-    expect(result.paidBorder).toBe("rgb(23, 62, 118)");
+
+    if (theme === "light") {
+      expect(result.bg).toBe("#efefef");
+      expect(result.primary).toBe("#173b67");
+      expect(result.bodyBg).toBe("rgb(239, 239, 239)");
+      expect(result.paidBg).toBe("rgb(23, 59, 103)");
+      expect(result.paidBorder).toBe("rgb(23, 59, 103)");
+      expect(result.accountBorder).not.toBe("rgba(207, 231, 213, 0.24)");
+    } else {
+      expect(result.bg).toBe("#000000");
+      expect(result.primary).toBe("#173e76");
+      expect(result.bodyBg).toBe("rgb(0, 0, 0)");
+      expect(result.paidBg).toBe("rgb(23, 62, 118)");
+      expect(result.paidBorder).toBe("rgb(23, 62, 118)");
+      expect(result.accountBorder).toBe("rgba(207, 231, 213, 0.24)");
+    }
     expect(result.paidColor).toBe("rgb(255, 255, 255)");
     expect(result.spendColor).toBe("rgb(255, 255, 255)");
-    expect(result.accountBorder).toBe("rgba(207, 231, 213, 0.24)");
     await context.close();
   });
 }

@@ -1,7 +1,12 @@
 /* My Finance Records · V15.1.0 · Black Canvas UI */
 /* Final palette layer. Geometry, finance content, and interaction behavior remain unchanged. */
-:root,
-html[data-theme="light"],
+:root {
+  --bg:#efefef;
+}
+html[data-theme="light"] {
+  color-scheme:light;
+  --bg:#efefef;
+}
 html[data-theme="dark"] {
   color-scheme:dark;
   --bg:#000000;
@@ -17,9 +22,20 @@ html[data-theme="dark"] {
   --field-label:#dbe3ef;
   --nav-active-bg:#173e76;
   --nav-active-text:#ffffff;
+  --green-soft:#10271a;
+  --red-soft:#2a1412;
+  --orange-soft:#2b1d0d;
+  --blue-soft:#111d33;
   --shadow:0 10px 30px rgba(0,0,0,.42);
 }
-html, body, .app, .main { background:#000000; }
+html[data-theme="light"],
+html[data-theme="light"] body,
+html[data-theme="light"] .app,
+html[data-theme="light"] .main { background:#efefef; }
+html[data-theme="dark"],
+html[data-theme="dark"] body,
+html[data-theme="dark"] .app,
+html[data-theme="dark"] .main { background:#000000; }
 body { color:var(--text); }
 .topbar { border-bottom-color:var(--line); }
 button:focus-visible,
@@ -33,7 +49,6 @@ textarea:focus-visible,
 .button-primary:hover { background:var(--primary-dark); }
 input[type="checkbox"], input[type="radio"], progress { accent-color:var(--primary); }
 
-
 /* V15.1.0 Mark Paid primary-action hotfix. */
 .button-paid {
   background:var(--primary) !important;
@@ -45,19 +60,20 @@ input[type="checkbox"], input[type="radio"], progress { accent-color:var(--prima
   border-color:var(--primary-dark) !important;
 }
 
-
 /* V15.1.0 Available money Spend label hotfix. */
 #availableMoneySection .account-spend-button span {
   color:#ffffff !important;
 }
 
-
 /* V15.1.0 Available money account-border softening. */
-#availableMoneySection .account-card {
+html[data-theme="dark"] #availableMoneySection .account-card {
   border-color:rgba(207,231,213,.24) !important;
 }
+html[data-theme="light"] #availableMoneySection .account-card {
+  border-color:color-mix(in srgb,var(--green) 22%,var(--line)) !important;
+}
 
-/* V15.1.0 Finance period corner-radius polish. */
+/* V15.1.0 Finance nested-panel corner-radius contract. */
 #money .period-card {
   border-radius:9px !important;
   overflow:hidden;

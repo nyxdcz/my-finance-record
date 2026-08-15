@@ -48,25 +48,12 @@ html[data-theme="dark"] .sidebar .nav-button.active .nav-icon-image{
 .sidebar .nav-button[data-page="projects"] .nav-icon::before,
 .sidebar .settings-nav-button .nav-icon::before{content:none!important}
 
-.sidebar .insights-nav-button::before{
-  content:"";
-  display:block;
-  width:28px;
-  height:28px;
-  flex:0 0 28px;
-  background-image:url("./icons/sidebar-insights-v14-0-24.png");
-  background-repeat:no-repeat;
-  background-position:center;
-  background-size:20px 20px;
-  opacity:.94;
-}
-.sidebar .insights-nav-button.active::before{filter:brightness(0) saturate(100%);opacity:1}
 
 @media(min-width:851px){
-  .sidebar.desktop-open .insights-nav-button,.sidebar.sidebar-pinned .insights-nav-button{padding-inline-start:10px!important}
+  .sidebar.desktop-open .insights-nav-button,.sidebar.sidebar-pinned .insights-nav-button{padding-inline-start:46px!important}
 }
 @media(max-width:850px){
-  .sidebar.open .insights-nav-button{padding-inline-start:12px!important}
+  .sidebar.open .insights-nav-button{padding-inline-start:46px!important}
 }
 
 /* V14.0.24 · self-contained compact marquee fallback for production Pages. */
@@ -87,7 +74,7 @@ html[data-theme="dark"] .sidebar .nav-button.active .nav-icon-image{
 .dashboard-week-marquee-window:hover .dashboard-week-marquee-track,.dashboard-week-marquee-window:focus-within .dashboard-week-marquee-track{animation-play-state:paused}
 @keyframes dashboard-week-marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 
-.finance-workspace-marquee-row{position:sticky;top:71px;z-index:23;display:flex;align-items:stretch;gap:8px;margin-bottom:10px}
+.finance-workspace-marquee-row{position:sticky;top:var(--desktop-header-height,72px);z-index:23;display:flex;align-items:stretch;gap:8px;margin-bottom:10px}
 .finance-workspace-marquee-row>.money-workspace-switcher{position:static;top:auto;flex:0 0 auto;height:43px;min-height:43px;max-height:43px;box-sizing:border-box;margin:0}
 .finance-workspace-marquee-row>.finance-week-marquee{flex:1 1 auto;min-width:0;margin:0}
 
@@ -224,7 +211,7 @@ html[data-theme="dark"] .sidebar .nav-button.active .nav-icon-image{
 .workspace-switcher,
 .dashboard-week-marquee{
   border-color:var(--line);
-  border-radius:8px;
+  border-radius:7px;
   background:color-mix(in srgb,var(--surface) 96%,transparent);
   -webkit-backdrop-filter:blur(12px);
   backdrop-filter:blur(12px);

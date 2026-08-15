@@ -1,7 +1,7 @@
 .project-calendar-v13020 { margin-top:12px; overflow:hidden; }
 .project-calendar-v13020 .pc-header { align-items:flex-start; padding-bottom:7px; }
 .pc-header-actions { display:flex; align-items:center; gap:6px; flex-wrap:wrap; justify-content:flex-end; }
-.pc-count { padding:3px 7px; border:1px solid var(--line); border-radius:999px; color:var(--muted); font-size:.6rem; font-weight:750; }
+.pc-count { min-height:23px; padding:3px 8px; display:inline-flex; align-items:center; border:1px solid var(--line); border-radius:999px; color:var(--muted); font-size:.64rem; font-weight:750; }
 .pc-agenda { min-width:0; border-top:1px solid var(--line); background:var(--surface-soft); padding:8px; }
 .pc-agenda-preview .pc-agenda-list { grid-template-columns:repeat(3,minmax(0,1fr)); }
 .pc-agenda-heading { display:flex; align-items:baseline; justify-content:space-between; gap:6px; margin-bottom:6px; }
@@ -12,11 +12,11 @@
 .pc-event-main { min-width:0; flex:1; padding:0; border:0; background:transparent; color:inherit; text-align:left; cursor:pointer; }
 .pc-event-main:hover h4,.pc-event-main:hover .pc-event-title { color:var(--primary); }
 .pc-event-topline { display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
-.pc-event-type { color:var(--primary); font-size:.55rem; font-weight:850; text-transform:uppercase; letter-spacing:.04em; }
-.pc-event-date-state { padding:1px 5px; border-radius:999px; background:var(--surface-soft); color:var(--muted); font-size:.52rem; font-weight:800; }
-.pc-event-card h4,.pc-event-title { display:block; margin:2px 0 1px; font-size:.7rem; font-weight:800; }
-.pc-event-card p,.pc-event-meta { display:block; margin:0; color:var(--muted); font-size:.59rem; }
-.pc-event-card small { display:block; margin-top:2px; color:var(--muted); font-size:.55rem; overflow-wrap:anywhere; }
+.pc-event-type { color:var(--primary); font-size:.6rem; font-weight:850; text-transform:uppercase; letter-spacing:.04em; }
+.pc-event-date-state { min-height:23px; padding:2px 7px; display:inline-flex; align-items:center; border-radius:999px; background:var(--surface-soft); color:var(--muted); font-size:.6rem; font-weight:800; }
+.pc-event-card h4,.pc-event-title { display:block; margin:2px 0 1px; font-size:.72rem; font-weight:800; }
+.pc-event-card p,.pc-event-meta { display:block; margin:0; color:var(--muted); font-size:.64rem; }
+.pc-event-card small { display:block; margin-top:2px; color:var(--muted); font-size:.6rem; overflow-wrap:anywhere; }
 .pc-event-card small a { color:var(--primary); font-weight:750; }
 .pc-event-notes { margin-top:5px !important; padding-top:5px; border-top:1px solid var(--line); white-space:pre-wrap; }
 .pc-event-actions { display:flex; gap:3px; flex-wrap:wrap; justify-content:flex-end; }

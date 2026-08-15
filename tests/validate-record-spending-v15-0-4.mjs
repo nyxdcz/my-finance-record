@@ -19,7 +19,7 @@ const refreshAt = ledger.indexOf("refreshReconciledAccountState(account, expecte
 assert.ok(saveAt >= 0 && refreshAt > saveAt, "verified persistence must happen before final UI refresh");
 assert.match(index, /account-ledger\.js\?v=15\.0\.4/, "account-ledger asset must be freshly pinned");
 assert.match(index, /budget-planning\.js\?v=15\.0\.4/, "budget-planning asset must be freshly pinned");
-assert.match(worker, /finance-v15-20260815-finance-marquee-r24/, "PWA cache must rotate for phone delivery");
+assert.match(worker, /finance-v15-20260815-desktop-ui-r25/, "PWA cache must rotate for phone delivery");
 assert.match(worker, /account-ledger\.js\?v=15\.0\.4/, "worker must precache repaired account ledger");
 assert.match(worker, /budget-planning\.js\?v=15\.0\.4/, "worker must precache repaired budget planning");
 assert.equal(pkg.version, "15.1.0");
