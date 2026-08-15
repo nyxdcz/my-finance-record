@@ -1,0 +1,38 @@
+name: Desktop icon test patch
+
+on:
+  push:
+    branches:
+      - fix/desktop-consistency-icons
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/desktop-consistency-icons
+      - name: Update restored Insights icon expectation
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('tests/privacy-and-inputs.spec.mjs')
+          text = p.read_text()
+          old = '  await expect(sidebar.locator(".nav-icon-image")).toHaveCount(4);\n  await expect(insightsButton.locator(".nav-icon")).toHaveCount(0);'
+          new = '  await expect(sidebar.locator(".nav-icon-image")).toHaveCount(5);\n  await expect(insightsButton.locator(".nav-icon")).toHaveCount(1);\n  await expect(insightsButton.locator(".nav-icon-image")).toHaveCSS("width", "20px");\n  await expect(insightsButton.locator(".nav-icon-image")).toHaveCSS("height", "20px");'
+          if text.count(old) != 1:
+              raise SystemExit(f'expected stale Insights assertion once, found {text.count(old)}')
+          p.write_text(text.replace(old, new))
+          PY
+      - name: Commit test contract
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add tests/privacy-and-inputs.spec.mjs
+          git diff --cached --check
+          git commit -m "test: require restored Insights icon"
+          git push origin HEAD:fix/desktop-consistency-icons
