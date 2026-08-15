@@ -82,3 +82,16 @@ html body #customizeDashboardButton[data-dashboard-toolbar-action]::before {
     align-items:center !important;
   }
 }
+
+/* V15.2.2 sidebar nav alignment: Insights follows the same horizontal padding as peer items. */
+@media (min-width:851px) {
+  html body .sidebar.desktop-open .insights-nav-button,
+  html body .sidebar.sidebar-pinned .insights-nav-button {
+    padding-inline-start:10px !important;
+  }
+}
+@media (max-width:850px) {
+  html body .sidebar .insights-nav-button {
+    padding-inline-start:12px !important;
+  }
+}
