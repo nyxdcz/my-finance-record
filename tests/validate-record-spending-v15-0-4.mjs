@@ -17,10 +17,10 @@ assert.match(ledger, /storedLedger\.length !== 1/, "Record spending must still v
 const saveAt = ledger.indexOf("const saved = saveData(");
 const refreshAt = ledger.indexOf("refreshReconciledAccountState(account, expectedAfter)", saveAt);
 assert.ok(saveAt >= 0 && refreshAt > saveAt, "verified persistence must happen before final UI refresh");
-assert.match(index, /account-ledger\.js\?v=15\.0\.4/, "account-ledger asset must be freshly pinned");
-assert.match(index, /budget-planning\.js\?v=15\.0\.4/, "budget-planning asset must be freshly pinned");
-assert.match(worker, /finance-v15-20260815-desktop-ui-phase1-r28/, "PWA cache must rotate for phone delivery");
+assert.match(index, /account-ledger\.js\?v=15\.0\.4/, "account-ledger asset must remain on its repaired pin");
+assert.match(index, /budget-planning\.js\?v=15\.0\.4/, "budget-planning asset must remain on its repaired pin");
+assert.match(worker, /finance-v15-20260816-desktop-ux-r29/, "PWA cache must match the V15.2.0 shell");
 assert.match(worker, /account-ledger\.js\?v=15\.0\.4/, "worker must precache repaired account ledger");
 assert.match(worker, /budget-planning\.js\?v=15\.0\.4/, "worker must precache repaired budget planning");
-assert.equal(pkg.version, "15.1.0");
-console.log("V15.0.4 Record spending regression validation passed.");
+assert.equal(pkg.version, "15.2.0");
+console.log("Record spending regression validation passed under V15.2.0.");

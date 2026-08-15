@@ -58,6 +58,31 @@
     catch (error) { return month || "Selected month"; }
   };
 
+  async function confirmProductivityAction(options) {
+    if (typeof openAppConfirmation === "function") return openAppConfirmation(options);
+    return window.confirm(`${options.title || "Confirm"}\n\n${options.message || ""}`);
+  }
+
+  function requestProductivityText({ title, label, value = "", confirmLabel = "Save" }) {
+    return new Promise(resolve => {
+      const returnFocus = document.activeElement;
+      const dialog = document.createElement("dialog");
+      dialog.className = "modal app-dialog productivity-text-dialog";
+      dialog.innerHTML = `<form method="dialog"><div class="modal-header"><h3>${esc(title)}</h3><button class="button button-secondary button-small" type="button" data-productivity-prompt-cancel>Cancel</button></div><div class="modal-body"><label class="field"><span>${esc(label)}</span><input class="input" data-productivity-prompt-input maxlength="80" autocomplete="off"></label><p class="field-error" data-productivity-prompt-error hidden></p></div><div class="modal-footer"><button class="button button-secondary" type="button" data-productivity-prompt-cancel>Cancel</button><button class="button button-primary" type="submit">${esc(confirmLabel)}</button></div></form>`;
+      document.body.appendChild(dialog);
+      const input = dialog.querySelector("[data-productivity-prompt-input]");
+      const error = dialog.querySelector("[data-productivity-prompt-error]");
+      input.value = String(value || "");
+      let settled = false;
+      const finish = result => { if (settled) return; settled = true; if (dialog.open) dialog.close(); dialog.remove(); returnFocus?.focus?.(); resolve(result); };
+      dialog.querySelectorAll("[data-productivity-prompt-cancel]").forEach(button => button.addEventListener("click", () => finish(null)));
+      dialog.addEventListener("cancel", event => { event.preventDefault(); finish(null); });
+      dialog.querySelector("form").addEventListener("submit", event => { event.preventDefault(); const next=input.value.trim(); if(!next){error.hidden=false;error.textContent=`Enter ${String(label || "a value").toLowerCase()}.`;input.focus();return;} finish(next); });
+      dialog.showModal();
+      requestAnimationFrame(() => { input.focus(); input.select(); });
+    });
+  }
+
   function normalizeTemplate(item) {
     if (!item || typeof item !== "object") return null;
     const id = compactText(item.id || makeId("expense-template"), 120);
@@ -339,11 +364,11 @@
     }, 0);
   }
 
-  function saveTemplateFromDialog() {
+  async function saveTemplateFromDialog() {
     const template = captureExpenseTemplate();
     if (!template?.expenseName) { showToast("Enter an expense name before saving a template", "warning"); document.getElementById("expenseName")?.focus(); return; }
-    const name = prompt("Template name", template.expenseName);
-    if (!name?.trim()) return;
+    const name = await requestProductivityText({title:"Save expense template",label:"Template name",value:template.expenseName,confirmLabel:"Save template"});
+    if (!name) return;
     template.name = compactText(name, 80);
     template.updatedAt = nowIso();
     pushUndo(`Save expense template ${template.name}`);
@@ -351,20 +376,22 @@
     saveData("Expense template saved");
   }
 
-  function updateTemplate(templateId) {
+  async function updateTemplate(templateId) {
     const existing = data.expenseTemplates.find(item => item.id === templateId);
     if (!existing) return;
-    const name = prompt("Template name", existing.name);
-    if (!name?.trim()) return;
+    const name = await requestProductivityText({title:"Rename expense template",label:"Template name",value:existing.name,confirmLabel:"Rename"});
+    if (!name) return;
     pushUndo(`Rename expense template ${existing.name}`);
     existing.name = compactText(name,80);
     existing.updatedAt = nowIso();
     saveData("Expense template renamed");
   }
 
-  function deleteTemplate(templateId) {
+  async function deleteTemplate(templateId) {
     const existing = data.expenseTemplates.find(item => item.id === templateId);
-    if (!existing || !confirm(`Delete the “${existing.name}” expense template?`)) return;
+    if (!existing) return;
+    const confirmed=await confirmProductivityAction({title:"Delete expense template?",message:`Delete “${existing.name}”?`,details:"This removes the saved template only. Existing expenses are unchanged.",confirmLabel:"Delete template",danger:true});
+    if(!confirmed)return;
     pushUndo(`Delete expense template ${existing.name}`);
     data.expenseTemplates = data.expenseTemplates.filter(item => item.id !== templateId);
     saveData("Expense template deleted");
@@ -484,7 +511,7 @@
             <button class="productivity-tab" type="button" role="tab" aria-selected="false" data-productivity-tab="undo">Undo history</button>
             <button class="productivity-tab" type="button" role="tab" aria-selected="false" data-productivity-tab="shortcuts">Shortcuts</button>
           </div>
-          <section class="productivity-panel" id="productivityPanelTemplates" data-productivity-panel="templates"><div class="productivity-section-heading"><div><h4>Expense templates</h4><small>Templates synchronize through Cloud Sync V2</small></div><button class="button button-primary button-small" type="button" data-productivity-action="expense">Create from expense form</button></div><div class="productivity-list" id="productivityTemplateList"></div></section>
+          <section class="productivity-panel" id="productivityPanelTemplates" data-productivity-panel="templates"><div class="productivity-section-heading"><div><h4>Expense templates</h4><small>Templates synchronize through Cloud Sync</small></div><button class="button button-primary button-small" type="button" data-productivity-action="expense">Create from expense form</button></div><div class="productivity-list" id="productivityTemplateList"></div></section>
           <section class="productivity-panel" id="productivityPanelRecent" data-productivity-panel="recent" hidden><div class="productivity-section-heading"><div><h4>Recently edited records</h4><small>Stored only on this device</small></div><button class="button button-secondary button-small" type="button" id="clearProductivityActivity">Clear history</button></div><div class="productivity-list" id="productivityRecentList"></div></section>
           <section class="productivity-panel" id="productivityPanelUndo" data-productivity-panel="undo" hidden><div class="productivity-section-heading"><div><h4>Undo history</h4><small>Restore one of the last ${MAX_UNDO} pre-change snapshots</small></div><button class="button button-secondary button-small" type="button" id="clearProductivityUndo">Clear history</button></div><div class="productivity-list" id="productivityUndoList"></div></section>
           <section class="productivity-panel" id="productivityPanelShortcuts" data-productivity-panel="shortcuts" hidden><div class="productivity-shortcuts">
@@ -591,9 +618,11 @@
     renderQuickMenu();
   }
 
-  function restoreUndoSnapshot(snapshotId) {
+  async function restoreUndoSnapshot(snapshotId) {
     const snapshot = undoHistory.find(item => item.id === snapshotId);
-    if (!snapshot || !confirm(`Restore the snapshot saved before “${snapshot.label}”?\n\nYour current records will become a new undo point first.`)) return;
+    if (!snapshot) return;
+    const confirmed=await confirmProductivityAction({title:"Restore this undo snapshot?",message:`Restore the snapshot saved before “${snapshot.label}”?`,details:"Your current records will first become a new undo point.",confirmLabel:"Restore snapshot",danger:true});
+    if(!confirmed)return;
     pushUndo("Restore prior undo snapshot");
     data = normalizeData(clone(snapshot.data));
     saveData(`Restored snapshot: ${snapshot.label}`);
@@ -970,8 +999,8 @@
       const paidCheckbox = event.target.closest("[data-select-paid-expense]"); if (paidCheckbox) { const id=paidCheckbox.dataset.selectPaidExpense; paidCheckbox.checked ? paidSelection.add(id) : paidSelection.delete(id); updatePaidBulkToolbar(); return; }
       if (event.target.closest("#applyPaidProductivityAction")) { applyPaidBulkAction(); return; }
       if (event.target.closest("#clearPaidProductivitySelection")) { paidSelection.clear(); productivityRenderPaidExpenses(); return; }
-      if (event.target.closest("#clearProductivityActivity")) { if (confirm("Clear recently edited history on this device?")) { activity=[]; writeJson(ACTIVITY_KEY,activity); renderProductivityPanels(); } return; }
-      if (event.target.closest("#clearProductivityUndo")) { if (confirm("Clear the multi-step undo history on this device?")) { undoHistory=[]; writeJson(UNDO_HISTORY_KEY,undoHistory); renderProductivityPanels(); } return; }
+      if (event.target.closest("#clearProductivityActivity")) { confirmProductivityAction({title:"Clear recent history?",message:"Clear recently edited history on this device?",details:"Finance records are not deleted.",confirmLabel:"Clear history",danger:true}).then(ok=>{if(ok){activity=[];writeJson(ACTIVITY_KEY,activity);renderProductivityPanels();}}); return; }
+      if (event.target.closest("#clearProductivityUndo")) { confirmProductivityAction({title:"Clear undo history?",message:"Clear the multi-step undo history on this device?",details:"Your current finance records stay unchanged, but these older restore points will be removed.",confirmLabel:"Clear undo history",danger:true}).then(ok=>{if(ok){undoHistory=[];writeJson(UNDO_HISTORY_KEY,undoHistory);renderProductivityPanels();}}); return; }
     }, true);
 
     document.addEventListener("input", event => {

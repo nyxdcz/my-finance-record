@@ -87,9 +87,9 @@ assert.match(syncConfig, /expenseScreenshotMenuButton/, "loaded screenshot tools
 assert.match(syncConfig, /button\.textContent = "Upload"/, "screenshot launcher should use the compact Upload label");
 assert.match(syncConfig, /"Analyzing…" : "AI"/, "optional AI screenshot action should use the compact AI label");
 assert.match(syncConfig, /header\.insertBefore\(shell, close\)/, "screenshot actions should be positioned immediately before the expense dialog Close button");
-assert.match(syncConfig, /expense-screenshot-parser\.js\?v=15\.0\.3/, "screenshot parser should load from the V15 app shell");
-assert.match(syncConfig, /expense-screenshot-detect\.js\?v=15\.0\.3/, "local screenshot detector should remain loaded from the V15 app shell");
-assert.match(syncConfig, /expense-screenshot-ai\.js\?v=15\.0\.3/, "optional AI screenshot detector should load after the local detector with a V15 cache pin");
+assert.match(syncConfig, /expense-screenshot-parser\.js\?v=15\.0\.3/, "screenshot parser should remain on its validated V15 pin");
+assert.match(syncConfig, /expense-screenshot-detect\.js\?v=15\.0\.3/, "local screenshot detector should remain on its validated V15 pin");
+assert.match(syncConfig, /expense-screenshot-ai\.js\?v=15\.0\.3/, "optional AI screenshot detector should remain on its validated V15 pin");
 assert.doesNotMatch(syncConfig, /OPENAI_API_KEY/, "browser sync config must not contain an OpenAI API key");
 
 const aiClient = fs.readFileSync(path.join(root, "expense-screenshot-ai.js"), "utf8");
@@ -109,7 +109,7 @@ assert.match(edgeFunction, /type:"json_schema"/, "Edge Function should request a
 assert.match(edgeFunction, /store:false/, "AI screenshot response should disable response storage");
 
 const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
-assert.match(worker, /finance-v15-20260815-desktop-ui-phase1-r28/, "service worker cache generation must remain current for V15 while preserving screenshot detection");
+assert.match(worker, /finance-v15-20260816-desktop-ux-r29/, "service worker cache generation must remain current for V15.2.0 while preserving screenshot detection");
 assert.match(worker, /expense-screenshot-parser\.js\?v=15\.0\.3/, "service worker should precache the V15 screenshot parser");
 assert.match(worker, /expense-screenshot-detect\.js\?v=15\.0\.3/, "service worker should precache the V15 local screenshot detector");
 assert.match(worker, /expense-screenshot-ai\.js\?v=15\.0\.3/, "service worker should precache the V15 optional AI client");

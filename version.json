@@ -1,5 +1,5 @@
 {
-  "version": "15.1.0",
+  "version": "15.2.0",
   "schemaVersion": 12,
   "cloudSchemaVersion": 3,
   "ledgerVersion": 1,
@@ -10,8 +10,8 @@
   "profileArchitectureVersion": 1,
   "encryptionVersion": 1,
   "authSecurityVersion": 1,
-  "cacheVersion": "finance-v15-20260815-desktop-ui-phase1-r28",
-  "released": "2026-08-15",
-  "name": "Black Canvas UI",
-  "notes": "Desktop UI Phase 1: clearer header/workspace hierarchy, compact Income KPIs, calmer Dashboard and Finance surfaces, consolidated Report exports, simplified Calendar status color, contextual Paid Expenses guidance, progressive disclosure for advanced cloud connection fields, consistent desktop controls/statuses/modals/empty states/toasts, and ultra-wide Settings constraints. Phone layout, Finance Schema 12, Cloud Schema V3, records, calculations, and sync behavior remain unchanged."
+  "cacheVersion": "finance-v15-20260816-desktop-ux-r29",
+  "released": "2026-08-16",
+  "name": "Desktop UX Consistency",
+  "notes": "V15.2.0 desktop UX consistency: clearer month-navigation and filter-selection feedback, inline form validation, unified destructive confirmations, per-action Settings busy states, discoverable Search shortcuts, and plain-language Cloud Sync recovery messaging. Finance Schema 12, Cloud Schema V3, saved records, calculations, account balances, budgets, projects, five-minute sync cadence, and phone layout remain unchanged."
 }
