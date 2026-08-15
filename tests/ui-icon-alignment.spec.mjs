@@ -68,10 +68,12 @@ test("V15.1.0 desktop topbar controls match the Synced 38px height", async ({ pa
   await page.goto("http://127.0.0.1:3000/index.html?page=money", { waitUntil:"networkidle" });
 
   await page.evaluate(() => {
+    window.FinancePrivacyLock?.unlock?.({ email:"toolbar-height-test@example.invalid" });
     const add = document.getElementById("quickAddExpense");
     if (add) add.hidden = false;
   });
 
+  await expect(page.locator("#cloudSyncStatusButton")).toBeVisible();
   const heightOf = selector => page.locator(selector).first().evaluate(element => element.getBoundingClientRect().height);
   const reference = await heightOf("#cloudSyncStatusButton");
   expect(reference).toBe(38);
