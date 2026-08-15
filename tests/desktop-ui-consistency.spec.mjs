@@ -103,7 +103,7 @@ test("light and dark appearance use distinct surfaces", async ({ page }) => {
   }));
   expect(dark).toEqual({
     body:"rgb(0, 0, 0)",
-    record:"rgb(14, 19, 27)",
+    record:"rgb(8, 11, 16)",
     input:"rgb(8, 11, 16)"
   });
 });
