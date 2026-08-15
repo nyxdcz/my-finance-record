@@ -8,7 +8,7 @@
 .pc-agenda-heading strong { font-size:.72rem; }
 .pc-agenda-heading small { color:var(--muted); font-size:.56rem; }
 .pc-agenda-list { display:grid; gap:5px; }
-.pc-event-card { position:relative; display:flex; align-items:flex-start; justify-content:space-between; gap:8px; padding:7px 8px; border:1px solid var(--line); border-left:4px solid var(--line); border-radius:7px; background:var(--surface); }
+.pc-event-card { position:relative; display:flex; align-items:flex-start; justify-content:space-between; gap:8px; padding:7px 8px; border:1px solid var(--line); border-left:4px solid var(--line); border-radius:8px; background:var(--surface); }
 .pc-event-main { min-width:0; flex:1; padding:0; border:0; background:transparent; color:inherit; text-align:left; cursor:pointer; }
 .pc-event-main:hover h4,.pc-event-main:hover .pc-event-title { color:var(--primary); }
 .pc-event-topline { display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
@@ -20,7 +20,7 @@
 .pc-event-card small a { color:var(--primary); font-weight:750; }
 .pc-event-notes { margin-top:5px !important; padding-top:5px; border-top:1px solid var(--line); white-space:pre-wrap; }
 .pc-event-actions { display:flex; gap:3px; flex-wrap:wrap; justify-content:flex-end; }
-.pc-event-actions .button { min-height:24px; padding:2px 6px; font-size:.66rem; }
+.pc-event-actions .button { min-height:32px; padding:4px 6px; font-size:.66rem; }
 .pc-date-overdue { border-left-color:var(--red); background:color-mix(in srgb,var(--red-soft) 58%,var(--surface)); }
 .pc-date-overdue .pc-event-date-state { background:var(--red-soft); color:var(--red); }
 .pc-date-near { border-left-color:var(--orange); background:color-mix(in srgb,var(--orange-soft) 55%,var(--surface)); }

@@ -12,5 +12,5 @@ assert.match(sw, /black-canvas-v15-1-0\.css\?v=15\.1\.0-periodradius1/);
 assert.equal(version.version, "15.1.0");
 assert.equal(version.schemaVersion, 12);
 assert.equal(version.cloudSchemaVersion, 3);
-assert.equal(version.cacheVersion, "finance-v15-20260815-period-radius-r21");
+assert.equal(version.cacheVersion, "finance-v15-20260815-desktop-consistency-r22");
 console.log("V15.1.0 Available money account-border regression passed.");
