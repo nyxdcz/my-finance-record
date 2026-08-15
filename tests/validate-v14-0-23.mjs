@@ -176,7 +176,7 @@ for(const token of ["FinancePrivacyLock","finance-signed-out","finance-auth-pend
 for(const token of ["setAuthenticated","closeSensitiveSurfaces","blockLockedInteraction","FINANCE_AUTH_STATE","finance:privacy-auth-change"]) assert(privacyLock.includes(token),`privacy runtime safeguard missing: ${token}`);
 assert(cloud.includes("setPrivacyAuthentication(false)")&&cloud.includes("setPrivacyAuthentication(true"),"cloud auth does not drive privacy lock state");
 assert(worker.includes('let financeAuthState = "signed-out"')&&worker.includes('FINANCE_AUTH_STATE')&&worker.includes('financeAuthState !== "signed-in"'),"service worker does not suppress signed-out finance notifications");
-assert(worker.includes('asset("./privacy-lock.js?v=14.0.23")'),"privacy module missing from service-worker shell");
+assert(worker.includes('asset("./privacy-lock.js?v=15.0.5-ui1")'),"privacy module missing from service-worker shell");
 assert(workflow.includes("privacy-lock.js"),"GitHub Pages workflow does not deploy privacy module");
 assert(exists("SIGNED_OUT_PRIVACY_LOCK_VALIDATION_V13_0_18.md"),"V14.0.23 privacy validation report missing");
 

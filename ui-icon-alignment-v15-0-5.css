@@ -53,3 +53,10 @@ html body .topbar-actions > button:not(.cloud-sync-toolbar-button):not(.topbar-a
   justify-self:center !important;
   align-self:center !important;
 }
+
+
+/* V15.0.5 header hotfix: optical centering for the asymmetric widget glyph. */
+html body #customizeDashboardButton[data-dashboard-toolbar-action]::before {
+  transform:translateY(1px) !important;
+  transform-origin:center !important;
+}
