@@ -1,0 +1,98 @@
+name: Temporary Search Clear R31
+
+on:
+  push:
+    branches:
+      - agent/v15-2-1-search-clear-r31
+
+permissions:
+  contents: write
+
+jobs:
+  patch-and-validate:
+    if: github.event.head_commit.message != 'chore: apply search clear r31 patch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Apply approved Search recovery gap fix
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+
+          p = Path('productivity-tools.js')
+          s = p.read_text()
+          old = '''resultsNode.innerHTML = !input.value.trim() ? `<div class="productivity-empty">Search by name, category, account, amount, date, status, note, or record type.</div>` : results.length ? results.map((item,index) => `<button class="productivity-search-result" type="button" role="option" aria-selected="${index===searchSelection}" data-global-search-index="${index}"><span class="productivity-search-copy"><strong><span class="productivity-type-badge">${esc(item.type)}</span>${esc(item.label)}</strong><small>${esc(item.detail)}</small></span><span class="productivity-search-value">${esc(item.value || "Open")}</span></button>`).join("") : `<div class="productivity-empty">No matching finance records.</div>`;'''
+          new = '''resultsNode.innerHTML = !input.value.trim() ? `<div class="productivity-empty">Search by name, category, account, amount, date, status, note, or record type.</div>` : results.length ? results.map((item,index) => `<button class="productivity-search-result" type="button" role="option" aria-selected="${index===searchSelection}" data-global-search-index="${index}"><span class="productivity-search-copy"><strong><span class="productivity-type-badge">${esc(item.type)}</span>${esc(item.label)}</strong><small>${esc(item.detail)}</small></span><span class="productivity-search-value">${esc(item.value || "Open")}</span></button>`).join("") : `<div class="productivity-empty">No matching finance records.<div class="empty-state-actions"><button class="button button-secondary button-small" type="button" data-clear-global-search>Clear search</button></div></div>`;'''
+          if old not in s:
+              raise SystemExit('renderGlobalSearch target not found')
+          s = s.replace(old, new, 1)
+          old = '''      const searchResult = event.target.closest("[data-global-search-index]"); if (searchResult) { openSearchResult(searchResult.dataset.globalSearchIndex); return; }'''
+          new = '''      const searchResult = event.target.closest("[data-global-search-index]"); if (searchResult) { openSearchResult(searchResult.dataset.globalSearchIndex); return; }\n      if (event.target.closest("[data-clear-global-search]")) { const input=document.getElementById("globalSearchInput"); if(input){input.value="";searchSelection=0;renderGlobalSearch();input.focus();} return; }'''
+          if old not in s:
+              raise SystemExit('Search click handler target not found')
+          p.write_text(s.replace(old, new, 1))
+
+          p = Path('index.html')
+          s = p.read_text().replace('finance-v15-20260816-desktop-ux-quick-wins-r30','finance-v15-20260816-desktop-ux-quick-wins-r31').replace('./productivity-tools.js?v=15.2.1-ux1','./productivity-tools.js?v=15.2.1-ux2')
+          p.write_text(s)
+
+          p = Path('sw.js')
+          s = p.read_text().replace('finance-v15-20260816-desktop-ux-quick-wins-r30','finance-v15-20260816-desktop-ux-quick-wins-r31').replace('./productivity-tools.js?v=15.2.1-ux1','./productivity-tools.js?v=15.2.1-ux2')
+          s = s.replace('V15.2.1 desktop UX quick-win delivery · improves action hierarchy, empty states, and Agenda feedback without changing finance schemas, saved data, sync cadence, or phone layout.','V15.2.1 desktop UX quick-win delivery r31 · adds Search no-results recovery while preserving finance schemas, saved data, sync cadence, and phone layout.')
+          p.write_text(s)
+
+          p = Path('version.json')
+          data = json.loads(p.read_text())
+          data['cacheVersion'] = 'finance-v15-20260816-desktop-ux-quick-wins-r31'
+          data['notes'] = 'V15.2.1 desktop UX quick wins: actionable empty and filtered states, visible removable Income filter chips, Search no-results Clear search recovery, clearer Budget & Expenses copy, lower-noise Budget Plan and Agenda actions, Project Agenda inline validation, and unified Agenda deletion confirmation. Finance Schema 12, Cloud Schema V3, saved records, calculations, account balances, budgets, projects, five-minute sync cadence, and phone layout remain unchanged.'
+          p.write_text(json.dumps(data, indent=2) + '\n')
+
+          changelog = Path('CHANGELOG.md')
+          if changelog.exists():
+              s = changelog.read_text().replace('finance-v15-20260816-desktop-ux-quick-wins-r30','finance-v15-20260816-desktop-ux-quick-wins-r31',1)
+              marker = '- Added actionable empty and filtered states across Income, Budget & Expenses, Paid Expenses, and Projects, including removable Income filter chips and direct next-step actions.'
+              if marker in s and 'Search no-results recovery' not in s.split('## 15.2.0',1)[0]:
+                  s = s.replace(marker, marker + '\n- Added a Clear search recovery action when global Search returns no matching finance records.', 1)
+              changelog.write_text(s)
+
+          for path in Path('tests').rglob('*'):
+              if path.is_file() and path.suffix in {'.mjs','.js'}:
+                  t = path.read_text()
+                  t = t.replace('finance-v15-20260816-desktop-ux-quick-wins-r30','finance-v15-20260816-desktop-ux-quick-wins-r31')
+                  t = t.replace('./productivity-tools.js?v=15.2.1-ux1','./productivity-tools.js?v=15.2.1-ux2')
+                  path.write_text(t)
+
+          spec = Path('tests/v15-2-1-desktop-ux-quick-wins.spec.mjs')
+          t = spec.read_text()
+          needle = '  expect(budget).toContain(\'aria-haspopup="menu"\');\n\n'
+          addition = '  expect(source("productivity-tools.js")).toContain("data-clear-global-search");\n  expect(source("productivity-tools.js")).toContain("Clear search");\n  expect(source("productivity-tools.js")).toContain(\'input.value=""\');\n  expect(index).toContain("./productivity-tools.js?v=15.2.1-ux2");\n\n'
+          if needle not in t:
+              raise SystemExit('Quick-win spec insertion point not found')
+          spec.write_text(t.replace(needle, needle + addition, 1))
+          PY
+      - name: Use Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - name: Install locked project metadata
+        run: npm ci
+      - name: Run repository quality checks
+        run: npm run quality
+      - name: Audit production dependencies
+        run: npm run audit
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Run browser validation
+        run: npm run test:browser
+      - name: Commit validated patch
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add CHANGELOG.md productivity-tools.js index.html sw.js version.json tests
+          git commit -m 'chore: apply search clear r31 patch'
+          git push origin HEAD:agent/v15-2-1-search-clear-r31
