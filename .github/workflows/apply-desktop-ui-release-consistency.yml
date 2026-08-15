@@ -15,7 +15,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           ref: fix/desktop-ui-phase1
-      - name: Align cache, deploy packaging, and tests
+      - name: Align cache and tests
         shell: bash
         run: |
           set -euo pipefail
@@ -26,7 +26,6 @@ jobs:
           old_cache = "finance-v15-20260815-desktop-consistency-r27"
           new_cache = "finance-v15-20260815-desktop-ui-phase1-r28"
 
-          # Update every validation/source reference that pins the previous cache.
           targets = [Path("sw.js"), Path("version.json")]
           targets += list(Path("tests").glob("*.mjs"))
           for path in targets:
@@ -36,7 +35,6 @@ jobs:
               if old_cache in text:
                   path.write_text(text.replace(old_cache, new_cache))
 
-          # Precache the new desktop-only stylesheet.
           sw = Path("sw.js")
           text = sw.read_text()
           asset = '  asset("./desktop-ui-phase1-v15-1-0.css?v=15.1.0-phase1"),\n'
@@ -51,31 +49,12 @@ jobs:
           )
           sw.write_text(text)
 
-          # Refresh public release metadata without changing semantic version/schema versions.
           version_path = Path("version.json")
           version = json.loads(version_path.read_text())
           version["cacheVersion"] = new_cache
           version["notes"] = "Desktop UI Phase 1: clearer header/workspace hierarchy, compact Income KPIs, calmer Dashboard and Finance surfaces, consolidated Report exports, simplified Calendar status color, contextual Paid Expenses guidance, progressive disclosure for advanced cloud connection fields, consistent desktop controls/statuses/modals/empty states/toasts, and ultra-wide Settings constraints. Phone layout, Finance Schema 12, Cloud Schema V3, records, calculations, and sync behavior remain unchanged."
           version_path.write_text(json.dumps(version, indent=2, ensure_ascii=False) + "\n")
 
-          # Package the stylesheet in GitHub Pages and assert it exists in the staged site.
-          workflow = Path(".github/workflows/quality-pages.yml")
-          text = workflow.read_text()
-          if " desktop-ui-phase1-v15-1-0.css " not in text:
-              text = text.replace(
-                  "ui-icon-alignment-v15-0-5.css black-canvas-v15-1-0.css pwa-update-v15-0-5.js",
-                  "ui-icon-alignment-v15-0-5.css black-canvas-v15-1-0.css desktop-ui-phase1-v15-1-0.css pwa-update-v15-0-5.js",
-                  1
-              )
-          test_anchor = "          test -f _site/black-canvas-v15-1-0.css\n"
-          test_line = "          test -f _site/desktop-ui-phase1-v15-1-0.css\n"
-          if test_line not in text:
-              if test_anchor not in text:
-                  raise SystemExit("quality-pages stylesheet test anchor not found")
-              text = text.replace(test_anchor, test_anchor + test_line, 1)
-          workflow.write_text(text)
-
-          # Make the new source contract part of npm test.
           package_path = Path("package.json")
           package = json.loads(package_path.read_text())
           static_test = "node tests/validate-desktop-ui-phase1-v15-1-0.mjs"
@@ -88,18 +67,15 @@ jobs:
               )
           package_path.write_text(json.dumps(package, indent=2) + "\n")
 
-          # Include the final production cascade in the existing five-width browser fixture.
           desktop_spec = Path("tests/desktop-ui-consistency.spec.mjs")
           text = desktop_spec.read_text()
-          css_entry = '  "desktop-ui-phase1-v15-1-0.css?v=15.1.0-phase1"\n'
           if "desktop-ui-phase1-v15-1-0.css" not in text:
               anchor = '  "black-canvas-v15-1-0.css?v=15.1.0-light1"\n'
               if anchor not in text:
                   raise SystemExit("desktop consistency CSS anchor not found")
-              text = text.replace(anchor, '  "black-canvas-v15-1-0.css?v=15.1.0-light1",\n' + css_entry, 1)
+              text = text.replace(anchor, '  "black-canvas-v15-1-0.css?v=15.1.0-light1",\n  "desktop-ui-phase1-v15-1-0.css?v=15.1.0-phase1"\n', 1)
           desktop_spec.write_text(text)
 
-          # Make repository inspection explicitly aware of the new production layer.
           inspect = Path("tests/inspect-project.mjs")
           text = inspect.read_text()
           if '"desktop-ui-phase1-v15-1-0.css"' not in text:
@@ -116,7 +92,6 @@ jobs:
               text = text.replace(deploy_anchor, deploy_anchor + deploy_line, 1)
           inspect.write_text(text)
 
-          # Document the same-version UI delivery in the current changelog entry.
           changelog = Path("CHANGELOG.md")
           text = changelog.read_text()
           bullet = "- Desktop UI Phase 1: simplified desktop hierarchy, report export menu, compact Income summary, calmer Calendar/Settings/status surfaces, and r28 PWA delivery while leaving phone layout and finance/sync behavior unchanged.\n"
@@ -137,6 +112,6 @@ jobs:
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add sw.js version.json package.json CHANGELOG.md .github/workflows/quality-pages.yml tests
+          git add sw.js version.json package.json CHANGELOG.md tests
           git commit -m "test: align desktop UI phase 1 delivery"
           git push origin HEAD:fix/desktop-ui-phase1
