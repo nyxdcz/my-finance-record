@@ -29,6 +29,17 @@ jobs:
       - name: Apply V15.0.4 patch
         run: python3 scripts/apply-record-spending-v15-0-4.py
 
+      - name: Align escaped V15.0.4 validator markers
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path('tests/validate-v15-0-4.mjs')
+          text = path.read_text(encoding='utf-8')
+          text = text.replace(r'15\.0\.3', r'15\.0\.4')
+          text = text.replace(r'V15\.0\.3', r'V15\.0\.4')
+          path.write_text(text, encoding='utf-8')
+          PY
+
       - name: Preserve installer executable bit
         run: chmod +x Install_V15_0_4.command run_audit.sh
 
