@@ -13,13 +13,24 @@ for (const theme of ["light","dark"]) {
       paid.textContent = "Mark paid";
       document.body.appendChild(paid);
       const paidStyle = getComputedStyle(paid);
+      const available = document.createElement("section");
+      available.id = "availableMoneySection";
+      const spend = document.createElement("button");
+      spend.className = "button button-secondary button-small account-spend-button";
+      const spendLabel = document.createElement("span");
+      spendLabel.textContent = "Spend";
+      spend.appendChild(spendLabel);
+      available.appendChild(spend);
+      document.body.appendChild(available);
+      const spendStyle = getComputedStyle(spendLabel);
       return {
         bg:root.getPropertyValue("--bg").trim(),
         primary:root.getPropertyValue("--primary").trim(),
         bodyBg:body.backgroundColor,
         paidBg:paidStyle.backgroundColor,
         paidBorder:paidStyle.borderTopColor,
-        paidColor:paidStyle.color
+        paidColor:paidStyle.color,
+        spendColor:spendStyle.color
       };
     });
     expect(result.bg).toBe("#000000");
@@ -28,6 +39,7 @@ for (const theme of ["light","dark"]) {
     expect(result.paidBg).toBe("rgb(23, 62, 118)");
     expect(result.paidBorder).toBe("rgb(23, 62, 118)");
     expect(result.paidColor).toBe("rgb(255, 255, 255)");
+    expect(result.spendColor).toBe("rgb(255, 255, 255)");
     await context.close();
   });
 }

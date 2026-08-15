@@ -44,3 +44,9 @@ input[type="checkbox"], input[type="radio"], progress { accent-color:var(--prima
   background:var(--primary-dark) !important;
   border-color:var(--primary-dark) !important;
 }
+
+
+/* V15.1.0 Available money Spend label hotfix. */
+#availableMoneySection .account-spend-button span {
+  color:#ffffff !important;
+}
