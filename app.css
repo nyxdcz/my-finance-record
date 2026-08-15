@@ -20,18 +20,18 @@
       --blue-soft: #edf3ff;
       --danger: #b42318;
       --shadow: 0 10px 30px rgba(16, 24, 40, 0.07);
-      --radius: 12px;
+      --radius: 9px;
       --sidebar-width: 245px;
       --desktop-header-height: 72px;
       --desktop-page-gutter: 24px;
-      --desktop-card-padding: 16px;
-      --desktop-compact-card-padding: 12px;
+      --desktop-card-padding: 13px;
+      --desktop-compact-card-padding: 11px;
       --desktop-panel-radius: 9px;
-      --desktop-inner-radius: 8px;
-      --desktop-control-height: 40px;
-      --desktop-control-compact-height: 34px;
+      --desktop-inner-radius: 7px;
+      --desktop-control-height: 38px;
+      --desktop-control-compact-height: 35px;
       --desktop-control-icon-height: 32px;
-      --desktop-section-gap: 16px;
+      --desktop-section-gap: 10px;
       --desktop-workspace-gap: 10px;
     }
     * { box-sizing: border-box; }
@@ -323,7 +323,7 @@
     .monthly-check-item input { accent-color: var(--primary); flex: 0 0 auto; }
     .monthly-check-item.is-done { color: var(--muted); background: var(--surface-soft); text-decoration: line-through; }
 
-    .content { padding: 20px var(--desktop-page-gutter) 42px; }
+    .content { padding: 18px var(--desktop-page-gutter) 34px; }
     .page { display: none; animation: fade 0.18s ease; }
     .page.active { display: block; }
 
@@ -340,7 +340,7 @@
       margin-bottom: 19px;
     }
 
-    .page-heading h2 { margin: 0 0 4px; font-size: 1.28rem; letter-spacing: -0.03em; }
+    .page-heading h2 { margin: 0 0 4px; font-size: 1.34rem; letter-spacing: -0.03em; }
     .page-heading p { margin: 0; color: var(--muted); max-width: 760px; }
 
     .button {
@@ -3579,7 +3579,7 @@
       --workspace-raised-shadow: 0 7px 22px rgba(15,23,42,.065);
     }
 
-    .content { padding:18px 22px 34px; }
+    .content { padding:18px var(--desktop-page-gutter) 34px; }
     .page-heading {
       align-items:center;
       gap:12px;
