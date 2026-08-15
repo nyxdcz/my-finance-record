@@ -15,13 +15,13 @@ const fail = message => errors.push(message);
 const warn = message => warnings.push(message);
 
 const requiredFiles = [
-  "index.html", "app.css", "dashboard-interactions.css", "ui-icon-alignment-v15-0-4.css", "liquid-glass-v15.css", "mobile-v14-0-23.css", "interaction-patterns.js", "offline.html", "manifest.webmanifest", "version.json", "sw.js",
+  "index.html", "app.css", "dashboard-interactions.css", "ui-icon-alignment-v15-0-5.css", "pwa-update-v15-0-5.js", "liquid-glass-v15.css", "mobile-v14-0-23.css", "interaction-patterns.js", "offline.html", "manifest.webmanifest", "version.json", "sw.js",
   "package.json", "package-lock.json", "README.md", "CHANGELOG.md", ".gitignore",
   ".github/workflows/quality-pages.yml", "vendor/supabase.min.js",
   "sync-config.js", "sync-config.example.js", "privacy-lock.js", "cloud-conflict-review.js", "cloud-conflict-resolution.js", "cloud-sync-lifecycle.js", "projects-calendar-v13.0.20.js", "projects-calendar-v13.0.20.css",
   "expense-screenshot-parser.js", "expense-screenshot-detect.js", "expense-screenshot-ai.js", "supabase/functions/detect-payment/index.ts", "AI_SCREENSHOT_DETECTOR_SETUP.md",
-  "Install_V15_0_4.command", "run_audit.sh", "eslint.config.js", "playwright.config.mjs",
-  "tests/validate-v15-0-4.mjs", "tests/validate-record-spending-v15-0-4.mjs", "tests/validate-safe-multidevice-sync.mjs", "tests/validate-expense-screenshot.mjs", "tests/expense-screenshot.spec.mjs", "tests/privacy-and-inputs.spec.mjs", "tests/check-maintainability.mjs"
+  "Install_V15_0_5.command", "run_audit.sh", "eslint.config.js", "playwright.config.mjs",
+  "tests/validate-v15-0-5.mjs", "tests/validate-pwa-updater-v15-0-5.mjs", "tests/validate-record-spending-v15-0-4.mjs", "tests/validate-safe-multidevice-sync.mjs", "tests/validate-expense-screenshot.mjs", "tests/expense-screenshot.spec.mjs", "tests/privacy-and-inputs.spec.mjs", "tests/check-maintainability.mjs"
 ];
 for (const file of requiredFiles) if (!exists(file)) fail(`Missing required file: ${file}`);
 
@@ -91,7 +91,7 @@ for (const match of worker.matchAll(/asset\("([^"]+)"\)/g)) {
 for (const assetPath of productionAssets) {
   if (!deployedByPages(assetPath)) fail(`GitHub Pages deploy omits production asset: ${assetPath}`);
 }
-if (!deploySources.has("ui-icon-alignment-v15-0-4.css")) fail("GitHub Pages must package ui-icon-alignment-v15-0-4.css");
+if (!deploySources.has("ui-icon-alignment-v15-0-5.css")) fail("GitHub Pages must package ui-icon-alignment-v15-0-5.css");
 
 let pkg = {}, lock = {}, version = {};
 try { pkg = JSON.parse(read("package.json")); } catch (error) { fail(`package.json is invalid JSON: ${error.message}`); }
@@ -107,9 +107,9 @@ const testTargets = [...String(pkg.scripts?.test || "").matchAll(/\bnode\s+(\S+)
 if (!testTargets.length) fail(`Test script target is missing: ${pkg.scripts?.test || "(not configured)"}`);
 for (const target of testTargets) if (!exists(target)) fail(`Test script target is missing: ${target}`);
 if (!String(pkg.engines?.node || "").includes("22")) warn(`Node engine is ${pkg.engines?.node || "not set"}; project validation expects Node 22+`);
-if (pkg.version !== "15.0.4") fail(`Expected current package version 15.0.4, found ${pkg.version || "(missing)"}`);
-if (!read("README.md").startsWith("# My Finance Records · V15.0.4")) fail("README release heading is not V15.0.4");
-if (!read("CHANGELOG.md").startsWith("## 15.0.4 · 2026-08-15")) fail("CHANGELOG latest entry is not V15.0.4");
+if (pkg.version !== "15.0.5") fail(`Expected current package version 15.0.5, found ${pkg.version || "(missing)"}`);
+if (!read("README.md").startsWith("# My Finance Records · V15.0.5")) fail("README release heading is not V15.0.5");
+if (!read("CHANGELOG.md").startsWith("## 15.0.5 · 2026-08-15")) fail("CHANGELOG latest entry is not V15.0.5");
 
 const syncConfig = read("sync-config.js");
 const syncConfigCode = syncConfig.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|\s)\/\/.*$/gm, "$1");
@@ -118,7 +118,7 @@ if (!/sb_publishable_|anon/i.test(syncConfigCode)) warn("sync-config.js does not
 if (/OPENAI_API_KEY\s*[:=]\s*["'][^"']+/i.test(syncConfigCode)) fail("sync-config.js must never contain an OpenAI API key");
 
 if (process.platform !== "win32") {
-  for (const file of ["Install_V15_0_4.command", "run_audit.sh"]) {
+  for (const file of ["Install_V15_0_5.command", "run_audit.sh"]) {
     if ((fs.statSync(path.join(root, file)).mode & 0o100) === 0) fail(`Executable entry point lost its user-executable bit: ${file}`);
   }
   const visit = directory => {
@@ -141,4 +141,4 @@ console.log(`Repository inspection: ${errors.length} error(s), ${warnings.length
 for (const message of errors) console.error(`ERROR: ${message}`);
 for (const message of warnings) console.warn(`WARN: ${message}`);
 if (errors.length) process.exit(1);
-console.log("Repository inspection passed: V15.0.4 release files, local paths, deploy paths, package metadata, permissions, and public sync configuration are consistent.");
+console.log("Repository inspection passed: V15.0.5 release files, local paths, deploy paths, package metadata, permissions, and public sync configuration are consistent.");

@@ -1,8 +1,8 @@
 "use strict";
-const APP_VERSION = "15.0.4";
+const APP_VERSION = "15.0.5";
 self.__FINANCE_APP_VERSION = APP_VERSION;
 // V15.0.4 UI alignment delivery refresh · forces installed PWAs to fetch the cascade-safe icon alignment rules while preserving finance and sync behavior.
-const CACHE_VERSION = "finance-v15-20260815-ui-align-r12";
+const CACHE_VERSION = "finance-v15-20260815-pwa-update-r13";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const DB_NAME = "simple-finance-project-records-v12-db";
@@ -18,9 +18,10 @@ const APP_SHELL = [
   asset("./version.json"),
   asset("./app.css?v=14.0.23"),
   asset("./dashboard-interactions.css?v=14.0.23"),
-  asset("./ui-icon-alignment-v15-0-4.css?v=15.0.4-ui3"),
+  asset("./ui-icon-alignment-v15-0-5.css?v=15.0.5-ui1"),
+  asset("./pwa-update-v15-0-5.js?v=15.0.5"),
   asset("./dashboard-interactions-core-v14-0-23.css"),
-  asset("./liquid-glass-v15.css?v=15.0.3"),
+  asset("./liquid-glass-v15.css?v=15.0.5"),
   asset("./mobile-v14-0-23.css?v=14.0.23"),
   asset("./interaction-patterns.js?v=14.0.23"),
   asset("./privacy-lock.js?v=14.0.23"),
@@ -29,7 +30,7 @@ const APP_SHELL = [
   asset("./cloud-conflict-review.js?v=14.0.23"),
   asset("./cloud-conflict-resolution.js?v=14.0.23"),
   asset("./cloud-sync-lifecycle.js?v=14.0.23"),
-  asset("./cloud-sync.js?v=15.0.4"),
+  asset("./cloud-sync.js?v=15.0.5"),
   asset("./account-ledger.js?v=15.0.4"),
   asset("./account-ledger.css?v=14.0.23"),
   asset("./budget-planning.js?v=15.0.4"),
@@ -42,7 +43,7 @@ const APP_SHELL = [
   asset("./reminders-alerts.css?v=14.0.23"),
   asset("./projects-calendar-v13.0.20.js?v=14.0.23"),
   asset("./projects-calendar-v13.0.20.css?v=14.0.23"),
-  asset("./sync-config.js?v=15.0.4"),
+  asset("./sync-config.js?v=15.0.5"),
   asset("./expense-screenshot-parser.js?v=15.0.3"),
   asset("./expense-screenshot-detect.js?v=15.0.3"),
   asset("./expense-screenshot-ai.js?v=15.0.3"),

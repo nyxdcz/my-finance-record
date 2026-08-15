@@ -1,3 +1,16 @@
+## 15.0.5 · 2026-08-15
+
+### Fixed
+- Released the UI delivery repair as a real app-version change so existing V15.0.4 clients detect and install the new service worker instead of treating cache-only revisions as unchanged.
+- Updated the service-worker registration URL to include both app version and shell cache generation.
+- Made the update check compare both `version` and `cacheVersion`.
+- Fixed App & About cache status, Clear app cache, and Repair offline app so stale V12–V15 Finance caches are recognized and removed.
+- Limited offline-app repair to this Finance app service-worker scope and preserved finance records and PDF packs.
+
+### Delivery
+- Rotated the PWA shell to `finance-v15-20260815-pwa-update-r13` and moved the final icon-alignment rules to a fresh V15.0.5 stylesheet URL.
+- Finance Schema 12, Cloud Schema V3, finance calculations, records, ledger behavior, and five-minute Cloud Sync cadence are unchanged.
+
 ## 15.0.4 · 2026-08-15
 
 ### Fixed

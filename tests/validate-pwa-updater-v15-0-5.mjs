@@ -1,0 +1,25 @@
+#!/usr/bin/env node
+import assert from "node:assert/strict";
+import fs from "node:fs";
+const index = fs.readFileSync("index.html", "utf8");
+const worker = fs.readFileSync("sw.js", "utf8");
+const updater = fs.readFileSync("pwa-update-v15-0-5.js", "utf8");
+const version = JSON.parse(fs.readFileSync("version.json", "utf8"));
+assert.equal(version.version, "15.0.5");
+assert.equal(version.cacheVersion, "finance-v15-20260815-pwa-update-r13");
+assert.match(index, /const APP_CACHE_VERSION = "finance-v15-20260815-pwa-update-r13";/);
+assert.match(index, /FinancePwaUpdate\.shellCacheName\(APP_CACHE_VERSION\)/);
+assert.match(index, /FinancePwaUpdate\.clearFinanceCaches\(\)/);
+assert.match(index, /registration\.scope === financeScope/);
+assert.match(index, /FinancePwaUpdate\.serviceWorkerUrl\(APP_VERSION, APP_CACHE_VERSION\)/);
+assert.match(index, /FinancePwaUpdate\.updateState\(remote, APP_VERSION, APP_CACHE_VERSION\)/);
+assert.doesNotMatch(index, /finance-v\(\?:12\|13\)/);
+assert.match(updater, /const FINANCE_CACHE_PATTERN = \/\^finance-v\\d\+-\//);
+assert.match(updater, /serviceWorkerUrl\(version, cacheVersion\)/);
+assert.match(updater, /cacheChanged:Boolean\(remote\?\.cacheVersion && remote\.cacheVersion !== cacheVersion\)/);
+assert.match(updater, /async clearFinanceCaches\(\)/);
+assert.match(worker, /const APP_VERSION = "15\.0\.5";/);
+assert.match(worker, /finance-v15-20260815-pwa-update-r13/);
+assert.match(worker, /pwa-update-v15-0-5\.js\?v=15\.0\.5/);
+assert.match(worker, /ui-icon-alignment-v15-0-5\.css\?v=15\.0\.5-ui1/);
+console.log("V15.0.5 PWA updater regression passed.");
