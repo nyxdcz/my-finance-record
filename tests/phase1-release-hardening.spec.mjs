@@ -55,7 +55,10 @@ test("signed-out Settings expose safe capabilities but hide finance backup acces
   const capabilities = await page.evaluate(() => window.FinancePrivacyLock.capabilities);
   expect(capabilities.help).toEqual(expect.arrayContaining(["[data-help-key]", "[data-section-help]"]));
   expect(capabilities.appMaintenance).toEqual(expect.arrayContaining(["#installPwaButton", "#checkUpdateButton", "#repairPwaButton", "#requestPersistenceButton"]));
-  expect(Object.values(capabilities).flat()).not.toEqual(expect.arrayContaining(["#importBackup", "label[for='importBackup']", "#exportBackup"]));
+  const allowed = Object.values(capabilities).flat();
+  for (const selector of ["#importBackup", "label[for='importBackup']", "#exportBackup", "#restoreV11BackupButton", "#downloadV11BackupButton"]) {
+    expect(allowed).not.toContain(selector);
+  }
 
   await page.evaluate(() => {
     if (typeof window.goToPage === "function") window.goToPage("settings", { historyMode:"none", smooth:false });
@@ -63,12 +66,15 @@ test("signed-out Settings expose safe capabilities but hide finance backup acces
   });
 
   const backupCard = page.locator("#importBackup").locator("xpath=ancestor::*[contains(concat(' ', normalize-space(@class), ' '), ' card ')][1]");
-  await expect(backupCard).toHaveAttribute("data-finance-private-settings", "");
-  await expect(backupCard).toBeHidden();
+  const migrationCard = page.locator("#restoreV11BackupButton").locator("xpath=ancestor::*[contains(concat(' ', normalize-space(@class), ' '), ' card ')][1]");
+  for (const card of [backupCard, migrationCard]) {
+    await expect(card).toHaveAttribute("data-finance-private-settings", "");
+    await expect(card).toBeHidden();
+  }
   await expect(page.locator(".finance-settings-privacy-note").first()).toContainText("backups");
 
   await page.evaluate(() => window.activateSettingsPanel?.("app", false));
   await expect(page.locator("#installPwaButton")).toBeVisible();
   await expect(page.locator("#requestPersistenceButton")).toBeVisible();
-  await expect(page.locator("[data-section-help], [data-help-key]").first()).toBeVisible();
+  await expect(page.locator("#settings [data-settings-panel='app'] [data-section-help], #settings [data-settings-panel='app'] [data-help-key]").first()).toBeVisible();
 });
