@@ -288,8 +288,10 @@ test("responsive sidebar hides collapsed Pin, keeps Insights available, and pres
   expect(activeContrast.ratio).toBeGreaterThanOrEqual(4.5);
   expect(activeContrast).toMatchObject({ color:"rgb(16, 42, 49)", background:"rgb(223, 244, 232)" });
   await expect(sidebar.locator(".nav-button.active .nav-icon")).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
-  await expect(sidebar.locator(".nav-icon-image")).toHaveCount(4);
-  await expect(insightsButton.locator(".nav-icon")).toHaveCount(0);
+  await expect(sidebar.locator(".nav-icon-image")).toHaveCount(5);
+  await expect(insightsButton.locator(".nav-icon")).toHaveCount(1);
+  await expect(insightsButton.locator(".nav-icon-image")).toHaveCSS("width", "20px");
+  await expect(insightsButton.locator(".nav-icon-image")).toHaveCSS("height", "20px");
   await expect(insightsButton).toBeVisible();
 
   const dashboardLabel = sidebar.locator('.nav-button[data-page="dashboard"] .nav-label');
