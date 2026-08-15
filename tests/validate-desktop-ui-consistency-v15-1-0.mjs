@@ -17,7 +17,7 @@ const version = JSON.parse(read("version.json"));
 assert.equal(version.version, "15.1.0");
 assert.equal(version.schemaVersion, 12);
 assert.equal(version.cloudSchemaVersion, 3);
-assert.equal(version.cacheVersion, "finance-v15-20260815-month-nav-borderless-r23");
+assert.equal(version.cacheVersion, "finance-v15-20260815-finance-marquee-r24");
 assert.match(app, /--workspace-card-radius:\s*9px/);
 assert.match(app, /--workspace-control-height:\s*38px/);
 assert.match(app, /--workspace-compact-control-height:\s*35px/);
@@ -49,7 +49,7 @@ for (const pin of [
   "projects-calendar-v13.0.20.css?v=15.1.0-desktop1",
   "sync-config.js?v=15.1.0-desktop1"
 ]) assert.ok(index.includes(pin), `index missing ${pin}`);
-assert.ok(sw.includes("finance-v15-20260815-month-nav-borderless-r23"));
+assert.ok(sw.includes("finance-v15-20260815-finance-marquee-r24"));
 for (const pin of [
   "app.css?v=15.1.0-desktop1",
   "dashboard-interactions.css?v=15.1.0-desktop1",

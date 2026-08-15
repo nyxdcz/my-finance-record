@@ -10,8 +10,8 @@
   "profileArchitectureVersion": 1,
   "encryptionVersion": 1,
   "authSecurityVersion": 1,
-  "cacheVersion": "finance-v15-20260815-month-nav-borderless-r23",
+  "cacheVersion": "finance-v15-20260815-finance-marquee-r24",
   "released": "2026-08-15",
   "name": "Black Canvas UI",
-  "notes": "Black Canvas UI desktop consistency plus a borderless top month-navigation shell: removes the visible surrounding line around Previous, Month, Next, and Current while preserving 38px toolbar geometry, focus states, mobile behavior, Finance Schema 12, Cloud Schema V3, records, calculations, and sync behavior."
+  "notes": "Black Canvas UI with a source-level Finance marquee alignment delivery refresh: Income and Paid Expenses now use the same tabs-left, weekly-marquee-right row as Budget & Expenses while preserving 43px desktop/tablet geometry, phone marquee hiding, Finance Schema 12, Cloud Schema V3, records, calculations, and sync behavior."
 }
