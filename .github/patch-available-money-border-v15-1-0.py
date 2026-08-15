@@ -4,6 +4,8 @@ OLD_CACHE = "finance-v15-20260815-spend-label-white-r17"
 NEW_CACHE = "finance-v15-20260815-account-border-r18"
 OLD_CSS = "black-canvas-v15-1-0.css?v=15.1.0-spend1"
 NEW_CSS = "black-canvas-v15-1-0.css?v=15.1.0-accountborder1"
+OLD_CSS_REGEX = r"black-canvas-v15-1-0\.css\?v=15\.1\.0-spend1"
+NEW_CSS_REGEX = r"black-canvas-v15-1-0\.css\?v=15\.1\.0-accountborder1"
 
 # Scope the visual change to the six Available money account cards only.
 css_path = Path("black-canvas-v15-1-0.css")
@@ -25,7 +27,7 @@ for filename in ["index.html", "sw.js", "version.json"]:
 # Keep inherited regression assertions aligned with the new cache/style pin.
 for path in Path("tests").glob("*.mjs"):
     text = path.read_text()
-    changed = text.replace(OLD_CACHE, NEW_CACHE).replace(OLD_CSS, NEW_CSS)
+    changed = text.replace(OLD_CACHE, NEW_CACHE).replace(OLD_CSS, NEW_CSS).replace(OLD_CSS_REGEX, NEW_CSS_REGEX)
     if changed != text:
         path.write_text(changed)
 
