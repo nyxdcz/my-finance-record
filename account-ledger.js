@@ -220,7 +220,12 @@
     if (targetBalance != null && Number.isFinite(Number(targetBalance)) && actual !== roundMoney(targetBalance)) {
       console.warn(`Account ledger refresh mismatch for ${account}: expected ${roundMoney(targetBalance)}, calculated ${actual}`);
     }
-    renderAll(false);
+    try {
+      renderAll(false);
+    } catch (error) {
+      console.error("Finance data was saved but the full interface refresh failed.", error);
+      try { renderMoneyPage(); } catch (refreshError) { console.error("Money workspace refresh also failed.", refreshError); }
+    }
     try { window.dispatchEvent(new CustomEvent("finance:account-balance-refreshed", { detail:{ account, balance:actual } })); } catch (error) {}
     return actual;
   }

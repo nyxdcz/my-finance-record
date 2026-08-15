@@ -39,8 +39,8 @@ const firstPull = cloud.indexOf("await pullChanges();", syncStart);
 const pushLoop = cloud.indexOf("while (Object.values(pending)", syncStart);
 assert(syncStart >= 0 && firstPull > syncStart && pushLoop > firstPull, "sync must pull current cloud revisions before queued device uploads");
 assert(cloud.includes("5*60*1000"), "five-minute routine sync cadence changed");
-assert(worker.includes('finance-v15-20260815-safe-multidevice-sync-r7'), "PWA cache was not rotated for the sync repair");
-assert(worker.includes('asset("./cloud-sync.js?v=15.0.3")'), "PWA shell does not pin the repaired cloud sync client");
+assert(worker.includes('finance-v15-20260815-record-spending-r8'), "PWA cache was not rotated for the sync repair");
+assert(worker.includes('asset("./cloud-sync.js?v=15.0.4")'), "PWA shell does not pin the repaired cloud sync client");
 assert(worker.includes('new Request(url, { cache:"reload" })'), "PWA precache no longer bypasses stale HTTP cache");
 
 if (failures.length) {
