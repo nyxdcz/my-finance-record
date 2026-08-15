@@ -1,0 +1,8 @@
+/* My Finance Records · V15.2.0 desktop UX consistency */
+@media (min-width:851px){
+  .cloud-sync-technical-details{margin-top:8px;padding-top:8px;border-top:1px solid var(--line);font-size:.72rem;color:var(--muted)}
+  .cloud-sync-technical-details summary{cursor:pointer;font-weight:700;color:var(--text)}
+  .cloud-sync-technical-details code{display:block;margin-top:6px;max-height:88px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;font:inherit}
+  button[aria-busy="true"]{cursor:progress}
+  .productivity-text-dialog{width:min(440px,calc(100vw - 48px))}
+}

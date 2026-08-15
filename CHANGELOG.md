@@ -1,3 +1,8 @@
+## 15.2.0 · 2026-08-16
+- Desktop UX consistency: month changes now explicitly report recurring-item checks, filter changes clearly report when an active expense selection is reset, Income/Account forms focus and explain the first invalid field, and harmless filter clears no longer create extra toasts.
+- Replaced native Productivity destructive confirmations and text prompts with app dialogs, added per-action busy states for long Settings operations, exposed Search keyboard shortcuts, and simplified Cloud Sync error copy with optional technical details.
+- Released as V15.2.0 with PWA cache `finance-v15-20260816-desktop-ux-r29`. Finance Schema 12, Cloud Schema V3, saved records, calculations, account balances, budgets, projects, five-minute Cloud Sync cadence, and phone layout remain unchanged.
+
 ## 15.1.0 · 2026-08-15
 - Desktop UI Phase 1: simplified desktop hierarchy, report export menu, compact Income summary, calmer Calendar/Settings/status surfaces, and r28 PWA delivery while leaving phone layout and finance/sync behavior unchanged.
 - Rounded Finance period headers and expense rows to 9px so the First half, Second half, Other expenses, and individual expense surfaces match the compact Black Canvas card language.

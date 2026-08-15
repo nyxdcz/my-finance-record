@@ -3,7 +3,7 @@
    Safe multi-device sync refreshes cloud revisions before upload, preserves concurrent device edits,
    merges non-overlapping changes, and pauses overlapping changes for explicit review. */
 (function financeCloudSyncV3Bootstrap() {
-  const APP_VERSION_FALLBACK = "15.1.0";
+  const APP_VERSION_FALLBACK = "15.2.0";
   const APP_VERSION_CODE = 130000;
   const CLOUD_SCHEMA_VERSION = 3;
   const CORE_SCHEMA_VERSION = 12;
@@ -589,10 +589,11 @@
     if (!activeDetail) {
       if (conflictsNow > 0) activeDetail = `${conflictsNow} record conflict${conflictsNow === 1 ? "" : "s"} preserved for review. Neither version will be silently discarded.`;
       else if (pendingErrors > 0) activeDetail = `${pendingErrors} pending record change${pendingErrors === 1 ? "" : "s"} failed to sync.`;
-      else if (state.lastError) activeDetail = `Sync issue: ${state.lastError}`;
+      else if (state.lastError) activeDetail = "Cloud Sync could not finish. Your local changes are safe. Check your connection, then try Sync now or review the issue.";
       else activeDetail = state.status || (label === "Synced" ? "This device matches the latest cloud state." : label === "Cloud off" ? "Cloud sync is not configured on this device." : "Cloud is checked before this device can upload changes.");
     }
     if (detailNode) detailNode.textContent=activeDetail;
+    const technicalDetails=document.getElementById("cloudToolbarTechnicalDetails"),technicalError=document.getElementById("cloudToolbarTechnicalError"); if(technicalDetails){technicalDetails.hidden=!state.lastError;if(technicalError)technicalError.textContent=state.lastError||"";}
     if (lastNode) lastNode.textContent=formatDateTime(state.lastSyncAt);
     if (syncButton) syncButton.disabled=syncing || !cloudUser || !navigator.onLine || !configStatus().ok;
     if (fixButton) {
