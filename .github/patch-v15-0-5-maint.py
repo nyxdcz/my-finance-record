@@ -48,21 +48,76 @@ if '"pwa-update-v15-0-5.js"' not in s:
     s = s.replace('"ui-icon-alignment-v15-0-5.css", "liquid-glass-v15.css"', '"ui-icon-alignment-v15-0-5.css", "pwa-update-v15-0-5.js", "liquid-glass-v15.css"')
 p.write_text(s)
 
-p = root / 'tests/validate-pwa-updater-v15-0-5.mjs'
-s = p.read_text()
-s = s.replace('const worker = fs.readFileSync("sw.js", "utf8");', 'const worker = fs.readFileSync("sw.js", "utf8");\nconst updater = fs.readFileSync("pwa-update-v15-0-5.js", "utf8");')
-s = s.replace('assert.match(index, /const FINANCE_CACHE_PATTERN = \\/\\\\^finance-v\\\\\\\\d\\\\\\+-\\//);', 'assert.match(updater, /const FINANCE_CACHE_PATTERN = \\/\\^finance-v\\\\d\\+-\\//);')
-s = s.replace('assert.match(index, /names\\.includes\\(`\\\\$\\\\{APP_CACHE_VERSION\\\\}-shell`\\)/);', 'assert.match(index, /FinancePwaUpdate\\.shellCacheName\\(APP_CACHE_VERSION\\)/);')
-s = s.replace('assert.match(index, /deleteFinanceAppCaches\\(\\)/);', 'assert.match(index, /FinancePwaUpdate\\.clearFinanceCaches\\(\\)/);')
-s = s.replace('assert.match(index, /sw\\.js\\?v=\\\\$\\\\{encodeURIComponent\\(APP_VERSION\\)\\\\}&cache=\\\\$\\\\{encodeURIComponent\\(APP_CACHE_VERSION\\)\\\\}/);', 'assert.match(index, /FinancePwaUpdate\\.serviceWorkerUrl\\(APP_VERSION, APP_CACHE_VERSION\\)/);')
-s = s.replace('assert.match(index, /const cacheChanged=Boolean\\(remote\\?\\.cacheVersion&&remote\\.cacheVersion!==APP_CACHE_VERSION\\)/);', 'assert.match(index, /FinancePwaUpdate\\.updateState\\(remote, APP_VERSION, APP_CACHE_VERSION\\)/);')
-s += '\nassert.match(updater, /async clearFinanceCaches\\(\\)/);\nassert.match(updater, /serviceWorkerUrl\\(version, cacheVersion\\)/);\n'
-p.write_text(s)
+(root / 'tests/validate-pwa-updater-v15-0-5.mjs').write_text(r'''#!/usr/bin/env node
+import assert from "node:assert/strict";
+import fs from "node:fs";
+const index = fs.readFileSync("index.html", "utf8");
+const worker = fs.readFileSync("sw.js", "utf8");
+const updater = fs.readFileSync("pwa-update-v15-0-5.js", "utf8");
+const version = JSON.parse(fs.readFileSync("version.json", "utf8"));
+assert.equal(version.version, "15.0.5");
+assert.equal(version.cacheVersion, "finance-v15-20260815-pwa-update-r13");
+assert.match(index, /const APP_CACHE_VERSION = "finance-v15-20260815-pwa-update-r13";/);
+assert.match(index, /FinancePwaUpdate\.shellCacheName\(APP_CACHE_VERSION\)/);
+assert.match(index, /FinancePwaUpdate\.clearFinanceCaches\(\)/);
+assert.match(index, /registration\.scope === financeScope/);
+assert.match(index, /FinancePwaUpdate\.serviceWorkerUrl\(APP_VERSION, APP_CACHE_VERSION\)/);
+assert.match(index, /FinancePwaUpdate\.updateState\(remote, APP_VERSION, APP_CACHE_VERSION\)/);
+assert.doesNotMatch(index, /finance-v\(\?:12\|13\)/);
+assert.match(updater, /const FINANCE_CACHE_PATTERN = \/\^finance-v\\d\+-\//);
+assert.match(updater, /serviceWorkerUrl\(version, cacheVersion\)/);
+assert.match(updater, /cacheChanged:Boolean\(remote\?\.cacheVersion && remote\.cacheVersion !== cacheVersion\)/);
+assert.match(updater, /async clearFinanceCaches\(\)/);
+assert.match(worker, /const APP_VERSION = "15\.0\.5";/);
+assert.match(worker, /finance-v15-20260815-pwa-update-r13/);
+assert.match(worker, /pwa-update-v15-0-5\.js\?v=15\.0\.5/);
+assert.match(worker, /ui-icon-alignment-v15-0-5\.css\?v=15\.0\.5-ui1/);
+console.log("V15.0.5 PWA updater regression passed.");
+''')
 
-p = root / 'tests/validate-v15-0-5.mjs'
-s = p.read_text()
-s = s.replace('const worker = read("sw.js");', 'const worker = read("sw.js");\nconst updater = read("pwa-update-v15-0-5.js");')
-s = s.replace('assert.match(worker,/const APP_VERSION = "15\\\\.0\\\\.5";/);', 'assert.match(worker,/const APP_VERSION = "15\\\\.0\\\\.5";/);\nassert.match(updater,/finance-v\\\\d\\+-/);')
-p.write_text(s)
+(root / 'tests/validate-v15-0-5.mjs').write_text(r'''#!/usr/bin/env node
+import assert from "node:assert/strict";
+import fs from "node:fs";
+const read = file => fs.readFileSync(file, "utf8");
+const pkg = JSON.parse(read("package.json"));
+const lock = JSON.parse(read("package-lock.json"));
+const version = JSON.parse(read("version.json"));
+const index = read("index.html");
+const uiCss = read("ui-icon-alignment-v15-0-5.css");
+const worker = read("sw.js");
+const updater = read("pwa-update-v15-0-5.js");
+const cloud = read("cloud-sync.js");
+const runtime = read("sync-config.js");
+const readme = read("README.md");
+const changelog = read("CHANGELOG.md");
+const installer = read("Install_V15_0_5.command");
+assert.equal(pkg.version,"15.0.5");
+assert.equal(lock.version,"15.0.5");
+assert.equal(lock.packages?.[""]?.version,"15.0.5");
+assert.equal(version.version,"15.0.5");
+assert.equal(version.schemaVersion,12);
+assert.equal(version.cloudSchemaVersion,3);
+assert.equal(version.name,"PWA Update Recovery");
+assert.equal(version.cacheVersion,"finance-v15-20260815-pwa-update-r13");
+assert.match(index,/<title>My Finance Records · V15\.0\.5<\/title>/);
+assert.match(index,/const APP_VERSION = "15\.0\.5";/);
+assert.match(index,/const APP_RELEASE_NAME = "PWA Update Recovery";/);
+assert.match(index,/ui-icon-alignment-v15-0-5\.css\?v=15\.0\.5-ui1/);
+assert.match(index,/pwa-update-v15-0-5\.js\?v=15\.0\.5/);
+assert.ok(index.indexOf('dashboard-interactions.css?v=14.0.23') < index.indexOf('ui-icon-alignment-v15-0-5.css?v=15.0.5-ui1'));
+assert.match(uiCss,/html body #buildBadge::before/);
+assert.match(uiCss,/content:none !important/);
+assert.match(uiCss,/gap:4px !important/);
+assert.match(updater,/FINANCE_CACHE_PATTERN/);
+assert.match(worker,/const APP_VERSION = "15\.0\.5";/);
+assert.match(worker,/finance-v15-20260815-pwa-update-r13/);
+assert.match(cloud,/const APP_VERSION_FALLBACK = "15\.0\.5";/);
+assert.match(runtime,/const VERSION = "15\.0\.5";/);
+assert.match(runtime,/const RELEASE_NAME = "PWA Update Recovery";/);
+assert.ok(readme.startsWith("# My Finance Records · V15.0.5"));
+assert.ok(changelog.startsWith("## 15.0.5 · 2026-08-15"));
+assert.match(installer,/V15\.0\.5/);
+console.log("V15.0.5 release validation passed.");
+''')
 
 print('PWA updater helper extracted from index.html')
