@@ -46,6 +46,7 @@
   <link rel="stylesheet" href="./dashboard-interactions.css?v=15.1.0-desktop3">
   <link rel="stylesheet" href="./ui-icon-alignment-v15-0-5.css?v=15.1.0-ui3">
   <link rel="stylesheet" href="./black-canvas-v15-1-0.css?v=15.1.0-light1">
+  <link rel="stylesheet" href="./desktop-ui-phase1-v15-1-0.css?v=15.1.0-phase1">
   <script src="./pwa-update-v15-0-5.js?v=15.1.0"></script>
 </head>
 <body class="finance-signed-out finance-auth-pending">
@@ -588,7 +589,7 @@
           <div class="page-heading">
             <div>
               <h2 id="paid-expenses-title">Paid expenses</h2>
-              <p>Expenses marked as paid are moved here. Marking an item paid does not change the account balance automatically.</p>
+              <p>Review expenses already marked as paid.</p>
             </div>
           </div>
 
@@ -599,7 +600,9 @@
             <article class="card kpi-card"><div class="kpi-label">Payment progress</div><div class="kpi-value" id="paidRate">27%</div></article>
           </div>
 
-          <article class="card collapsible-section" id="paidExpensesSection" data-collapse-key="paid-expenses" style="margin-top:16px">
+          <p class="paid-expenses-info-note">Marking an item paid moves it to this list; it does not automatically change the account balance.</p>
+
+          <article class="card collapsible-section" id="paidExpensesSection" data-collapse-key="paid-expenses" style="margin-top:10px">
             <div class="card-header collapsible-header">
               <div><h3>Paid expense records</h3><p>Review, edit, or move paid expenses back to unpaid</p></div>
               <button class="collapse-toggle" type="button" data-collapse-toggle="paid-expenses" aria-expanded="true" aria-controls="paidExpenseList" title="Collapse Paid expenses"><span class="collapse-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="m6 9 6 6 6-6"/></svg></span><span class="sr-only">Collapse Paid expenses</span></button>
@@ -809,13 +812,7 @@
             <div class="card-header">
               <div><h3>Export monthly report</h3><p>CSV for spreadsheets, JSON for backup, or print to save a PDF</p></div>
             </div>
-            <div class="toolbar" style="margin-bottom:0">
-              <button class="button button-primary" type="button" onclick="window.print()">Print / Save PDF</button>
-              <button class="button button-secondary" id="exportMonthlyReportCsv">Export report CSV</button>
-              <button class="button button-secondary" id="exportMonthlyReportJson">Export report JSON</button>
-              <button class="button button-secondary" id="exportIncomeReportCsv">Export income CSV</button><button class="button button-secondary" id="exportExpensesCsv">Export all expenses CSV</button>
-              <button class="button button-secondary" id="exportProjectsCsv">Export all projects CSV</button>
-            </div>
+            <div class="toolbar report-export-actions" style="margin-bottom:0"><button class="button button-primary" type="button" onclick="window.print()">Print / Save PDF</button><div class="overflow-menu report-export-menu"><button class="button button-secondary overflow-menu-trigger" type="button" aria-haspopup="menu" aria-controls="reportExportMenuPanel" aria-expanded="false">Export <span aria-hidden="true">▾</span></button><div class="record-more-panel report-export-menu-panel" id="reportExportMenuPanel" role="menu" aria-label="Export report" hidden><button id="exportMonthlyReportCsv" type="button" role="menuitem">Monthly report CSV</button><button id="exportMonthlyReportJson" type="button" role="menuitem">Monthly report JSON</button><button id="exportIncomeReportCsv" type="button" role="menuitem">Income CSV</button><button id="exportExpensesCsv" type="button" role="menuitem">All expenses CSV</button><button id="exportProjectsCsv" type="button" role="menuitem">All projects CSV</button></div></div></div>
           </article>
         </section>
 
@@ -860,7 +857,7 @@
                 <button class="card settings-status-card" type="button" data-settings-status="calendar" data-settings-open="calendar" aria-label="Open Work and Calendar settings"><span class="settings-status-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M7 3v4m10-4v4M3 10h18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><span class="settings-status-copy"><span>Work &amp; Calendar</span><strong id="settingsOverviewCalendarStatus">Checking schedule</strong><small id="settingsOverviewCalendarText">Work and project calendar defaults.</small></span><span class="settings-state-chip neutral" id="settingsOverviewCalendarChip">Ready</span><span class="settings-row-arrow" aria-hidden="true">›</span></button>
                 <button class="card settings-status-card" type="button" data-settings-status="profiles" data-settings-open="profiles" aria-label="Open Profile and Security settings"><span class="settings-status-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 21c.8-4.2 3.5-6 8-6s7.2 1.8 8 6" fill="none" stroke="currentColor" stroke-width="2"/></svg></span><span class="settings-status-copy"><span>Profile &amp; Security</span><strong id="settingsOverviewProfileStatus">Loading profile</strong><small id="settingsOverviewProfileText">Profile and protection status.</small></span><span class="settings-state-chip neutral" id="settingsOverviewProfileChip">Checking</span><span class="settings-row-arrow" aria-hidden="true">›</span></button>
                 <button class="card settings-status-card" type="button" data-settings-status="sync" data-settings-open="sync" aria-label="Open Sync and Backup settings"><span class="settings-status-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 18a5 5 0 0 1 .4-10A6 6 0 0 1 19 10.5 3.5 3.5 0 0 1 18.5 18H7z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9 13l3-3 3 3M12 10v7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="settings-status-copy"><span>Sync &amp; Backup</span><strong id="settingsOverviewSyncStatus">Checking storage</strong><small id="settingsOverviewSyncText">Cloud connection and backup status.</small></span><span class="settings-state-chip neutral" id="settingsOverviewSyncChip">Checking</span><span class="settings-row-arrow" aria-hidden="true">›</span></button>
-                <button class="card settings-status-card" type="button" data-settings-status="app" data-settings-open="app" aria-label="Open App and About settings"><span class="settings-status-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9 18h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><span class="settings-status-copy"><span>App &amp; About</span><strong id="settingsOverviewAppStatus">Version 15.0.3</strong><small id="settingsOverviewAppText">Installation, notifications, and app information.</small></span><span class="settings-state-chip success" id="settingsOverviewAppChip">Current</span><span class="settings-row-arrow" aria-hidden="true">›</span></button>
+                <button class="card settings-status-card" type="button" data-settings-status="app" data-settings-open="app" aria-label="Open App and About settings"><span class="settings-status-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9 18h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><span class="settings-status-copy"><span>App &amp; About</span><strong id="settingsOverviewAppStatus">Version 15.1.0</strong><small id="settingsOverviewAppText">Installation, notifications, and app information.</small></span><span class="settings-state-chip success" id="settingsOverviewAppChip">Current</span><span class="settings-row-arrow" aria-hidden="true">›</span></button>
               </div>
             </section>
             <section class="settings-panel" id="settings-panel-accounts" role="tabpanel" aria-labelledby="settings-tab-accounts" data-settings-panel="accounts" hidden></section>
@@ -886,12 +883,17 @@
 
               <article class="card cloud-config-card" id="cloudConfigCard">
                 <div class="card-header"><div><h3>Advanced cloud connection</h3><p>Technical setup for your private cloud project</p></div><span class="v12-chip warning" id="cloudConfigStatusChip">Setup required</span></div>
+                <details class="advanced-settings-disclosure">
+                  <summary><span>Connection details</span><small>Supabase URL and publishable key</small></summary>
+                  <div class="advanced-settings-content">
                 <div class="cloud-config-grid">
                   <div class="field"><label for="cloudConfigUrl">Supabase project URL</label><input class="input" id="cloudConfigUrl" inputmode="url" autocomplete="off" placeholder="https://project-ref.supabase.co"></div>
                   <div class="field"><label for="cloudConfigKey">Publishable key</label><input class="input" id="cloudConfigKey" type="password" autocomplete="off" placeholder="sb_publishable_..."></div>
                 </div>
                 <div class="v12-actions"><button class="button button-primary" id="saveCloudConfig" type="button">Save on this device</button><button class="button button-secondary" id="clearCloudConfig" type="button">Clear device configuration</button></div>
                 <p class="v12-help">A hosted `sync-config.js` can configure both devices automatically. Secret and service-role keys are rejected and must never be placed in this PWA.</p>
+                  </div>
+                </details>
               </article>
 
               <article class="card" id="cloudDisconnectedSection" hidden>
@@ -8198,7 +8200,7 @@
     const APP_VERSION = "15.1.0";
     const APP_RELEASE_NAME = "Black Canvas UI";
     const APP_RELEASE_DATE = "August 15, 2026";
-    const APP_CACHE_VERSION = "finance-v15-20260815-desktop-consistency-r27";
+    const APP_CACHE_VERSION = "finance-v15-20260815-desktop-ui-phase1-r28";
 
     function synchronizeVersionDisplay() {
       document.title = `My Finance Records · V${APP_VERSION}`;

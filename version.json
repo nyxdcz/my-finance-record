@@ -10,8 +10,8 @@
   "profileArchitectureVersion": 1,
   "encryptionVersion": 1,
   "authSecurityVersion": 1,
-  "cacheVersion": "finance-v15-20260815-desktop-consistency-r27",
+  "cacheVersion": "finance-v15-20260815-desktop-ui-phase1-r28",
   "released": "2026-08-15",
   "name": "Black Canvas UI",
-  "notes": "Desktop UI consistency refresh: unified 64px header and sticky offsets, Finance record density, dialog and Settings control heights, 32px Project row actions, 35px Budget planner actions, and restored the Insights sidebar icon while preserving Light/Dark themes, mobile-specific layout, Finance Schema 12, Cloud Schema V3, records, calculations, and sync behavior."
+  "notes": "Desktop UI Phase 1: clearer header/workspace hierarchy, compact Income KPIs, calmer Dashboard and Finance surfaces, consolidated Report exports, simplified Calendar status color, contextual Paid Expenses guidance, progressive disclosure for advanced cloud connection fields, consistent desktop controls/statuses/modals/empty states/toasts, and ultra-wide Settings constraints. Phone layout, Finance Schema 12, Cloud Schema V3, records, calculations, and sync behavior remain unchanged."
 }

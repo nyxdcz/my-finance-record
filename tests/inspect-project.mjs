@@ -15,7 +15,7 @@ const fail = message => errors.push(message);
 const warn = message => warnings.push(message);
 
 const requiredFiles = [
-  "index.html", "app.css", "dashboard-interactions.css", "ui-icon-alignment-v15-0-5.css", "black-canvas-v15-1-0.css", "pwa-update-v15-0-5.js", "liquid-glass-v15.css", "mobile-v14-0-23.css", "interaction-patterns.js", "offline.html", "manifest.webmanifest", "version.json", "sw.js",
+  "index.html", "app.css", "dashboard-interactions.css", "ui-icon-alignment-v15-0-5.css", "black-canvas-v15-1-0.css", "desktop-ui-phase1-v15-1-0.css", "pwa-update-v15-0-5.js", "liquid-glass-v15.css", "mobile-v14-0-23.css", "interaction-patterns.js", "offline.html", "manifest.webmanifest", "version.json", "sw.js",
   "package.json", "package-lock.json", "README.md", "CHANGELOG.md", ".gitignore",
   ".github/workflows/quality-pages.yml", "vendor/supabase.min.js",
   "sync-config.js", "sync-config.example.js", "privacy-lock.js", "cloud-conflict-review.js", "cloud-conflict-resolution.js", "cloud-sync-lifecycle.js", "projects-calendar-v13.0.20.js", "projects-calendar-v13.0.20.css",
@@ -93,6 +93,7 @@ for (const assetPath of productionAssets) {
 }
 if (!deploySources.has("ui-icon-alignment-v15-0-5.css")) fail("GitHub Pages must package ui-icon-alignment-v15-0-5.css");
 if (!deploySources.has("black-canvas-v15-1-0.css")) fail("GitHub Pages must package black-canvas-v15-1-0.css");
+if (!deploySources.has("desktop-ui-phase1-v15-1-0.css")) fail("GitHub Pages must package desktop-ui-phase1-v15-1-0.css");
 
 let pkg = {}, lock = {}, version = {};
 try { pkg = JSON.parse(read("package.json")); } catch (error) { fail(`package.json is invalid JSON: ${error.message}`); }

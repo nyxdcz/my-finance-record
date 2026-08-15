@@ -1,4 +1,5 @@
 ## 15.1.0 · 2026-08-15
+- Desktop UI Phase 1: simplified desktop hierarchy, report export menu, compact Income summary, calmer Calendar/Settings/status surfaces, and r28 PWA delivery while leaving phone layout and finance/sync behavior unchanged.
 - Rounded Finance period headers and expense rows to 9px so the First half, Second half, Other expenses, and individual expense surfaces match the compact Black Canvas card language.
 - Normalized desktop topbar controls to the 38px Synced reference while preserving the existing 44px mobile touch targets.
 
