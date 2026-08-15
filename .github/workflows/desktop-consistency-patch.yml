@@ -1,0 +1,158 @@
+name: Desktop consistency patch
+
+on:
+  push:
+    branches:
+      - fix/desktop-consistency-icons
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/desktop-consistency-icons
+          fetch-depth: 0
+      - name: Apply approved desktop consistency changes
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+
+          def replace(path, old, new, expected=None):
+              p = Path(path)
+              text = p.read_text()
+              count = text.count(old)
+              if expected is not None and count != expected:
+                  raise SystemExit(f"{path}: expected {expected} occurrence(s), found {count}: {old[:90]!r}")
+              if count == 0:
+                  raise SystemExit(f"{path}: replacement target missing: {old[:90]!r}")
+              p.write_text(text.replace(old, new))
+
+          # Desktop header + sticky geometry.
+          replace('app.css', '--desktop-header-height: 72px;', '--desktop-header-height: 64px;', 1)
+          replace('app.css', '.dashboard-view .topbar { min-height: 72px; padding-top: 12px; padding-bottom: 12px; }', '.dashboard-view .topbar { min-height: var(--desktop-header-height); padding-top: 8px; padding-bottom: 8px; }', 1)
+          replace('app.css', '    .workspace-switcher {\n      position:sticky;\n      top:71px;', '    .workspace-switcher {\n      position:sticky;\n      top:var(--desktop-header-height);', 1)
+          replace('app.css', '#reports .report-section-nav { top:71px; margin-bottom:8px; padding:5px; }', '#reports .report-section-nav { top:var(--desktop-header-height); margin-bottom:8px; padding:5px; }', 1)
+          replace('app.css', '#settings > .settings-navigation {\n      grid-column:1;\n      position:sticky;\n      top:74px;', '#settings > .settings-navigation {\n      grid-column:1;\n      position:sticky;\n      top:var(--desktop-header-height);', 1)
+
+          # Shared page-heading rhythm.
+          replace('app.css', '#income .page-heading { margin-bottom:10px; }', '#income .page-heading { margin-bottom:12px; }', 1)
+
+          # Finance record density.
+          replace('app.css', '.income-record-row { min-height:66px; padding-top:9px; padding-bottom:9px; }', '.income-record-row { min-height:0; padding:8px 13px; }', 1)
+          replace('app.css', '#money .record-row { padding-top:7px; padding-bottom:7px; }', '#money .record-row { padding:8px 13px; }\n    #paid-expenses .record-row { padding:8px 13px; }', 1)
+
+          # Shared desktop dialog rhythm.
+          replace('app.css', '#incomeDialog .modal-header, #incomeDialog .modal-footer { padding:12px 14px; }', '#incomeDialog .modal-header, #incomeDialog .modal-footer { padding:9px 12px; }', 1)
+          replace('app.css', '#incomeDialog .modal-body { padding:13px 14px; }', '#incomeDialog .modal-body { padding:10px 12px; }', 1)
+          replace('app.css', '#expenseDialog .modal-header, #expenseDialog .modal-footer { padding:12px 14px; }', '#expenseDialog .modal-header, #expenseDialog .modal-footer { padding:9px 12px; }', 1)
+          replace('app.css', '#expenseDialog .modal-body { padding:13px 14px; }', '#expenseDialog .modal-body { padding:10px 12px; }', 1)
+          replace('app.css', '      height:42px;\n      min-height:42px;\n      padding:8px 10px;', '      height:38px;\n      min-height:38px;\n      padding:7px 10px;', 1)
+
+          # Settings desktop control-height normalization, preserving checkbox/toggle row height.
+          replace('app.css', '#settings .savings-settings-grid > .field .select,\n    #settings .savings-setting-check { width:100%; min-height:40px; height:40px; box-sizing:border-box; }', '#settings .savings-settings-grid > .field .select { width:100%; min-height:38px; height:38px; box-sizing:border-box; }\n    #settings .savings-setting-check { width:100%; min-height:40px; height:40px; box-sizing:border-box; }', 1)
+          replace('app.css', '#settings .salary-work-settings-grid .input,\n    #settings .salary-work-settings-grid .select { width:100%; min-height:42px; height:42px; box-sizing:border-box; }', '#settings .salary-work-settings-grid .input,\n    #settings .salary-work-settings-grid .select { width:100%; min-height:38px; height:38px; box-sizing:border-box; }', 1)
+          replace('app.css', '#settings-panel-profiles .profile-sharing-card .input,\n    #settings-panel-profiles .profile-sharing-card .select,\n    #settings-panel-profiles .profile-sharing-card > .button { min-height:40px; height:40px; box-sizing:border-box; }', '#settings-panel-profiles .profile-sharing-card .input,\n    #settings-panel-profiles .profile-sharing-card .select,\n    #settings-panel-profiles .profile-sharing-card > .button { min-height:38px; height:38px; box-sizing:border-box; }', 1)
+
+          # Work compact action size.
+          text = Path('app.css').read_text()
+          old = '.project-row-actions .project-compact-action { min-width:0; min-height:30px; height:30px;'
+          if text.count(old) != 1:
+              raise SystemExit(f'app.css: expected first project action contract once, got {text.count(old)}')
+          text = text.replace(old, '.project-row-actions .project-compact-action { min-width:0; min-height:32px; height:32px;', 1)
+          old2 = '#projects .project-row-actions .project-compact-action { min-height:30px; height:30px;'
+          if text.count(old2) != 1:
+              raise SystemExit(f'app.css: expected second project action contract once, got {text.count(old2)}')
+          text = text.replace(old2, '#projects .project-row-actions .project-compact-action { min-height:32px; height:32px;', 1)
+          Path('app.css').write_text(text)
+
+          # Monthly budget planner compact action tier.
+          replace('budget-planning.css', '.budget-planner-actions .button { min-height:34px; padding:6px 9px; font-size:.68rem; }', '.budget-planner-actions .button { min-height:35px; padding:6px 9px; font-size:.68rem; }', 1)
+
+          # Restore Insights to the same sidebar icon markup as the other destinations.
+          replace('index.html', '<button class="nav-button insights-nav-button" data-page="reports" data-nav-label="Insights"><span class="nav-label">Insights</span></button>', '<button class="nav-button insights-nav-button" data-page="reports" data-nav-label="Insights"><span class="nav-icon"><img class="nav-icon-image" src="./icons/sidebar-insights-v14-0-24.png" alt=""></span><span class="nav-label">Insights</span></button>', 1)
+          replace('dashboard-interactions.css', '.sidebar .nav-button[data-page="projects"] .nav-icon-image{content:url("./icons/sidebar-work-v14-0-24.png")}\n.sidebar .settings-nav-button .nav-icon-image{content:url("./icons/sidebar-settings-v14-0-24.png")}', '.sidebar .nav-button[data-page="projects"] .nav-icon-image{content:url("./icons/sidebar-work-v14-0-24.png")}\n.sidebar .nav-button[data-page="reports"] .nav-icon-image{content:url("./icons/sidebar-insights-v14-0-24.png")}\n.sidebar .settings-nav-button .nav-icon-image{content:url("./icons/sidebar-settings-v14-0-24.png")}', 1)
+          replace('dashboard-interactions.css', '.sidebar .nav-button[data-page="projects"] .nav-icon::before,\n.sidebar .settings-nav-button .nav-icon::before{content:none!important}', '.sidebar .nav-button[data-page="projects"] .nav-icon::before,\n.sidebar .nav-button[data-page="reports"] .nav-icon::before,\n.sidebar .settings-nav-button .nav-icon::before{content:none!important}', 1)
+          replace('dashboard-interactions.css', '\n\n@media(min-width:851px){\n  .sidebar.desktop-open .insights-nav-button,.sidebar.sidebar-pinned .insights-nav-button{padding-inline-start:46px!important}\n}\n@media(max-width:850px){\n  .sidebar.open .insights-nav-button{padding-inline-start:46px!important}\n}\n', '\n', 1)
+
+          # Delivery refresh for changed CSS and PWA shell.
+          OLD_CACHE = 'finance-v15-20260815-light-chrome-r26'
+          NEW_CACHE = 'finance-v15-20260815-desktop-consistency-r27'
+          for path in ['index.html', 'sw.js']:
+              p = Path(path)
+              text = p.read_text()
+              if OLD_CACHE not in text:
+                  raise SystemExit(f'{path}: old cache missing')
+              p.write_text(text.replace(OLD_CACHE, NEW_CACHE))
+          for path in ['index.html', 'sw.js']:
+              p = Path(path)
+              text = p.read_text()
+              text = text.replace('app.css?v=15.1.0-desktop2', 'app.css?v=15.1.0-desktop3')
+              text = text.replace('dashboard-interactions.css?v=15.1.0-desktop2', 'dashboard-interactions.css?v=15.1.0-desktop3')
+              text = text.replace('budget-planning.css?v=15.1.0-desktop2', 'budget-planning.css?v=15.1.0-desktop3')
+              p.write_text(text)
+
+          version_path = Path('version.json')
+          version = json.loads(version_path.read_text())
+          if version.get('cacheVersion') != OLD_CACHE:
+              raise SystemExit(f"version.json: unexpected cache {version.get('cacheVersion')}")
+          version['cacheVersion'] = NEW_CACHE
+          version['notes'] = 'Desktop UI consistency refresh: unified 64px header and sticky offsets, Finance record density, dialog and Settings control heights, 32px Project row actions, 35px Budget planner actions, and restored the Insights sidebar icon while preserving Light/Dark themes, mobile-specific layout, Finance Schema 12, Cloud Schema V3, records, calculations, and sync behavior.'
+          version_path.write_text(json.dumps(version, indent=2) + '\n')
+
+          # Update focused static/browser contracts and other cache pins in tests.
+          tests = list(Path('tests').glob('*.mjs'))
+          for p in tests:
+              text = p.read_text()
+              text = text.replace(OLD_CACHE, NEW_CACHE)
+              text = text.replace('app.css?v=15.1.0-desktop2', 'app.css?v=15.1.0-desktop3')
+              text = text.replace('dashboard-interactions.css?v=15.1.0-desktop2', 'dashboard-interactions.css?v=15.1.0-desktop3')
+              text = text.replace('budget-planning.css?v=15.1.0-desktop2', 'budget-planning.css?v=15.1.0-desktop3')
+              p.write_text(text)
+
+          p = Path('tests/validate-desktop-ui-consistency-v15-1-0.mjs')
+          text = p.read_text()
+          text = text.replace('assert.match(app, /--desktop-header-height:\\s*72px/);', 'assert.match(app, /--desktop-header-height:\\s*64px/);')
+          text = text.replace('assert.match(app, /\\.dashboard-view \\.topbar \\{ min-height: 72px;/);', 'assert.match(app, /\\.dashboard-view \\.topbar \\{ min-height: var\\(--desktop-header-height\\);/);')
+          text = text.replace('assert.doesNotMatch(app, /\\.dashboard-view \\.topbar \\{ min-height: 64px/);', 'assert.doesNotMatch(app, /top:71px|top:74px/);')
+          text = text.replace('assert.match(dashboard, /\\.finance-workspace-marquee-row\\{[^}]*top:var\\(--desktop-header-height,72px\\)/);', 'assert.match(dashboard, /\\.finance-workspace-marquee-row\\{[^}]*top:var\\(--desktop-header-height,72px\\)/);\nassert.match(index, /data-page="reports"[^>]*data-nav-label="Insights"[\\s\\S]*?<span class="nav-icon"><img class="nav-icon-image" src="\\.\\/icons\\/sidebar-insights-v14-0-24\\.png"/);\nassert.match(dashboard, /data-page="reports"\\] \\.nav-icon-image\\{content:url\\("\\.\\/icons\\/sidebar-insights-v14-0-24\\.png"\\)\\}/);\nassert.doesNotMatch(dashboard, /insights-nav-button\\{padding-inline-start:46px/);')
+          p.write_text(text)
+
+          p = Path('tests/desktop-ui-consistency.spec.mjs')
+          text = p.read_text()
+          text = text.replace('<button class="nav-button insights-nav-button" id="insightsNav"><span class="nav-label">Insights</span></button>', '<aside class="sidebar desktop-open"><button class="nav-button insights-nav-button" id="insightsNav"><span class="nav-icon"><img class="nav-icon-image" id="insightsIcon" src="./icons/sidebar-insights-v14-0-24.png" alt=""></span><span class="nav-label">Insights</span></button></aside>')
+          text = text.replace('insightsPseudo:getComputedStyle(document.querySelector("#insightsNav"), "::before").content,', 'insightsPseudo:getComputedStyle(document.querySelector("#insightsNav"), "::before").content,\n        insightsIconWidth:value("#insightsIcon", "width"),\n        insightsIconHeight:value("#insightsIcon", "height"),')
+          text = text.replace('topbarMin:"72px",', 'topbarMin:"64px",')
+          text = text.replace('financeStickyTop:"72px",', 'financeStickyTop:"64px",')
+          text = text.replace('insightsPseudo:"none",', 'insightsPseudo:"none",\n      insightsIconWidth:"20px",\n      insightsIconHeight:"20px",')
+          p.write_text(text)
+
+          # Validate exact intended state before committing.
+          app = Path('app.css').read_text()
+          dash = Path('dashboard-interactions.css').read_text()
+          idx = Path('index.html').read_text()
+          sw = Path('sw.js').read_text()
+          assert '--desktop-header-height: 64px;' in app
+          assert 'top:71px' not in app
+          assert 'top:74px' not in app
+          assert 'sidebar-insights-v14-0-24.png' in idx
+          assert '.nav-button[data-page="reports"] .nav-icon-image' in dash
+          assert 'padding-inline-start:46px' not in dash
+          assert NEW_CACHE in idx and NEW_CACHE in sw
+          assert 'app.css?v=15.1.0-desktop3' in idx and 'app.css?v=15.1.0-desktop3' in sw
+          assert 'dashboard-interactions.css?v=15.1.0-desktop3' in idx and 'dashboard-interactions.css?v=15.1.0-desktop3' in sw
+          assert 'budget-planning.css?v=15.1.0-desktop3' in idx and 'budget-planning.css?v=15.1.0-desktop3' in sw
+          PY
+      - name: Commit patch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add app.css budget-planning.css dashboard-interactions.css index.html sw.js version.json tests
+          git diff --cached --check
+          git commit -m "fix: align desktop UI and restore Insights icon"
+          git push origin HEAD:fix/desktop-consistency-icons
