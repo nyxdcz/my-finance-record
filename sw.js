@@ -2,6 +2,7 @@
 const APP_VERSION = "15.2.2";
 self.__FINANCE_APP_VERSION = APP_VERSION;
 // V15.2.2 mobile UI/UX delivery · phone layout, touch targets, menu safety, and responsive regression coverage; finance data and sync semantics unchanged.
+// V15.2.2 hotfix: Finance workspace sticky row now follows the mobile topbar offset.
 const CACHE_VERSION = "finance-v15-20260816-mobile-ui-ux-r32";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;

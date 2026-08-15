@@ -86,7 +86,8 @@
 
 /* My Finance Records V15.2.2 · mobile UI + UX consistency */
 @media (max-width: 850px) {
-  body .workspace-switcher {
+  body .workspace-switcher,
+  body .finance-workspace-marquee-row {
     top: var(--mobile-topbar-offset, calc(env(safe-area-inset-top) + 112px));
   }
   .sidebar .sidebar-close-button {
