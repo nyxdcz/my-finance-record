@@ -1,0 +1,65 @@
+name: Apply safe multi-device sync V15.0.3
+
+on:
+  push:
+    branches:
+      - fix/safe-multidevice-sync-v15-0-3
+    paths:
+      - scripts/apply-safe-multidevice-sync-v15-0-3.py
+      - .github/workflows/apply-safe-multidevice-sync-v15-0-3.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Repair patch-script typo
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path('scripts/apply-safe-multidevice-sync-v15-0-3.py')
+          text = path.read_text(encoding='utf-8')
+          text = text.replace('lock = read("package-lock.json")n = lock.count', 'lock = read("package-lock.json")\nn = lock.count')
+          path.write_text(text, encoding='utf-8')
+          PY
+          python3 -m py_compile scripts/apply-safe-multidevice-sync-v15-0-3.py
+
+      - name: Apply sync repair
+        run: python3 scripts/apply-safe-multidevice-sync-v15-0-3.py
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate JavaScript and release
+        run: |
+          npm run lint
+          npm run maintainability
+          npm test
+
+      - name: Remove one-time patch automation
+        run: |
+          rm -f scripts/apply-safe-multidevice-sync-v15-0-3.py
+          rm -f .github/workflows/apply-safe-multidevice-sync-v15-0-3.yml
+
+      - name: Commit repaired sync
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "fix: preserve multi-device finance edits in V15.0.3"
+          git push origin HEAD:fix/safe-multidevice-sync-v15-0-3
