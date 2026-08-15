@@ -1,0 +1,236 @@
+name: Apply desktop UX quick wins V15.2.1
+
+on:
+  push:
+    branches:
+      - agent/desktop-ux-quick-wins-v15-2-1
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply-and-validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/desktop-ux-quick-wins-v15-2-1
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Apply approved desktop UX quick wins
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          def read(path):
+              return Path(path).read_text(encoding="utf-8")
+
+          def write(path, text):
+              Path(path).write_text(text, encoding="utf-8")
+
+          def replace_once(path, old, new):
+              text = read(path)
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f"{path}: expected one match, found {count}: {old[:100]!r}")
+              write(path, text.replace(old, new, 1))
+
+          def replace_count(path, old, new, expected):
+              text = read(path)
+              count = text.count(old)
+              if count != expected:
+                  raise SystemExit(f"{path}: expected {expected} matches, found {count}: {old[:100]!r}")
+              write(path, text.replace(old, new))
+
+          # ---------- Project Agenda: inline validation, unified confirmation, secondary More menu ----------
+          path = "projects-calendar-v13.0.20.js"
+          replace_once(path,
+          '''  function openDialog(projectId = "", eventId = "") {\n    const dialog = document.getElementById("projectCalendarEventDialog");\n    if (!dialog) return;''',
+          '''  function eventFieldErrorNode(input) {\n    if (!input) return null;\n    const field = input.closest(".field");\n    if (!field) return null;\n    let error = field.querySelector("[data-pc-field-error]");\n    if (!error) {\n      error = document.createElement("small");\n      error.className = "field-error";\n      error.dataset.pcFieldError = "";\n      error.id = `${input.id}Error`;\n      error.hidden = true;\n      field.appendChild(error);\n    }\n    return error;\n  }\n\n  function clearEventFieldError(input) {\n    const error = eventFieldErrorNode(input);\n    if (error) { error.hidden = true; error.textContent = ""; }\n    input?.removeAttribute("aria-invalid");\n    if (input?.getAttribute("aria-describedby") === error?.id) input.removeAttribute("aria-describedby");\n  }\n\n  function setEventFieldError(input, message) {\n    const error = eventFieldErrorNode(input);\n    if (!input || !error) return;\n    error.textContent = message;\n    error.hidden = false;\n    input.setAttribute("aria-invalid", "true");\n    input.setAttribute("aria-describedby", error.id);\n  }\n\n  function clearEventFormErrors() {\n    ["pcEventTitle", "pcEventDate", "pcEventStart", "pcEventEnd"].forEach(id => clearEventFieldError(document.getElementById(id)));\n  }\n\n  function openDialog(projectId = "", eventId = "") {\n    const dialog = document.getElementById("projectCalendarEventDialog");\n    if (!dialog) return;\n    clearEventFormErrors();''')
+
+          replace_once(path,
+          '''  function saveEvent(event) {\n    event.preventDefault();\n    const title = document.getElementById("pcEventTitle").value.trim();\n    const date = document.getElementById("pcEventDate").value;\n    if (!title || !date) {\n      showCalendarMessage("Add an event title and date.", "warning");\n      return;\n    }\n    const startTime = document.getElementById("pcEventStart").value;\n    const endTime = document.getElementById("pcEventEnd").value;\n    if (startTime && endTime && endTime <= startTime) {\n      showCalendarMessage("End time must be after the start time.", "warning");\n      return;\n    }''',
+          '''  function saveEvent(event) {\n    event.preventDefault();\n    const titleInput = document.getElementById("pcEventTitle");\n    const dateInput = document.getElementById("pcEventDate");\n    const startInput = document.getElementById("pcEventStart");\n    const endInput = document.getElementById("pcEventEnd");\n    clearEventFormErrors();\n    const title = titleInput.value.trim();\n    const date = dateInput.value;\n    if (!title) {\n      setEventFieldError(titleInput, "Enter an event title.");\n      titleInput.focus();\n      return;\n    }\n    if (!date) {\n      setEventFieldError(dateInput, "Choose an event date.");\n      dateInput.focus();\n      return;\n    }\n    const startTime = startInput.value;\n    const endTime = endInput.value;\n    if (startTime && endTime && endTime <= startTime) {\n      setEventFieldError(endInput, "End time must be after the start time.");\n      endInput.focus();\n      return;\n    }''')
+
+          replace_once(path,
+          '''  function deleteEvent(id) {\n    const event = events.find(item => item.id === id);\n    if (!event) return;\n    if (!confirm(`Delete “${event.title}”?`)) return;\n    const next = events.filter(item => item.id !== id);''',
+          '''  async function deleteEvent(id) {\n    const event = events.find(item => item.id === id);\n    if (!event) return;\n    if (typeof openAppConfirmation !== "function") {\n      showCalendarMessage("Delete confirmation is unavailable. Reload the latest app version and try again.", "error");\n      return;\n    }\n    const confirmed = await openAppConfirmation({\n      title:"Delete agenda event?",\n      message:`Delete “${event.title}”?`,\n      details:"This removes the agenda entry from the Project Agenda and Dashboard calendar. Project financial records are unchanged.",\n      confirmLabel:"Delete event",\n      danger:true\n    });\n    if (!confirmed) return;\n    const next = events.filter(item => item.id !== id);''')
+
+          replace_once(path,
+          '''          ${compact ? "" : `<button type="button" class="button button-secondary button-small" data-pc-edit="${escapeHtml(event.id)}">Edit</button><button type="button" class="button button-secondary button-small" data-pc-delete="${escapeHtml(event.id)}">Delete</button><button type="button" class="button button-secondary button-small" data-pc-ics="${escapeHtml(event.id)}">ICS</button>`}''',
+          '''          ${compact ? "" : `<button type="button" class="button button-secondary button-small" data-pc-edit="${escapeHtml(event.id)}">Edit</button><div class="record-more-menu overflow-menu pc-event-more-menu"><button type="button" class="button button-secondary button-small overflow-menu-trigger" aria-label="More actions for ${title}" title="More actions" aria-haspopup="menu" aria-controls="pc-event-more-${escapeHtml(event.id)}" aria-expanded="false"><span class="kebab-icon" aria-hidden="true">&#8942;</span><span class="sr-only">More actions</span></button><div class="record-more-panel pc-event-more-panel" id="pc-event-more-${escapeHtml(event.id)}" role="menu" aria-label="More actions for ${title}" hidden><button type="button" class="button button-secondary" role="menuitem" data-pc-ics="${escapeHtml(event.id)}">Export ICS</button><button type="button" class="button button-danger" role="menuitem" data-pc-delete="${escapeHtml(event.id)}">Delete event</button></div></div>`}''')
+
+          replace_once(path,
+          '''            <div class="field field-full"><label for="pcEventTitle">Title <span class="required-mark">*</span></label><input class="input" id="pcEventTitle" maxlength="120" required placeholder="Example: Client presentation"></div>\n            <div class="field"><label for="pcEventDate">Date <span class="required-mark">*</span></label><input class="input" id="pcEventDate" type="date" required></div>''',
+          '''            <div class="field field-full"><label for="pcEventTitle">Title <span class="required-mark">*</span></label><input class="input" id="pcEventTitle" maxlength="120" required placeholder="Example: Client presentation"><small class="field-error" id="pcEventTitleError" data-pc-field-error hidden></small></div>\n            <div class="field"><label for="pcEventDate">Date <span class="required-mark">*</span></label><input class="input" id="pcEventDate" type="date" required><small class="field-error" id="pcEventDateError" data-pc-field-error hidden></small></div>''')
+
+          replace_once(path,
+          '''            <div class="field"><label for="pcEventEnd">End time</label><input class="input" id="pcEventEnd" type="time"></div>''',
+          '''            <div class="field"><label for="pcEventEnd">End time</label><input class="input" id="pcEventEnd" type="time"><small class="field-error" id="pcEventEndError" data-pc-field-error hidden></small></div>''')
+
+          replace_once(path,
+          '''    dialog.querySelector("#projectCalendarEventForm").addEventListener("submit", saveEvent);\n    dialog.querySelectorAll("[data-pc-close]").forEach(button => button.addEventListener("click", closeDialog));''',
+          '''    dialog.querySelector("#projectCalendarEventForm").addEventListener("submit", saveEvent);\n    ["pcEventTitle", "pcEventDate", "pcEventStart", "pcEventEnd"].forEach(id => {\n      const input = dialog.querySelector(`#${id}`);\n      ["input", "change"].forEach(type => input?.addEventListener(type, () => clearEventFieldError(input)));\n    });\n    dialog.querySelectorAll("[data-pc-close]").forEach(button => button.addEventListener("click", closeDialog));''')
+
+          # ---------- Budget planner: reduce competing header actions ----------
+          path = "budget-planning.js"
+          replace_once(path,
+          '''<button class="button button-secondary button-small" id="openBudgetSettings" type="button">Plan settings…</button><button class="button button-secondary button-small" id="exportBudgetCsv" type="button">Export CSV</button><button class="button button-primary button-small" id="addBudgetItem" type="button">+ Add category…</button>''',
+          '''<div class="overflow-menu budget-planner-more-menu"><button class="button button-secondary button-small overflow-menu-trigger" type="button" aria-label="More budget plan actions" title="More budget plan actions" aria-haspopup="menu" aria-controls="budgetPlannerMorePanel" aria-expanded="false">More</button><div class="record-more-panel budget-planner-more-panel" id="budgetPlannerMorePanel" role="menu" aria-label="More budget plan actions" hidden><button class="button button-secondary" id="openBudgetSettings" type="button" role="menuitem">Plan settings…</button><button class="button button-secondary" id="exportBudgetCsv" type="button" role="menuitem">Export CSV</button></div></div><button class="button button-primary button-small" id="addBudgetItem" type="button">+ Add category…</button>''')
+
+          # ---------- Main source: actionable empty states, filtered states, Income chips, clearer Budget copy ----------
+          path = "index.html"
+          replace_once(path, '<title>My Finance Records · V15.2.0</title>', '<title>My Finance Records · V15.2.1</title>')
+          replace_once(path, 'title="V15.2.0 · Desktop UX Consistency · August 16, 2026">V15.2.0</small>', 'title="V15.2.1 · Desktop UX Quick Wins · August 16, 2026">V15.2.1</small>')
+          replace_once(path, 'const APP_VERSION = "15.2.0";\n    const APP_RELEASE_NAME = "Desktop UX Consistency";\n    const APP_RELEASE_DATE = "August 15, 2026";\n    const APP_CACHE_VERSION = "finance-v15-20260816-desktop-ux-r29";', 'const APP_VERSION = "15.2.1";\n    const APP_RELEASE_NAME = "Desktop UX Quick Wins";\n    const APP_RELEASE_DATE = "August 16, 2026";\n    const APP_CACHE_VERSION = "finance-v15-20260816-desktop-ux-quick-wins-r30";')
+          replace_once(path, 'Your budget is the total money in your cash, bank, and e-wallet accounts.', 'Manage available money, planned budgets, and unpaid expenses for this month.')
+          replace_once(path, 'desktop-ux-v15-2-0.css?v=15.2.0', 'desktop-ux-v15-2-0.css?v=15.2.1')
+          replace_once(path, 'cloud-sync.js?v=15.2.0-ux1', 'cloud-sync.js?v=15.2.1-ux1')
+          replace_once(path, 'budget-planning.js?v=15.0.4', 'budget-planning.js?v=15.2.1-ux1')
+          replace_once(path, 'productivity-tools.js?v=15.2.0-ux1', 'productivity-tools.js?v=15.2.1-ux1')
+          replace_once(path, 'projects-calendar-v13.0.20.js?v=14.0.23', 'projects-calendar-v13.0.20.js?v=15.2.1-ux1')
+
+          replace_once(path,
+          '''    function emptyHtml(title, text) {\n      return `<div class="empty-state"><strong>${escapeHtml(title)}</strong>${escapeHtml(text)}</div>`;\n    }''',
+          '''    function emptyHtml(title, text, action = null) {\n      const label = String(action?.label || "");\n      const actionHtml = label ? `<div class="empty-state-actions"><button class="button button-secondary button-small" type="button"${action?.go ? ` data-go="${escapeHtml(action.go)}"` : ""}${action?.action ? ` data-empty-action="${escapeHtml(action.action)}"` : ""}>${escapeHtml(label)}</button></div>` : "";\n      return `<div class="empty-state"><strong>${escapeHtml(title)}</strong>${escapeHtml(text)}${actionHtml}</div>`;\n    }''')
+
+          replace_once(path,
+          '''              <div class="income-toolbar"><label class="sr-only" for="incomeSearch">Search income</label><input class="input" id="incomeSearch" placeholder="Name or note" aria-label="Search income by name or note"><label class="sr-only" for="incomeCategoryFilter">Income category</label><select class="select" id="incomeCategoryFilter" aria-label="Income category"><option value="">All categories</option></select><button class="button button-secondary income-clear-filters" id="clearIncomeFilters" type="button" hidden>Clear</button></div>\n            </details>''',
+          '''              <div class="income-toolbar"><label class="sr-only" for="incomeSearch">Search income</label><input class="input" id="incomeSearch" placeholder="Name or note" aria-label="Search income by name or note"><label class="sr-only" for="incomeCategoryFilter">Income category</label><select class="select" id="incomeCategoryFilter" aria-label="Income category"><option value="">All categories</option></select><button class="button button-secondary income-clear-filters" id="clearIncomeFilters" type="button" hidden>Clear</button></div>\n              <div class="income-active-filter-chips" id="incomeActiveFilterChips" aria-label="Active income filters" hidden></div>\n            </details>''')
+
+          replace_once(path,
+          '''      document.getElementById("clearIncomeFilters").hidden = !(search || category);\n      document.getElementById("incomeList").innerHTML = rows.length ? rows.map(item => {''',
+          '''      document.getElementById("clearIncomeFilters").hidden = !(search || category);\n      window.FinanceInteractionPatterns?.renderActiveFilterChips?.(document.getElementById("incomeActiveFilterChips"), [\n        search ? { key:"search", label:`Search: ${document.getElementById("incomeSearch").value.trim()}` } : null,\n        category ? { key:"category", label:`Category: ${category}` } : null\n      ], key => {\n        if (key === "search") document.getElementById("incomeSearch").value = "";\n        if (key === "category") document.getElementById("incomeCategoryFilter").value = "";\n        renderIncomePage();\n      });\n      document.getElementById("incomeList").innerHTML = rows.length ? rows.map(item => {''')
+
+          replace_once(path,
+          '''      }).join("") : emptyHtml("No income records", "Add salary, bonus, gifts, refunds, or other income for this month.");''',
+          '''      }).join("") : (summary.manual.length && (search || category)\n        ? emptyHtml("No income matches these filters", "Try removing a search or category filter.", { label:"Clear filters", action:"clear-income-filters" })\n        : emptyHtml("No income records", "Add salary, bonus, gifts, refunds, or other income for this month.", { label:"Add income", action:"add-income" }));''')
+
+          replace_once(path,
+          '''      }).join("") : emptyHtml("No expenses here", "Add an expense or change the filters.");''',
+          '''      }).join("") : ((search || category) && items.length\n        ? emptyHtml("No expenses match these filters", "Try clearing the active expense filters.", { label:"Clear filters", action:"clear-expense-filters" })\n        : emptyHtml("No expenses here", "Add an expense for this section.", { label:"Add expense", action:"add-expense" }));''')
+
+          replace_once(path,
+          '''      `).join("") : emptyHtml("No paid expenses", "Use the Paid button beside an unpaid expense.");''',
+          '''      `).join("") : emptyHtml("No paid expenses", "Nothing has been paid for this month yet.", { label:"View unpaid expenses", go:"money" });''')
+
+          replace_once(path,
+          '''      const sourceFilter = document.getElementById("projectSourceFilter").value;\n      const filtered = [...data.projects]''',
+          '''      const sourceFilter = document.getElementById("projectSourceFilter").value;\n      const hasProjectFilters = Boolean(search || statusFilter || typeFilter || sourceFilter);\n      const filtered = [...data.projects]''')
+
+          replace_once(path,
+          '''      document.getElementById("activeProjectList").innerHTML = active.length ? active.map(project => projectCard(project, false)).join("") : emptyHtml("No active projects", "Add a project or change the filters.");\n      document.getElementById("completedProjectList").innerHTML = completed.length ? completed.map(project => projectCard(project, true)).join("") : emptyHtml("No completed projects", "Projects with Completed status appear here, whether paid or still carrying a balance.");''',
+          '''      document.getElementById("activeProjectList").innerHTML = active.length ? active.map(project => projectCard(project, false)).join("") : (hasProjectFilters ? emptyHtml("No active projects match these filters", "Try clearing the active project filters.", { label:"Clear filters", action:"clear-project-filters" }) : emptyHtml("No active projects", "Add a project to start tracking work, deadlines, and client payments.", { label:"Add project", action:"add-project" }));\n      document.getElementById("completedProjectList").innerHTML = completed.length ? completed.map(project => projectCard(project, true)).join("") : (hasProjectFilters ? emptyHtml("No completed projects match these filters", "Try clearing the active project filters.", { label:"Clear filters", action:"clear-project-filters" }) : emptyHtml("No completed projects", "Projects with Completed status appear here, whether paid or still carrying a balance."));''')
+
+          replace_once(path,
+          '''    document.getElementById("clearIncomeFilters").addEventListener("click", () => { document.getElementById("incomeSearch").value=""; document.getElementById("incomeCategoryFilter").value=""; renderIncomePage(); });''',
+          '''    document.getElementById("clearIncomeFilters").addEventListener("click", () => { document.getElementById("incomeSearch").value=""; document.getElementById("incomeCategoryFilter").value=""; renderIncomePage(); });\n    document.addEventListener("click", event => {\n      const action = event.target.closest("[data-empty-action]");\n      if (!action) return;\n      if (action.dataset.emptyAction === "clear-income-filters") { document.getElementById("incomeSearch").value=""; document.getElementById("incomeCategoryFilter").value=""; renderIncomePage(); }\n      if (action.dataset.emptyAction === "add-income") openIncomeDialog();\n      if (action.dataset.emptyAction === "clear-expense-filters") { document.getElementById("expenseSearch").value=""; document.getElementById("expenseCategoryFilter").value=""; renderMoneyPage(); }\n      if (action.dataset.emptyAction === "add-expense") openExpenseDialog();\n      if (action.dataset.emptyAction === "clear-project-filters") { document.getElementById("projectSearch").value=""; document.getElementById("projectStatusFilter").value=""; document.getElementById("projectTypeFilter").value=""; document.getElementById("projectSourceFilter").value=""; renderProjects(); }\n      if (action.dataset.emptyAction === "add-project") openProjectDialog();\n    });''')
+
+          replace_once(path,
+          '''    const VERSION_HISTORY = [{"version":"V15.2.0","title":"Desktop UX Consistency"''',
+          '''    const VERSION_HISTORY = [{"version":"V15.2.1","title":"Desktop UX Quick Wins","changes":["Makes empty and filtered states actionable across Income, Budget & Expenses, Paid Expenses, and Projects.","Standardizes Project Agenda validation and deletion feedback, and moves low-frequency Agenda and Budget Plan actions into More menus.","Preserves Finance Schema 12, Cloud Schema V3, saved records, calculations, account balances, budgets, projects, five-minute sync cadence, and phone layout."]},{"version":"V15.2.0","title":"Desktop UX Consistency"''')
+
+          # ---------- Desktop-only presentation for the new controls ----------
+          path = "desktop-ux-v15-2-0.css"
+          replace_once(path, '/* My Finance Records · V15.2.0 desktop UX consistency */', '/* My Finance Records · V15.2.1 desktop UX quick wins */')
+          text = read(path)
+          if not text.rstrip().endswith("}"):
+              raise SystemExit("desktop-ux-v15-2-0.css: expected closing media block")
+          insertion = '''\n  .income-active-filter-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}\n  .empty-state-actions{display:flex;justify-content:center;gap:8px;margin-top:10px}\n  .budget-planner-more-menu,.pc-event-more-menu{position:relative}\n  .budget-planner-more-panel,.pc-event-more-panel{min-width:180px}\n'''
+          idx = text.rfind("}")
+          write(path, text[:idx] + insertion + text[idx:])
+
+          # ---------- Release identity / PWA delivery ----------
+          path = "cloud-sync.js"
+          replace_once(path, 'const APP_VERSION_FALLBACK = "15.2.0";', 'const APP_VERSION_FALLBACK = "15.2.1";')
+
+          path = "sw.js"
+          replace_once(path, 'const APP_VERSION = "15.2.0";', 'const APP_VERSION = "15.2.1";')
+          replace_once(path, '// V15.2.0 desktop UX delivery · improves desktop interaction consistency without changing finance schemas, saved data, sync cadence, or phone layout.', '// V15.2.1 desktop UX quick-win delivery · improves action hierarchy, empty states, and Agenda feedback without changing finance schemas, saved data, sync cadence, or phone layout.')
+          replace_once(path, 'const CACHE_VERSION = "finance-v15-20260816-desktop-ux-r29";', 'const CACHE_VERSION = "finance-v15-20260816-desktop-ux-quick-wins-r30";')
+          replace_once(path, 'desktop-ux-v15-2-0.css?v=15.2.0', 'desktop-ux-v15-2-0.css?v=15.2.1')
+          replace_once(path, 'cloud-sync.js?v=15.2.0-ux1', 'cloud-sync.js?v=15.2.1-ux1')
+          replace_once(path, 'budget-planning.js?v=15.0.4', 'budget-planning.js?v=15.2.1-ux1')
+          replace_once(path, 'productivity-tools.js?v=15.2.0-ux1', 'productivity-tools.js?v=15.2.1-ux1')
+          replace_once(path, 'projects-calendar-v13.0.20.js?v=14.0.23', 'projects-calendar-v13.0.20.js?v=15.2.1-ux1')
+
+          Path("version.json").write_text('''{\n  "version": "15.2.1",\n  "schemaVersion": 12,\n  "cloudSchemaVersion": 3,\n  "ledgerVersion": 1,\n  "budgetVersion": 1,\n  "insightsVersion": 1,\n  "productivityVersion": 1,\n  "remindersVersion": 1,\n  "profileArchitectureVersion": 1,\n  "encryptionVersion": 1,\n  "authSecurityVersion": 1,\n  "cacheVersion": "finance-v15-20260816-desktop-ux-quick-wins-r30",\n  "released": "2026-08-16",\n  "name": "Desktop UX Quick Wins",\n  "notes": "V15.2.1 desktop UX quick wins: actionable empty and filtered states, visible removable Income filter chips, clearer Budget & Expenses copy, lower-noise Budget Plan and Agenda actions, Project Agenda inline validation, and unified Agenda deletion confirmation. Finance Schema 12, Cloud Schema V3, saved records, calculations, account balances, budgets, projects, five-minute sync cadence, and phone layout remain unchanged."\n}\n''', encoding="utf-8")
+
+          # ---------- Docs ----------
+          path = "README.md"
+          replace_once(path, '# My Finance Records · V15.2.0', '# My Finance Records · V15.2.1')
+          replace_once(path, '## Recent updates\n\n- **V15.2.0 · Desktop UX Consistency**', '## Recent updates\n\n- **V15.2.1 · Desktop UX Quick Wins** — Makes empty/filter states actionable, adds removable Income filter chips, simplifies Budget Plan and Agenda secondary actions, and standardizes Agenda validation/deletion feedback without changing finance logic, sync cadence, or phone layout.\n- **V15.2.0 · Desktop UX Consistency**')
+
+          path = "CHANGELOG.md"
+          text = read(path)
+          entry = '''## 15.2.1 · 2026-08-16\n- Added actionable empty and filtered states across Income, Budget & Expenses, Paid Expenses, and Projects, including removable Income filter chips and direct next-step actions.\n- Standardized Project Agenda field-level validation and deletion confirmation, and moved Agenda ICS/Delete plus Budget Plan Settings/Export into accessible More menus.\n- Clarified Budget & Expenses page copy and released the desktop-only UX quick wins with PWA cache `finance-v15-20260816-desktop-ux-quick-wins-r30`; Finance Schema 12, Cloud Schema V3, calculations, saved records, five-minute sync cadence, and phone layout remain unchanged.\n\n'''
+          if text.startswith("## 15.2.1"):
+              raise SystemExit("CHANGELOG.md already contains 15.2.1")
+          write(path, entry + text)
+
+          # ---------- Regression coverage ----------
+          Path("tests/v15-2-1-desktop-ux-quick-wins.spec.mjs").write_text(r'''import { test, expect } from "@playwright/test";\nimport fs from "node:fs";\n\nconst source = name => fs.readFileSync(new URL(`../${name}`, import.meta.url), "utf8");\n\ntest("V15.2.1 source keeps the approved desktop UX quick wins", async () => {\n  const index = source("index.html");\n  const agenda = source("projects-calendar-v13.0.20.js");\n  const budget = source("budget-planning.js");\n  const sw = source("sw.js");\n  const version = JSON.parse(source("version.json"));\n\n  expect(index).toContain("V15.2.1");\n  expect(index).toContain("Manage available money, planned budgets, and unpaid expenses for this month.");\n  expect(index).toContain('id="incomeActiveFilterChips"');\n  expect(index).toContain("No income matches these filters");\n  expect(index).toContain("No expenses match these filters");\n  expect(index).toContain("No active projects match these filters");\n  expect(index).toContain("View unpaid expenses");\n  expect(index).toContain('data-empty-action="clear-income-filters"');\n\n  expect(agenda).toContain("Enter an event title.");\n  expect(agenda).toContain("Choose an event date.");\n  expect(agenda).toContain("End time must be after the start time.");\n  expect(agenda).toContain("openAppConfirmation");\n  expect(agenda).not.toContain('confirm(`Delete “${event.title}”?`)');\n  expect(agenda).toContain("pc-event-more-panel");\n  expect(agenda).toContain("Export ICS");\n  expect(agenda).toContain("Delete event");\n\n  expect(budget).toContain('id="budgetPlannerMorePanel"');\n  expect(budget).toContain('id="openBudgetSettings"');\n  expect(budget).toContain('id="exportBudgetCsv"');\n  expect(budget).toContain('aria-haspopup="menu"');\n\n  expect(version.version).toBe("15.2.1");\n  expect(version.schemaVersion).toBe(12);\n  expect(version.cloudSchemaVersion).toBe(3);\n  expect(version.cacheVersion).toBe("finance-v15-20260816-desktop-ux-quick-wins-r30");\n  expect(sw).toContain('const APP_VERSION = "15.2.1";');\n  expect(sw).toContain('finance-v15-20260816-desktop-ux-quick-wins-r30');\n});\n\nfor (const width of [1024, 1280, 1366, 1440, 1920]) {\n  test(`V15.2.1 desktop-only additions avoid horizontal overflow at ${width}px`, async ({ page }) => {\n    await page.setViewportSize({ width, height: 900 });\n    await page.setContent(`<!doctype html><html><head><link rel="stylesheet" href="http://127.0.0.1:3000/app.css?v=15.1.0-desktop3"><link rel="stylesheet" href="http://127.0.0.1:3000/desktop-ux-v15-2-0.css?v=15.2.1"></head><body><div class="income-active-filter-chips"><span class="ui-chip"><span>Category: Utilities</span><button class="ui-chip-remove" aria-label="Remove category filter">×</button></span></div><div class="empty-state"><strong>No records</strong>Nothing matches.<div class="empty-state-actions"><button class="button button-secondary button-small">Clear filters</button></div></div><div class="budget-planner-more-menu overflow-menu"><button class="button button-secondary button-small overflow-menu-trigger">More</button><div class="record-more-panel budget-planner-more-panel" hidden></div></div></body></html>`, { waitUntil:"networkidle" });\n    const overflow = await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1);\n    expect(overflow).toBe(false);\n  });\n}\n'''.replace('\\n', '\n'), encoding="utf-8")
+
+          # Final source guards before tests.
+          changed = {str(p) for p in Path('.').glob('**/*') if p.is_file()}
+          if 'mobile-v14-0-23.css' not in changed:
+              raise SystemExit('mobile stylesheet unexpectedly missing')
+          PY
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Quality
+        run: npm run quality
+
+      - name: Dependency audit
+        run: npm run audit
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Browser regression suite
+        run: npm run test:browser
+
+      - name: Diff safety checks
+        shell: bash
+        run: |
+          git diff --check
+          if git diff --name-only | grep -q '^mobile-v14-0-23.css$'; then
+            echo 'Mobile stylesheet must remain unchanged in this desktop pass.' >&2
+            exit 1
+          fi
+          git diff --name-only
+
+      - name: Package validated patch
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-ux-quick-wins-v15-2-1
+          path: |
+            index.html
+            projects-calendar-v13.0.20.js
+            budget-planning.js
+            desktop-ux-v15-2-0.css
+            cloud-sync.js
+            sw.js
+            version.json
+            README.md
+            CHANGELOG.md
+            tests/v15-2-1-desktop-ux-quick-wins.spec.mjs
+
+      - name: Commit validated changes
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html projects-calendar-v13.0.20.js budget-planning.js desktop-ux-v15-2-0.css cloud-sync.js sw.js version.json README.md CHANGELOG.md tests/v15-2-1-desktop-ux-quick-wins.spec.mjs
+          git commit -m "feat: refine desktop UX quick wins"
+          git push origin HEAD:agent/desktop-ux-quick-wins-v15-2-1
