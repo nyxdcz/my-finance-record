@@ -1,0 +1,41 @@
+name: Apply Finance marquee source patch
+
+on:
+  push:
+    branches:
+      - fix/finance-marquee-source-cache
+    paths:
+      - scripts/patch-finance-marquee-v15-1-1.py
+      - .github/workflows/patch-finance-marquee-source.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out patch branch
+        uses: actions/checkout@v7
+        with:
+          ref: fix/finance-marquee-source-cache
+          fetch-depth: 0
+
+      - name: Apply validated source patch
+        run: python3 scripts/patch-finance-marquee-v15-1-1.py
+
+      - name: Validate source contract
+        run: node tests/validate-finance-marquee-source-v15-1-1.mjs
+
+      - name: Remove one-time patch machinery
+        run: rm -f scripts/patch-finance-marquee-v15-1-1.py .github/workflows/patch-finance-marquee-source.yml
+
+      - name: Commit corrected source
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git commit -m "fix: ship Finance marquee source layout"
+          git push origin HEAD:fix/finance-marquee-source-cache
