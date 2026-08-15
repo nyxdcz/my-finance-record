@@ -47,6 +47,7 @@ replace("tests/validate-v15-2-0-desktop-ux.mjs", 'console.log("V15.2.1 desktop U
 # Static release text that deliberately changed, while keeping V15.2.1 asset pins intact.
 replace("tests/validate-desktop-ui-phase1-v15-1-0.mjs", 'id="settingsOverviewAppStatus">Version 15.2.1</strong>', 'id="settingsOverviewAppStatus">Version 15.2.2</strong>')
 replace("tests/v15-2-1-desktop-ux-quick-wins.spec.mjs", 'expect(index).toContain("V15.2.1");', 'expect(index).toContain("V15.2.2");')
+replace("tests/validate-pwa-updater-v15-0-5.mjs", 'assert.match(worker, /const APP_VERSION = "15\\.2\\.1";/);', 'assert.match(worker, /const APP_VERSION = "15\\.2\\.2";/);')
 
 # Verify the critical release-facing expectations now exist.
 checks = {
@@ -55,6 +56,7 @@ checks = {
     "tests/inspect-project.mjs": 'pkg.version !== "15.2.2"',
     "tests/validate-v15-2-0-desktop-ux.mjs": 'const RELEASE_NAME = "Mobile UI & UX"',
     "tests/validate-desktop-ui-phase1-v15-1-0.mjs": 'Version 15.2.2</strong>',
+    "tests/validate-pwa-updater-v15-0-5.mjs": 'APP_VERSION = "15\\.2\\.2"',
 }
 for path, token in checks.items():
     if token not in (root / path).read_text():
