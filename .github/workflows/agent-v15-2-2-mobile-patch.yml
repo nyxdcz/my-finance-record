@@ -24,11 +24,13 @@ jobs:
           package-manager-cache: false
 
       - name: Apply approved V15.2.2 mobile patch
-        run: python scripts/apply-v15-2-2-mobile.py
+        run: |
+          python scripts/apply-v15-2-2-mobile.py
+          python scripts/fix-v15-2-2-release-pins.py
 
       - name: Show remaining old release pins
         shell: bash
-        run: grep -RIn "15\.2\.1\|desktop-ux-quick-wins-r31" tests || true
+        run: grep -RIn "desktop-ux-quick-wins-r31" tests index.html sw.js version.json || true
 
       - name: Install dependencies
         run: npm ci --ignore-scripts --no-audit --no-fund
@@ -55,6 +57,6 @@ jobs:
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add CHANGELOG.md index.html mobile-v14-0-23.css package.json package-lock.json sw.js sync-config.js version.json tests
+          git add CHANGELOG.md README.md index.html mobile-v14-0-23.css package.json package-lock.json sw.js sync-config.js version.json tests
           git commit -m "fix: refine V15.2.2 mobile UI and UX"
           git push origin HEAD:fix/v15-2-2-mobile-ui-ux
