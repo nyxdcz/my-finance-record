@@ -18,7 +18,7 @@ const version = JSON.parse(read("version.json"));
 assert.equal(version.version, "15.1.0");
 assert.equal(version.schemaVersion, 12);
 assert.equal(version.cloudSchemaVersion, 3);
-assert.equal(version.cacheVersion, "finance-v15-20260815-desktop-ui-r25");
+assert.equal(version.cacheVersion, "finance-v15-20260815-light-chrome-r26");
 assert.match(app, /--desktop-header-height:\s*72px/);
 assert.match(app, /--desktop-page-gutter:\s*24px/);
 assert.match(app, /--workspace-card-radius:\s*9px/);
@@ -56,11 +56,11 @@ for (const pin of [
   "reports-insights.css?v=15.1.0-desktop1",
   "budget-planning.css?v=15.1.0-desktop2",
   "projects-calendar-v13.0.20.css?v=15.1.0-desktop2",
-  "black-canvas-v15-1-0.css?v=15.1.0-desktop2",
-  "sync-config.js?v=15.1.0-desktop1"
+  "black-canvas-v15-1-0.css?v=15.1.0-light1",
+  "sync-config.js?v=15.1.0-light1"
 ]) assert.ok(index.includes(pin), `index missing ${pin}`);
-assert.ok(index.includes('const APP_CACHE_VERSION = "finance-v15-20260815-desktop-ui-r25";'));
-assert.ok(sw.includes("finance-v15-20260815-desktop-ui-r25"));
+assert.ok(index.includes('const APP_CACHE_VERSION = "finance-v15-20260815-light-chrome-r26";'));
+assert.ok(sw.includes("finance-v15-20260815-light-chrome-r26"));
 for (const pin of [
   "app.css?v=15.1.0-desktop2",
   "dashboard-interactions.css?v=15.1.0-desktop2",
@@ -68,8 +68,8 @@ for (const pin of [
   "reports-insights.css?v=15.1.0-desktop1",
   "budget-planning.css?v=15.1.0-desktop2",
   "projects-calendar-v13.0.20.css?v=15.1.0-desktop2",
-  "black-canvas-v15-1-0.css?v=15.1.0-desktop2",
-  "sync-config.js?v=15.1.0-desktop1",
-  "liquid-glass-v15.css?v=15.1.0-monthnav1"
+  "black-canvas-v15-1-0.css?v=15.1.0-light1",
+  "sync-config.js?v=15.1.0-light1",
+  "liquid-glass-v15.css?v=15.1.0-light1"
 ]) assert.ok(sw.includes(pin), `service worker missing ${pin}`);
 console.log("V15.1.0 desktop UI consistency validation passed.");

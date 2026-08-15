@@ -10,8 +10,8 @@
   "profileArchitectureVersion": 1,
   "encryptionVersion": 1,
   "authSecurityVersion": 1,
-  "cacheVersion": "finance-v15-20260815-desktop-ui-r25",
+  "cacheVersion": "finance-v15-20260815-light-chrome-r26",
   "released": "2026-08-15",
   "name": "Black Canvas UI",
-  "notes": "Desktop UI consistency refresh with shared desktop geometry, consistent 72px sticky offsets and controls, restored light mode with #efefef background, dark-safe semantic surfaces, and preserved Finance Schema 12, Cloud Schema V3, records, calculations, sync behavior, and phone layout."
+  "notes": "Light mode chrome correction: #efefef canvas with light sidebar, readable Spend controls, light marquee/month/history controls and modal chrome; Black Canvas dark mode, Finance Schema 12, Cloud Schema V3, records, calculations, sync behavior, and phone marquee behavior remain unchanged."
 }

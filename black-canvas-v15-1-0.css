@@ -60,8 +60,19 @@ input[type="checkbox"], input[type="radio"], progress { accent-color:var(--prima
   border-color:var(--primary-dark) !important;
 }
 
-/* V15.1.0 Available money Spend label hotfix. */
-#availableMoneySection .account-spend-button span {
+/* V15.1.0 Available money Spend contrast by theme. */
+html[data-theme="light"] #availableMoneySection .account-spend-button {
+  background:var(--surface) !important;
+  border-color:var(--line) !important;
+  color:var(--text) !important;
+}
+html[data-theme="light"] #availableMoneySection .account-spend-button span {
+  color:var(--text) !important;
+}
+html[data-theme="light"] #availableMoneySection .account-spend-button:hover {
+  background:var(--surface-soft) !important;
+}
+html[data-theme="dark"] #availableMoneySection .account-spend-button span {
   color:#ffffff !important;
 }
 
