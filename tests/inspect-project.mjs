@@ -15,7 +15,7 @@ const fail = message => errors.push(message);
 const warn = message => warnings.push(message);
 
 const requiredFiles = [
-  "index.html", "app.css", "dashboard-interactions.css", "liquid-glass-v15.css", "mobile-v14-0-23.css", "interaction-patterns.js", "offline.html", "manifest.webmanifest", "version.json", "sw.js",
+  "index.html", "app.css", "dashboard-interactions.css", "ui-icon-alignment-v15-0-4.css", "liquid-glass-v15.css", "mobile-v14-0-23.css", "interaction-patterns.js", "offline.html", "manifest.webmanifest", "version.json", "sw.js",
   "package.json", "package-lock.json", "README.md", "CHANGELOG.md", ".gitignore",
   ".github/workflows/quality-pages.yml", "vendor/supabase.min.js",
   "sync-config.js", "sync-config.example.js", "privacy-lock.js", "cloud-conflict-review.js", "cloud-conflict-resolution.js", "cloud-sync-lifecycle.js", "projects-calendar-v13.0.20.js", "projects-calendar-v13.0.20.css",
@@ -61,6 +61,37 @@ for (const line of workflow.split(/\r?\n/)) {
     if (!exists(source)) fail(`GitHub Pages deploy source is missing: ${source}`);
   }
 }
+
+
+// Ensure every local asset referenced by production HTML or the service worker is packaged by GitHub Pages.
+const deploySources = new Set();
+const deployPrefixes = [];
+for (const line of workflow.split(/\r?\n/)) {
+  const trimmed = line.trim();
+  if (!trimmed.startsWith("cp ") || !trimmed.includes(" _site")) continue;
+  const sources = trimmed.slice(3).split(" _site", 1)[0].trim().split(/\s+/);
+  for (const source of sources) {
+    const normalized = source.replace(/^\.\//, "");
+    if (normalized.includes("*")) deployPrefixes.push(normalized.slice(0, normalized.indexOf("*")));
+    else deploySources.add(normalized);
+  }
+}
+const deployedByPages = assetPath => deploySources.has(assetPath) || deployPrefixes.some(prefix => assetPath.startsWith(prefix));
+const productionAssets = new Set();
+for (const match of html.matchAll(/\b(?:src|href)="([^"]+)"/g)) {
+  const value = match[1];
+  if (/^(?:https?:|data:|#|javascript:|\$\{)/.test(value)) continue;
+  const local = value.split(/[?#]/, 1)[0].replace(/^\.\//, "");
+  if (local) productionAssets.add(local);
+}
+for (const match of worker.matchAll(/asset\("([^"]+)"\)/g)) {
+  const local = match[1].split(/[?#]/, 1)[0].replace(/^\.\//, "");
+  if (local) productionAssets.add(local);
+}
+for (const assetPath of productionAssets) {
+  if (!deployedByPages(assetPath)) fail(`GitHub Pages deploy omits production asset: ${assetPath}`);
+}
+if (!deploySources.has("ui-icon-alignment-v15-0-4.css")) fail("GitHub Pages must package ui-icon-alignment-v15-0-4.css");
 
 let pkg = {}, lock = {}, version = {};
 try { pkg = JSON.parse(read("package.json")); } catch (error) { fail(`package.json is invalid JSON: ${error.message}`); }
