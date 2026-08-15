@@ -66,7 +66,8 @@ validator_path.write_text(validator)
 
 for test_path in [
     Path("tests/validate-record-spending-v15-0-4.mjs"),
-    Path("tests/validate-safe-multidevice-sync.mjs")
+    Path("tests/validate-safe-multidevice-sync.mjs"),
+    Path("tests/validate-expense-screenshot.mjs")
 ]:
     test = test_path.read_text()
     test = test.replace(
