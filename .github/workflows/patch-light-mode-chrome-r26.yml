@@ -1,0 +1,368 @@
+name: Patch and prevalidate Light mode chrome r26
+
+on:
+  push:
+    branches:
+      - fix/light-mode-chrome-r26
+    paths:
+      - .github/workflows/patch-light-mode-chrome-r26.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch-and-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v4
+        with:
+          ref: fix/light-mode-chrome-r26
+          fetch-depth: 0
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          package-manager-cache: false
+
+      - name: Apply Light mode root fix and cache refresh
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+
+          OLD_CACHE = "finance-v15-20260815-desktop-ui-r25"
+          NEW_CACHE = "finance-v15-20260815-light-chrome-r26"
+          OLD_LIQUID = "liquid-glass-v15.css?v=15.1.0-monthnav1"
+          NEW_LIQUID = "liquid-glass-v15.css?v=15.1.0-light1"
+          OLD_BLACK = "black-canvas-v15-1-0.css?v=15.1.0-desktop2"
+          NEW_BLACK = "black-canvas-v15-1-0.css?v=15.1.0-light1"
+          OLD_SYNC = "sync-config.js?v=15.1.0-desktop1"
+          NEW_SYNC = "sync-config.js?v=15.1.0-light1"
+
+          def read(path):
+              return Path(path).read_text()
+
+          def write(path, text):
+              Path(path).write_text(text)
+
+          def replace_exact(path, old, new, expected=None):
+              text = read(path)
+              count = text.count(old)
+              if expected is not None and count != expected:
+                  raise SystemExit(f"{path}: expected {expected} occurrences of {old!r}, found {count}")
+              if count == 0:
+                  raise SystemExit(f"{path}: missing expected text {old!r}")
+              write(path, text.replace(old, new))
+              return count
+
+          # Delivery/cache contract. Keep semantic app version at V15.1.0.
+          replace_exact("index.html", OLD_CACHE, NEW_CACHE, 1)
+          replace_exact("index.html", OLD_BLACK, NEW_BLACK, 1)
+          replace_exact("index.html", OLD_SYNC, NEW_SYNC, 1)
+          replace_exact("sw.js", OLD_CACHE, NEW_CACHE, 1)
+          replace_exact("sw.js", OLD_BLACK, NEW_BLACK, 1)
+          replace_exact("sw.js", OLD_LIQUID, NEW_LIQUID, 1)
+          replace_exact("sw.js", OLD_SYNC, NEW_SYNC, 1)
+          replace_exact("sync-config.js", "./liquid-glass-v15.css?v=${VERSION}-monthnav1", "./liquid-glass-v15.css?v=${VERSION}-light1", 1)
+
+          version_path = Path("version.json")
+          version = json.loads(version_path.read_text())
+          if version.get("cacheVersion") != OLD_CACHE:
+              raise SystemExit(f"version.json: unexpected cacheVersion {version.get('cacheVersion')!r}")
+          version["cacheVersion"] = NEW_CACHE
+          version["notes"] = "Desktop Light mode chrome correction: #efefef canvas with light sidebar, readable Spend controls, light weekly marquee and month/history controls, light modal chrome, preserved Black Canvas dark mode, Finance Schema 12, Cloud Schema V3, records, calculations, sync behavior, and phone marquee rules."
+          version_path.write_text(json.dumps(version, indent=2) + "\n")
+
+          # Fix the real Spend contrast regression instead of forcing white in both themes.
+          black_path = Path("black-canvas-v15-1-0.css")
+          black = black_path.read_text()
+          old_spend = '''/* V15.1.0 Available money Spend label hotfix. */
+          #availableMoneySection .account-spend-button span {
+            color:#ffffff !important;
+          }
+          '''
+          new_spend = '''/* V15.1.0 Available money Spend contrast by theme. */
+          html[data-theme="light"] #availableMoneySection .account-spend-button,
+          html[data-theme="light"] #availableMoneySection .account-spend-button span {
+            background:var(--surface) !important;
+            border-color:var(--line) !important;
+            color:var(--text) !important;
+          }
+          html[data-theme="light"] #availableMoneySection .account-spend-button:hover {
+            background:var(--surface-soft) !important;
+          }
+          html[data-theme="dark"] #availableMoneySection .account-spend-button span {
+            color:#ffffff !important;
+          }
+          '''
+          if black.count(old_spend) != 1:
+              raise SystemExit("black-canvas-v15-1-0.css: Spend hotfix block did not match exactly once")
+          black_path.write_text(black.replace(old_spend, new_spend))
+
+          # Liquid Glass is injected after the normal CSS stack. Give Light mode its own
+          # material tokens and readable navigation/content chrome without touching Dark mode.
+          liquid_path = Path("liquid-glass-v15.css")
+          liquid = liquid_path.read_text()
+          marker = "/* V15.1.0 · Light mode chrome correction r26 */"
+          if marker in liquid:
+              raise SystemExit("liquid-glass-v15.css: r26 patch already present")
+          light_patch = r'''
+
+          /* V15.1.0 · Light mode chrome correction r26 */
+          html[data-theme="light"] {
+            --liquid-glass-surface:rgba(255,255,255,.82);
+            --liquid-glass-surface-strong:rgba(255,255,255,.96);
+            --liquid-glass-surface-soft:rgba(247,249,252,.88);
+            --liquid-glass-border:rgba(23,59,103,.14);
+            --liquid-glass-edge:rgba(255,255,255,.92);
+            --liquid-glass-shadow:0 14px 36px rgba(16,24,40,.12),inset 0 1px 0 rgba(255,255,255,.96),inset 0 -1px 0 rgba(16,24,40,.06);
+            --liquid-glass-shadow-soft:0 8px 22px rgba(16,24,40,.09),inset 0 1px 0 rgba(255,255,255,.92);
+            --liquid-glass-active:rgba(23,59,103,.94);
+            --liquid-glass-hover:rgba(23,59,103,.08);
+            --nav:#ffffff;
+            --nav-active-bg:var(--primary);
+            --nav-active-text:#ffffff;
+          }
+
+          html[data-theme="light"] .sidebar {
+            color:var(--text);
+          }
+          html[data-theme="light"] .sidebar :is(.sidebar-close-button,.nav-button) {
+            color:var(--text);
+          }
+          html[data-theme="light"] .sidebar .nav-icon {
+            background:color-mix(in srgb,var(--primary) 7%,var(--surface));
+            color:var(--text);
+          }
+          html[data-theme="light"] .sidebar .nav-icon-image {
+            filter:brightness(0) saturate(100%) !important;
+            opacity:.78 !important;
+          }
+          html[data-theme="light"] .sidebar .nav-button.active {
+            color:#ffffff;
+          }
+          html[data-theme="light"] .sidebar .nav-button.active .nav-icon {
+            background:transparent;
+            color:#ffffff;
+          }
+          html[data-theme="light"] .sidebar .nav-button.active .nav-icon-image {
+            filter:brightness(0) invert(1) !important;
+            opacity:1 !important;
+          }
+          html[data-theme="light"] .sidebar :is(.brand small,.sidebar-note) {
+            color:var(--muted);
+          }
+          html[data-theme="light"] .sidebar:not(.desktop-open):not(.sidebar-pinned) .nav-button::after {
+            border-color:var(--line);
+            background:var(--surface);
+            color:var(--text);
+          }
+
+          html[data-theme="light"] .workspace-switcher button.active,
+          html[data-theme="light"] .workspace-switcher button[aria-selected="true"] {
+            color:#ffffff;
+          }
+          html[data-theme="light"] :is(.dashboard-week-marquee,.finance-week-marquee,.work-week-marquee),
+          html[data-theme="light"] :is(.dashboard-week-marquee,.finance-week-marquee,.work-week-marquee) .dashboard-week-day,
+          html[data-theme="light"] .topbar :is(.month-nav-button,.month-display-button,.month-current-button,.topbar-history-button),
+          html[data-theme="light"] :is(dialog,.modal,.dialog) :is(.modal-header,.dialog-header,.modal-footer,.dialog-footer,.modal-actions,.dialog-actions) {
+            color:var(--text);
+          }
+
+          @media (prefers-reduced-transparency:reduce) {
+            html[data-theme="light"] {
+              --liquid-glass-surface:rgba(255,255,255,.98);
+              --liquid-glass-surface-strong:#ffffff;
+              --liquid-glass-surface-soft:rgba(247,249,252,.98);
+            }
+          }
+          '''
+          liquid_path.write_text(liquid + light_patch)
+
+          # Migrate exact active test pins so CI validates r26 instead of the old shell/assets.
+          for path in Path("tests").rglob("*"):
+              if not path.is_file():
+                  continue
+              try:
+                  text = path.read_text()
+              except UnicodeDecodeError:
+                  continue
+              text = text.replace(OLD_CACHE, NEW_CACHE)
+              text = text.replace(OLD_LIQUID, NEW_LIQUID)
+              text = text.replace(OLD_BLACK, NEW_BLACK)
+              text = text.replace(OLD_SYNC, NEW_SYNC)
+              path.write_text(text)
+
+          # Existing palette browser test: Spend is dark in Light mode and white in Dark mode.
+          palette_path = Path("tests/black-canvas-v15-1-0.spec.mjs")
+          palette = palette_path.read_text()
+          old_assert = '    expect(result.spendColor).toBe("rgb(255, 255, 255)");'
+          new_assert = '    expect(result.spendColor).toBe(theme === "light" ? "rgb(24, 34, 48)" : "rgb(255, 255, 255)");'
+          if palette.count(old_assert) != 1:
+              raise SystemExit("black-canvas browser test: expected Spend assertion once")
+          palette_path.write_text(palette.replace(old_assert, new_assert))
+
+          # Static Spend validator now requires the theme-specific contract.
+          Path("tests/validate-spend-label-v15-1-0.mjs").write_text(r'''#!/usr/bin/env node
+          import assert from "node:assert/strict";
+          import fs from "node:fs";
+          const css = fs.readFileSync("black-canvas-v15-1-0.css", "utf8");
+          const index = fs.readFileSync("index.html", "utf8");
+          const sw = fs.readFileSync("sw.js", "utf8");
+          const version = JSON.parse(fs.readFileSync("version.json", "utf8"));
+          assert.match(css, /html\[data-theme="light"\] #availableMoneySection \.account-spend-button,[\s\S]*color:var\(--text\) !important;/);
+          assert.match(css, /html\[data-theme="dark"\] #availableMoneySection \.account-spend-button span\s*\{[\s\S]*color:#ffffff !important;/);
+          assert.match(index, /black-canvas-v15-1-0\.css\?v=15\.1\.0-light1/);
+          assert.match(sw, /black-canvas-v15-1-0\.css\?v=15\.1\.0-light1/);
+          assert.equal(version.version, "15.1.0");
+          assert.equal(version.schemaVersion, 12);
+          assert.equal(version.cloudSchemaVersion, 3);
+          assert.equal(version.cacheVersion, "finance-v15-20260815-light-chrome-r26");
+          console.log("V15.1.0 Spend label theme contrast regression passed.");
+          '''.replace("          ", ""))
+
+          # Strengthen static palette validation for the dynamically injected final layer.
+          static_path = Path("tests/validate-black-canvas-v15-1-0.mjs")
+          static = static_path.read_text()
+          anchor = 'assert.match(liquid,/--liquid-glass-active:rgba\\(23,62,118,/);\n'
+          extra = (
+              'assert.match(liquid,/html\\[data-theme="light"\\][\\s\\S]*--liquid-glass-surface:rgba\\(255,255,255,.82\\)/);\n'
+              'assert.match(liquid,/html\\[data-theme="light"\\][\\s\\S]*--nav:#ffffff/);\n'
+              'assert.match(liquid,/html\\[data-theme="light"\\] \\.sidebar \\.nav-button\\.active[\\s\\S]*color:#ffffff/);\n'
+          )
+          if static.count(anchor) != 1:
+              raise SystemExit("static Black Canvas validator: liquid anchor not found exactly once")
+          static_path.write_text(static.replace(anchor, anchor + extra))
+
+          # Browser regression that reproduces the real final cascade: Liquid Glass last.
+          Path("tests/light-mode-chrome-v15-1-0.spec.mjs").write_text(r'''import { test, expect } from "@playwright/test";
+
+          for (const theme of ["light", "dark"]) {
+            test(`V15.1.0 ${theme} chrome keeps navigation, marquee, Spend, and modal readable`, async ({ page }) => {
+              await page.setViewportSize({ width:1440, height:900 });
+              await page.setContent(`<!doctype html><html data-theme="${theme}"><head>
+                <link rel="stylesheet" href="http://127.0.0.1:3000/app.css?v=15.1.0-desktop2">
+                <link rel="stylesheet" href="http://127.0.0.1:3000/dashboard-interactions.css?v=15.1.0-desktop2">
+                <link rel="stylesheet" href="http://127.0.0.1:3000/black-canvas-v15-1-0.css?v=15.1.0-light1">
+                <link rel="stylesheet" href="http://127.0.0.1:3000/liquid-glass-v15.css?v=15.1.0-light1">
+                <style>*,*::before,*::after{animation:none!important;transition:none!important}</style>
+              </head><body>
+                <aside class="sidebar desktop-open" id="sidebar">
+                  <button class="sidebar-close-button" id="sidebarClose">Pin</button>
+                  <button class="nav-button" id="inactiveNav"><span class="nav-icon"><img id="inactiveIcon" class="nav-icon-image" src="http://127.0.0.1:3000/icons/sidebar-overview.png" alt=""></span><span>Overview</span></button>
+                  <button class="nav-button active" id="activeNav"><span class="nav-icon"><img id="activeIcon" class="nav-icon-image" src="http://127.0.0.1:3000/icons/sidebar-finance.png" alt=""></span><span>Finance</span></button>
+                </aside>
+                <header class="topbar"><div class="topbar-actions">
+                  <div class="month-navigator" id="monthNav"><button class="month-nav-button" id="monthPrev">‹</button><div class="month-control"><button class="month-display-button" id="monthDisplay">August 2026</button></div><button class="month-nav-button">›</button></div>
+                  <div class="topbar-history-actions"><button class="topbar-history-button" id="undo">↶</button></div>
+                </div></header>
+                <div class="workspace-switcher"><button class="workspace-switcher-button active" id="workspaceActive">Budget & Expenses</button></div>
+                <section class="dashboard-week-marquee" id="marquee"><div class="dashboard-week-marquee-heading"><strong>This week</strong></div><div class="dashboard-week-marquee-window"><div class="dashboard-week-marquee-track"><div class="dashboard-week-marquee-group"><article class="dashboard-week-day" id="weekDay"><div class="dashboard-week-copy"><strong>15th Month Salary</strong><small>Paycheck</small></div></article></div></div></div></section>
+                <section id="availableMoneySection"><button class="button button-secondary button-small account-spend-button" id="spend"><span id="spendLabel">Spend</span></button></section>
+                <dialog open class="app-dialog"><form><header class="modal-header" id="modalHeader"><h3>Edit account</h3><button class="button button-secondary button-small">Close</button></header><div class="modal-body">Body</div><footer class="modal-footer" id="modalFooter"><button class="button button-secondary">Cancel</button><button class="button button-primary">Record spending</button></footer></form></dialog>
+              </body></html>`, { waitUntil:"load" });
+
+              const result = await page.evaluate(() => ({
+                body:getComputedStyle(document.body).backgroundColor,
+                glassStrong:getComputedStyle(document.documentElement).getPropertyValue("--liquid-glass-surface-strong").trim(),
+                sidebarBackground:getComputedStyle(document.querySelector("#sidebar")).backgroundImage,
+                sidebarColor:getComputedStyle(document.querySelector("#sidebar")).color,
+                inactiveColor:getComputedStyle(document.querySelector("#inactiveNav")).color,
+                activeColor:getComputedStyle(document.querySelector("#activeNav")).color,
+                inactiveIconFilter:getComputedStyle(document.querySelector("#inactiveIcon")).filter,
+                activeIconFilter:getComputedStyle(document.querySelector("#activeIcon")).filter,
+                workspaceColor:getComputedStyle(document.querySelector("#workspaceActive")).color,
+                marqueeBackground:getComputedStyle(document.querySelector("#marquee")).backgroundImage,
+                dayBackground:getComputedStyle(document.querySelector("#weekDay")).backgroundImage,
+                monthColor:getComputedStyle(document.querySelector("#monthDisplay")).color,
+                undoColor:getComputedStyle(document.querySelector("#undo")).color,
+                spendColor:getComputedStyle(document.querySelector("#spendLabel")).color,
+                modalHeaderBackground:getComputedStyle(document.querySelector("#modalHeader")).backgroundImage,
+                modalHeaderColor:getComputedStyle(document.querySelector("#modalHeader")).color,
+                modalFooterBackground:getComputedStyle(document.querySelector("#modalFooter")).backgroundImage
+              }));
+
+              if (theme === "light") {
+                expect(result.body).toBe("rgb(239, 239, 239)");
+                expect(result.glassStrong).toContain("255,255,255");
+                expect(result.sidebarBackground).toContain("rgba(255, 255, 255");
+                expect(result.sidebarColor).toBe("rgb(24, 34, 48)");
+                expect(result.inactiveColor).toBe("rgb(24, 34, 48)");
+                expect(result.activeColor).toBe("rgb(255, 255, 255)");
+                expect(result.inactiveIconFilter).toContain("brightness(0)");
+                expect(result.activeIconFilter).toContain("invert(1)");
+                expect(result.workspaceColor).toBe("rgb(255, 255, 255)");
+                expect(result.marqueeBackground).toContain("rgba(255, 255, 255");
+                expect(result.dayBackground).toContain("rgba(247, 249, 252");
+                expect(result.monthColor).toBe("rgb(24, 34, 48)");
+                expect(result.undoColor).toBe("rgb(24, 34, 48)");
+                expect(result.spendColor).toBe("rgb(24, 34, 48)");
+                expect(result.modalHeaderBackground).toContain("rgba(255, 255, 255");
+                expect(result.modalHeaderColor).toBe("rgb(24, 34, 48)");
+                expect(result.modalFooterBackground).toContain("rgba(255, 255, 255");
+              } else {
+                expect(result.body).toBe("rgb(0, 0, 0)");
+                expect(result.glassStrong).toContain("7,12,20");
+                expect(result.sidebarBackground).toContain("rgba(7, 12, 20");
+                expect(result.spendColor).toBe("rgb(255, 255, 255)");
+                expect(result.modalHeaderBackground).toContain("rgba(7, 12, 20");
+              }
+            });
+          }
+          '''.replace(/^          /gm, ""))
+
+          # Contract checks before tests run.
+          source_contract = {
+              "index.html": [NEW_CACHE, NEW_BLACK, NEW_SYNC],
+              "sw.js": [NEW_CACHE, NEW_BLACK, NEW_LIQUID, NEW_SYNC],
+              "sync-config.js": ["./liquid-glass-v15.css?v=${VERSION}-light1"],
+              "black-canvas-v15-1-0.css": ['html[data-theme="light"] #availableMoneySection .account-spend-button'],
+              "liquid-glass-v15.css": [marker, '--liquid-glass-surface:rgba(255,255,255,.82)', '--nav:#ffffff']
+          }
+          for path, needles in source_contract.items():
+              text = read(path)
+              for needle in needles:
+                  if needle not in text:
+                      raise SystemExit(f"{path}: missing final contract token {needle!r}")
+          for path in [Path("index.html"), Path("sw.js"), Path("version.json")]:
+              if OLD_CACHE in path.read_text():
+                  raise SystemExit(f"{path}: stale r25 cache token remains")
+          for path in Path("tests").rglob("*"):
+              if path.is_file():
+                  try:
+                      text = path.read_text()
+                  except UnicodeDecodeError:
+                      continue
+                  if OLD_CACHE in text or OLD_LIQUID in text or OLD_BLACK in text or OLD_SYNC in text:
+                      raise SystemExit(f"{path}: stale delivery token remains")
+          PY
+
+      - name: Remove temporary patch workflow before validation
+        run: git rm .github/workflows/patch-light-mode-chrome-r26.yml
+
+      - name: Install locked project metadata
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Run repository quality suite
+        run: npm run quality
+
+      - name: Audit production dependencies
+        run: npm run audit
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run full browser suite
+        run: npm run test:browser
+
+      - name: Commit validated final tree
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git commit -m "fix: correct Light mode chrome contrast"
+          git push origin HEAD:fix/light-mode-chrome-r26
