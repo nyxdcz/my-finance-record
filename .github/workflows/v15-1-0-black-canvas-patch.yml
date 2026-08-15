@@ -1,0 +1,45 @@
+name: V15.1.0 Black Canvas Patch
+
+on:
+  push:
+    branches:
+      - feat/v15-1-0-black-canvas
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out release branch
+        uses: actions/checkout@v7
+        with:
+          ref: feat/v15-1-0-black-canvas
+          fetch-depth: 0
+      - name: Use Node.js 24
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          package-manager-cache: false
+      - name: Apply V15.1.0 patch
+        run: python .github/patch-v15-1-0-black-canvas.py
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Run repository quality
+        run: npm run quality
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Run browser regressions
+        run: npm run test:browser
+      - name: Commit validated release and remove temporary automation
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/patch-v15-1-0-black-canvas.py .github/workflows/v15-1-0-black-canvas-patch.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git commit -m "feat: release V15.1.0 Black Canvas UI"
+          git push origin HEAD:feat/v15-1-0-black-canvas
