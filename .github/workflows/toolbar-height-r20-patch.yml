@@ -61,8 +61,8 @@ jobs:
           }
           '''
           if marker not in css:
-              css = css.rstrip() + block + "\n"
-          css_path.write_text(css)
+              css = css.rstrip() + block
+          css_path.write_text(css.rstrip() + "\n")
 
           for path in [Path("index.html"), Path("sw.js")]:
               text = path.read_text()
@@ -129,8 +129,8 @@ jobs:
               expect(await heightOf(selector), `${selector} should match Synced height`).toBe(reference);
             }
           });
-          ''' + "\n"
-              spec_path.write_text(spec)
+          '''
+          spec_path.write_text(spec.rstrip() + "\n")
 
           changelog_path = Path("CHANGELOG.md")
           changelog = changelog_path.read_text()
