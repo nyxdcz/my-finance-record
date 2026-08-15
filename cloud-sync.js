@@ -1,9 +1,9 @@
 "use strict";
 /* My Finance Records · Encrypted profile-scoped Cloud Sync 3.0.
-   For connected profiles, the current cloud record is authoritative. This device refreshes
-   cloud changes before queued local changes may upload, while preserving offline editing. */
+   Safe multi-device sync refreshes cloud revisions before upload, preserves concurrent device edits,
+   merges non-overlapping changes, and pauses overlapping changes for explicit review. */
 (function financeCloudSyncV3Bootstrap() {
-  const APP_VERSION_FALLBACK = "15.0.2";
+  const APP_VERSION_FALLBACK = "15.0.3";
   const APP_VERSION_CODE = 130000;
   const CLOUD_SCHEMA_VERSION = 3;
   const CORE_SCHEMA_VERSION = 12;
@@ -515,20 +515,42 @@
   function pendingCount() { return Object.keys(pending).length; }
   function conflictCount() { return conflicts.filter(item => !item.resolved).length; }
 
-  function adoptExistingCloudConflicts() {
-    let adopted = 0;
-    const keys = new Set();
-    conflicts.filter(item => !item.resolved).forEach(item => {
-      if (!baseRecords[item.key]) return;
-      delete pending[item.key];
-      keys.add(item.key);
-      adopted += 1;
+  function recoverStoredConflicts() {
+    let recovered = 0;
+    conflicts.filter(item => !item.resolved).forEach(conflict => {
+      const key = conflict.key, base = baseRecords[key];
+      if (!base) return;
+      let item = pending[key];
+      if (!item) {
+        const [collection,recordId] = splitKey(key);
+        item = pending[key] = {
+          key,
+          collection:String(conflict.collection || collection),
+          recordId:String(conflict.recordId || recordId),
+          payload:clone(conflict.localPayload || {}),
+          sortIndex:Number(conflict.localSortIndex ?? base.sortIndex ?? 0),
+          deleted:Boolean(conflict.localDeleted),
+          baseRevision:Number(conflict.remoteRevision || base.revision || 0),
+          basePayload:clone(conflict.remotePayload || base.payload || {}),
+          baseSortIndex:Number(conflict.remoteSortIndex ?? base.sortIndex ?? 0),
+          minWriterVersionCode:APP_VERSION_CODE,
+          status:"conflict",
+          attempts:0,
+          nextAttemptAt:0,
+          updatedAt:conflict.createdAt || nowIso(),
+          reason:"Recovered unresolved multi-device conflict",
+          lastError:"Both cloud and this device changed this record. Review both versions before choosing."
+        };
+        recovered += 1;
+      } else {
+        item.status = "conflict";
+        item.lastError = "Both cloud and this device changed this record. Review both versions before choosing.";
+      }
     });
-    if (!adopted) return 0;
-    conflicts = conflicts.filter(item => !keys.has(item.key));
+    if (!recovered) return 0;
     persist({ reclaimFirst:true });
-    applyEffectiveRecords("Current cloud records restored on this device");
-    return adopted;
+    applyEffectiveRecords("Recovered unresolved device edits without discarding them");
+    return recovered;
   }
 
   function topStatusLabel() {
@@ -565,7 +587,7 @@
     const pendingErrors = Object.values(pending).filter(item => item.status === "error" || item.status === "conflict").length;
     let activeDetail = detail;
     if (!activeDetail) {
-      if (conflictsNow > 0) activeDetail = `${conflictsNow} old conflict${conflictsNow === 1 ? "" : "s"} will be replaced by current cloud records on sync.`;
+      if (conflictsNow > 0) activeDetail = `${conflictsNow} record conflict${conflictsNow === 1 ? "" : "s"} preserved for review. Neither version will be silently discarded.`;
       else if (pendingErrors > 0) activeDetail = `${pendingErrors} pending record change${pendingErrors === 1 ? "" : "s"} failed to sync.`;
       else if (state.lastError) activeDetail = `Sync issue: ${state.lastError}`;
       else activeDetail = state.status || (label === "Synced" ? "This device matches the latest cloud state." : label === "Cloud off" ? "Cloud sync is not configured on this device." : "Cloud is checked before this device can upload changes.");
@@ -576,7 +598,7 @@
     if (fixButton) {
       if (conflictsNow > 0 || pendingErrors > 0 || label === "Sync issue" || Boolean(state.lastError)) {
         fixButton.hidden = false;
-        fixButton.textContent = conflictsNow > 0 ? "Sync cloud version" : pendingErrors > 0 ? `Fix ${pendingErrors} sync issue${pendingErrors === 1 ? "" : "s"}` : "Review & fix issue";
+        fixButton.textContent = conflictsNow > 0 ? "Review conflicts" : pendingErrors > 0 ? `Fix ${pendingErrors} sync issue${pendingErrors === 1 ? "" : "s"}` : "Review & fix issue";
       } else fixButton.hidden = true;
     }
   }
@@ -606,7 +628,9 @@
     style.textContent = `.cloud-v3-health-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.cloud-v3-health-grid>div{padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface-soft);min-width:0}.cloud-v3-health-grid span,.cloud-v3-health-grid strong{display:block;overflow-wrap:anywhere}.cloud-v3-health-grid span{color:var(--muted);font-size:.61rem}.cloud-v3-health-grid strong{margin-top:3px;font-size:.72rem}.cloud-pending-list{display:grid;gap:7px}.cloud-pending-item{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface-soft)}.cloud-pending-item[data-status="conflict"]{border-color:color-mix(in srgb,var(--orange) 42%,var(--line));background:var(--orange-soft)}.cloud-pending-item[data-status="error"]{border-color:color-mix(in srgb,var(--red) 35%,var(--line));background:var(--red-soft)}.cloud-pending-item strong,.cloud-pending-item small{display:block;overflow-wrap:anywhere}.cloud-pending-item strong{font-size:.69rem}.cloud-pending-item small{margin-top:2px;color:var(--muted);font-size:.59rem}.cloud-pending-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:5px}.cloud-audit-list{display:grid;gap:5px;max-height:250px;overflow:auto}.cloud-audit-row{display:grid;grid-template-columns:90px minmax(0,1fr) auto;gap:8px;align-items:center;padding:7px 8px;border-bottom:1px solid var(--line);font-size:.62rem}.cloud-audit-row small{color:var(--muted)}@media(max-width:900px){.cloud-v3-health-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:700px){.cloud-v3-health-grid{grid-template-columns:1fr}.cloud-pending-item{grid-template-columns:1fr}.cloud-pending-actions{justify-content:flex-start}.cloud-pending-actions .button{min-height:42px}.cloud-audit-row{grid-template-columns:1fr}.cloud-device-table th:nth-child(3),.cloud-device-table td:nth-child(3){display:table-cell}}`;
     document.head.appendChild(style);
     const controls = connected.firstElementChild;
-    controls?.insertAdjacentHTML("afterend", `<article class="card" id="cloudSyncHealthCard"><div class="card-header"><div><h3>Sync Health</h3><p>Encrypted Cloud Sync 3.0 status and compatibility</p></div><span class="v12-chip info" id="cloudProtocolChip">Cloud Schema V3</span></div><div class="cloud-v3-health-grid"><div><span>Protocol</span><strong>Encrypted record-level V3</strong></div><div><span>Last cloud audit</span><strong id="cloudAuditCursor">0</strong></div><div><span>Last pull</span><strong id="cloudLastPull">Never</strong></div><div><span>Last push</span><strong id="cloudLastPush">Never</strong></div><div><span>Pending records</span><strong id="cloudHealthPending">0</strong></div><div><span>Conflicts</span><strong id="cloudHealthConflicts">0</strong></div><div><span>This app</span><strong id="cloudHealthAppVersion">V${appVersion()}</strong></div><div><span>Minimum writer</span><strong id="cloudHealthRequiredVersion">V13.0.0</strong></div></div><p class="v12-help" id="cloudHealthMessage">Cloud is authoritative. This device refreshes cloud records before queued device changes can upload.</p></article><article class="card" id="cloudPendingCard"><div class="card-header"><div><h3>Queued device changes</h3><p>Local edits waiting for cloud confirmation</p></div><span class="v12-chip success" id="cloudPendingChip">Nothing pending</span></div><div class="cloud-pending-list" id="cloudPendingList"><div class="v12-empty">No records are waiting to synchronize.</div></div></article><article class="card" id="cloudAuditCard"><div class="card-header"><div><h3>Recent cloud audit</h3><p>Immutable record activity received by this device</p></div><span class="v12-chip info">Latest 30</span></div><div class="cloud-audit-list" id="cloudAuditList"><div class="v12-empty">No Cloud Schema V3 activity has been received yet.</div></div></article>`);
+    controls?.insertAdjacentHTML("afterend", `<article class="card" id="cloudSyncHealthCard"><div class="card-header"><div><h3>Sync Health</h3><p>Encrypted Cloud Sync 3.0 status and compatibility</p></div><span class="v12-chip info" id="cloudProtocolChip">Cloud Schema V3</span></div><div class="cloud-v3-health-grid"><div><span>Protocol</span><strong>Encrypted record-level V3</strong></div><div><span>Last cloud audit</span><strong id="cloudAuditCursor">0</strong></div><div><span>Last pull</span><strong id="cloudLastPull">Never</strong></div><div><span>Last push</span><strong id="cloudLastPush">Never</strong></div><div><span>Pending records</span><strong id="cloudHealthPending">0</strong></div><div><span>Conflicts</span><strong id="cloudHealthConflicts">0</strong></div><div><span>This app</span><strong id="cloudHealthAppVersion">V${appVersion()}</strong></div><div><span>Minimum writer</span><strong id="cloudHealthRequiredVersion">V13.0.0</strong></div></div><p class="v12-help" id="cloudHealthMessage">Cloud revisions are checked first; pending device edits are preserved, safely merged, or held for review.</p></article><article class="card" id="cloudPendingCard"><div class="card-header"><div><h3>Queued device changes</h3><p>Local edits waiting for cloud confirmation</p></div><span class="v12-chip success" id="cloudPendingChip">Nothing pending</span></div><div class="cloud-pending-list" id="cloudPendingList"><div class="v12-empty">No records are waiting to synchronize.</div></div></article><article class="card" id="cloudAuditCard"><div class="card-header"><div><h3>Recent cloud audit</h3><p>Immutable record activity received by this device</p></div><span class="v12-chip info">Latest 30</span></div><div class="cloud-audit-list" id="cloudAuditList"><div class="v12-empty">No Cloud Schema V3 activity has been received yet.</div></div></article>`);
+    const healthCard=document.getElementById("cloudSyncHealthCard");
+    if (healthCard && !document.getElementById("cloudReplaceFromDeviceCard")) healthCard.insertAdjacentHTML("afterend", `<article class="card" id="cloudReplaceFromDeviceCard"><div class="card-header"><div><h3>Cloud recovery</h3><p>Use only when this device contains the finance copy you want every device to use.</p></div><span class="v12-chip warning">Protected action</span></div><p class="v12-help">A local recovery point is created first. The app then compares current cloud revisions before replacing them with this device’s current records.</p><div class="card-actions"><button class="button button-danger" id="cloudReplaceFromDevice" type="button">Make this device the current cloud copy</button></div></article>`);
   }
 
   function renderCloudStats() {
@@ -627,7 +651,7 @@
     const pendingNode = document.getElementById("cloudPendingCount"); if (pendingNode) pendingNode.textContent = String(pendingCount());
     const pendingLabel = pendingNode?.parentElement?.querySelector("span"); if (pendingLabel) pendingLabel.textContent = "Queued device changes";
     const overviewHelp = document.querySelector(".cloud-sync-overview-card .v12-help");
-    if (overviewHelp) overviewHelp.textContent = cloudUser ? "Cloud records are the source of truth. This device refreshes from cloud first, then uploads only changes based on the current cloud revision. Keep a downloaded backup for recovery." : "Connect Cloud Sync to make cloud records the source of truth across your devices.";
+    if (overviewHelp) overviewHelp.textContent = cloudUser ? "Cloud revisions are checked before upload. Device edits stay pending until safely merged or explicitly resolved. Keep a downloaded backup for recovery." : "Connect Cloud Sync to keep encrypted finance records coordinated across your devices.";
     const lastSync = document.getElementById("cloudLastSync"); if (lastSync) lastSync.textContent = formatDateTime(state.lastSyncAt);
     const device = document.getElementById("cloudCurrentDevice"); if (device) device.textContent = currentDeviceName();
     const deviceInput = document.getElementById("cloudDeviceName"); if (deviceInput && document.activeElement !== deviceInput) deviceInput.value = currentDeviceName();
@@ -641,7 +665,7 @@
     const overviewFix = document.getElementById("cloudOverviewFixButton");
     const overviewSync = document.getElementById("cloudOverviewSyncNow");
     if (overviewFix) {
-      if (conflictsNow > 0 || pendingErrors > 0 || state.lastError) { overviewFix.hidden = false; overviewFix.textContent = conflictsNow > 0 ? "Sync cloud version" : pendingErrors > 0 ? `Fix ${pendingErrors} sync issue${pendingErrors === 1 ? "" : "s"}` : "Review & fix issue"; }
+      if (conflictsNow > 0 || pendingErrors > 0 || state.lastError) { overviewFix.hidden = false; overviewFix.textContent = conflictsNow > 0 ? "Review conflicts" : pendingErrors > 0 ? `Fix ${pendingErrors} sync issue${pendingErrors === 1 ? "" : "s"}` : "Review & fix issue"; }
       else overviewFix.hidden = true;
     }
     if (overviewSync) overviewSync.disabled = syncing || !cloudUser || !navigator.onLine || !configStatus().ok;
@@ -652,12 +676,18 @@
     const set = (id,value) => { const node=document.getElementById(id); if(node) node.textContent=String(value); };
     set("cloudAuditCursor", Number(state.lastAuditId || 0)); set("cloudLastPull", formatDateTime(state.lastPullAt)); set("cloudLastPush", formatDateTime(state.lastPushAt)); set("cloudHealthPending", pendingCount()); set("cloudHealthConflicts", conflictCount()); set("cloudHealthAppVersion", `V${appVersion()}`); set("cloudHealthRequiredVersion", versionFromCode(state.requiredAppVersionCode || APP_VERSION_CODE));
     const protocol = document.getElementById("cloudProtocolChip"); if (protocol) { protocol.textContent = `Cloud Schema V${state.cloudSchemaVersion || 2}`; protocol.className = `v12-chip ${(state.requiredAppVersionCode || 0) > APP_VERSION_CODE ? "danger" : "success"}`; }
-    const health = document.getElementById("cloudHealthMessage"); if (health) health.textContent = (state.requiredAppVersionCode || 0) > APP_VERSION_CODE ? `This cloud account requires ${versionFromCode(state.requiredAppVersionCode)} or newer. Update this device before writing records.` : state.lastError || "Cloud is authoritative. This device refreshes cloud records before queued device changes can upload.";
+    const health = document.getElementById("cloudHealthMessage"); if (health) health.textContent = (state.requiredAppVersionCode || 0) > APP_VERSION_CODE ? `This cloud account requires ${versionFromCode(state.requiredAppVersionCode)} or newer. Update this device before writing records.` : state.lastError || "Cloud revisions are checked first. Pending device edits are preserved, merged when safe, and never silently replaced on conflict.";
     const chip = document.getElementById("cloudPendingChip"); if (chip) { chip.textContent = pendingCount() ? `${pendingCount()} waiting` : "Nothing pending"; chip.className = `v12-chip ${conflictCount() ? "warning" : pendingCount() ? "info" : "success"}`; }
     const list = document.getElementById("cloudPendingList");
     if (list) {
       const items = Object.values(pending).sort((a,b) => String(b.updatedAt).localeCompare(String(a.updatedAt)));
-      list.innerHTML = items.length ? items.map(item => { const next = item.nextAttemptAt && item.nextAttemptAt > Date.now() ? ` · retry ${formatDateTime(new Date(item.nextAttemptAt).toISOString())}` : ""; return `<article class="cloud-pending-item" data-status="${escape(item.status)}"><div><strong>${escape(recordLabel(item.collection,item.payload,item.recordId))}</strong><small>${escape(item.status)} · revision ${Number(item.baseRevision || 0)} · ${Number(item.attempts || 0)} attempt${Number(item.attempts || 0) === 1 ? "" : "s"}${escape(next)}</small>${item.lastError ? `<small>${escape(item.lastError)}</small>` : ""}</div><div class="cloud-pending-actions"><button class="button button-secondary button-small" type="button" data-sync-retry="${escape(keyToken(item.key))}">Retry</button><button class="button button-secondary button-small" type="button" data-sync-discard="${escape(keyToken(item.key))}">Use cloud</button></div></article>`; }).join("") : `<div class="v12-empty">No records are waiting to synchronize.</div>`;
+      list.innerHTML = items.length ? items.map(item => {
+        const next = item.nextAttemptAt && item.nextAttemptAt > Date.now() ? ` · retry ${formatDateTime(new Date(item.nextAttemptAt).toISOString())}` : "";
+        const actions = item.status === "conflict"
+          ? `<button class="button button-primary button-small" type="button" data-sync-review="${escape(keyToken(item.key))}">Review versions</button>`
+          : `<button class="button button-secondary button-small" type="button" data-sync-retry="${escape(keyToken(item.key))}">Retry</button><button class="button button-secondary button-small" type="button" data-sync-discard="${escape(keyToken(item.key))}">Use cloud</button>`;
+        return `<article class="cloud-pending-item" data-status="${escape(item.status)}"><div><strong>${escape(recordLabel(item.collection,item.payload,item.recordId))}</strong><small>${escape(item.status)} · revision ${Number(item.baseRevision || 0)} · ${Number(item.attempts || 0)} attempt${Number(item.attempts || 0) === 1 ? "" : "s"}${escape(next)}</small>${item.lastError ? `<small>${escape(item.lastError)}</small>` : ""}</div><div class="cloud-pending-actions">${actions}</div></article>`;
+      }).join("") : `<div class="v12-empty">No records are waiting to synchronize.</div>`;
     }
   }
 
@@ -777,6 +807,47 @@
     state.initializedUserId = initializedScope(); state.initializedProfileId = cloudProfileId(); state.migratedFromV1 = false; state.lastSyncAt = nowIso(); state.lastPullAt = nowIso(); persist(); await registerDevice(); await loadDevices(); await loadRecentAudit(); setStatus("Synced", "Cloud is authoritative and this device now matches it.", "success");
   }
 
+  async function replaceCloudWithThisDevice() {
+    if (syncing) throw new Error("Wait for the current sync to finish first.");
+    if (!cloudUser) throw new Error("Sign in before replacing the cloud copy.");
+    if (!navigator.onLine) throw new Error("Connect to the internet before replacing the cloud copy.");
+    requireCloudProfile({ write:true });
+    const desiredData = clone(data);
+    recoveryPoint("Before replacing cloud from this device");
+    syncing = true;
+    setStatus("Updating cloud copy", "A recovery point was saved. Writing this device’s current records with cloud revision checks…", "warning");
+    try {
+      let committed = false;
+      for (let attempt=0; attempt<2 && !committed; attempt += 1) {
+        const snap = await snapshot();
+        if (snap.status === "revoked") return false;
+        if (snap.status !== "ok") throw new Error(`Cloud snapshot returned ${snap.status || "an unknown status"}.`);
+        const remoteStore = storeFromSnapshotRows(snap.records || []), desiredMap = toRecordMap(desiredData), changes = changesBetween(remoteStore,desiredMap);
+        if (!changes.length) { seedBaseFromSnapshot(snap.records || []); state.lastAuditId = Number(snap.latest_audit_id || state.lastAuditId || 0); committed = true; break; }
+        const result = await commitRawChanges(changes);
+        if (result.status === "committed") { committed = true; break; }
+        if (result.status === "conflict" && attempt === 0) continue;
+        if (result.status === "upgrade_required") throw new Error(`Cloud requires ${versionFromCode(result.min_app_version_code)} or newer.`);
+        if (result.status === "revoked") { await handleRevoked(result); return false; }
+        throw new Error(`Cloud replacement returned ${result.status || "an unknown status"}.`);
+      }
+      if (!committed) throw new Error("Cloud changed again while replacing it. Sync once, then retry the recovery action.");
+      const refreshed = await snapshot();
+      if (refreshed.status !== "ok") throw new Error(`Cloud refresh returned ${refreshed.status || "an unknown status"}.`);
+      seedBaseFromSnapshot(refreshed.records || []);
+      state.lastAuditId = Number(refreshed.latest_audit_id || state.lastAuditId || 0);
+      pending = {}; conflicts = [];
+      state.lastSyncAt = nowIso(); state.lastPullAt = nowIso(); state.lastError = "";
+      persist({ reclaimFirst:true });
+      applyEffectiveRecords("This device is now the current cloud copy");
+      await registerDevice(); await loadDevices(); await loadRecentAudit();
+      setStatus("Synced", "This device’s current records are now the cloud copy. Other devices will read this revision before uploading changes.", "success");
+      return true;
+    } finally {
+      syncing = false; updateTopSyncUi(); renderCloudStats(); scheduleRetry(); scheduleForegroundPoll();
+    }
+  }
+
   async function pullChanges() {
     let pages=0, changed=false, hasMore=true;
     while (hasMore && pages < MAX_PULL_PAGES) {
@@ -790,17 +861,107 @@
     state.lastPullAt = nowIso(); persist(); if (changed) applyEffectiveRecords("Current cloud records written to this device"); return changed;
   }
 
+  function reconcilePendingWithRemote(local, row, reason = "Cloud and this device both changed this record") {
+    const key = recordKey(row.collection,row.recordId);
+    const basePayload = clone(local.basePayload);
+    const baseSortIndex = Number(local.baseSortIndex || 0);
+    const localSortIndex = Number(local.sortIndex || 0);
+    const remoteSortIndex = Number(row.sortIndex || 0);
+    const overlaps = [];
+
+    baseRecords[key] = row;
+
+    if ((local.deleted && row.deletedAt) || (!local.deleted && !row.deletedAt && same(local.payload,row.payload) && localSortIndex === remoteSortIndex)) {
+      delete pending[key];
+      conflicts = conflicts.filter(item => item.key !== key);
+      persist({ reclaimFirst:true });
+      return "confirmed";
+    }
+
+    if (local.deleted || row.deletedAt) {
+      local.status = "conflict";
+      local.attempts = 0;
+      local.nextAttemptAt = 0;
+      local.lastError = "Deletion and edit changes overlap. Review the cloud and device versions.";
+      addConflict({
+        key,
+        collection:local.collection,
+        recordId:local.recordId,
+        reason,
+        localPayload:local.payload,
+        localSortIndex,
+        localDeleted:local.deleted,
+        remotePayload:row.payload,
+        remoteRevision:row.revision,
+        remoteDeletedAt:row.deletedAt,
+        remoteSortIndex,
+        remoteMissing:Boolean(row.deletedAt),
+        basePayload,
+        paths:["record"]
+      });
+      persist({ reclaimFirst:true });
+      return "conflict";
+    }
+
+    const merged = threeWayMerge(basePayload, local.payload, row.payload, "", overlaps);
+    let mergedSortIndex = localSortIndex;
+    const localSortChanged = localSortIndex !== baseSortIndex;
+    const remoteSortChanged = remoteSortIndex !== baseSortIndex;
+    if (!localSortChanged) mergedSortIndex = remoteSortIndex;
+    else if (remoteSortChanged && localSortIndex !== remoteSortIndex) overlaps.push("sortIndex");
+
+    if (overlaps.length) {
+      local.status = "conflict";
+      local.attempts = 0;
+      local.nextAttemptAt = 0;
+      local.lastError = "Cloud and this device changed the same fields. Review both versions before choosing.";
+      addConflict({
+        key,
+        collection:local.collection,
+        recordId:local.recordId,
+        reason,
+        localPayload:local.payload,
+        localSortIndex,
+        localDeleted:false,
+        remotePayload:row.payload,
+        remoteRevision:row.revision,
+        remoteDeletedAt:row.deletedAt,
+        remoteSortIndex,
+        remoteMissing:false,
+        basePayload,
+        paths:overlaps
+      });
+      persist({ reclaimFirst:true });
+      return "conflict";
+    }
+
+    conflicts = conflicts.filter(item => item.key !== key);
+    if (same(merged,row.payload) && mergedSortIndex === remoteSortIndex) {
+      delete pending[key];
+      persist({ reclaimFirst:true });
+      return "remote";
+    }
+
+    local.payload = merged;
+    local.sortIndex = mergedSortIndex;
+    local.basePayload = clone(row.payload);
+    local.baseRevision = Number(row.revision || 0);
+    local.baseSortIndex = remoteSortIndex;
+    local.status = "pending";
+    local.attempts = 0;
+    local.nextAttemptAt = 0;
+    local.lastError = "Safely merged non-overlapping changes from another device.";
+    persist({ reclaimFirst:true });
+    return "merged";
+  }
+
   function applyRemoteEvent(event) {
     const row = recordFromRow(event), key = recordKey(row.collection,row.recordId), local = pending[key];
     if (!local) { baseRecords[key] = row; conflicts = conflicts.filter(item => item.key !== key); return; }
     const localConfirmed = row.updatedByDevice === currentDeviceId() && ((!local.deleted && !row.deletedAt && same(local.payload,row.payload) && Number(local.sortIndex || 0) === Number(row.sortIndex || 0)) || (local.deleted && row.deletedAt));
     if (localConfirmed) { baseRecords[key] = row; delete pending[key]; conflicts = conflicts.filter(item => item.key !== key); return; }
-    if (Number(row.revision || 0) > Number(local.baseRevision || 0)) {
-      baseRecords[key] = row;
-      delete pending[key];
-      conflicts = conflicts.filter(item => item.key !== key);
-      return;
-    }
+    if (Number(row.revision || 0) <= Number(local.baseRevision || 0)) return;
+    reconcilePendingWithRemote(local,row,"Cloud changed after this device began editing the record.");
   }
 
   function addConflict(input) { conflicts = conflicts.filter(item => item.key !== input.key); conflicts.unshift({ id:uid("conflict"), key:input.key, collection:input.collection, recordId:input.recordId, reason:input.reason || "Record conflict", createdAt:nowIso(), resolved:false, localPayload:sanitizeRecordPayload(input.collection,input.recordId,input.localPayload), localSortIndex:input.localSortIndex == null ? null : Number(input.localSortIndex || 0), localDeleted:Boolean(input.localDeleted), remotePayload:sanitizeRecordPayload(input.collection,input.recordId,input.remotePayload), remoteRevision:Number(input.remoteRevision || 0), remoteDeletedAt:input.remoteDeletedAt || "", remoteSortIndex:input.remoteSortIndex == null ? null : Number(input.remoteSortIndex || 0), remoteMissing:Boolean(input.remoteMissing), basePayload:input.basePayload == null ? null : sanitizeRecordPayload(input.collection,input.recordId,input.basePayload), paths:(input.paths || []).slice(0,80) }); conflicts=conflicts.slice(0,MAX_CONFLICTS); persist(); }
@@ -820,35 +981,55 @@
   }
 
   function handleCommitConflicts(remoteConflicts, batchItems = []) {
-    const remoteByKey = new Map((remoteConflicts || []).map(remote => [recordKey(remote.collection,remote.record_id),remote])); let adopted = false;
+    const remoteByKey = new Map((remoteConflicts || []).map(remote => [recordKey(remote.collection,remote.record_id),remote]));
+    let reconciled = false;
     (batchItems || []).forEach(local => {
-      const key=recordKey(local.collection,local.recordId), remote=remoteByKey.get(key), base=baseRecords[key];
-      if (remote) {
-        baseRecords[key] = { ...(base || {}), collection:local.collection, recordId:local.recordId, payload:sanitizeRecordPayload(local.collection,local.recordId,remote.remote_payload ?? base?.payload ?? {}), sortIndex:Number(remote.remote_sort_index ?? base?.sortIndex ?? 0), revision:Number(remote.remote_revision ?? base?.revision ?? local.baseRevision ?? 0), deletedAt:remote.remote_deleted_at ?? base?.deletedAt ?? "", updatedAt:base?.updatedAt || nowIso(), updatedByDevice:base?.updatedByDevice || "", appVersion:base?.appVersion || "", appVersionCode:Number(base?.appVersionCode || 0), minWriterVersionCode:Number(base?.minWriterVersionCode || APP_VERSION_CODE) };
-        delete pending[key]; conflicts = conflicts.filter(item => item.key !== key); adopted = true;
-      } else {
-        local.status="pending"; local.attempts=0; local.nextAttemptAt=0; local.lastError="A related cloud record changed. Retrying this device change against the current cloud revision.";
+      const key = recordKey(local.collection,local.recordId), remote = remoteByKey.get(key), base = baseRecords[key];
+      if (!remote) {
+        local.status = "pending";
+        local.attempts = 0;
+        local.nextAttemptAt = 0;
+        local.lastError = "A related cloud record changed. Retrying after the latest cloud revision is read.";
+        return;
       }
+      const row = {
+        ...(base || {}),
+        collection:local.collection,
+        recordId:local.recordId,
+        payload:sanitizeRecordPayload(local.collection,local.recordId,remote.remote_payload ?? base?.payload ?? {}),
+        sortIndex:Number(remote.remote_sort_index ?? base?.sortIndex ?? 0),
+        revision:Number(remote.remote_revision ?? base?.revision ?? local.baseRevision ?? 0),
+        deletedAt:remote.remote_missing ? (remote.remote_deleted_at || nowIso()) : (remote.remote_deleted_at || ""),
+        updatedAt:base?.updatedAt || nowIso(),
+        updatedByDevice:base?.updatedByDevice || "cloud",
+        appVersion:base?.appVersion || "",
+        appVersionCode:Number(base?.appVersionCode || 0),
+        minWriterVersionCode:Number(base?.minWriterVersionCode || APP_VERSION_CODE)
+      };
+      reconcilePendingWithRemote(local,row,"Cloud changed while this device was uploading the record.");
+      reconciled = true;
     });
-    persist({ reclaimFirst:true }); if (adopted) applyEffectiveRecords("Current cloud records restored after a commit race");
+    persist({ reclaimFirst:true });
+    if (reconciled) applyEffectiveRecords("Concurrent cloud changes reviewed without discarding this device edits");
   }
 
   async function syncNow({ reason="manual" } = {}) {
     if (syncing) return; if (!cloudUser) { renderCloudStats(); return; }
     if (state.initializedUserId !== initializedScope()) { setStatus("Initializing sync", "Setting up encrypted cloud synchronization...", "info"); await onSignedIn(); if (state.initializedUserId !== initializedScope()) { renderCloudStats(); return; } }
     if (!navigator.onLine) { setStatus("Offline", `${pendingCount()} device change${pendingCount()===1?"":"s"} waiting for cloud.`, "info"); return; }
-    requireCloudProfile(); syncing=true; setStatus("Syncing", `Reading current cloud records first (${reason})…`, "info");
+    requireCloudProfile(); syncing=true; setStatus("Syncing", `Reading current cloud revisions first (${reason})…`, "info");
     try {
       if (!await registerDevice()) return;
-      const recovered=reconcileUnqueuedLocalChanges(); if(recovered.length)setStatus("Queued device changes",`${recovered.length} previously missed Finance record${recovered.length===1?"":"s"} will be checked against cloud first.`,"warning");
-      const adoptedBeforePull = adoptExistingCloudConflicts();
+      const recovered = reconcileUnqueuedLocalChanges();
+      if (recovered.length) setStatus("Queued device changes", `${recovered.length} previously missed Finance record${recovered.length===1?"":"s"} will be checked against the current cloud revision.`, "warning");
+      recoverStoredConflicts();
       await pullChanges();
       let guard=0;
       while (Object.values(pending).some(item=>item.status!=="conflict"&&Number(item.nextAttemptAt||0)<=Date.now()) && guard<6) { await pushPending(); guard += 1; await pullChanges(); }
       await pullChanges(); await loadDevices(); await loadRecentAudit(); state.lastSyncAt=nowIso(); state.lastError=""; persist();
-      if (conflictCount()) { const adopted = adoptExistingCloudConflicts(); if (adopted) setStatus("Synced", `${adopted} stale device conflict${adopted===1?" was":"s were"} replaced by current cloud records.`, "success"); else setStatus("Sync needs attention", `${conflictCount()} old conflict${conflictCount()===1?"":"s"} could not yet be matched to a cloud base record.`, "warning"); }
-      else if (pendingCount()) setStatus("Changes pending", `${pendingCount()} device change${pendingCount()===1?"":"s"} will upload only after checking the current cloud revision.`, "warning");
-      else setStatus("Synced", adoptedBeforePull ? `Current cloud records replaced ${adoptedBeforePull} stale device conflict${adoptedBeforePull===1?"":"s"}.` : "This device matches the current cloud records.", "success");
+      if (conflictCount()) setStatus("Sync needs review", `${conflictCount()} record conflict${conflictCount()===1?" is":"s are"} preserved. Choose the cloud version or this device before either edit is discarded.`, "warning");
+      else if (pendingCount()) setStatus("Changes pending", `${pendingCount()} device change${pendingCount()===1?"":"s"} will upload after the current cloud revision is checked.`, "warning");
+      else setStatus("Synced", "This device and cloud match. Concurrent edits were preserved or safely merged.", "success");
     } catch (error) { setStatus("Sync needs attention", error.message || "Cloud synchronization failed.", "danger"); throw error; }
     finally { syncing=false; updateTopSyncUi(); renderCloudStats(); scheduleRetry(); scheduleForegroundPoll(); }
   }
@@ -864,13 +1045,37 @@
   function renderDevices(devices) { const body=document.getElementById("cloudDevicesBody"); if (!body) return; const table=body.closest("table"); if (table?.tHead?.rows?.[0]) table.tHead.rows[0].innerHTML="<th>Device</th><th>Status</th><th>App</th><th>Last seen</th><th>Action</th>"; body.innerHTML=devices.length?devices.map(device=>{ const current=device.device_id===currentDeviceId() && device.user_id===cloudUser?.id, revoked=Boolean(device.revoked_at), status=revoked?"Revoked":current?"Current":"Connected", tone=revoked?"danger":current?"success":"info"; return `<tr><td data-label="Device"><strong>${escape(device.device_name||"Device")}</strong><details class="device-platform-details"><summary>Browser details</summary><small>${escape(device.platform||"Browser")}</small></details></td><td data-label="Status"><span class="v12-chip ${tone}">${status}</span></td><td data-label="App">V${escape(device.app_version||"Unknown")}<br><small>Cloud V${Number(device.cloud_schema_version||1)}</small></td><td data-label="Last seen">${escape(formatDateTime(device.last_seen_at))}</td><td data-label="Action">${current||revoked?"—":`<button class="button button-secondary button-small" type="button" data-revoke-cloud-device="${escape(device.device_id)}" data-revoke-cloud-user="${escape(device.user_id || cloudUser?.id || "")}">Sign out remotely</button>`}</td></tr>`; }).join(""):`<tr><td colspan="5"><div class="v12-empty">No cloud devices are listed yet.</div></td></tr>`; }
   async function revokeDevice(deviceId,userId = cloudUser?.id) { if (!deviceId || (deviceId===currentDeviceId() && userId===cloudUser?.id)) return; const result=await rpc("finance_v3_revoke_device",{p_profile_id:requireCloudProfile(),p_user_id:userId,p_device_id:deviceId,p_revoked_by_device:currentDeviceId()}); if (result.status!=="revoked") throw new Error("The device could not be revoked."); await loadDevices(); showToast("The device will sign out the next time it connects.","success"); }
   async function loadRecentAudit() { if (!client || !cloudUser) return; const result=await client.from(AUDIT_TABLE).select("id,collection,record_id,action,revision,device_id,app_version,created_at").eq("profile_id",requireCloudProfile()).order("id",{ascending:false}).limit(30); if (result.error) throw result.error; const node=document.getElementById("cloudAuditList"); if (!node) return; node.innerHTML=(result.data||[]).length?(result.data||[]).map(item=>`<div class="cloud-audit-row"><small>#${Number(item.id||0)} · ${escape(item.action)}</small><span>${escape(item.collection)} · ${escape(item.record_id)}</span><small>r${Number(item.revision||0)} · V${escape(item.app_version||"?")}</small></div>`).join(""):`<div class="v12-empty">No encrypted Cloud Schema V3 activity has been recorded yet.</div>`; }
-  function renderConflicts() { const node=document.getElementById("cloudConflictList"), chip=document.getElementById("cloudConflictCount"); if (!node||!chip) return; const unresolved=conflicts.filter(item=>!item.resolved); chip.textContent=unresolved.length?`${unresolved.length} awaiting cloud refresh`:"No conflicts"; chip.className=`v12-chip ${unresolved.length?"warning":"success"}`; node.innerHTML=unresolved.length?`<div class="v12-empty">These old conflicts will be replaced automatically by the current cloud records on the next sync.</div>`:`<div class="v12-empty">No unresolved record conflicts.</div>`; }
+  function renderConflicts() {
+    const node=document.getElementById("cloudConflictList"), chip=document.getElementById("cloudConflictCount");
+    if (!node || !chip) return;
+    const unresolved=conflicts.filter(item=>!item.resolved);
+    chip.textContent=unresolved.length?`${unresolved.length} needs review`:"No conflicts";
+    chip.className=`v12-chip ${unresolved.length?"warning":"success"}`;
+    node.innerHTML=unresolved.length ? unresolved.map(item => `<article class="cloud-pending-item" data-status="conflict"><div><strong>${escape(recordLabel(item.collection,item.localPayload,item.recordId))}</strong><small>${escape(item.reason || "Both cloud and this device changed this record.")}</small>${item.paths?.length ? `<small>Changed fields: ${escape(item.paths.join(", "))}</small>` : ""}</div><div class="cloud-pending-actions"><button class="button button-primary button-small" type="button" data-review-cloud-conflict="${escape(keyToken(item.key))}">Review versions</button></div></article>`).join("") : `<div class="v12-empty">No unresolved record conflicts.</div>`;
+  }
   function conflictForKey(key) { return conflicts.find(item=>item.key===key&&!item.resolved) || null; }
+  function openConflictReview(key) {
+    const item=conflictForKey(key), review=window.FinanceCloudConflictReview;
+    if (!item) return false;
+    if (!review?.open) throw new Error("Conflict review is unavailable. Reload the latest app version and try again.");
+    review.open({ item, keyToken:keyToken(key), title:recordLabel(item.collection,item.localPayload,item.recordId) });
+    return true;
+  }
   function retryRecord(key) { const item=pending[key]; if (!item) return; item.status="pending"; item.attempts=0; item.nextAttemptAt=0; item.lastError="Cloud will be checked before retrying this device change."; persist(); renderCloudStats(); scheduleSync(80); }
   function refreshAfterConflictChoice(message) { try { applyEffectiveRecords(message); } catch (error) { console.error("Conflict choice was saved but the interface could not refresh.",error); try { showToast("Choice saved. Reload the app to refresh the interface.","warning"); } catch (toastError) {} } try { renderCloudStats(); } catch (error) { console.error("Could not refresh Cloud Sync status.",error); } }
-  function resolveConflict(key, choice) { if (choice !== "cloud") choice = "cloud"; const item=pending[key], conflict=conflictForKey(key), resolver=window.FinanceCloudConflictResolution; if (!resolver?.apply) throw new Error("Conflict resolution is unavailable. Reload the latest app version and try again."); const result=resolver.apply({key,choice,item,conflict,baseRecords,pending,conflicts,setConflicts:value=>{conflicts=value;},persist:()=>persist({reclaimFirst:true}),clone,splitKey,nowIso,appVersion:appVersion(),appVersionCode:APP_VERSION_CODE}); refreshAfterConflictChoice("Current cloud version applied on this device"); showToast("Current cloud version applied on this device.","success"); return result; }
+  function resolveConflict(key, choice) {
+    if (!["cloud","device"].includes(choice)) throw new Error("Choose either the cloud version or this device’s version.");
+    const item=pending[key], conflict=conflictForKey(key), resolver=window.FinanceCloudConflictResolution;
+    if (!resolver?.apply) throw new Error("Conflict resolution is unavailable. Reload the latest app version and try again.");
+    const result=resolver.apply({key,choice,item,conflict,baseRecords,pending,conflicts,setConflicts:value=>{conflicts=value;},persist:()=>persist({reclaimFirst:true}),clone,splitKey,nowIso,appVersion:appVersion(),appVersionCode:APP_VERSION_CODE});
+    const usingDevice = choice === "device";
+    refreshAfterConflictChoice(usingDevice ? "This device version rebased onto the latest cloud revision" : "Current cloud version applied on this device");
+    showToast(usingDevice ? "This device version is queued to become the cloud version." : "Current cloud version applied on this device.","success");
+    if (usingDevice) scheduleSync(80);
+    return result;
+  }
   function discardLocal(key) { return resolveConflict(key,"cloud"); }
-  function keepLocal(key) { return resolveConflict(key,"cloud"); }
+  function keepLocal(key) { return resolveConflict(key,"device"); }
   function downloadConflict(id) { const item=conflicts.find(entry=>entry.id===id); if (!item) return; downloadJson(`finance-record-conflict-${id}.json`,item); }
   function downloadJson(filename,value) { const blob=new Blob([JSON.stringify(value,null,2)],{type:"application/json"}); const url=URL.createObjectURL(blob), link=document.createElement("a"); link.href=url; link.download=filename; document.body.appendChild(link); link.click(); link.remove(); setTimeout(()=>URL.revokeObjectURL(url),0); }
 
@@ -881,7 +1086,8 @@
     document.getElementById("cloudToolbarOpenSettings")?.addEventListener("click",()=>{closeTopSyncPopover();goToPage("settings",{smooth:false});activateSettingsPanel("cloud",true);});
     document.getElementById("cloudToolbarFixIssue")?.addEventListener("click",()=>{closeTopSyncPopover();syncNow({reason:"fix-cloud-authority"}).catch(error=>showToast(error.message,"warning"));});
     document.getElementById("cloudOverviewSyncNow")?.addEventListener("click", () => syncNow({reason:"overview"}).catch(error => showToast(error.message, "warning")));
-    document.getElementById("cloudOverviewFixButton")?.addEventListener("click", () => syncNow({reason:"overview-cloud-authority"}).catch(error => showToast(error.message, "warning")));
+    document.getElementById("cloudOverviewFixButton")?.addEventListener("click", () => { closeTopSyncPopover(); goToPage("settings",{smooth:false}); activateSettingsPanel("cloud",true); });
+    document.getElementById("cloudReplaceFromDevice")?.addEventListener("click",async()=>{if(!confirm("Make this device the current cloud copy? A local recovery point will be saved first. Other connected devices will download this copy before uploading their own changes."))return;try{await replaceCloudWithThisDevice();}catch(error){setStatus("Cloud replacement needs attention",error.message,"danger");showToast(error.message,"warning");}});
     document.addEventListener("click",event=>{if(!event.target.closest("#cloudSyncToolbarPopover")&&!event.target.closest("#cloudSyncStatusButton"))closeTopSyncPopover();});
     window.addEventListener("resize",()=>{if(!document.getElementById("cloudSyncToolbarPopover")?.hidden&&typeof positionCloudToolbarPopover==="function")positionCloudToolbarPopover();});
     document.getElementById("saveCloudConfig")?.addEventListener("click",()=>{const config={supabaseUrl:document.getElementById("cloudConfigUrl").value.trim(),supabasePublishableKey:document.getElementById("cloudConfigKey").value.trim()};const status=configStatus(config); if(!status.ok)return showToast(status.message,"warning");saveJson(CONFIG_KEY,config); showToast("Cloud configuration saved. Reloading…","success"); setTimeout(()=>location.reload(),350);});
@@ -907,7 +1113,8 @@
     document.getElementById("cloudSaveDeviceName")?.addEventListener("click",async()=>{const value=document.getElementById("cloudDeviceName").value.trim().slice(0,60);if(!value)return showToast("Enter a device name.","warning");state.currentDeviceName=value;persist();try{const id=currentDeviceId();if(typeof appMeta!=="undefined"&&appMeta.devices?.[id]){appMeta.devices[id].name=value;if(typeof writeMeta==="function")writeMeta();}}catch(error){}try{await registerDevice();await loadDevices();setStatus("Device renamed",value,"success");}catch(error){setStatus("Rename needs sync",error.message,"warning");}});
     document.getElementById("cloudDevicesBody")?.addEventListener("click",event=>{const button=event.target.closest("[data-revoke-cloud-device]");if(!button)return;if(!confirm("Sign out this device remotely? It will be blocked from future Cloud Sync 3.0 commits and will clear its cloud session the next time it connects."))return;revokeDevice(button.dataset.revokeCloudDevice,button.dataset.revokeCloudUser).catch(error=>showToast(error.message,"warning"));});
     document.getElementById("cloudPendingList")?.addEventListener("click",handlePendingClick);
-    window.FinanceCloudConflictReview?.bind?.({onDownload:downloadConflict,onUseCloud:token=>discardLocal(keyFromToken(token)),onUseDevice:token=>discardLocal(keyFromToken(token))});
+    document.getElementById("cloudConflictList")?.addEventListener("click",event=>{const button=event.target.closest("[data-review-cloud-conflict]");if(button)openConflictReview(keyFromToken(button.dataset.reviewCloudConflict));});
+    window.FinanceCloudConflictReview?.bind?.({onDownload:downloadConflict,onUseCloud:token=>discardLocal(keyFromToken(token)),onUseDevice:token=>keepLocal(keyFromToken(token))});
     window.addEventListener("finance:data-persisted",handlePersistedData); window.addEventListener("online",()=>{setStatus("Back online","Checking the current cloud records first…","info");if(state.autoSync!==false){ensureRealtime().catch(()=>scheduleRealtimeRecovery("CHANNEL_ERROR"));requestLifecycleSync("online",120);}});
     window.addEventListener("offline",()=>{clearForegroundPoll();setStatus("Offline",`${pendingCount()} device change${pendingCount()===1?"":"s"} waiting for cloud.`,"info");}); window.addEventListener("focus",()=>requestLifecycleSync("focus",220));
     window.addEventListener("pageshow",()=>{if(state.autoSync!==false&&cloudUser){ensureRealtime().catch(()=>scheduleRealtimeRecovery("CHANNEL_ERROR"));requestLifecycleSync("pageshow",80);}});
@@ -917,7 +1124,7 @@
     window.addEventListener("finance:profile-unlocked",()=>{if(cloudUser)requestLifecycleSync("profile-unlocked",100);});
   }
 
-  function handlePendingClick(event) { const retry=event.target.closest("[data-sync-retry]"),discard=event.target.closest("[data-sync-discard]"); if(retry)retryRecord(keyFromToken(retry.dataset.syncRetry)); if(discard&&confirm("Replace this device’s pending version with the current cloud-confirmed record?"))discardLocal(keyFromToken(discard.dataset.syncDiscard)); }
+  function handlePendingClick(event) { const retry=event.target.closest("[data-sync-retry]"),discard=event.target.closest("[data-sync-discard]"),review=event.target.closest("[data-sync-review]"); if(review)return openConflictReview(keyFromToken(review.dataset.syncReview)); if(retry)retryRecord(keyFromToken(retry.dataset.syncRetry)); if(discard&&confirm("Replace this device’s pending version with the current cloud-confirmed record?"))discardLocal(keyFromToken(discard.dataset.syncDiscard)); }
 
   async function initialize() {
     if(initialized)return; initialized=true; setPrivacyAuthentication(false); persist(); injectV2Ui(); wrapSaveData(); bindEvents();
@@ -925,8 +1132,8 @@
     renderCloudStats(); if (passwordRecoveryError) setRecoveryHelpMessage(recoveryErrorMessage(passwordRecoveryError), "danger"); const status=configStatus(); if(!status.ok){setStatus("Cloud sync not configured",status.message,"warning");return;} await restoreSession(); setInterval(()=>{if(cloudUser&&state.autoSync!==false&&navigator.onLine&&!document.hidden)syncNow({reason:"periodic"}).catch(()=>{});},5*60*1000); scheduleForegroundPoll(); scheduleRetry();
   }
 
-  window.FinanceCloudSync={ initialize,syncNow, buildRecordMap:()=>toRecordMap(data), get status(){return{...state,pendingCount:pendingCount(),conflictCount:conflictCount(),signedIn:Boolean(cloudUser),email:cloudUser?.email||""};} };
-  window.FinanceCloudSyncInternals={loadClient,stable,checksum,deepMerge,threeWayMerge,toRecordMap,fromRecordStore,changesBetween,recordKey,keyToken,keyFromToken,retryDelay,detectFinancialOperations,encryptRecordPayload,decryptRecordPayload,toRpcChange,decryptRow,sanitizeRecordPayload,reconcileDerivedSettingsState,reconcileUnqueuedLocalChanges,seedBaseFromSnapshot,applyRemoteEvent,resolveConflict,persist,handlePersistedData,requestLifecycleSync,scheduleForegroundPoll,scheduleRealtimeRecovery,ensureRealtime,friendlyAuthError,passwordRecoveryRedirect,parsePasswordRecoveryUrl,recoveryErrorMessage,cleanPasswordRecoveryUrl,testCloudConnection,requestPasswordReset,verifyRecoveryCode,completePasswordReset,setPasswordVisibility,adoptExistingCloudConflicts};
+  window.FinanceCloudSync={ initialize,syncNow,replaceCloudWithThisDevice, buildRecordMap:()=>toRecordMap(data), get status(){return{...state,pendingCount:pendingCount(),conflictCount:conflictCount(),signedIn:Boolean(cloudUser),email:cloudUser?.email||""};} };
+  window.FinanceCloudSyncInternals={loadClient,stable,checksum,deepMerge,threeWayMerge,toRecordMap,fromRecordStore,changesBetween,recordKey,keyToken,keyFromToken,retryDelay,detectFinancialOperations,encryptRecordPayload,decryptRecordPayload,toRpcChange,decryptRow,sanitizeRecordPayload,reconcileDerivedSettingsState,reconcileUnqueuedLocalChanges,seedBaseFromSnapshot,applyRemoteEvent,resolveConflict,persist,handlePersistedData,requestLifecycleSync,scheduleForegroundPoll,scheduleRealtimeRecovery,ensureRealtime,friendlyAuthError,passwordRecoveryRedirect,parsePasswordRecoveryUrl,recoveryErrorMessage,cleanPasswordRecoveryUrl,testCloudConnection,requestPasswordReset,verifyRecoveryCode,completePasswordReset,setPasswordVisibility,recoverStoredConflicts,reconcilePendingWithRemote,replaceCloudWithThisDevice};
 
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",()=>initialize().catch(error=>setStatus("Cloud sync unavailable",error.message,"danger")),{once:true});
   else initialize().catch(error=>setStatus("Cloud sync unavailable",error.message,"danger"));

@@ -1,5 +1,5 @@
 {
-  "version": "15.0.2",
+  "version": "15.0.3",
   "schemaVersion": 12,
   "cloudSchemaVersion": 3,
   "ledgerVersion": 1,
@@ -10,8 +10,8 @@
   "profileArchitectureVersion": 1,
   "encryptionVersion": 1,
   "authSecurityVersion": 1,
-  "cacheVersion": "finance-v15-20260815-liquid-glass-r6",
+  "cacheVersion": "finance-v15-20260815-safe-multidevice-sync-r7",
   "released": "2026-08-15",
-  "name": "Liquid Glass Interface",
-  "notes": "Removes the Dashboard exact cash-flow values and forecast boxes, expands both cash-flow charts inside the unchanged bento size, and refreshes V15 PWA delivery without changing finance or cloud schemas."
+  "name": "Safe Multi-device Sync",
+  "notes": "Preserves pending device edits across cloud revision changes, auto-merges non-overlapping edits, requires explicit review for overlapping conflicts, and adds a protected device-to-cloud recovery action without changing Finance Schema 12 or Cloud Schema V3."
 }
