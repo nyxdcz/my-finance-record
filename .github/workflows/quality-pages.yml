@@ -78,7 +78,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p _site/icons _site/vendor
-          cp index.html offline.html manifest.webmanifest version.json sw.js app.css dashboard-interactions.css ui-icon-alignment-v15-0-5.css black-canvas-v15-1-0.css desktop-ui-phase1-v15-1-0.css pwa-update-v15-0-5.js dashboard-interactions-core-v14-0-23.css liquid-glass-v15.css mobile-v14-0-23.css interaction-patterns.js privacy-lock.js security-profiles.js security-profiles.css cloud-conflict-review.js cloud-conflict-resolution.js cloud-sync-lifecycle.js cloud-sync.js account-ledger.js account-ledger.css budget-planning.js budget-planning.css reports-insights.js reports-insights.css productivity-tools.js productivity-tools.css reminders-alerts.js reminders-alerts.css projects-calendar-v13.0.20.js projects-calendar-v13.0.20.css sync-config.js expense-screenshot-parser.js expense-screenshot-detect.js expense-screenshot-ai.js _site/
+          cp index.html offline.html manifest.webmanifest version.json sw.js app.css dashboard-interactions.css ui-icon-alignment-v15-0-5.css black-canvas-v15-1-0.css desktop-ui-phase1-v15-1-0.css desktop-ux-v15-2-0.css pwa-update-v15-0-5.js dashboard-interactions-core-v14-0-23.css liquid-glass-v15.css mobile-v14-0-23.css interaction-patterns.js privacy-lock.js security-profiles.js security-profiles.css cloud-conflict-review.js cloud-conflict-resolution.js cloud-sync-lifecycle.js cloud-sync.js account-ledger.js account-ledger.css budget-planning.js budget-planning.css reports-insights.js reports-insights.css productivity-tools.js productivity-tools.css reminders-alerts.js reminders-alerts.css projects-calendar-v13.0.20.js projects-calendar-v13.0.20.css sync-config.js expense-screenshot-parser.js expense-screenshot-detect.js expense-screenshot-ai.js _site/
           cp vendor/supabase.min.js _site/vendor/
           cp icons/* _site/icons/
           test -f _site/dashboard-interactions-core-v14-0-23.css
@@ -86,6 +86,7 @@ jobs:
           test -f _site/ui-icon-alignment-v15-0-5.css
           test -f _site/black-canvas-v15-1-0.css
           test -f _site/desktop-ui-phase1-v15-1-0.css
+          test -f _site/desktop-ux-v15-2-0.css
           test -f _site/pwa-update-v15-0-5.js
       - name: Upload GitHub Pages artifact
         uses: actions/upload-pages-artifact@v5
