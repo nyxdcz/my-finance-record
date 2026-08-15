@@ -1,0 +1,61 @@
+name: Prevalidate V15.2.0 Desktop UX
+
+on:
+  push:
+    branches:
+      - fix/v15-2-0-desktop-ux
+
+permissions:
+  contents: write
+
+jobs:
+  prevalidate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check whether patch is already applied
+        id: gate
+        shell: bash
+        run: |
+          if grep -q '"version": "15.2.0"' version.json; then
+            echo "patched=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "patched=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Use Node.js 22
+        if: steps.gate.outputs.patched != 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Apply V15.2.0 desktop UX patch
+        if: steps.gate.outputs.patched != 'true'
+        run: python3 scripts/apply-v15-2-0-desktop-ux.py
+      - name: Install dependencies
+        if: steps.gate.outputs.patched != 'true'
+        run: npm ci
+      - name: Repository quality
+        if: steps.gate.outputs.patched != 'true'
+        run: npm run quality
+      - name: Production dependency audit
+        if: steps.gate.outputs.patched != 'true'
+        run: npm run audit
+      - name: Install Chromium
+        if: steps.gate.outputs.patched != 'true'
+        run: npx playwright install --with-deps chromium
+      - name: Browser tests
+        if: steps.gate.outputs.patched != 'true'
+        run: npm run test:browser
+      - name: Commit validated app changes
+        if: steps.gate.outputs.patched != 'true'
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A ':!.github/workflows/prevalidate-v15-2-0-desktop-ux.yml' ':!scripts/apply-v15-2-0-desktop-ux.py'
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "feat: prepare V15.2.0 desktop UX"
+          git push origin HEAD:fix/v15-2-0-desktop-ux
