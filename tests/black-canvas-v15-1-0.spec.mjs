@@ -1,47 +1,35 @@
 import { test, expect } from "@playwright/test";
 
 for (const theme of ["light", "dark"]) {
-  test(`V15.1.0 appearance uses the expected ${theme} palette`, async ({ browser }) => {
-    const context = await browser.newContext({ javaScriptEnabled:false });
-    const page = await context.newPage();
-    await page.goto("http://127.0.0.1:3000/index.html?page=settings", { waitUntil:"domcontentloaded" });
-    await page.addStyleTag({ content:"*,*::before,*::after{animation:none!important;transition:none!important}" });
-    await page.locator("html").evaluate((element, value) => { element.dataset.theme = value; }, theme);
+  test(`V15.1.0 appearance uses the expected ${theme} palette`, async ({ page }) => {
+    await page.setViewportSize({ width:1440, height:900 });
+    await page.setContent(`<!doctype html><html data-theme="${theme}"><head>
+      <link rel="stylesheet" href="http://127.0.0.1:3000/app.css?v=15.1.0-desktop2">
+      <link rel="stylesheet" href="http://127.0.0.1:3000/black-canvas-v15-1-0.css?v=15.1.0-desktop2">
+      <style>*,*::before,*::after{animation:none!important;transition:none!important}</style>
+    </head><body>
+      <button class="button button-paid" id="paid">Mark paid</button>
+      <section id="availableMoneySection">
+        <button class="button button-secondary button-small account-spend-button"><span id="spendLabel">Spend</span></button>
+        <article class="account-card" id="accountCard">Account</article>
+      </section>
+    </body></html>`, { waitUntil:"load" });
 
     const expectedBg = theme === "light" ? "#efefef" : "#000000";
     await expect.poll(() => page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue("--bg").trim())).toBe(expectedBg);
 
     const result = await page.evaluate(() => {
       const root = getComputedStyle(document.documentElement);
-      const body = getComputedStyle(document.body);
-      const paid = document.createElement("button");
-      paid.className = "button button-paid";
-      paid.textContent = "Mark paid";
-      document.body.appendChild(paid);
-      const paidStyle = getComputedStyle(paid);
-
-      const available = document.createElement("section");
-      available.id = "availableMoneySection";
-      const spend = document.createElement("button");
-      spend.className = "button button-secondary button-small account-spend-button";
-      const spendLabel = document.createElement("span");
-      spendLabel.textContent = "Spend";
-      spend.appendChild(spendLabel);
-      available.appendChild(spend);
-      const accountCard = document.createElement("article");
-      accountCard.className = "account-card";
-      available.appendChild(accountCard);
-      document.body.appendChild(available);
-
+      const paidStyle = getComputedStyle(document.querySelector("#paid"));
       return {
         bg:root.getPropertyValue("--bg").trim(),
         primary:root.getPropertyValue("--primary").trim(),
-        bodyBg:body.backgroundColor,
+        bodyBg:getComputedStyle(document.body).backgroundColor,
         paidBg:paidStyle.backgroundColor,
         paidBorder:paidStyle.borderTopColor,
         paidColor:paidStyle.color,
-        spendColor:getComputedStyle(spendLabel).color,
-        accountBorder:getComputedStyle(accountCard).borderTopColor
+        spendColor:getComputedStyle(document.querySelector("#spendLabel")).color,
+        accountBorder:getComputedStyle(document.querySelector("#accountCard")).borderTopColor
       };
     });
 
@@ -62,6 +50,5 @@ for (const theme of ["light", "dark"]) {
     }
     expect(result.paidColor).toBe("rgb(255, 255, 255)");
     expect(result.spendColor).toBe("rgb(255, 255, 255)");
-    await context.close();
   });
 }
