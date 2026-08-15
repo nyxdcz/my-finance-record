@@ -10,8 +10,8 @@
   "profileArchitectureVersion": 1,
   "encryptionVersion": 1,
   "authSecurityVersion": 1,
-  "cacheVersion": "finance-v15-20260815-ui-align-r10",
+  "cacheVersion": "finance-v15-20260815-ui-align-r11",
   "released": "2026-08-15",
   "name": "Record Spending Reliability",
-  "notes": "Fixes Record spending and Add Expense refresh failures, preserves safe multi-device Finance behavior, and refreshes the cascade-safe V15.0.4 UI alignment shell without changing Finance Schema 12 or Cloud Schema V3."
+  "notes": "Fixes Record spending and Add Expense refresh failures, preserves safe multi-device Finance behavior, and forces the corrected production UI alignment stylesheet order/cache pin without changing Finance Schema 12 or Cloud Schema V3."
 }
