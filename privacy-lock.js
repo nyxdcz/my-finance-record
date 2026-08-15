@@ -1,21 +1,31 @@
 "use strict";
 (() => {
   const state = { authenticated:false, resolved:false, email:"" };
-  const allowedSelector = [
-    "[data-page]", "#menuButton", "#sidebarCloseButton", "#overlay",
-    "#previousMonthButton", "#nextMonthButton", "#monthDisplayButton", "#currentMonthButton",
-    "#monthPicker", "#monthPickerPreviousYear", "#monthPickerNextYear", "#monthPickerGrid button",
-    "#topbarToolsTrigger", "#themeToggleButton", ".finance-privacy-signin",
-    "[data-help-key]", "[data-section-help]", "[data-close='sectionHelpDialog']", "[data-close='pwaInstallGuideDialog']",
-    "[data-settings-tab='sync']", "[data-settings-tab='app']", "#settingsBackButton", "[data-settings-open='sync']", "[data-settings-open='app']",
-    "#settingsSearchButton", "#settingsSearchInput", "#settingsSearchClear", "[data-settings-search-result]",
-    "#cloudConfigUrl", "#cloudConfigKey", "#saveCloudConfig", "#clearCloudConfig",
-    "#cloudAuthEmail", "#cloudAuthPassword", "#cloudPasswordToggle", "#cloudSignIn", "#cloudCreateAccount", "#cloudForgotPassword", "#cloudTestConnection",
-    "#cloudRecoveryEmail", "#cloudRecoveryCode", "#cloudRecoveryResend", "#cloudVerifyRecoveryCode", "#cloudRecoveryBackToSignIn",
-    "#cloudNewPassword", "#cloudConfirmPassword", "#cloudCompletePasswordReset", "#cloudCancelPasswordReset", "[data-cloud-password-target]",
-    "#installPwaButton", "#checkUpdateButton", "#repairPwaButton", "#clearAppCacheButton", "#requestPersistenceButton", "#applyUpdateButton", "#laterUpdateButton",
-    "label[for='importBackup']", "#importBackup", "#restoreV11BackupButton"
-  ].join(",");
+  const capabilitySelectors = Object.freeze({
+    navigation:[
+      "[data-page]", "#menuButton", "#sidebarCloseButton", "#overlay",
+      "#previousMonthButton", "#nextMonthButton", "#monthDisplayButton", "#currentMonthButton",
+      "#monthPicker", "#monthPickerPreviousYear", "#monthPickerNextYear", "#monthPickerGrid button",
+      "#topbarToolsTrigger"
+    ],
+    appearance:["#themeToggleButton"],
+    authentication:[
+      ".finance-privacy-signin",
+      "[data-settings-tab='sync']", "[data-settings-tab='app']", "#settingsBackButton", "[data-settings-open='sync']", "[data-settings-open='app']",
+      "#settingsSearchButton", "#settingsSearchInput", "#settingsSearchClear", "[data-settings-search-result]",
+      "#cloudConfigUrl", "#cloudConfigKey", "#saveCloudConfig", "#clearCloudConfig",
+      "#cloudAuthEmail", "#cloudAuthPassword", "#cloudPasswordToggle", "#cloudSignIn", "#cloudCreateAccount", "#cloudForgotPassword", "#cloudTestConnection",
+      "#cloudRecoveryEmail", "#cloudRecoveryCode", "#cloudRecoveryResend", "#cloudVerifyRecoveryCode", "#cloudRecoveryBackToSignIn",
+      "#cloudNewPassword", "#cloudConfirmPassword", "#cloudCompletePasswordReset", "#cloudCancelPasswordReset", "[data-cloud-password-target]"
+    ],
+    help:[
+      "[data-help-key]", "[data-section-help]", "[data-close='sectionHelpDialog']", "[data-close='pwaInstallGuideDialog']"
+    ],
+    appMaintenance:[
+      "#installPwaButton", "#checkUpdateButton", "#repairPwaButton", "#clearAppCacheButton", "#requestPersistenceButton", "#applyUpdateButton", "#laterUpdateButton"
+    ]
+  });
+  const allowedSelector = Object.values(capabilitySelectors).flat().join(",");
   const sensitiveDialogIds = new Set([
     "accountDialog","incomeDialog","expenseDialog","expensePaymentDialog","expenseActionConfirmDialog","dashboardCustomizeDialog",
     "projectDialog","projectRevisionDialog","projectPaidDialog","savingsGoalDialog","syncReviewDialog","sampleResetDialog"
@@ -55,13 +65,19 @@
     document.getElementById("privacySignInButton")?.remove();
   }
 
+  function markPrivateFinanceSettings(){
+    const backupCard=document.getElementById("importBackup")?.closest(".card");
+    if(backupCard) backupCard.setAttribute("data-finance-private-settings","");
+  }
+
   function ensureSettingsPrivacyNote(){
+    markPrivateFinanceSettings();
     const panel=document.querySelector("[data-settings-panel='app']");
     if(!panel || panel.querySelector(":scope > .finance-settings-privacy-note")) return;
     const note=document.createElement("section");
     note.className="finance-settings-privacy-note";
     note.setAttribute("aria-label","Signed-out Settings privacy");
-    note.innerHTML=`<div><strong>Finance-specific app settings are hidden while signed out.</strong><p>Sign in to manage reminders and offline finance documents. Installation, updates, appearance, app repair, storage protection, and Help remain available.</p></div><button class="button button-primary finance-privacy-signin" type="button">Sign in</button>`;
+    note.innerHTML=`<div><strong>Finance-specific app settings are hidden while signed out.</strong><p>Sign in to manage backups, reminders, and offline finance documents. Installation, updates, appearance, app repair, storage protection, and Help remain available.</p></div><button class="button button-primary finance-privacy-signin" type="button">Sign in</button>`;
     const intro=panel.querySelector(":scope > .settings-section-intro");
     if(intro) intro.after(note); else panel.prepend(note);
   }
@@ -159,6 +175,7 @@
     lock:()=>setAuthenticated(false),
     unlock:detail=>setAuthenticated(true,detail||{}),
     openSignIn,
-    get status(){ return {...state}; }
+    get status(){ return {...state}; },
+    get capabilities(){ return Object.fromEntries(Object.entries(capabilitySelectors).map(([name,selectors])=>[name,[...selectors]])); }
   };
 })();
