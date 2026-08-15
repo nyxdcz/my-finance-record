@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import assert from "node:assert/strict";
 import fs from "node:fs";
+// Keep the deployed Black Canvas asset pin aligned with the current desktop shell.
 const css = fs.readFileSync("black-canvas-v15-1-0.css", "utf8");
 const index = fs.readFileSync("index.html", "utf8");
 const sw = fs.readFileSync("sw.js", "utf8");
