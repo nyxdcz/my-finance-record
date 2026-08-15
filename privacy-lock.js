@@ -66,8 +66,10 @@
   }
 
   function markPrivateFinanceSettings(){
-    const backupCard=document.getElementById("importBackup")?.closest(".card");
-    if(backupCard) backupCard.setAttribute("data-finance-private-settings","");
+    ["importBackup","restoreV11BackupButton"].forEach(id=>{
+      const card=document.getElementById(id)?.closest(".card");
+      if(card) card.setAttribute("data-finance-private-settings","");
+    });
   }
 
   function ensureSettingsPrivacyNote(){
