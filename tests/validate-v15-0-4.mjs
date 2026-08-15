@@ -26,7 +26,7 @@ assert.match(index,/const APP_VERSION = "15\.0\.4";/);
 assert.match(index,/const APP_RELEASE_NAME = "Record Spending Reliability";/);
 assert.match(index,/"version":"V15\.0\.4","title":"Record Spending Reliability"/);
 assert.match(index,/ui-icon-alignment-v15-0-4\.css\?v=15\.0\.4-ui3/);
-assert.ok(index.indexOf('dashboard-interactions.css?v=15.1.0-desktop2') < index.indexOf('ui-icon-alignment-v15-0-4.css?v=15.0.4-ui3'), "production UI alignment stylesheet must load after dashboard interactions");
+assert.ok(index.indexOf('dashboard-interactions.css?v=15.1.0-desktop3') < index.indexOf('ui-icon-alignment-v15-0-4.css?v=15.0.4-ui3'), "production UI alignment stylesheet must load after dashboard interactions");
 assert.doesNotMatch(index,/ui-icon-alignment-v15-0-4\.css\?v=15\.0\.4-ui1/);
 assert.match(worker,/ui-icon-alignment-v15-0-4\.css\?v=15\.0\.4-ui3/);
 assert.match(worker,/finance-v15-20260815-ui-align-r12/);

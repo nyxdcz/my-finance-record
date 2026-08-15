@@ -22,7 +22,7 @@
       --shadow: 0 10px 30px rgba(16, 24, 40, 0.07);
       --radius: 9px;
       --sidebar-width: 245px;
-      --desktop-header-height: 72px;
+      --desktop-header-height: 64px;
       --desktop-page-gutter: 24px;
       --desktop-card-padding: 13px;
       --desktop-compact-card-padding: 11px;
@@ -1063,7 +1063,7 @@
 
 
 
-    .dashboard-view .topbar { min-height: 72px; padding-top: 12px; padding-bottom: 12px; }
+    .dashboard-view .topbar { min-height: var(--desktop-header-height); padding-top: 8px; padding-bottom: 8px; }
     .dashboard-view .content { padding: 18px var(--desktop-page-gutter) 34px; }
 
     /* Compact dashboard: keeps the monthly overview visible on one desktop screen. */
@@ -3101,7 +3101,7 @@
 
 
     /* V12.16.3 · compact forms, icon picker, annual income, and expense duplication */
-    #income .page-heading { margin-bottom:10px; }
+    #income .page-heading { margin-bottom:12px; }
     #income .page-heading > div:first-child p { max-width:620px; }
     .income-kpi-grid { grid-template-columns:repeat(5,minmax(0,1fr)); gap:8px; }
     .income-kpi-card { min-height:104px; padding:12px; display:flex; flex-direction:column; justify-content:space-between; }
@@ -3123,7 +3123,7 @@
     .income-record-header, .income-record-row { grid-template-columns:minmax(230px,1.55fr) minmax(135px,.85fr) minmax(118px,.72fr) minmax(125px,.78fr) minmax(108px,.66fr) minmax(70px,auto); align-items:center; }
     .income-record-header > :nth-child(n+2), .income-record-row > :nth-child(n+2):not(:nth-child(5)) { text-align:center; }
     .income-record-header > :nth-child(5), .income-record-row > :nth-child(5) { text-align:right; font-variant-numeric:tabular-nums; }
-    .income-record-row { min-height:66px; padding-top:9px; padding-bottom:9px; }
+    .income-record-row { min-height:0; padding:8px 13px; }
     .income-record-row .record-statuses { margin-top:4px; }
     .income-record-row .record-title-copy > small { margin-top:2px; color:var(--muted); }
     .income-record-row .record-actions { justify-content:center; }
@@ -3200,8 +3200,8 @@
     /* V12.16.3 · compact forms, icon picker, annual income, and expense duplication */
     [hidden] { display:none !important; }
     #incomeDialog { width:min(638px,calc(100vw - 28px)); }
-    #incomeDialog .modal-header, #incomeDialog .modal-footer { padding:12px 14px; }
-    #incomeDialog .modal-body { padding:13px 14px; }
+    #incomeDialog .modal-header, #incomeDialog .modal-footer { padding:9px 12px; }
+    #incomeDialog .modal-body { padding:10px 12px; }
     #incomeDialog .form-grid.two-column { gap:9px 10px; }
     #incomeDialog .required-note { margin-bottom:7px; }
     #incomeDialog .income-form-mode-note { margin-bottom:8px; padding:6px 8px; font-size:.67rem; }
@@ -3280,8 +3280,8 @@
 
     /* V12.17.0 · compact and reliable Expense dialog */
     #expenseDialog { width:min(638px,calc(100vw - 28px)); }
-    #expenseDialog .modal-header, #expenseDialog .modal-footer { padding:12px 14px; }
-    #expenseDialog .modal-body { padding:13px 14px; }
+    #expenseDialog .modal-header, #expenseDialog .modal-footer { padding:9px 12px; }
+    #expenseDialog .modal-body { padding:10px 12px; }
     #expenseDialog .form-grid { gap:9px 10px; }
     #expenseDialog .required-note { margin-bottom:7px; }
     #expenseDialog .expense-form-mode-note { margin-bottom:8px; padding:6px 8px; font-size:.67rem; }
@@ -3408,9 +3408,9 @@
     #accountDialog .account-balance-type-row .input,
     #accountDialog .account-balance-type-row .select {
       box-sizing:border-box;
-      height:42px;
-      min-height:42px;
-      padding:8px 10px;
+      height:38px;
+      min-height:38px;
+      padding:7px 10px;
     }
     #accountDialog .account-reconcile-help {
       display:block;
@@ -3617,7 +3617,7 @@
     .textarea { border-radius:7px; font-size:.77rem; }
     .workspace-switcher {
       position:sticky;
-      top:71px;
+      top:var(--desktop-header-height);
       z-index:23;
       margin-bottom:10px;
       padding:3px;
@@ -3751,7 +3751,8 @@
     #money .period-card .card-header { min-height:0; }
     #money .record-header,
     #money .record-row { min-height:0; }
-    #money .record-row { padding-top:7px; padding-bottom:7px; }
+    #money .record-row { padding:8px 13px; }
+    #paid-expenses .record-row { padding:8px 13px; }
 
     /* 03 Projects */
     #projects .project-section-card { padding:12px; }
@@ -3785,7 +3786,7 @@
       background:var(--surface);
       box-shadow:var(--workspace-soft-shadow);
     }
-    #reports .report-section-nav { top:71px; margin-bottom:8px; padding:5px; }
+    #reports .report-section-nav { top:var(--desktop-header-height); margin-bottom:8px; padding:5px; }
     #reports .report-section-nav button { min-height:35px; padding:5px 9px; }
     .report-compact-group {
       margin:0 0 8px;
@@ -3847,7 +3848,7 @@
     #settings > .settings-navigation {
       grid-column:1;
       position:sticky;
-      top:74px;
+      top:var(--desktop-header-height);
       z-index:20;
       margin:0;
     }
@@ -4718,7 +4719,7 @@
     .budget-bento-panel.is-collapsed .budget-panel-collapse > svg { transform:rotate(180deg); }
     .budget-planner-card.is-planner-collapsed .budget-planner-toggle > svg { transform:rotate(180deg); }
     #projects .project-row-actions { display:flex; align-items:center; justify-content:center; flex-wrap:nowrap; gap:5px; }
-    #projects .project-row-actions .project-compact-action { min-width:0; min-height:30px; height:30px; padding:4px 7px; font-size:.65rem; white-space:nowrap; }
+    #projects .project-row-actions .project-compact-action { min-width:0; min-height:32px; height:32px; padding:4px 7px; font-size:.65rem; white-space:nowrap; }
     #projects .completed-project-record .status-completed { white-space:normal; text-align:center; line-height:1.15; }
     @media (max-width:850px) {
       :root { --ui-disclosure-size:44px; }
@@ -4739,7 +4740,7 @@
       grid-template-columns:minmax(190px,1.65fr) minmax(78px,.72fr) minmax(94px,.86fr) minmax(82px,.72fr) minmax(92px,.82fr) minmax(92px,.82fr) minmax(82px,.72fr) minmax(150px,.95fr);
     }
     #projects .project-row-actions { gap:6px; flex-wrap:nowrap; overflow:visible; }
-    #projects .project-row-actions .project-compact-action { min-height:30px; height:30px; padding:4px 8px; font-size:.64rem; line-height:1; white-space:nowrap; }
+    #projects .project-row-actions .project-compact-action { min-height:32px; height:32px; padding:4px 8px; font-size:.64rem; line-height:1; white-space:nowrap; }
     .project-action-more, .record-more-menu { position:relative; }
     .project-action-more > summary { list-style:none; cursor:pointer; }
     .project-action-more > summary::-webkit-details-marker { display:none; }
@@ -5223,20 +5224,20 @@
 
     #settings .savings-settings-grid { grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; align-items:end; }
     #settings .savings-settings-grid > .field { min-width:0; }
-    #settings .savings-settings-grid > .field .select,
+    #settings .savings-settings-grid > .field .select { width:100%; min-height:38px; height:38px; box-sizing:border-box; }
     #settings .savings-setting-check { width:100%; min-height:40px; height:40px; box-sizing:border-box; }
     #settings .savings-setting-check { justify-content:flex-start; padding:6px 9px; line-height:1.2; }
     #settings .salary-work-settings-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px 10px; align-items:end; }
     #settings .salary-work-settings-grid > .field { min-width:0; }
     #settings .salary-work-settings-grid .input,
-    #settings .salary-work-settings-grid .select { width:100%; min-height:42px; height:42px; box-sizing:border-box; }
+    #settings .salary-work-settings-grid .select { width:100%; min-height:38px; height:38px; box-sizing:border-box; }
     #settings .salary-work-settings-grid .field label { min-height:16px; display:flex; align-items:end; }
 
     #settings-panel-profiles .profile-sharing-card .profile-inline-fields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); align-items:end; gap:8px; }
     #settings-panel-profiles .profile-sharing-card .profile-inline-fields > .field { min-width:0; }
     #settings-panel-profiles .profile-sharing-card .input,
     #settings-panel-profiles .profile-sharing-card .select,
-    #settings-panel-profiles .profile-sharing-card > .button { min-height:40px; height:40px; box-sizing:border-box; }
+    #settings-panel-profiles .profile-sharing-card > .button { min-height:38px; height:38px; box-sizing:border-box; }
     #settings-panel-profiles .profile-sharing-card > .button { margin-top:8px; width:auto; justify-self:start; }
     #settings-panel-profiles .profile-sharing-card #acceptProfileInviteButton:disabled { opacity:.5; cursor:not-allowed; }
 

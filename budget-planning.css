@@ -91,7 +91,7 @@
 .budget-planner-header h3 { font-size:.88rem; }
 .budget-planner-header p { margin-top:2px; font-size:.66rem; }
 .budget-planner-actions { align-items:center; gap:6px; }
-.budget-planner-actions .button { min-height:34px; padding:6px 9px; font-size:.68rem; }
+.budget-planner-actions .button { min-height:35px; padding:6px 9px; font-size:.68rem; }
 .budget-planner-toggle { flex:0 0 34px; }
 .budget-planner-body { min-width:0; }
 .budget-planner-summary { gap:7px; margin:8px 12px 10px; }

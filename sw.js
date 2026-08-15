@@ -2,7 +2,7 @@
 const APP_VERSION = "15.1.0";
 self.__FINANCE_APP_VERSION = APP_VERSION;
 // V15.0.4 UI alignment delivery refresh · forces installed PWAs to fetch the cascade-safe icon alignment rules while preserving finance and sync behavior.
-const CACHE_VERSION = "finance-v15-20260815-light-chrome-r26";
+const CACHE_VERSION = "finance-v15-20260815-desktop-consistency-r27";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const DB_NAME = "simple-finance-project-records-v12-db";
@@ -16,8 +16,8 @@ const APP_SHELL = [
   asset("./offline.html"),
   asset("./manifest.webmanifest"),
   asset("./version.json"),
-  asset("./app.css?v=15.1.0-desktop2"),
-  asset("./dashboard-interactions.css?v=15.1.0-desktop2"),
+  asset("./app.css?v=15.1.0-desktop3"),
+  asset("./dashboard-interactions.css?v=15.1.0-desktop3"),
   asset("./ui-icon-alignment-v15-0-5.css?v=15.1.0-ui3"),
   asset("./black-canvas-v15-1-0.css?v=15.1.0-light1"),
   asset("./pwa-update-v15-0-5.js?v=15.1.0"),
@@ -35,7 +35,7 @@ const APP_SHELL = [
   asset("./account-ledger.js?v=15.0.4"),
   asset("./account-ledger.css?v=14.0.23"),
   asset("./budget-planning.js?v=15.0.4"),
-  asset("./budget-planning.css?v=15.1.0-desktop2"),
+  asset("./budget-planning.css?v=15.1.0-desktop3"),
   asset("./reports-insights.js?v=14.0.23"),
   asset("./reports-insights.css?v=15.1.0-desktop1"),
   asset("./productivity-tools.js?v=14.0.23"),

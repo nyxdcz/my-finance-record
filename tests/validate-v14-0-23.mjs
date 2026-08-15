@@ -156,7 +156,7 @@ assert(html.includes('./cloud-conflict-resolution.js?v=14.0.23')&&worker.include
 assert(accountLedger.includes('function recalculateBalances(target = data, { stamp = false } = {})'),"ledger recalculation is not pure by default");
 assert(accountLedger.includes('if (stamp && target.ledgerSettings) target.ledgerSettings.lastRecalculatedAt = new Date().toISOString();'),"ledger timestamp is not limited to explicit mutations");
 assert(accountLedger.includes("if (ledgerMigrationChanged)")&&!accountLedger.includes('persistFinanceDataRaw("Account ledger updated")'),"ledger startup still persists unchanged data");
-assert(read("index.html").includes('./app.css?v=15.1.0-desktop2')&&worker.includes('asset("./app.css?v=15.1.0-desktop2")'),"extracted application CSS is not versioned and precached");
+assert(read("index.html").includes('./app.css?v=15.1.0-desktop3')&&worker.includes('asset("./app.css?v=15.1.0-desktop3")'),"extracted application CSS is not versioned and precached");
 assert(html.includes('data-settings-tab="profiles"')&&html.includes('id="settings-panel-profiles"'),"Profiles & Security settings panel missing");
 assert(html.includes('security-profiles.css')&&html.includes('security-profiles.js'),"profile architecture assets are not loaded");
 assert(html.includes('{"version": "V13.0.10", "title": "Account Spending from Balance"'),"in-app V13.0.10 history entry missing");

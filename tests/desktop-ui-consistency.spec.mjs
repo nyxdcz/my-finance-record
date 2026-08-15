@@ -2,12 +2,12 @@ import { test, expect } from "@playwright/test";
 
 const widths = [1024, 1280, 1366, 1440, 1920];
 const css = [
-  "app.css?v=15.1.0-desktop2",
+  "app.css?v=15.1.0-desktop3",
   "reports-insights.css?v=15.1.0-desktop1",
-  "budget-planning.css?v=15.1.0-desktop2",
+  "budget-planning.css?v=15.1.0-desktop3",
   "security-profiles.css?v=15.1.0-desktop2",
   "projects-calendar-v13.0.20.css?v=15.1.0-desktop2",
-  "dashboard-interactions.css?v=15.1.0-desktop2",
+  "dashboard-interactions.css?v=15.1.0-desktop3",
   "liquid-glass-v15.css?v=15.1.0-light1",
   "black-canvas-v15-1-0.css?v=15.1.0-light1"
 ];
@@ -15,7 +15,7 @@ const css = [
 async function fixture(page, width, theme) {
   await page.setViewportSize({ width, height:900 });
   const links = css.map(href => `<link rel="stylesheet" href="http://127.0.0.1:3000/${href}">`).join("");
-  await page.setContent(`<!doctype html><html data-theme="${theme}"><head>${links}<style>*,*::before,*::after{animation:none!important;transition:none!important}</style></head><body class="dashboard-view"><header class="topbar"><div class="topbar-actions"><button class="button">Action</button></div></header><main class="main"><div class="content"><section class="page-heading"><div><h2>Heading</h2><p>Copy</p></div></section><article class="card" id="card">Card</article><div class="finance-workspace-marquee-row" id="financeRow"><div class="workspace-switcher money-workspace-switcher"><button class="workspace-switcher-button">Tab</button></div><section class="dashboard-week-marquee finance-week-marquee"><strong>This week</strong></section></div><div class="expense-toolbar-compact"><input class="input" id="compactFilter"><div class="expense-view-toggle"><button class="button">View</button></div></div><div class="record-header" id="recordHeader">Header</div><section id="reports"><nav class="report-section-nav"><button id="reportTab">Report</button></nav></section><div class="report-insights-filters"><input class="input" id="reportFilter"></div><div class="budget-plan-kpi" id="budgetKpi">Budget</div><button class="budget-panel-collapse" id="budgetToggle" type="button">Toggle</button><div class="project-summary-strip"><div id="projectSummary">Project</div></div><section id="settings"><div class="settings-tablist"><button id="settingsTab">Settings</button></div></section><button class="sidebar-close-button" id="sidebarPin">Pin</button><button class="nav-button insights-nav-button" id="insightsNav"><span class="nav-label">Insights</span></button><span class="v13-chip" id="profileChip">Private</span><div class="pc-event-card" id="calendarCard"><div class="pc-event-actions"><button class="button" id="calendarAction">Edit</button></div></div></div></main></body></html>`, { waitUntil:"networkidle" });
+  await page.setContent(`<!doctype html><html data-theme="${theme}"><head>${links}<style>*,*::before,*::after{animation:none!important;transition:none!important}</style></head><body class="dashboard-view"><header class="topbar"><div class="topbar-actions"><button class="button">Action</button></div></header><main class="main"><div class="content"><section class="page-heading"><div><h2>Heading</h2><p>Copy</p></div></section><article class="card" id="card">Card</article><div class="finance-workspace-marquee-row" id="financeRow"><div class="workspace-switcher money-workspace-switcher"><button class="workspace-switcher-button">Tab</button></div><section class="dashboard-week-marquee finance-week-marquee"><strong>This week</strong></section></div><div class="expense-toolbar-compact"><input class="input" id="compactFilter"><div class="expense-view-toggle"><button class="button">View</button></div></div><div class="record-header" id="recordHeader">Header</div><section id="reports"><nav class="report-section-nav"><button id="reportTab">Report</button></nav></section><div class="report-insights-filters"><input class="input" id="reportFilter"></div><div class="budget-plan-kpi" id="budgetKpi">Budget</div><button class="budget-panel-collapse" id="budgetToggle" type="button">Toggle</button><div class="project-summary-strip"><div id="projectSummary">Project</div></div><section id="settings"><div class="settings-tablist"><button id="settingsTab">Settings</button></div></section><button class="sidebar-close-button" id="sidebarPin">Pin</button><aside class="sidebar desktop-open"><button class="nav-button insights-nav-button" id="insightsNav"><span class="nav-icon"><img class="nav-icon-image" id="insightsIcon" src="./icons/sidebar-insights-v14-0-24.png" alt=""></span><span class="nav-label">Insights</span></button></aside><span class="v13-chip" id="profileChip">Private</span><div class="pc-event-card" id="calendarCard"><div class="pc-event-actions"><button class="button" id="calendarAction">Edit</button></div></div></div></main></body></html>`, { waitUntil:"networkidle" });
   await expect.poll(() => page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue("--bg").trim())).toBe(theme === "light" ? "#efefef" : "#000000");
 }
 
@@ -47,6 +47,8 @@ for (const width of widths) {
         calendarRadius:value("#calendarCard", "borderRadius"),
         calendarAction:value("#calendarAction", "minHeight"),
         insightsPseudo:getComputedStyle(document.querySelector("#insightsNav"), "::before").content,
+        insightsIconWidth:value("#insightsIcon", "width"),
+        insightsIconHeight:value("#insightsIcon", "height"),
         recordBackground:value("#recordHeader", "backgroundColor"),
         inputBackground:value("#compactFilter", "backgroundColor"),
         hasHorizontalOverflow:document.documentElement.scrollWidth > window.innerWidth + 1
@@ -54,7 +56,7 @@ for (const width of widths) {
     });
     expect(metrics).toEqual({
       bodyBackground:"rgb(239, 239, 239)",
-      topbarMin:"72px",
+      topbarMin:"64px",
       contentTop:"18px",
       contentRight:"24px",
       contentBottom:"34px",
@@ -64,7 +66,7 @@ for (const width of widths) {
       compactHeight:"35px",
       workspaceRadius:"7px",
       workspaceButton:"35px",
-      financeStickyTop:"72px",
+      financeStickyTop:"64px",
       reportTab:"35px",
       reportFilter:"35px",
       settingsTab:"38px",
@@ -75,6 +77,8 @@ for (const width of widths) {
       calendarRadius:"8px",
       calendarAction:"32px",
       insightsPseudo:"none",
+      insightsIconWidth:"20px",
+      insightsIconHeight:"20px",
       recordBackground:"rgb(249, 250, 251)",
       inputBackground:"rgb(255, 255, 255)",
       hasHorizontalOverflow:false

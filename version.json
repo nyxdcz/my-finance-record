@@ -10,8 +10,8 @@
   "profileArchitectureVersion": 1,
   "encryptionVersion": 1,
   "authSecurityVersion": 1,
-  "cacheVersion": "finance-v15-20260815-light-chrome-r26",
+  "cacheVersion": "finance-v15-20260815-desktop-consistency-r27",
   "released": "2026-08-15",
   "name": "Black Canvas UI",
-  "notes": "Light mode chrome correction: #efefef canvas with light sidebar, readable Spend controls, light marquee/month/history controls and modal chrome; Black Canvas dark mode, Finance Schema 12, Cloud Schema V3, records, calculations, sync behavior, and phone marquee behavior remain unchanged."
+  "notes": "Desktop UI consistency refresh: unified 64px header and sticky offsets, Finance record density, dialog and Settings control heights, 32px Project row actions, 35px Budget planner actions, and restored the Insights sidebar icon while preserving Light/Dark themes, mobile-specific layout, Finance Schema 12, Cloud Schema V3, records, calculations, and sync behavior."
 }
