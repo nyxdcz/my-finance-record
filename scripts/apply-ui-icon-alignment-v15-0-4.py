@@ -63,3 +63,11 @@ insert = '''assert.match(index,/ui-icon-alignment-v15-0-4\\.css\\?v=15\\.0\\.4-u
 if insert not in validator:
     validator = validator.replace(needle, insert + needle)
 validator_path.write_text(validator)
+
+record_spending_validator_path = Path("tests/validate-record-spending-v15-0-4.mjs")
+record_spending_validator = record_spending_validator_path.read_text()
+record_spending_validator = record_spending_validator.replace(
+    "finance-v15-20260815-record-spending-r8",
+    "finance-v15-20260815-ui-align-r9"
+)
+record_spending_validator_path.write_text(record_spending_validator)
