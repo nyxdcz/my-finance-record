@@ -26,6 +26,15 @@ jobs:
         run: |
           python .github/patch-v15-1-0-black-canvas.py
           chmod +x Install_V15_1_0.command
+          python - <<'PY'
+          from pathlib import Path
+          for filename in ["index.html", "sw.js"]:
+              path = Path(filename)
+              text = path.read_text()
+              text = text.replace("ui-icon-alignment-v15-0-5.css?v=15.0.5-ui2", "ui-icon-alignment-v15-0-5.css?v=15.1.0-ui2")
+              text = text.replace("privacy-lock.js?v=15.0.5-ui1", "privacy-lock.js?v=15.1.0-ui1")
+              path.write_text(text)
+          PY
       - name: Install locked dependencies
         run: npm ci --ignore-scripts --no-audit --no-fund
       - name: Run repository quality
