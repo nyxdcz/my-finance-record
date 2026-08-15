@@ -1,8 +1,8 @@
 "use strict";
-const APP_VERSION = "15.2.0";
+const APP_VERSION = "15.2.1";
 self.__FINANCE_APP_VERSION = APP_VERSION;
-// V15.2.0 desktop UX delivery · improves desktop interaction consistency without changing finance schemas, saved data, sync cadence, or phone layout.
-const CACHE_VERSION = "finance-v15-20260816-desktop-ux-r29";
+// V15.2.1 desktop UX quick-win delivery · improves action hierarchy, empty states, and Agenda feedback without changing finance schemas, saved data, sync cadence, or phone layout.
+const CACHE_VERSION = "finance-v15-20260816-desktop-ux-quick-wins-r30";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const DB_NAME = "simple-finance-project-records-v12-db";
@@ -21,32 +21,32 @@ const APP_SHELL = [
   asset("./ui-icon-alignment-v15-0-5.css?v=15.1.0-ui3"),
   asset("./black-canvas-v15-1-0.css?v=15.1.0-light1"),
   asset("./desktop-ui-phase1-v15-1-0.css?v=15.1.0-phase1"),
-  asset("./desktop-ux-v15-2-0.css?v=15.2.0"),
+  asset("./desktop-ux-v15-2-0.css?v=15.2.1"),
   asset("./pwa-update-v15-0-5.js?v=15.1.0"),
   asset("./dashboard-interactions-core-v14-0-23.css"),
-  asset("./liquid-glass-v15.css?v=15.2.0-light1"),
+  asset("./liquid-glass-v15.css?v=15.2.1-light1"),
   asset("./mobile-v14-0-23.css?v=14.0.23"),
-  asset("./interaction-patterns.js?v=15.1.0-finance-marquee1"),
+  asset("./interaction-patterns.js?v=15.2.1-ux1"),
   asset("./privacy-lock.js?v=15.1.0-ui1"),
   asset("./security-profiles.js?v=14.0.23"),
   asset("./security-profiles.css?v=15.1.0-desktop2"),
   asset("./cloud-conflict-review.js?v=14.0.23"),
   asset("./cloud-conflict-resolution.js?v=14.0.23"),
   asset("./cloud-sync-lifecycle.js?v=14.0.23"),
-  asset("./cloud-sync.js?v=15.2.0-ux1"),
+  asset("./cloud-sync.js?v=15.2.1-ux1"),
   asset("./account-ledger.js?v=15.0.4"),
   asset("./account-ledger.css?v=14.0.23"),
-  asset("./budget-planning.js?v=15.0.4"),
+  asset("./budget-planning.js?v=15.2.1-ux1"),
   asset("./budget-planning.css?v=15.1.0-desktop3"),
   asset("./reports-insights.js?v=14.0.23"),
   asset("./reports-insights.css?v=15.1.0-desktop1"),
-  asset("./productivity-tools.js?v=15.2.0-ux1"),
+  asset("./productivity-tools.js?v=15.2.1-ux1"),
   asset("./productivity-tools.css?v=14.0.23"),
   asset("./reminders-alerts.js?v=14.0.23"),
   asset("./reminders-alerts.css?v=14.0.23"),
-  asset("./projects-calendar-v13.0.20.js?v=14.0.23"),
+  asset("./projects-calendar-v13.0.20.js?v=15.2.1-ux1"),
   asset("./projects-calendar-v13.0.20.css?v=15.1.0-desktop2"),
-  asset("./sync-config.js?v=15.2.0-ux1"),
+  asset("./sync-config.js?v=15.2.1-ux1"),
   asset("./expense-screenshot-parser.js?v=15.0.3"),
   asset("./expense-screenshot-detect.js?v=15.0.3"),
   asset("./expense-screenshot-ai.js?v=15.0.3"),

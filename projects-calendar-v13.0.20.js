@@ -150,7 +150,7 @@
         </${mainTag}>
         <div class="pc-event-actions">
           <button type="button" class="button ${completed ? "button-secondary" : "button-primary"} button-small" data-pc-complete="${escapeHtml(event.id)}">${completed ? "Reopen" : "Complete"}</button>
-          ${compact ? "" : `<button type="button" class="button button-secondary button-small" data-pc-edit="${escapeHtml(event.id)}">Edit</button><button type="button" class="button button-secondary button-small" data-pc-delete="${escapeHtml(event.id)}">Delete</button><button type="button" class="button button-secondary button-small" data-pc-ics="${escapeHtml(event.id)}">ICS</button>`}
+          ${compact ? "" : `<button type="button" class="button button-secondary button-small" data-pc-edit="${escapeHtml(event.id)}">Edit</button><div class="record-more-menu overflow-menu pc-event-more-menu"><button type="button" class="button button-secondary button-small overflow-menu-trigger" aria-label="More actions for ${title}" title="More actions" aria-haspopup="menu" aria-controls="pc-event-more-${escapeHtml(event.id)}" aria-expanded="false"><span class="kebab-icon" aria-hidden="true">&#8942;</span><span class="sr-only">More actions</span></button><div class="record-more-panel pc-event-more-panel" id="pc-event-more-${escapeHtml(event.id)}" role="menu" aria-label="More actions for ${title}" hidden><button type="button" class="button button-secondary" role="menuitem" data-pc-ics="${escapeHtml(event.id)}">Export ICS</button><button type="button" class="button button-danger" role="menuitem" data-pc-delete="${escapeHtml(event.id)}">Delete event</button></div></div>`}
         </div>
       </article>`;
   }
@@ -192,9 +192,46 @@
     }, 4200);
   }
 
+  function eventFieldErrorNode(input) {
+    if (!input) return null;
+    const field = input.closest(".field");
+    if (!field) return null;
+    let error = field.querySelector("[data-pc-field-error]");
+    if (!error) {
+      error = document.createElement("small");
+      error.className = "field-error";
+      error.dataset.pcFieldError = "";
+      error.id = `${input.id}Error`;
+      error.hidden = true;
+      field.appendChild(error);
+    }
+    return error;
+  }
+
+  function clearEventFieldError(input) {
+    const error = eventFieldErrorNode(input);
+    if (error) { error.hidden = true; error.textContent = ""; }
+    input?.removeAttribute("aria-invalid");
+    if (input?.getAttribute("aria-describedby") === error?.id) input.removeAttribute("aria-describedby");
+  }
+
+  function setEventFieldError(input, message) {
+    const error = eventFieldErrorNode(input);
+    if (!input || !error) return;
+    error.textContent = message;
+    error.hidden = false;
+    input.setAttribute("aria-invalid", "true");
+    input.setAttribute("aria-describedby", error.id);
+  }
+
+  function clearEventFormErrors() {
+    ["pcEventTitle", "pcEventDate", "pcEventStart", "pcEventEnd"].forEach(id => clearEventFieldError(document.getElementById(id)));
+  }
+
   function openDialog(projectId = "", eventId = "") {
     const dialog = document.getElementById("projectCalendarEventDialog");
     if (!dialog) return;
+    clearEventFormErrors();
     editingId = eventId;
     const event = eventId ? events.find(item => item.id === eventId) : null;
     document.getElementById("pcEventId").value = event?.id || "";
@@ -220,16 +257,28 @@
 
   function saveEvent(event) {
     event.preventDefault();
-    const title = document.getElementById("pcEventTitle").value.trim();
-    const date = document.getElementById("pcEventDate").value;
-    if (!title || !date) {
-      showCalendarMessage("Add an event title and date.", "warning");
+    const titleInput = document.getElementById("pcEventTitle");
+    const dateInput = document.getElementById("pcEventDate");
+    const startInput = document.getElementById("pcEventStart");
+    const endInput = document.getElementById("pcEventEnd");
+    clearEventFormErrors();
+    const title = titleInput.value.trim();
+    const date = dateInput.value;
+    if (!title) {
+      setEventFieldError(titleInput, "Enter an event title.");
+      titleInput.focus();
       return;
     }
-    const startTime = document.getElementById("pcEventStart").value;
-    const endTime = document.getElementById("pcEventEnd").value;
+    if (!date) {
+      setEventFieldError(dateInput, "Choose an event date.");
+      dateInput.focus();
+      return;
+    }
+    const startTime = startInput.value;
+    const endTime = endInput.value;
     if (startTime && endTime && endTime <= startTime) {
-      showCalendarMessage("End time must be after the start time.", "warning");
+      setEventFieldError(endInput, "End time must be after the start time.");
+      endInput.focus();
       return;
     }
 
@@ -262,10 +311,21 @@
     showCalendarMessage(existing ? "Agenda event updated." : "Agenda event scheduled.", "success");
   }
 
-  function deleteEvent(id) {
+  async function deleteEvent(id) {
     const event = events.find(item => item.id === id);
     if (!event) return;
-    if (!confirm(`Delete “${event.title}”?`)) return;
+    if (typeof openAppConfirmation !== "function") {
+      showCalendarMessage("Delete confirmation is unavailable. Reload the latest app version and try again.", "error");
+      return;
+    }
+    const confirmed = await openAppConfirmation({
+      title:"Delete agenda event?",
+      message:`Delete “${event.title}”?`,
+      details:"This removes the agenda entry from the Project Agenda and Dashboard calendar. Project financial records are unchanged.",
+      confirmLabel:"Delete event",
+      danger:true
+    });
+    if (!confirmed) return;
     const next = events.filter(item => item.id !== id);
     if (!safeWrite(next)) return;
     events = next;
@@ -402,11 +462,11 @@
           <div class="form-grid two-column">
             <div class="field"><label for="pcEventProject">Project</label><select class="select" id="pcEventProject">${projectOptions()}</select></div>
             <div class="field"><label for="pcEventType">Event type</label><select class="select" id="pcEventType">${EVENT_TYPES.map(([value, label]) => `<option value="${value}">${label}</option>`).join("")}</select></div>
-            <div class="field field-full"><label for="pcEventTitle">Title <span class="required-mark">*</span></label><input class="input" id="pcEventTitle" maxlength="120" required placeholder="Example: Client presentation"></div>
-            <div class="field"><label for="pcEventDate">Date <span class="required-mark">*</span></label><input class="input" id="pcEventDate" type="date" required></div>
+            <div class="field field-full"><label for="pcEventTitle">Title <span class="required-mark">*</span></label><input class="input" id="pcEventTitle" maxlength="120" required placeholder="Example: Client presentation"><small class="field-error" id="pcEventTitleError" data-pc-field-error hidden></small></div>
+            <div class="field"><label for="pcEventDate">Date <span class="required-mark">*</span></label><input class="input" id="pcEventDate" type="date" required><small class="field-error" id="pcEventDateError" data-pc-field-error hidden></small></div>
             <div class="field"><label for="pcEventReminder">Reminder</label><select class="select" id="pcEventReminder">${REMINDERS.map(([value, label]) => `<option value="${value}">${label}</option>`).join("")}</select></div>
             <div class="field"><label for="pcEventStart">Start time</label><input class="input" id="pcEventStart" type="time"></div>
-            <div class="field"><label for="pcEventEnd">End time</label><input class="input" id="pcEventEnd" type="time"></div>
+            <div class="field"><label for="pcEventEnd">End time</label><input class="input" id="pcEventEnd" type="time"><small class="field-error" id="pcEventEndError" data-pc-field-error hidden></small></div>
             <div class="field field-full"><label for="pcEventLocation">Location</label><input class="input" id="pcEventLocation" maxlength="180" placeholder="Office, site, café, or online"></div>
             <div class="field field-full"><label for="pcEventLink">Meeting / presentation link</label><input class="input" id="pcEventLink" type="url" maxlength="500" placeholder="https://..."></div>
             <div class="field field-full"><label for="pcEventAttendees">Client / attendees</label><input class="input" id="pcEventAttendees" maxlength="240" placeholder="Client name, team, or attendees"></div>
@@ -454,6 +514,10 @@
     fullDialog.querySelectorAll("[data-pc-full-close]").forEach(button => button.addEventListener("click", closeFullAgenda));
 
     dialog.querySelector("#projectCalendarEventForm").addEventListener("submit", saveEvent);
+    ["pcEventTitle", "pcEventDate", "pcEventStart", "pcEventEnd"].forEach(id => {
+      const input = dialog.querySelector(`#${id}`);
+      ["input", "change"].forEach(type => input?.addEventListener(type, () => clearEventFieldError(input)));
+    });
     dialog.querySelectorAll("[data-pc-close]").forEach(button => button.addEventListener("click", closeDialog));
 
     // Add a Schedule button to each rendered project without modifying the core project renderer.
