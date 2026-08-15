@@ -76,6 +76,20 @@
     track.innerHTML = `<div class="dashboard-week-marquee-group">${groupContent}</div><div class="dashboard-week-marquee-group" aria-hidden="true">${groupContent}</div>`;
   }
 
+  function alignFinanceWorkspaceMarquees() {
+    ["income", "paid-expenses"].forEach(pageId => {
+      const page = document.getElementById(pageId);
+      if (!page || page.querySelector(":scope > .finance-workspace-marquee-row")) return;
+      const switcher = page.querySelector(":scope > .money-workspace-switcher");
+      const marquee = page.querySelector(":scope > .finance-week-marquee");
+      if (!switcher || !marquee) return;
+      const row = document.createElement("div");
+      row.className = "finance-workspace-marquee-row no-print";
+      page.insertBefore(row, marquee);
+      row.append(switcher, marquee);
+    });
+  }
+
   function renderActiveFilterChips(container, filters, onRemove) {
     if (!container) return;
     const active = filters.filter(Boolean);
@@ -172,7 +186,12 @@
     return { announce, cancel, createHandle };
   }
 
-  window.FinanceInteractionPatterns = { closeOverflowMenu, setupOverflowMenus, renderDuplicatedMarquee, renderActiveFilterChips, middleTruncateFilename, createDashboardDragController };
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", setupOverflowMenus, { once:true });
-  else setupOverflowMenus();
+  function setupInteractionPatterns() {
+    setupOverflowMenus();
+    alignFinanceWorkspaceMarquees();
+  }
+
+  window.FinanceInteractionPatterns = { closeOverflowMenu, setupOverflowMenus, renderDuplicatedMarquee, alignFinanceWorkspaceMarquees, renderActiveFilterChips, middleTruncateFilename, createDashboardDragController };
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", setupInteractionPatterns, { once:true });
+  else setupInteractionPatterns();
 })();
