@@ -1,4 +1,5 @@
 ## 15.1.0 · 2026-08-15
+- Normalized desktop topbar controls to the 38px Synced reference while preserving the existing 44px mobile touch targets.
 
 ### Changed
 - Set the app canvas/background to `#000000` across both appearance modes and the offline/PWA shell.

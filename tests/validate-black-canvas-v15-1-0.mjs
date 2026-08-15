@@ -23,6 +23,6 @@ assert.equal(manifest.background_color,"#000000");
 assert.equal(manifest.theme_color,"#173e76");
 assert.match(offline,/background:#000000/);
 assert.equal(version.version,"15.1.0");
-assert.equal(version.cacheVersion,"finance-v15-20260815-account-border-r19");
+assert.equal(version.cacheVersion,"finance-v15-20260815-toolbar-height-r20");
 assert.match(worker,/black-canvas-v15-1-0\.css\?v=15\.1\.0-accountborder2/);
 console.log("V15.1.0 Black Canvas palette regression passed.");

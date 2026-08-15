@@ -60,3 +60,25 @@ html body #customizeDashboardButton[data-dashboard-toolbar-action]::before {
   transform:translateY(1px) !important;
   transform-origin:center !important;
 }
+
+/* V15.1.0 desktop toolbar height normalization. */
+@media (min-width:851px) {
+  html body .topbar-actions > .cloud-sync-toolbar-button,
+  html body #customizeDashboardButton[data-dashboard-toolbar-action],
+  html body .topbar-actions .topbar-history-button,
+  html body .topbar-actions .topbar-add-button,
+  html body .topbar-actions .topbar-tools-trigger {
+    box-sizing:border-box !important;
+    height:38px !important;
+    min-height:38px !important;
+    max-height:38px !important;
+  }
+  html body .topbar-actions .month-navigator {
+    box-sizing:border-box !important;
+    height:38px !important;
+    min-height:38px !important;
+    max-height:38px !important;
+    padding-block:1px !important;
+    align-items:center !important;
+  }
+}
