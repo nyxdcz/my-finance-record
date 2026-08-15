@@ -36,19 +36,16 @@ jobs:
           css_path = Path("black-canvas-v15-1-0.css")
           css = css_path.read_text()
           marker = "/* V15.1.0 Finance period corner-radius polish. */"
-          block = '''
-
-/* V15.1.0 Finance period corner-radius polish. */
-#money .period-card {
-  border-radius:9px !important;
-  overflow:hidden;
-}
-#money .period-card .period-header,
-#money .period-card .record-row {
-  border-radius:9px !important;
-  overflow:hidden;
-}
-'''
+          block = ("\n\n/* V15.1.0 Finance period corner-radius polish. */\n"
+                   "#money .period-card {\n"
+                   "  border-radius:9px !important;\n"
+                   "  overflow:hidden;\n"
+                   "}\n"
+                   "#money .period-card .period-header,\n"
+                   "#money .period-card .record-row {\n"
+                   "  border-radius:9px !important;\n"
+                   "  overflow:hidden;\n"
+                   "}\n")
           if marker not in css:
               css = css.rstrip() + block
           css_path.write_text(css.rstrip() + "\n")
