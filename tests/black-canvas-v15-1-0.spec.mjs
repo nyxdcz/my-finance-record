@@ -45,7 +45,7 @@ for (const theme of ["light","dark"]) {
     expect(result.paidBorder).toBe("rgb(23, 62, 118)");
     expect(result.paidColor).toBe("rgb(255, 255, 255)");
     expect(result.spendColor).toBe("rgb(255, 255, 255)");
-    expect(result.accountBorder).toBe("rgba(207, 231, 213, 0.42)");
+    expect(result.accountBorder).toBe("rgba(207, 231, 213, 0.24)");
     await context.close();
   });
 }
