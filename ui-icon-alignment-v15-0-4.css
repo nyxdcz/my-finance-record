@@ -1,0 +1,27 @@
+/* My Finance Records · V15.0.4 · icon alignment hotfix */
+/* Keep the build badge text-only and compact. */
+#buildBadge { background-image:none !important; }
+#buildBadge::before,
+#buildBadge::after { content:none !important; display:none !important; }
+
+/* Keep icon + label controls compact without changing their hit areas. */
+.button { gap:4px !important; }
+
+/* Center any standalone top-bar utility button added beside Cloud Sync. */
+.topbar-actions > button:not(.cloud-sync-toolbar-button):not(.topbar-add-button) {
+  display:inline-grid !important;
+  place-items:center !important;
+  padding-inline:0 !important;
+  text-align:center;
+}
+.topbar-actions > button:not(.cloud-sync-toolbar-button):not(.topbar-add-button) > :is(svg,img,.toolbar-icon) {
+  margin:0 !important;
+  justify-self:center;
+  align-self:center;
+}
+
+/* Match icon-to-label spacing on common add actions and toolbar buttons. */
+#addAccountButton,
+#quickAddExpense,
+.topbar-add-button,
+.button:has(> .toolbar-icon) { gap:4px !important; }

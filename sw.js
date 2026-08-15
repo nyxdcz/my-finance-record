@@ -2,7 +2,7 @@
 const APP_VERSION = "15.0.4";
 self.__FINANCE_APP_VERSION = APP_VERSION;
 // V15.0.4 record-spending reliability refresh · removes the obsolete budget forecast renderer, protects verified spend persistence from render-only failures, and forces installed PWAs to fetch repaired finance modules.
-const CACHE_VERSION = "finance-v15-20260815-record-spending-r8";
+const CACHE_VERSION = "finance-v15-20260815-ui-align-r9";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const DB_NAME = "simple-finance-project-records-v12-db";
@@ -17,6 +17,7 @@ const APP_SHELL = [
   asset("./manifest.webmanifest"),
   asset("./version.json"),
   asset("./app.css?v=14.0.23"),
+  asset("./ui-icon-alignment-v15-0-4.css?v=15.0.4-ui1"),
   asset("./dashboard-interactions.css?v=14.0.23"),
   asset("./dashboard-interactions-core-v14-0-23.css"),
   asset("./liquid-glass-v15.css?v=15.0.3"),
