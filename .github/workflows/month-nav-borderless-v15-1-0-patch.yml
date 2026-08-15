@@ -1,0 +1,83 @@
+name: V15.1.0 Month Navigation Border Patch
+
+on:
+  push:
+    branches:
+      - fix/month-nav-borderless-v15-1-0
+
+permissions:
+  contents: write
+
+jobs:
+  patch-and-validate:
+    if: ${{ !contains(github.event.head_commit.message, '[month-nav-final]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out patch branch
+        uses: actions/checkout@v4
+        with:
+          ref: fix/month-nav-borderless-v15-1-0
+          fetch-depth: 0
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Apply approved month navigation patch
+        run: python3 .github/month-nav-borderless-v15-1-0.py
+
+      - name: Keep child-border regression visual rather than color-based
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('tests/ui-icon-alignment.spec.mjs')
+          t=p.read_text()
+          t=t.replace('''  for (const selector of ["#previousMonthButton", "#monthControl", "#nextMonthButton"]) {
+            const borderColor = await page.locator(selector).evaluate(element => getComputedStyle(element).borderTopColor);
+            expect(borderColor, `${selector} should not show a surrounding border`).toBe("rgba(0, 0, 0, 0)");
+          }
+
+          const current = page.locator("#currentMonthButton:not([hidden]), #monthStatusChip:not([hidden])").first();
+          await expect(current).toBeVisible();
+          const currentBorder = await current.evaluate(element => getComputedStyle(element).borderTopColor);
+          expect(["rgba(0, 0, 0, 0)", "rgb(32, 41, 56)"]).toContain(currentBorder);''','''  for (const selector of ["#previousMonthButton", "#monthControl", "#nextMonthButton"]) {
+            const borderWidth = await page.locator(selector).evaluate(element => getComputedStyle(element).borderTopWidth);
+            expect(borderWidth, `${selector} should not show a surrounding border`).toBe("0px");
+          }
+
+          const current = page.locator("#currentMonthButton:not([hidden]), #monthStatusChip:not([hidden])").first();
+          await expect(current).toBeVisible();
+          const currentBorderWidth = await current.evaluate(element => getComputedStyle(element).borderTopWidth);
+          expect(currentBorderWidth).toBe("0px");''')
+          p.write_text(t)
+          PY
+
+      - name: Install locked project metadata
+        run: npm ci
+
+      - name: Run repository quality suite
+        run: npm run quality
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run browser regressions
+        run: npm run test:browser
+
+      - name: Commit validated patch and remove temporary automation
+        run: |
+          rm -rf test-results playwright-report
+          rm -f .github/month-nav-borderless-v15-1-0.py
+          rm -f .github/workflows/month-nav-borderless-v15-1-0-patch.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No patch changes to commit"
+            exit 1
+          fi
+          git commit -m "fix: remove V15.1.0 month navigation outline [month-nav-final]"
+          git push origin HEAD:fix/month-nav-borderless-v15-1-0
