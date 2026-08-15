@@ -1,13 +1,13 @@
 import { test, expect } from "@playwright/test";
 
-test("production V15.0.5 UI alignment uses the delivered final stylesheet", async ({ browser }) => {
+test("production V15.1.0 UI alignment uses the delivered final stylesheet", async ({ browser }) => {
   const context = await browser.newContext({ javaScriptEnabled:false });
   const page = await context.newPage();
   await page.goto("http://127.0.0.1:3000/index.html?page=dashboard", { waitUntil:"networkidle" });
 
   const styles = await page.locator('link[rel="stylesheet"]').evaluateAll(nodes => nodes.map(node => node.getAttribute("href") || ""));
   const dashboardCss = styles.findIndex(href => href.includes("dashboard-interactions.css?v=14.0.23"));
-  const uiCss = styles.findIndex(href => href.includes("ui-icon-alignment-v15-0-5.css?v=15.0.5-ui2"));
+  const uiCss = styles.findIndex(href => href.includes("ui-icon-alignment-v15-0-5.css?v=15.1.0-ui2"));
   expect(dashboardCss).toBeGreaterThanOrEqual(0);
   expect(uiCss).toBeGreaterThan(dashboardCss);
   expect(styles.some(href => href.includes("ui-icon-alignment-v15-0-4.css?v=15.0.4-ui1"))).toBe(false);
@@ -28,7 +28,7 @@ test("production V15.0.5 UI alignment uses the delivered final stylesheet", asyn
 });
 
 
-test("V15.0.5 header omits duplicate sign-in shortcut and optically centers Dashboard utility glyph", async ({ page }) => {
+test("V15.1.0 header omits duplicate sign-in shortcut and optically centers Dashboard utility glyph", async ({ page }) => {
   await page.goto("http://127.0.0.1:3000/index.html?page=settings", { waitUntil:"networkidle" });
 
   await expect(page.locator("#privacySignInButton")).toHaveCount(0);

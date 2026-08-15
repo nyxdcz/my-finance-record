@@ -1,3 +1,14 @@
+## 15.1.0 · 2026-08-15
+
+### Changed
+- Set the app canvas/background to `#000000` across both appearance modes and the offline/PWA shell.
+- Set the primary interface color to `#173e76`, including primary buttons, active navigation, focus accents, browser chrome, and manifest theme color.
+- Retinted V15 Liquid Glass navigation, toolbars, menus, popovers, and active controls to the black-and-blue palette without changing their geometry or blur behavior.
+
+### Delivery
+- Released the visual refresh as V15.1.0 and rotated the PWA shell to `finance-v15-20260815-black-canvas-r15` with a dedicated final palette stylesheet.
+- Finance Schema 12, Cloud Schema V3, finance records, calculations, ledger behavior, Dashboard/card dimensions, and five-minute Cloud Sync cadence are unchanged.
+
 ## 15.0.5 · 2026-08-15
 
 ### Fixed

@@ -3,30 +3,30 @@
    Finance content, tables, cards, charts, and forms remain opaque. */
 
 :root {
-  --liquid-glass-surface:rgba(248,251,255,.66);
-  --liquid-glass-surface-strong:rgba(249,252,255,.82);
-  --liquid-glass-surface-soft:rgba(255,255,255,.44);
-  --liquid-glass-border:rgba(255,255,255,.72);
-  --liquid-glass-edge:rgba(255,255,255,.92);
-  --liquid-glass-shadow:0 12px 34px rgba(20,44,70,.14),inset 0 1px 0 rgba(255,255,255,.82),inset 0 -1px 0 rgba(28,55,82,.05);
-  --liquid-glass-shadow-soft:0 7px 20px rgba(20,44,70,.11),inset 0 1px 0 rgba(255,255,255,.72);
-  --liquid-glass-active:rgba(220,246,235,.84);
-  --liquid-glass-hover:rgba(255,255,255,.68);
+  --liquid-glass-surface:rgba(4,8,14,.74);
+  --liquid-glass-surface-strong:rgba(7,12,20,.90);
+  --liquid-glass-surface-soft:rgba(18,27,41,.58);
+  --liquid-glass-border:rgba(93,139,204,.20);
+  --liquid-glass-edge:rgba(125,166,224,.26);
+  --liquid-glass-shadow:0 14px 36px rgba(0,0,0,.46),inset 0 1px 0 rgba(255,255,255,.08),inset 0 -1px 0 rgba(0,0,0,.28);
+  --liquid-glass-shadow-soft:0 8px 22px rgba(0,0,0,.36),inset 0 1px 0 rgba(255,255,255,.07);
+  --liquid-glass-active:rgba(23,62,118,.82);
+  --liquid-glass-hover:rgba(25,42,66,.78);
   --liquid-glass-blur:22px;
   --liquid-glass-saturate:145%;
   --liquid-glass-radius:7px;
 }
 
 html[data-theme="dark"] {
-  --liquid-glass-surface:rgba(14,28,43,.68);
-  --liquid-glass-surface-strong:rgba(16,31,47,.84);
-  --liquid-glass-surface-soft:rgba(35,53,70,.48);
-  --liquid-glass-border:rgba(211,230,245,.16);
-  --liquid-glass-edge:rgba(238,247,255,.22);
-  --liquid-glass-shadow:0 14px 36px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.12),inset 0 -1px 0 rgba(0,0,0,.2);
-  --liquid-glass-shadow-soft:0 8px 22px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.1);
-  --liquid-glass-active:rgba(79,150,125,.46);
-  --liquid-glass-hover:rgba(75,96,116,.46);
+  --liquid-glass-surface:rgba(4,8,14,.74);
+  --liquid-glass-surface-strong:rgba(7,12,20,.90);
+  --liquid-glass-surface-soft:rgba(18,27,41,.58);
+  --liquid-glass-border:rgba(93,139,204,.20);
+  --liquid-glass-edge:rgba(125,166,224,.26);
+  --liquid-glass-shadow:0 14px 36px rgba(0,0,0,.46),inset 0 1px 0 rgba(255,255,255,.08),inset 0 -1px 0 rgba(0,0,0,.28);
+  --liquid-glass-shadow-soft:0 8px 22px rgba(0,0,0,.36),inset 0 1px 0 rgba(255,255,255,.07);
+  --liquid-glass-active:rgba(23,62,118,.82);
+  --liquid-glass-hover:rgba(25,42,66,.78);
 }
 
 /* Primary floating navigation layer. */
