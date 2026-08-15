@@ -18,7 +18,7 @@ window.FINANCE_SYNC_CONFIG = window.FINANCE_SYNC_CONFIG || {
     const link = document.createElement("link");
     link.id = "financeLiquidGlassStyles";
     link.rel = "stylesheet";
-    link.href = `./liquid-glass-v15.css?v=${VERSION}-desktop1`;
+    link.href = `./liquid-glass-v15.css?v=${VERSION}-monthnav1`;
     document.head.appendChild(link);
   }
 

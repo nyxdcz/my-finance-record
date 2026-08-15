@@ -395,7 +395,6 @@ form,
 }
 
 /* V15.0.0 · flat top toolbar and toast cleanup. */
-.topbar :is(.month-navigator,.topbar-history-actions),
 .topbar :is(.cloud-sync-toolbar-button,#customizeDashboardButton,.topbar-tools-trigger) {
   background:var(--surface)!important;
   border-color:var(--line)!important;
@@ -424,6 +423,15 @@ form,
 .sidebar {
   border-right:0!important;
   box-shadow:none!important;
+}
+
+/* V15.1.0 · borderless month navigation shell. Keep the 1px layout slot transparent so toolbar geometry does not move. */
+.topbar .month-navigator {
+  border-color:transparent!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
 }
 
 .topbar .topbar-history-actions {

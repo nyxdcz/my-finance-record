@@ -10,8 +10,8 @@
   "profileArchitectureVersion": 1,
   "encryptionVersion": 1,
   "authSecurityVersion": 1,
-  "cacheVersion": "finance-v15-20260815-desktop-consistency-r22",
+  "cacheVersion": "finance-v15-20260815-month-nav-borderless-r23",
   "released": "2026-08-15",
   "name": "Black Canvas UI",
-  "notes": "Black Canvas UI desktop consistency pass: normalizes desktop page framing, card/control geometry, Finance/Reports/Work/Settings component tiers, Black Canvas surfaces, and static Dashboard layout ownership across 1024\u20131920px while preserving mobile behavior, Finance Schema 12, Cloud Schema V3, records, calculations, and sync behavior."
+  "notes": "Black Canvas UI desktop consistency plus a borderless top month-navigation shell: removes the visible surrounding line around Previous, Month, Next, and Current while preserving 38px toolbar geometry, focus states, mobile behavior, Finance Schema 12, Cloud Schema V3, records, calculations, and sync behavior."
 }
