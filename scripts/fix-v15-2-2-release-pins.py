@@ -49,6 +49,14 @@ replace("tests/validate-desktop-ui-phase1-v15-1-0.mjs", 'id="settingsOverviewApp
 replace("tests/v15-2-1-desktop-ux-quick-wins.spec.mjs", 'expect(index).toContain("V15.2.1");', 'expect(index).toContain("V15.2.2");')
 replace("tests/validate-pwa-updater-v15-0-5.mjs", 'assert.match(worker, /const APP_VERSION = "15\\.2\\.1";/);', 'assert.match(worker, /const APP_VERSION = "15\\.2\\.2";/);')
 
+# The browser fixture should exercise a real top-layer dialog. A bare <dialog open>
+# stays at its document position and gives misleading short-viewport geometry.
+browser = "tests/v15-2-2-mobile-ui-ux.spec.mjs"
+replace(browser, '<dialog class="app-dialog" open>', '<dialog class="app-dialog">')
+replace(browser, '`, { waitUntil:"networkidle" });\n}', '`, { waitUntil:"networkidle" });\n  await page.evaluate(() => document.querySelector(".app-dialog")?.showModal());\n}', 1)
+replace(browser, 'overflow:document.documentElement.scrollWidth > innerWidth + 1\n  }));', 'dialogInside:document.querySelector(".app-dialog").getBoundingClientRect().right <= innerWidth + 1\n  }));', 1)
+replace(browser, 'expect(metrics.overflow).toBe(false);\n});\n\ntest("V15.2.2 short portrait', 'expect(metrics.dialogInside).toBe(true);\n});\n\ntest("V15.2.2 short portrait', 1)
+
 # Verify the critical release-facing expectations now exist.
 checks = {
     "README.md": "# My Finance Records · V15.2.2",
@@ -57,6 +65,7 @@ checks = {
     "tests/validate-v15-2-0-desktop-ux.mjs": 'const RELEASE_NAME = "Mobile UI & UX"',
     "tests/validate-desktop-ui-phase1-v15-1-0.mjs": 'Version 15.2.2</strong>',
     "tests/validate-pwa-updater-v15-0-5.mjs": 'APP_VERSION = "15\\.2\\.2"',
+    browser: 'showModal()',
 }
 for path, token in checks.items():
     if token not in (root / path).read_text():
