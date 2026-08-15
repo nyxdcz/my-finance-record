@@ -7,7 +7,7 @@ test("production V15.1.0 UI alignment uses the delivered final stylesheet", asyn
 
   const styles = await page.locator('link[rel="stylesheet"]').evaluateAll(nodes => nodes.map(node => node.getAttribute("href") || ""));
   const dashboardCss = styles.findIndex(href => href.includes("dashboard-interactions.css?v=14.0.23"));
-  const uiCss = styles.findIndex(href => href.includes("ui-icon-alignment-v15-0-5.css?v=15.1.0-ui2"));
+  const uiCss = styles.findIndex(href => href.includes("ui-icon-alignment-v15-0-5.css?v=15.1.0-ui3"));
   expect(dashboardCss).toBeGreaterThanOrEqual(0);
   expect(uiCss).toBeGreaterThan(dashboardCss);
   expect(styles.some(href => href.includes("ui-icon-alignment-v15-0-4.css?v=15.0.4-ui1"))).toBe(false);
@@ -60,4 +60,30 @@ test("V15.1.0 header omits duplicate sign-in shortcut and optically centers Dash
   expect(geometry.glyphHeight).toBe("20px");
   expect(geometry.glyphTransform).toBe("matrix(1, 0, 0, 1, 0, 1)");
   expect(geometry.glyphMargin).toBe("0px");
+});
+
+
+test("V15.1.0 desktop topbar controls match the Synced 38px height", async ({ page }) => {
+  await page.setViewportSize({ width:1440, height:900 });
+  await page.goto("http://127.0.0.1:3000/index.html?page=money", { waitUntil:"networkidle" });
+
+  await page.evaluate(() => {
+    const add = document.getElementById("quickAddExpense");
+    if (add) add.hidden = false;
+  });
+
+  const heightOf = selector => page.locator(selector).first().evaluate(element => element.getBoundingClientRect().height);
+  const reference = await heightOf("#cloudSyncStatusButton");
+  expect(reference).toBe(38);
+
+  for (const selector of [
+    "#customizeDashboardButton",
+    ".month-navigator",
+    "#undoMoneyButton",
+    "#redoMoneyButton",
+    "#quickAddExpense",
+    "#topbarToolsTrigger"
+  ]) {
+    expect(await heightOf(selector), `${selector} should match Synced height`).toBe(reference);
+  }
 });
