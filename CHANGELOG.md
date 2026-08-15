@@ -1,4 +1,5 @@
 ## 15.1.0 · 2026-08-15
+- Rounded Finance period headers and expense rows to 9px so the First half, Second half, Other expenses, and individual expense surfaces match the compact Black Canvas card language.
 - Normalized desktop topbar controls to the 38px Synced reference while preserving the existing 44px mobile touch targets.
 
 ### Changed

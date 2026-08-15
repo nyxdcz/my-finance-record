@@ -56,3 +56,14 @@ input[type="checkbox"], input[type="radio"], progress { accent-color:var(--prima
 #availableMoneySection .account-card {
   border-color:rgba(207,231,213,.24) !important;
 }
+
+/* V15.1.0 Finance period corner-radius polish. */
+#money .period-card {
+  border-radius:9px !important;
+  overflow:hidden;
+}
+#money .period-card .period-header,
+#money .period-card .record-row {
+  border-radius:9px !important;
+  overflow:hidden;
+}
