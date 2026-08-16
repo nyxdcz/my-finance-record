@@ -2,7 +2,7 @@
 (function exposeFinancePwaUpdate(root) {
   const FINANCE_CACHE_PATTERN = /^finance-v\d+-/;
   const LEGACY_INDEX_CACHE = "finance-v15-20260816-mobile-ui-ux-r32";
-  const CURRENT_CACHE_VERSION = "finance-v15-20260816-import-review-r34";
+  const CURRENT_CACHE_VERSION = "finance-v15-20260816-sidebar-brand-r35";
   const normalizeCacheVersion = cacheVersion => cacheVersion === LEGACY_INDEX_CACHE ? CURRENT_CACHE_VERSION : cacheVersion;
   const api = {
     financeCachePattern:FINANCE_CACHE_PATTERN,
@@ -27,6 +27,18 @@
     }
   };
   root.FinancePwaUpdate = api;
+
+  function installSidebarBrand() {
+    const doc = root.document;
+    if (!doc) return;
+    const apply = () => {
+      const brand = doc.querySelector(".sidebar .brand strong");
+      if (brand && brand.textContent !== "My Finance Records") brand.textContent = "My Finance Records";
+    };
+    if (doc.readyState === "loading") doc.addEventListener("DOMContentLoaded", apply, { once:true });
+    else apply();
+  }
+  installSidebarBrand();
 
   function installCashFlowStyles() {
     const doc = root.document;
