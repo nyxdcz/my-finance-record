@@ -21,6 +21,11 @@
     "accountDialog","incomeDialog","expenseDialog","expensePaymentDialog","expenseActionConfirmDialog","dashboardCustomizeDialog",
     "projectDialog","projectRevisionDialog","projectPaidDialog","savingsGoalDialog","syncReviewDialog","sampleResetDialog"
   ]);
+  const recoveryImportActions = new Map([
+    ["mergeKeepCurrentButton", ["merge", "current"]],
+    ["mergeUseIncomingButton", ["merge", "incoming"]],
+    ["replaceWithIncomingButton", ["replace", "incoming"]]
+  ]);
 
   function pageLabel(page){
     const heading=page.querySelector(".page-heading h2, .page-heading h3");
@@ -142,7 +147,27 @@
     try { if(typeof showToast==="function") showToast(message,"info"); } catch(e){}
   }
 
+  function runRecoveryImportAction(event){
+    const button=event.target.closest?.("#mergeKeepCurrentButton, #mergeUseIncomingButton, #replaceWithIncomingButton");
+    if(!button) return false;
+    const action=recoveryImportActions.get(button.id);
+    if(!action) return false;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    const dialog=document.getElementById("syncReviewDialog");
+    try {
+      if(typeof window.applyPendingSyncImport!=="function") throw new Error("Import action is unavailable");
+      window.applyPendingSyncImport(action[0],action[1]);
+      if(dialog?.open && typeof showToast==="function") showToast("Import review expired. Choose the backup again.","warning");
+    } catch(error) {
+      console.error("Recovery import action failed",error);
+      try { if(typeof showToast==="function") showToast(`Import failed: ${error?.message || "unknown error"}`,"warning"); } catch(e){}
+    }
+    return true;
+  }
+
   document.addEventListener("click",event=>{
+    if(runRecoveryImportAction(event)) return;
     const signin=event.target.closest?.(".finance-privacy-signin");
     if(signin){ event.preventDefault(); openSignIn(); return; }
     blockLockedInteraction(event);
