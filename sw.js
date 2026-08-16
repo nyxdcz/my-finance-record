@@ -4,6 +4,7 @@ self.__FINANCE_APP_VERSION = APP_VERSION;
 // V15.2.2 mobile UI/UX delivery · phone layout, touch targets, menu safety, and responsive regression coverage; finance data and sync semantics unchanged.
 // V15.2.2 hotfix: Finance workspace sticky row now follows the mobile topbar offset.
 // V15.2.2 hotfix: force refreshed shell assets for the Income versus Expenses dashboard arrangement.
+// V15.2.2 hotfix: refresh the signed-out privacy guard so recovery import review actions remain clickable.
 const CACHE_VERSION = "finance-v15-20260816-cashflow-r33";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
