@@ -2,6 +2,7 @@ import { test, expect } from "@playwright/test";
 import fs from "node:fs";
 
 const privacySource = fs.readFileSync(new URL("../privacy-lock.js", import.meta.url), "utf8");
+const serviceWorkerSource = fs.readFileSync(new URL("../sw.js", import.meta.url), "utf8");
 
 const allowedRecoveryControls = [
   "label[for='importSyncBundleInput']",
@@ -13,26 +14,34 @@ const allowedRecoveryControls = [
   "#replaceWithIncomingButton"
 ];
 
-test("recovery import controls are explicitly allowed through the signed-out privacy guard", async () => {
+const appUrl = "http://127.0.0.1:3000/index.html?page=settings&settings=sync";
+
+async function waitForStableRuntime(page) {
+  await expect.poll(async () => {
+    try { return await page.evaluate(() => navigator.serviceWorker?.controller?.scriptURL || ""); }
+    catch { return ""; }
+  }, { timeout:15000 }).toContain("cache=finance-v15-20260816-import-review-r34");
+  await page.waitForLoadState("networkidle");
+  await page.waitForTimeout(350);
+  await page.waitForFunction(() => typeof window.openSyncReview === "function" && typeof window.buildBundle === "function" && typeof window.applyPendingSyncImport === "function" && Boolean(window.FinancePrivacyLock?.recoveryStorage));
+  await page.evaluate(() => window.FinancePrivacyLock.recoveryStorage.ready());
+}
+
+test("recovery import controls and quota-safe storage are wired through the privacy guard", async () => {
   for (const selector of allowedRecoveryControls) expect(privacySource).toContain(selector);
   expect(privacySource).toContain("runRecoveryImportAction");
   expect(privacySource).toContain("window.applyPendingSyncImport");
+  expect(privacySource).toContain('const RECOVERY_DB_VERSION = 2');
+  expect(privacySource).toContain('const RECOVERY_STORE = "recoverySnapshots"');
+  expect(privacySource).toContain("compactLegacyRecoverySnapshots");
+  expect(privacySource).toContain("persistRecoverySnapshot");
+  expect(serviceWorkerSource).toContain('const DB_VERSION = 2');
+  expect(serviceWorkerSource).toContain('createObjectStore("recoverySnapshots"');
 });
 
 test("recovery import review actions execute and persist while the privacy guard is locked", async ({ page }) => {
-  const url = "http://127.0.0.1:3000/index.html?page=settings&settings=sync";
-  await page.goto(url, { waitUntil:"networkidle" });
-
-  const waitForStableRuntime = async () => {
-    await expect.poll(async () => {
-      try { return await page.evaluate(() => navigator.serviceWorker?.controller?.scriptURL || ""); }
-      catch { return ""; }
-    }, { timeout:15000 }).toContain("cache=finance-v15-20260816-import-review-r34");
-    await page.waitForLoadState("networkidle");
-    await page.waitForTimeout(350);
-    await page.waitForFunction(() => typeof window.openSyncReview === "function" && typeof window.buildBundle === "function" && typeof window.applyPendingSyncImport === "function" && Boolean(window.FinancePrivacyLock));
-  };
-  await waitForStableRuntime();
+  await page.goto(appUrl, { waitUntil:"networkidle" });
+  await waitForStableRuntime(page);
 
   const dialog = page.locator("#syncReviewDialog");
   const lock = async () => page.evaluate(() => window.FinancePrivacyLock.lock());
@@ -52,7 +61,7 @@ test("recovery import review actions execute and persist while the privacy guard
   const expectPersisted = async (name, amount) => {
     await expect.poll(() => page.evaluate(name => window.buildBundle().data.accounts?.[name] ?? null, name)).toBe(amount);
     await page.reload({ waitUntil:"networkidle" });
-    await waitForStableRuntime();
+    await waitForStableRuntime(page);
     await expect.poll(() => page.evaluate(name => window.buildBundle().data.accounts?.[name] ?? null, name)).toBe(amount);
   };
 
@@ -76,7 +85,112 @@ test("recovery import review actions execute and persist while the privacy guard
     await lock();
     await openReview(name, amount);
     await page.locator(selector).click();
-    await expect(dialog).not.toBeVisible();
+    await expect(dialog).not.toBeVisible({ timeout:10000 });
     await expectPersisted(name, amount);
   }
+});
+
+test("large legacy recovery metadata is compacted and import survives a simulated localStorage quota", async ({ page }) => {
+  await page.goto(appUrl, { waitUntil:"networkidle" });
+  await waitForStableRuntime(page);
+
+  const legacyId = `legacy-quota-${Date.now()}`;
+  await page.evaluate(async legacyId => {
+    const legacySnapshot = {
+      id:legacyId,
+      label:"Legacy oversized recovery snapshot",
+      createdAt:new Date().toISOString(),
+      sourceDeviceId:"legacy-test-device",
+      checksum:"legacy-quota",
+      summary:{ accounts:1, expenses:350, projects:0 },
+      data:{
+        accounts:{ Legacy:1 },
+        expenses:Array.from({ length:350 }, (_, index) => ({ id:`legacy-expense-${index}`, name:`Legacy ${index}`, notes:"x".repeat(240) })),
+        projects:[]
+      }
+    };
+    appMeta.recoverySnapshots = [legacySnapshot, ...(appMeta.recoverySnapshots || []).filter(item => item.id !== legacyId)];
+    writeMeta();
+    await window.FinancePrivacyLock.recoveryStorage.compact();
+  }, legacyId);
+
+  const migrated = await page.evaluate(async legacyId => {
+    const meta = JSON.parse(localStorage.getItem("simple-finance-project-records-v12-meta") || "{}");
+    const indexed = await window.FinancePrivacyLock.recoveryStorage.list();
+    return {
+      metadata:meta.recoverySnapshots?.find(item => item.id === legacyId) || null,
+      indexed:indexed.find(item => item.id === legacyId) || null,
+      serializedMetaLength:JSON.stringify(meta).length
+    };
+  }, legacyId);
+  expect(migrated.metadata).toBeTruthy();
+  expect(migrated.metadata.data).toBeUndefined();
+  expect(migrated.metadata.storage).toBe("indexeddb-v2");
+  expect(migrated.indexed?.data?.expenses?.length).toBe(350);
+  expect(migrated.serializedMetaLength).toBeLessThan(100000);
+
+  await page.evaluate(() => {
+    const account = Object.keys(data.accounts || {})[0] || "Cash";
+    const quotaExpenses = Array.from({ length:800 }, (_, index) => ({
+      id:`quota-expense-${index}`,
+      name:`Quota seed ${index}`,
+      amount:1,
+      date:`2026-08-${String((index % 28) + 1).padStart(2,"0")}`,
+      category:"Other",
+      group:"Other",
+      account,
+      recurring:"No",
+      paid:false,
+      notes:"quota-test-" + "q".repeat(220),
+      includeInTotals:false
+    }));
+    data.expenses = [...data.expenses.filter(item => !String(item.id || "").startsWith("quota-expense-")), ...quotaExpenses];
+    saveData("Seed quota recovery test");
+
+    const originalSetItem = Storage.prototype.setItem;
+    const metaKey = "simple-finance-project-records-v12-meta";
+    const baseline = String(localStorage.getItem(metaKey) || "").length;
+    const quotaLimit = baseline + 80000;
+    Storage.prototype.setItem = function(key, value) {
+      if (key === metaKey && String(value).length > quotaLimit) {
+        throw new DOMException("Setting the value exceeded the quota.", "QuotaExceededError");
+      }
+      return originalSetItem.call(this, key, value);
+    };
+  });
+
+  const importedName = "Quota-safe imported account";
+  const importedAmount = 404.04;
+  await page.evaluate(({ importedName, importedAmount }) => {
+    const bundle = window.buildBundle("my-finance-v12-recovery");
+    bundle.exportedAt = new Date().toISOString();
+    bundle.sourceDevice = { id:"playwright-quota-import", name:"Quota import source" };
+    bundle.data.accounts = { ...(bundle.data.accounts || {}), [importedName]:importedAmount };
+    window.openSyncReview(bundle);
+  }, { importedName, importedAmount });
+
+  const dialog = page.locator("#syncReviewDialog");
+  await expect(dialog).toBeVisible();
+  await page.locator("#mergeUseIncomingButton").click();
+  await expect(dialog).not.toBeVisible({ timeout:10000 });
+  await expect.poll(() => page.evaluate(name => window.buildBundle().data.accounts?.[name] ?? null, importedName)).toBe(importedAmount);
+
+  const quotaSafeState = await page.evaluate(async () => {
+    const meta = JSON.parse(localStorage.getItem("simple-finance-project-records-v12-meta") || "{}");
+    const snapshots = await window.FinancePrivacyLock.recoveryStorage.list();
+    return {
+      metadataSnapshots:meta.recoverySnapshots || [],
+      indexedSnapshots:snapshots.map(snapshot => ({ id:snapshot.id, expenseCount:snapshot.data?.expenses?.length || 0 })),
+      serializedMetaLength:JSON.stringify(meta).length
+    };
+  });
+  expect(quotaSafeState.metadataSnapshots.length).toBeGreaterThan(0);
+  expect(quotaSafeState.metadataSnapshots.every(snapshot => !Object.prototype.hasOwnProperty.call(snapshot, "data"))).toBe(true);
+  expect(quotaSafeState.metadataSnapshots.every(snapshot => snapshot.storage === "indexeddb-v2")).toBe(true);
+  expect(quotaSafeState.indexedSnapshots.some(snapshot => snapshot.expenseCount >= 800)).toBe(true);
+  expect(quotaSafeState.serializedMetaLength).toBeLessThan(100000);
+
+  await page.reload({ waitUntil:"networkidle" });
+  await waitForStableRuntime(page);
+  await expect.poll(() => page.evaluate(name => window.buildBundle().data.accounts?.[name] ?? null, importedName)).toBe(importedAmount);
 });
