@@ -6,6 +6,7 @@ self.__FINANCE_APP_VERSION = APP_VERSION;
 // V15.2.2 hotfix: force refreshed shell assets for the Income versus Expenses dashboard arrangement.
 // V15.2.2 hotfix: recovery import actions are force-refreshed and the privacy lock is network-first with offline fallback.
 // V15.2.2 hotfix: large pre-import recovery snapshots are stored in IndexedDB instead of localStorage metadata.
+// V15.2.2 hotfix: re-precache the expense dialog after removing the redundant required-fields and mode-note strip.
 const CACHE_VERSION = "finance-v15-20260816-import-review-r34";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
@@ -215,7 +216,7 @@ async function writeReminderIndex(value) {
   const db = await openDb();
   return new Promise((resolve, reject) => {
     const tx = db.transaction("reminderIndex", "readwrite");
-    tx.objectStore("reminderIndex").put(value);
+    tx.objectStore(storeName).put(value);
     tx.oncomplete = () => { db.close(); resolve(value); };
     tx.onerror = () => { db.close(); reject(tx.error); };
     tx.onabort = () => { db.close(); reject(tx.error); };
