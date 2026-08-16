@@ -14,7 +14,8 @@
     "#cloudRecoveryEmail", "#cloudRecoveryCode", "#cloudRecoveryResend", "#cloudVerifyRecoveryCode", "#cloudRecoveryBackToSignIn",
     "#cloudNewPassword", "#cloudConfirmPassword", "#cloudCompletePasswordReset", "#cloudCancelPasswordReset", "[data-cloud-password-target]",
     "#installPwaButton", "#checkUpdateButton", "#repairPwaButton", "#clearAppCacheButton", "#requestPersistenceButton", "#applyUpdateButton", "#laterUpdateButton",
-    "label[for='importBackup']", "#importBackup", "#restoreV11BackupButton"
+    "label[for='importBackup']", "#importBackup", "label[for='importSyncBundleInput']", "#importSyncBundleInput", "#restoreV11BackupButton",
+    "#closeSyncReviewButton", "#cancelSyncImportButton", "#mergeKeepCurrentButton", "#mergeUseIncomingButton", "#replaceWithIncomingButton"
   ].join(",");
   const sensitiveDialogIds = new Set([
     "accountDialog","incomeDialog","expenseDialog","expensePaymentDialog","expenseActionConfirmDialog","dashboardCustomizeDialog",
