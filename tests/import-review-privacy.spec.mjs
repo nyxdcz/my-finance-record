@@ -1,3 +1,4 @@
+/* global appMeta, writeMeta, data, saveData */
 import { test, expect } from "@playwright/test";
 import fs from "node:fs";
 
