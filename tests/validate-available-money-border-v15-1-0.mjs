@@ -13,5 +13,5 @@ assert.match(sw, /black-canvas-v15-1-0\.css\?v=15\.1\.0-light1/);
 assert.equal(version.version, "15.2.2");
 assert.equal(version.schemaVersion, 12);
 assert.equal(version.cloudSchemaVersion, 3);
-assert.equal(version.cacheVersion, "finance-v15-20260816-cashflow-r33");
+assert.equal(version.cacheVersion, "finance-v15-20260816-import-review-r34");
 console.log("V15.2.2 Available money account-border regression passed.");
