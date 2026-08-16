@@ -4,8 +4,8 @@ self.__FINANCE_APP_VERSION = APP_VERSION;
 // V15.2.2 mobile UI/UX delivery · phone layout, touch targets, menu safety, and responsive regression coverage; finance data and sync semantics unchanged.
 // V15.2.2 hotfix: Finance workspace sticky row now follows the mobile topbar offset.
 // V15.2.2 hotfix: force refreshed shell assets for the Income versus Expenses dashboard arrangement.
-// V15.2.2 hotfix: refresh the signed-out privacy guard so recovery import review actions remain clickable.
-const CACHE_VERSION = "finance-v15-20260816-cashflow-r33";
+// V15.2.2 hotfix: recovery import actions are force-refreshed and the privacy lock is network-first with offline fallback.
+const CACHE_VERSION = "finance-v15-20260816-import-review-r34";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const DB_NAME = "simple-finance-project-records-v12-db";
@@ -127,6 +127,18 @@ async function cacheFirst(request) {
   return response;
 }
 
+async function networkFirstCriticalAsset(request) {
+  const shell = await caches.open(SHELL_CACHE);
+  const runtime = await caches.open(RUNTIME_CACHE);
+  try {
+    const response = await fetch(request, { cache:"no-store" });
+    if (response && response.ok) runtime.put(request, response.clone());
+    return response;
+  } catch {
+    return (await runtime.match(request)) || (await shell.match(request)) || new Response("Offline", { status:503, statusText:"Offline" });
+  }
+}
+
 async function staleWhileRevalidate(request) {
   const cache = await caches.open(RUNTIME_CACHE);
   const cached = await cache.match(request);
@@ -146,6 +158,10 @@ self.addEventListener("fetch", event => {
     return;
   }
   if (url.origin !== self.location.origin) return;
+  if (url.pathname.endsWith("privacy-lock.js")) {
+    event.respondWith(networkFirstCriticalAsset(request));
+    return;
+  }
   if (url.pathname.endsWith("version.json") || url.pathname.endsWith("manifest.webmanifest")) {
     event.respondWith(staleWhileRevalidate(request));
     return;
