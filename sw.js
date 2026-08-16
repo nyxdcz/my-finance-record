@@ -216,7 +216,7 @@ async function writeReminderIndex(value) {
   const db = await openDb();
   return new Promise((resolve, reject) => {
     const tx = db.transaction("reminderIndex", "readwrite");
-    tx.objectStore(storeName).put(value);
+    tx.objectStore("reminderIndex").put(value);
     tx.oncomplete = () => { db.close(); resolve(value); };
     tx.onerror = () => { db.close(); reject(tx.error); };
     tx.onabort = () => { db.close(); reject(tx.error); };
