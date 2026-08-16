@@ -12,12 +12,6 @@
   .budget-planner-more-panel,.pc-event-more-panel{min-width:180px}
 }
 
-/* V15.2.2 hotfix · remove the redundant expense-dialog guidance strip. */
-#expenseDialog > form > .modal-body > .required-note,
-#expenseDialog #expenseFormModeNote{
-  display:none !important;
-}
-
 /* V15.2.2 · Income versus expenses: one primary chart + compact monthly summary. */
 #dashCashFlowChart .cash-flow-chart-grid{
   grid-template-columns:minmax(0,7fr) minmax(190px,3fr);
