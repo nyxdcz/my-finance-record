@@ -1,0 +1,177 @@
+name: Apply sidebar brand patch
+
+on:
+  push:
+    branches:
+      - fix/sidebar-brand-my-finance-records
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: ${{ !contains(github.event.head_commit.message, '[sidebar-brand-applied]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v7
+        with:
+          ref: fix/sidebar-brand-my-finance-records
+          fetch-depth: 0
+
+      - name: Apply focused sidebar brand changes
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+
+          OLD_CACHE = "finance-v15-20260816-import-review-r34"
+          NEW_CACHE = "finance-v15-20260816-sidebar-brand-r35"
+          OLD_UI = "./ui-icon-alignment-v15-0-5.css?v=15.1.0-ui3"
+          NEW_UI = "./ui-icon-alignment-v15-0-5.css?v=15.2.2-sidebar-brand1"
+
+          def replace_exact(path, old, new, expected=1):
+              p = Path(path)
+              text = p.read_text()
+              count = text.count(old)
+              if count != expected:
+                  raise SystemExit(f"{path}: expected {expected} occurrence(s) of {old!r}, found {count}")
+              p.write_text(text.replace(old, new))
+
+          # Structural brand name and cache-safe stylesheet URL.
+          replace_exact("index.html", "<strong>Records</strong>", "<strong>My Finance Records</strong>")
+          replace_exact("index.html", OLD_UI, NEW_UI)
+
+          # Final sidebar visual layer: smaller pin, stable location, one-line full product name.
+          css_path = Path("ui-icon-alignment-v15-0-5.css")
+          css = css_path.read_text()
+          marker = "/* V15.2.2 sidebar brand: My Finance Records + compact pin. */"
+          if marker in css:
+              raise SystemExit("sidebar brand CSS marker already exists")
+          css += r'''
+
+/* V15.2.2 sidebar brand: My Finance Records + compact pin. */
+@media (min-width:851px) {
+  html body .sidebar.desktop-open .sidebar-close-button,
+  html body .sidebar.sidebar-pinned .sidebar-close-button {
+    box-sizing:border-box !important;
+    width:28px !important;
+    min-width:28px !important;
+    max-width:28px !important;
+    height:28px !important;
+    min-height:28px !important;
+    max-height:28px !important;
+    top:15px !important;
+  }
+  html body .sidebar.desktop-open .sidebar-close-button :is(.sidebar-pin-icon,.sidebar-unpin-icon),
+  html body .sidebar.sidebar-pinned .sidebar-close-button :is(.sidebar-pin-icon,.sidebar-unpin-icon) {
+    width:14px !important;
+    height:14px !important;
+  }
+  html body .sidebar.desktop-open .brand,
+  html body .sidebar.sidebar-pinned .brand {
+    left:52px !important;
+    right:8px !important;
+    min-width:0 !important;
+    height:42px !important;
+  }
+  html body .sidebar.desktop-open .brand strong,
+  html body .sidebar.sidebar-pinned .brand strong {
+    display:block !important;
+    max-width:100% !important;
+    overflow:hidden !important;
+    white-space:nowrap !important;
+    text-overflow:ellipsis !important;
+    font-size:.92rem !important;
+    line-height:1.1 !important;
+    font-weight:850 !important;
+    letter-spacing:-.015em !important;
+  }
+}
+
+@media (max-width:850px) {
+  html body .sidebar .brand strong {
+    white-space:nowrap !important;
+    font-size:.92rem !important;
+  }
+}
+'''
+          css_path.write_text(css)
+
+          # Rotate the shell so already-installed browsers receive the new sidebar CSS and markup.
+          replace_exact("pwa-update-v15-0-5.js", OLD_CACHE, NEW_CACHE)
+          replace_exact("sw.js", OLD_CACHE, NEW_CACHE)
+          replace_exact("sw.js", f'asset("{OLD_UI}")', f'asset("{NEW_UI}")')
+
+          version_path = Path("version.json")
+          version = json.loads(version_path.read_text())
+          if version.get("cacheVersion") != OLD_CACHE:
+              raise SystemExit(f"version.json: expected cacheVersion {OLD_CACHE!r}, got {version.get('cacheVersion')!r}")
+          version["cacheVersion"] = NEW_CACHE
+          version["notes"] = "V15.2.2 sidebar hotfix: rename the expanded navigation brand to My Finance Records, reduce the desktop pin control to 28px while keeping its expanded/pinned position stable, and refresh the PWA shell. Finance Schema 12, Cloud Schema V3, records, calculations, sync, and phone navigation behavior remain unchanged."
+          version_path.write_text(json.dumps(version, indent=2, ensure_ascii=False) + "\n")
+
+          # Update hard-coded release/cache expectations without changing unrelated assertions.
+          for p in Path("tests").glob("*.mjs"):
+              text = p.read_text()
+              changed = text.replace(OLD_CACHE, NEW_CACHE).replace(OLD_UI, NEW_UI)
+              if changed != text:
+                  p.write_text(changed)
+
+          test_path = Path("tests/sidebar-brand-v15-2-2.spec.mjs")
+          test_path.write_text(r'''import { test, expect } from "@playwright/test";
+import fs from "node:fs";
+
+const source = name => fs.readFileSync(new URL(`../${name}`, import.meta.url), "utf8");
+
+test("expanded sidebar uses the full My Finance Records brand and compact stable pin", async ({ page }) => {
+  expect(source("index.html")).toContain("<strong>My Finance Records</strong>");
+  expect(source("index.html")).not.toContain("<strong>Records</strong>");
+
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.setContent(`<!doctype html><html><head><link rel="stylesheet" href="http://127.0.0.1:3000/ui-icon-alignment-v15-0-5.css?v=15.2.2-sidebar-brand1"></head><body><aside class="sidebar desktop-open"><button class="sidebar-close-button"><svg class="sidebar-pin-icon"></svg><svg class="sidebar-unpin-icon"></svg></button><div class="brand"><strong>My Finance Records</strong></div></aside></body></html>`, { waitUntil:"networkidle" });
+
+  const open = await page.evaluate(() => {
+    const button = document.querySelector(".sidebar-close-button");
+    const brand = document.querySelector(".brand strong");
+    const buttonStyle = getComputedStyle(button);
+    const brandStyle = getComputedStyle(brand);
+    return {
+      width: buttonStyle.width,
+      height: buttonStyle.height,
+      top: buttonStyle.top,
+      brandWhiteSpace: brandStyle.whiteSpace,
+      brandFontSize: brandStyle.fontSize
+    };
+  });
+  expect(open.width).toBe("28px");
+  expect(open.height).toBe("28px");
+  expect(open.top).toBe("15px");
+  expect(open.brandWhiteSpace).toBe("nowrap");
+
+  await page.locator(".sidebar").evaluate(node => {
+    node.classList.remove("desktop-open");
+    node.classList.add("sidebar-pinned");
+  });
+  const pinned = await page.evaluate(() => {
+    const style = getComputedStyle(document.querySelector(".sidebar-close-button"));
+    return { width:style.width, height:style.height, top:style.top };
+  });
+  expect(pinned).toEqual({ width:"28px", height:"28px", top:"15px" });
+});
+''')
+
+          # The patch runner is temporary and must not remain in the product branch.
+          Path(".github/workflows/sidebar-brand-patch.yml").unlink()
+          PY
+
+      - name: Commit applied patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "fix: fit My Finance Records in sidebar [sidebar-brand-applied]"
+          git push origin HEAD:fix/sidebar-brand-my-finance-records
