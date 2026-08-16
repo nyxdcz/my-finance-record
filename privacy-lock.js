@@ -357,7 +357,6 @@
       }
     });
   }
-
   function removeTopbarSignIn(){
     document.getElementById("privacySignInButton")?.remove();
   }
@@ -371,6 +370,22 @@
     note.innerHTML=`<div><strong>Finance-specific app settings are hidden while signed out.</strong><p>Sign in to manage reminders and offline finance documents. Installation, updates, appearance, app repair, storage protection, and Help remain available.</p></div><button class="button button-primary finance-privacy-signin" type="button">Sign in</button>`;
     const intro=panel.querySelector(":scope > .settings-section-intro");
     if(intro) intro.after(note); else panel.prepend(note);
+  }
+
+  function structurallyRemoveExpenseDialogGuidance(){
+    const dialog=document.getElementById("expenseDialog");
+    if(!dialog) return;
+    dialog.querySelector(":scope > form > .modal-body > .required-note")?.remove();
+    const modeNote=dialog.querySelector("#expenseFormModeNote");
+    if(!modeNote) return;
+    modeNote.remove();
+    if(document.querySelector("[data-expense-mode-surrogate='true']")) return;
+    const surrogate=document.createElement("span");
+    surrogate.id="expenseFormModeNote";
+    surrogate.hidden=true;
+    surrogate.setAttribute("aria-hidden","true");
+    surrogate.dataset.expenseModeSurrogate="true";
+    document.body.appendChild(surrogate);
   }
 
   function openSignIn(){
@@ -415,6 +430,7 @@
     ensurePrivacyViews();
     removeTopbarSignIn();
     ensureSettingsPrivacyNote();
+    structurallyRemoveExpenseDialogGuidance();
     installRecoveryDbUpgrade();
     ensureRecoveryStorageReady().catch(error=>console.error("Recovery storage migration failed",error));
     installSyncReviewCapture();
