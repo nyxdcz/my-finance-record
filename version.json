@@ -10,8 +10,8 @@
   "profileArchitectureVersion": 1,
   "encryptionVersion": 1,
   "authSecurityVersion": 1,
-  "cacheVersion": "finance-v15-20260816-cashflow-r33",
+  "cacheVersion": "finance-v15-20260816-import-review-r34",
   "released": "2026-08-16",
   "name": "Mobile UI & UX",
-  "notes": "V15.2.2 hotfix: refresh the Income versus Expenses dashboard delivery so the single primary chart plus compact monthly summary replaces the stale duplicate horizontal comparison layout. Finance Schema 12, Cloud Schema V3, calculations, saved records, account balances, budgets, projects, and five-minute sync cadence remain unchanged."
+  "notes": "V15.2.2 hotfix: force-refresh the recovery import review runtime so Merge · keep current conflicts, Merge · use incoming conflicts, and Replace after backup execute reliably. The privacy-lock script now uses a network-first service-worker path with offline fallback, while Finance Schema 12, Cloud Schema V3, calculations, saved records, account balances, budgets, projects, and five-minute sync cadence remain unchanged."
 }
