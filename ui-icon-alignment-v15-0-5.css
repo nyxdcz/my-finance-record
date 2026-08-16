@@ -95,3 +95,49 @@ html body #customizeDashboardButton[data-dashboard-toolbar-action]::before {
     padding-inline-start:12px !important;
   }
 }
+
+/* V15.2.2 sidebar brand: full product name with a compact, stable pin control. */
+@media (min-width:851px) {
+  html body .sidebar.desktop-open .sidebar-close-button,
+  html body .sidebar.sidebar-pinned .sidebar-close-button {
+    box-sizing:border-box !important;
+    width:28px !important;
+    min-width:28px !important;
+    max-width:28px !important;
+    height:28px !important;
+    min-height:28px !important;
+    max-height:28px !important;
+    top:15px !important;
+  }
+  html body .sidebar.desktop-open .sidebar-close-button :is(.sidebar-pin-icon,.sidebar-unpin-icon),
+  html body .sidebar.sidebar-pinned .sidebar-close-button :is(.sidebar-pin-icon,.sidebar-unpin-icon) {
+    width:14px !important;
+    height:14px !important;
+  }
+  html body .sidebar.desktop-open .brand,
+  html body .sidebar.sidebar-pinned .brand {
+    left:52px !important;
+    right:8px !important;
+    min-width:0 !important;
+    height:42px !important;
+  }
+  html body .sidebar.desktop-open .brand strong,
+  html body .sidebar.sidebar-pinned .brand strong {
+    display:block !important;
+    max-width:100% !important;
+    overflow:hidden !important;
+    white-space:nowrap !important;
+    text-overflow:ellipsis !important;
+    font-size:.92rem !important;
+    line-height:1.1 !important;
+    font-weight:850 !important;
+    letter-spacing:-.015em !important;
+  }
+}
+
+@media (max-width:850px) {
+  html body .sidebar .brand strong {
+    white-space:nowrap !important;
+    font-size:.92rem !important;
+  }
+}
