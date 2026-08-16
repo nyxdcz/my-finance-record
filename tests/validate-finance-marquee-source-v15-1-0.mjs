@@ -9,7 +9,8 @@ const pkg = JSON.parse(fs.readFileSync("package.json", "utf8"));
 const lock = JSON.parse(fs.readFileSync("package-lock.json", "utf8"));
 
 const expectedVersion = "15.2.2";
-const expectedCache = "finance-v15-20260816-mobile-ui-ux-r32";
+const expectedIndexCache = "finance-v15-20260816-mobile-ui-ux-r32";
+const expectedCache = "finance-v15-20260816-cashflow-r33";
 const interactionQuery = "15.2.1-ux1";
 
 for (const [pageId, marqueeId] of [["income", "incomeFinanceWeekMarquee"], ["money", "financeWeekMarquee"], ["paid-expenses", "paidFinanceWeekMarquee"]]) {
@@ -28,7 +29,7 @@ for (const [pageId, marqueeId] of [["income", "incomeFinanceWeekMarquee"], ["mon
 
 assert.equal(interaction.includes("alignFinanceWorkspaceMarquees"), false, "runtime DOM rearrangement workaround must be removed");
 assert.ok(index.includes(`const APP_VERSION = "${expectedVersion}";`));
-assert.ok(index.includes(`const APP_CACHE_VERSION = "${expectedCache}";`));
+assert.ok(index.includes(`const APP_CACHE_VERSION = "${expectedIndexCache}";`));
 assert.ok(index.includes(`./interaction-patterns.js?v=${interactionQuery}`));
 assert.ok(sw.includes(`const APP_VERSION = "${expectedVersion}";`));
 assert.ok(sw.includes(`const CACHE_VERSION = "${expectedCache}";`));
