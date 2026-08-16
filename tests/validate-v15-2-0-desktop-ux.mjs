@@ -9,11 +9,11 @@ const cloudFile = fs.readdirSync(".").find(name => name.endsWith(".js") && read(
 if (!cloudFile) throw new Error("Cloud Sync V3 file missing");
 const cloud = read(cloudFile);
 const required = [
-  [version.version === "15.2.2", "version.json is V15.2.1"],
-  [pkg.version === "15.2.2", "package.json is V15.2.1"],
+  [version.version === "15.2.2", "version.json is V15.2.2"],
+  [pkg.version === "15.2.2", "package.json is V15.2.2"],
   [version.schemaVersion === 12 && version.cloudSchemaVersion === 3, "schemas remain 12/3"],
-  [version.cacheVersion === "finance-v15-20260816-mobile-ui-ux-r32", "r30 cache is declared"],
-  [index.includes("My Finance Records · V15.2.2"), "page title is V15.2.1"],
+  [version.cacheVersion === "finance-v15-20260816-cashflow-r33", "cash-flow refresh cache is declared"],
+  [index.includes("My Finance Records · V15.2.2"), "page title is V15.2.2"],
   [index.includes("recurring items checked"), "month navigation explains recurring preparation"],
   [index.includes("cleared because filters changed"), "selection reset is announced"],
   [index.includes("Enter an account name."), "account name has inline validation"],
