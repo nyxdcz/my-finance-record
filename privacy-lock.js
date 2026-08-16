@@ -1,6 +1,7 @@
 "use strict";
 (() => {
   const state = { authenticated:false, resolved:false, email:"" };
+  const importReviewState = { bundle:null, beforeAccounts:{} };
   const allowedSelector = [
     "[data-page]", "#menuButton", "#sidebarCloseButton", "#overlay",
     "#previousMonthButton", "#nextMonthButton", "#monthDisplayButton", "#currentMonthButton",
@@ -26,6 +27,72 @@
     ["mergeUseIncomingButton", ["merge", "incoming"]],
     ["replaceWithIncomingButton", ["replace", "incoming"]]
   ]);
+
+  function cloneValue(value){
+    try { return structuredClone(value); } catch(e){}
+    try { return JSON.parse(JSON.stringify(value)); } catch(e) { return value; }
+  }
+
+  function currentAccounts(){
+    try {
+      const bundle=typeof window.buildBundle==="function" ? window.buildBundle() : null;
+      return cloneValue(bundle?.data?.accounts || {});
+    } catch(e) { return {}; }
+  }
+
+  function captureImportReview(bundle){
+    importReviewState.bundle=cloneValue(bundle);
+    importReviewState.beforeAccounts=currentAccounts();
+  }
+
+  function installSyncReviewCapture(){
+    const original=window.openSyncReview;
+    if(typeof original!=="function" || original.__financeRecoveryCapture) return;
+    const wrapped=function(bundle){
+      captureImportReview(bundle);
+      return original.apply(this,arguments);
+    };
+    Object.defineProperty(wrapped,"__financeRecoveryCapture",{value:true});
+    window.openSyncReview=wrapped;
+  }
+
+  function clearImportReviewCapture(){
+    importReviewState.bundle=null;
+    importReviewState.beforeAccounts={};
+  }
+
+  function importedAccounts(){
+    const incoming=importReviewState.bundle?.data || importReviewState.bundle;
+    return incoming?.accounts && typeof incoming.accounts==="object" && !Array.isArray(incoming.accounts) ? incoming.accounts : {};
+  }
+
+  function reconcileImportedAccountBalances(mode, conflictPolicy){
+    const ledger=window.FinanceAccountLedger;
+    if(!ledger || typeof ledger.appendReconciliation!=="function") return 0;
+    if(window.FinanceProfileArchitecture?.canWrite?.()===false) return 0;
+    const desired=importedAccounts();
+    const before=importReviewState.beforeAccounts || {};
+    const after=currentAccounts();
+    let adjusted=0;
+    Object.entries(desired).forEach(([name, rawValue])=>{
+      const target=Number(rawValue);
+      if(!Number.isFinite(target) || !Object.prototype.hasOwnProperty.call(after,name)) return;
+      const existedBefore=Object.prototype.hasOwnProperty.call(before,name);
+      const shouldUseIncoming=mode==="replace" || conflictPolicy==="incoming" || !existedBefore;
+      if(!shouldUseIncoming) return;
+      const actual=Number(after[name] || 0);
+      if(Math.abs(actual-target)<0.005) return;
+      const result=ledger.appendReconciliation(name,target,{note:"Imported backup balance"});
+      if(result) adjusted+=1;
+    });
+    if(adjusted){
+      try {
+        if(typeof window.saveData==="function") window.saveData("Imported account balances reconciled");
+        else if(typeof saveData==="function") saveData("Imported account balances reconciled");
+      } catch(error){ console.error("Imported balance persistence failed",error); }
+    }
+    return adjusted;
+  }
 
   function pageLabel(page){
     const heading=page.querySelector(".page-heading h2, .page-heading h3");
@@ -114,6 +181,7 @@
     ensurePrivacyViews();
     removeTopbarSignIn();
     ensureSettingsPrivacyNote();
+    installSyncReviewCapture();
     const locked=!state.authenticated;
     document.body.classList.toggle("finance-signed-out",locked);
     document.body.classList.toggle("finance-signed-in",!locked);
@@ -158,7 +226,12 @@
     try {
       if(typeof window.applyPendingSyncImport!=="function") throw new Error("Import action is unavailable");
       window.applyPendingSyncImport(action[0],action[1]);
-      if(dialog?.open && typeof showToast==="function") showToast("Import review expired. Choose the backup again.","warning");
+      if(dialog?.open){
+        if(typeof showToast==="function") showToast("Import review expired. Choose the backup again.","warning");
+        return true;
+      }
+      reconcileImportedAccountBalances(action[0],action[1]);
+      clearImportReviewCapture();
     } catch(error) {
       console.error("Recovery import action failed",error);
       try { if(typeof showToast==="function") showToast(`Import failed: ${error?.message || "unknown error"}`,"warning"); } catch(e){}
@@ -168,6 +241,8 @@
 
   document.addEventListener("click",event=>{
     if(runRecoveryImportAction(event)) return;
+    const closeImport=event.target.closest?.("#closeSyncReviewButton, #cancelSyncImportButton");
+    if(closeImport) setTimeout(clearImportReviewCapture,0);
     const signin=event.target.closest?.(".finance-privacy-signin");
     if(signin){ event.preventDefault(); openSignIn(); return; }
     blockLockedInteraction(event);
