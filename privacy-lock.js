@@ -2,6 +2,13 @@
 (() => {
   const state = { authenticated:false, resolved:false, email:"" };
   const importReviewState = { bundle:null, beforeAccounts:{} };
+  const RECOVERY_META_KEY = "simple-finance-project-records-v12-meta";
+  const RECOVERY_DB_NAME = "simple-finance-project-records-v12-db";
+  const RECOVERY_DB_VERSION = 2;
+  const RECOVERY_STORE = "recoverySnapshots";
+  const MAX_RECOVERY_SNAPSHOTS = 12;
+  let recoveryStorageReadyPromise = null;
+  let recoveryImportBusy = false;
   const allowedSelector = [
     "[data-page]", "#menuButton", "#sidebarCloseButton", "#overlay",
     "#previousMonthButton", "#nextMonthButton", "#monthDisplayButton", "#currentMonthButton",
@@ -38,6 +45,15 @@
       const bundle=typeof window.buildBundle==="function" ? window.buildBundle() : null;
       return cloneValue(bundle?.data?.accounts || {});
     } catch(e) { return {}; }
+  }
+
+  function currentFinanceData(){
+    try {
+      const bundle=typeof window.buildBundle==="function" ? window.buildBundle("my-finance-v12-recovery") : null;
+      if(bundle?.data) return cloneValue(bundle.data);
+    } catch(e){}
+    try { if(typeof data!=="undefined") return cloneValue(data); } catch(e){}
+    return {};
   }
 
   function captureImportReview(bundle){
@@ -92,6 +108,224 @@
       } catch(error){ console.error("Imported balance persistence failed",error); }
     }
     return adjusted;
+  }
+
+  function openRecoveryDb(){
+    return new Promise((resolve,reject)=>{
+      if(!("indexedDB" in window)) return reject(new Error("IndexedDB is unavailable"));
+      const request=indexedDB.open(RECOVERY_DB_NAME,RECOVERY_DB_VERSION);
+      request.onupgradeneeded=()=>{
+        const db=request.result;
+        if(!db.objectStoreNames.contains("accountSnapshots")) db.createObjectStore("accountSnapshots",{keyPath:"id"});
+        if(!db.objectStoreNames.contains("pdfPacks")) db.createObjectStore("pdfPacks",{keyPath:"id"});
+        if(!db.objectStoreNames.contains("reminderIndex")) db.createObjectStore("reminderIndex",{keyPath:"id"});
+        if(!db.objectStoreNames.contains(RECOVERY_STORE)) db.createObjectStore(RECOVERY_STORE,{keyPath:"id"});
+      };
+      request.onsuccess=()=>resolve(request.result);
+      request.onerror=()=>reject(request.error || new Error("Could not open recovery storage"));
+      request.onblocked=()=>reject(new Error("Recovery storage upgrade is blocked by another open tab"));
+    });
+  }
+
+  function installRecoveryDbUpgrade(){
+    try {
+      if(typeof openV12Db!=="function" || openV12Db.__financeRecoveryV2) return;
+      const upgraded=function(){ return openRecoveryDb(); };
+      Object.defineProperty(upgraded,"__financeRecoveryV2",{value:true});
+      openV12Db=upgraded;
+    } catch(error){ console.warn("Could not attach recovery storage upgrade",error); }
+  }
+
+  async function recoveryPut(value){
+    const db=await openRecoveryDb();
+    return new Promise((resolve,reject)=>{
+      const tx=db.transaction(RECOVERY_STORE,"readwrite");
+      tx.objectStore(RECOVERY_STORE).put(value);
+      tx.oncomplete=()=>{ db.close(); resolve(value); };
+      tx.onerror=()=>{ db.close(); reject(tx.error || new Error("Could not save recovery snapshot")); };
+      tx.onabort=()=>{ db.close(); reject(tx.error || new Error("Recovery snapshot transaction was aborted")); };
+    });
+  }
+
+  async function recoveryDelete(id){
+    if(!id) return;
+    const db=await openRecoveryDb();
+    return new Promise((resolve,reject)=>{
+      const tx=db.transaction(RECOVERY_STORE,"readwrite");
+      tx.objectStore(RECOVERY_STORE).delete(id);
+      tx.oncomplete=()=>{ db.close(); resolve(); };
+      tx.onerror=()=>{ db.close(); reject(tx.error || new Error("Could not remove old recovery snapshot")); };
+      tx.onabort=()=>{ db.close(); reject(tx.error || new Error("Recovery cleanup was aborted")); };
+    });
+  }
+
+  async function recoveryGetAll(){
+    const db=await openRecoveryDb();
+    return new Promise((resolve,reject)=>{
+      const tx=db.transaction(RECOVERY_STORE,"readonly");
+      const request=tx.objectStore(RECOVERY_STORE).getAll();
+      request.onsuccess=()=>resolve(request.result || []);
+      request.onerror=()=>reject(request.error || new Error("Could not read recovery snapshots"));
+      tx.oncomplete=()=>db.close();
+      tx.onabort=()=>{ db.close(); reject(tx.error || new Error("Recovery read was aborted")); };
+    });
+  }
+
+  function recoveryMetaObject(){
+    try { if(typeof appMeta!=="undefined" && appMeta && typeof appMeta==="object") return appMeta; } catch(e){}
+    try {
+      const raw=localStorage.getItem(RECOVERY_META_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch(e) { return null; }
+  }
+
+  function snapshotMetadata(snapshot){
+    return {
+      id:String(snapshot?.id || ""),
+      label:String(snapshot?.label || "Recovery snapshot"),
+      createdAt:String(snapshot?.createdAt || new Date().toISOString()),
+      sourceDeviceId:String(snapshot?.sourceDeviceId || ""),
+      checksum:String(snapshot?.checksum || ""),
+      summary:cloneValue(snapshot?.summary || {}),
+      storage:"indexeddb-v2"
+    };
+  }
+
+  function persistRecoveryMeta(meta){
+    try {
+      if(typeof appMeta!=="undefined" && meta===appMeta && typeof writeMeta==="function") {
+        writeMeta();
+        return;
+      }
+    } catch(e){}
+    localStorage.setItem(RECOVERY_META_KEY,JSON.stringify(meta));
+  }
+
+  function financeUid(){
+    try { if(typeof uid==="function") return uid(); } catch(e){}
+    return globalThis.crypto?.randomUUID?.() || `recovery-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  }
+
+  function financeChecksum(value){
+    try { if(typeof checksum==="function") return checksum(value); } catch(e){}
+    try { return String(JSON.stringify(value).length); } catch(e) { return ""; }
+  }
+
+  function financeSummary(value){
+    try { if(typeof dataSummary==="function") return cloneValue(dataSummary(value)); } catch(e){}
+    return {};
+  }
+
+  function currentDeviceId(){
+    try { return String(typeof appMeta!=="undefined" ? appMeta.currentDeviceId || "" : ""); } catch(e) { return ""; }
+  }
+
+  async function compactLegacyRecoverySnapshots(){
+    installRecoveryDbUpgrade();
+    const meta=recoveryMetaObject();
+    if(!meta) return { migrated:0, total:0 };
+    const snapshots=Array.isArray(meta.recoverySnapshots) ? meta.recoverySnapshots : [];
+    let migrated=0;
+    for(const snapshot of snapshots){
+      if(!snapshot?.id || !snapshot?.data) continue;
+      await recoveryPut(cloneValue(snapshot));
+      migrated+=1;
+    }
+    if(migrated){
+      meta.recoverySnapshots=snapshots.map(snapshotMetadata).slice(0,MAX_RECOVERY_SNAPSHOTS);
+      persistRecoveryMeta(meta);
+    }
+    return { migrated, total:meta.recoverySnapshots?.length || 0 };
+  }
+
+  function ensureRecoveryStorageReady(){
+    if(!recoveryStorageReadyPromise){
+      recoveryStorageReadyPromise=compactLegacyRecoverySnapshots().catch(error=>{
+        recoveryStorageReadyPromise=null;
+        throw error;
+      });
+    }
+    return recoveryStorageReadyPromise;
+  }
+
+  async function persistRecoverySnapshot(label,sourceData){
+    await ensureRecoveryStorageReady();
+    const source=cloneValue(sourceData);
+    const snapshot={
+      id:financeUid(),
+      label:String(label || "Before import"),
+      createdAt:new Date().toISOString(),
+      sourceDeviceId:currentDeviceId(),
+      checksum:financeChecksum(source),
+      summary:financeSummary(source),
+      data:source
+    };
+    await recoveryPut(snapshot);
+
+    const meta=recoveryMetaObject();
+    if(!meta) throw new Error("Recovery metadata is unavailable");
+    const previous=Array.isArray(meta.recoverySnapshots) ? meta.recoverySnapshots : [];
+    const next=[snapshotMetadata(snapshot),...previous.filter(item=>item?.id!==snapshot.id).map(snapshotMetadata)].slice(0,MAX_RECOVERY_SNAPSHOTS);
+    const keepIds=new Set(next.map(item=>item.id));
+    const removed=previous.filter(item=>item?.id && !keepIds.has(String(item.id))).map(item=>String(item.id));
+    meta.recoverySnapshots=next;
+    persistRecoveryMeta(meta);
+    await Promise.allSettled(removed.map(recoveryDelete));
+    return snapshotMetadata(snapshot);
+  }
+
+  function setImportButtonsBusy(active,activeButton=null){
+    recoveryImportActions.forEach((_,id)=>{
+      const button=document.getElementById(id);
+      if(!button) return;
+      if(active){
+        button.dataset.recoveryOriginalText=button.textContent;
+        button.disabled=true;
+        if(button===activeButton) button.textContent="Creating recovery copy…";
+      } else {
+        button.disabled=false;
+        if(button.dataset.recoveryOriginalText) button.textContent=button.dataset.recoveryOriginalText;
+        delete button.dataset.recoveryOriginalText;
+      }
+    });
+  }
+
+  async function executeRecoveryImport(button,action){
+    if(recoveryImportBusy) return;
+    recoveryImportBusy=true;
+    setImportButtonsBusy(true,button);
+    const dialog=document.getElementById("syncReviewDialog");
+    let originalCreateRecoverySnapshot=null;
+    let replacedSnapshotCreator=false;
+    try {
+      await ensureRecoveryStorageReady();
+      const before=currentFinanceData();
+      const recoveryMeta=await persistRecoverySnapshot(`Before ${action[0]} import`,before);
+
+      try {
+        if(typeof createRecoverySnapshot!=="function") throw new Error("Recovery snapshot hook is unavailable");
+        originalCreateRecoverySnapshot=createRecoverySnapshot;
+        createRecoverySnapshot=function(){ return recoveryMeta; };
+        replacedSnapshotCreator=true;
+      } catch(error){
+        throw new Error(`Could not attach safe recovery storage: ${error?.message || "unknown error"}`);
+      }
+
+      if(typeof window.applyPendingSyncImport!=="function") throw new Error("Import action is unavailable");
+      window.applyPendingSyncImport(action[0],action[1]);
+      if(dialog?.open) throw new Error("Import review expired. Choose the backup again.");
+      reconcileImportedAccountBalances(action[0],action[1]);
+      clearImportReviewCapture();
+    } catch(error) {
+      console.error("Recovery import action failed",error);
+      try { if(typeof showToast==="function") showToast(`Import failed: ${error?.message || "unknown error"}`,"warning"); } catch(e){}
+    } finally {
+      if(replacedSnapshotCreator){
+        try { createRecoverySnapshot=originalCreateRecoverySnapshot; } catch(e){}
+      }
+      setImportButtonsBusy(false);
+      recoveryImportBusy=false;
+    }
   }
 
   function pageLabel(page){
@@ -181,6 +415,8 @@
     ensurePrivacyViews();
     removeTopbarSignIn();
     ensureSettingsPrivacyNote();
+    installRecoveryDbUpgrade();
+    ensureRecoveryStorageReady().catch(error=>console.error("Recovery storage migration failed",error));
     installSyncReviewCapture();
     const locked=!state.authenticated;
     document.body.classList.toggle("finance-signed-out",locked);
@@ -222,20 +458,7 @@
     if(!action) return false;
     event.preventDefault();
     event.stopImmediatePropagation();
-    const dialog=document.getElementById("syncReviewDialog");
-    try {
-      if(typeof window.applyPendingSyncImport!=="function") throw new Error("Import action is unavailable");
-      window.applyPendingSyncImport(action[0],action[1]);
-      if(dialog?.open){
-        if(typeof showToast==="function") showToast("Import review expired. Choose the backup again.","warning");
-        return true;
-      }
-      reconcileImportedAccountBalances(action[0],action[1]);
-      clearImportReviewCapture();
-    } catch(error) {
-      console.error("Recovery import action failed",error);
-      try { if(typeof showToast==="function") showToast(`Import failed: ${error?.message || "unknown error"}`,"warning"); } catch(e){}
-    }
+    executeRecoveryImport(button,action);
     return true;
   }
 
@@ -260,6 +483,13 @@
     lock:()=>setAuthenticated(false),
     unlock:detail=>setAuthenticated(true,detail||{}),
     openSignIn,
+    recoveryStorage:{
+      ready:ensureRecoveryStorageReady,
+      compact:async()=>{ recoveryStorageReadyPromise=null; return ensureRecoveryStorageReady(); },
+      list:recoveryGetAll,
+      version:RECOVERY_DB_VERSION,
+      store:RECOVERY_STORE
+    },
     get status(){ return {...state}; }
   };
 })();
