@@ -5,11 +5,12 @@ self.__FINANCE_APP_VERSION = APP_VERSION;
 // V15.2.2 hotfix: Finance workspace sticky row now follows the mobile topbar offset.
 // V15.2.2 hotfix: force refreshed shell assets for the Income versus Expenses dashboard arrangement.
 // V15.2.2 hotfix: recovery import actions are force-refreshed and the privacy lock is network-first with offline fallback.
+// V15.2.2 hotfix: large pre-import recovery snapshots are stored in IndexedDB instead of localStorage metadata.
 const CACHE_VERSION = "finance-v15-20260816-import-review-r34";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const DB_NAME = "simple-finance-project-records-v12-db";
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 let financeAuthState = "signed-out";
 
 const scopeUrl = self.registration.scope;
@@ -192,6 +193,7 @@ function openDb() {
       if (!db.objectStoreNames.contains("accountSnapshots")) db.createObjectStore("accountSnapshots", { keyPath: "id" });
       if (!db.objectStoreNames.contains("pdfPacks")) db.createObjectStore("pdfPacks", { keyPath: "id" });
       if (!db.objectStoreNames.contains("reminderIndex")) db.createObjectStore("reminderIndex", { keyPath: "id" });
+      if (!db.objectStoreNames.contains("recoverySnapshots")) db.createObjectStore("recoverySnapshots", { keyPath: "id" });
     };
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error);
