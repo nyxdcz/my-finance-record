@@ -109,7 +109,7 @@ assert.match(edgeFunction, /type:"json_schema"/, "Edge Function should request a
 assert.match(edgeFunction, /store:false/, "AI screenshot response should disable response storage");
 
 const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
-assert.match(worker, /finance-v15-20260816-cashflow-r33/, "service worker cache generation must remain current for V15.2.2 while preserving screenshot detection");
+assert.match(worker, /finance-v15-20260816-import-review-r34/, "service worker cache generation must remain current for V15.2.2 while preserving screenshot detection");
 assert.match(worker, /expense-screenshot-parser\.js\?v=15\.0\.3/, "service worker should precache the V15 screenshot parser");
 assert.match(worker, /expense-screenshot-detect\.js\?v=15\.0\.3/, "service worker should precache the V15 local screenshot detector");
 assert.match(worker, /expense-screenshot-ai\.js\?v=15\.0\.3/, "service worker should precache the V15 optional AI client");
