@@ -76,7 +76,6 @@
     track.innerHTML = `<div class="dashboard-week-marquee-group">${groupContent}</div><div class="dashboard-week-marquee-group" aria-hidden="true">${groupContent}</div>`;
   }
 
-
   function renderActiveFilterChips(container, filters, onRemove) {
     if (!container) return;
     const active = filters.filter(Boolean);
@@ -222,12 +221,151 @@
     });
   }
 
+  const FIRST_HALF_COMPLETE_LIGHT_ICON = "data:image/png;base64,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";
+  const FIRST_HALF_COMPLETE_DARK_ICON = "data:image/png;base64,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";
+  let firstHalfCompletionObserver = null;
+
+  function selectedFinanceMonth() {
+    try {
+      const value = typeof globalThis.selectedMonth === "function" ? globalThis.selectedMonth() : "";
+      if (/^\d{4}-\d{2}$/.test(String(value || ""))) return String(value);
+    } catch (error) {}
+    const picker = document.getElementById("monthPicker")?.value;
+    if (/^\d{4}-\d{2}$/.test(String(picker || ""))) return String(picker);
+    const shortValue = document.getElementById("monthDisplayShort")?.textContent?.trim();
+    return /^\d{4}-\d{2}$/.test(String(shortValue || "")) ? String(shortValue) : "";
+  }
+
+  function manilaTodayKey() {
+    const override = String(globalThis.FINANCE_FIRST_HALF_TODAY_OVERRIDE || "");
+    if (/^\d{4}-\d{2}-\d{2}$/.test(override)) return override;
+    try {
+      const parts = new Intl.DateTimeFormat("en-CA", { timeZone:"Asia/Manila", year:"numeric", month:"2-digit", day:"2-digit" }).formatToParts(new Date());
+      const map = Object.fromEntries(parts.map(part => [part.type, part.value]));
+      return `${map.year}-${map.month}-${map.day}`;
+    } catch (error) {
+      const date = new Date();
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")}`;
+    }
+  }
+
+  function firstHalfFinished(month = selectedFinanceMonth()) {
+    if (!/^\d{4}-\d{2}$/.test(month)) return false;
+    const today = manilaTodayKey();
+    const currentMonth = today.slice(0, 7);
+    if (month < currentMonth) return true;
+    if (month > currentMonth) return false;
+    return Number(today.slice(8, 10)) > 15;
+  }
+
+  function moneyTextValue(text) {
+    const parsed = Number(String(text || "").replace(/[^0-9.-]/g, ""));
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+
+  function firstHalfCompletionIconSource() {
+    return document.documentElement.dataset.theme === "dark" ? FIRST_HALF_COMPLETE_DARK_ICON : FIRST_HALF_COMPLETE_LIGHT_ICON;
+  }
+
+  function ensureFirstHalfCompletionStyles() {
+    if (document.getElementById("firstHalfCompletionIconStyles")) return;
+    const style = document.createElement("style");
+    style.id = "firstHalfCompletionIconStyles";
+    style.textContent = `.first-half-complete-value{display:inline-flex!important;align-items:center;justify-content:center;min-width:34px;line-height:1}.first-half-complete-icon{display:block;width:32px;height:32px;object-fit:contain;flex:0 0 auto}@media(max-width:700px){.first-half-complete-icon{width:30px;height:30px}}`;
+    document.head.appendChild(style);
+  }
+
+  function renderFirstHalfCompleteIcon(value) {
+    if (!value) return;
+    const existing = value.querySelector("img[data-first-half-complete-icon]");
+    if (!existing) {
+      value.dataset.firstHalfOriginalText = value.textContent || "";
+      value.textContent = "";
+      const icon = document.createElement("img");
+      icon.className = "first-half-complete-icon";
+      icon.dataset.firstHalfCompleteIcon = "true";
+      icon.alt = "";
+      icon.setAttribute("aria-hidden", "true");
+      value.appendChild(icon);
+    }
+    const icon = value.querySelector("img[data-first-half-complete-icon]");
+    const dark = document.documentElement.dataset.theme === "dark";
+    if (icon && icon.dataset.themeVariant !== (dark ? "dark" : "light")) {
+      icon.src = firstHalfCompletionIconSource();
+      icon.dataset.themeVariant = dark ? "dark" : "light";
+    }
+    value.classList.add("first-half-complete-value");
+    value.setAttribute("aria-label", "First half completed");
+    value.title = "First half completed";
+  }
+
+  function restoreFirstHalfAmount(value) {
+    if (!value) return;
+    const icon = value.querySelector("img[data-first-half-complete-icon]");
+    if (icon) value.textContent = value.dataset.firstHalfOriginalText || "";
+    delete value.dataset.firstHalfOriginalText;
+    value.classList.remove("first-half-complete-value");
+    value.removeAttribute("aria-label");
+    if (value.title === "First half completed") value.removeAttribute("title");
+  }
+
+  function updateFirstHalfCompletionIcons() {
+    ensureFirstHalfCompletionStyles();
+    const month = selectedFinanceMonth();
+    const finished = firstHalfFinished(month);
+    const firstHalfValue = document.getElementById("legendEarlyTotal");
+    const firstDifferenceValue = document.querySelector("#moneySummary > .summary-item:nth-child(2) .summary-card-value");
+
+    if (!finished) {
+      restoreFirstHalfAmount(firstHalfValue);
+      restoreFirstHalfAmount(firstDifferenceValue);
+      return;
+    }
+
+    const currentFirstHalfAmount = firstHalfValue?.querySelector("img[data-first-half-complete-icon]")
+      ? moneyTextValue(firstHalfValue.dataset.firstHalfOriginalText)
+      : moneyTextValue(firstHalfValue?.textContent);
+    if (currentFirstHalfAmount === 0) renderFirstHalfCompleteIcon(firstHalfValue);
+    else restoreFirstHalfAmount(firstHalfValue);
+    renderFirstHalfCompleteIcon(firstDifferenceValue);
+  }
+
+  function setupFirstHalfCompletionIcons() {
+    ensureFirstHalfCompletionStyles();
+    updateFirstHalfCompletionIcons();
+    const moneyPage = document.getElementById("money");
+    if (moneyPage && !firstHalfCompletionObserver) {
+      let scheduled = false;
+      firstHalfCompletionObserver = new MutationObserver(() => {
+        if (scheduled) return;
+        scheduled = true;
+        queueMicrotask(() => {
+          scheduled = false;
+          updateFirstHalfCompletionIcons();
+        });
+      });
+      firstHalfCompletionObserver.observe(moneyPage, { childList:true, subtree:true, characterData:true });
+    }
+    if (document.documentElement.dataset.firstHalfThemeObserverReady !== "true") {
+      document.documentElement.dataset.firstHalfThemeObserverReady = "true";
+      new MutationObserver(updateFirstHalfCompletionIcons).observe(document.documentElement, { attributes:true, attributeFilter:["data-theme"] });
+    }
+    if (document.documentElement.dataset.firstHalfEventsReady !== "true") {
+      document.documentElement.dataset.firstHalfEventsReady = "true";
+      window.addEventListener("finance:page-changed", updateFirstHalfCompletionIcons);
+      document.addEventListener("change", event => {
+        if (event.target?.id === "monthPicker") updateFirstHalfCompletionIcons();
+      });
+    }
+  }
+
   function setupInteractionPatterns() {
     setupOverflowMenus();
     setupEmptyStateActions();
+    setupFirstHalfCompletionIcons();
   }
 
-  window.FinanceInteractionPatterns = { closeOverflowMenu, setupOverflowMenus, renderDuplicatedMarquee, renderActiveFilterChips, emptyStateHtml, renderIncomeFilterChips, setupEmptyStateActions, middleTruncateFilename, createDashboardDragController };
+  window.FinanceInteractionPatterns = { closeOverflowMenu, setupOverflowMenus, renderDuplicatedMarquee, renderActiveFilterChips, emptyStateHtml, renderIncomeFilterChips, setupEmptyStateActions, middleTruncateFilename, createDashboardDragController, updateFirstHalfCompletionIcons, firstHalfFinished };
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", setupInteractionPatterns, { once:true });
   else setupInteractionPatterns();
 })();
