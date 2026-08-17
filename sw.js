@@ -13,6 +13,7 @@ self.__FINANCE_APP_VERSION = APP_VERSION;
 // V15.2.2 hotfix: require explicit Cloud Profile selection when an account has multiple finance profiles.
 // V15.2.2 hotfix: refresh the first-half completion heart-smile artwork from the validated app shell.
 // V15.2.2 hotfix: keep interaction-patterns network-first so completion-state presentation refreshes without rotating finance caches.
+// V15.2.2 hotfix: keep the PWA update layer network-first so the Quick add topbar relocation reaches installed apps.
 const CACHE_VERSION = "finance-v15-20260817-phone-finance-r37";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
@@ -166,7 +167,7 @@ self.addEventListener("fetch", event => {
     return;
   }
   if (url.origin !== self.location.origin) return;
-  if (url.pathname.endsWith("privacy-lock.js") || url.pathname.endsWith("cloud-sync-lifecycle.js") || url.pathname.endsWith("interaction-patterns.js")) {
+  if (url.pathname.endsWith("privacy-lock.js") || url.pathname.endsWith("cloud-sync-lifecycle.js") || url.pathname.endsWith("interaction-patterns.js") || url.pathname.endsWith("pwa-update-v15-0-5.js")) {
     event.respondWith(networkFirstCriticalAsset(request));
     return;
   }
