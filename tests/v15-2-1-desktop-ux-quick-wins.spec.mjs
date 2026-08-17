@@ -10,7 +10,7 @@ test("V15.2.1 source keeps the approved desktop UX quick wins", async () => {
   const sw = source("sw.js");
   const version = JSON.parse(source("version.json"));
 
-  expect(index).toContain("V15.2.2");
+  expect(index).toContain("V15.2.4");
   expect(index).toContain("Manage available money, planned budgets, and unpaid expenses for this month.");
   expect(index).toContain('id="incomeActiveFilterChips"');
   expect(index).toContain("No income matches these filters");
