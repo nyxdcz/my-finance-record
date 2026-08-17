@@ -204,6 +204,84 @@
   }
   installQuickEntryToolsMenuRelocation();
 
+  function installHeaderToolsRelocation() {
+    const doc = root.document;
+    if (!doc) return;
+    const hideStandalone = node => {
+      if (!node) return;
+      node.hidden = true;
+      node.setAttribute("aria-hidden", "true");
+      node.tabIndex = -1;
+      node.style.setProperty("display", "none", "important");
+    };
+    const apply = () => {
+      const panel = doc.getElementById("topbarToolsPanel");
+      const theme = doc.getElementById("themeToggleButton");
+      const quick = doc.getElementById("quickEntryMenuButton");
+      const search = doc.getElementById("globalSearchButton");
+      const quickActions = doc.getElementById("productivityCenterButton");
+      const undo = doc.getElementById("undoMoneyMenuButton");
+      const redo = doc.getElementById("redoMoneyMenuButton");
+      if (panel && theme) {
+        let customize = doc.getElementById("customizeDashboardMenuButton");
+        if (!customize) {
+          customize = doc.createElement("button");
+          customize.className = "topbar-tools-item";
+          customize.id = "customizeDashboardMenuButton";
+          customize.type = "button";
+          customize.setAttribute("role", "menuitem");
+          customize.setAttribute("aria-label", "Customize dashboard");
+          customize.title = "Customize dashboard";
+          customize.innerHTML = '<span class="toolbar-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><path d="M17 14v6M14 17h6"/></svg></span><span><strong>Customize dashboard</strong><small>Show, hide, reorder, and resize cards</small></span>';
+        }
+        const anchor = quick || theme;
+        if (anchor.nextElementSibling !== customize) anchor.insertAdjacentElement("afterend", customize);
+        if (search && undo && undo.nextElementSibling !== redo) panel.insertBefore(undo, search);
+        if (search && redo) panel.insertBefore(redo, search);
+        panel.querySelectorAll(":scope > .menu-command-separator").forEach(separator => separator.remove());
+        if (quickActions && quickActions.parentElement === panel && search && search.nextElementSibling !== quickActions) search.insertAdjacentElement("afterend", quickActions);
+      }
+      const history = doc.querySelector(".topbar-history-actions");
+      if (history) {
+        history.hidden = true;
+        history.setAttribute("aria-hidden", "true");
+        history.style.setProperty("display", "none", "important");
+        history.querySelectorAll("button").forEach(button => { button.tabIndex = -1; });
+      }
+      hideStandalone(doc.getElementById("mobileAddExpenseButton"));
+      doc.querySelectorAll(".topbar-actions button").forEach(button => {
+        if (button.id === "customizeDashboardMenuButton") return;
+        const label = `${button.getAttribute("aria-label") || ""} ${button.getAttribute("title") || ""} ${button.textContent || ""}`.toLowerCase();
+        if (label.includes("customize dashboard")) hideStandalone(button);
+      });
+    };
+    const activate = event => {
+      const button = event.target.closest?.("#customizeDashboardMenuButton");
+      if (!button) return;
+      event.preventDefault();
+      const openCustomizer = () => doc.getElementById("customizeDashboardButton")?.click();
+      if (doc.querySelector("#dashboard.active")) {
+        openCustomizer();
+        return;
+      }
+      const dashboardNav = doc.querySelector('[data-page="dashboard"]');
+      if (dashboardNav) {
+        dashboardNav.click();
+        root.setTimeout?.(openCustomizer, 0);
+      } else openCustomizer();
+    };
+    doc.addEventListener("click", activate);
+    const start = () => {
+      apply();
+      if (!doc.body || doc.body.dataset.headerToolsRelocationObserved === "true") return;
+      doc.body.dataset.headerToolsRelocationObserved = "true";
+      const observer = new MutationObserver(() => apply());
+      observer.observe(doc.body, { childList:true, subtree:true });
+    };
+    if (doc.readyState === "loading") doc.addEventListener("DOMContentLoaded", start, { once:true }); else start();
+  }
+  installHeaderToolsRelocation();
+
   function installPhoneFinanceCompactStyles() {
     const doc = root.document;
     if (!doc || doc.getElementById("phoneFinanceCompactV1522")) return;
