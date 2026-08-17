@@ -11,7 +11,7 @@ test("V15.2.2 registers the cache-qualified worker and clears stale Finance cach
 
   await expect.poll(async () => page.evaluate(() => navigator.serviceWorker.controller?.scriptURL || ""), { timeout:15000 }).toContain("v=15.2.2");
   const workerUrl = await page.evaluate(() => navigator.serviceWorker.controller?.scriptURL || "");
-  expect(workerUrl).toContain("cache=finance-v15-20260817-phone-finance-r36");
+  expect(workerUrl).toContain("cache=finance-v15-20260817-phone-finance-r37");
 
   await page.evaluate(async () => { await window.clearAppCaches(); });
   const names = await page.evaluate(async () => caches.keys());
