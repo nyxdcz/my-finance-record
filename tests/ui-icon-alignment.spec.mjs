@@ -28,42 +28,30 @@ test("production V15.1.0 UI alignment uses the delivered final stylesheet", asyn
 });
 
 
-test("V15.1.0 header omits duplicate sign-in shortcut and optically centers Dashboard utility glyph", async ({ page }) => {
-  await page.goto("http://127.0.0.1:3000/index.html?page=settings", { waitUntil:"networkidle" });
+test("V15.2.2 header moves Dashboard customization into More tools", async ({ page }) => {
+  await page.goto("http://127.0.0.1:3000/index.html?page=dashboard", { waitUntil:"networkidle" });
 
   await expect(page.locator("#privacySignInButton")).toHaveCount(0);
   await expect(page.locator("#cloudSignIn")).toHaveCount(1);
 
-  const customize = page.locator("#customizeDashboardButton");
-  await expect(customize).toHaveAttribute("data-dashboard-toolbar-action", "true");
-  const geometry = await customize.evaluate(element => {
-    const button = getComputedStyle(element);
-    const glyph = getComputedStyle(element, "::before");
-    return {
-      width:button.width,
-      height:button.height,
-      display:button.display,
-      justifyItems:button.justifyItems,
-      alignItems:button.alignItems,
-      glyphWidth:glyph.width,
-      glyphHeight:glyph.height,
-      glyphTransform:glyph.transform,
-      glyphMargin:glyph.margin
-    };
-  });
-  expect(geometry.width).toBe("38px");
-  expect(geometry.height).toBe("38px");
-  expect(geometry.display).toBe("grid");
-  expect(geometry.justifyItems).toBe("center");
-  expect(geometry.alignItems).toBe("center");
-  expect(geometry.glyphWidth).toBe("20px");
-  expect(geometry.glyphHeight).toBe("20px");
-  expect(geometry.glyphTransform).toBe("matrix(1, 0, 0, 1, 0, 1)");
-  expect(geometry.glyphMargin).toBe("0px");
+  const standalone = page.locator("#customizeDashboardButton");
+  await expect(standalone).toHaveAttribute("data-dashboard-toolbar-action", "true");
+  await expect(standalone).toBeHidden();
+
+  const menuItem = page.locator("#customizeDashboardMenuButton");
+  await expect(menuItem).toHaveCount(1);
+  await expect(menuItem).toHaveAttribute("role", "menuitem");
+  await expect(menuItem).toHaveAttribute("aria-label", "Customize dashboard");
+  await expect(menuItem.locator("strong")).toHaveText("Customize dashboard");
+  const icon = menuItem.locator(".toolbar-icon svg");
+  await expect(icon).toHaveCount(1);
+  await expect(icon).toHaveAttribute("viewBox", "0 0 24 24");
+  await expect(icon.locator("rect")).toHaveCount(3);
+  await expect(icon.locator("path")).toHaveCount(1);
 });
 
 
-test("V15.1.0 desktop topbar controls match the Synced 38px height", async ({ page }) => {
+test("V15.2.2 desktop topbar keeps only persistent controls at the Synced 38px height", async ({ page }) => {
   await page.setViewportSize({ width:1440, height:900 });
   await page.goto("http://127.0.0.1:3000/index.html?page=money", { waitUntil:"networkidle" });
 
@@ -79,15 +67,18 @@ test("V15.1.0 desktop topbar controls match the Synced 38px height", async ({ pa
   expect(reference).toBe(38);
 
   for (const selector of [
-    "#customizeDashboardButton",
     ".month-navigator",
-    "#undoMoneyButton",
-    "#redoMoneyButton",
     "#quickAddExpense",
     "#topbarToolsTrigger"
   ]) {
     expect(await heightOf(selector), `${selector} should match Synced height`).toBe(reference);
   }
+
+  await expect(page.locator(".topbar-history-actions")).toBeHidden();
+  await expect(page.locator("#undoMoneyButton")).toBeHidden();
+  await expect(page.locator("#redoMoneyButton")).toBeHidden();
+  await expect(page.locator("#undoMoneyMenuButton")).toHaveCount(1);
+  await expect(page.locator("#redoMoneyMenuButton")).toHaveCount(1);
 });
 
 
