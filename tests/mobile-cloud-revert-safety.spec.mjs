@@ -29,9 +29,11 @@ function establishedPhoneData() {
   };
 }
 
-test("established phone data is protected before Cloud Sync can treat an empty baseline as first sync", async ({ page }) => {
-  await page.addInitScript(({ finance }) => {
+async function loadGuard(page, { withBaseline = false } = {}) {
+  await page.goto("http://127.0.0.1:3000/offline.html", { waitUntil:"networkidle" });
+  await page.evaluate(({ finance, withBaseline }) => {
     localStorage.clear();
+    sessionStorage.clear();
     localStorage.setItem("simple-finance-profiles-v1", JSON.stringify({
       version:1,
       activeProfileId:"profile-personal",
@@ -39,15 +41,43 @@ test("established phone data is protected before Cloud Sync can treat an empty b
     }));
     localStorage.setItem("simple-finance-profile-data-v1:profile-personal", JSON.stringify(finance));
     localStorage.setItem("simple-finance-project-records-v2", JSON.stringify(finance));
-    localStorage.setItem("simple-finance-cloud-config-v1", JSON.stringify({ supabaseUrl:"https://mobileguard.supabase.co", supabasePublishableKey:"short" }));
-    localStorage.setItem("sb-mobileguard-auth-token", JSON.stringify({ user:{ id:"user-mobile" }, access_token:"" }));
-    localStorage.removeItem("simple-finance-cloud-record-base-v3:profile-personal");
-    localStorage.removeItem("simple-finance-cloud-record-queue-v3:profile-personal");
-    localStorage.removeItem("simple-finance-cloud-sync-v3:profile-personal");
-  }, { finance:establishedPhoneData() });
 
-  await page.goto("http://127.0.0.1:3000/index.html?page=money", { waitUntil:"domcontentloaded" });
+    if (withBaseline) {
+      localStorage.setItem("simple-finance-cloud-record-base-v3:profile-personal", JSON.stringify({
+        "accounts\u001fWallet":{
+          collection:"accounts",
+          recordId:"Wallet",
+          payload:{ name:"Wallet", balance:4821.5, type:"Cash", icon:null },
+          sortIndex:0,
+          revision:8
+        }
+      }));
+      localStorage.setItem("simple-finance-cloud-sync-v3:profile-personal", JSON.stringify({
+        initializedUserId:"user-mobile:cloud-mobile",
+        initializedProfileId:"cloud-mobile"
+      }));
+      localStorage.removeItem("simple-finance-cloud-record-queue-v3:profile-personal");
+    } else {
+      localStorage.setItem("simple-finance-cloud-config-v1", JSON.stringify({
+        supabaseUrl:"https://mobileguard.supabase.co",
+        supabasePublishableKey:"short"
+      }));
+      localStorage.setItem("sb-mobileguard-auth-token", JSON.stringify({
+        user:{ id:"user-mobile" },
+        access_token:""
+      }));
+      localStorage.removeItem("simple-finance-cloud-record-base-v3:profile-personal");
+      localStorage.removeItem("simple-finance-cloud-record-queue-v3:profile-personal");
+      localStorage.removeItem("simple-finance-cloud-sync-v3:profile-personal");
+    }
+  }, { finance:establishedPhoneData(), withBaseline });
+
+  await page.addScriptTag({ url:"http://127.0.0.1:3000/privacy-lock.js?v=mobile-revert-test" });
   await expect.poll(async () => page.evaluate(() => Boolean(window.FinanceCloudRevertGuard)), { timeout:10000 }).toBe(true);
+}
+
+test("established phone data is protected before Cloud Sync can treat an empty baseline as first sync", async ({ page }) => {
+  await loadGuard(page);
 
   const protectedState = await page.evaluate(() => {
     const meta = JSON.parse(localStorage.getItem("simple-finance-cloud-sync-v3:profile-personal") || "{}");
@@ -78,25 +108,13 @@ test("established phone data is protected before Cloud Sync can treat an empty b
 });
 
 test("guard does not interfere when a trustworthy cloud baseline already exists", async ({ page }) => {
-  await page.addInitScript(({ finance }) => {
-    localStorage.clear();
-    localStorage.setItem("simple-finance-profiles-v1", JSON.stringify({
-      version:1,
-      activeProfileId:"profile-personal",
-      profiles:[{ id:"profile-personal", name:"My Finances", type:"personal", role:"owner", cloudProfileId:"cloud-mobile", encryption:{enabled:false} }]
-    }));
-    localStorage.setItem("simple-finance-profile-data-v1:profile-personal", JSON.stringify(finance));
-    localStorage.setItem("simple-finance-project-records-v2", JSON.stringify(finance));
-    localStorage.setItem("simple-finance-cloud-record-base-v3:profile-personal", JSON.stringify({ "accounts\u001fWallet":{ collection:"accounts", recordId:"Wallet", payload:{name:"Wallet",balance:4821.5,type:"Cash",icon:null}, sortIndex:0, revision:8 } }));
-    localStorage.setItem("simple-finance-cloud-sync-v3:profile-personal", JSON.stringify({ initializedUserId:"user-mobile:cloud-mobile", initializedProfileId:"cloud-mobile" }));
-  }, { finance:establishedPhoneData() });
+  await loadGuard(page, { withBaseline:true });
 
-  await page.goto("http://127.0.0.1:3000/index.html?page=money", { waitUntil:"domcontentloaded" });
-  await expect.poll(async () => page.evaluate(() => Boolean(window.FinanceCloudRevertGuard)), { timeout:10000 }).toBe(true);
   const state = await page.evaluate(() => ({
     guard:window.FinanceCloudRevertGuard.last,
     queue:JSON.parse(localStorage.getItem("simple-finance-cloud-record-queue-v3:profile-personal") || "{}")
   }));
+
   expect(state.guard?.armed).toBe(false);
   expect(state.guard?.reason).toBe("sync-baseline-present");
   expect(Object.keys(state.queue)).toHaveLength(0);
