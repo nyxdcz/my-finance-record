@@ -293,16 +293,33 @@ html[data-theme="light"] body #money .first-half-complete-icon {
   content:url("./icons/heart-smile-light-v15-2-4-r2.png") !important;
 }
 
-/* V15.2.4 · More tools: label Philippine-time automatic appearance as Auto. */
-html[data-theme-preference="system"] body #themeToggleText {
+/* V15.2.4 · More tools appearance is one compact icon + Auto/Light/Dark label. */
+html body #themeToggleButton > span:last-child > strong {
+  display:none !important;
+}
+html body #themeToggleText {
   display:inline-grid !important;
+  align-items:center !important;
+  margin:0 !important;
+  color:var(--text) !important;
   font-size:0 !important;
-  line-height:1 !important;
+  font-weight:800 !important;
+  line-height:1.2 !important;
+  white-space:nowrap !important;
+}
+html body #themeToggleText::after {
+  color:inherit;
+  font-size:.72rem;
+  font-weight:800;
+  line-height:1.2;
+  white-space:nowrap;
 }
 html[data-theme-preference="system"] body #themeToggleText::after {
   content:"Auto";
-  color:var(--muted);
-  font-size:.64rem;
-  line-height:1.25;
-  white-space:nowrap;
+}
+html[data-theme-preference="light"] body #themeToggleText::after {
+  content:"Light";
+}
+html[data-theme-preference="dark"] body #themeToggleText::after {
+  content:"Dark";
 }
