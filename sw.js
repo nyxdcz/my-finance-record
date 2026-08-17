@@ -1,6 +1,7 @@
 "use strict";
-const APP_VERSION = "15.2.2";
+const APP_VERSION = "15.2.3";
 self.__FINANCE_APP_VERSION = APP_VERSION;
+// V15.2.3 sync status artwork: supplied green/orange/red Cloud Sync icons and matching toolbar text colors.
 // V15.2.2 mobile UI/UX delivery · phone layout, touch targets, menu safety, and responsive regression coverage; finance data and sync semantics unchanged.
 // V15.2.2 hotfix: Finance workspace sticky row now follows the mobile topbar offset.
 // V15.2.2 hotfix: force refreshed shell assets for the Income versus Expenses dashboard arrangement.
@@ -14,7 +15,7 @@ self.__FINANCE_APP_VERSION = APP_VERSION;
 // V15.2.2 hotfix: refresh the first-half completion heart-smile artwork from the validated app shell.
 // V15.2.2 hotfix: keep interaction-patterns network-first so completion-state presentation refreshes without rotating finance caches.
 // V15.2.2 hotfix: keep the PWA update layer network-first so the Quick add topbar relocation reaches installed apps.
-const CACHE_VERSION = "finance-v15-20260817-phone-finance-r37";
+const CACHE_VERSION = "finance-v15-20260817-sync-status-r38";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const DB_NAME = "simple-finance-project-records-v12-db";

@@ -7,9 +7,9 @@ window.FINANCE_SYNC_CONFIG = window.FINANCE_SYNC_CONFIG || {
 };
 
 (function applyV15ReleaseLayer() {
-  const VERSION = "15.2.2";
-  const RELEASE_NAME = "Mobile UI & UX";
-  const RELEASE_DATE = "August 16, 2026";
+  const VERSION = "15.2.3";
+  const RELEASE_NAME = "Sync Status Icons";
+  const RELEASE_DATE = "August 17, 2026";
   window.FINANCE_APP_VERSION_OVERRIDE = VERSION;
   window.FINANCE_RELEASE_OVERRIDE = { version:VERSION, name:RELEASE_NAME, released:"2026-08-16" };
 
@@ -79,6 +79,15 @@ window.FINANCE_SYNC_CONFIG = window.FINANCE_SYNC_CONFIG || {
     const style = document.createElement("style");
     style.id = "financeUiEnhancementStyles";
     style.textContent = `
+      /* V15.2.3 · supplied Cloud Sync status artwork */
+      #cloudSyncStatusButton[data-sync-state="synced"]{color:#43cf78!important}#cloudSyncStatusButton[data-sync-state="syncing"]{color:#f5a623!important}#cloudSyncStatusButton[data-sync-state="needs-sync"],#cloudSyncStatusButton[data-sync-state="sync-issue"],#cloudSyncStatusButton[data-sync-state="offline"]{color:#ff786e!important}
+      #cloudSyncStatusButton[data-sync-state] .cloud-sync-label,#cloudSyncStatusButton[data-sync-state] .toolbar-icon{color:inherit!important}
+      #cloudSyncStatusButton .toolbar-icon[data-uploaded-sync-icon]{background-repeat:no-repeat!important;background-position:center!important;background-size:contain!important}
+      #cloudSyncStatusButton .toolbar-icon[data-uploaded-sync-icon]::before,#cloudSyncStatusButton .toolbar-icon[data-uploaded-sync-icon] svg{display:none!important}
+      #cloudSyncStatusButton .toolbar-icon[data-uploaded-sync-icon="synced"]{background-image:url("./icons/sync-synced-v15-2-3.png")!important}
+      #cloudSyncStatusButton .toolbar-icon[data-uploaded-sync-icon="syncing"]{background-image:url("./icons/sync-syncing-v15-2-3.png")!important}
+      #cloudSyncStatusButton .toolbar-icon[data-uploaded-sync-icon="needs-sync"]{background-image:url("./icons/sync-needs-sync-v15-2-3.png")!important}
+      #cloudSyncStatusButton .toolbar-icon[data-uploaded-sync-icon="offline"]{background-image:url("./icons/sync-issue-offline-v15-2-3.png")!important}
       .expense-screenshot-header-actions{position:relative;display:flex;align-items:center;gap:6px;margin-left:auto}.expense-screenshot-header-actions .button{min-width:84px;min-height:38px;white-space:nowrap}
       .expense-screenshot-panel.expense-screenshot-panel-compact{padding:9px 10px;gap:8px;margin-top:8px}.expense-screenshot-panel-compact .expense-screenshot-head{display:none!important}.expense-screenshot-panel-compact .expense-screenshot-privacy{display:none!important}
       .expense-screenshot-action-menu{position:absolute;top:calc(100% + 6px);right:0;z-index:190;display:grid;gap:4px;min-width:156px;padding:6px;border:1px solid var(--line);border-radius:10px;background:var(--surface);box-shadow:0 12px 30px rgba(0,0,0,.22)}.expense-screenshot-action-menu[hidden]{display:none!important}.expense-screenshot-action-menu .button{justify-content:flex-start;width:100%;min-height:38px;text-align:left}
@@ -259,7 +268,7 @@ window.FINANCE_SYNC_CONFIG = window.FINANCE_SYNC_CONFIG || {
     const icon = button?.querySelector(".toolbar-icon");
     if (!button || !icon) return;
     const state = String(button.dataset.syncState || "");
-    const mapped = state === "syncing" ? "syncing" : (["sync-issue", "offline"].includes(state) ? "error" : (state === "synced" ? "success" : ""));
+    const mapped = state === "syncing" ? "syncing" : (state === "needs-sync" ? "needs-sync" : (["sync-issue", "offline"].includes(state) ? "offline" : (state === "synced" ? "synced" : "")));
     if (mapped) icon.dataset.uploadedSyncIcon = mapped;
     else delete icon.dataset.uploadedSyncIcon;
   }

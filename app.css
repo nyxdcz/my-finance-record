@@ -5491,3 +5491,12 @@
     @media (prefers-reduced-motion:reduce) {
       .sidebar,.sidebar .nav-label { transition:none!important; }
     }
+
+/* V15.2.3 · Cloud Sync status colors match supplied icon artwork */
+.cloud-sync-toolbar-button[data-sync-state="synced"] { color:#43cf78; border-color:color-mix(in srgb,#43cf78 48%,var(--line)); background:color-mix(in srgb,#43cf78 10%,var(--surface)); }
+.cloud-sync-toolbar-button[data-sync-state="syncing"] { color:#f5a623; border-color:color-mix(in srgb,#f5a623 46%,var(--line)); background:color-mix(in srgb,#f5a623 9%,var(--surface)); }
+.cloud-sync-toolbar-button[data-sync-state="needs-sync"],
+.cloud-sync-toolbar-button[data-sync-state="sync-issue"],
+.cloud-sync-toolbar-button[data-sync-state="offline"] { color:#ff786e; border-color:color-mix(in srgb,#ff786e 44%,var(--line)); background:color-mix(in srgb,#ff786e 9%,var(--surface)); }
+.cloud-sync-toolbar-button[data-sync-state] .cloud-sync-label,
+.cloud-sync-toolbar-button[data-sync-state] .toolbar-icon { color:inherit; }

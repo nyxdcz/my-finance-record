@@ -1,5 +1,5 @@
 {
-  "version": "15.2.2",
+  "version": "15.2.3",
   "schemaVersion": 12,
   "cloudSchemaVersion": 3,
   "ledgerVersion": 1,
@@ -10,8 +10,8 @@
   "profileArchitectureVersion": 1,
   "encryptionVersion": 1,
   "authSecurityVersion": 1,
-  "cacheVersion": "finance-v15-20260817-phone-finance-r37",
+  "cacheVersion": "finance-v15-20260817-sync-status-r38",
   "released": "2026-08-17",
-  "name": "Mobile UI & UX",
-  "notes": "V15.2.2 Budget & Expenses presentation hotfix: once the first half is finished, use the supplied theme-aware heart-smile completion artwork for First-half difference and for First half of the month when its unpaid total is zero. Finance calculations, records, Cloud Schema V3, and the five-minute sync cadence remain unchanged."
+  "name": "Sync Status Icons",
+  "notes": "V15.2.3 uses the supplied status artwork and matching colors in the Cloud Sync toolbar: Synced is green, Syncing is orange, Needs sync uses its red attention icon, and Sync issue/Offline use the red unavailable icon. Finance Schema 12, Cloud Schema V3, records, calculations, conflict resolution, and the five-minute sync cadence are unchanged."
 }
