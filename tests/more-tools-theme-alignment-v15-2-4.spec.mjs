@@ -56,7 +56,10 @@ test("More tools theme icon and Auto/Light/Dark title stay centered on one row",
       document.documentElement.dataset.themePreference = value;
       document.documentElement.dataset.theme = value === "dark" ? "dark" : "light";
     }, preference);
-    const generated = await page.locator("#themeToggleText").evaluate(element => getComputedStyle(element, "::after").content.replace(/^['\"]|['\"]$/g, ""));
+    const generated = await page.locator("#themeToggleText").evaluate(element => {
+      const content = getComputedStyle(element, "::after").content;
+      return content && content !== "none" ? content.slice(1, -1) : "";
+    });
     expect(generated).toBe(expected);
   }
 });
