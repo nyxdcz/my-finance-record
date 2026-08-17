@@ -10,12 +10,15 @@ async function openPhone(page) {
 
 async function exposePage(page, pageId) {
   await page.evaluate(id => {
+    document.documentElement.dataset.financeAuth = "signed-in";
     document.body.classList.remove("finance-signed-out", "finance-auth-pending");
     const target = document.getElementById(id);
     if (!target) return;
     document.querySelectorAll(".page.active").forEach(node => node.classList.remove("active"));
     target.classList.add("active");
     target.style.setProperty("display", "block", "important");
+    window.dispatchEvent(new CustomEvent("finance:privacy-auth-change", { detail:{ authenticated:true } }));
+    window.dispatchEvent(new CustomEvent("finance:page-changed", { detail:{ pageId:id } }));
   }, pageId);
 }
 
@@ -47,7 +50,6 @@ test("phone Add Expense stays in the toolbar grid instead of covering the title"
 
 test("phone Add account and Schedule event are true 44px icon-only controls", async ({ page }) => {
   await openPhone(page);
-  await page.waitForTimeout(50);
 
   const targets = [
     { pageId:"money", selector:"#addAccountButton" },
@@ -58,6 +60,7 @@ test("phone Add account and Schedule event are true 44px icon-only controls", as
     await exposePage(page, target.pageId);
     const button = page.locator(target.selector).first();
     await expect(button).toHaveCount(1);
+    await page.waitForFunction(selector => Boolean(document.querySelector(selector)?.querySelector(".phone-only-action-icon")), target.selector);
     const contract = await button.evaluate(node => {
       const style = getComputedStyle(node);
       const before = getComputedStyle(node, "::before");
