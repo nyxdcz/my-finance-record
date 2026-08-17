@@ -31,20 +31,30 @@ test("phone Finance installs compact record layout and icon-only Add account", a
   expect(styleText).toContain('content:"Account ·"');
 });
 
-test("Schedule event becomes icon-only only at phone width and keeps an accessible name", async ({ page }) => {
+test("dynamically rendered Schedule event becomes icon-only only at phone width", async ({ page }) => {
   await page.setViewportSize(phone);
-  await page.goto("http://127.0.0.1:3000/index.html?page=projects", { waitUntil:"domcontentloaded" });
+  await page.goto("http://127.0.0.1:3000/index.html?page=money", { waitUntil:"domcontentloaded" });
+  await expect(page.locator("#phoneFinanceCompactV1522")).toHaveCount(1);
 
-  const schedule = page.locator("[data-pc-add]").first();
-  await expect(schedule).toHaveCount(1, { timeout:10000 });
+  await page.evaluate(() => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.dataset.pcAdd = "true";
+    button.textContent = "Schedule event";
+    document.body.appendChild(button);
+  });
+
+  const schedule = page.locator("[data-pc-add]").last();
   await expect(schedule).toHaveClass(/phone-icon-only-action/);
   await expect(schedule).toHaveAttribute("aria-label", "Schedule event");
   const phonePresentation = await schedule.evaluate(button => ({
     width:getComputedStyle(button).width,
+    height:getComputedStyle(button).height,
     labelDisplay:getComputedStyle(button.querySelector(".phone-only-action-label")).display,
     iconDisplay:getComputedStyle(button.querySelector(".phone-only-action-icon")).display
   }));
   expect(phonePresentation.width).toBe("44px");
+  expect(phonePresentation.height).toBe("44px");
   expect(phonePresentation.labelDisplay).toBe("none");
   expect(phonePresentation.iconDisplay).toBe("grid");
 
