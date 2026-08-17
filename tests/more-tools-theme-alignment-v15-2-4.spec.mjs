@@ -1,10 +1,19 @@
+import fs from "node:fs";
 import { test, expect } from "@playwright/test";
 
-test("More tools Appearance stays compact, left-aligned, and keeps Auto/Light/Dark on one row", async ({ page }) => {
+test("More tools Appearance stays compact, left-aligned, and network-first", async ({ page }) => {
+  const alignmentCss = fs.readFileSync("ui-icon-alignment-v15-0-5.css", "utf8");
+  const serviceWorker = fs.readFileSync("sw.js", "utf8");
+  expect(alignmentCss).toContain("V15.2.4-r3 · Final network-first More tools Appearance geometry");
+  expect(alignmentCss).toContain("#themeToggleButton.topbar-tools-item.theme-toggle-button");
+  expect(alignmentCss).toContain("justify-content:flex-start !important");
+  expect(alignmentCss).toContain("height:38px !important");
+  expect(alignmentCss).toContain("gap:6px !important");
+  expect(serviceWorker).toContain('url.pathname.endsWith("ui-icon-alignment-v15-0-5.css")');
+
   await page.setViewportSize({ width:1440, height:900 });
   await page.goto("http://127.0.0.1:3000/index.html?page=dashboard", { waitUntil:"networkidle" });
   await page.evaluate(() => window.FinancePrivacyLock?.unlock?.({ email:"theme-alignment-test@example.invalid" }));
-
   await page.locator("#topbarToolsTrigger").click();
   await expect(page.locator("#topbarToolsPanel")).toBeVisible();
 
@@ -15,7 +24,6 @@ test("More tools Appearance stays compact, left-aligned, and keeps Auto/Light/Da
     const hiddenHeading = textWrap?.querySelector("strong");
     const searchIcon = document.querySelector("#globalSearchButton > .toolbar-icon");
     if (!icon || !textWrap || !label || !hiddenHeading || !searchIcon) throw new Error("More tools Appearance structure is incomplete");
-
     const buttonStyle = getComputedStyle(button);
     const wrapStyle = getComputedStyle(textWrap);
     const labelStyle = getComputedStyle(label);
@@ -24,7 +32,6 @@ test("More tools Appearance stays compact, left-aligned, and keeps Auto/Light/Da
     const iconRect = icon.getBoundingClientRect();
     const labelRect = label.getBoundingClientRect();
     const searchIconRect = searchIcon.getBoundingClientRect();
-
     return {
       buttonDisplay:buttonStyle.display,
       buttonAlign:buttonStyle.alignItems,
