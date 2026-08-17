@@ -10,8 +10,8 @@
   "profileArchitectureVersion": 1,
   "encryptionVersion": 1,
   "authSecurityVersion": 1,
-  "cacheVersion": "finance-v15-20260816-sidebar-brand-r35",
+  "cacheVersion": "finance-v15-20260817-phone-finance-r36",
   "released": "2026-08-16",
   "name": "Mobile UI & UX",
-  "notes": "V15.2.2 sidebar hotfix: rename the expanded navigation brand to My Finance Records, reduce the desktop pin control to 28px while keeping its expanded/pinned position stable, and refresh the PWA shell. Finance Schema 12, Cloud Schema V3, records, calculations, sync, and phone navigation behavior remain unchanged."
+  "notes": "V15.2.2 phone Finance hotfix: compact Income, Budget & Expenses, and Paid Expenses record layouts, keep Mark paid text actions compact, make Add account and Schedule event icon-only on phones with accessible labels, tighten their surrounding headers, and refresh the PWA shell. Finance Schema 12, Cloud Schema V3, records, calculations, account behavior, calendar behavior, and sync semantics remain unchanged."
 }
