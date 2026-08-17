@@ -1,0 +1,1 @@
+Phone UI overlap hotfix scope: toolbar Add Expense grid placement; non-sticky Finance tabs on phone; true icon-only Add account and Schedule event controls; single-row Mark paid + More actions. No finance, sync, account, project, or calendar behavior changes.
