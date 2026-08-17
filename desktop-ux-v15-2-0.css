@@ -139,3 +139,40 @@
     margin-top:0;
   }
 }
+
+/* V15.2.4 · More tools Appearance keeps the theme icon and Auto/Light/Dark title on one centered row. */
+#topbarToolsPanel #themeToggleButton{
+  display:flex !important;
+  align-items:center !important;
+  gap:8px !important;
+}
+#topbarToolsPanel #themeToggleButton > .toolbar-icon{
+  align-self:center !important;
+  margin:0 !important;
+}
+#topbarToolsPanel #themeToggleButton > span:last-child{
+  display:flex !important;
+  align-items:center !important;
+  min-width:0 !important;
+  min-height:20px !important;
+  margin:0 !important;
+  padding:0 !important;
+}
+#topbarToolsPanel #themeToggleButton > span:last-child > strong{
+  display:none !important;
+  margin:0 !important;
+}
+#topbarToolsPanel #themeToggleText{
+  display:inline-flex !important;
+  align-items:center !important;
+  height:20px !important;
+  min-height:20px !important;
+  margin:0 !important;
+  padding:0 !important;
+  line-height:20px !important;
+  white-space:nowrap !important;
+}
+#topbarToolsPanel #themeToggleText::after{
+  display:block;
+  line-height:20px !important;
+}
