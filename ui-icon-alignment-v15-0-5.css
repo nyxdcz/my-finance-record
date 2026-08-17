@@ -252,3 +252,17 @@ html body .button-saved .saved-button-text {
     transform:none !important;
   }
 }
+
+
+/* V15.2.3 · Finance legend markers use the supplied scalloped silhouette. */
+html body #money .legend > .legend-item .legend-dot {
+  border-radius:0 !important;
+  -webkit-mask-image:url("./icons/finance-legend-shape-v15-2-3.png");
+  mask-image:url("./icons/finance-legend-shape-v15-2-3.png");
+  -webkit-mask-repeat:no-repeat;
+  mask-repeat:no-repeat;
+  -webkit-mask-position:center;
+  mask-position:center;
+  -webkit-mask-size:contain;
+  mask-size:contain;
+}
