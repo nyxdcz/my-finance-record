@@ -54,7 +54,6 @@ html body .topbar-actions > button:not(.cloud-sync-toolbar-button):not(.topbar-a
   align-self:center !important;
 }
 
-
 /* V15.0.5 header hotfix: optical centering for the asymmetric widget glyph. */
 html body #customizeDashboardButton[data-dashboard-toolbar-action]::before {
   transform:translateY(1px) !important;
@@ -142,7 +141,7 @@ html body #customizeDashboardButton[data-dashboard-toolbar-action]::before {
   }
 }
 
-/* V15.2.3 · More tools uses the supplied image artwork without changing menu behavior. */
+/* V15.2.3 · More tools uses the user's exact uploaded 50px PNG artwork. */
 html body #topbarToolsPanel :is(#themeToggleButton,#quickEntryMenuButton,#customizeDashboardMenuButton,#globalSearchButton,#productivityCenterButton) .toolbar-icon {
   width:20px !important;
   min-width:20px !important;
@@ -155,24 +154,43 @@ html body #topbarToolsPanel :is(#themeToggleButton,#quickEntryMenuButton,#custom
 html body #topbarToolsPanel :is(#themeToggleButton,#quickEntryMenuButton,#customizeDashboardMenuButton,#globalSearchButton,#productivityCenterButton) .toolbar-icon > svg {
   opacity:0 !important;
 }
-html[data-theme-preference="system"] body #themeToggleButton .toolbar-icon {
-  background-image:url("./icons/theme-auto-v14-0-23.png") !important;
+
+/* Philippine time has separate artwork for the resolved day/night appearance. */
+html[data-theme-preference="system"][data-theme="dark"] body #themeToggleButton .toolbar-icon {
+  background-image:url("./icons/more-tools-theme-ph-dark-v15-2-3.png") !important;
 }
-html[data-theme-preference="light"] body #themeToggleButton .toolbar-icon {
-  background-image:url("./icons/theme-day-v14-0-23.png") !important;
+html[data-theme-preference="system"][data-theme="light"] body #themeToggleButton .toolbar-icon {
+  background-image:url("./icons/more-tools-theme-ph-light-v15-2-3.png") !important;
 }
 html[data-theme-preference="dark"] body #themeToggleButton .toolbar-icon {
-  background-image:url("./icons/theme-night-v14-0-23.png") !important;
+  background-image:url("./icons/more-tools-theme-dark-v15-2-3.png") !important;
 }
-html body #quickEntryMenuButton .toolbar-icon {
-  background-image:url("./icons/action-add-sparkle-v14-0-23.png") !important;
+html[data-theme-preference="light"] body #themeToggleButton .toolbar-icon {
+  background-image:url("./icons/more-tools-theme-light-v15-2-3.png") !important;
 }
-html body #customizeDashboardMenuButton .toolbar-icon {
-  background-image:url("./icons/customize-dashboard-v15.png") !important;
+
+/* Remaining More tools icons switch to the user's matching dark/light artwork. */
+html[data-theme="dark"] body #quickEntryMenuButton .toolbar-icon {
+  background-image:url("./icons/more-tools-quick-add-dark-v15-2-3.png") !important;
 }
-html body #globalSearchButton .toolbar-icon {
-  background-image:url("./icons/utility-search.png") !important;
+html[data-theme="light"] body #quickEntryMenuButton .toolbar-icon {
+  background-image:url("./icons/more-tools-quick-add-light-v15-2-3.png") !important;
 }
-html body #productivityCenterButton .toolbar-icon {
-  background-image:url("./icons/utility-controls.png") !important;
+html[data-theme="dark"] body #customizeDashboardMenuButton .toolbar-icon {
+  background-image:url("./icons/more-tools-customize-dark-v15-2-3.png") !important;
+}
+html[data-theme="light"] body #customizeDashboardMenuButton .toolbar-icon {
+  background-image:url("./icons/more-tools-customize-light-v15-2-3.png") !important;
+}
+html[data-theme="dark"] body #globalSearchButton .toolbar-icon {
+  background-image:url("./icons/more-tools-search-dark-v15-2-3.png") !important;
+}
+html[data-theme="light"] body #globalSearchButton .toolbar-icon {
+  background-image:url("./icons/more-tools-search-light-v15-2-3.png") !important;
+}
+html[data-theme="dark"] body #productivityCenterButton .toolbar-icon {
+  background-image:url("./icons/more-tools-quick-actions-dark-v15-2-3.png") !important;
+}
+html[data-theme="light"] body #productivityCenterButton .toolbar-icon {
+  background-image:url("./icons/more-tools-quick-actions-light-v15-2-3.png") !important;
 }
