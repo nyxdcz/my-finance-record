@@ -9,7 +9,7 @@ test("V15.2.4 registers the cache-qualified worker and clears stale Finance cach
     await caches.open("unrelated-test-cache");
   });
 
-  await expect.poll(async () => page.evaluate(() => navigator.serviceWorker.controller?.scriptURL || ""), { timeout:15000 }).toContain("v=15.2.3");
+  await expect.poll(async () => page.evaluate(() => navigator.serviceWorker.controller?.scriptURL || ""), { timeout:15000 }).toContain("v=15.2.4");
   const workerUrl = await page.evaluate(() => navigator.serviceWorker.controller?.scriptURL || "");
   expect(workerUrl).toContain("cache=finance-v15-20260818-ui-refinement-r39");
 
