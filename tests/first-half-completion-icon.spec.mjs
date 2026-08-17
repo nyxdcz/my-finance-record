@@ -34,15 +34,13 @@ test("completed first half uses the supplied heart-smile artwork in both request
   await expect(firstHalfValue).toHaveAttribute("aria-label", "First half completed");
   await expect(firstDifferenceValue).toHaveAttribute("title", "First half completed");
 
-  const lightSrc = await firstHalfValue.locator("img").getAttribute("src");
-  expect(lightSrc).toMatch(/^data:image\/png;base64,/);
-  await expect(firstHalfValue.locator("img")).toHaveAttribute("data-theme-variant", "light");
+  const lightIcon = firstHalfValue.locator("img");
+  await expect(lightIcon).toHaveAttribute("src", /heart-smile-light-v15-2-4\.png$/);
+  await expect(lightIcon).toHaveAttribute("data-theme-variant", "light");
 
   await page.evaluate(() => { document.documentElement.dataset.theme = "dark"; });
-  await expect(firstHalfValue.locator("img")).toHaveAttribute("data-theme-variant", "dark");
-  const darkSrc = await firstHalfValue.locator("img").getAttribute("src");
-  expect(darkSrc).toMatch(/^data:image\/png;base64,/);
-  expect(darkSrc).not.toBe(lightSrc);
+  await expect(lightIcon).toHaveAttribute("data-theme-variant", "dark");
+  await expect(lightIcon).toHaveAttribute("src", /heart-smile-dark-v15-2-4\.png$/);
 });
 
 test("past first half keeps an unpaid first-half amount visible but replaces the difference amount", async ({ page }) => {
