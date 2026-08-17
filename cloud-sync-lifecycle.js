@@ -64,11 +64,13 @@
   window.FinanceCloudSyncLifecycle = { create, FOREGROUND_POLL_MS };
 })();
 
-/* V15.2.2: never auto-pick profiles[0] when a cloud account exposes several finance profiles. */
+/* V15.2.2: require deliberate profile identity selection and make duplicate cloud datasets easy to distinguish. */
 (function financeCloudProfileSelectionGuard() {
   const APPROVED_KEY = "simple-finance-cloud-profile-approved-v1";
+  const LAST_SELECTED_KEY = "simple-finance-cloud-profile-last-selected-v1";
   const CHOOSER_ID = "cloudProfileSelectionCard";
   let pendingProfiles = [];
+  let knownProfiles = [];
   let originals = null;
 
   const architecture = () => window.FinanceProfileArchitecture || null;
@@ -79,6 +81,31 @@
   };
   const roleLabel = value => String(value || "viewer").toLowerCase() === "owner" ? "Owner" : String(value || "viewer").toLowerCase() === "editor" ? "Editor" : "Viewer";
   const escapeHtml = value => String(value ?? "").replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[ch]);
+  const normalizedName = profile => String(profile?.name || "Cloud finances").trim().toLowerCase();
+  const updatedMs = profile => {
+    const value = Date.parse(String(profile?.updated_at || profile?.created_at || ""));
+    return Number.isFinite(value) ? value : 0;
+  };
+
+  function formatDate(value) {
+    const date = new Date(String(value || ""));
+    if (Number.isNaN(date.getTime())) return "Unknown";
+    try {
+      return new Intl.DateTimeFormat(undefined, { month:"short", day:"numeric", year:"numeric", hour:"numeric", minute:"2-digit" }).format(date);
+    } catch (error) {
+      return date.toLocaleString();
+    }
+  }
+
+  function lastSelectedId() {
+    try { return String(localStorage.getItem(LAST_SELECTED_KEY) || ""); }
+    catch (error) { return ""; }
+  }
+
+  function rememberSelectedId(id) {
+    try { if (id) localStorage.setItem(LAST_SELECTED_KEY, String(id)); }
+    catch (error) {}
+  }
 
   function toast(message, tone = "info") {
     if (typeof window.showToast === "function") window.showToast(message, tone);
@@ -89,10 +116,53 @@
     return document.getElementById("cloudFirstSyncCard") || document.getElementById("cloudConnectedSection") || document.getElementById("cloudDisconnectedSection");
   }
 
+  function duplicateInfo(list) {
+    const counts = new Map();
+    list.forEach(profile => counts.set(normalizedName(profile), (counts.get(normalizedName(profile)) || 0) + 1));
+    const duplicateGroups = [...counts.values()].filter(count => count > 1);
+    return { counts, duplicateProfiles:duplicateGroups.reduce((total, count) => total + count, 0) };
+  }
+
+  function updateProfileStats(id, stats = {}) {
+    document.querySelectorAll("[data-cloud-profile-id]").forEach(row => {
+      if (String(row.dataset.cloudProfileId || "") !== String(id || "")) return;
+      const value = row.querySelector("[data-cloud-profile-stats]");
+      if (!value) return;
+      const accounts = Number.isFinite(stats.accounts) ? stats.accounts : "—";
+      const devices = Number.isFinite(stats.devices) ? stats.devices : "—";
+      value.textContent = `Accounts ${accounts} · Devices ${devices}`;
+    });
+  }
+
+  async function hydrateProfileStats(list) {
+    const loadClient = window.FinanceCloudSyncInternals?.loadClient;
+    if (typeof loadClient !== "function") return;
+    let client;
+    try { client = await loadClient(); }
+    catch (error) { return; }
+    if (!client?.from) return;
+    await Promise.all(list.map(async profile => {
+      const id = profileId(profile);
+      if (!id) return;
+      let accounts = null;
+      let devices = null;
+      try {
+        const result = await client.from("finance_v3_records").select("record_id", { count:"exact", head:true }).eq("profile_id", id).eq("collection", "accounts").is("deleted_at", null);
+        if (!result?.error && Number.isFinite(Number(result?.count))) accounts = Number(result.count);
+      } catch (error) {}
+      try {
+        const result = await client.from("finance_v3_devices").select("device_id", { count:"exact", head:true }).eq("profile_id", id).is("revoked_at", null);
+        if (!result?.error && Number.isFinite(Number(result?.count))) devices = Number(result.count);
+      } catch (error) {}
+      updateProfileStats(id, { accounts, devices });
+    }));
+  }
+
   function renderChooser(profiles = pendingProfiles, switching = false) {
-    const list = (Array.isArray(profiles) ? profiles : []).filter(profile => profileId(profile));
+    const list = (Array.isArray(profiles) ? profiles : []).filter(profile => profileId(profile)).slice().sort((a,b) => updatedMs(b) - updatedMs(a));
     if (!list.length) return null;
     pendingProfiles = list;
+    knownProfiles = list;
     let card = document.getElementById(CHOOSER_ID);
     if (!card) {
       const anchor = chooserAnchor();
@@ -103,15 +173,30 @@
       anchor.parentNode.insertBefore(card, anchor);
     }
     const current = String(architecture()?.cloudProfileId?.() || "");
+    const prior = lastSelectedId();
+    const { counts, duplicateProfiles } = duplicateInfo(list);
+    const newestId = profileId(list[0]);
+    const duplicateWarning = duplicateProfiles > 1
+      ? `<div class="v12-callout warning" data-cloud-profile-duplicate-warning style="margin:10px 0;"><strong>${duplicateProfiles} profiles share a duplicate name.</strong><p style="margin:4px 0 0;">They are separate finance datasets. Compare the Profile ID, last updated time, account count, and device count before choosing. Nothing is deleted from this screen.</p></div>`
+      : "";
     card.hidden = false;
     card.innerHTML = `<div class="card-header"><div><h3>${switching ? "Switch Cloud Profile" : "Choose Cloud Profile"}</h3><p>${switching ? "Choose the exact cloud dataset this device should use." : "This account has more than one finance profile. Confirm one before any finance records are downloaded."}</p></div><span class="v12-chip warning">Selection required</span></div>
-      <div role="radiogroup" aria-label="Available cloud profiles" style="display:grid;gap:8px;margin:10px 0 12px;">${list.map((profile,index) => {
+      ${duplicateWarning}<div style="display:flex;justify-content:flex-end;margin:0 0 8px;"><button class="button button-secondary button-small" type="button" data-cloud-profile-refresh>Refresh profiles</button></div>
+      <div role="radiogroup" aria-label="Available cloud profiles" style="display:grid;gap:8px;margin:0 0 12px;">${list.map(profile => {
         const id = profileId(profile);
-        const checked = current ? id === current : index === 0;
-        return `<label style="display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:start;padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:var(--surface-soft);"><input type="radio" name="cloudProfileSelection" value="${escapeHtml(id)}" ${checked ? "checked" : ""}><span><strong style="display:block;">${escapeHtml(profile.name || "Cloud finances")}</strong><small style="display:block;color:var(--muted);margin-top:2px;">${escapeHtml(roleLabel(profile.role))} · Profile ${escapeHtml(shortId(id))}</small></span></label>`;
+        const checked = Boolean(current && id === current);
+        const sameNameCount = counts.get(normalizedName(profile)) || 0;
+        const chips = [
+          checked ? `<span class="v12-chip success">Current on this device</span>` : "",
+          id === newestId ? `<span class="v12-chip">Most recently updated</span>` : "",
+          !checked && prior && id === prior ? `<span class="v12-chip">Previously used here</span>` : "",
+          sameNameCount > 1 ? `<span class="v12-chip warning">Duplicate name</span>` : ""
+        ].filter(Boolean).join(" ");
+        return `<label data-cloud-profile-id="${escapeHtml(id)}" title="Cloud Profile ${escapeHtml(id)}" style="display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:start;padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:var(--surface-soft);"><input type="radio" name="cloudProfileSelection" value="${escapeHtml(id)}" ${checked ? "checked" : ""}><span><span style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;"><strong>${escapeHtml(profile.name || "Cloud finances")}</strong>${chips}</span><small style="display:block;color:var(--muted);margin-top:3px;">${escapeHtml(roleLabel(profile.role))} · Profile ${escapeHtml(shortId(id))}</small><small style="display:block;color:var(--muted);margin-top:2px;">Updated ${escapeHtml(formatDate(profile.updated_at))} · Created ${escapeHtml(formatDate(profile.created_at))}</small><small data-cloud-profile-stats style="display:block;color:var(--muted);margin-top:2px;">Accounts — · Devices —</small></span></label>`;
       }).join("")}</div>
       <div class="field" style="margin-bottom:10px;"><label for="cloudProfileSelectionPassphrase">Profile encryption passphrase</label><input class="input" id="cloudProfileSelectionPassphrase" type="password" autocomplete="current-password" placeholder="Leave blank for an automatically created profile"><small style="display:block;color:var(--muted);margin-top:4px;">Enter a passphrase only when this profile was created with a custom encryption passphrase.</small></div>
-      <div class="card-actions" style="display:flex;gap:8px;flex-wrap:wrap;"><button class="button button-primary" id="cloudProfileSelectionConfirm" type="button">Use selected profile</button>${switching ? `<button class="button button-secondary" id="cloudProfileSelectionCancel" type="button">Cancel</button>` : ""}</div><p class="v12-help" id="cloudProfileSelectionMessage">No finance records will be downloaded until you confirm the profile.</p>`;
+      <div class="card-actions" style="display:flex;gap:8px;flex-wrap:wrap;"><button class="button button-primary" id="cloudProfileSelectionConfirm" type="button" ${current ? "" : "disabled"}>Use selected profile</button>${switching ? `<button class="button button-secondary" id="cloudProfileSelectionCancel" type="button">Cancel</button>` : ""}</div><p class="v12-help" id="cloudProfileSelectionMessage">${current ? "Choose carefully before switching datasets." : "No profile is preselected. No finance records will be downloaded until you deliberately choose and confirm one."}</p>`;
+    hydrateProfileStats(list).catch(() => {});
     return card;
   }
 
@@ -130,7 +215,10 @@
     const button = document.getElementById("cloudProfileSelectionConfirm");
     const message = document.getElementById("cloudProfileSelectionMessage");
     const profile = pendingProfiles.find(item => profileId(item) === selected);
-    if (!selected || !profile || !originals?.connect) return;
+    if (!selected || !profile || !originals?.connect) {
+      if (message) message.textContent = "Choose a Cloud Profile first. Nothing has been downloaded.";
+      return;
+    }
     const prior = button?.textContent || "Use selected profile";
     if (button) { button.disabled = true; button.textContent = "Connecting…"; }
     try {
@@ -138,8 +226,10 @@
       if (!passphrase) throw new Error("Enter the encryption passphrase for this Cloud Profile.");
       sessionStorage.setItem(APPROVED_KEY, selected);
       await originals.connect(selected, passphrase, true, { auto:false, selectedByUser:true });
+      rememberSelectedId(selected);
       sessionStorage.removeItem(APPROVED_KEY);
       pendingProfiles = [];
+      knownProfiles = [];
       if (message) message.textContent = "Cloud Profile selected. Reloading this finance dataset…";
       toast(`Cloud Profile selected: ${profile.name || shortId(selected)}`, "success");
     } catch (error) {
@@ -163,6 +253,18 @@
     } catch (error) { toast(error?.message || "Could not list Cloud Profiles.", "warning"); }
   }
 
+  async function refreshChooser() {
+    if (!originals?.list) return;
+    const message = document.getElementById("cloudProfileSelectionMessage");
+    if (message) message.textContent = "Refreshing Cloud Profiles…";
+    try {
+      const result = await originals.list();
+      const profiles = Array.isArray(result?.profiles) ? result.profiles : [];
+      if (!profiles.length) return toast("No Cloud Profiles are available for this account.", "warning");
+      renderChooser(profiles, Boolean(architecture()?.cloudProfileId?.()));
+    } catch (error) { toast(error?.message || "Could not refresh Cloud Profiles.", "warning"); }
+  }
+
   function identity() {
     const arch = architecture();
     const profile = arch?.activeProfile?.() || {};
@@ -173,6 +275,7 @@
   function renderIdentity() {
     const current = identity();
     if (!current) return;
+    rememberSelectedId(current.id);
     const grid = document.querySelector("#cloudSyncHealthCard .cloud-v3-health-grid");
     if (grid) {
       let item = document.getElementById("cloudHealthProfileItem");
@@ -210,7 +313,8 @@
     originals = { list:arch.listCloudProfiles.bind(arch), connect:arch.connectCloudProfile.bind(arch), create:arch.createCloudProfile.bind(arch) };
     arch.listCloudProfiles = async (...args) => {
       const result = await originals.list(...args);
-      const profiles = Array.isArray(result?.profiles) ? result.profiles : [];
+      const profiles = (Array.isArray(result?.profiles) ? result.profiles : []).filter(profile => profileId(profile));
+      knownProfiles = profiles.slice();
       if (arch.cloudProfileId?.()) return result;
       const approved = String(sessionStorage.getItem(APPROVED_KEY) || "");
       if (approved && profiles.some(profile => profileId(profile) === approved)) return { ...result, profiles:profiles.filter(profile => profileId(profile) === approved) };
@@ -223,16 +327,21 @@
       return result;
     };
     arch.createCloudProfile = async (...args) => {
-      if (!arch.cloudProfileId?.() && pendingProfiles.length > 1 && !sessionStorage.getItem(APPROVED_KEY)) {
-        renderChooser(pendingProfiles, false);
-        throw new Error("Choose which Cloud Profile this device should use before creating another cloud profile.");
+      if (!arch.cloudProfileId?.() && knownProfiles.length && !sessionStorage.getItem(APPROVED_KEY)) {
+        if (knownProfiles.length > 1) renderChooser(knownProfiles, false);
+        throw new Error(knownProfiles.length > 1
+          ? "Choose which existing Cloud Profile this device should use before creating another cloud profile."
+          : "An existing Cloud Profile is already available. Connect it instead of creating another duplicate profile.");
       }
       return originals.create(...args);
     };
     arch.connectCloudProfile = async (...args) => {
       const result = await originals.connect(...args);
+      const connectedId = String(args[0] || arch.cloudProfileId?.() || "");
+      if (connectedId) rememberSelectedId(connectedId);
       sessionStorage.removeItem(APPROVED_KEY);
       pendingProfiles = [];
+      knownProfiles = [];
       setTimeout(renderIdentity, 0);
       return result;
     };
@@ -247,9 +356,18 @@
     [0,250,1000,2500].forEach(delay => setTimeout(renderIdentity, delay));
   }
 
+  document.addEventListener("change", event => {
+    if (!event.target.matches?.(`#${CHOOSER_ID} input[name="cloudProfileSelection"]`)) return;
+    const button = document.getElementById("cloudProfileSelectionConfirm");
+    if (button) button.disabled = false;
+    const message = document.getElementById("cloudProfileSelectionMessage");
+    if (message) message.textContent = `Selected Profile ${shortId(event.target.value)}. Confirm only if its details match the dataset you want.`;
+  });
+
   document.addEventListener("click", event => {
     if (event.target.closest("#cloudProfileSelectionConfirm")) { event.preventDefault(); confirmSelection(); return; }
     if (event.target.closest("#cloudProfileSelectionCancel")) { event.preventDefault(); document.getElementById(CHOOSER_ID)?.remove(); return; }
+    if (event.target.closest("[data-cloud-profile-refresh]")) { event.preventDefault(); refreshChooser(); return; }
     if (event.target.closest("[data-cloud-profile-switch]")) { event.preventDefault(); openSwitcher(); }
   });
   window.addEventListener("finance:cloud-profile-linked", () => setTimeout(renderIdentity, 50));
