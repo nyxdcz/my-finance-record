@@ -141,3 +141,38 @@ html body #customizeDashboardButton[data-dashboard-toolbar-action]::before {
     font-size:.92rem !important;
   }
 }
+
+/* V15.2.3 · More tools uses the supplied image artwork without changing menu behavior. */
+html body #topbarToolsPanel :is(#themeToggleButton,#quickEntryMenuButton,#customizeDashboardMenuButton,#globalSearchButton,#productivityCenterButton) .toolbar-icon {
+  width:20px !important;
+  min-width:20px !important;
+  height:20px !important;
+  flex:0 0 20px !important;
+  background-repeat:no-repeat !important;
+  background-position:center !important;
+  background-size:20px 20px !important;
+}
+html body #topbarToolsPanel :is(#themeToggleButton,#quickEntryMenuButton,#customizeDashboardMenuButton,#globalSearchButton,#productivityCenterButton) .toolbar-icon > svg {
+  opacity:0 !important;
+}
+html[data-theme-preference="system"] body #themeToggleButton .toolbar-icon {
+  background-image:url("./icons/theme-auto-v14-0-23.png") !important;
+}
+html[data-theme-preference="light"] body #themeToggleButton .toolbar-icon {
+  background-image:url("./icons/theme-day-v14-0-23.png") !important;
+}
+html[data-theme-preference="dark"] body #themeToggleButton .toolbar-icon {
+  background-image:url("./icons/theme-night-v14-0-23.png") !important;
+}
+html body #quickEntryMenuButton .toolbar-icon {
+  background-image:url("./icons/action-add-sparkle-v14-0-23.png") !important;
+}
+html body #customizeDashboardMenuButton .toolbar-icon {
+  background-image:url("./icons/customize-dashboard-v15.png") !important;
+}
+html body #globalSearchButton .toolbar-icon {
+  background-image:url("./icons/utility-search.png") !important;
+}
+html body #productivityCenterButton .toolbar-icon {
+  background-image:url("./icons/utility-controls.png") !important;
+}
