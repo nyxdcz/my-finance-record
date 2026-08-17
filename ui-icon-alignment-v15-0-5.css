@@ -213,6 +213,16 @@ html body .button-saved.active:hover {
   color:inherit !important;
   box-shadow:none !important;
 }
+html body .button-saved {
+  transform:scale(1);
+  transform-origin:center;
+  transition:transform .22s cubic-bezier(.34,1.56,.64,1) !important;
+  will-change:transform;
+}
+html body .button-saved:active {
+  transform:scale(.82) !important;
+  transition-duration:.07s !important;
+}
 html body .button-saved .saved-icon-container {
   width:30px !important;
   min-width:30px !important;
@@ -220,17 +230,25 @@ html body .button-saved .saved-icon-container {
   flex:0 0 30px !important;
   border:0 !important;
   border-radius:0 !important;
-  background-image:url("./icons/finance-save-unsaved-v15-2-3.png") !important;
+  background-image:url("./icons/finance-save-unsaved-v15-2-3-r2.png") !important;
   background-repeat:no-repeat !important;
   background-position:center !important;
   background-size:30px 30px !important;
 }
 html body .button-saved.active .saved-icon-container {
-  background-image:url("./icons/finance-save-saved-v15-2-3.png") !important;
+  background-image:url("./icons/finance-save-saved-v15-2-3-r2.png") !important;
 }
 html body .button-saved .saved-icon {
   opacity:0 !important;
 }
 html body .button-saved .saved-button-text {
   display:none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  html body .button-saved {
+    transition:none !important;
+  }
+  html body .button-saved:active {
+    transform:none !important;
+  }
 }
