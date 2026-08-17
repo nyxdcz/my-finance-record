@@ -93,6 +93,10 @@ const APP_SHELL = [
   asset("./icons/sync-syncing-v14-0-23.png"),
   asset("./icons/sync-error-v14-0-23.png"),
   asset("./icons/sync-success-v14-0-23.png"),
+  asset("./icons/sync-needs-sync-v15-2-3.png"),
+  asset("./icons/sync-issue-offline-v15-2-3.png"),
+  asset("./icons/sync-syncing-v15-2-3.png"),
+  asset("./icons/sync-synced-v15-2-3.png"),
   asset("./icons/theme-night-v14-0-23.png"),
   asset("./icons/theme-day-v14-0-23.png"),
   asset("./icons/theme-auto-v14-0-23.png")
