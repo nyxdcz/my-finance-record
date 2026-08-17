@@ -253,7 +253,6 @@ html body .button-saved .saved-button-text {
   }
 }
 
-
 /* V15.2.3 · Finance legend markers use the supplied scalloped silhouette. */
 html body #money .legend > .legend-item .legend-dot {
   border-radius:0 !important;
@@ -292,4 +291,18 @@ html[data-theme="dark"] body #money .first-half-complete-icon {
 }
 html[data-theme="light"] body #money .first-half-complete-icon {
   content:url("./icons/heart-smile-light-v15-2-4-r2.png") !important;
+}
+
+/* V15.2.4 · More tools: label Philippine-time automatic appearance as Auto. */
+html[data-theme-preference="system"] body #themeToggleText {
+  display:inline-grid !important;
+  font-size:0 !important;
+  line-height:1 !important;
+}
+html[data-theme-preference="system"] body #themeToggleText::after {
+  content:"Auto";
+  color:var(--muted);
+  font-size:.64rem;
+  line-height:1.25;
+  white-space:nowrap;
 }
