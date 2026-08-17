@@ -9,7 +9,7 @@ const cloudFile = fs.readdirSync(".").find(name => name.endsWith(".js") && read(
 if (!cloudFile) throw new Error("Cloud Sync V3 file missing");
 const cloud = read(cloudFile);
 const required = [
-  [version.version === "15.2.2", "version.json is V15.2.2"],
+  [version.version === "15.2.3", "version.json is V15.2.3"],
   [pkg.version === "15.2.2", "package.json is V15.2.2"],
   [version.schemaVersion === 12 && version.cloudSchemaVersion === 3, "schemas remain 12/3"],
   [version.cacheVersion === "finance-v15-20260817-sync-status-r38", "phone-Finance/cloud-profile refresh cache is declared"],
@@ -25,10 +25,10 @@ const required = [
   [prod.includes("synchronize through Cloud Sync") && !prod.includes("Cloud Sync V2"), "Cloud terminology is current"],
   [cloud.includes("Your local changes are safe"), "Cloud error copy is plain-language"],
   [index.includes("cloudToolbarTechnicalDetails") && cloud.includes("cloudToolbarTechnicalError"), "Cloud technical details are optional"],
-  [sw.includes('const APP_VERSION = "15.2.2"') && sw.includes(version.cacheVersion), "service worker delivery matches release"],
+  [sw.includes('const APP_VERSION = "15.2.3"') && sw.includes(version.cacheVersion), "service worker delivery matches release"],
   [sw.includes("desktop-ux-v15-2-0.css?v=15.2.1"), "desktop UX CSS is precached"],
   [read("sync-config.js").includes('const VERSION = "15.2.2"') && read("sync-config.js").includes('const RELEASE_NAME = "Mobile UI & UX"'), "release override matches V15.2.2"],
-  [index.includes("sync-config.js?v=15.2.2-mobile1") && sw.includes("sync-config.js?v=15.2.2-mobile1"), "release layer is cache-busted consistently"],
+  [index.includes("sync-config.js?v=15.2.3-sync1") && sw.includes("sync-config.js?v=15.2.3-sync1"), "release layer is cache-busted consistently"],
   [read("mobile-v14-0-23.css").length > 0, "mobile stylesheet remains present"]
 ];
 for (const [ok, message] of required) { if (!ok) throw new Error(message); }

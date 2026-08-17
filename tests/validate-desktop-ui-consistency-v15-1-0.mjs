@@ -60,7 +60,7 @@ for (const pin of [
   "budget-planning.css?v=15.1.0-desktop3",
   "projects-calendar-v13.0.20.css?v=15.1.0-desktop2",
   "black-canvas-v15-1-0.css?v=15.1.0-light1",
-  "sync-config.js?v=15.2.2-mobile1"
+  "sync-config.js?v=15.2.3-sync1"
 ]) assert.ok(index.includes(pin), `index missing ${pin}`);
 assert.ok(index.includes('const APP_CACHE_VERSION = "finance-v15-20260817-sync-status-r38";'));
 assert.ok(sw.includes("finance-v15-20260817-sync-status-r38"));
@@ -72,7 +72,7 @@ for (const pin of [
   "budget-planning.css?v=15.1.0-desktop3",
   "projects-calendar-v13.0.20.css?v=15.1.0-desktop2",
   "black-canvas-v15-1-0.css?v=15.1.0-light1",
-  "sync-config.js?v=15.2.2-mobile1",
+  "sync-config.js?v=15.2.3-sync1",
   "liquid-glass-v15.css?v=15.2.2-light1"
 ]) assert.ok(sw.includes(pin), `service worker missing ${pin}`);
 console.log("V15.2.3 desktop UI consistency validation passed.");
