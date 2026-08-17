@@ -236,7 +236,7 @@
         }
         const anchor = quick || theme;
         if (anchor.nextElementSibling !== customize) anchor.insertAdjacentElement("afterend", customize);
-        if (search && undo && undo.nextElementSibling !== redo) panel.insertBefore(undo, search);
+        if (search && undo) panel.insertBefore(undo, search);
         if (search && redo) panel.insertBefore(redo, search);
         panel.querySelectorAll(":scope > .menu-command-separator").forEach(separator => separator.remove());
         if (quickActions && quickActions.parentElement === panel && search && search.nextElementSibling !== quickActions) search.insertAdjacentElement("afterend", quickActions);
