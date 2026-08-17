@@ -220,13 +220,13 @@ html body .button-saved .saved-icon-container {
   flex:0 0 30px !important;
   border:0 !important;
   border-radius:0 !important;
-  background-image:url("./icons/finance-save-unsaved-v15-2-3.png") !important;
+  background-image:url("./icons/finance-save-unsaved-v15-2-3-r2.png") !important;
   background-repeat:no-repeat !important;
   background-position:center !important;
   background-size:30px 30px !important;
 }
 html body .button-saved.active .saved-icon-container {
-  background-image:url("./icons/finance-save-saved-v15-2-3.png") !important;
+  background-image:url("./icons/finance-save-saved-v15-2-3-r2.png") !important;
 }
 html body .button-saved .saved-icon {
   opacity:0 !important;
