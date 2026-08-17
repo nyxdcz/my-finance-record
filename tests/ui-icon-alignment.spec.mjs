@@ -43,13 +43,11 @@ test("V15.2.2 header moves Dashboard customization into More tools", async ({ pa
   await expect(menuItem).toHaveAttribute("role", "menuitem");
   await expect(menuItem).toHaveAttribute("aria-label", "Customize dashboard");
   await expect(menuItem.locator("strong")).toHaveText("Customize dashboard");
-
-  const iconGeometry = await menuItem.locator(".toolbar-icon svg").evaluate(element => {
-    const rect = element.getBoundingClientRect();
-    return { width:rect.width, height:rect.height };
-  });
-  expect(iconGeometry.width).toBeGreaterThan(0);
-  expect(iconGeometry.height).toBeGreaterThan(0);
+  const icon = menuItem.locator(".toolbar-icon svg");
+  await expect(icon).toHaveCount(1);
+  await expect(icon).toHaveAttribute("viewBox", "0 0 24 24");
+  await expect(icon.locator("rect")).toHaveCount(3);
+  await expect(icon.locator("path")).toHaveCount(1);
 });
 
 
