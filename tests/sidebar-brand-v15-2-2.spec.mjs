@@ -53,7 +53,7 @@ test("expanded sidebar uses My Finance Records and a compact stable pin", async 
 });
 
 test("sidebar brand shell cache is synchronized", () => {
-  const expected = "finance-v15-20260817-sync-status-r38";
+  const expected = "finance-v15-20260818-ui-refinement-r39";
   expect(source("version.json")).toContain(`"cacheVersion": "${expected}"`);
   expect(source("sw.js")).toContain(`const CACHE_VERSION = "${expected}"`);
   expect(source("pwa-update-v15-0-5.js")).toContain(`const CURRENT_CACHE_VERSION = "${expected}"`);
