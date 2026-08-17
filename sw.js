@@ -8,7 +8,8 @@ self.__FINANCE_APP_VERSION = APP_VERSION;
 // V15.2.2 hotfix: large pre-import recovery snapshots are stored in IndexedDB instead of localStorage metadata.
 // V15.2.2 hotfix: re-precache the expense dialog after removing the redundant required-fields and mode-note strip.
 // V15.2.2 hotfix: refresh the compact My Finance Records sidebar brand and pin geometry.
-const CACHE_VERSION = "finance-v15-20260816-sidebar-brand-r35";
+// V15.2.2 hotfix: compact phone Finance records and icon-only Add account / Schedule event actions.
+const CACHE_VERSION = "finance-v15-20260817-phone-finance-r36";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const DB_NAME = "simple-finance-project-records-v12-db";
