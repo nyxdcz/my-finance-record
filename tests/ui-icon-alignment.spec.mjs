@@ -1,13 +1,13 @@
 import { test, expect } from "@playwright/test";
 
-test("production V15.1.0 UI alignment uses the delivered final stylesheet", async ({ browser }) => {
+test("production V15.2.4 UI alignment uses the delivered final stylesheet", async ({ browser }) => {
   const context = await browser.newContext({ javaScriptEnabled:false });
   const page = await context.newPage();
   await page.goto("http://127.0.0.1:3000/index.html?page=dashboard", { waitUntil:"networkidle" });
 
   const styles = await page.locator('link[rel="stylesheet"]').evaluateAll(nodes => nodes.map(node => node.getAttribute("href") || ""));
   const dashboardCss = styles.findIndex(href => href.includes("dashboard-interactions.css?v=15.1.0-desktop3"));
-  const uiCss = styles.findIndex(href => href.includes("ui-icon-alignment-v15-0-5.css?v=15.1.0-ui3"));
+  const uiCss = styles.findIndex(href => href.includes("ui-icon-alignment-v15-0-5.css?v=15.2.4-ui1"));
   expect(dashboardCss).toBeGreaterThanOrEqual(0);
   expect(uiCss).toBeGreaterThan(dashboardCss);
   expect(styles.some(href => href.includes("ui-icon-alignment-v15-0-4.css?v=15.0.4-ui1"))).toBe(false);
