@@ -149,6 +149,61 @@
   }
   installCashFlowLayoutUpgrade();
 
+  function installQuickEntryToolsMenuRelocation() {
+    const doc = root.document;
+    if (!doc) return;
+    const apply = () => {
+      const panel = doc.getElementById("topbarToolsPanel");
+      const theme = doc.getElementById("themeToggleButton");
+      if (panel && theme) {
+        let button = doc.getElementById("quickEntryMenuButton");
+        if (!button) {
+          button = doc.createElement("button");
+          button.className = "topbar-tools-item";
+          button.id = "quickEntryMenuButton";
+          button.type = "button";
+          button.setAttribute("role", "menuitem");
+          button.setAttribute("aria-label", "Quick add");
+          button.title = "Quick add";
+          button.innerHTML = '<span class="toolbar-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><path d="M17 14v6M14 17h6"/></svg></span><span><strong>Quick add</strong><small>Add a finance or work record</small></span>';
+        }
+        if (theme.nextElementSibling !== button) theme.insertAdjacentElement("afterend", button);
+      }
+      const standalone = doc.getElementById("mobileAddExpenseButton");
+      if (standalone) {
+        standalone.hidden = true;
+        standalone.setAttribute("aria-hidden", "true");
+        standalone.tabIndex = -1;
+        standalone.dataset.movedToToolsMenu = "true";
+      }
+    };
+    const activate = event => {
+      const button = event.target.closest?.("#quickEntryMenuButton");
+      if (!button) return;
+      event.preventDefault();
+      if (typeof root.FinanceProductivityTools?.openQuickAdd === "function") {
+        root.FinanceProductivityTools.openQuickAdd();
+        return;
+      }
+      const fallback = doc.getElementById("mobileAddExpenseButton");
+      if (!fallback) return;
+      const wasHidden = fallback.hidden;
+      fallback.hidden = false;
+      fallback.click();
+      fallback.hidden = wasHidden;
+    };
+    doc.addEventListener("click", activate);
+    const start = () => {
+      apply();
+      if (!doc.body || doc.body.dataset.quickEntryMenuRelocationObserved === "true") return;
+      doc.body.dataset.quickEntryMenuRelocationObserved = "true";
+      const observer = new MutationObserver(() => apply());
+      observer.observe(doc.body, { childList:true, subtree:true });
+    };
+    if (doc.readyState === "loading") doc.addEventListener("DOMContentLoaded", start, { once:true }); else start();
+  }
+  installQuickEntryToolsMenuRelocation();
+
   function installPhoneFinanceCompactStyles() {
     const doc = root.document;
     if (!doc || doc.getElementById("phoneFinanceCompactV1522")) return;
