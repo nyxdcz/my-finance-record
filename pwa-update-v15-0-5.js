@@ -236,8 +236,9 @@
         }
         const anchor = quick || theme;
         if (anchor.nextElementSibling !== customize) anchor.insertAdjacentElement("afterend", customize);
-        if (search && undo) panel.insertBefore(undo, search);
-        if (search && redo) panel.insertBefore(redo, search);
+        if (customize && undo && customize.nextElementSibling !== undo) customize.insertAdjacentElement("afterend", undo);
+        if (undo && redo && undo.nextElementSibling !== redo) undo.insertAdjacentElement("afterend", redo);
+        if (redo && search && redo.nextElementSibling !== search) redo.insertAdjacentElement("afterend", search);
         panel.querySelectorAll(":scope > .menu-command-separator").forEach(separator => separator.remove());
         if (quickActions && quickActions.parentElement === panel && search && search.nextElementSibling !== quickActions) search.insertAdjacentElement("afterend", quickActions);
       }
