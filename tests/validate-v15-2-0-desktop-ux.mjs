@@ -12,7 +12,7 @@ const required = [
   [version.version === "15.2.2", "version.json is V15.2.2"],
   [pkg.version === "15.2.2", "package.json is V15.2.2"],
   [version.schemaVersion === 12 && version.cloudSchemaVersion === 3, "schemas remain 12/3"],
-  [version.cacheVersion === "finance-v15-20260817-phone-finance-r36", "phone-Finance refresh cache is declared"],
+  [version.cacheVersion === "finance-v15-20260817-phone-finance-r37", "phone-Finance/cloud-profile refresh cache is declared"],
   [index.includes("My Finance Records · V15.2.2"), "page title is V15.2.2"],
   [index.includes("recurring items checked"), "month navigation explains recurring preparation"],
   [index.includes("cleared because filters changed"), "selection reset is announced"],
