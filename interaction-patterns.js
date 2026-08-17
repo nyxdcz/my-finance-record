@@ -309,12 +309,53 @@
     if (value.title === "First half completed") value.removeAttribute("title");
   }
 
+  function renderOtherExpensesCompleteIcon(value) {
+    if (!value) return;
+    const existing = value.querySelector("img[data-other-expenses-complete-icon]");
+    if (!existing) {
+      value.dataset.otherExpensesOriginalText = value.textContent || "";
+      value.textContent = "";
+      const icon = document.createElement("img");
+      icon.className = "first-half-complete-icon";
+      icon.dataset.otherExpensesCompleteIcon = "true";
+      icon.alt = "";
+      icon.setAttribute("aria-hidden", "true");
+      value.appendChild(icon);
+    }
+    const icon = value.querySelector("img[data-other-expenses-complete-icon]");
+    const dark = document.documentElement.dataset.theme === "dark";
+    if (icon && icon.dataset.themeVariant !== (dark ? "dark" : "light")) {
+      icon.src = firstHalfCompletionIconSource();
+      icon.dataset.themeVariant = dark ? "dark" : "light";
+    }
+    value.classList.add("first-half-complete-value");
+    value.setAttribute("aria-label", "No other expenses");
+    value.title = "No other expenses";
+  }
+
+  function restoreOtherExpensesAmount(value) {
+    if (!value) return;
+    const icon = value.querySelector("img[data-other-expenses-complete-icon]");
+    if (icon) value.textContent = value.dataset.otherExpensesOriginalText || "";
+    delete value.dataset.otherExpensesOriginalText;
+    value.classList.remove("first-half-complete-value");
+    value.removeAttribute("aria-label");
+    if (value.title === "No other expenses") value.removeAttribute("title");
+  }
+
   function updateFirstHalfCompletionIcons() {
     ensureFirstHalfCompletionStyles();
     const month = selectedFinanceMonth();
     const finished = firstHalfFinished(month);
     const firstHalfValue = document.getElementById("legendEarlyTotal");
     const firstDifferenceValue = document.querySelector("#moneySummary > .summary-item:nth-child(2) .summary-card-value");
+    const otherExpensesValue = document.getElementById("legendOtherTotal");
+
+    const currentOtherAmount = otherExpensesValue?.querySelector("img[data-other-expenses-complete-icon]")
+      ? moneyTextValue(otherExpensesValue.dataset.otherExpensesOriginalText)
+      : moneyTextValue(otherExpensesValue?.textContent);
+    if (currentOtherAmount === 0) renderOtherExpensesCompleteIcon(otherExpensesValue);
+    else restoreOtherExpensesAmount(otherExpensesValue);
 
     if (!finished) {
       restoreFirstHalfAmount(firstHalfValue);
