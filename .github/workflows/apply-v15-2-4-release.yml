@@ -1,0 +1,39 @@
+name: Apply V15.2.4 release
+
+on:
+  push:
+    branches: [release/v15-2-4]
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out release branch
+        uses: actions/checkout@v7
+        with:
+          ref: release/v15-2-4
+          fetch-depth: 0
+      - name: Use Node.js 24
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          package-manager-cache: false
+      - name: Apply release metadata and notes
+        run: node scripts/apply-v15-2-4-release.mjs
+      - name: Commit release update
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md CHANGELOG.md version.json package.json package-lock.json index.html sw.js pwa-update-v15-0-5.js sync-config.js
+          if git diff --cached --quiet; then
+            echo "No release changes to commit."
+            exit 0
+          fi
+          git commit -m "chore: apply V15.2.4 release metadata"
+          git push origin HEAD:release/v15-2-4
