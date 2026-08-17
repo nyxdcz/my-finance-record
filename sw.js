@@ -9,6 +9,7 @@ self.__FINANCE_APP_VERSION = APP_VERSION;
 // V15.2.2 hotfix: re-precache the expense dialog after removing the redundant required-fields and mode-note strip.
 // V15.2.2 hotfix: refresh the compact My Finance Records sidebar brand and pin geometry.
 // V15.2.2 hotfix: compact phone Finance records and icon-only Add account / Schedule event actions.
+// V15.2.2 hotfix: refresh phone toolbar grid, Finance tabs, and expense action geometry after overlap repair.
 const CACHE_VERSION = "finance-v15-20260817-phone-finance-r36";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;

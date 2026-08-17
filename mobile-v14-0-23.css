@@ -242,3 +242,128 @@
     max-width: calc(100vw - 28px);
   }
 }
+
+/* V15.2.2 phone overlap hotfix · keep the mobile toolbar and record actions in their intended grid slots. */
+@media (max-width: 700px) {
+  html body .topbar .topbar-actions #quickAddExpense:not([hidden]) {
+    position: static !important;
+    inset: auto !important;
+    top: auto !important;
+    right: auto !important;
+    grid-area: add !important;
+    width: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    max-height: 44px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    place-self: center !important;
+    z-index: auto !important;
+  }
+
+  html body .finance-workspace-marquee-row {
+    position: static !important;
+    top: auto !important;
+    z-index: auto !important;
+    display: block !important;
+    margin: 0 0 10px !important;
+  }
+  html body .finance-workspace-marquee-row > .money-workspace-switcher {
+    position: static !important;
+    top: auto !important;
+    width: 100% !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    max-height: 44px !important;
+    margin: 0 !important;
+    background: var(--surface) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    overflow: hidden !important;
+  }
+  html body .finance-workspace-marquee-row > .money-workspace-switcher .workspace-switcher-button {
+    min-width: 0 !important;
+    min-height: 42px !important;
+  }
+
+  html body #availableMoneySection #addAccountButton::before,
+  html body .project-calendar-v13020 [data-pc-add]::before,
+  html body .project-calendar-v13020 [data-pc-full-add]::before,
+  html body #availableMoneySection #addAccountButton::after,
+  html body .project-calendar-v13020 [data-pc-add]::after,
+  html body .project-calendar-v13020 [data-pc-full-add]::after {
+    content: none !important;
+    display: none !important;
+  }
+  html body #availableMoneySection #addAccountButton,
+  html body .project-calendar-v13020 [data-pc-add],
+  html body .project-calendar-v13020 [data-pc-full-add] {
+    width: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    max-height: 44px !important;
+    padding: 0 !important;
+    gap: 0 !important;
+    overflow: hidden !important;
+  }
+  html body #availableMoneySection #addAccountButton .phone-only-action-icon,
+  html body .project-calendar-v13020 [data-pc-add] .phone-only-action-icon,
+  html body .project-calendar-v13020 [data-pc-full-add] .phone-only-action-icon {
+    display: grid !important;
+    width: 20px !important;
+    height: 20px !important;
+  }
+  html body #availableMoneySection #addAccountButton .phone-only-action-label,
+  html body .project-calendar-v13020 [data-pc-add] .phone-only-action-label,
+  html body .project-calendar-v13020 [data-pc-full-add] .phone-only-action-label {
+    display: none !important;
+  }
+
+  html body #money .record-row[data-expense-row] {
+    min-height: 0 !important;
+    height: auto !important;
+    align-content: start !important;
+    padding: 9px 10px !important;
+    gap: 6px 10px !important;
+  }
+  html body #money .record-row[data-expense-row] > .mobile-record-actions {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 44px !important;
+    gap: 6px !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 44px !important;
+    height: 44px !important;
+    margin: 1px 0 0 !important;
+  }
+  html body #money .record-row[data-expense-row] > .mobile-record-actions > .button {
+    width: 100% !important;
+    min-width: 0 !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    margin: 0 !important;
+  }
+  html body #money .record-row[data-expense-row] > .mobile-record-actions > .record-more-menu {
+    width: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    margin: 0 !important;
+    justify-self: end !important;
+  }
+  html body #money .record-row[data-expense-row] > .mobile-record-actions > .record-more-menu > .overflow-menu-trigger {
+    width: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+}
