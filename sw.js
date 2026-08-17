@@ -10,7 +10,8 @@ self.__FINANCE_APP_VERSION = APP_VERSION;
 // V15.2.2 hotfix: refresh the compact My Finance Records sidebar brand and pin geometry.
 // V15.2.2 hotfix: compact phone Finance records and icon-only Add account / Schedule event actions.
 // V15.2.2 hotfix: refresh phone toolbar grid, Finance tabs, and expense action geometry after overlap repair.
-const CACHE_VERSION = "finance-v15-20260817-phone-finance-r36";
+// V15.2.2 hotfix: require explicit Cloud Profile selection when an account has multiple finance profiles.
+const CACHE_VERSION = "finance-v15-20260817-phone-finance-r37";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const DB_NAME = "simple-finance-project-records-v12-db";
@@ -163,7 +164,7 @@ self.addEventListener("fetch", event => {
     return;
   }
   if (url.origin !== self.location.origin) return;
-  if (url.pathname.endsWith("privacy-lock.js")) {
+  if (url.pathname.endsWith("privacy-lock.js") || url.pathname.endsWith("cloud-sync-lifecycle.js")) {
     event.respondWith(networkFirstCriticalAsset(request));
     return;
   }
