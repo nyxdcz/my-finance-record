@@ -7,7 +7,7 @@ const sw = fs.readFileSync("sw.js", "utf8");
 const index = fs.readFileSync("index.html", "utf8");
 const version = JSON.parse(fs.readFileSync("version.json", "utf8"));
 
-assert.equal(version.version, "15.2.2");
+assert.equal(version.version, "15.2.3");
 assert.equal(version.schemaVersion, 12);
 assert.equal(version.cloudSchemaVersion, 3);
 assert.equal(version.cacheVersion, "finance-v15-20260817-sync-status-r38");
@@ -17,4 +17,4 @@ assert.match(sync, /liquid-glass-v15\.css\?v=\$\{VERSION\}-light1/);
 assert.match(sw, /liquid-glass-v15\.css\?v=15\.2\.2-light1/);
 assert.match(sw, /finance-v15-20260817-sync-status-r38/);
 assert.match(index, /finance-v15-20260817-sync-status-r38/);
-console.log("V15.2.2 borderless month-navigation regression passed.");
+console.log("V15.2.3 borderless month-navigation regression passed.");
