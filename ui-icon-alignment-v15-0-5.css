@@ -323,3 +323,115 @@ html[data-theme-preference="light"] body #themeToggleText::after {
 html[data-theme-preference="dark"] body #themeToggleText::after {
   content:"Dark";
 }
+
+/* V15.2.4 · Desktop month selector uses the clean, flat More tools visual language. */
+@media (min-width:851px) {
+  html body .topbar-actions .month-navigator {
+    display:flex !important;
+    gap:0 !important;
+    padding:0 !important;
+    border:0 !important;
+    border-radius:0 !important;
+    background:transparent !important;
+    background-image:none !important;
+    box-shadow:none !important;
+    -webkit-backdrop-filter:none !important;
+    backdrop-filter:none !important;
+    overflow:visible !important;
+  }
+
+  html body .topbar-actions .month-navigator > .month-nav-button,
+  html body .topbar-actions .month-navigator > .month-control {
+    box-sizing:border-box !important;
+    height:38px !important;
+    min-height:38px !important;
+    max-height:38px !important;
+    margin:0 !important;
+    border:1px solid var(--line) !important;
+    border-radius:0 !important;
+    background:var(--surface) !important;
+    background-image:none !important;
+    box-shadow:none !important;
+    -webkit-backdrop-filter:none !important;
+    backdrop-filter:none !important;
+  }
+
+  html body .topbar-actions .month-navigator > #previousMonthButton {
+    width:38px !important;
+    min-width:38px !important;
+    max-width:38px !important;
+    padding:0 !important;
+    border-inline-end:0 !important;
+    border-radius:8px 0 0 8px !important;
+  }
+
+  html body .topbar-actions .month-navigator > .month-control {
+    width:190px !important;
+    padding:0 !important;
+    border-inline-end:0 !important;
+  }
+
+  html body .topbar-actions .month-navigator > #nextMonthButton {
+    width:38px !important;
+    min-width:38px !important;
+    max-width:38px !important;
+    padding:0 !important;
+    border-radius:0 8px 8px 0 !important;
+  }
+
+  html body .topbar-actions .month-navigator .month-display-button {
+    box-sizing:border-box !important;
+    width:100% !important;
+    height:36px !important;
+    min-height:36px !important;
+    padding:4px 10px !important;
+    border:0 !important;
+    border-radius:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
+    -webkit-backdrop-filter:none !important;
+    backdrop-filter:none !important;
+  }
+
+  html body .topbar-actions .month-navigator > .month-nav-button:not(:disabled):hover,
+  html body .topbar-actions .month-navigator .month-display-button:not(:disabled):hover {
+    background:var(--surface-soft) !important;
+  }
+
+  html body .topbar-actions .month-navigator > .month-current-button {
+    box-sizing:border-box !important;
+    height:38px !important;
+    min-height:38px !important;
+    max-height:38px !important;
+    margin-inline-start:8px !important;
+    padding-inline:10px !important;
+    border:1px solid var(--line) !important;
+    border-radius:8px !important;
+    background:var(--surface) !important;
+    background-image:none !important;
+    box-shadow:none !important;
+    -webkit-backdrop-filter:none !important;
+    backdrop-filter:none !important;
+  }
+
+  html body .topbar-actions .month-navigator > .month-status-chip {
+    box-sizing:border-box !important;
+    height:38px !important;
+    min-height:38px !important;
+    max-height:38px !important;
+    margin-inline-start:8px !important;
+    border-radius:8px !important;
+  }
+
+  html body .topbar-actions .month-display-label {
+    color:var(--muted) !important;
+    font-size:.61rem !important;
+    font-weight:750 !important;
+  }
+
+  html body .topbar-actions .month-display-value {
+    color:var(--text) !important;
+    font-size:.76rem !important;
+    font-weight:800 !important;
+  }
+}
