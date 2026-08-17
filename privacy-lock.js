@@ -509,3 +509,233 @@
     get status(){ return {...state}; }
   };
 })();
+
+/* V15.2.2 mobile cloud-revert safety guard.
+   Runs before Cloud Sync initializes because privacy-lock.js is loaded first and is network-first in the service worker. */
+(() => {
+  const PROFILE_META_KEY="simple-finance-profiles-v1";
+  const ACTIVE_DATA_KEY="simple-finance-project-records-v2";
+  const PROFILE_DATA_PREFIX="simple-finance-profile-data-v1:";
+  const CLOUD_META_PREFIX="simple-finance-cloud-sync-v3:";
+  const CLOUD_BASE_PREFIX="simple-finance-cloud-record-base-v3:";
+  const CLOUD_QUEUE_PREFIX="simple-finance-cloud-record-queue-v3:";
+  const CLOUD_CONFIG_KEY="simple-finance-cloud-config-v1";
+  const GUARD_MARKER_PREFIX="simple-finance-cloud-revert-guard-v1:";
+  const HOLD_UNTIL=253402300799000;
+  const APP_VERSION_CODE=130000;
+  const ARRAY_COLLECTIONS=["expenses","projects","incomeRecords","savingsGoals","accountLedger","accountReconciliations","budgetTemplates","expenseTemplates"];
+  const MAP_COLLECTIONS=["monthlyReports","monthlyChecklists","monthlyBudgets","iconLibrary"];
+  const KNOWN_TOP_LEVEL=new Set([
+    ...ARRAY_COLLECTIONS,...MAP_COLLECTIONS,
+    "accounts","accountTypes","accountOrder","accountIcons","expenseRecurrenceSkips",
+    "savingsSettings","projectCalendarSettings","salaryWorkSettings","ledgerSettings","budgetSettings","productivitySettings","reminderSettings"
+  ]);
+
+  function clone(value){
+    try { return structuredClone(value); } catch(error){}
+    try { return JSON.parse(JSON.stringify(value)); } catch(error) { return value; }
+  }
+  function readJson(key,fallback=null){
+    try { const raw=localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; } catch(error) { return fallback; }
+  }
+  function isObject(value){ return Boolean(value && typeof value==="object" && !Array.isArray(value)); }
+  function recordKey(collection,recordId){ return `${collection}\u001f${recordId}`; }
+
+  function storedProfileContext(){
+    const meta=readJson(PROFILE_META_KEY,null);
+    const profiles=Array.isArray(meta?.profiles) ? meta.profiles : [];
+    const active=profiles.find(profile=>profile?.id===meta?.activeProfileId) || profiles[0];
+    if(!active?.id) return null;
+    return { profileId:String(active.id), cloudProfileId:String(active.cloudProfileId || "") };
+  }
+
+  function jwtSubject(token){
+    try {
+      const part=String(token||"").split(".")[1];
+      if(!part) return "";
+      const normalized=part.replace(/-/g,"+").replace(/_/g,"/");
+      const json=JSON.parse(atob(normalized+"=".repeat((4-normalized.length%4)%4)));
+      return String(json?.sub || "");
+    } catch(error) { return ""; }
+  }
+
+  function authUserIdFromValue(value){
+    if(!value || typeof value!=="object") return "";
+    const direct=value?.user?.id || value?.currentSession?.user?.id || value?.session?.user?.id || value?.data?.user?.id;
+    if(direct) return String(direct);
+    const token=value?.access_token || value?.currentSession?.access_token || value?.session?.access_token || value?.data?.session?.access_token;
+    return jwtSubject(token);
+  }
+
+  function storedSupabaseUserId(){
+    const config=readJson(CLOUD_CONFIG_KEY,{}) || {};
+    let preferred="";
+    try {
+      const host=new URL(String(config.supabaseUrl||"")).hostname;
+      const projectRef=host.split(".")[0];
+      if(projectRef) preferred=`sb-${projectRef}-auth-token`;
+    } catch(error){}
+    const keys=[];
+    if(preferred) keys.push(preferred);
+    for(let index=0; index<localStorage.length; index+=1){
+      const key=localStorage.key(index);
+      if(/^sb-.+-auth-token$/.test(String(key||"")) && !keys.includes(key)) keys.push(key);
+    }
+    for(const key of keys){
+      const userId=authUserIdFromValue(readJson(key,null));
+      if(userId) return userId;
+    }
+    return "";
+  }
+
+  function meaningfulFinanceData(source){
+    if(!isObject(source)) return false;
+    if(ARRAY_COLLECTIONS.some(key=>Array.isArray(source[key]) && source[key].length)) return true;
+    if(MAP_COLLECTIONS.some(key=>isObject(source[key]) && Object.keys(source[key]).length)) return true;
+    const accounts=isObject(source.accounts) ? source.accounts : {};
+    if(Object.keys(accounts).length>1) return true;
+    if(Object.values(accounts).some(value=>Math.abs(Number(value||0))>0.005)) return true;
+    return false;
+  }
+
+  function recoveryRecordMap(source){
+    const records={};
+    const add=(collection,recordId,payload,sortIndex=0)=>{
+      if(!recordId) return;
+      const id=String(recordId);
+      records[recordKey(collection,id)]={ collection,recordId:id,payload:clone(payload||{}),sortIndex:Number(sortIndex||0) };
+    };
+
+    ARRAY_COLLECTIONS.forEach(collection=>{
+      (Array.isArray(source?.[collection]) ? source[collection] : []).forEach((item,index)=>{ if(item?.id) add(collection,item.id,item,index); });
+    });
+
+    const accounts=isObject(source?.accounts) ? source.accounts : {};
+    const accountOrder=Array.isArray(source?.accountOrder) ? source.accountOrder : Object.keys(accounts);
+    accountOrder.forEach((name,index)=>{
+      if(!Object.prototype.hasOwnProperty.call(accounts,name)) return;
+      add("accounts",name,{ name,balance:Number(accounts[name]||0),type:source?.accountTypes?.[name]||"Other",icon:source?.accountIcons?.[name]||null },index);
+    });
+    Object.keys(accounts).filter(name=>!accountOrder.includes(name)).forEach((name,index)=>{
+      add("accounts",name,{ name,balance:Number(accounts[name]||0),type:source?.accountTypes?.[name]||"Other",icon:source?.accountIcons?.[name]||null },accountOrder.length+index);
+    });
+
+    MAP_COLLECTIONS.forEach(collection=>{
+      Object.entries(isObject(source?.[collection]) ? source[collection] : {}).forEach(([id,payload],index)=>add(collection,id,payload,index));
+    });
+
+    (Array.isArray(source?.expenseRecurrenceSkips) ? source.expenseRecurrenceSkips : []).forEach((item,index)=>{
+      const id=`${String(item?.seriesId||"")}::${String(item?.month||"")}`;
+      if(item?.seriesId && item?.month) add("expenseRecurrenceSkips",id,item,index);
+    });
+
+    add("settings","preferences",{
+      savingsSettings:clone(source?.savingsSettings||{}),
+      projectCalendarSettings:clone(source?.projectCalendarSettings||{}),
+      salaryWorkSettings:clone(source?.salaryWorkSettings||{}),
+      ledgerSettings:clone(source?.ledgerSettings||{}),
+      budgetSettings:clone(source?.budgetSettings||{}),
+      productivitySettings:clone(source?.productivitySettings||{}),
+      reminderSettings:clone(source?.reminderSettings||{})
+    },0);
+
+    const extra={};
+    Object.keys(source||{}).forEach(key=>{ if(!KNOWN_TOP_LEVEL.has(key)) extra[key]=clone(source[key]); });
+    if(Object.keys(extra).length) add("extra","root",extra,0);
+    return records;
+  }
+
+  function resolveScope(meta,cloudProfileId){
+    const existing=String(meta?.initializedUserId||"");
+    if(existing){
+      if(existing.endsWith(`:${cloudProfileId}`)) return existing;
+      return "";
+    }
+    const userId=storedSupabaseUserId();
+    return userId ? `${userId}:${cloudProfileId}` : "";
+  }
+
+  function armRevertGuard(){
+    const context=storedProfileContext();
+    if(!context?.cloudProfileId) return { armed:false,reason:"no-cloud-profile" };
+    const profileDataRaw=localStorage.getItem(`${PROFILE_DATA_PREFIX}${context.profileId}`);
+    if(!profileDataRaw) return { armed:false,reason:"no-established-profile-data" };
+    const profileData=readJson(`${PROFILE_DATA_PREFIX}${context.profileId}`,{});
+    const activeData=readJson(ACTIVE_DATA_KEY,null);
+    const source=meaningfulFinanceData(activeData) ? activeData : profileData;
+    if(!meaningfulFinanceData(source)) return { armed:false,reason:"no-local-finance-data" };
+
+    const baseKey=`${CLOUD_BASE_PREFIX}${context.profileId}`;
+    const base=readJson(baseKey,{}) || {};
+    if(Object.keys(base).length) return { armed:false,reason:"sync-baseline-present" };
+
+    const metaKey=`${CLOUD_META_PREFIX}${context.profileId}`;
+    const queueKey=`${CLOUD_QUEUE_PREFIX}${context.profileId}`;
+    const meta=readJson(metaKey,{}) || {};
+    const scope=resolveScope(meta,context.cloudProfileId);
+    if(!scope) return { armed:false,reason:"cloud-account-unresolved" };
+
+    const records=recoveryRecordMap(source);
+    if(!Object.keys(records).length) return { armed:false,reason:"no-records" };
+    const queue=readJson(queueKey,{}) || {};
+    const now=new Date().toISOString();
+    let seeded=0;
+    Object.entries(records).forEach(([key,row])=>{
+      if(queue[key]) return;
+      queue[key]={
+        key,
+        collection:row.collection,
+        recordId:row.recordId,
+        payload:clone(row.payload),
+        sortIndex:Number(row.sortIndex||0),
+        deleted:false,
+        baseRevision:0,
+        basePayload:null,
+        baseSortIndex:0,
+        minWriterVersionCode:APP_VERSION_CODE,
+        status:"pending",
+        attempts:0,
+        nextAttemptAt:HOLD_UNTIL,
+        updatedAt:now,
+        reason:"Recovered local Finance record waiting for cloud comparison",
+        lastError:"Cloud sync baseline was missing on this device. The local record is protected until the cloud version is compared."
+      };
+      seeded+=1;
+    });
+
+    meta.initializedUserId=scope;
+    meta.initializedProfileId=context.cloudProfileId;
+    meta.status=seeded ? "Protected local recovery" : (meta.status||"Sync recovery ready");
+    localStorage.setItem(metaKey,JSON.stringify(meta));
+    localStorage.setItem(queueKey,JSON.stringify(queue));
+    const result={ armed:true,profileId:context.profileId,cloudProfileId:context.cloudProfileId,seeded,protectedUntil:HOLD_UNTIL,armedAt:now };
+    localStorage.setItem(`${GUARD_MARKER_PREFIX}${context.profileId}`,JSON.stringify(result));
+    return result;
+  }
+
+  let lastResult;
+  try { lastResult=armRevertGuard(); } catch(error) { lastResult={armed:false,reason:"guard-error",error:String(error?.message||error)}; }
+
+  function installFastResumeSync(){
+    let timer=null;
+    const request=reason=>{
+      clearTimeout(timer);
+      timer=setTimeout(()=>{
+        if(!navigator.onLine || document.hidden) return;
+        const sync=window.FinanceCloudSync?.syncNow;
+        if(typeof sync!=="function") return;
+        Promise.resolve(sync({reason:`fast-${reason}`})).catch(()=>{});
+      },120);
+    };
+    window.addEventListener("online",()=>request("online"));
+    window.addEventListener("focus",()=>request("focus"));
+    window.addEventListener("pageshow",()=>request("pageshow"));
+    document.addEventListener("visibilitychange",()=>{ if(!document.hidden) request("visible"); });
+    setTimeout(()=>request("startup"),1500);
+  }
+
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",installFastResumeSync,{once:true});
+  else installFastResumeSync();
+
+  window.FinanceCloudRevertGuard={ arm:armRevertGuard, buildRecordMap:recoveryRecordMap, get last(){ return clone(lastResult); }, holdUntil:HOLD_UNTIL };
+})();
