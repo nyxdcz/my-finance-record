@@ -569,7 +569,7 @@
     if (label === "Syncing…") return "syncing";
     if (label === "Needs sync") return "needs-sync";
     if (label === "Sync issue") return "sync-issue";
-    if (label === "Offline") return "offline";
+    if (label === "Offline" || /^\d+ pending$/.test(label)) return "offline";
     return "setup";
   }
 

@@ -1,3 +1,8 @@
+## 15.2.3 · 2026-08-17
+- Replaced the Cloud Sync toolbar artwork with the supplied state icons and matching colors: green Synced, orange Syncing, red Needs sync attention, and red Sync issue/Offline unavailable.
+- Made the icon and text inherit the same state color on desktop and phone, including offline states that still have queued pending records.
+- Rotated the PWA cache to `finance-v15-20260817-sync-status-r38` and updated release metadata/README. Finance Schema 12, Cloud Schema V3, records, calculations, conflict resolution, and the five-minute sync cadence are unchanged.
+
 ## 15.2.2 · 2026-08-16
 - Refined the phone UI across 320–428px with corrected sticky workspace navigation, 44px touch targets, safer overflow menus, and a narrow Paid Expenses fallback.
 - Added deliberate mobile treatment for V15.2.1 filter chips, empty/search recovery actions, Budget Plan actions, and Project Agenda menus while preserving the completed desktop interface.
