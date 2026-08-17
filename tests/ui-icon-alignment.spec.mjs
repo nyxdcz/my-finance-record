@@ -82,7 +82,7 @@ test("V15.2.2 desktop topbar keeps only persistent controls at the Synced 38px h
 });
 
 
-test("V15.1.0 desktop month navigation removes its surrounding line", async ({ page }) => {
+test("V15.2.4 desktop month navigation uses flat segmented More tools chrome", async ({ page }) => {
   await page.setViewportSize({ width:1440, height:900 });
   await page.goto("http://127.0.0.1:3000/index.html?page=dashboard", { waitUntil:"networkidle" });
   await page.evaluate(() => window.FinancePrivacyLock?.unlock?.({ email:"month-nav-border-test@example.invalid" }));
@@ -94,23 +94,34 @@ test("V15.1.0 desktop month navigation removes its surrounding line", async ({ p
     const rect = element.getBoundingClientRect();
     return {
       height:rect.height,
-      borderColor:style.borderTopColor,
+      borderWidth:style.borderTopWidth,
       background:style.backgroundColor,
-      shadow:style.boxShadow
+      shadow:style.boxShadow,
+      backdrop:style.backdropFilter
     };
   });
   expect(shellStyle.height).toBe(38);
-  expect(shellStyle.borderColor).toBe("rgba(0, 0, 0, 0)");
+  expect(shellStyle.borderWidth).toBe("0px");
   expect(shellStyle.background).toBe("rgba(0, 0, 0, 0)");
   expect(shellStyle.shadow).toBe("none");
+  expect(shellStyle.backdrop).toBe("none");
 
   for (const selector of ["#previousMonthButton", "#monthControl", "#nextMonthButton"]) {
-    const borderWidth = await page.locator(selector).evaluate(element => getComputedStyle(element).borderTopWidth);
-    expect(borderWidth, `${selector} should not show a surrounding border`).toBe("0px");
+    const style = await page.locator(selector).evaluate(element => {
+      const computed = getComputedStyle(element);
+      return { height:element.getBoundingClientRect().height, borderWidth:computed.borderTopWidth, backdrop:computed.backdropFilter };
+    });
+    expect(style.height, `${selector} should stay at the compact toolbar height`).toBe(38);
+    expect(style.borderWidth, `${selector} should use the flat segmented outline`).toBe("1px");
+    expect(style.backdrop, `${selector} should not use glass blur`).toBe("none");
   }
 
   const current = page.locator("#currentMonthButton:not([hidden]), #monthStatusChip:not([hidden])").first();
   await expect(current).toBeVisible();
-  const currentBorderWidth = await current.evaluate(element => getComputedStyle(element).borderTopWidth);
-  expect(currentBorderWidth).toBe("0px");
+  const currentStyle = await current.evaluate(element => {
+    const style = getComputedStyle(element);
+    return { height:element.getBoundingClientRect().height, marginLeft:style.marginLeft };
+  });
+  expect(currentStyle.height).toBe(38);
+  expect(currentStyle.marginLeft).toBe("8px");
 });
