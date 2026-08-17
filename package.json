@@ -10,7 +10,7 @@
     "build": "echo 'No build step required'",
     "lint": "eslint .",
     "inspect": "node tests/inspect-project.mjs",
-    "test": "node tests/validate-finance-marquee-source-v15-1-0.mjs && node tests/validate-desktop-ui-phase1-v15-1-0.mjs && node tests/validate-month-navigation-borderless-v15-1-0.mjs && node tests/validate-desktop-ui-consistency-v15-1-0.mjs && node tests/validate-available-money-border-v15-1-0.mjs && node tests/validate-spend-label-v15-1-0.mjs && node tests/validate-black-canvas-v15-1-0.mjs && node tests/validate-header-ui-v15-0-5.mjs && node tests/validate-pwa-updater-v15-0-5.mjs && node tests/validate-record-spending-v15-0-4.mjs && node tests/validate-safe-multidevice-sync.mjs && node tests/validate-expense-screenshot.mjs && node tests/validate-v15-2-0-desktop-ux.mjs && node tests/validate-v15-2-2-mobile-ui.mjs",
+    "test": "node tests/validate-finance-marquee-source-v15-1-0.mjs && node tests/validate-desktop-ui-phase1-v15-1-0.mjs && node tests/validate-month-navigation-borderless-v15-1-0.mjs && node tests/validate-desktop-ui-consistency-v15-1-0.mjs && node tests/validate-available-money-border-v15-1-0.mjs && node tests/validate-spend-label-v15-1-0.mjs && node tests/validate-black-canvas-v15-1-0.mjs && node tests/validate-header-ui-v15-0-5.mjs && node tests/validate-pwa-updater-v15-0-5.mjs && node tests/validate-record-spending-v15-0-4.mjs && node tests/validate-safe-multidevice-sync.mjs && node tests/validate-mobile-cloud-revert-safety.mjs && node tests/validate-expense-screenshot.mjs && node tests/validate-v15-2-0-desktop-ux.mjs && node tests/validate-v15-2-2-mobile-ui.mjs",
     "test:browser": "playwright test",
     "maintainability": "node tests/check-maintainability.mjs",
     "audit": "npm audit --omit=dev",
