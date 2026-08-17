@@ -33,6 +33,8 @@ for (const name of fs.readdirSync("tests")) {
     ['assert.equal(version.version,"15.2.2");', 'assert.equal(version.version,"15.2.3");'],
     ['assert.strictEqual(version.version, "15.2.2");', 'assert.strictEqual(version.version, "15.2.3");'],
     ['expect(version.version).toBe("15.2.2")', 'expect(version.version).toBe("15.2.3")'],
+    ['version.version === "15.2.2"', 'version.version === "15.2.3"'],
+    ['version.json is V15.2.2', 'version.json is V15.2.3'],
     ['const APP_VERSION = "15\\.2\\.2"', 'const APP_VERSION = "15\\.2\\.3"'],
     ['const APP_VERSION = "15.2.2"', 'const APP_VERSION = "15.2.3"'],
     ['sync-config.js?v=15.2.2-mobile1', `sync-config.js?v=${SYNC_PIN}`],
