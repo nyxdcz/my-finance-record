@@ -18,7 +18,7 @@ const version = JSON.parse(read("version.json"));
 assert.equal(version.version, "15.2.2");
 assert.equal(version.schemaVersion, 12);
 assert.equal(version.cloudSchemaVersion, 3);
-assert.equal(version.cacheVersion, "finance-v15-20260817-phone-finance-r37");
+assert.equal(version.cacheVersion, "finance-v15-20260817-sync-status-r38");
 assert.match(app, /--desktop-header-height:\s*64px/);
 assert.match(app, /--desktop-page-gutter:\s*24px/);
 assert.match(app, /--workspace-card-radius:\s*9px/);
@@ -62,8 +62,8 @@ for (const pin of [
   "black-canvas-v15-1-0.css?v=15.1.0-light1",
   "sync-config.js?v=15.2.2-mobile1"
 ]) assert.ok(index.includes(pin), `index missing ${pin}`);
-assert.ok(index.includes('const APP_CACHE_VERSION = "finance-v15-20260816-mobile-ui-ux-r32";'));
-assert.ok(sw.includes("finance-v15-20260817-phone-finance-r37"));
+assert.ok(index.includes('const APP_CACHE_VERSION = "finance-v15-20260817-sync-status-r38";'));
+assert.ok(sw.includes("finance-v15-20260817-sync-status-r38"));
 for (const pin of [
   "app.css?v=15.1.0-desktop3",
   "dashboard-interactions.css?v=15.1.0-desktop3",
