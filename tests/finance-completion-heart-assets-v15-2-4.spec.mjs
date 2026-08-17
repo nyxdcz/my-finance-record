@@ -2,8 +2,8 @@ import { createHash } from "node:crypto";
 import { test, expect } from "@playwright/test";
 
 const EXPECTED = {
-  light:"1bbfc55061177f3afccb85371fb69fa600addff9fca6dbbccaae71028644da1f",
-  dark:"8a3d04ac167510232f44fa183ac704778b46f87df6d5c0125c0e9b8da606a80d"
+  light:"98999e5da1549a7ffdf0bb170400b91b01c806868fc259cff80c90fa6b5cc79e",
+  dark:"f0220d0b819f34370a5a3179a09bc1ba0ad813bd60161909a1357db0c50e972b"
 };
 
 async function assetSha256(request, path) {
@@ -12,14 +12,16 @@ async function assetSha256(request, path) {
   return createHash("sha256").update(await response.body()).digest("hex");
 }
 
-test("Finance completion hearts use the exact clean uploaded PNGs", async ({ request }) => {
-  expect(await assetSha256(request, "/icons/heart-smile-light-v15-2-4-r3.png")).toBe(EXPECTED.light);
-  expect(await assetSha256(request, "/icons/heart-smile-dark-v15-2-4-r3.png")).toBe(EXPECTED.dark);
+test("Finance completion hearts use the exact clean uploaded PNGs without the line", async ({ request }) => {
+  for (const revision of ["r3", "r4"]) {
+    expect(await assetSha256(request, `/icons/heart-smile-light-v15-2-4-${revision}.png`)).toBe(EXPECTED.light);
+    expect(await assetSha256(request, `/icons/heart-smile-dark-v15-2-4-${revision}.png`)).toBe(EXPECTED.dark);
+  }
 
   const cssResponse = await request.get("http://127.0.0.1:3000/ui-icon-alignment-v15-0-5.css", { headers:{ "cache-control":"no-cache" } });
   expect(cssResponse.ok()).toBeTruthy();
   const css = await cssResponse.text();
-  expect(css).toContain('heart-smile-light-v15-2-4-r3.png');
-  expect(css).toContain('heart-smile-dark-v15-2-4-r3.png');
+  expect(css).toContain('heart-smile-light-v15-2-4-r4.png');
+  expect(css).toContain('heart-smile-dark-v15-2-4-r4.png');
   expect(css).not.toMatch(/heart-smile-(?:light|dark)-v15-2-4-r2\.png/);
 });
