@@ -266,3 +266,19 @@ html body #money .legend > .legend-item .legend-dot {
   -webkit-mask-size:contain;
   mask-size:contain;
 }
+
+/* V15.2.4 · Finance Spend keeps its existing small icon dimensions and uses the exact supplied receipt artwork. */
+html body #money .account-card-actions .account-spend-button > svg {
+  background-image:url("./icons/finance-spend-light-v15-2-4.png") !important;
+  background-repeat:no-repeat !important;
+  background-position:center !important;
+  background-size:contain !important;
+  stroke:transparent !important;
+  fill:transparent !important;
+}
+html[data-theme="dark"] body #money .account-card-actions .account-spend-button > svg {
+  background-image:url("./icons/finance-spend-dark-v15-2-4.png") !important;
+}
+html[data-theme="light"] body #money .account-card-actions .account-spend-button > svg {
+  background-image:url("./icons/finance-spend-light-v15-2-4.png") !important;
+}
