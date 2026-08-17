@@ -1,0 +1,32 @@
+name: Finalize V15.2.3 validation
+
+on:
+  push:
+    branches:
+      - feat/v15-2-3-sync-status-icons
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: feat/v15-2-3-sync-status-icons
+          fetch-depth: 0
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          package-manager-cache: false
+      - run: node scripts/finalize-v15-2-3-validation.mjs
+      - name: Commit final validation alignment
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "fix: finalize V15.2.3 validation and asset pins"
+          git push origin HEAD:feat/v15-2-3-sync-status-icons
