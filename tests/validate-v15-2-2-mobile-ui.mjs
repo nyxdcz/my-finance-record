@@ -39,6 +39,6 @@ assert.match(mobile, /max-height: 520px/);
 assert.match(updater, /id = "phoneFinanceCompactV1522"/);
 assert.match(updater, /phone-icon-only-action/);
 assert.match(updater, /data-pc-add/);
-assert.match(updater, /grid-template-areas:\"title amount\" \"due account\" \"actions actions\"/);
+assert.match(updater, /grid-template-areas:"title amount" "due account" "actions actions"/);
 assert.match(cloud, /5\*60\*1000/);
 console.log("V15.2.2 mobile UI/UX and compact Finance source regression passed.");
