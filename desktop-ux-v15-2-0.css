@@ -28,16 +28,18 @@
   min-height:170px;
 }
 #dashCashFlowChart .cash-flow-chart-main .chart-legend{
-  margin:6px 0 0;
-  padding-top:6px;
-  border-top:1px solid var(--line);
+  flex:0 0 auto;
+  margin-top:8px;
 }
 #dashCashFlowChart .cash-flow-summary-panel{
-  display:flex;
   min-width:0;
+  display:flex;
   flex-direction:column;
   gap:9px;
-  padding:10px;
+  padding:10px 11px;
+  border:1px solid var(--line);
+  border-radius:8px;
+  background:var(--surface-soft);
 }
 #dashCashFlowChart .cash-flow-summary-head{
   display:flex;
@@ -174,5 +176,33 @@
 }
 #topbarToolsPanel #themeToggleText::after{
   display:block;
+  line-height:20px !important;
+}
+
+/* V15.2.4-r2 · Compact Appearance row aligns with the other More tools items. */
+#topbarToolsPanel #themeToggleButton{
+  width:100% !important;
+  min-width:0 !important;
+  height:38px !important;
+  min-height:38px !important;
+  max-height:38px !important;
+  justify-content:flex-start !important;
+  gap:6px !important;
+  padding:6px 10px !important;
+  text-align:left !important;
+}
+#topbarToolsPanel #themeToggleButton > .toolbar-icon{
+  width:20px !important;
+  min-width:20px !important;
+  height:20px !important;
+  flex:0 0 20px !important;
+}
+#topbarToolsPanel #themeToggleButton > span:last-child{
+  flex:0 1 auto !important;
+  min-height:20px !important;
+}
+#topbarToolsPanel #themeToggleText{
+  height:20px !important;
+  min-height:20px !important;
   line-height:20px !important;
 }
