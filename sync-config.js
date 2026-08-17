@@ -7,11 +7,11 @@ window.FINANCE_SYNC_CONFIG = window.FINANCE_SYNC_CONFIG || {
 };
 
 (function applyV15ReleaseLayer() {
-  const VERSION = "15.2.3";
-  const RELEASE_NAME = "Sync Status Icons";
-  const RELEASE_DATE = "August 17, 2026";
+  const VERSION = "15.2.4";
+  const RELEASE_NAME = "Finance UI & Header Refinement";
+  const RELEASE_DATE = "August 18, 2026";
   window.FINANCE_APP_VERSION_OVERRIDE = VERSION;
-  window.FINANCE_RELEASE_OVERRIDE = { version:VERSION, name:RELEASE_NAME, released:"2026-08-17" };
+  window.FINANCE_RELEASE_OVERRIDE = { version:VERSION, name:RELEASE_NAME, released:"2026-08-18" };
 
   function ensureLiquidGlassStyles() {
     if (document.getElementById("financeLiquidGlassStyles")) return;

@@ -1,3 +1,10 @@
+## 15.2.4 · 2026-08-18
+- Replaced the More tools presentation with the exact supplied light/dark PNG artwork and finalized Appearance as a compact 38px, left-aligned **Auto / Light / Dark** control with the existing 20px icon and theme behavior.
+- Refined Finance visuals with the revised monthly-save toggle artwork and press feedback, scalloped Available/First-half/Second-half/Other-expenses legend markers, supplied receipt artwork for Spend, and clean theme-aware heart-smile completion icons for First half, First-half difference, and zero Other expenses.
+- Flattened the desktop month selector into the same compact visual language as More tools: one 38px segmented month control with subtle separators, no glass blur/double-border treatment, and a separate aligned **Current** control.
+- Hardened GitHub Pages/PWA delivery with run-attempt-specific artifacts, automatic deployment retries, network-first final Appearance geometry, and expanded browser regression coverage for the new icon, theme, and month-selector states.
+- Released the consolidated interface update as V15.2.4 with cache `finance-v15-20260818-ui-refinement-r39`. Finance Schema 12, Cloud Schema V3, finance records, calculations, account balances, conflict-resolution behavior, and the five-minute routine sync cadence are unchanged.
+
 ## 15.2.3 · 2026-08-17
 - Replaced the Cloud Sync toolbar artwork with the supplied state icons and matching colors: green Synced, orange Syncing, red Needs sync attention, and red Sync issue/Offline unavailable.
 - Made the icon and text inherit the same state color on desktop and phone, including offline states that still have queued pending records.
