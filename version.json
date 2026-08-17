@@ -10,8 +10,8 @@
   "profileArchitectureVersion": 1,
   "encryptionVersion": 1,
   "authSecurityVersion": 1,
-  "cacheVersion": "finance-v15-20260817-phone-finance-r37",
+  "cacheVersion": "finance-v15-20260817-phone-finance-r38",
   "released": "2026-08-17",
   "name": "Mobile UI & UX",
-  "notes": "V15.2.2 cloud profile identity hotfix: require explicit Cloud Profile selection when an account has multiple finance profiles, show the active Cloud Profile name/role/short ID for verification across devices, provide a switch-profile action, and refresh the critical Cloud Sync lifecycle asset. Finance Schema 12, Cloud Schema V3, records, calculations, and the five-minute routine sync cadence remain unchanged."
+  "notes": "V15.2.2 Budget & Expenses presentation hotfix: once the first half is finished, use the supplied theme-aware heart-smile completion artwork for First-half difference and for First half of the month when its unpaid total is zero. Finance calculations, records, Cloud Schema V3, and the five-minute sync cadence remain unchanged."
 }
