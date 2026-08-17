@@ -2,6 +2,7 @@
 const APP_VERSION = "15.2.3";
 self.__FINANCE_APP_VERSION = APP_VERSION;
 // V15.2.3 sync status artwork: supplied green/orange/red Cloud Sync icons and matching toolbar text colors.
+// V15.2.3 hotfix: keep the More tools icon-alignment stylesheet network-first so installed apps receive refreshed artwork.
 // V15.2.2 mobile UI/UX delivery · phone layout, touch targets, menu safety, and responsive regression coverage; finance data and sync semantics unchanged.
 // V15.2.2 hotfix: Finance workspace sticky row now follows the mobile topbar offset.
 // V15.2.2 hotfix: force refreshed shell assets for the Income versus Expenses dashboard arrangement.
@@ -172,7 +173,7 @@ self.addEventListener("fetch", event => {
     return;
   }
   if (url.origin !== self.location.origin) return;
-  if (url.pathname.endsWith("privacy-lock.js") || url.pathname.endsWith("cloud-sync-lifecycle.js") || url.pathname.endsWith("interaction-patterns.js") || url.pathname.endsWith("pwa-update-v15-0-5.js")) {
+  if (url.pathname.endsWith("privacy-lock.js") || url.pathname.endsWith("cloud-sync-lifecycle.js") || url.pathname.endsWith("interaction-patterns.js") || url.pathname.endsWith("pwa-update-v15-0-5.js") || url.pathname.endsWith("ui-icon-alignment-v15-0-5.css")) {
     event.respondWith(networkFirstCriticalAsset(request));
     return;
   }
