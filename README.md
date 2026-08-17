@@ -1,9 +1,10 @@
-# My Finance Records · V15.2.3
+# My Finance Records · V15.2.4
 
 Local-first personal finance PWA with multi-profile support and optional encrypted cloud synchronization.
 
 ## Recent updates
 
+- **V15.2.4 · Finance UI & Header Refinement** — Consolidates all post-V15.2.3 interface updates: exact supplied light/dark **More tools** icons; revised Finance monthly-save artwork with press feedback and reduced-motion support; scalloped Finance legend markers; supplied Spend receipt icons; clean theme-aware heart-smile completion artwork for First half, First-half difference, and zero Other expenses; compact **Auto / Light / Dark** Appearance controls; a flat 38px desktop month selector matching More tools; and retry-safe GitHub Pages/PWA delivery. Finance Schema 12, Cloud Schema V3, records, calculations, account balances, conflict resolution, and the five-minute sync cadence are unchanged.
 - **V15.2.3 · Sync Status Icons** — Uses the supplied Cloud Sync artwork with matching state colors: Synced is green, Syncing is orange, Needs sync uses its red attention icon, and Sync issue/Offline use the red unavailable icon. The release also refreshes PWA delivery without changing finance logic, Cloud Schema V3, or the five-minute sync cadence.
 - **V15.2.2 · Mobile UI & UX** — Refines phone layouts across 320–428px, fixes sticky Finance tabs, standardizes key 44px touch targets, and makes mobile overflow actions safer without changing finance logic, sync cadence, or the completed desktop interface.
 - **V15.2.1 · Desktop UX Quick Wins** — Makes empty/filter states actionable, adds removable Income filter chips, simplifies Budget Plan and Agenda secondary actions, and standardizes Agenda validation/deletion feedback without changing finance logic, sync cadence, or phone layout.
