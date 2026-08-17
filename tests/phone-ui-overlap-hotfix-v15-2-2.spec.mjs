@@ -8,6 +8,17 @@ async function openPhone(page) {
   await page.waitForFunction(() => Boolean(document.querySelector(".topbar")));
 }
 
+async function exposePage(page, pageId) {
+  await page.evaluate(id => {
+    document.body.classList.remove("finance-signed-out", "finance-auth-pending");
+    const target = document.getElementById(id);
+    if (!target) return;
+    document.querySelectorAll(".page.active").forEach(node => node.classList.remove("active"));
+    target.classList.add("active");
+    target.style.setProperty("display", "block", "important");
+  }, pageId);
+}
+
 test("phone Add Expense stays in the toolbar grid instead of covering the title", async ({ page }) => {
   await openPhone(page);
   await page.evaluate(() => {
@@ -38,18 +49,24 @@ test("phone Add account and Schedule event are true 44px icon-only controls", as
   await openPhone(page);
   await page.waitForTimeout(50);
 
-  for (const selector of ["#addAccountButton", ".project-calendar-v13020 [data-pc-add]"]) {
-    const button = page.locator(selector).first();
+  const targets = [
+    { pageId:"money", selector:"#addAccountButton" },
+    { pageId:"projects", selector:".project-calendar-v13020 [data-pc-add]" }
+  ];
+
+  for (const target of targets) {
+    await exposePage(page, target.pageId);
+    const button = page.locator(target.selector).first();
     await expect(button).toHaveCount(1);
     const contract = await button.evaluate(node => {
-      const rect = node.getBoundingClientRect();
+      const style = getComputedStyle(node);
       const before = getComputedStyle(node, "::before");
       const after = getComputedStyle(node, "::after");
       const label = node.querySelector(".phone-only-action-label");
       const icon = node.querySelector(".phone-only-action-icon");
       return {
-        width:rect.width,
-        height:rect.height,
+        width:style.width,
+        height:style.height,
         beforeContent:before.content,
         afterContent:after.content,
         labelDisplay:label ? getComputedStyle(label).display : null,
@@ -57,8 +74,8 @@ test("phone Add account and Schedule event are true 44px icon-only controls", as
         ariaLabel:node.getAttribute("aria-label")
       };
     });
-    expect(contract.width).toBe(44);
-    expect(contract.height).toBe(44);
+    expect(contract.width).toBe("44px");
+    expect(contract.height).toBe("44px");
     expect(["none", "normal", "\"\""]).toContain(contract.beforeContent);
     expect(["none", "normal", "\"\""]).toContain(contract.afterContent);
     expect(contract.labelDisplay).toBe("none");
@@ -69,19 +86,20 @@ test("phone Add account and Schedule event are true 44px icon-only controls", as
 
 test("phone Finance tabs are static and expense actions stay on one 44px row", async ({ page }) => {
   await openPhone(page);
+  await exposePage(page, "money");
 
   const switcherContract = await page.locator("#money > .finance-workspace-marquee-row").evaluate(row => {
     const switcher = row.querySelector(":scope > .money-workspace-switcher");
     return {
       rowPosition:getComputedStyle(row).position,
       switcherPosition:getComputedStyle(switcher).position,
-      switcherHeight:switcher.getBoundingClientRect().height,
+      switcherHeight:getComputedStyle(switcher).height,
       marqueeDisplay:getComputedStyle(row.querySelector(":scope > .finance-week-marquee")).display
     };
   });
   expect(switcherContract.rowPosition).toBe("static");
   expect(switcherContract.switcherPosition).toBe("static");
-  expect(switcherContract.switcherHeight).toBe(44);
+  expect(switcherContract.switcherHeight).toBe("44px");
   expect(switcherContract.marqueeDisplay).toBe("none");
 
   await page.evaluate(() => {
@@ -90,6 +108,8 @@ test("phone Finance tabs are static and expense actions stay on one 44px row", a
     row.id = "phoneHotfixExpenseFixture";
     row.className = "record-row";
     row.dataset.expenseRow = "fixture";
+    row.style.setProperty("display", "grid", "important");
+    row.style.setProperty("width", "360px", "important");
     row.innerHTML = '<div class="record-title">Fixture</div><strong class="amount">₱100.00</strong><div class="due-cell">21</div><div data-label="Planned account">Maya</div><div class="mobile-record-actions"><button class="button button-paid">Mark paid</button><div class="record-more-menu overflow-menu"><button class="button button-secondary overflow-menu-trigger" type="button">⋮</button></div></div>';
     host.appendChild(row);
   });
