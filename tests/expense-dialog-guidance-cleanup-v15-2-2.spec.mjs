@@ -26,7 +26,8 @@ test("expense dialog cleanup is structural and delivered by the network-first pr
   expect(privacy).toContain('const modeNote=dialog.querySelector("#expenseFormModeNote");');
   expect(privacy).toContain("modeNote.remove();");
   expect(privacy).toContain('surrogate.dataset.expenseModeSurrogate="true";');
-  expect(worker).toContain('if (url.pathname.endsWith("privacy-lock.js"))');
+  expect(worker).toContain('url.pathname.endsWith("privacy-lock.js")');
+  expect(worker).toContain('url.pathname.endsWith("cloud-sync-lifecycle.js")');
   expect(worker).toContain("networkFirstCriticalAsset(request)");
   expect(desktopUx).not.toContain("#expenseDialog #expenseFormModeNote");
 });
