@@ -282,15 +282,15 @@ html[data-theme="light"] body #money .account-card-actions .account-spend-button
   background-image:url("./icons/finance-spend-light-v15-2-4.png") !important;
 }
 
-/* V15.2.4-r2 · Finance completion hearts use the new exact uploaded artwork without changing size or layout. */
+/* V15.2.4-r3 · Finance completion hearts use the user's exact uploaded artwork without changing size or layout. */
 html body #money .first-half-complete-icon {
-  content:url("./icons/heart-smile-light-v15-2-4-r2.png") !important;
+  content:url("./icons/heart-smile-light-v15-2-4-r3.png") !important;
 }
 html[data-theme="dark"] body #money .first-half-complete-icon {
-  content:url("./icons/heart-smile-dark-v15-2-4-r2.png") !important;
+  content:url("./icons/heart-smile-dark-v15-2-4-r3.png") !important;
 }
 html[data-theme="light"] body #money .first-half-complete-icon {
-  content:url("./icons/heart-smile-light-v15-2-4-r2.png") !important;
+  content:url("./icons/heart-smile-light-v15-2-4-r3.png") !important;
 }
 
 /* V15.2.4 · More tools appearance is one compact icon + Auto/Light/Dark label. */
