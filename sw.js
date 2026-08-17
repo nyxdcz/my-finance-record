@@ -12,7 +12,7 @@ self.__FINANCE_APP_VERSION = APP_VERSION;
 // V15.2.2 hotfix: refresh phone toolbar grid, Finance tabs, and expense action geometry after overlap repair.
 // V15.2.2 hotfix: require explicit Cloud Profile selection when an account has multiple finance profiles.
 // V15.2.2 hotfix: refresh the first-half completion heart-smile artwork from the validated app shell.
-const CACHE_VERSION = "finance-v15-20260817-phone-finance-r38";
+const CACHE_VERSION = "finance-v15-20260817-phone-finance-r37";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const DB_NAME = "simple-finance-project-records-v12-db";
