@@ -478,8 +478,35 @@
     return true;
   }
 
+  function runCloudFirstSyncRecovery(event){
+    const button=event.target.closest?.("#cloudInitialConfirm");
+    if(!button) return false;
+    const mode=document.querySelector('input[name="cloudInitialMode"]:checked')?.value || "upload";
+    if(mode!=="upload") return false;
+    const replace=window.FinanceCloudSync?.replaceCloudWithThisDevice;
+    if(typeof replace!=="function") return false;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    const originalText=button.textContent;
+    button.disabled=true;
+    button.textContent="Protecting this device…";
+    Promise.resolve()
+      .then(()=>persistRecoverySnapshot("Before first-sync device upload",currentFinanceData()))
+      .then(()=>replace())
+      .catch(error=>{
+        console.error("First-sync device protection failed",error);
+        try { if(typeof showToast==="function") showToast(`Could not use this device safely: ${error?.message || "unknown error"}`,"warning"); } catch(e){}
+      })
+      .finally(()=>{
+        button.disabled=false;
+        button.textContent=originalText;
+      });
+    return true;
+  }
+
   document.addEventListener("click",event=>{
     if(runRecoveryImportAction(event)) return;
+    if(runCloudFirstSyncRecovery(event)) return;
     const closeImport=event.target.closest?.("#closeSyncReviewButton, #cancelSyncImportButton");
     if(closeImport) setTimeout(clearImportReviewCapture,0);
     const signin=event.target.closest?.(".finance-privacy-signin");
@@ -503,6 +530,7 @@
       ready:ensureRecoveryStorageReady,
       compact:async()=>{ recoveryStorageReadyPromise=null; return ensureRecoveryStorageReady(); },
       list:recoveryGetAll,
+      save:persistRecoverySnapshot,
       version:RECOVERY_DB_VERSION,
       store:RECOVERY_STORE
     },
@@ -510,7 +538,7 @@
   };
 })();
 
-/* V15.2.2 mobile cloud-revert safety guard.
+/* V15.2.2 cloud authority guard.
    Runs before Cloud Sync initializes because privacy-lock.js is loaded first and is network-first in the service worker. */
 (() => {
   const PROFILE_META_KEY="simple-finance-profiles-v1";
@@ -521,7 +549,7 @@
   const CLOUD_QUEUE_PREFIX="simple-finance-cloud-record-queue-v3:";
   const CLOUD_CONFIG_KEY="simple-finance-cloud-config-v1";
   const GUARD_MARKER_PREFIX="simple-finance-cloud-revert-guard-v1:";
-  const HOLD_UNTIL=253402300799000;
+  const LEGACY_HOLD_UNTIL=253402300799000;
   const APP_VERSION_CODE=130000;
   const ARRAY_COLLECTIONS=["expenses","projects","incomeRecords","savingsGoals","accountLedger","accountReconciliations","budgetTemplates","expenseTemplates"];
   const MAP_COLLECTIONS=["monthlyReports","monthlyChecklists","monthlyBudgets","iconLibrary"];
@@ -540,6 +568,14 @@
   }
   function isObject(value){ return Boolean(value && typeof value==="object" && !Array.isArray(value)); }
   function recordKey(collection,recordId){ return `${collection}\u001f${recordId}`; }
+  function splitKey(key){ const at=String(key||"").indexOf("\u001f"); return at>=0 ? [key.slice(0,at),key.slice(at+1)] : ["",String(key||"")]; }
+  function stable(value){
+    if(value===undefined) return "__undefined__";
+    if(value===null || typeof value!=="object") return JSON.stringify(value);
+    if(Array.isArray(value)) return `[${value.map(stable).join(",")}]`;
+    return `{${Object.keys(value).sort().map(key=>`${JSON.stringify(key)}:${stable(value[key])}`).join(",")}}`;
+  }
+  function same(a,b){ return stable(a)===stable(b); }
 
   function storedProfileContext(){
     const meta=readJson(PROFILE_META_KEY,null);
@@ -629,11 +665,13 @@
       if(item?.seriesId && item?.month) add("expenseRecurrenceSkips",id,item,index);
     });
 
+    const ledgerSettings=clone(source?.ledgerSettings||{});
+    if(isObject(ledgerSettings)) delete ledgerSettings.lastRecalculatedAt;
     add("settings","preferences",{
       savingsSettings:clone(source?.savingsSettings||{}),
       projectCalendarSettings:clone(source?.projectCalendarSettings||{}),
       salaryWorkSettings:clone(source?.salaryWorkSettings||{}),
-      ledgerSettings:clone(source?.ledgerSettings||{}),
+      ledgerSettings,
       budgetSettings:clone(source?.budgetSettings||{}),
       productivitySettings:clone(source?.productivitySettings||{}),
       reminderSettings:clone(source?.reminderSettings||{})
@@ -647,12 +685,23 @@
 
   function resolveScope(meta,cloudProfileId){
     const existing=String(meta?.initializedUserId||"");
-    if(existing){
-      if(existing.endsWith(`:${cloudProfileId}`)) return existing;
-      return "";
-    }
+    if(existing && existing.endsWith(`:${cloudProfileId}`)) return existing;
     const userId=storedSupabaseUserId();
     return userId ? `${userId}:${cloudProfileId}` : "";
+  }
+
+  function localMatchesBase(local,base){
+    if(!local) return Boolean(base?.deletedAt);
+    if(!base || base.deletedAt) return false;
+    return same(local.payload,base.payload) && Number(local.sortIndex||0)===Number(base.sortIndex||0);
+  }
+
+  function savePreSyncRecovery(source){
+    try {
+      const save=window.FinancePrivacyLock?.recoveryStorage?.save;
+      if(typeof save!=="function") return;
+      Promise.resolve(save("Before cloud authority reconciliation",source)).catch(error=>console.warn("Could not save pre-sync recovery snapshot",error));
+    } catch(error){ console.warn("Could not start pre-sync recovery snapshot",error); }
   }
 
   function armRevertGuard(){
@@ -662,59 +711,100 @@
     if(!profileDataRaw) return { armed:false,reason:"no-established-profile-data" };
     const profileData=readJson(`${PROFILE_DATA_PREFIX}${context.profileId}`,{});
     const activeData=readJson(ACTIVE_DATA_KEY,null);
-    const source=meaningfulFinanceData(activeData) ? activeData : profileData;
+    const source=meaningfulFinanceData(profileData) ? profileData : activeData;
     if(!meaningfulFinanceData(source)) return { armed:false,reason:"no-local-finance-data" };
 
     const baseKey=`${CLOUD_BASE_PREFIX}${context.profileId}`;
-    const base=readJson(baseKey,{}) || {};
-    if(Object.keys(base).length) return { armed:false,reason:"sync-baseline-present" };
-
     const metaKey=`${CLOUD_META_PREFIX}${context.profileId}`;
     const queueKey=`${CLOUD_QUEUE_PREFIX}${context.profileId}`;
+    const base=readJson(baseKey,{}) || {};
     const meta=readJson(metaKey,{}) || {};
+    const queue=readJson(queueKey,{}) || {};
     const scope=resolveScope(meta,context.cloudProfileId);
     if(!scope) return { armed:false,reason:"cloud-account-unresolved" };
 
     const records=recoveryRecordMap(source);
     if(!Object.keys(records).length) return { armed:false,reason:"no-records" };
-    const queue=readJson(queueKey,{}) || {};
+    const baselinePresent=Object.keys(base).length>0;
+    const keys=new Set([...Object.keys(records),...Object.keys(base)]);
     const now=new Date().toISOString();
     let seeded=0;
-    Object.entries(records).forEach(([key,row])=>{
-      if(queue[key]) return;
+    let released=0;
+
+    keys.forEach(key=>{
+      const local=records[key];
+      const baseline=base[key];
+      if(baselinePresent && localMatchesBase(local,baseline)) return;
+      const existing=queue[key];
+      if(existing){
+        const legacyHold=Number(existing.nextAttemptAt||0)>=LEGACY_HOLD_UNTIL-1000 || /baseline was missing on this device/i.test(String(existing.lastError||""));
+        if(legacyHold && existing.status!=="conflict"){
+          existing.status="pending";
+          existing.attempts=0;
+          existing.nextAttemptAt=0;
+          existing.updatedAt=now;
+          existing.reason="Recovered local Finance change waiting for current cloud revision";
+          existing.lastError="This device is protected. Cloud revisions will be read before this record can upload.";
+          released+=1;
+        }
+        return;
+      }
+      const [fallbackCollection,fallbackRecordId]=splitKey(key);
       queue[key]={
         key,
-        collection:row.collection,
-        recordId:row.recordId,
-        payload:clone(row.payload),
-        sortIndex:Number(row.sortIndex||0),
-        deleted:false,
-        baseRevision:0,
-        basePayload:null,
-        baseSortIndex:0,
+        collection:String(local?.collection || baseline?.collection || fallbackCollection),
+        recordId:String(local?.recordId || baseline?.recordId || fallbackRecordId),
+        payload:clone(local?.payload || baseline?.payload || {}),
+        sortIndex:Number(local?.sortIndex ?? baseline?.sortIndex ?? 0),
+        deleted:!local,
+        baseRevision:Number(baseline?.revision || 0),
+        basePayload:baseline ? clone(baseline.payload ?? null) : null,
+        baseSortIndex:Number(baseline?.sortIndex || 0),
         minWriterVersionCode:APP_VERSION_CODE,
         status:"pending",
         attempts:0,
-        nextAttemptAt:HOLD_UNTIL,
+        nextAttemptAt:0,
         updatedAt:now,
-        reason:"Recovered local Finance record waiting for cloud comparison",
-        lastError:"Cloud sync baseline was missing on this device. The local record is protected until the cloud version is compared."
+        reason:baselinePresent ? "Recovered unqueued local Finance change before cloud pull" : "Recovered local Finance record before cloud baseline reconstruction",
+        lastError:baselinePresent ? "This device differs from its stored cloud baseline. Local data is protected until the current cloud revision is checked." : "The cloud baseline is missing. Local data is protected and cloud revisions will be read before upload."
       };
       seeded+=1;
     });
 
+    const metadataRepaired=meta.initializedUserId!==scope || meta.initializedProfileId!==context.cloudProfileId;
     meta.initializedUserId=scope;
     meta.initializedProfileId=context.cloudProfileId;
-    meta.status=seeded ? "Protected local recovery" : (meta.status||"Sync recovery ready");
+    if(!baselinePresent) meta.lastAuditId=0;
+    if(seeded || released) meta.status="Protected local recovery";
+    else if(metadataRepaired) meta.status="Sync authority repaired";
     localStorage.setItem(metaKey,JSON.stringify(meta));
     localStorage.setItem(queueKey,JSON.stringify(queue));
-    const result={ armed:true,profileId:context.profileId,cloudProfileId:context.cloudProfileId,seeded,protectedUntil:HOLD_UNTIL,armedAt:now };
+
+    const shouldSnapshot=!baselinePresent || seeded>0 || released>0;
+    if(shouldSnapshot) savePreSyncRecovery(source);
+    const result={
+      armed:shouldSnapshot || metadataRepaired,
+      reason:!baselinePresent ? "baseline-missing" : seeded || released ? "local-diverged-from-baseline" : metadataRepaired ? "sync-metadata-repaired" : "baseline-matches-local",
+      profileId:context.profileId,
+      cloudProfileId:context.cloudProfileId,
+      baselinePresent,
+      seeded,
+      released,
+      metadataRepaired,
+      protectedUntil:0,
+      armedAt:now
+    };
     localStorage.setItem(`${GUARD_MARKER_PREFIX}${context.profileId}`,JSON.stringify(result));
     return result;
   }
 
   let lastResult;
-  try { lastResult=armRevertGuard(); } catch(error) { lastResult={armed:false,reason:"guard-error",error:String(error?.message||error)}; }
+  function runGuard(){
+    try { lastResult=armRevertGuard(); }
+    catch(error) { lastResult={armed:false,reason:"guard-error",error:String(error?.message||error)}; }
+    return clone(lastResult);
+  }
+  runGuard();
 
   function installFastResumeSync(){
     let timer=null;
@@ -722,6 +812,7 @@
       clearTimeout(timer);
       timer=setTimeout(()=>{
         if(!navigator.onLine || document.hidden) return;
+        runGuard();
         const sync=window.FinanceCloudSync?.syncNow;
         if(typeof sync!=="function") return;
         Promise.resolve(sync({reason:`fast-${reason}`})).catch(()=>{});
@@ -737,5 +828,5 @@
   if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",installFastResumeSync,{once:true});
   else installFastResumeSync();
 
-  window.FinanceCloudRevertGuard={ arm:armRevertGuard, buildRecordMap:recoveryRecordMap, get last(){ return clone(lastResult); }, holdUntil:HOLD_UNTIL };
+  window.FinanceCloudRevertGuard={ arm:runGuard, buildRecordMap:recoveryRecordMap, get last(){ return clone(lastResult); }, holdUntil:0 };
 })();
