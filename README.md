@@ -2,9 +2,28 @@
 
 Local-first personal finance PWA with multi-profile support and optional encrypted cloud synchronization.
 
+## V15.2.4 · Finance UI & Header Refinement
+
+Released **August 18, 2026** with PWA cache `finance-v15-20260818-ui-refinement-r39`.
+
+### New updates since V15.2.3
+
+- **More tools icon refresh** — Uses the exact supplied light/dark PNG artwork for Philippine-time/Theme, Quick add, Customize dashboard, Search, and Quick actions while keeping Undo/Redo behavior unchanged.
+- **Compact Appearance control** — Replaces the old Theme presentation with a compact **Auto / Light / Dark** state label, keeps the existing Philippine-time automatic day/night behavior, uses the existing 20px theme artwork, and finalizes the row at **38px high** with left-aligned icon/text geometry.
+- **Finance monthly-save control** — Uses the revised supplied unsaved/saved artwork beside **Mark paid**, keeps the existing 34px control and 30px artwork sizing, adds press/bounce feedback, and includes a reduced-motion fallback without changing monthly-save behavior.
+- **Finance summary markers** — Replaces the circular Available money, First half, Second half, and Other expenses indicators with the supplied scalloped silhouette while preserving their existing responsive sizes and green/red/orange/blue state colors.
+- **Spend action artwork** — Replaces only the visible Finance account-card Spend glyph with the supplied receipt artwork and automatic light/dark switching while preserving the existing 15px desktop/tablet and 18px compact-phone sizing and all spending logic.
+- **Completion heart artwork** — Uses the final clean supplied light/dark heart-smile assets for **First half of the month**, **First-half difference**, and zero-value **Other expenses**, preserving their existing size, placement, spacing, completion rules, and automatic theme switching.
+- **Desktop month selector refinement** — Flattens the `‹ | Month | August 2026 | ›` navigation into one compact **38px** segmented control with subtle separators, removes the glass blur/double-border treatment, and keeps **Current** as a separate aligned 38px control.
+- **PWA and GitHub Pages delivery** — Adds retry-safe Pages deployment with run-attempt-specific artifacts and automatic retries, keeps the final icon/alignment layer network-first, and cache-busts the V15.2.4 release assets so installed/mobile PWAs receive the latest interface reliably.
+- **Regression coverage** — Expands and aligns browser/source validation for V15.2.4 icon artwork, Appearance states, month-selector geometry, release/cache identity, and preserved mobile UI behavior.
+
+### Preserved in V15.2.4
+
+Finance Schema **12**, Cloud Schema **V3**, finance records, calculations, account balances, conflict-resolution behavior, and the routine **five-minute sync cadence** are unchanged.
+
 ## Recent updates
 
-- **V15.2.4 · Finance UI & Header Refinement** — Consolidates all post-V15.2.3 interface updates: exact supplied light/dark **More tools** icons; revised Finance monthly-save artwork with press feedback and reduced-motion support; scalloped Finance legend markers; supplied Spend receipt icons; clean theme-aware heart-smile completion artwork for First half, First-half difference, and zero Other expenses; compact **Auto / Light / Dark** Appearance controls; a flat 38px desktop month selector matching More tools; and retry-safe GitHub Pages/PWA delivery. Finance Schema 12, Cloud Schema V3, records, calculations, account balances, conflict resolution, and the five-minute sync cadence are unchanged.
 - **V15.2.3 · Sync Status Icons** — Uses the supplied Cloud Sync artwork with matching state colors: Synced is green, Syncing is orange, Needs sync uses its red attention icon, and Sync issue/Offline use the red unavailable icon. The release also refreshes PWA delivery without changing finance logic, Cloud Schema V3, or the five-minute sync cadence.
 - **V15.2.2 · Mobile UI & UX** — Refines phone layouts across 320–428px, fixes sticky Finance tabs, standardizes key 44px touch targets, and makes mobile overflow actions safer without changing finance logic, sync cadence, or the completed desktop interface.
 - **V15.2.1 · Desktop UX Quick Wins** — Makes empty/filter states actionable, adds removable Income filter chips, simplifies Budget Plan and Agenda secondary actions, and standardizes Agenda validation/deletion feedback without changing finance logic, sync cadence, or phone layout.
