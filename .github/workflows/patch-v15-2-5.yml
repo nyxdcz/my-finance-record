@@ -1,0 +1,144 @@
+name: One-time V15.2.5 release patch
+
+on:
+  push:
+    branches:
+      - agent/align-budget-disclosure-buttons
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out release branch
+        uses: actions/checkout@v7
+        with:
+          ref: agent/align-budget-disclosure-buttons
+      - name: Apply V15.2.5 release replacements
+        shell: python
+        run: |
+          from pathlib import Path
+          import json
+
+          OLD_VERSION = "15.2.4"
+          NEW_VERSION = "15.2.5"
+          OLD_CACHE = "finance-v15-20260818-ui-refinement-r39"
+          NEW_CACHE = "finance-v15-20260818-disclosure-alignment-r40"
+          OLD_RELEASE = "Finance UI & Header Refinement"
+          NEW_RELEASE = "Finance Disclosure Alignment"
+
+          def replace(path, old, new, expected_min=1):
+              p = Path(path)
+              text = p.read_text()
+              count = text.count(old)
+              if count < expected_min:
+                  raise SystemExit(f"{path}: expected at least {expected_min} occurrence(s) of {old!r}, found {count}")
+              p.write_text(text.replace(old, new))
+              print(f"{path}: replaced {count} occurrence(s) of {old!r}")
+
+          # Current release identity and cache-busted delivery references.
+          replace("index.html", "<title>My Finance Records · V15.2.4</title>", "<title>My Finance Records · V15.2.5</title>")
+          replace("index.html", "desktop-ux-v15-2-0.css?v=15.2.4-header1", "desktop-ux-v15-2-0.css?v=15.2.5-disclosure1")
+          replace("index.html", "pwa-update-v15-0-5.js?v=15.2.4-release1", "pwa-update-v15-0-5.js?v=15.2.5-release1")
+          replace("index.html", 'title="V15.2.4 · Finance UI &amp; Header Refinement · August 18, 2026">V15.2.4</small>', 'title="V15.2.5 · Finance Disclosure Alignment · August 18, 2026">V15.2.5</small>')
+          replace("index.html", 'const APP_VERSION = "15.2.4";', 'const APP_VERSION = "15.2.5";')
+          replace("index.html", 'const APP_RELEASE_NAME = "Finance UI & Header Refinement";', 'const APP_RELEASE_NAME = "Finance Disclosure Alignment";')
+          replace("index.html", 'const APP_CACHE_VERSION = "finance-v15-20260818-ui-refinement-r39";', 'const APP_CACHE_VERSION = "finance-v15-20260818-disclosure-alignment-r40";')
+          replace("index.html", "sync-config.js?v=15.2.4-release1", "sync-config.js?v=15.2.5-release1")
+
+          replace("sw.js", 'const CACHE_NAME = "finance-v15-20260818-ui-refinement-r39";', 'const CACHE_NAME = "finance-v15-20260818-disclosure-alignment-r40";')
+          replace("sw.js", 'const APP_VERSION = "15.2.4";', 'const APP_VERSION = "15.2.5";')
+          replace("sw.js", "desktop-ux-v15-2-0.css?v=15.2.4-header1", "desktop-ux-v15-2-0.css?v=15.2.5-disclosure1")
+          replace("sw.js", "pwa-update-v15-0-5.js?v=15.2.4-release1", "pwa-update-v15-0-5.js?v=15.2.5-release1")
+          replace("sw.js", "sync-config.js?v=15.2.4-release1", "sync-config.js?v=15.2.5-release1")
+
+          replace("pwa-update-v15-0-5.js", 'const CURRENT_CACHE_VERSION = "finance-v15-20260818-ui-refinement-r39";', 'const CURRENT_CACHE_VERSION = "finance-v15-20260818-disclosure-alignment-r40";')
+          replace("sync-config.js", 'const VERSION = "15.2.4";', 'const VERSION = "15.2.5";')
+          replace("sync-config.js", 'const RELEASE_NAME = "Finance UI & Header Refinement";', 'const RELEASE_NAME = "Finance Disclosure Alignment";')
+
+          # Release history.
+          readme = Path("README.md")
+          text = readme.read_text()
+          old_heading = "# My Finance Records · V15.2.4"
+          if old_heading not in text:
+              raise SystemExit("README top V15.2.4 heading missing")
+          text = text.replace(old_heading, "# My Finance Records · V15.2.5", 1)
+          anchor = "## V15.2.4 · Finance UI & Header Refinement"
+          if anchor not in text:
+              raise SystemExit("README V15.2.4 history anchor missing")
+          section = """## V15.2.5 · Finance Disclosure Alignment
+
+Released **August 18, 2026** with PWA cache `finance-v15-20260818-disclosure-alignment-r40`.
+
+### New updates since V15.2.4
+
+- **Budget disclosure alignment** — Aligns Monthly budget plan, Available money, First half, Second half, and Other expenses disclosure controls to a shared **40px** desktop size and the exact **17px** right inset established by First half.
+- **Responsive preservation** — Keeps the existing **44px** mobile touch targets and phone layouts unchanged.
+- **Delivery refresh** — Cache-busts the disclosure stylesheet, service worker, and release layer so GitHub Pages and installed PWA clients receive the fix.
+- **Regression coverage** — Updates current-release source contracts for V15.2.5 while preserving older feature-specific asset versions.
+
+### Preserved in V15.2.5
+
+Finance Schema **12**, Cloud Schema **V3**, finance records, calculations, account balances, conflict-resolution behavior, and the routine **five-minute sync cadence** are unchanged.
+
+"""
+          text = text.replace(anchor, section + anchor, 1)
+          readme.write_text(text)
+
+          # Keep package-lock release metadata aligned with package.json.
+          lock_path = Path("package-lock.json")
+          if lock_path.exists():
+              lock = json.loads(lock_path.read_text())
+              lock["version"] = NEW_VERSION
+              if "" in lock.get("packages", {}):
+                  lock["packages"][""]["version"] = NEW_VERSION
+              lock_path.write_text(json.dumps(lock, indent=2) + "\n")
+
+          # Current-release regression files that intentionally track release delivery.
+          pwa_test = Path("tests/validate-pwa-updater-v15-0-5.mjs")
+          text = pwa_test.read_text()
+          text = text.replace('assert.equal(version.version, "15.2.4");', 'assert.equal(version.version, "15.2.5");')
+          text = text.replace(OLD_CACHE, NEW_CACHE)
+          text = text.replace('const APP_VERSION = "15\\.2\\.4";', 'const APP_VERSION = "15\\.2\\.5";')
+          text = text.replace('pwa-update-v15-0-5\\.js\\?v=15\\.2\\.4-release1', 'pwa-update-v15-0-5\\.js\\?v=15\\.2\\.5-release1')
+          text = text.replace('console.log("V15.2.4 PWA updater regression passed with sync-status cache refresh.");', 'console.log("V15.2.5 PWA updater regression passed with disclosure-alignment cache refresh.");')
+          pwa_test.write_text(text)
+
+          mobile_test = Path("tests/validate-v15-2-2-mobile-ui.mjs")
+          text = mobile_test.read_text()
+          text = text.replace('assert.equal(version.version, "15.2.4");', 'assert.equal(version.version, "15.2.5");')
+          text = text.replace('assert.equal(pkg.version, "15.2.4");', 'assert.equal(pkg.version, "15.2.5");')
+          text = text.replace(OLD_CACHE, NEW_CACHE)
+          text = text.replace('My Finance Records · V15\\.2\\.4', 'My Finance Records · V15\\.2\\.5')
+          text = text.replace('sync-config\\.js\\?v=15\\.2\\.4-release1', 'sync-config\\.js\\?v=15\\.2\\.5-release1')
+          text = text.replace('const APP_VERSION = "15\\.2\\.4";', 'const APP_VERSION = "15\\.2\\.5";')
+          text = text.replace('const VERSION = "15\\.2\\.4";', 'const VERSION = "15\\.2\\.5";')
+          text = text.replace('const RELEASE_NAME = "Finance UI & Header Refinement";', 'const RELEASE_NAME = "Finance Disclosure Alignment";')
+          text = text.replace('console.log("V15.2.4 release preserves V15.2.2 mobile UI/UX and compact Finance source regression.");', 'console.log("V15.2.5 release preserves V15.2.2 mobile UI/UX and compact Finance source regression.");')
+          mobile_test.write_text(text)
+
+      - name: Validate patched release sources
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check sync-config.js
+          node --check pwa-update-v15-0-5.js
+          node --check sw.js
+          node tests/validate-v15-2-0-desktop-ux.mjs
+          node tests/validate-pwa-updater-v15-0-5.mjs
+          node tests/validate-v15-2-2-mobile-ui.mjs
+          grep -F 'My Finance Records · V15.2.5' index.html
+          grep -F 'finance-v15-20260818-disclosure-alignment-r40' version.json sw.js pwa-update-v15-0-5.js
+      - name: Commit release patch and remove one-time workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rm .github/workflows/patch-v15-2-5.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html sw.js pwa-update-v15-0-5.js sync-config.js README.md package-lock.json tests/validate-pwa-updater-v15-0-5.mjs tests/validate-v15-2-2-mobile-ui.mjs
+          git commit -m "release: prepare V15.2.5 disclosure alignment"
+          git push origin HEAD:agent/align-budget-disclosure-buttons
