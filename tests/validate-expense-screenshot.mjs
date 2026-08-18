@@ -109,9 +109,9 @@ assert.match(edgeFunction, /type:"json_schema"/, "Edge Function should request a
 assert.match(edgeFunction, /store:false/, "AI screenshot response should disable response storage");
 
 const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
-assert.match(worker, /finance-v15-20260818-ui-refinement-r39/, "service worker cache generation must remain current for V15.2.2 while preserving screenshot detection");
+assert.match(worker, /finance-v15-20260818-disclosure-alignment-r40/, "service worker cache generation must match V15.2.5 while preserving screenshot detection");
 assert.match(worker, /expense-screenshot-parser\.js\?v=15\.0\.3/, "service worker should precache the V15 screenshot parser");
 assert.match(worker, /expense-screenshot-detect\.js\?v=15\.0\.3/, "service worker should precache the V15 local screenshot detector");
 assert.match(worker, /expense-screenshot-ai\.js\?v=15\.0\.3/, "service worker should precache the V15 optional AI client");
 
-console.log("Expense screenshot local and optional AI detector validation passed.");
+console.log("Expense screenshot local and optional AI detector validation passed under the V15.2.5 release shell.");
