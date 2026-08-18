@@ -15,40 +15,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  patch-release:
-    name: Apply authorized V15.2.5 release patch
-    if: github.event_name == 'pull_request' && github.event.pull_request.number == 134 && github.actor != 'github-actions[bot]'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Check out PR branch
-        uses: actions/checkout@v7
-        with:
-          ref: ${{ github.event.pull_request.head.ref }}
-      - name: Apply release replacements
-        run: python tools/patch-v15-2-5.py
-      - name: Validate release sources
-        run: |
-          set -euo pipefail
-          node --check sync-config.js
-          node --check pwa-update-v15-0-5.js
-          node --check sw.js
-          node tests/validate-v15-2-0-desktop-ux.mjs
-          node tests/validate-pwa-updater-v15-0-5.mjs
-          node tests/validate-v15-2-2-mobile-ui.mjs
-      - name: Commit patched release branch
-        run: |
-          set -euo pipefail
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          rm -f patch-trigger-v15-2-5.txt
-          rm -f tools/patch-v15-2-5.py
-          rm -f .github/workflows/patch-pr-134-v15-2-5.yml
-          git add -A
-          git commit -m "release: prepare V15.2.5 disclosure alignment"
-          git push origin HEAD:${{ github.event.pull_request.head.ref }}
-
   quality:
     name: Regression quality
     runs-on: ubuntu-latest
