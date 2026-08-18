@@ -32,6 +32,7 @@ const required = [
   [index.includes("sync-config.js?v=15.2.5-release1") && sw.includes("sync-config.js?v=15.2.5-release1"), "release layer is cache-busted consistently"],
   [desktopUx.includes("--budget-disclosure-reference-size:var(--ui-disclosure-size,40px)"), "Budget disclosure buttons share the First-half control size"],
   [desktopUx.includes("--budget-disclosure-reference-inset:17px"), "Budget disclosure buttons use the First-half right inset"],
+  [desktopUx.includes("#money .period-card .period-header") && desktopUx.includes("padding-right:var(--budget-disclosure-reference-inset) !important"), "First, second, and other period headers pin the reference disclosure edge"],
   [desktopUx.includes("padding-right:calc(var(--budget-disclosure-reference-inset) - var(--budget-available-card-inset)) !important"), "Available money header resolves to the First-half right edge"],
   [desktopUx.includes("#monthlyBudgetPlannerCard.is-planner-collapsed .budget-planner-actions") && desktopUx.includes("right:var(--budget-disclosure-reference-inset) !important"), "Collapsed Monthly budget plan disclosure aligns to the First-half column"],
   [!desktopUx.includes("margin-right:5px !important"), "Budget disclosure alignment no longer relies on hard-coded margin offsets"],
