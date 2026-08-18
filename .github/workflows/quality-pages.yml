@@ -15,43 +15,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  patch-changelog:
-    name: Restore PR 134 changelog history
-    if: github.event_name == 'pull_request' && github.event.pull_request.number == 134 && github.actor != 'github-actions[bot]'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Check out PR branch
-        uses: actions/checkout@v7
-        with:
-          ref: ${{ github.event.pull_request.head.ref }}
-          fetch-depth: 0
-      - name: Restore full changelog and prepend V15.2.5
-        shell: bash
-        run: |
-          set -euo pipefail
-          git fetch origin main
-          git show origin/main:CHANGELOG.md > /tmp/changelog-main.md
-          cat > CHANGELOG.md <<'EOF'
-          ## 15.2.5 · 2026-08-18
-          - Aligned the Budget & Expenses disclosure controls for Monthly budget plan, Available money, First half, Second half, and Other expenses to the First-half reference geometry: 40px desktop controls on one exact 17px right-side column.
-          - Replaced the previous margin approximation with a derived Available money header inset that accounts for its existing 12px card padding, and anchored the collapsed Monthly budget plan control to the same reference edge.
-          - Preserved the existing 44px mobile disclosure touch targets and phone layouts while adding source-contract regression coverage for the shared desktop size and right edge.
-          - Released the alignment fix as V15.2.5 with cache `finance-v15-20260818-disclosure-alignment-r40`; Finance Schema 12, Cloud Schema V3, finance calculations, account balances, conflict-resolution behavior, and the five-minute routine sync cadence are unchanged.
-
-          EOF
-          cat /tmp/changelog-main.md >> CHANGELOG.md
-      - name: Commit restored changelog
-        shell: bash
-        run: |
-          set -euo pipefail
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add CHANGELOG.md
-          git commit -m "docs: preserve full V15.2.5 changelog history"
-          git push origin HEAD:${{ github.event.pull_request.head.ref }}
-
   quality:
     name: Regression quality
     runs-on: ubuntu-latest
