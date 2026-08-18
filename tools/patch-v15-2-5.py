@@ -24,7 +24,7 @@ replace("index.html", 'const APP_RELEASE_NAME = "Finance UI & Header Refinement"
 replace("index.html", 'const APP_CACHE_VERSION = "finance-v15-20260818-ui-refinement-r39";', 'const APP_CACHE_VERSION = "finance-v15-20260818-disclosure-alignment-r40";')
 replace("index.html", "sync-config.js?v=15.2.4-release1", "sync-config.js?v=15.2.5-release1")
 
-replace("sw.js", 'const CACHE_NAME = "finance-v15-20260818-ui-refinement-r39";', 'const CACHE_NAME = "finance-v15-20260818-disclosure-alignment-r40";')
+replace("sw.js", 'const CACHE_VERSION = "finance-v15-20260818-ui-refinement-r39";', 'const CACHE_VERSION = "finance-v15-20260818-disclosure-alignment-r40";')
 replace("sw.js", 'const APP_VERSION = "15.2.4";', 'const APP_VERSION = "15.2.5";')
 replace("sw.js", "desktop-ux-v15-2-0.css?v=15.2.4-header1", "desktop-ux-v15-2-0.css?v=15.2.5-disclosure1")
 replace("sw.js", "pwa-update-v15-0-5.js?v=15.2.4-release1", "pwa-update-v15-0-5.js?v=15.2.5-release1")
