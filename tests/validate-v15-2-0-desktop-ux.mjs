@@ -6,6 +6,7 @@ const version = JSON.parse(read("version.json"));
 const pkg = JSON.parse(read("package.json"));
 const prod = read("productivity-tools.js");
 const desktopUx = read("desktop-ux-v15-2-0.css");
+const changelog = read("CHANGELOG.md");
 const cloudFile = fs.readdirSync(".").find(name => name.endsWith(".js") && read(name).includes("financeCloudSyncV3Bootstrap"));
 if (!cloudFile) throw new Error("Cloud Sync V3 file missing");
 const cloud = read(cloudFile);
@@ -15,6 +16,7 @@ const required = [
   [version.schemaVersion === 12 && version.cloudSchemaVersion === 3, "schemas remain 12/3"],
   [version.cacheVersion === "finance-v15-20260818-disclosure-alignment-r40", "V15.2.5 disclosure cache is declared"],
   [index.includes("My Finance Records · V15.2.5"), "page title is V15.2.5"],
+  [changelog.startsWith("## 15.2.5 · 2026-08-18"), "CHANGELOG begins with V15.2.5"],
   [index.includes("recurring items checked"), "month navigation explains recurring preparation"],
   [index.includes("cleared because filters changed"), "selection reset is announced"],
   [index.includes("Enter an account name."), "account name has inline validation"],
