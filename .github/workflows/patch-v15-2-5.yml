@@ -1,6 +1,9 @@
 name: One-time V15.2.5 release patch
 
 on:
+  pull_request:
+    branches: [main]
+    types: [synchronize]
   push:
     branches:
       - agent/align-budget-disclosure-buttons
@@ -10,7 +13,7 @@ permissions:
 
 jobs:
   patch:
-    if: github.actor != 'github-actions[bot]'
+    if: github.actor != 'github-actions[bot]' && (github.event_name != 'pull_request' || github.head_ref == 'agent/align-budget-disclosure-buttons')
     runs-on: ubuntu-latest
     steps:
       - name: Check out release branch
@@ -39,7 +42,6 @@ jobs:
               p.write_text(text.replace(old, new))
               print(f"{path}: replaced {count} occurrence(s) of {old!r}")
 
-          # Current release identity and cache-busted delivery references.
           replace("index.html", "<title>My Finance Records · V15.2.4</title>", "<title>My Finance Records · V15.2.5</title>")
           replace("index.html", "desktop-ux-v15-2-0.css?v=15.2.4-header1", "desktop-ux-v15-2-0.css?v=15.2.5-disclosure1")
           replace("index.html", "pwa-update-v15-0-5.js?v=15.2.4-release1", "pwa-update-v15-0-5.js?v=15.2.5-release1")
@@ -59,7 +61,6 @@ jobs:
           replace("sync-config.js", 'const VERSION = "15.2.4";', 'const VERSION = "15.2.5";')
           replace("sync-config.js", 'const RELEASE_NAME = "Finance UI & Header Refinement";', 'const RELEASE_NAME = "Finance Disclosure Alignment";')
 
-          # Release history.
           readme = Path("README.md")
           text = readme.read_text()
           old_heading = "# My Finance Records · V15.2.4"
@@ -88,7 +89,6 @@ Finance Schema **12**, Cloud Schema **V3**, finance records, calculations, accou
           text = text.replace(anchor, section + anchor, 1)
           readme.write_text(text)
 
-          # Keep package-lock release metadata aligned with package.json.
           lock_path = Path("package-lock.json")
           if lock_path.exists():
               lock = json.loads(lock_path.read_text())
@@ -97,7 +97,6 @@ Finance Schema **12**, Cloud Schema **V3**, finance records, calculations, accou
                   lock["packages"][""]["version"] = NEW_VERSION
               lock_path.write_text(json.dumps(lock, indent=2) + "\n")
 
-          # Current-release regression files that intentionally track release delivery.
           pwa_test = Path("tests/validate-pwa-updater-v15-0-5.mjs")
           text = pwa_test.read_text()
           text = text.replace('assert.equal(version.version, "15.2.4");', 'assert.equal(version.version, "15.2.5");')
