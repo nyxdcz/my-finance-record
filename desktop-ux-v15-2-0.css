@@ -206,3 +206,30 @@
   min-height:20px !important;
   line-height:20px !important;
 }
+
+/* V15.2.4-r3 · Budget & Expenses disclosure controls follow First half geometry. */
+@media (min-width:851px){
+  #money{
+    --budget-disclosure-reference-size:var(--ui-disclosure-size,40px);
+    --budget-disclosure-reference-inset:17px;
+  }
+  #money .period-card .collapse-toggle,
+  #money #availableMoneySection [data-collapse-toggle="available-money"],
+  #money #monthlyBudgetPlannerToggle{
+    width:var(--budget-disclosure-reference-size) !important;
+    min-width:var(--budget-disclosure-reference-size) !important;
+    height:var(--budget-disclosure-reference-size) !important;
+    min-height:var(--budget-disclosure-reference-size) !important;
+    padding:0 !important;
+    flex:0 0 var(--budget-disclosure-reference-size) !important;
+  }
+  #money #availableMoneySection [data-collapse-toggle="available-money"]{
+    margin-right:5px !important;
+  }
+  #money #monthlyBudgetPlannerCard.is-planner-collapsed .budget-planner-actions{
+    right:var(--budget-disclosure-reference-inset) !important;
+  }
+  #money #monthlyBudgetPlannerCard:not(.is-planner-collapsed) #monthlyBudgetPlannerToggle{
+    margin-right:5px !important;
+  }
+}
