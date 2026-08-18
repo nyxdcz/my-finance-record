@@ -17,6 +17,7 @@ const required = [
   [version.cacheVersion === "finance-v15-20260818-disclosure-alignment-r40", "V15.2.5 disclosure cache is declared"],
   [index.includes("My Finance Records · V15.2.5"), "page title is V15.2.5"],
   [changelog.startsWith("## 15.2.5 · 2026-08-18"), "CHANGELOG begins with V15.2.5"],
+  [changelog.includes("## 15.2.4 · 2026-08-18"), "CHANGELOG preserves the previous V15.2.4 history"],
   [index.includes("recurring items checked"), "month navigation explains recurring preparation"],
   [index.includes("cleared because filters changed"), "selection reset is announced"],
   [index.includes("Enter an account name."), "account name has inline validation"],
