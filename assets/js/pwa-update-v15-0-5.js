@@ -2,7 +2,7 @@
 (function exposeFinancePwaUpdate(root) {
   const FINANCE_CACHE_PATTERN = /^finance-v\d+-/;
   const LEGACY_INDEX_CACHE = "finance-v15-20260816-mobile-ui-ux-r32";
-  const CURRENT_CACHE_VERSION = "finance-v15-20260819-sync-config-separation-r43";
+  const CURRENT_CACHE_VERSION = "finance-v15-20260819-pwa-ui-ownership-r44";
   const normalizeCacheVersion = cacheVersion => cacheVersion === LEGACY_INDEX_CACHE ? CURRENT_CACHE_VERSION : cacheVersion;
   const api = {
     financeCachePattern:FINANCE_CACHE_PATTERN,
@@ -39,40 +39,6 @@
     else apply();
   }
   installSidebarBrand();
-
-  function installCashFlowStyles() {
-    const doc = root.document;
-    if (!doc || doc.getElementById("cashFlowLayoutV1522")) return;
-    const style = doc.createElement("style");
-    style.id = "cashFlowLayoutV1522";
-    style.textContent = `
-      #dashCashFlowChart .cash-flow-chart-grid{display:grid;grid-template-columns:minmax(0,7fr) minmax(190px,3fr);gap:10px;align-items:stretch}
-      #dashCashFlowChart .cash-flow-chart-main{display:flex;min-width:0;flex-direction:column}
-      #dashCashFlowChart .cash-flow-chart-main .chart-svg{flex:1 1 auto;min-height:170px}
-      #dashCashFlowChart .cash-flow-chart-main .chart-legend{margin:6px 0 0;padding-top:6px;border-top:1px solid var(--line)}
-      #dashCashFlowChart .cash-flow-summary-panel{display:flex;min-width:0;flex-direction:column;gap:9px;padding:10px}
-      #dashCashFlowChart .cash-flow-summary-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;padding-bottom:7px;border-bottom:1px solid var(--line)}
-      #dashCashFlowChart .cash-flow-summary-head h4{margin:0}
-      #dashCashFlowChart .cash-flow-summary-head strong{color:var(--text);font-size:.72rem;text-align:right;white-space:nowrap}
-      #dashCashFlowChart .cash-flow-summary-metrics{display:grid;gap:6px}
-      #dashCashFlowChart .cash-flow-summary-metric{display:flex;align-items:center;justify-content:space-between;gap:9px;min-width:0;padding:7px 8px;border:1px solid var(--line);border-radius:7px;background:var(--surface)}
-      #dashCashFlowChart .cash-flow-summary-metric span{display:flex;align-items:center;gap:6px;min-width:0;color:var(--muted);font-size:.66rem;font-weight:750}
-      #dashCashFlowChart .cash-flow-summary-metric i{width:8px;height:8px;flex:0 0 8px;border-radius:999px}
-      #dashCashFlowChart .cash-flow-summary-metric i.income{background:var(--green)}
-      #dashCashFlowChart .cash-flow-summary-metric i.expense{background:var(--red)}
-      #dashCashFlowChart .cash-flow-summary-metric i.balance{background:var(--blue)}
-      #dashCashFlowChart .cash-flow-summary-metric strong{min-width:0;font-size:.75rem;font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
-      #dashCashFlowChart .cash-flow-summary-metric .income-value{color:var(--green)}
-      #dashCashFlowChart .cash-flow-summary-metric .expense-value{color:var(--red)}
-      #dashCashFlowChart .cash-flow-summary-metric .balance-value{color:var(--blue)}
-      #dashCashFlowChart .cash-flow-summary-change{margin-top:auto;padding:8px;border:1px solid var(--line);border-radius:7px;background:var(--surface-soft)}
-      #dashCashFlowChart .cash-flow-summary-change span{display:block;color:var(--muted);font-size:.61rem;font-weight:750}
-      #dashCashFlowChart .cash-flow-summary-change strong{display:block;margin-top:2px;font-size:.72rem;font-variant-numeric:tabular-nums}
-      @media (min-width:701px) and (max-width:1100px){#dashCashFlowChart .cash-flow-chart-grid{grid-template-columns:minmax(0,3fr) minmax(180px,2fr)}}
-      @media (max-width:700px){#dashCashFlowChart .cash-flow-chart-grid{grid-template-columns:1fr}#dashCashFlowChart .cash-flow-summary-panel{gap:7px}#dashCashFlowChart .cash-flow-summary-metrics{grid-template-columns:1fr}#dashCashFlowChart .cash-flow-summary-change{margin-top:0}}
-    `;
-    doc.head.appendChild(style);
-  }
 
   function parseMoneyText(value) {
     const numeric = Number(String(value || "").replace(/[^0-9.-]/g, ""));
@@ -133,7 +99,6 @@
   function installCashFlowLayoutUpgrade() {
     const doc = root.document;
     if (!doc) return;
-    installCashFlowStyles();
     const start = () => {
       const target = doc.getElementById("dashCashFlowChart");
       if (!target) return;

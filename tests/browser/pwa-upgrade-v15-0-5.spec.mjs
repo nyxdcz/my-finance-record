@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-test("V15.2.7 registers the cache-qualified worker and clears stale Finance caches", async ({ page }) => {
+test("V15.2.8 registers the cache-qualified worker and clears stale Finance caches", async ({ page }) => {
   await page.goto("http://127.0.0.1:3000/index.html?page=settings", { waitUntil:"networkidle" });
   await page.evaluate(async () => {
     await navigator.serviceWorker.ready;
@@ -9,9 +9,9 @@ test("V15.2.7 registers the cache-qualified worker and clears stale Finance cach
     await caches.open("unrelated-test-cache");
   });
 
-  await expect.poll(async () => page.evaluate(() => navigator.serviceWorker.controller?.scriptURL || ""), { timeout:15000 }).toContain("v=15.2.7");
+  await expect.poll(async () => page.evaluate(() => navigator.serviceWorker.controller?.scriptURL || ""), { timeout:15000 }).toContain("v=15.2.8");
   const workerUrl = await page.evaluate(() => navigator.serviceWorker.controller?.scriptURL || "");
-  expect(workerUrl).toContain("cache=finance-v15-20260819-sync-config-separation-r43");
+  expect(workerUrl).toContain("cache=finance-v15-20260819-pwa-ui-ownership-r44");
 
   await page.evaluate(async () => { await window.clearAppCaches(); });
   const names = await page.evaluate(async () => caches.keys());

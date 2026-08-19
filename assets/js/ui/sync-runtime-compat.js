@@ -1,6 +1,6 @@
 (function applyV15ReleaseLayer() {
-  const VERSION = "15.2.7";
-  const RELEASE_NAME = "Application Help Module Extraction";
+  const VERSION = "15.2.8";
+  const RELEASE_NAME = "PWA UI Ownership Cleanup";
   const RELEASE_DATE = "August 19, 2026";
   window.FINANCE_APP_VERSION_OVERRIDE = VERSION;
   window.FINANCE_RELEASE_OVERRIDE = { version:VERSION, name:RELEASE_NAME, released:"2026-08-19" };
