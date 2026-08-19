@@ -6,6 +6,7 @@ const version = JSON.parse(read("version.json"));
 const pkg = JSON.parse(read("package.json"));
 const prod = read("productivity-tools.js");
 const desktopUx = read("desktop-ux-v15-2-0.css");
+const uiIcons = read("ui-icon-alignment-v15-0-5.css");
 const changelog = read("CHANGELOG.md");
 const cloudFile = fs.readdirSync(".").find(name => name.endsWith(".js") && read(name).includes("financeCloudSyncV3Bootstrap"));
 if (!cloudFile) throw new Error("Cloud Sync V3 file missing");
@@ -39,6 +40,11 @@ const required = [
   [desktopUx.includes("padding-right:calc(var(--budget-disclosure-reference-inset) - var(--budget-available-card-inset)) !important"), "Available money header resolves to the First-half right edge"],
   [desktopUx.includes("#monthlyBudgetPlannerCard.is-planner-collapsed .budget-planner-actions") && desktopUx.includes("right:var(--budget-disclosure-reference-inset) !important"), "Collapsed Monthly budget plan disclosure aligns to the First-half column"],
   [!desktopUx.includes("margin-right:5px !important"), "Budget disclosure alignment no longer relies on hard-coded margin offsets"],
+  [uiIcons.includes("V15.2.5-r3 · Available Money uses universal 35px scalloped account badges without cropping"), "Available Money universal badge layer is present"],
+  [uiIcons.includes("#money #moneyAccounts .account-card-icon") && uiIcons.includes("width:35px !important") && uiIcons.includes("height:35px !important"), "Available Money account badges are 35px"],
+  [uiIcons.includes("width:29px !important") && uiIcons.includes("object-fit:contain !important") && uiIcons.includes("object-position:center !important"), "Account logos use a centered no-crop safe area"],
+  [uiIcons.includes('img[alt=\"Wallet icon\" i]') && uiIcons.includes("--available-account-badge-fill:#ffffff"), "Wallet receives the universal badge treatment"],
+  [uiIcons.includes('img[alt=\"UnionBank icon\" i]') && uiIcons.includes('img[alt=\"RCBC icon\" i]') && uiIcons.includes('img[alt=\"Maya icon\" i]') && uiIcons.includes('img[alt=\"GCash icon\" i]') && uiIcons.includes('img[alt=\"GoTyme icon\" i]'), "Current Bank and E-wallet artwork keeps matching outer fills"],
   [read("mobile-v14-0-23.css").length > 0, "mobile stylesheet remains present"]
 ];
 for (const [ok, message] of required) { if (!ok) throw new Error(message); }
