@@ -29,7 +29,7 @@ assert.match(sw, /mobile-v14-0-23\.css\?v=15\.2\.2-mobile1/);
 assert.match(sw, /liquid-glass-v15\.css\?v=15\.2\.2-light1/);
 assert.match(sw, /sync-config\.js\?v=15\.2\.7-release1/);
 assert.match(runtimeCompat, /const VERSION = "15\.2\.7";/);
-assert.match(runtimeCompat, /const RELEASE_NAME = "Application Help Module Extraction";/);
+assert.match(runtimeCompat, /const RELEASE_NAME = "PWA UI Ownership Cleanup";/);
 assert.match(mobile, /V15\.2\.2 · mobile UI \+ UX consistency/);
 assert.match(mobile, /body \.workspace-switcher,\s*body \.finance-workspace-marquee-row[\s\S]*var\(--mobile-topbar-offset/);
 assert.match(mobile, /\.toast \.toast-dismiss[\s\S]*min-width:\s*44px/);
