@@ -42,3 +42,23 @@ if (!pwaTest.includes(oldWorkerVersion) && !pwaTest.includes(newWorkerVersion)) 
 pwaTest = pwaTest.replace(oldWorkerVersion, newWorkerVersion);
 pwaTest = pwaTest.replaceAll("V15.2.9 PWA updater regression passed", "V15.2.10 PWA updater regression passed");
 fs.writeFileSync(pwaTestFile, pwaTest);
+
+const desktopUxTestFile = "tests/regression/validate-v15-2-0-desktop-ux.mjs";
+let desktopUxTest = fs.readFileSync(desktopUxTestFile, "utf8");
+desktopUxTest = desktopUxTest.replaceAll('version.version === "15.2.9"', 'version.version === "15.2.10"');
+desktopUxTest = desktopUxTest.replaceAll('pkg.version === "15.2.9"', 'pkg.version === "15.2.10"');
+desktopUxTest = desktopUxTest.replaceAll('"version.json is V15.2.9"', '"version.json is V15.2.10"');
+desktopUxTest = desktopUxTest.replaceAll('"package.json is V15.2.9"', '"package.json is V15.2.10"');
+desktopUxTest = desktopUxTest.replaceAll('finance-v15-20260820-ui-asset-delivery-r45', 'finance-v15-20260820-sidebar-icons-r46');
+desktopUxTest = desktopUxTest.replaceAll('V15.2.9 Application Help cache is declared', 'V15.2.10 sidebar icon cache is declared');
+desktopUxTest = desktopUxTest.replaceAll('My Finance Records · V15.2.9', 'My Finance Records · V15.2.10');
+desktopUxTest = desktopUxTest.replaceAll('page title is V15.2.9', 'page title is V15.2.10');
+desktopUxTest = desktopUxTest.replaceAll('## 15.2.9 · 2026-08-20', '## 15.2.10 · 2026-08-20');
+desktopUxTest = desktopUxTest.replaceAll('CHANGELOG begins with V15.2.9', 'CHANGELOG begins with V15.2.10');
+desktopUxTest = desktopUxTest.replaceAll('const APP_VERSION = "15.2.9"', 'const APP_VERSION = "15.2.10"');
+desktopUxTest = desktopUxTest.replaceAll('const VERSION = "15.2.9"', 'const VERSION = "15.2.10"');
+desktopUxTest = desktopUxTest.replaceAll('const RELEASE_NAME = "UI Asset Delivery Hotfix"', 'const RELEASE_NAME = "Embedded Sidebar Icon Hotfix"');
+desktopUxTest = desktopUxTest.replaceAll('release override matches V15.2.9', 'release override matches V15.2.10');
+desktopUxTest = desktopUxTest.replaceAll('sync-config.js?v=15.2.9-release1', 'sync-config.js?v=15.2.10-release1');
+desktopUxTest = desktopUxTest.replaceAll('V15.2.9 release preserves the desktop UX source contract', 'V15.2.10 release preserves the desktop UX source contract');
+fs.writeFileSync(desktopUxTestFile, desktopUxTest);
