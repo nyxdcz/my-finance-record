@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import fs from "node:fs";
 
-const source = name => fs.readFileSync(new URL(`../${name}`, import.meta.url), "utf8");
+const source = name => fs.readFileSync(new URL(`../../${name}`, import.meta.url), "utf8");
 
 test("expanded sidebar uses My Finance Records and a compact stable pin", async ({ page }) => {
   expect(source("pwa-update-v15-0-5.js")).toContain('brand.textContent = "My Finance Records"');

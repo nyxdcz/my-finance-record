@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { fileURLToPath } from "node:url";
 
-const formInputsScript = fileURLToPath(new URL("../form-inputs.js", import.meta.url));
+const formInputsScript = fileURLToPath(new URL("../../form-inputs.js", import.meta.url));
 
 test("V15.2.6 extracted form inputs preserve calculator and validation behavior", async ({ page }) => {
   // Use an isolated DOM fixture so app authentication/PWA navigation cannot destroy

@@ -4,7 +4,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const root = path.resolve(here, "..");
+const root = path.resolve(here, "../..");
 const privacyScript = path.join(root, "privacy-lock.js");
 const interactionScript = path.join(root, "interaction-patterns.js");
 const projectAgendaScript = path.join(root, "projects-calendar-v13.0.20.js");

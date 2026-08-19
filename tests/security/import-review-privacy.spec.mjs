@@ -2,8 +2,8 @@
 import { test, expect } from "@playwright/test";
 import fs from "node:fs";
 
-const privacySource = fs.readFileSync(new URL("../privacy-lock.js", import.meta.url), "utf8");
-const serviceWorkerSource = fs.readFileSync(new URL("../sw.js", import.meta.url), "utf8");
+const privacySource = fs.readFileSync(new URL("../../privacy-lock.js", import.meta.url), "utf8");
+const serviceWorkerSource = fs.readFileSync(new URL("../../sw.js", import.meta.url), "utf8");
 
 const allowedRecoveryControls = [
   "label[for='importSyncBundleInput']",
