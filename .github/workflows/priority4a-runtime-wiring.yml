@@ -56,6 +56,9 @@ jobs:
           if (!index.includes(runtimeTag)) index = replaceOnce(index, configTag, `${configTag}\n  ${runtimeTag}`, "index sync-config tag");
           if (!index.includes(oldCache)) throw new Error("index.html: expected the current r42 cache identity");
           index = index.replaceAll(oldCache, newCache);
+          const controllerReload = 'navigator.serviceWorker.addEventListener("controllerchange", () => location.reload());';
+          const guardedControllerReload = 'let serviceWorkerControlled = Boolean(navigator.serviceWorker.controller);\n        navigator.serviceWorker.addEventListener("controllerchange", () => {\n          if (serviceWorkerControlled) location.reload();\n          serviceWorkerControlled = true;\n        });';
+          if (!index.includes("let serviceWorkerControlled = Boolean(navigator.serviceWorker.controller);")) index = replaceOnce(index, controllerReload, guardedControllerReload, "service-worker controller reload");
           write("index.html", index);
 
           let worker = read("sw.js");
@@ -93,6 +96,13 @@ jobs:
             const text = read(testFile);
             if (text.includes(oldCache)) write(testFile, text.replaceAll(oldCache, newCache));
           }
+
+          const pwaTest = "tests/regression/validate-pwa-updater-v15-0-5.mjs";
+          let pwaRegression = read(pwaTest);
+          const updateStateAssert = 'assert.match(index, /FinancePwaUpdate\\.updateState\\(remote, APP_VERSION, APP_CACHE_VERSION\\)/);';
+          const firstControllerAssert = 'assert.match(index, /let serviceWorkerControlled = Boolean\\(navigator\\.serviceWorker\\.controller\\);/);\nassert.match(index, /if \\(serviceWorkerControlled\\) location\\.reload\\(\\);/);';
+          if (!pwaRegression.includes("serviceWorkerControlled")) pwaRegression = replaceOnce(pwaRegression, updateStateAssert, `${updateStateAssert}\n${firstControllerAssert}`, "PWA first-controller regression assertion");
+          write(pwaTest, pwaRegression);
 
           const monthTest = "tests/regression/validate-month-navigation-borderless-v15-1-0.mjs";
           let month = read(monthTest);
