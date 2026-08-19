@@ -1,21 +1,22 @@
 name: Apply V15.2.5 account and project contrast patch
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - .github/workflows/ui-contrast-v15-2-5.yml
+  workflow_run:
+    workflows: ["Quality and GitHub Pages"]
+    types: [completed]
 
 permissions:
   contents: write
 
 jobs:
   patch:
+    if: github.event.workflow_run.head_branch == 'main'
     runs-on: ubuntu-latest
     steps:
-      - name: Check out repository
+      - name: Check out main
         uses: actions/checkout@v7
         with:
+          ref: main
           fetch-depth: 0
 
       - name: Apply approved contrast fixes
@@ -67,7 +68,6 @@ html body #projects .completed-project-record .project-revision-inline {
           sw = sw_path.read_text().replace("./ui-icon-alignment-v15-0-5.css?v=15.2.4-ui1", "./ui-icon-alignment-v15-0-5.css?v=15.2.5-contrast1")
           sw_path.write_text(sw)
 
-          # Self-check the approved scope before committing.
           index = index_path.read_text()
           css = css_path.read_text()
           sw = sw_path.read_text()
