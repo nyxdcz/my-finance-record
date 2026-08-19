@@ -34,5 +34,7 @@ if (version.schemaVersion !== 12 || version.cloudSchemaVersion !== 3) throw new 
 if (version.cacheVersion !== expectedCache) throw new Error(`Unexpected cache version: ${version.cacheVersion}`);
 if (!serviceWorker.includes(`const CACHE_VERSION = "${expectedCache}";`)) throw new Error("Service worker cache identity is not synchronized.");
 if (!serviceWorker.includes("./sync-runtime-compat.js?v=15.2.7-priority4a1")) throw new Error("Service worker must precache the sync runtime compatibility file.");
+if (!index.includes(`const APP_CACHE_VERSION = "${expectedCache}";`)) throw new Error("index.html cache identity is not synchronized.");
+if (runtime.includes("window.FINANCE_SYNC_CONFIG")) throw new Error("sync runtime compatibility file must not own hosted sync configuration.");
 
 console.log("Priority 4A sync configuration separation validated.");

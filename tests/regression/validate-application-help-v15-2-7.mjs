@@ -20,5 +20,5 @@ assert.ok(prepare.includes('"assets/js/ui"') && prepare.includes('"application-h
 assert.ok(worker.includes('asset("./application-help.js?v=15.2.7-phase5b1")'), "Service worker does not precache Application Help");
 assert.ok(workflow.includes("cp assets/js/ui/*.js _site/") && workflow.includes("test -f _site/application-help.js"), "Pages nested packaging missing");
 assert.equal(version.version, "15.2.7");
-assert.equal(version.cacheVersion, "finance-v15-20260819-application-help-r42");
+assert.equal(version.cacheVersion, "finance-v15-20260819-sync-config-separation-r43");
 console.log("Application Help V15.2.7 extraction validation passed.");

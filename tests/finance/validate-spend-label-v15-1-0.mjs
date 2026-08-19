@@ -13,5 +13,5 @@ assert.match(sw,/black-canvas-v15-1-0\.css\?v=15\.1\.0-light1/);
 assert.equal(version.version,"15.2.7");
 assert.equal(version.schemaVersion,12);
 assert.equal(version.cloudSchemaVersion,3);
-assert.equal(version.cacheVersion,"finance-v15-20260819-application-help-r42");
+assert.equal(version.cacheVersion,"finance-v15-20260819-sync-config-separation-r43");
 console.log("V15.2.7 Spend theme contrast regression passed.");

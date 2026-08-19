@@ -13,6 +13,6 @@ assert.match(index, /id="cloudSignIn"/);
 assert.match(css, /customizeDashboardButton\[data-dashboard-toolbar-action\]::before[\s\S]*translateY\(1px\)/);
 assert.match(index, /privacy-lock\.js\?v=15\.1\.0-ui1/);
 assert.match(index, /ui-icon-alignment-v15-0-5\.css\?v=15\.2\.4-ui1/);
-assert.equal(version.cacheVersion, "finance-v15-20260819-application-help-r42");
-assert.match(sw, /finance-v15-20260819-application-help-r42/);
+assert.equal(version.cacheVersion, "finance-v15-20260819-sync-config-separation-r43");
+assert.match(sw, /finance-v15-20260819-sync-config-separation-r43/);
 console.log("V15.2.7 header UI regression passed while preserving the V15.2.4 icon-alignment asset pin.");

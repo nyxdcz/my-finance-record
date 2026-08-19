@@ -26,6 +26,6 @@ assert.equal(manifest.background_color,"#000000");
 assert.equal(manifest.theme_color,"#173e76");
 assert.match(offline,/background:#000000/);
 assert.equal(version.version,"15.2.7");
-assert.equal(version.cacheVersion,"finance-v15-20260819-application-help-r42");
+assert.equal(version.cacheVersion,"finance-v15-20260819-sync-config-separation-r43");
 assert.match(worker,/black-canvas-v15-1-0\.css\?v=15\.1\.0-light1/);
 console.log("V15.2.7 light/dark palette regression passed.");

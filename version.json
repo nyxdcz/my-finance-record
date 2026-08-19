@@ -10,8 +10,8 @@
   "profileArchitectureVersion": 1,
   "encryptionVersion": 1,
   "authSecurityVersion": 1,
-  "cacheVersion": "finance-v15-20260819-application-help-r42",
+  "cacheVersion": "finance-v15-20260819-sync-config-separation-r43",
   "released": "2026-08-19",
   "name": "Application Help Module Extraction",
-  "notes": "V15.2.7 extracts the existing Application Help UI subsystem from index.html into assets/js/ui/application-help.js, preserves the same help topics, global functions, dialog behavior, focus return, and runtime URLs, adds nested-source compatibility plus focused source/browser regression coverage, and rotates PWA delivery to r42. Finance Schema 12, Cloud Schema V3, finance records, calculations, balances, storage, sync behavior, sidebar behavior, layouts, and the five-minute sync cadence are unchanged."
+  "notes": "V15.2.7 extracts the existing Application Help UI subsystem from index.html into assets/js/ui/application-help.js and preserves the same help topics, global functions, dialog behavior, focus return, and runtime URLs. This focused repair completes Priority 4A by loading the separated sync-runtime-compat.js after hosted sync configuration and precaching it under r43. Finance Schema 12, Cloud Schema V3, finance records, calculations, balances, storage, authentication, sync/conflict behavior, sidebar behavior, layouts, and the five-minute sync cadence are unchanged."
 }

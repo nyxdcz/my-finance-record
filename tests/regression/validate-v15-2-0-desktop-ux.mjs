@@ -16,7 +16,7 @@ const required = [
   [version.version === "15.2.7", "version.json is V15.2.7"],
   [pkg.version === "15.2.7", "package.json is V15.2.7"],
   [version.schemaVersion === 12 && version.cloudSchemaVersion === 3, "schemas remain 12/3"],
-  [version.cacheVersion === "finance-v15-20260819-application-help-r42", "V15.2.7 Application Help cache is declared"],
+  [version.cacheVersion === "finance-v15-20260819-sync-config-separation-r43", "V15.2.7 Application Help cache is declared"],
   [index.includes("My Finance Records · V15.2.7"), "page title is V15.2.7"],
   [changelog.startsWith("## 15.2.7 · 2026-08-19"), "CHANGELOG begins with V15.2.7"],
   [changelog.includes("## 15.2.4 · 2026-08-18"), "CHANGELOG preserves the previous V15.2.4 history"],

@@ -7608,7 +7608,7 @@
     const APP_VERSION = "15.2.7";
     const APP_RELEASE_NAME = "Application Help Module Extraction";
     const APP_RELEASE_DATE = "August 19, 2026";
-    const APP_CACHE_VERSION = "finance-v15-20260819-application-help-r42";
+    const APP_CACHE_VERSION = "finance-v15-20260819-sync-config-separation-r43";
 
     function synchronizeVersionDisplay() {
       document.title = `My Finance Records · V${APP_VERSION}`;
@@ -8527,7 +8527,11 @@
             if (worker.state === "installed" && navigator.serviceWorker.controller) showUpdateReady(registration);
           });
         });
-        navigator.serviceWorker.addEventListener("controllerchange", () => location.reload());
+        let serviceWorkerControlled = Boolean(navigator.serviceWorker.controller);
+        navigator.serviceWorker.addEventListener("controllerchange", () => {
+          if (serviceWorkerControlled) location.reload();
+          serviceWorkerControlled = true;
+        });
         try {
           const response=await fetch(`./version.json?check=${Date.now()}`,{cache:"no-store"});
           if(response.ok){
@@ -8892,6 +8896,7 @@
   </script>
   <script src="./vendor/supabase.min.js"></script>
   <script src="./sync-config.js?v=15.2.7-release1"></script>
+  <script src="./sync-runtime-compat.js?v=15.2.7-priority4a1"></script>
   <script src="./privacy-lock.js?v=15.1.0-ui1"></script>
   <script src="./security-profiles.js?v=14.0.23"></script>
   <script src="./cloud-conflict-review.js?v=14.0.23"></script>

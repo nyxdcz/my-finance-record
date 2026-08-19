@@ -6,7 +6,7 @@ const sw = read("sw.js");
 const version = JSON.parse(read("version.json"));
 const required = [
   [version.version === "15.2.7", "current release is V15.2.7"],
-  [version.cacheVersion === "finance-v15-20260819-application-help-r42", "r42 cache is active"],
+  [version.cacheVersion === "finance-v15-20260819-sync-config-separation-r43", "r42 cache is active"],
   [index.includes("./form-inputs.js?v=15.2.6-phase5a1"), "index preserves the extracted V15.2.6 form-input module pin"],
   [!index.includes("function evaluateArithmeticExpression"), "calculator implementation is no longer inline"],
   [formInputs.includes("function evaluateArithmeticExpression") && formInputs.includes("function validateMoneyInput") && formInputs.includes("function setupNumericInputs"), "extracted calculator APIs are present"],
