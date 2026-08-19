@@ -29,4 +29,7 @@ assert.match(worker, /networkFirstCriticalAsset/);
 assert.match(worker, /url\.pathname\.endsWith\("privacy-lock\.js"\) \|\| url\.pathname\.endsWith\("cloud-sync-lifecycle\.js"\)/);
 assert.match(worker, /pwa-update-v15-0-5\.js\?v=15\.2\.7-release1/);
 assert.match(worker, /ui-icon-alignment-v15-0-5\.css\?v=15\.2\.4-ui1/);
+assert.match(worker, /mobile-v14-0-23\.css/);
+assert.match(worker, /budget-planning\.css/);
+assert.match(worker, /black-canvas-v15-1-0\.css/);
 console.log("V15.2.7 PWA updater regression passed with Application Help extraction cache refresh.");
