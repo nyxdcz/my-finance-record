@@ -1,6 +1,21 @@
-# My Finance Records · V15.2.5
+# My Finance Records · V15.2.6
 
 Local-first personal finance PWA with multi-profile support and optional encrypted cloud synchronization.
+
+## V15.2.6 · Form Input Module Extraction
+
+Released **August 19, 2026** with PWA cache `finance-v15-20260819-form-inputs-r41`.
+
+### New updates since V15.2.5
+
+- **Form-input module extraction** — Moves the existing calculator and numeric input subsystem out of the large inline application script into `assets/js/form-inputs.js` while preserving the same global APIs and user behavior.
+- **Repository maintainability** — Reduces `index.html` and keeps the extracted runtime source inside the organized Phase 4 `assets/js/` structure with generated root compatibility for local development.
+- **PWA delivery** — Precaches the new form-input module and rotates the shell cache to r41 so installed clients receive the extracted runtime safely.
+- **Regression coverage** — Adds source and browser checks for arithmetic parsing, money/integer validation, accessible field errors, formatting, and calculator controls.
+
+### Preserved in V15.2.6
+
+Finance Schema **12**, Cloud Schema **V3**, finance records, calculations, account balances, layouts, conflict-resolution behavior, and the routine **five-minute sync cadence** are unchanged.
 
 ## V15.2.5 · Finance Disclosure Alignment
 

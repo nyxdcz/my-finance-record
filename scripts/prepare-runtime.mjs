@@ -34,6 +34,7 @@ const runtimeGroups = {
     "expense-screenshot-ai.js",
     "expense-screenshot-detect.js",
     "expense-screenshot-parser.js",
+    "form-inputs.js",
     "interaction-patterns.js",
     "privacy-lock.js",
     "productivity-tools.js",
