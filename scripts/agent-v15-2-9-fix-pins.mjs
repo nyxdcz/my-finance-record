@@ -24,6 +24,10 @@ const sidebarRegexPins = [
   [String.raw`sidebar-settings\.png"`, String.raw`sidebar-settings\.png\?v=15\.2\.9-icon1"`],
   [String.raw`sidebar-insights-v14-0-24\.png"`, String.raw`sidebar-insights-v14-0-24\.png\?v=15\.2\.9-icon1"`]
 ];
+const legacyCssFallbackPin = [
+  String.raw`data-page="reports"\] \.nav-icon-image\{content:url\("\.\/icons\/sidebar-insights-v14-0-24\.png\?v=15\.2\.9-icon1"\)\}`,
+  String.raw`data-page="reports"\] \.nav-icon-image\{content:url\("\.\/icons\/sidebar-insights-v14-0-24\.png"\)\}`
+];
 
 const visit = directory => {
   for (const entry of fs.readdirSync(directory, { withFileTypes:true })) {
@@ -34,10 +38,11 @@ const visit = directory => {
       value = value.replaceAll("## 15.2.9 · 2026-08-19", "## 15.2.9 · 2026-08-20");
       value = value.replaceAll("V15.2.9 · UI Asset Delivery Hotfix · August 19, 2026", "V15.2.9 · UI Asset Delivery Hotfix · August 20, 2026");
       for (const [from, to] of sidebarRegexPins) value = value.replaceAll(from, to);
+      value = value.replaceAll(...legacyCssFallbackPin);
       fs.writeFileSync(full, value);
     }
   }
 };
 visit(path.join(root, "tests"));
 
-console.log("Normalized V15.2.9 release and sidebar asset pins.");
+console.log("Normalized V15.2.9 release and sidebar asset pins while preserving the legacy CSS fallback contract.");
