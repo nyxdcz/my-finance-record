@@ -66,6 +66,7 @@ fs.writeFileSync(desktopUxTestFile, desktopUxTest);
 const mobileUiTestFile = "tests/regression/validate-v15-2-2-mobile-ui.mjs";
 let mobileUiTest = fs.readFileSync(mobileUiTestFile, "utf8");
 mobileUiTest = mobileUiTest.replaceAll("15.2.9", "15.2.10");
+mobileUiTest = mobileUiTest.replaceAll("15\\.2\\.9", "15\\.2\\.10");
 mobileUiTest = mobileUiTest.replaceAll("finance-v15-20260820-ui-asset-delivery-r45", "finance-v15-20260820-sidebar-icons-r46");
 mobileUiTest = mobileUiTest.replaceAll("UI Asset Delivery Hotfix", "Embedded Sidebar Icon Hotfix");
 fs.writeFileSync(mobileUiTestFile, mobileUiTest);
