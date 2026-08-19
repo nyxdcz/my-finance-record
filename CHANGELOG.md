@@ -1,3 +1,8 @@
+## 15.2.7 · 2026-08-19
+- Extracted the existing Application Help topic registry and Help dialog wiring from `index.html` into `assets/js/ui/application-help.js` while preserving the same topic content, global Help APIs, dialog behavior, Escape handling, and focus return.
+- Added the first nested UI runtime source mapping to local compatibility staging and GitHub Pages flattening, plus focused source/browser regression coverage.
+- Rotated the PWA shell to `finance-v15-20260819-application-help-r42` and updated V15.2.7 release metadata without changing Finance Schema 12, Cloud Schema V3, records, calculations, balances, storage, sync/conflict behavior, sidebar behavior, layouts, or five-minute Cloud Sync behavior.
+
 ## 15.2.6 · 2026-08-19
 - Extracted the existing calculator/numeric form-input subsystem from `index.html` into `assets/js/form-inputs.js` while preserving the existing global function names and behavior used by Finance forms.
 - Added the new runtime module to the organized source/compatibility pipeline, GitHub Pages packaging, service-worker shell precache, and focused source/browser regression coverage.

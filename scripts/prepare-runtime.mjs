@@ -43,6 +43,9 @@ const runtimeGroups = {
     "reminders-alerts.js",
     "reports-insights.js",
     "security-profiles.js"
+  ],
+  "assets/js/ui": [
+    "application-help.js"
   ]
 };
 
