@@ -1,7 +1,21 @@
 import { test, expect } from "@playwright/test";
+import { fileURLToPath } from "node:url";
+
+const formInputsScript = fileURLToPath(new URL("../form-inputs.js", import.meta.url));
 
 test("V15.2.6 extracted form inputs preserve calculator and validation behavior", async ({ page }) => {
-  await page.goto("http://127.0.0.1:3000/index.html?page=money", { waitUntil:"domcontentloaded" });
+  // Use an isolated DOM fixture so app authentication/PWA navigation cannot destroy
+  // the execution context while this focused module test is running.
+  await page.setContent("<!doctype html><html><body></body></html>", { waitUntil:"domcontentloaded" });
+  await page.evaluate(() => {
+    window.money = value => new Intl.NumberFormat("en-PH", {
+      style:"currency",
+      currency:"PHP",
+      minimumFractionDigits:2,
+      maximumFractionDigits:2
+    }).format(Number(value || 0));
+  });
+  await page.addScriptTag({ path:formInputsScript });
   await expect.poll(() => page.evaluate(() => typeof window.evaluateArithmeticExpression)).toBe("function");
 
   const arithmetic = await page.evaluate(() => ({
@@ -29,6 +43,7 @@ test("V15.2.6 extracted form inputs preserve calculator and validation behavior"
     const preview = document.getElementById("phase5Money-preview")?.textContent || "";
     const operatorCount = moneyInput.closest(".calculator-input-shell")?.querySelectorAll(".calculator-operator-row button").length || 0;
     const formatted = window.formatMoneyInput(moneyInput, true);
+    const formattedValue = moneyInput.value;
     moneyInput.value = "-5";
     const negativeAccepted = window.validateMoneyInput(moneyInput, { required:true, min:0 });
     const moneyInvalid = moneyInput.getAttribute("aria-invalid");
@@ -36,7 +51,7 @@ test("V15.2.6 extracted form inputs preserve calculator and validation behavior"
     integerInput.value = "10 / 4";
     const integerAccepted = window.validateIntegerInput(integerInput, { required:true, min:0, max:100 });
     const integerError = document.getElementById("phase5Integer-error")?.textContent || "";
-    return { preview, operatorCount, formatted, formattedValue:formatted ? "300.00" : moneyInput.value, negativeAccepted, moneyInvalid, moneyError, integerAccepted, integerError };
+    return { preview, operatorCount, formatted, formattedValue, negativeAccepted, moneyInvalid, moneyError, integerAccepted, integerError };
   });
   expect(formState.preview).toContain("₱300.00");
   expect(formState.operatorCount).toBe(6);
