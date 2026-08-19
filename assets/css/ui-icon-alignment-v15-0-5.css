@@ -555,8 +555,22 @@ html body #projects .completed-project-record .project-revision-inline {
   border-color:color-mix(in srgb,var(--orange) 55%,var(--line)) !important;
 }
 
-
 /* V15.2.7 touch-tablet toolbar sizing */
+@media (min-width:701px) and (max-width:1024px) and (pointer:coarse),
+       (min-width:701px) and (max-width:1024px) and (hover:none) {
+  html body .workspace-switcher-button,
+  html body .topbar .month-nav-button,
+  html body .topbar #topbarToolsTrigger {
+    box-sizing:border-box !important;
+    height:44px !important;
+    min-height:44px !important;
+    max-height:44px !important;
+  }
+  html body .topbar .month-nav-button,
+  html body .topbar #topbarToolsTrigger {
+    min-width:44px !important;
+  }
+}
 @media (min-width:851px) and (max-width:1024px) and (pointer:coarse),
        (min-width:851px) and (max-width:1024px) and (hover:none) {
   html body .topbar-actions > .cloud-sync-toolbar-button,
