@@ -43,7 +43,7 @@ jobs:
           let budget = read(budgetPath);
           const budgetMarker = '/* V15.2.7 responsive readability refinement */';
           if (!budget.includes(budgetMarker)) {
-            budget += `\n\n${budgetMarker}\n@media (max-width:430px) {\n  .budget-planner-card.is-planner-collapsed .budget-planner-summary { grid-template-columns:repeat(2,minmax(0,1fr)); gap:5px; }\n  .budget-planner-card.is-planner-collapsed .budget-plan-kpi { min-height:50px; padding:6px 7px; }\n  .budget-planner-card.is-planner-collapsed .budget-plan-kpi span { display:block; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; font-size:.64rem; line-height:1.2; }\n  .budget-planner-card.is-planner-collapsed .budget-plan-kpi strong { margin-top:3px; font-size:.8rem; }\n  .budget-planner-card.is-planner-collapsed .budget-plan-kpi:last-child { grid-column:1 / -1; }\n}\n`;
+            budget += `\n\n${budgetMarker}\n@media (max-width:430px) {\n  .budget-planner-card.is-planner-collapsed .budget-planner-summary { grid-template-columns:repeat(3,minmax(0,1fr)); gap:4px; }\n  .budget-planner-card.is-planner-collapsed .budget-plan-kpi { min-height:48px; padding:5px 6px; }\n  .budget-planner-card.is-planner-collapsed .budget-plan-kpi span { display:block; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; font-size:.64rem; line-height:1.15; }\n  .budget-planner-card.is-planner-collapsed .budget-plan-kpi strong { margin-top:2px; font-size:.78rem; }\n  .budget-planner-card.is-planner-collapsed .budget-plan-kpi:last-child { grid-column:auto; }\n}\n`;
           }
           write(budgetPath, budget);
 
@@ -57,7 +57,7 @@ jobs:
           );
           const tabletMarker = '/* V15.2.7 coarse-pointer tablet touch-target contract */';
           if (!mobile.includes(tabletMarker)) {
-            mobile += `\n\n${tabletMarker}\n@media (min-width:701px) and (max-width:1024px) and (pointer:coarse) {\n  .workspace-switcher-button, .button, .month-nav-button, .topbar-history-button, .topbar-tools-trigger, .overflow-menu-trigger, .budget-planner-toggle, .budget-panel-collapse { min-height:44px !important; }\n  .month-nav-button, .topbar-history-button, .topbar-tools-trigger, .overflow-menu-trigger, .budget-planner-toggle, .budget-panel-collapse { min-width:44px !important; }\n}\n`;
+            mobile += `\n\n${tabletMarker}\n@media (min-width:701px) and (max-width:1024px) and (pointer:coarse),\n       (min-width:701px) and (max-width:1024px) and (hover:none) {\n  html body .workspace-switcher-button,\n  html body .button,\n  html body .topbar .month-nav-button,\n  html body .topbar .topbar-history-button,\n  html body .topbar #topbarToolsTrigger,\n  html body .overflow-menu-trigger,\n  html body .budget-planner-toggle,\n  html body .budget-panel-collapse { min-height:44px !important; }\n  html body .topbar .month-nav-button,\n  html body .topbar .topbar-history-button,\n  html body .topbar #topbarToolsTrigger,\n  html body .overflow-menu-trigger,\n  html body .budget-planner-toggle,\n  html body .budget-panel-collapse { min-width:44px !important; }\n}\n`;
           }
           write(mobilePath, mobile);
 
@@ -66,7 +66,12 @@ jobs:
           black = replaceOnce(black, ':root {\n  --bg:#efefef;\n}', ':root {\n  --bg:#efefef;\n  --focus-ring:#245ea8;\n}', 'root focus token');
           black = replaceOnce(black, 'html[data-theme="light"] {\n  color-scheme:light;\n  --bg:#efefef;\n}', 'html[data-theme="light"] {\n  color-scheme:light;\n  --bg:#efefef;\n  --focus-ring:#245ea8;\n}', 'light focus token');
           black = replaceOnce(black, '  --primary-contrast:#ffffff;\n  --field-label:#dbe3ef;', '  --primary-contrast:#ffffff;\n  --focus-ring:#8ab4f8;\n  --field-label:#dbe3ef;', 'dark focus token');
-          black = replaceOnce(black, '  outline-color:color-mix(in srgb,var(--primary) 58%,transparent) !important;\n}', '  outline:3px solid var(--focus-ring) !important;\n  outline-offset:2px;\n}', 'focus indicator contract');
+          black = replaceOnce(
+            black,
+            'button:focus-visible,\ninput:focus-visible,\nselect:focus-visible,\ntextarea:focus-visible,\n.workspace-switcher-button:focus-visible {\n  outline-color:color-mix(in srgb,var(--primary) 58%,transparent) !important;\n}',
+            'html body button:focus-visible,\nhtml body input:focus-visible,\nhtml body select:focus-visible,\nhtml body textarea:focus-visible,\nhtml body .workspace-switcher-button:focus-visible {\n  outline-style:solid !important;\n  outline-width:3px !important;\n  outline-color:var(--focus-ring) !important;\n  outline-offset:2px !important;\n}',
+            'focus indicator contract'
+          );
           write(blackPath, black);
 
           const swPath = 'sw.js';
