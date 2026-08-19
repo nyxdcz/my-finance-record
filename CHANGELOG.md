@@ -1,3 +1,8 @@
+## 15.2.6 · 2026-08-19
+- Extracted the existing calculator/numeric form-input subsystem from `index.html` into `assets/js/form-inputs.js` while preserving the existing global function names and behavior used by Finance forms.
+- Added the new runtime module to the organized source/compatibility pipeline, GitHub Pages packaging, service-worker shell precache, and focused source/browser regression coverage.
+- Rotated the PWA shell to `finance-v15-20260819-form-inputs-r41` and updated V15.2.6 release metadata without changing Finance Schema 12, Cloud Schema V3, records, calculations, balances, layouts, or five-minute Cloud Sync behavior.
+
 ## 15.2.5 · 2026-08-18
 - Aligned the Budget & Expenses disclosure controls for Monthly budget plan, Available money, First half, Second half, and Other expenses to the First-half reference geometry: 40px desktop controls on one exact 17px right-side column.
 - Replaced the previous margin approximation with a derived Available money header inset that accounts for its existing 12px card padding, and anchored the collapsed Monthly budget plan control to the same reference edge.

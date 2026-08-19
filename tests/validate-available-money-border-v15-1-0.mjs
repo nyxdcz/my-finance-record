@@ -10,8 +10,8 @@ assert.match(css, /#availableMoneySection \.account-card \{[\s\S]*border-color:r
 assert.doesNotMatch(css, /#availableMoneySection \{[\s\S]{0,160}border-color:rgba\(207,231,213,\.24\)/);
 assert.match(index, /black-canvas-v15-1-0\.css\?v=15\.1\.0-light1/);
 assert.match(sw, /black-canvas-v15-1-0\.css\?v=15\.1\.0-light1/);
-assert.equal(version.version, "15.2.5");
+assert.equal(version.version, "15.2.6");
 assert.equal(version.schemaVersion, 12);
 assert.equal(version.cloudSchemaVersion, 3);
-assert.equal(version.cacheVersion, "finance-v15-20260818-disclosure-alignment-r40");
-console.log("V15.2.5 Available money account-border regression passed.");
+assert.equal(version.cacheVersion, "finance-v15-20260819-form-inputs-r41");
+console.log("V15.2.6 Available money account-border regression passed.");

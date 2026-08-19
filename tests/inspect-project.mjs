@@ -18,7 +18,7 @@ const runtimeCssFiles = [
   "account-ledger.css", "app.css", "black-canvas-v15-1-0.css", "budget-planning.css", "dashboard-interactions-core-v14-0-23.css", "dashboard-interactions.css", "desktop-ui-phase1-v15-1-0.css", "desktop-ux-v15-2-0.css", "liquid-glass-v15.css", "mobile-v14-0-23.css", "productivity-tools.css", "projects-calendar-v13.0.20.css", "reminders-alerts.css", "reports-insights.css", "security-profiles.css", "ui-icon-alignment-v15-0-5.css"
 ];
 const runtimeJsFiles = [
-  "account-ledger.js", "budget-planning.js", "cloud-conflict-resolution.js", "cloud-conflict-review.js", "cloud-sync-lifecycle.js", "cloud-sync.js", "expense-screenshot-ai.js", "expense-screenshot-detect.js", "expense-screenshot-parser.js", "interaction-patterns.js", "privacy-lock.js", "productivity-tools.js", "projects-calendar-v13.0.20.js", "pwa-update-v15-0-5.js", "reminders-alerts.js", "reports-insights.js", "security-profiles.js"
+  "account-ledger.js", "budget-planning.js", "cloud-conflict-resolution.js", "cloud-conflict-review.js", "cloud-sync-lifecycle.js", "cloud-sync.js", "expense-screenshot-ai.js", "expense-screenshot-detect.js", "expense-screenshot-parser.js", "form-inputs.js", "interaction-patterns.js", "privacy-lock.js", "productivity-tools.js", "projects-calendar-v13.0.20.js", "pwa-update-v15-0-5.js", "reminders-alerts.js", "reports-insights.js", "security-profiles.js"
 ];
 const runtimeCssSet = new Set(runtimeCssFiles);
 const runtimeJsSet = new Set(runtimeJsFiles);
@@ -132,9 +132,9 @@ const testTargets = [...String(pkg.scripts?.test || "").matchAll(/\bnode\s+(\S+)
 if (!testTargets.length) fail(`Test script target is missing: ${pkg.scripts?.test || "(not configured)"}`);
 for (const target of testTargets) if (!exists(target)) fail(`Test script target is missing: ${target}`);
 if (!String(pkg.engines?.node || "").includes("22")) warn(`Node engine is ${pkg.engines?.node || "not set"}; project validation expects Node 22+`);
-if (pkg.version !== "15.2.5") fail(`Expected current package version 15.2.5, found ${pkg.version || "(missing)"}`);
-if (!read("README.md").startsWith("# My Finance Records · V15.2.5")) fail("README release heading is not V15.2.5");
-if (!read("CHANGELOG.md").startsWith("## 15.2.5 · 2026-08-18")) fail("CHANGELOG latest entry is not V15.2.5");
+if (pkg.version !== "15.2.6") fail(`Expected current package version 15.2.6, found ${pkg.version || "(missing)"}`);
+if (!read("README.md").startsWith("# My Finance Records · V15.2.6")) fail("README release heading is not V15.2.6");
+if (!read("CHANGELOG.md").startsWith("## 15.2.6 · 2026-08-19")) fail("CHANGELOG latest entry is not V15.2.6");
 
 const syncConfig = read("sync-config.js");
 const syncConfigCode = syncConfig.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|\s)\/\/.*$/gm, "$1");
@@ -166,4 +166,4 @@ console.log(`Repository inspection: ${errors.length} error(s), ${warnings.length
 for (const message of errors) console.error(`ERROR: ${message}`);
 for (const message of warnings) console.warn(`WARN: ${message}`);
 if (errors.length) process.exit(1);
-console.log("Repository inspection passed: V15.2.5 release sources, local paths, deploy paths, package metadata, permissions, and public sync configuration are consistent.");
+console.log("Repository inspection passed: V15.2.6 release sources, local paths, deploy paths, package metadata, permissions, and public sync configuration are consistent.");
