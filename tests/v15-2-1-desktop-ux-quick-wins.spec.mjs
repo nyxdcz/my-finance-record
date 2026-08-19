@@ -41,7 +41,7 @@ test("V15.2.1 source keeps the approved desktop UX quick wins", async () => {
   expect(source("productivity-tools.js")).toContain('input.value=""');
   expect(index).toContain("./productivity-tools.js?v=15.2.1-ux2");
 
-  expect(version.version).toBe("15.2.5");
+  expect(version.version).toBe("15.2.6");
   expect(version.schemaVersion).toBe(12);
   expect(version.cloudSchemaVersion).toBe(3);
   expect(version.cacheVersion).toBe("finance-v15-20260819-form-inputs-r41");
