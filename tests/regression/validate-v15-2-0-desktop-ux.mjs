@@ -33,7 +33,7 @@ const required = [
   [index.includes("cloudToolbarTechnicalDetails") && cloud.includes("cloudToolbarTechnicalError"), "Cloud technical details are optional"],
   [sw.includes('const APP_VERSION = "15.2.7"') && sw.includes(version.cacheVersion), "service worker delivery matches release"],
   [sw.includes("desktop-ux-v15-2-0.css?v=15.2.5-disclosure1"), "desktop disclosure CSS is precached"],
-  [runtimeCompat.includes('const VERSION = "15.2.7"') && runtimeCompat.includes('const RELEASE_NAME = "Application Help Module Extraction"'), "release override matches V15.2.7"],
+  [runtimeCompat.includes('const VERSION = "15.2.7"') && runtimeCompat.includes('const RELEASE_NAME = "PWA UI Ownership Cleanup"'), "release override matches V15.2.7"],
   [index.includes("sync-config.js?v=15.2.7-release1") && sw.includes("sync-config.js?v=15.2.7-release1"), "release layer is cache-busted consistently"],
   [desktopUx.includes("--budget-disclosure-reference-size:var(--ui-disclosure-size,40px)"), "Budget disclosure buttons share the First-half control size"],
   [desktopUx.includes("--budget-disclosure-reference-inset:17px"), "Budget disclosure buttons use the First-half right inset"],
