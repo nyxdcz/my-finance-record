@@ -535,10 +535,12 @@ html body #money #moneyAccounts .account-card-icon:has(> img[alt="GCash icon" i]
 html body #money #moneyAccounts .account-card-icon:has(> img[alt="GoTyme icon" i]) { --available-account-badge-fill:#16d3cf; }
 html body #money #moneyAccounts .account-card-icon:has(> img[alt="Metrobank icon" i]) { --available-account-badge-fill:#005baa; }
 
-/* V15.2.5-r4 · Bank/E-wallet label contrast and completed-project readability. */
-html body #money #moneyAccounts .account-card:is([data-account-type="Bank" i],[data-account-type="E-wallet" i]) .account-card-label > span,
-html body #money #moneyAccounts .account-card:is([data-account-type="Bank" i],[data-account-type="E-wallet" i]) .account-card-label > small {
+/* V15.2.5-r5 · Available Money account names are white and account types use #AEB6C1. */
+html body #money #moneyAccounts .account-card .account-card-label > span {
   color:#fff !important;
+}
+html body #money #moneyAccounts .account-card .account-card-label > small {
+  color:#aeb6c1 !important;
 }
 html body #projects .completed-project-record .project-source-line {
   color:var(--text) !important;
