@@ -32,7 +32,7 @@ assert.match(worker, /const APP_VERSION = "15\.2\.10";/);
 assert.match(worker, /finance-v15-20260820-sidebar-icons-r46/);
 assert.match(worker, /networkFirstCriticalAsset/);
 assert.match(worker, /url\.pathname\.endsWith\("privacy-lock\.js"\) \|\| url\.pathname\.endsWith\("cloud-sync-lifecycle\.js"\)/);
-assert.match(worker, /pwa-update-v15-0-5\.js\?v=15\.2\.10-release1/);
+assert.match(worker, /pwa-update-v15-0-5\.js\?v=15\.2\.10-release2/);
 assert.match(worker, /ui-icon-alignment-v15-0-5\.css\?v=15\.2\.9-ui2/);
 assert.match(worker, /mobile-v14-0-23\.css/);
 assert.match(worker, /budget-planning\.css/);

@@ -2,11 +2,11 @@ import { test, expect } from "@playwright/test";
 
 const phone = { width:390, height:844 };
 
-test("phone Finance installs compact record layout and icon-only Add account", async ({ page }) => {
+test("phone Finance uses static compact record layout and icon-only Add account", async ({ page }) => {
   await page.setViewportSize(phone);
   await page.goto("http://127.0.0.1:3000/index.html?page=money", { waitUntil:"domcontentloaded" });
 
-  await expect(page.locator("#phoneFinanceCompactV1522")).toHaveCount(1);
+  await expect(page.locator("#phoneFinanceCompactV1522")).toHaveCount(0);
   const addAccount = page.locator("#addAccountButton");
   await expect(addAccount).toHaveClass(/phone-icon-only-action/);
   await expect(addAccount).toHaveAttribute("aria-label", "Add account");
@@ -24,17 +24,13 @@ test("phone Finance installs compact record layout and icon-only Add account", a
   expect(mobileState.labelDisplay).toBe("none");
   expect(mobileState.iconDisplay).toBe("grid");
 
-  const styleText = await page.locator("#phoneFinanceCompactV1522").textContent();
-  expect(styleText).toContain('grid-template-areas:"title amount" "due account" "actions actions"');
-  expect(styleText).toContain("grid-template-columns:minmax(0,1fr) 44px");
-  expect(styleText).toContain('content:"Due ·"');
-  expect(styleText).toContain('content:"Account ·"');
+  await expect(page.locator('link[rel="stylesheet"][href*="mobile-v14-0-23.css?v=15.2.10-mobile2"]')).toHaveCount(1);
 });
 
 test("dynamically rendered Schedule event becomes icon-only only at phone width", async ({ page }) => {
   await page.setViewportSize(phone);
   await page.goto("http://127.0.0.1:3000/index.html?page=money", { waitUntil:"domcontentloaded" });
-  await expect(page.locator("#phoneFinanceCompactV1522")).toHaveCount(1);
+  await expect(page.locator("#phoneFinanceCompactV1522")).toHaveCount(0);
 
   await page.evaluate(() => {
     const button = document.createElement("button");
