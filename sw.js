@@ -175,7 +175,7 @@ self.addEventListener("fetch", event => {
     return;
   }
   if (url.origin !== self.location.origin) return;
-  if (url.pathname.endsWith("privacy-lock.js") || url.pathname.endsWith("cloud-sync-lifecycle.js") || url.pathname.endsWith("interaction-patterns.js") || url.pathname.endsWith("pwa-update-v15-0-5.js") || url.pathname.endsWith("ui-icon-alignment-v15-0-5.css")) {
+  if (url.pathname.endsWith("privacy-lock.js") || url.pathname.endsWith("cloud-sync-lifecycle.js") || url.pathname.endsWith("interaction-patterns.js") || url.pathname.endsWith("pwa-update-v15-0-5.js") || url.pathname.endsWith("ui-icon-alignment-v15-0-5.css") || url.pathname.endsWith("mobile-v14-0-23.css") || url.pathname.endsWith("budget-planning.css") || url.pathname.endsWith("black-canvas-v15-1-0.css")) {
     event.respondWith(networkFirstCriticalAsset(request));
     return;
   }

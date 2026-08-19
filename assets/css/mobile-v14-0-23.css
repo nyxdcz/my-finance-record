@@ -285,7 +285,7 @@
   }
   html body .finance-workspace-marquee-row > .money-workspace-switcher .workspace-switcher-button {
     min-width: 0 !important;
-    min-height: 42px !important;
+    min-height: 44px !important;
   }
 
   html body #availableMoneySection #addAccountButton::before,
@@ -366,4 +366,24 @@
     margin: 0 !important;
     padding: 0 !important;
   }
+}
+
+
+/* V15.2.7 coarse-pointer tablet touch-target contract */
+@media (min-width:701px) and (max-width:850px) and (pointer:coarse),
+       (min-width:701px) and (max-width:850px) and (hover:none) {
+  html body .workspace-switcher-button,
+  html body .button,
+  html body .topbar .month-nav-button,
+  html body .topbar .topbar-history-button,
+  html body .topbar #topbarToolsTrigger,
+  html body .overflow-menu-trigger,
+  html body .budget-planner-toggle,
+  html body .budget-panel-collapse { min-height:44px !important; }
+  html body .topbar .month-nav-button,
+  html body .topbar .topbar-history-button,
+  html body .topbar #topbarToolsTrigger,
+  html body .overflow-menu-trigger,
+  html body .budget-planner-toggle,
+  html body .budget-panel-collapse { min-width:44px !important; }
 }
