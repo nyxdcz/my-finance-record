@@ -1,11 +1,8 @@
 name: Phase 5A Form Input Extraction
-# trigger: approved 2026-08-19-r2
 
 on:
-  push:
+  pull_request:
     branches: [main]
-    paths:
-      - ".github/workflows/phase5a-extract.yml"
   workflow_dispatch:
 
 permissions:
@@ -13,12 +10,14 @@ permissions:
 
 jobs:
   extract:
+    if: github.event_name == 'pull_request' && github.head_ref == 'phase5a-form-inputs'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Check out repository
+      - name: Check out feature branch
         uses: actions/checkout@v7
         with:
+          ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 0
       - name: Use Node.js 24
         uses: actions/setup-node@v7
@@ -27,17 +26,19 @@ jobs:
           package-manager-cache: false
       - name: Apply Phase 5A extraction
         run: node scripts/phase5a-extract.mjs
-      - name: Commit approved Phase 5A changes
+      - name: Commit approved Phase 5A changes to feature branch
         shell: bash
+        env:
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
-          git reset scripts/phase5a-extract.mjs .github/workflows/phase5a-extract.yml
+          git reset scripts/phase5a-extract.mjs .github/workflows/phase5a-extract.yml .github/workflows/quality-pages.yml
           if git diff --cached --quiet; then
             echo "No Phase 5A changes to commit."
             exit 1
           fi
           git commit -m "refactor: extract form input runtime V15.2.6"
-          git push origin HEAD:main
+          git push origin HEAD:"${HEAD_REF}"
