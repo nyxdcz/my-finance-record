@@ -16,8 +16,8 @@ const version = JSON.parse(read("version.json"));
 if (!html.includes('href="./desktop-ui-phase1-v15-1-0.css?v=15.1.0-phase1"')) fail("Production HTML does not load the desktop Phase 1 stylesheet.");
 if (!worker.includes('asset("./desktop-ui-phase1-v15-1-0.css?v=15.1.0-phase1")')) fail("Service worker does not precache the desktop Phase 1 stylesheet.");
 if (!workflow.includes("desktop-ui-phase1-v15-1-0.css")) fail("GitHub Pages packaging omits the desktop Phase 1 stylesheet.");
-if (version.cacheVersion !== "finance-v15-20260819-form-inputs-r41") fail(`Unexpected cache version: ${version.cacheVersion}`);
-if (!worker.includes('const CACHE_VERSION = "finance-v15-20260819-form-inputs-r41";')) fail("Service worker cache version is not the V15.2.5 disclosure-alignment refresh cache.");
+if (version.cacheVersion !== "finance-v15-20260819-application-help-r42") fail(`Unexpected cache version: ${version.cacheVersion}`);
+if (!worker.includes('const CACHE_VERSION = "finance-v15-20260819-application-help-r42";')) fail("Service worker cache version is not the V15.2.7 Application Help extraction cache.");
 
 for (const token of [
   '#income > .page-heading',
@@ -46,4 +46,4 @@ for (const id of ["exportMonthlyReportCsv","exportMonthlyReportJson","exportInco
   if ((html.match(new RegExp(`id=\\"${id}\\"`, "g")) || []).length !== 1) fail(`${id} must remain unique after export-menu consolidation.`);
 }
 
-console.log("Desktop UI Phase 1 validation passed under V15.2.5: desktop hierarchy, compact Income, report export menu, calendar states, Settings disclosure, contextual Paid note, deployment packaging, and preserved phone-Finance/cloud-profile delivery are source-aligned.");
+console.log("Desktop UI Phase 1 validation passed under V15.2.7: desktop hierarchy, compact Income, report export menu, calendar states, Settings disclosure, contextual Paid note, deployment packaging, and preserved phone-Finance/cloud-profile delivery are source-aligned.");
