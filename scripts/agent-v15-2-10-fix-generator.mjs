@@ -62,3 +62,30 @@ desktopUxTest = desktopUxTest.replaceAll('release override matches V15.2.9', 're
 desktopUxTest = desktopUxTest.replaceAll('sync-config.js?v=15.2.9-release1', 'sync-config.js?v=15.2.10-release1');
 desktopUxTest = desktopUxTest.replaceAll('V15.2.9 release preserves the desktop UX source contract', 'V15.2.10 release preserves the desktop UX source contract');
 fs.writeFileSync(desktopUxTestFile, desktopUxTest);
+
+const mobileUiTestFile = "tests/regression/validate-v15-2-2-mobile-ui.mjs";
+let mobileUiTest = fs.readFileSync(mobileUiTestFile, "utf8");
+mobileUiTest = mobileUiTest.replaceAll("15.2.9", "15.2.10");
+mobileUiTest = mobileUiTest.replaceAll("finance-v15-20260820-ui-asset-delivery-r45", "finance-v15-20260820-sidebar-icons-r46");
+mobileUiTest = mobileUiTest.replaceAll("UI Asset Delivery Hotfix", "Embedded Sidebar Icon Hotfix");
+fs.writeFileSync(mobileUiTestFile, mobileUiTest);
+
+const formInputsTestFile = "tests/finance/validate-form-inputs-v15-2-6.mjs";
+let formInputsTest = fs.readFileSync(formInputsTestFile, "utf8");
+formInputsTest = formInputsTest.replaceAll('version.version === "15.2.9"', 'version.version === "15.2.10"');
+formInputsTest = formInputsTest.replaceAll('current release is V15.2.9', 'current release is V15.2.10');
+formInputsTest = formInputsTest.replaceAll('finance-v15-20260820-ui-asset-delivery-r45', 'finance-v15-20260820-sidebar-icons-r46');
+formInputsTest = formInputsTest.replaceAll('V15.2.9 shell', 'V15.2.10 shell');
+fs.writeFileSync(formInputsTestFile, formInputsTest);
+
+const applicationHelpTestFile = "tests/regression/validate-application-help-v15-2-7.mjs";
+let applicationHelpTest = fs.readFileSync(applicationHelpTestFile, "utf8");
+applicationHelpTest = applicationHelpTest.replace('assert.equal(version.version, "15.2.9");', 'assert.equal(version.version, "15.2.10");');
+applicationHelpTest = applicationHelpTest.replace('assert.equal(version.cacheVersion, "finance-v15-20260820-ui-asset-delivery-r45");', 'assert.equal(version.cacheVersion, "finance-v15-20260820-sidebar-icons-r46");');
+fs.writeFileSync(applicationHelpTestFile, applicationHelpTest);
+
+const syncConfigTestFile = "tests/regression/validate-sync-config-separation.mjs";
+let syncConfigTest = fs.readFileSync(syncConfigTestFile, "utf8");
+syncConfigTest = syncConfigTest.replaceAll("15.2.9", "15.2.10");
+syncConfigTest = syncConfigTest.replaceAll("finance-v15-20260820-ui-asset-delivery-r45", "finance-v15-20260820-sidebar-icons-r46");
+fs.writeFileSync(syncConfigTestFile, syncConfigTest);
