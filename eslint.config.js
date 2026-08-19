@@ -21,8 +21,7 @@ const legacyBrowserFiles = [
 export default [
   {
     ignores: [
-      "node_modules/**", "vendor/**", "_site/**", "coverage/**",
-      "tests/validate-v12-*.mjs", "tests/validate-v13-*.mjs"
+      "node_modules/**", "vendor/**", "_site/**", "coverage/**"
     ]
   },
   {
