@@ -49,6 +49,10 @@ const oldMobileAsset = "mobile-v14-0-23.css?v=15.2.2-mobile1";
 const newMobileAsset = "mobile-v14-0-23.css?v=15.2.10-mobile2";
 const oldUpdaterAsset = "pwa-update-v15-0-5.js?v=15.2.10-release1";
 const newUpdaterAsset = "pwa-update-v15-0-5.js?v=15.2.10-release2";
+const oldMobileAssetRegex = "mobile-v14-0-23\\\\.css\\\\?v=15\\\\.2\\\\.2-mobile1";
+const newMobileAssetRegex = "mobile-v14-0-23\\\\.css\\\\?v=15\\\\.2\\\\.10-mobile2";
+const oldUpdaterAssetRegex = "pwa-update-v15-0-5\\\\.js\\\\?v=15\\\\.2\\\\.10-release1";
+const newUpdaterAssetRegex = "pwa-update-v15-0-5\\\\.js\\\\?v=15\\\\.2\\\\.10-release2";
 
 for (const file of ["index.html", "sw.js"]) {
   replaceExact(file, oldMobileAsset, newMobileAsset);
@@ -65,6 +69,8 @@ function walk(dir) {
 for (const file of walk("tests").filter(file => /\.(?:mjs|js)$/.test(file))) {
   replaceExact(file, oldMobileAsset, newMobileAsset);
   replaceExact(file, oldUpdaterAsset, newUpdaterAsset);
+  replaceExact(file, oldMobileAssetRegex, newMobileAssetRegex);
+  replaceExact(file, oldUpdaterAssetRegex, newUpdaterAssetRegex);
 }
 
 let sourceRegression = read(sourceRegressionPath);
