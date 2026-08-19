@@ -1,0 +1,107 @@
+name: Scoped responsive accessibility refinement
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  refine-and-validate:
+    if: github.head_ref == 'agent/responsive-accessibility-v15-2-7'
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.62.1-noble
+      options: --ipc=host
+    env:
+      PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: agent/responsive-accessibility-v15-2-7
+          fetch-depth: 0
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          package-manager-cache: false
+      - name: Apply scoped responsive and accessibility fixes
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const read = file => fs.readFileSync(file, 'utf8');
+          const write = (file, text) => fs.writeFileSync(file, text);
+          const replaceOnce = (text, from, to, label) => {
+            const first = text.indexOf(from);
+            if (first < 0 || text.indexOf(from, first + from.length) >= 0) throw new Error(`${label}: expected exactly one match`);
+            return text.slice(0, first) + to + text.slice(first + from.length);
+          };
+
+          const budgetPath = 'assets/css/budget-planning.css';
+          let budget = read(budgetPath);
+          const budgetMarker = '/* V15.2.7 responsive readability refinement */';
+          if (!budget.includes(budgetMarker)) {
+            budget += `\n\n${budgetMarker}\n@media (max-width:430px) {\n  .budget-planner-card.is-planner-collapsed .budget-planner-summary { grid-template-columns:repeat(2,minmax(0,1fr)); gap:5px; }\n  .budget-planner-card.is-planner-collapsed .budget-plan-kpi { min-height:50px; padding:6px 7px; }\n  .budget-planner-card.is-planner-collapsed .budget-plan-kpi span { display:block; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; font-size:.64rem; line-height:1.2; }\n  .budget-planner-card.is-planner-collapsed .budget-plan-kpi strong { margin-top:3px; font-size:.8rem; }\n  .budget-planner-card.is-planner-collapsed .budget-plan-kpi:last-child { grid-column:1 / -1; }\n}\n`;
+          }
+          write(budgetPath, budget);
+
+          const mobilePath = 'assets/css/mobile-v14-0-23.css';
+          let mobile = read(mobilePath);
+          mobile = replaceOnce(
+            mobile,
+            'html body .finance-workspace-marquee-row > .money-workspace-switcher .workspace-switcher-button {\n    min-width: 0 !important;\n    min-height: 42px !important;\n  }',
+            'html body .finance-workspace-marquee-row > .money-workspace-switcher .workspace-switcher-button {\n    min-width: 0 !important;\n    min-height: 44px !important;\n  }',
+            'phone Finance tab touch target'
+          );
+          const tabletMarker = '/* V15.2.7 coarse-pointer tablet touch-target contract */';
+          if (!mobile.includes(tabletMarker)) {
+            mobile += `\n\n${tabletMarker}\n@media (min-width:701px) and (max-width:1024px) and (pointer:coarse) {\n  .workspace-switcher-button, .button, .month-nav-button, .topbar-history-button, .topbar-tools-trigger, .overflow-menu-trigger, .budget-planner-toggle, .budget-panel-collapse { min-height:44px !important; }\n  .month-nav-button, .topbar-history-button, .topbar-tools-trigger, .overflow-menu-trigger, .budget-planner-toggle, .budget-panel-collapse { min-width:44px !important; }\n}\n`;
+          }
+          write(mobilePath, mobile);
+
+          const blackPath = 'assets/css/black-canvas-v15-1-0.css';
+          let black = read(blackPath);
+          black = replaceOnce(black, ':root {\n  --bg:#efefef;\n}', ':root {\n  --bg:#efefef;\n  --focus-ring:#245ea8;\n}', 'root focus token');
+          black = replaceOnce(black, 'html[data-theme="light"] {\n  color-scheme:light;\n  --bg:#efefef;\n}', 'html[data-theme="light"] {\n  color-scheme:light;\n  --bg:#efefef;\n  --focus-ring:#245ea8;\n}', 'light focus token');
+          black = replaceOnce(black, '  --primary-contrast:#ffffff;\n  --field-label:#dbe3ef;', '  --primary-contrast:#ffffff;\n  --focus-ring:#8ab4f8;\n  --field-label:#dbe3ef;', 'dark focus token');
+          black = replaceOnce(black, '  outline-color:color-mix(in srgb,var(--primary) 58%,transparent) !important;\n}', '  outline:3px solid var(--focus-ring) !important;\n  outline-offset:2px;\n}', 'focus indicator contract');
+          write(blackPath, black);
+
+          const swPath = 'sw.js';
+          let sw = read(swPath);
+          const oldCritical = 'url.pathname.endsWith("privacy-lock.js") || url.pathname.endsWith("cloud-sync-lifecycle.js") || url.pathname.endsWith("interaction-patterns.js") || url.pathname.endsWith("pwa-update-v15-0-5.js") || url.pathname.endsWith("ui-icon-alignment-v15-0-5.css")';
+          const newCritical = `${oldCritical} || url.pathname.endsWith("mobile-v14-0-23.css") || url.pathname.endsWith("budget-planning.css") || url.pathname.endsWith("black-canvas-v15-1-0.css")`;
+          if (!sw.includes('url.pathname.endsWith("budget-planning.css")')) sw = replaceOnce(sw, oldCritical, newCritical, 'responsive CSS PWA delivery');
+          write(swPath, sw);
+
+          const pwaTestPath = 'tests/regression/validate-pwa-updater-v15-0-5.mjs';
+          let pwaTest = read(pwaTestPath);
+          const insertion = 'assert.match(worker, /ui-icon-alignment-v15-0-5\\.css\\?v=15\\.2\\.4-ui1/);';
+          const additions = 'assert.match(worker, /mobile-v14-0-23\\.css/);\nassert.match(worker, /budget-planning\\.css/);\nassert.match(worker, /black-canvas-v15-1-0\\.css/);';
+          if (!pwaTest.includes('assert.match(worker, /budget-planning\\.css/);')) pwaTest = replaceOnce(pwaTest, insertion, `${insertion}\n${additions}`, 'PWA responsive CSS regression');
+          write(pwaTestPath, pwaTest);
+          NODE
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Run source quality and regressions
+        run: npm run quality
+      - name: Run browser and UI validation
+        run: npm run test:browser
+      - name: Commit validated responsive refinement
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            assets/css/budget-planning.css \
+            assets/css/mobile-v14-0-23.css \
+            assets/css/black-canvas-v15-1-0.css \
+            sw.js \
+            tests/regression/validate-pwa-updater-v15-0-5.mjs
+          git diff --cached --check
+          git commit -m "fix: refine responsive accessibility"
+          git push origin HEAD:agent/responsive-accessibility-v15-2-7
