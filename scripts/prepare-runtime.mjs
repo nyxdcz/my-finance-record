@@ -45,7 +45,8 @@ const runtimeGroups = {
     "security-profiles.js"
   ],
   "assets/js/ui": [
-    "application-help.js"
+    "application-help.js",
+    "sync-runtime-compat.js"
   ]
 };
 
