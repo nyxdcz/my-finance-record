@@ -1,5 +1,5 @@
 name: Quality and GitHub Pages
-# Temporary V15.2.10 validation trigger 4; removed before final review.
+# Temporary V15.2.10 validation trigger 5; removed before final review.
 
 on:
   pull_request:
@@ -163,6 +163,8 @@ jobs:
         run: npm run prepare:runtime
       - name: Run source quality
         run: npm run quality
+      - name: Run embedded-sidebar source regression
+        run: node tests/regression/validate-sidebar-embedded-v15-2-10.mjs
       - name: Run focused embedded-sidebar coverage without retries
         run: npx playwright test tests/browser/ui-asset-delivery-v15-2-10.spec.mjs --retries=0
       - name: Run complete browser suite without retries
