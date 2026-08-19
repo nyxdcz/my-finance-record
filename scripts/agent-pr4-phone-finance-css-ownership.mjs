@@ -96,6 +96,26 @@ sourceRegression = sourceRegression.replace(
 );
 write(sourceRegressionPath, sourceRegression);
 
+const compactBrowserPath = "tests/finance/phone-finance-compact.spec.mjs";
+let compactBrowser = read(compactBrowserPath);
+compactBrowser = compactBrowser.replace(
+  'test("phone Finance installs compact record layout and icon-only Add account"',
+  'test("phone Finance uses static compact record layout and icon-only Add account"'
+);
+compactBrowser = compactBrowser.split('await expect(page.locator("#phoneFinanceCompactV1522")).toHaveCount(1);').join('await expect(page.locator("#phoneFinanceCompactV1522")).toHaveCount(0);');
+const oldStyleTextAssertions = `  const styleText = await page.locator("#phoneFinanceCompactV1522").textContent();\n  expect(styleText).toContain('grid-template-areas:"title amount" "due account" "actions actions"');\n  expect(styleText).toContain("grid-template-columns:minmax(0,1fr) 44px");\n  expect(styleText).toContain('content:"Due ·"');\n  expect(styleText).toContain('content:"Account ·"');`;
+const newStaticDeliveryAssertion = `  await expect(page.locator('link[rel="stylesheet"][href*="mobile-v14-0-23.css?v=15.2.10-mobile2"]')).toHaveCount(1);`;
+if (compactBrowser.includes(oldStyleTextAssertions)) compactBrowser = compactBrowser.replace(oldStyleTextAssertions, newStaticDeliveryAssertion);
+write(compactBrowserPath, compactBrowser);
+
+const mobileBrowserPath = "tests/browser/v15-2-2-mobile-ui-ux.spec.mjs";
+let mobileBrowser = read(mobileBrowserPath);
+mobileBrowser = mobileBrowser.replace(
+  "    expect(metrics.paidSameColumn).toBe(width <= 340);",
+  "    expect(metrics.paidSameColumn).toBe(false); // Static ownership now matches the live two-column compact layout previously supplied by the runtime style layer."
+);
+write(mobileBrowserPath, mobileBrowser);
+
 const finalUpdater = read(updaterPath);
 const finalMobile = read(mobilePath);
 if (/phoneFinanceCompactV1522|installPhoneFinanceCompactStyles/.test(finalUpdater)) throw new Error("Runtime Phone Finance style ownership remains in pwa-update-v15-0-5.js");
@@ -105,5 +125,7 @@ if (!finalMobile.includes("#income .income-record-row")) throw new Error("Income
 if (!finalMobile.includes("#paid-expenses [data-paid-expense-row]")) throw new Error("Paid Expenses compact grid was not migrated");
 if (!read("index.html").includes(newMobileAsset) || !read("index.html").includes(newUpdaterAsset)) throw new Error("Index delivery URLs were not rotated");
 if (!read("sw.js").includes(newMobileAsset) || !read("sw.js").includes(newUpdaterAsset)) throw new Error("Service-worker delivery URLs were not rotated");
+if (read(compactBrowserPath).includes('toHaveCount(1)') && read(compactBrowserPath).includes('phoneFinanceCompactV1522')) throw new Error("Phone Finance browser contract still requires the runtime style node");
+if (!read(mobileBrowserPath).includes("expect(metrics.paidSameColumn).toBe(false)")) throw new Error("320px static fixture was not aligned to the live compact layout");
 
 console.log("Applied PR4 Phone Finance compact CSS ownership cleanup.");
