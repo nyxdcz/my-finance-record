@@ -1,86 +1,139 @@
 # My Finance Records · V15.2.7
 
-Local-first personal finance PWA with multi-profile support and optional encrypted cloud synchronization.
+Local-first personal and household finance PWA with multi-profile support and optional encrypted Supabase synchronization.
 
-## V15.2.7 · Application Help Module Extraction
+## Project status
 
-Released **August 19, 2026** with PWA cache `finance-v15-20260819-application-help-r42`.
+Current release: **V15.2.7 · Application Help Module Extraction**  
+Released: **August 19, 2026**  
+Finance Schema: **12**  
+Cloud Schema: **V3**  
+Routine cloud sync cadence: **5 minutes**
 
-### New updates since V15.2.6
+V15.2.7 continues the maintainability work by extracting the contextual Application Help subsystem into `assets/js/ui/application-help.js` while preserving finance behavior, storage, sync/conflict handling, desktop/mobile layouts, and installed-PWA compatibility.
 
-- **Application Help module extraction** — Moves the existing contextual Help topic registry and Help dialog wiring out of the large inline application script into `assets/js/ui/application-help.js` without changing user-facing Help behavior.
-- **Nested runtime source mapping** — Adds the first focused `assets/js/ui/` source mapping while preserving the existing flat production runtime URL through the Phase 4 compatibility layer.
-- **PWA delivery** — Precaches `application-help.js` and rotates the shell cache to r42 so installed clients receive the extracted runtime safely.
-- **Regression coverage** — Adds source and browser checks for Help topics, dialog opening, Escape close behavior, focus return, subsystem boundaries, and Pages packaging.
+For complete release history, see [`CHANGELOG.md`](CHANGELOG.md).
 
-### Preserved in V15.2.7
+## Repository map
 
-Finance Schema **12**, Cloud Schema **V3**, finance records, calculations, account balances, storage, sync/conflict behavior, sidebar behavior, desktop/mobile layouts, and the routine **five-minute sync cadence** are unchanged.
+```text
+.github/        GitHub Actions, Dependabot, CODEOWNERS, PR template
+assets/         Application CSS and JavaScript source
+  css/          Stylesheets and compatibility layers
+  js/           Finance, sync, UI, and feature modules
+  js/ui/        Focused user-interface modules
+docs/           Setup, migration, release, and architecture documentation
+icons/          Runtime icon assets
+scripts/        Runtime preparation, install, and audit helpers
+supabase/       Database schema, policies, SQL helpers, and Edge Functions
+tests/          Browser, finance, regression, security, sync, and helper tests
+vendor/         Vendored browser dependencies
+```
 
-## V15.2.6 · Form Input Module Extraction
+See [`docs/architecture/README.md`](docs/architecture/README.md) for ownership rules and the staged repository-organization plan.
 
-Released **August 19, 2026** with PWA cache `finance-v15-20260819-form-inputs-r41`.
+## Main application files
 
-### New updates since V15.2.5
+- `index.html` — application shell and remaining legacy inline runtime
+- `assets/js/` — extracted JavaScript modules
+- `assets/css/` — application and responsive styles
+- `sw.js` — service worker and PWA cache delivery
+- `manifest.webmanifest` — PWA metadata
+- `sync-config.js` — hosted sync/release compatibility layer
+- `version.json` — canonical release and schema metadata
+- `server.js` — local development server
 
-- **Form-input module extraction** — Moves the existing calculator and numeric input subsystem out of the large inline application script into `assets/js/form-inputs.js` while preserving the same global APIs and user behavior.
-- **Repository maintainability** — Reduces `index.html` and keeps the extracted runtime source inside the organized Phase 4 `assets/js/` structure with generated root compatibility for local development.
-- **PWA delivery** — Precaches the new form-input module and rotates the shell cache to r41 so installed clients receive the extracted runtime safely.
-- **Regression coverage** — Adds source and browser checks for arithmetic parsing, money/integer validation, accessible field errors, formatting, and calculator controls.
+## Development
 
-### Preserved in V15.2.6
+Requirements:
 
-Finance Schema **12**, Cloud Schema **V3**, finance records, calculations, account balances, layouts, conflict-resolution behavior, and the routine **five-minute sync cadence** are unchanged.
+- Node.js **22 or newer**
+- npm
 
-## V15.2.5 · Finance Disclosure Alignment
+Install dependencies:
 
-Released **August 18, 2026** with PWA cache `finance-v15-20260818-disclosure-alignment-r40`.
+```bash
+npm ci --ignore-scripts --no-audit --no-fund
+```
 
-### New updates since V15.2.4
+Run locally:
 
-- **Budget disclosure alignment** — Aligns Monthly budget plan, Available money, First half, Second half, and Other expenses disclosure controls to a shared **40px** desktop size and the exact **17px** right inset established by First half.
-- **Responsive preservation** — Keeps the existing **44px** mobile touch targets and phone layouts unchanged.
-- **Delivery refresh** — Cache-busts the disclosure stylesheet, service worker, and release layer so GitHub Pages and installed PWA clients receive the fix.
-- **Regression coverage** — Updates current-release source contracts for V15.2.5 while preserving older feature-specific asset versions.
+```bash
+npm run dev
+```
 
-### Preserved in V15.2.5
+Run source quality checks:
 
-Finance Schema **12**, Cloud Schema **V3**, finance records, calculations, account balances, conflict-resolution behavior, and the routine **five-minute sync cadence** are unchanged.
+```bash
+npm run quality
+```
 
-## V15.2.4 · Finance UI & Header Refinement
+Run browser validation:
 
-Released **August 18, 2026** with PWA cache `finance-v15-20260818-ui-refinement-r39`.
+```bash
+npx playwright install chromium
+npm run test:browser
+```
 
-### New updates since V15.2.3
+Run the full CI-equivalent validation:
 
-- **More tools icon refresh** — Uses the exact supplied light/dark PNG artwork for Philippine-time/Theme, Quick add, Customize dashboard, Search, and Quick actions while keeping Undo/Redo behavior unchanged.
-- **Compact Appearance control** — Replaces the old Theme presentation with a compact **Auto / Light / Dark** state label, keeps the existing Philippine-time automatic day/night behavior, uses the existing 20px theme artwork, and finalizes the row at **38px high** with left-aligned icon/text geometry.
-- **Finance monthly-save control** — Uses the revised supplied unsaved/saved artwork beside **Mark paid**, keeps the existing 34px control and 30px artwork sizing, adds press/bounce feedback, and includes a reduced-motion fallback without changing monthly-save behavior.
-- **Finance summary markers** — Replaces the circular Available money, First half, Second half, and Other expenses indicators with the supplied scalloped silhouette while preserving their existing responsive sizes and green/red/orange/blue state colors.
-- **Spend action artwork** — Replaces only the visible Finance account-card Spend glyph with the supplied receipt artwork and automatic light/dark switching while preserving the existing 15px desktop/tablet and 18px compact-phone sizing and all spending logic.
-- **Completion heart artwork** — Uses the final clean supplied light/dark heart-smile assets for **First half of the month**, **First-half difference**, and zero-value **Other expenses**, preserving their existing size, placement, spacing, completion rules, and automatic theme switching.
-- **Desktop month selector refinement** — Flattens the `‹ | Month | August 2026 | ›` navigation into one compact **38px** segmented control with subtle separators, removes the glass blur/double-border treatment, and keeps **Current** as a separate aligned 38px control.
-- **PWA and GitHub Pages delivery** — Adds retry-safe Pages deployment with run-attempt-specific artifacts and automatic retries, keeps the final icon/alignment layer network-first, and cache-busts the V15.2.4 release assets so installed/mobile PWAs receive the latest interface reliably.
-- **Regression coverage** — Expands and aligns browser/source validation for V15.2.4 icon artwork, Appearance states, month-selector geometry, release/cache identity, and preserved mobile UI behavior.
+```bash
+npm run quality:ci
+```
 
-### Preserved in V15.2.4
+## Test organization
 
-Finance Schema **12**, Cloud Schema **V3**, finance records, calculations, account balances, conflict-resolution behavior, and the routine **five-minute sync cadence** are unchanged.
+Tests are grouped by responsibility:
 
-## Recent updates
+- `tests/browser/` — browser behavior, accessibility, and interaction coverage
+- `tests/finance/` — finance workflows and calculations
+- `tests/regression/` — release and UI regression contracts
+- `tests/security/` — privacy, import, and security behavior
+- `tests/sync/` — multi-device and cloud-sync behavior
+- `tests/helpers/` — repository inspection and maintenance utilities
 
-- **V15.2.3 · Sync Status Icons** — Uses the supplied Cloud Sync artwork with matching state colors: Synced is green, Syncing is orange, Needs sync uses its red attention icon, and Sync issue/Offline use the red unavailable icon. The release also refreshes PWA delivery without changing finance logic, Cloud Schema V3, or the five-minute sync cadence.
-- **V15.2.2 · Mobile UI & UX** — Refines phone layouts across 320–428px, fixes sticky Finance tabs, standardizes key 44px touch targets, and makes mobile overflow actions safer without changing finance logic, sync cadence, or the completed desktop interface.
-- **V15.2.1 · Desktop UX Quick Wins** — Makes empty/filter states actionable, adds removable Income filter chips, simplifies Budget Plan and Agenda secondary actions, and standardizes Agenda validation/deletion feedback without changing finance logic, sync cadence, or phone layout.
-- **V15.2.0 · Desktop UX Consistency** — Clarifies month and filter state changes, standardizes validation and destructive confirmations, adds per-action busy feedback, improves Search shortcut discovery, and makes Cloud Sync errors easier to recover from while preserving phone layout and finance/sync behavior.
-- **V15.1.0 · Black Canvas UI** — Changes the app canvas to #000000 and the primary interface color to #173e76 across desktop, phone, PWA chrome, and Liquid Glass controls while preserving finance and sync behavior.
-- **V15.0.5 · PWA Update Recovery** — Forces V15.0.4 clients onto a real app-version update, tracks the exact PWA shell cache, clears stale V12–V15 Finance caches safely, and delivers the corrected text-only badge/icon alignment on desktop and phone.
-- **V15.0.4 · Record Spending Reliability** — Fixes Record spending/Add Expense refresh failures, protects verified saved spends from render-only rollback, and refreshes the repaired account-ledger/budget modules on desktop and phone.
-- **V15.0.3 · Safe Multi-device Sync** — Preserves concurrent device edits, auto-merges non-overlapping changes, stops silent cloud-over-device replacement, restores a real Use this device conflict choice, and adds protected device-to-cloud recovery.
-- **V15.0.2 · Cash-flow Chart Focus** — Removes the exact cash-flow values/forecast boxes and expands both coordinated cash-flow charts inside the existing Dashboard bento size.
-- **V15.0.1 · Sidebar Header Maintenance** — Simplifies the expanded sidebar to a larger Records title, preserves collapsed Insights/expanded-only Pin behavior, and refreshes PWA cache delivery without changing finance or cloud schemas.
-- **V15.0.0 · Liquid Glass Interface** — Adds an adaptive Liquid Glass control layer to navigation, toolbars, menus, popovers, modal chrome, and toasts while keeping finance content opaque and readable.
-- **V14.0.23 · Phone UI & Sync Conflict Recovery** — Compacts phone Finance and Settings screens and repairs conflict-choice saving on storage-constrained devices.
-- **V14.0.22 · Marquee & Sidebar Stability** — Aligns the 43px marquee, stabilizes sidebar icons, compacts the collapsed budget plan, and adds accessible Toast timing.
-- **V14.0.21 · Compact Navigation & Sync Cadence** — Compacts and repositions the weekly marquee, uses the supplied sidebar icons with click-only expansion, and changes routine auto-sync to five minutes.
-- **V14.0.20 · Existing Sync State Repair** — Detects Finance records that were already out of sync, safely uploads missed desktop changes, and refreshes phones from the confirmed cloud state.
+## Architecture direction
+
+Repository cleanup is intentionally incremental because the application is installed as a PWA and must preserve old client compatibility while modules are extracted.
+
+The current direction is:
+
+1. Keep `index.html` moving toward an application shell rather than a monolithic runtime.
+2. Group new JavaScript modules by responsibility instead of expanding the flat `assets/js/` directory.
+3. Keep active filenames stable; preserve release history in Git, `CHANGELOG.md`, Releases, and `version.json` rather than adding new versioned filenames when compatibility does not require them.
+4. Keep configuration, sync logic, UI behavior, and release compatibility in separate modules as extraction continues.
+5. Keep tests organized by subsystem and make CI paths follow that structure.
+6. Move historical release detail out of this README so the project entry page stays useful to contributors.
+
+## Cloud sync and privacy
+
+The application is local-first. Cloud synchronization is optional and uses Supabase-compatible publishable/anon browser credentials only. Never place a Supabase `service_role` key or other privileged secret in browser-delivered files.
+
+Changes to sync, encryption, finance records, balances, payment state, or storage migrations require explicit regression coverage and a recovery-safe migration plan.
+
+See [`PRIVACY.md`](PRIVACY.md) and [`SECURITY.md`](SECURITY.md).
+
+## Contributing
+
+Read [`CONTRIBUTING.md`](CONTRIBUTING.md) before changing the project. In particular:
+
+- start from the latest `main`
+- keep branches and pull requests focused
+- use Conventional Commit titles
+- preserve finance and sync compatibility unless the approved scope explicitly changes it
+- run quality and browser validation before merge
+
+## Documentation
+
+Documentation is indexed in [`docs/README.md`](docs/README.md).
+
+Key areas:
+
+- [`docs/setup/`](docs/setup/) — setup guidance
+- [`docs/migration/`](docs/migration/) — migration notes
+- [`docs/release/`](docs/release/) — release documentation
+- [`docs/architecture/`](docs/architecture/) — repository and module organization
+
+## Release history
+
+The full chronological history belongs in [`CHANGELOG.md`](CHANGELOG.md). GitHub Releases and repository history should be used for older implementation details so this README remains compact and current.
