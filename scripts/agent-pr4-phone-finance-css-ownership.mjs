@@ -125,7 +125,7 @@ if (!finalMobile.includes("#income .income-record-row")) throw new Error("Income
 if (!finalMobile.includes("#paid-expenses [data-paid-expense-row]")) throw new Error("Paid Expenses compact grid was not migrated");
 if (!read("index.html").includes(newMobileAsset) || !read("index.html").includes(newUpdaterAsset)) throw new Error("Index delivery URLs were not rotated");
 if (!read("sw.js").includes(newMobileAsset) || !read("sw.js").includes(newUpdaterAsset)) throw new Error("Service-worker delivery URLs were not rotated");
-if (read(compactBrowserPath).includes('toHaveCount(1)') && read(compactBrowserPath).includes('phoneFinanceCompactV1522')) throw new Error("Phone Finance browser contract still requires the runtime style node");
+if (read(compactBrowserPath).includes('await expect(page.locator("#phoneFinanceCompactV1522")).toHaveCount(1);')) throw new Error("Phone Finance browser contract still requires the runtime style node");
 if (!read(mobileBrowserPath).includes("expect(metrics.paidSameColumn).toBe(false)")) throw new Error("320px static fixture was not aligned to the live compact layout");
 
 console.log("Applied PR4 Phone Finance compact CSS ownership cleanup.");
