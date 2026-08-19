@@ -34,7 +34,7 @@ jobs:
         if: github.event_name == 'pull_request'
         env:
           PR_TITLE: ${{ github.event.pull_request.title }}
-        run: node tests/check-pr-title.mjs
+        run: node tests/helpers/check-pr-title.mjs
       - name: Audit production dependencies
         run: npm run audit
 
