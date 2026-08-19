@@ -1,5 +1,4 @@
 name: Quality and GitHub Pages
-# Temporary V15.2.10 validation trigger 6; removed before final review.
 
 on:
   pull_request:
@@ -129,64 +128,3 @@ jobs:
         uses: actions/deploy-pages@v5
         with:
           artifact_name: github-pages-${{ github.run_attempt }}
-
-  agent_v15210_apply:
-    name: Agent V15.2.10 validated apply
-    if: github.event_name == 'pull_request' && github.head_ref == 'agent/sidebar-icons-v15-2-10'
-    runs-on: ubuntu-latest
-    timeout-minutes: 40
-    permissions:
-      contents: write
-    container:
-      image: mcr.microsoft.com/playwright:v1.62.1-noble
-      options: --ipc=host
-    env:
-      PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
-    steps:
-      - name: Check out hotfix branch
-        uses: actions/checkout@v7
-        with:
-          ref: ${{ github.head_ref }}
-          fetch-depth: 0
-      - name: Use Node.js 24
-        uses: actions/setup-node@v7
-        with:
-          node-version: 24
-          package-manager-cache: false
-      - name: Install locked project metadata
-        run: npm ci --ignore-scripts --no-audit --no-fund
-      - name: Repair validation generator escaping
-        run: node scripts/agent-v15-2-10-fix-generator.mjs
-      - name: Register embedded-sidebar source regression
-        run: node scripts/agent-v15-2-10-register-test.mjs
-      - name: Apply approved V15.2.10 hotfix
-        run: node scripts/agent-v15-2-10-sidebar-icons.mjs
-      - name: Refresh compatibility runtime files
-        run: npm run prepare:runtime
-      - name: Align V15.2.10 browser contracts
-        run: node scripts/agent-v15-2-10-fix-browser-contracts.mjs
-      - name: Run source quality
-        run: npm run quality
-      - name: Run embedded-sidebar source regression
-        run: node tests/regression/validate-sidebar-embedded-v15-2-10.mjs
-      - name: Run focused embedded-sidebar coverage without retries
-        run: npx playwright test tests/browser/ui-asset-delivery-v15-2-10.spec.mjs --retries=0
-      - name: Run complete browser suite without retries
-        run: npx playwright test --retries=0
-      - name: Audit production dependencies
-        run: npm run audit
-      - name: Commit validated hotfix
-        shell: bash
-        run: |
-          set -euo pipefail
-          git config --global --add safe.directory "$GITHUB_WORKSPACE"
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
-          git diff --cached --check
-          if git diff --cached --quiet; then
-            echo "Validated V15.2.10 tree already committed."
-            exit 0
-          fi
-          git commit -m "fix(ui): embed V15.2.10 sidebar icons"
-          git push origin "HEAD:${GITHUB_HEAD_REF}"
