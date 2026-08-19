@@ -127,6 +127,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
           git checkout origin/main -- .github/workflows/priority4a-runtime-wiring.yml
           rm -f .github/workflows/agent-ui-runtime-repair.yml
           git config user.name "github-actions[bot]"
