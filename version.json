@@ -1,5 +1,5 @@
 {
-  "version": "15.2.7",
+  "version": "15.2.8",
   "schemaVersion": 12,
   "cloudSchemaVersion": 3,
   "ledgerVersion": 1,
@@ -10,8 +10,8 @@
   "profileArchitectureVersion": 1,
   "encryptionVersion": 1,
   "authSecurityVersion": 1,
-  "cacheVersion": "finance-v15-20260819-sync-config-separation-r43",
+  "cacheVersion": "finance-v15-20260819-pwa-ui-ownership-r44",
   "released": "2026-08-19",
-  "name": "Application Help Module Extraction",
-  "notes": "V15.2.7 extracts the existing Application Help UI subsystem from index.html into assets/js/ui/application-help.js and preserves the same help topics, global functions, dialog behavior, focus return, and runtime URLs. This focused repair completes Priority 4A by loading the separated sync-runtime-compat.js after hosted sync configuration and precaching it under r43. Finance Schema 12, Cloud Schema V3, finance records, calculations, balances, storage, authentication, sync/conflict behavior, sidebar behavior, layouts, and the five-minute sync cadence are unchanged."
+  "name": "PWA UI Ownership Cleanup",
+  "notes": "V15.2.8 moves Cash Flow presentation ownership out of the PWA update runtime and into the existing desktop UX stylesheet while preserving the current rendered geometry and Cash Flow summary behavior. The PWA update module keeps cache/update responsibilities and existing UI behavior, including Quick add, header tools, sidebar brand, and phone compact enhancements. Finance Schema 12, Cloud Schema V3, finance records, calculations, balances, storage, authentication, sync/conflict behavior, and the five-minute sync cadence are unchanged."
 }

@@ -1,3 +1,8 @@
+## 15.2.8 · 2026-08-19
+- Consolidated Dashboard Cash Flow presentation ownership into `assets/css/desktop-ux-v15-2-0.css` and removed the duplicate runtime-injected Cash Flow stylesheet from `assets/js/pwa-update-v15-0-5.js`.
+- Preserved the current Cash Flow legend spacing, summary padding, responsive one/two-column geometry, and DOM summary upgrade behavior while keeping the legacy PWA updater URL compatible.
+- Added source and browser ownership regressions, rotated the PWA shell to `finance-v15-20260819-pwa-ui-ownership-r44`, and kept Finance Schema 12, Cloud Schema V3, finance calculations, balances, records, storage, authentication, sync/conflict behavior, and five-minute Cloud Sync behavior unchanged.
+
 ## 15.2.7 · 2026-08-19
 - Extracted the existing Application Help topic registry and Help dialog wiring from `index.html` into `assets/js/ui/application-help.js` while preserving the same topic content, global Help APIs, dialog behavior, Escape handling, and focus return.
 - Added the first nested UI runtime source mapping to local compatibility staging and GitHub Pages flattening, plus focused source/browser regression coverage.
