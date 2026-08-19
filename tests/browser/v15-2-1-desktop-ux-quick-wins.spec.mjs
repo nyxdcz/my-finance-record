@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import fs from "node:fs";
 
-const source = name => fs.readFileSync(new URL(`../${name}`, import.meta.url), "utf8");
+const source = name => fs.readFileSync(new URL(`../../${name}`, import.meta.url), "utf8");
 
 test("V15.2.1 source keeps the approved desktop UX quick wins", async () => {
   const index = source("index.html");

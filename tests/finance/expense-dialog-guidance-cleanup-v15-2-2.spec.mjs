@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import fs from "node:fs";
 
-const source = name => fs.readFileSync(new URL(`../${name}`, import.meta.url), "utf8");
+const source = name => fs.readFileSync(new URL(`../../${name}`, import.meta.url), "utf8");
 
 for (const [label, width] of [["phone", 390], ["desktop", 1280]]) {
   test(`expense dialog structurally removes redundant guidance on ${label}`, async ({ page }) => {
