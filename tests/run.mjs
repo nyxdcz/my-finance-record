@@ -18,6 +18,7 @@ const testPlan = [
   { suite: "regression", file: "tests/regression/validate-v15-2-2-mobile-ui.mjs" },
   { suite: "finance", file: "tests/finance/validate-form-inputs-v15-2-6.mjs" },
   { suite: "regression", file: "tests/regression/validate-application-help-v15-2-7.mjs" },
+  { suite: "regression", file: "tests/regression/validate-sync-config-separation.mjs" },
 ];
 
 const supportedSuites = new Set(["all", ...testPlan.map(({ suite }) => suite)]);
