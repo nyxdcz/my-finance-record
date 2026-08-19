@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 test("Application Help external runtime preserves dialog and focus return", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("http://127.0.0.1:3000/");
   await page.evaluate(() => {
     window.setupApplicationHelp();
     const trigger = document.getElementById("menuButton");
