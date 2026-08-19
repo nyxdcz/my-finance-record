@@ -6,12 +6,16 @@ on:
       - agent/fix-v15-2-7-ui-runtime
     paths:
       - .github/workflows/priority4a-runtime-wiring.yml
+  pull_request:
+    branches:
+      - main
 
 permissions:
   contents: write
 
 jobs:
   wire-runtime:
+    if: github.event_name == 'push' || github.head_ref == 'agent/fix-v15-2-7-ui-runtime'
     runs-on: ubuntu-latest
     container:
       image: mcr.microsoft.com/playwright:v1.62.1-noble
