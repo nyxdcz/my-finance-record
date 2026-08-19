@@ -10,7 +10,7 @@ const workflow = read(".github/workflows/quality-pages.yml");
 const version = JSON.parse(read("version.json"));
 
 for (const marker of ["const HELP_CONTENT =", "function helpButtonFor", "function setupApplicationHelp", "function openContextHelp"]) assert.ok(help.includes(marker), `Missing extracted Help marker: ${marker}`);
-for (const topic of ["dashboard-overview", "budget-page", "paid-page", "projects-page", "income-page", "settings-salary-work"]) assert.ok(help.includes(`\"${topic}\"`) || help.includes(`${topic}:`), `Missing Help topic: ${topic}`);
+for (const topic of ["dashboard-overview", "budget-page", "paid-page", "projects-page", "income-page", "settings-salary-work"]) assert.ok(help.includes(`"${topic}"`) || help.includes(`${topic}:`), `Missing Help topic: ${topic}`);
 for (const forbidden of ["function clearAccountDropTargets", "function runV12Migration", "saveData(", "const SCHEMA_VERSION"]) assert.ok(!help.includes(forbidden), `Phase 5B crossed boundary: ${forbidden}`);
 assert.ok(!html.includes("const HELP_CONTENT ="), "Help content still exists inline");
 assert.ok(!html.includes("function setupApplicationHelp"), "Help setup still exists inline");
