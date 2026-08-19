@@ -168,4 +168,4 @@ console.log(`Repository inspection: ${errors.length} error(s), ${warnings.length
 for (const message of errors) console.error(`ERROR: ${message}`);
 for (const message of warnings) console.warn(`WARN: ${message}`);
 if (errors.length) process.exit(1);
-console.log("Repository inspection passed: V15.2.6 release sources, local paths, deploy paths, package metadata, permissions, and public sync configuration are consistent.");
+console.log("Repository inspection passed: V15.2.7 release sources, local paths, deploy paths, package metadata, permissions, and public sync configuration are consistent.");
