@@ -19,8 +19,10 @@ const requiredFiles = [
   "package.json", "package-lock.json", "README.md", "CHANGELOG.md", ".gitignore",
   ".github/workflows/quality-pages.yml", "vendor/supabase.min.js",
   "sync-config.js", "sync-config.example.js", "privacy-lock.js", "cloud-conflict-review.js", "cloud-conflict-resolution.js", "cloud-sync-lifecycle.js", "projects-calendar-v13.0.20.js", "projects-calendar-v13.0.20.css",
-  "expense-screenshot-parser.js", "expense-screenshot-detect.js", "expense-screenshot-ai.js", "supabase/functions/detect-payment/index.ts", "AI_SCREENSHOT_DETECTOR_SETUP.md",
-  "Install_V15_2_0.command", "run_audit.sh", "eslint.config.js", "playwright.config.mjs",
+  "expense-screenshot-parser.js", "expense-screenshot-detect.js", "expense-screenshot-ai.js", "supabase/functions/detect-payment/index.ts", "docs/setup/AI_SCREENSHOT_DETECTOR_SETUP.md",
+  "docs/setup/CLOUD_SYNC_SETUP.md", "docs/setup/GITHUB_SECURITY_SETUP.md", "docs/setup/MACBOOK_IPHONE_INSTALLATION.md",
+  "docs/migration/CLOUD_SYNC_V2_MIGRATION.md", "docs/migration/V13_MIGRATION_GUIDE.md", "docs/release/RELEASE_CHECKLIST.md",
+  "scripts/Install_V15_2_0.command", "scripts/run_audit.sh", "eslint.config.js", "playwright.config.mjs",
   "tests/validate-v15-2-0-desktop-ux.mjs", "tests/validate-pwa-updater-v15-0-5.mjs", "tests/validate-record-spending-v15-0-4.mjs", "tests/validate-safe-multidevice-sync.mjs", "tests/validate-expense-screenshot.mjs", "tests/expense-screenshot.spec.mjs", "tests/privacy-and-inputs.spec.mjs", "tests/check-maintainability.mjs"
 ];
 for (const file of requiredFiles) if (!exists(file)) fail(`Missing required file: ${file}`);
@@ -120,7 +122,7 @@ if (!/sb_publishable_|anon/i.test(syncConfigCode)) warn("sync-config.js does not
 if (/OPENAI_API_KEY\s*[:=]\s*["'][^"']+/i.test(syncConfigCode)) fail("sync-config.js must never contain an OpenAI API key");
 
 if (process.platform !== "win32") {
-  for (const file of ["Install_V15_2_0.command", "run_audit.sh"]) {
+  for (const file of ["scripts/Install_V15_2_0.command", "scripts/run_audit.sh"]) {
     if ((fs.statSync(path.join(root, file)).mode & 0o100) === 0) fail(`Executable entry point lost its user-executable bit: ${file}`);
   }
   const visit = directory => {

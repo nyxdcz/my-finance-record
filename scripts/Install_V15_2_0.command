@@ -9,11 +9,12 @@ echo "  My Finance Records · V15.2.1 macOS Installer & Inspector"
 echo "================================================================"
 echo ""
 
-# 1. Determine working directory
+# 1. Determine repository working directory from scripts/
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-cd "$SCRIPT_DIR"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+cd "$REPO_ROOT"
 
-echo "📍 Working directory: $SCRIPT_DIR"
+echo "📍 Working directory: $REPO_ROOT"
 echo ""
 
 # 2. Check Prerequisites
@@ -53,7 +54,7 @@ echo ""
 # 3. Verify executable entry points
 echo "🛠️  [2/5] Verifying executable entry points..."
 chmod +x "$0" 2>/dev/null || true
-chmod +x "run_audit.sh" 2>/dev/null || true
+chmod +x "$SCRIPT_DIR/run_audit.sh" 2>/dev/null || true
 
 echo "   ✓ Installer and audit entry points are executable."
 echo ""
