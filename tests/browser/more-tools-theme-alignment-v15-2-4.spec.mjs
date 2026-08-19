@@ -19,8 +19,18 @@ test("More tools Appearance stays compact, left-aligned, and network-first", asy
   await page.evaluate(() => window.FinancePrivacyLock.unlock({ email:"theme-alignment-test@example.invalid" }));
   await page.locator("#topbarToolsTrigger").click();
   await expect(page.locator("#topbarToolsPanel")).toBeVisible();
+  const appearanceButton = page.locator("#themeToggleButton");
+  const searchButton = page.locator("#globalSearchButton");
+  await expect(appearanceButton).toBeVisible();
+  await expect(searchButton).toBeVisible();
+  await expect.poll(async () => page.evaluate(() => {
+    const appearanceIcon = document.querySelector("#themeToggleButton > .toolbar-icon");
+    const searchIcon = document.querySelector("#globalSearchButton > .toolbar-icon");
+    if (!appearanceIcon || !searchIcon) return Infinity;
+    return Math.abs(appearanceIcon.getBoundingClientRect().left - searchIcon.getBoundingClientRect().left);
+  })).toBeLessThanOrEqual(1);
 
-  const layout = await page.locator("#themeToggleButton").evaluate(button => {
+  const layout = await appearanceButton.evaluate(button => {
     const icon = button.querySelector(":scope > .toolbar-icon");
     const textWrap = button.querySelector(":scope > span:last-child");
     const label = button.querySelector("#themeToggleText");

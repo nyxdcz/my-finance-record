@@ -28,7 +28,7 @@ assert.match(index,/const APP_VERSION = "15\.1\.0";/);
 assert.match(index,/const APP_RELEASE_NAME = "Black Canvas UI";/);
 assert.match(index,/ui-icon-alignment-v15-0-5\.css\?v=15\.2\.9-ui2/);
 assert.match(index,/pwa-update-v15-0-5\.js\?v=15\.2\.4-release1/);
-assert.ok(index.indexOf('dashboard-interactions.css?v=15.1.0-desktop3') < index.indexOf('ui-icon-alignment-v15-0-5.css?v=15.1.0-ui3'));
+assert.ok(index.indexOf('dashboard-interactions.css?v=15.2.10-icons1') < index.indexOf('ui-icon-alignment-v15-0-5.css?v=15.1.0-ui3'));
 assert.match(uiCss,/html body #buildBadge::before/);
 assert.match(uiCss,/content:none !important/);
 assert.match(uiCss,/gap:4px !important/);

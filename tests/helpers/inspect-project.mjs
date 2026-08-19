@@ -134,9 +134,9 @@ const testTargets = [...String(pkg.scripts?.test || "").matchAll(/\bnode\s+(\S+)
 if (!testTargets.length) fail(`Test script target is missing: ${pkg.scripts?.test || "(not configured)"}`);
 for (const target of testTargets) if (!exists(target)) fail(`Test script target is missing: ${target}`);
 if (!String(pkg.engines?.node || "").includes("22")) warn(`Node engine is ${pkg.engines?.node || "not set"}; project validation expects Node 22+`);
-if (pkg.version !== "15.2.9") fail(`Expected current package version 15.2.9, found ${pkg.version || "(missing)"}`);
-if (!read("README.md").startsWith("# My Finance Records · V15.2.9")) fail("README release heading is not V15.2.9");
-if (!read("CHANGELOG.md").startsWith("## 15.2.9 · 2026-08-20")) fail("CHANGELOG latest entry is not V15.2.9");
+if (pkg.version !== "15.2.10") fail(`Expected current package version 15.2.9, found ${pkg.version || "(missing)"}`);
+if (!read("README.md").startsWith("# My Finance Records · V15.2.10")) fail("README release heading is not V15.2.10");
+if (!read("CHANGELOG.md").startsWith("## 15.2.10 · 2026-08-20")) fail("CHANGELOG latest entry is not V15.2.10");
 
 const syncConfig = read("sync-config.js");
 const syncConfigCode = syncConfig.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|\s)\/\/.*$/gm, "$1");
@@ -168,4 +168,4 @@ console.log(`Repository inspection: ${errors.length} error(s), ${warnings.length
 for (const message of errors) console.error(`ERROR: ${message}`);
 for (const message of warnings) console.warn(`WARN: ${message}`);
 if (errors.length) process.exit(1);
-console.log("Repository inspection passed: V15.2.9 release sources, local paths, deploy paths, package metadata, permissions, and public sync configuration are consistent.");
+console.log("Repository inspection passed: V15.2.10 release sources, local paths, deploy paths, package metadata, permissions, and public sync configuration are consistent.");

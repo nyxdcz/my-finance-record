@@ -1,16 +1,16 @@
-# My Finance Records · V15.2.9
+# My Finance Records · V15.2.10
 
 Local-first personal and household finance PWA with multi-profile support and optional encrypted Supabase synchronization.
 
 ## Project status
 
-Current release: **V15.2.9 · UI Asset Delivery Hotfix**
+Current release: **V15.2.10 · Embedded Sidebar Icon Hotfix**
 Released: **August 20, 2026**
 Finance Schema: **12**
 Cloud Schema: **V3**
 Routine cloud sync cadence: **5 minutes**
 
-V15.2.9 refreshes sidebar icon delivery so stale installed PWAs recover the supplied PNG navigation artwork, restores the native sliders glyph for Quick actions, and gives the collapsed Monthly budget plan disclosure its own aligned column without changing finance behavior, storage, sync/conflict handling, or schemas.
+V15.2.10 embeds the canonical sidebar PNG artwork directly in the app shell and removes obsolete CSS image overrides, so Overview, Finance, Work, Insights, and Settings no longer depend on separate sidebar-image requests. Finance behavior, storage, sync/conflict handling, and schemas remain unchanged.
 
 For complete release history, see [`CHANGELOG.md`](CHANGELOG.md).
 

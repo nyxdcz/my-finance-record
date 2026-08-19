@@ -2,7 +2,7 @@
 (function exposeFinancePwaUpdate(root) {
   const FINANCE_CACHE_PATTERN = /^finance-v\d+-/;
   const LEGACY_INDEX_CACHE = "finance-v15-20260816-mobile-ui-ux-r32";
-  const CURRENT_CACHE_VERSION = "finance-v15-20260820-ui-asset-delivery-r45";
+  const CURRENT_CACHE_VERSION = "finance-v15-20260820-sidebar-icons-r46";
   const normalizeCacheVersion = cacheVersion => cacheVersion === LEGACY_INDEX_CACHE ? CURRENT_CACHE_VERSION : cacheVersion;
   const api = {
     financeCachePattern:FINANCE_CACHE_PATTERN,
@@ -40,38 +40,6 @@
   }
   installSidebarBrand();
 
-  function installSidebarIconRecovery() {
-    const doc = root.document;
-    if (!doc) return;
-    const bind = img => {
-      if (img.dataset.sidebarIconRecoveryBound === "true") return;
-      img.dataset.sidebarIconRecoveryBound = "true";
-      img.dataset.sidebarIconSource = img.getAttribute("src") || "";
-      img.addEventListener("load", () => {
-        img.hidden = false;
-        delete img.dataset.sidebarIconFailed;
-      });
-      img.addEventListener("error", () => {
-        if (img.dataset.sidebarIconRetried !== "true") {
-          img.dataset.sidebarIconRetried = "true";
-          const url = new URL(img.dataset.sidebarIconSource || img.src, doc.baseURI);
-          url.searchParams.set("v", "15.2.9-icon1");
-          url.searchParams.set("retry", "1");
-          img.src = url.href;
-          return;
-        }
-        img.dataset.sidebarIconFailed = "true";
-        img.hidden = true;
-      });
-    };
-    const apply = () => doc.querySelectorAll(".sidebar .nav-icon-image").forEach(bind);
-    if (doc.readyState === "loading") {
-      const observer = new MutationObserver(apply);
-      observer.observe(doc.documentElement, { childList:true, subtree:true });
-      doc.addEventListener("DOMContentLoaded", () => { apply(); observer.disconnect(); }, { once:true });
-    } else apply();
-  }
-  installSidebarIconRecovery();
 
   function parseMoneyText(value) {
     const numeric = Number(String(value || "").replace(/[^0-9.-]/g, ""));

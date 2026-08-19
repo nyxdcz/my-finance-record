@@ -25,7 +25,7 @@ html[data-theme="dark"] #themeToggleIcon::before{-webkit-mask-image:url("./icons
 #cloudSyncStatusButton .toolbar-icon,#quickAddExpense .toolbar-icon,#globalSearchButton .toolbar-icon,#productivityCenterButton .toolbar-icon,#themeToggleIcon{display:inline-grid;place-items:center;width:22px;height:22px;flex:0 0 22px}
 .cloud-sync-toolbar-button[data-sync-state="syncing"] .toolbar-icon::before{display:none}
 
-/* V14.0.24 · supplied sidebar navigation icons · cache-safe rendering */
+/* V15.2.10 · canonical sidebar PNGs are embedded in markup; CSS only controls geometry. */
 .sidebar .nav-icon-image{
   display:block!important;
   width:20px!important;
@@ -34,11 +34,6 @@ html[data-theme="dark"] #themeToggleIcon::before{-webkit-mask-image:url("./icons
   opacity:.94!important;
   filter:none!important;
 }
-.sidebar .nav-button[data-page="dashboard"] .nav-icon-image{content:url("./icons/sidebar-overview-v14-0-24.png")}
-.sidebar .nav-button[data-page="money"] .nav-icon-image{content:url("./icons/sidebar-finance-v14-0-24.png")}
-.sidebar .nav-button[data-page="projects"] .nav-icon-image{content:url("./icons/sidebar-work-v14-0-24.png")}
-.sidebar .nav-button[data-page="reports"] .nav-icon-image{content:url("./icons/sidebar-insights-v14-0-24.png")}
-.sidebar .settings-nav-button .nav-icon-image{content:url("./icons/sidebar-settings-v14-0-24.png")}
 .sidebar .nav-button.active .nav-icon-image,
 html[data-theme="dark"] .sidebar .nav-button.active .nav-icon-image{
   filter:brightness(0) saturate(100%)!important;
