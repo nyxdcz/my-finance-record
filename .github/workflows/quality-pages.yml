@@ -46,7 +46,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
-          git reset scripts/phase5b-extract.mjs .github/workflows/phase5b-application-help.yml .phase5b-trigger
+          git reset scripts/phase5b-extract.mjs .github/workflows/phase5b-application-help.yml .github/workflows/quality-pages.yml .phase5b-trigger
           if git diff --cached --quiet; then
             echo "Phase 5B is already applied; nothing to commit."
             exit 0
