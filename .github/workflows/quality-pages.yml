@@ -15,6 +15,61 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  agent_apply:
+    name: Agent PR3 validated apply
+    if: github.event_name == 'pull_request' && github.head_ref == 'agent/pwa-ui-ownership-v15-2-8' && github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    permissions:
+      contents: write
+    container:
+      image: mcr.microsoft.com/playwright:v1.62.1-noble
+      options: --ipc=host
+    env:
+      PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
+    steps:
+      - name: Check out PR branch
+        uses: actions/checkout@v7
+        with:
+          ref: agent/pwa-ui-ownership-v15-2-8
+          fetch-depth: 0
+      - name: Use Node.js 24
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          package-manager-cache: false
+      - name: Apply approved V15.2.8 transform
+        run: node scripts/agent-pwa-ui-ownership-v15-2-8.mjs
+      - name: Install locked project metadata
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Prepare compatibility runtime
+        run: npm run prepare:runtime
+      - name: Run repository quality
+        run: npm run quality
+      - name: Run Chromium browser suite with retries disabled
+        run: npm run test:browser -- --retries=0
+      - name: Audit production dependencies
+        run: npm run audit
+      - name: Commit validated application scope
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git status --short
+          git diff --check
+          git add \
+            assets/js/pwa-update-v15-0-5.js \
+            assets/js/ui/sync-runtime-compat.js \
+            assets/css/desktop-ux-v15-2-0.css \
+            index.html sw.js version.json package.json package-lock.json README.md CHANGELOG.md \
+            tests
+          git diff --cached --check
+          test -n "$(git diff --cached --name-only)"
+          git commit -m "refactor(ui): consolidate cash flow styling"
+          git push origin HEAD:agent/pwa-ui-ownership-v15-2-8
+
   quality:
     name: Regression quality
     runs-on: ubuntu-latest
