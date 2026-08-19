@@ -43,8 +43,8 @@ const required = [
   [uiIcons.includes("V15.2.5-r3 · Available Money uses universal 35px scalloped account badges without cropping"), "Available Money universal badge layer is present"],
   [uiIcons.includes("#money #moneyAccounts .account-card-icon") && uiIcons.includes("width:35px !important") && uiIcons.includes("height:35px !important"), "Available Money account badges are 35px"],
   [uiIcons.includes("width:29px !important") && uiIcons.includes("object-fit:contain !important") && uiIcons.includes("object-position:center !important"), "Account logos use a centered no-crop safe area"],
-  [uiIcons.includes('img[alt=\"Wallet icon\" i]') && uiIcons.includes("--available-account-badge-fill:#ffffff"), "Wallet receives the universal badge treatment"],
-  [uiIcons.includes('img[alt=\"UnionBank icon\" i]') && uiIcons.includes('img[alt=\"RCBC icon\" i]') && uiIcons.includes('img[alt=\"Maya icon\" i]') && uiIcons.includes('img[alt=\"GCash icon\" i]') && uiIcons.includes('img[alt=\"GoTyme icon\" i]'), "Current Bank and E-wallet artwork keeps matching outer fills"],
+  [uiIcons.includes('img[alt="Wallet icon" i]') && uiIcons.includes("--available-account-badge-fill:#ffffff"), "Wallet receives the universal badge treatment"],
+  [uiIcons.includes('img[alt="UnionBank icon" i]') && uiIcons.includes('img[alt="RCBC icon" i]') && uiIcons.includes('img[alt="Maya icon" i]') && uiIcons.includes('img[alt="GCash icon" i]') && uiIcons.includes('img[alt="GoTyme icon" i]'), "Current Bank and E-wallet artwork keeps matching outer fills"],
   [read("mobile-v14-0-23.css").length > 0, "mobile stylesheet remains present"]
 ];
 for (const [ok, message] of required) { if (!ok) throw new Error(message); }
