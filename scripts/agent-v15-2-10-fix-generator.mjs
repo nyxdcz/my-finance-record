@@ -6,6 +6,9 @@ const from = 'page.goto(\\`${base}/?page=\\${route}\\`';
 const to = 'page.goto(\\`\\${base}/?page=\\${route}\\`';
 if (!generator.includes(from) && !generator.includes(to)) throw new Error("Missing generated Playwright URL template");
 generator = generator.replace(from, to);
+const broadEscapedVersionRewrite = '        value = value.replaceAll(`15\\\\.2\\\\.9`, `15\\\\.2\\\\.10`);\n';
+if (!generator.includes(broadEscapedVersionRewrite)) throw new Error("Missing broad escaped-version rewrite");
+generator = generator.replace(broadEscapedVersionRewrite, "");
 fs.writeFileSync(generatorFile, generator);
 
 const inspectorFile = "tests/helpers/inspect-project.mjs";
