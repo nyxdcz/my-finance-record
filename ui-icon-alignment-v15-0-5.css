@@ -488,3 +488,49 @@ html body #topbarToolsPanel #themeToggleText {
   line-height:20px !important;
   text-align:left !important;
 }
+
+/* V15.2.5-r3 · Available Money uses universal 35px scalloped account badges without cropping. */
+html body #money #moneyAccounts .account-card-icon {
+  --available-account-badge-fill:color-mix(in srgb,var(--surface-soft) 82%,var(--primary) 18%);
+  box-sizing:border-box !important;
+  width:35px !important;
+  min-width:35px !important;
+  max-width:35px !important;
+  height:35px !important;
+  min-height:35px !important;
+  max-height:35px !important;
+  flex:0 0 35px !important;
+  padding:0 !important;
+  border:0 !important;
+  border-radius:0 !important;
+  background:var(--available-account-badge-fill) !important;
+  display:inline-grid !important;
+  place-items:center !important;
+  overflow:hidden !important;
+  -webkit-mask-image:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAMAAAAp4XiDAAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAEVQTFRFAAAA3+/v4+fu4+ft4+ju4ufs4+bt3+fs5Oft4uft5+fv4+fs4+bs59/v5Ojt5Ofv4+bt5OTv5OTq4ufs4ubt3+Tv4+jsMCIv+AAAABd0Uk5TABC//89g/2Cf/yD//yCPn+8wMP//MK9rXdHQAAABiklEQVR4nK2WUXODIAyAQVa03ebV7v//we1ha3tWh8UWUFBJELxrnjySjyQkQSjZLPRlCKWU0PsWZKeWJSFZl4zkdn+UwZBd7z4xBkEmgkmMmSHFpOUC7NNC5EBb34wxQfaN2U3pDlcfYQtjCeMlds0iZW0MucCsORHK0cd5iRyv0HIwn9KSS2QPEoYxegiDxkBQBE3baSBSdEHACG8AEnYRDExXLii6mEukumBd4snYb9QRceH3ziGn8/HPuE5iaLIPF5tGUspIhhMg/UMjb49kJ0TfITTZiREupEbe43nPmEYj2ZbrbwjMRBbrFltnufWQCzEecjqT2VJqJtpgjpi35XpIrdeWCcUpWmTE1vrSTCwcsWg6PhLPv6iBl6iAwKrfoK2OQGXqIfqCjc2lh5Q1FyODZaXX7C/GdTGP3WI2+9kv6d8pl11tneY3H1GxZV0gGS4++6mjkPGqLsaNTozJ0w/QYxOpYrSxlcjJo0Ns8+L0hmjxuR+ZHCOCLyX1CPj6xlWve1ytyRMuvYMzfn/h6gAAAABJRU5ErkJggg==") !important;
+  mask-image:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAMAAAAp4XiDAAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAEVQTFRFAAAA3+/v4+fu4+ft4+ju4ufs4+bt3+fs5Oft4uft5+fv4+fs4+bs59/v5Ojt5Ofv4+bt5OTv5OTq4ufs4ubt3+Tv4+jsMCIv+AAAABd0Uk5TABC//89g/2Cf/yD//yCPn+8wMP//MK9rXdHQAAABiklEQVR4nK2WUXODIAyAQVa03ebV7v//we1ha3tWh8UWUFBJELxrnjySjyQkQSjZLPRlCKWU0PsWZKeWJSFZl4zkdn+UwZBd7z4xBkEmgkmMmSHFpOUC7NNC5EBb34wxQfaN2U3pDlcfYQtjCeMlds0iZW0MucCsORHK0cd5iRyv0HIwn9KSS2QPEoYxegiDxkBQBE3baSBSdEHACG8AEnYRDExXLii6mEukumBd4snYb9QRceH3ziGn8/HPuE5iaLIPF5tGUspIhhMg/UMjb49kJ0TfITTZiREupEbe43nPmEYj2ZbrbwjMRBbrFltnufWQCzEecjqT2VJqJtpgjpi35XpIrdeWCcUpWmTE1vrSTCwcsWg6PhLPv6iBl6iAwKrfoK2OQGXqIfqCjc2lh5Q1FyODZaXX7C/GdTGP3WI2+9kv6d8pl11tneY3H1GxZV0gGS4++6mjkPGqLsaNTozJ0w/QYxOpYrSxlcjJo0Ns8+L0hmjxuR+ZHCOCLyX1CPj6xlWve1ytyRMuvYMzfn/h6gAAAABJRU5ErkJggg==") !important;
+  -webkit-mask-repeat:no-repeat !important;
+  mask-repeat:no-repeat !important;
+  -webkit-mask-position:center !important;
+  mask-position:center !important;
+  -webkit-mask-size:100% 100% !important;
+  mask-size:100% 100% !important;
+}
+html body #money #moneyAccounts .account-card-icon > img {
+  width:29px !important;
+  max-width:29px !important;
+  height:29px !important;
+  max-height:29px !important;
+  object-fit:contain !important;
+  object-position:center !important;
+  border-radius:0 !important;
+}
+
+/* Current uploaded account artwork: extend each logo's own badge color through the outer scallop. */
+html body #money #moneyAccounts .account-card-icon:has(> img[alt="Wallet icon" i]) { --available-account-badge-fill:#ffffff; }
+html body #money #moneyAccounts .account-card-icon:has(> img[alt="UnionBank icon" i]) { --available-account-badge-fill:#f58220; }
+html body #money #moneyAccounts .account-card-icon:has(> img[alt="RCBC icon" i]) { --available-account-badge-fill:#4b9bd4; }
+html body #money #moneyAccounts .account-card-icon:has(> img[alt="Maya icon" i]) { --available-account-badge-fill:#101713; }
+html body #money #moneyAccounts .account-card-icon:has(> img[alt="GCash icon" i]) { --available-account-badge-fill:#0b66d6; }
+html body #money #moneyAccounts .account-card-icon:has(> img[alt="GoTyme icon" i]) { --available-account-badge-fill:#16d3cf; }
+html body #money #moneyAccounts .account-card-icon:has(> img[alt="Metrobank icon" i]) { --available-account-badge-fill:#005baa; }
