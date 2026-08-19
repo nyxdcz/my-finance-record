@@ -1,0 +1,104 @@
+name: Apply V15.2.5 account and project contrast patch
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/ui-contrast-v15-2-5.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Apply approved contrast fixes
+        shell: bash
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+
+          # 1) Expose account type on every rendered account card and refresh the final icon/contrast layer URL.
+          index_path = Path("index.html")
+          index = index_path.read_text()
+          old_card = '<div class="account-card ${editable ? "account-card-editable" : ""}" ${editable ? `data-account-card="${escapeHtml(name)}"` : ""}>'
+          new_card = '<div class="account-card ${editable ? "account-card-editable" : ""}" data-account-type="${escapeAttribute(accountTypeDisplay(name))}" ${editable ? `data-account-card="${escapeHtml(name)}"` : ""}>'
+          if new_card not in index:
+              if old_card not in index:
+                  raise SystemExit("Account card renderer anchor not found")
+              index = index.replace(old_card, new_card)
+          index = index.replace("./ui-icon-alignment-v15-0-5.css?v=15.2.4-ui1", "./ui-icon-alignment-v15-0-5.css?v=15.2.5-contrast1")
+          index_path.write_text(index)
+
+          # 2) Keep universal 35px no-crop logo badges, then add type-specific label contrast and completed-project readability.
+          css_path = Path("ui-icon-alignment-v15-0-5.css")
+          css = css_path.read_text()
+          marker = "/* V15.2.5-r4 · Bank/E-wallet label contrast and completed-project readability. */"
+          block = r'''
+
+          /* V15.2.5-r4 · Bank/E-wallet label contrast and completed-project readability. */
+          html body #money #moneyAccounts .account-card:is([data-account-type="Bank" i],[data-account-type="E-wallet" i]) .account-card-label > span,
+          html body #money #moneyAccounts .account-card:is([data-account-type="Bank" i],[data-account-type="E-wallet" i]) .account-card-label > small {
+            color:#fff !important;
+          }
+
+          /* Completed-project metadata must remain readable on both light and dark surfaces. */
+          html body #projects .completed-project-record .project-source-line {
+            color:var(--text) !important;
+          }
+          html body #projects .completed-project-record .project-deadline-state.upcoming {
+            color:var(--text) !important;
+            background:color-mix(in srgb,var(--green-soft) 78%,var(--surface) 22%) !important;
+          }
+          html body #projects .completed-project-record .project-revision-inline {
+            color:var(--text) !important;
+            background:color-mix(in srgb,var(--orange-soft) 78%,var(--surface) 22%) !important;
+            border-color:color-mix(in srgb,var(--orange) 55%,var(--line)) !important;
+          }
+          '''
+          if marker not in css:
+              css_path.write_text(css.rstrip() + block + "\n")
+
+          # 3) Keep the same V15.2.5/r40 service-worker identity, but precache the refreshed CSS URL.
+          sw_path = Path("sw.js")
+          sw = sw_path.read_text().replace("./ui-icon-alignment-v15-0-5.css?v=15.2.4-ui1", "./ui-icon-alignment-v15-0-5.css?v=15.2.5-contrast1")
+          sw_path.write_text(sw)
+
+          # 4) Extend the existing release contract without changing Finance data/schema/version semantics.
+          test_path = Path("tests/validate-v15-2-0-desktop-ux.mjs")
+          test = test_path.read_text()
+          anchor = '  [uiIcons.includes(\'img[alt="UnionBank icon" i]\') && uiIcons.includes(\'img[alt="RCBC icon" i]\') && uiIcons.includes(\'img[alt="Maya icon" i]\') && uiIcons.includes(\'img[alt="GCash icon" i]\') && uiIcons.includes(\'img[alt="GoTyme icon" i]\'), "Current Bank and E-wallet artwork keeps matching outer fills"],\n'
+          checks = '''  [index.includes('data-account-type="${escapeAttribute(accountTypeDisplay(name))}"'), "Account cards expose account type for scoped contrast styling"],
+          [uiIcons.includes('[data-account-type="Bank" i]') && uiIcons.includes('[data-account-type="E-wallet" i]') && uiIcons.includes("color:#fff !important"), "Bank and E-wallet labels use white text"],
+          [uiIcons.includes("#projects .completed-project-record .project-source-line") && uiIcons.includes("#projects .completed-project-record .project-deadline-state.upcoming") && uiIcons.includes("#projects .completed-project-record .project-revision-inline"), "Completed-project metadata has dedicated readable contrast"],
+          [index.includes("ui-icon-alignment-v15-0-5.css?v=15.2.5-contrast1") && sw.includes("ui-icon-alignment-v15-0-5.css?v=15.2.5-contrast1"), "Contrast stylesheet is cache-busted consistently"],
+          '''
+          if "Account cards expose account type for scoped contrast styling" not in test:
+              if anchor not in test:
+                  raise SystemExit("Desktop UX test anchor not found")
+              test = test.replace(anchor, anchor + checks)
+          test_path.write_text(test)
+          PY
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Validate repository
+        run: npm run quality
+
+      - name: Commit approved patch and remove temporary workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm .github/workflows/ui-contrast-v15-2-5.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html ui-icon-alignment-v15-0-5.css sw.js tests/validate-v15-2-0-desktop-ux.mjs .github/workflows/ui-contrast-v15-2-5.yml
+          git commit -m "fix: improve account and completed-project contrast"
+          git push origin HEAD:main
