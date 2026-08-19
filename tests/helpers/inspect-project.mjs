@@ -5,7 +5,7 @@ import process from "node:process";
 import { fileURLToPath } from "node:url";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const root = path.resolve(here, "..");
+const root = path.resolve(here, "../..");
 const errors = [];
 const warnings = [];
 const read = file => fs.readFileSync(path.join(root, file), "utf8");
@@ -41,7 +41,7 @@ const requiredFiles = [
   "docs/setup/CLOUD_SYNC_SETUP.md", "docs/setup/GITHUB_SECURITY_SETUP.md", "docs/setup/MACBOOK_IPHONE_INSTALLATION.md",
   "docs/migration/CLOUD_SYNC_V2_MIGRATION.md", "docs/migration/V13_MIGRATION_GUIDE.md", "docs/release/RELEASE_CHECKLIST.md",
   "scripts/Install_V15_2_0.command", "scripts/run_audit.sh", "scripts/prepare-runtime.mjs", "eslint.config.js", "playwright.config.mjs",
-  "tests/validate-v15-2-0-desktop-ux.mjs", "tests/validate-pwa-updater-v15-0-5.mjs", "tests/validate-record-spending-v15-0-4.mjs", "tests/validate-safe-multidevice-sync.mjs", "tests/validate-expense-screenshot.mjs", "tests/expense-screenshot.spec.mjs", "tests/privacy-and-inputs.spec.mjs", "tests/application-help.spec.mjs", "tests/validate-application-help-v15-2-7.mjs", "tests/check-maintainability.mjs"
+  "tests/regression/validate-v15-2-0-desktop-ux.mjs", "tests/regression/validate-pwa-updater-v15-0-5.mjs", "tests/finance/validate-record-spending-v15-0-4.mjs", "tests/sync/validate-safe-multidevice-sync.mjs", "tests/finance/validate-expense-screenshot.mjs", "tests/finance/expense-screenshot.spec.mjs", "tests/security/privacy-and-inputs.spec.mjs", "tests/browser/application-help.spec.mjs", "tests/regression/validate-application-help-v15-2-7.mjs", "tests/helpers/check-maintainability.mjs"
 ];
 for (const file of requiredFiles) if (!exists(file)) fail(`Missing required file: ${file}`);
 

@@ -5,7 +5,7 @@ import vm from "node:vm";
 import { fileURLToPath } from "node:url";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const root = path.resolve(here, "..");
+const root = path.resolve(here, "../..");
 const source = fs.readFileSync(path.join(root, "expense-screenshot-parser.js"), "utf8");
 const sandbox = { window:{} };
 vm.createContext(sandbox);
