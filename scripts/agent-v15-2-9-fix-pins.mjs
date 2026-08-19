@@ -98,4 +98,11 @@ replaceIn("assets/css/budget-planning.css", [[
   }
 }
 
-console.log("Normalized V15.2.9 release, asset pins, and disclosure spacing.");
+// Git's whitespace gate should not depend on Markdown hard-break spaces.
+{
+  const file = path.join(root, "README.md");
+  const value = fs.readFileSync(file, "utf8").split("\n").map(line => line.replace(/[ \t]+$/u, "")).join("\n");
+  fs.writeFileSync(file, value);
+}
+
+console.log("Normalized V15.2.9 release, asset pins, disclosure spacing, and Markdown whitespace.");
