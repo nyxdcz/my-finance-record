@@ -23,7 +23,6 @@
     "test:sync": "node tests/run.mjs sync",
     "pretest:browser": "npm run prepare:runtime",
     "test:browser": "playwright test",
-    "prequality": "node scripts/agent-v15-2-9-fix-pins.mjs",
     "maintainability": "node tests/helpers/check-maintainability.mjs",
     "audit": "npm audit --omit=dev",
     "quality": "npm run inspect && npm run lint && npm run maintainability && npm run test",
