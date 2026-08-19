@@ -3,6 +3,8 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 cd "$REPO_ROOT"
 
+node "$SCRIPT_DIR/prepare-runtime.mjs"
+
 echo "=== Broken References ==="
 for f in index.html offline.html; do
   if [ -f "$f" ]; then
