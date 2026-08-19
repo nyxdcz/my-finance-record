@@ -1,3 +1,9 @@
+## 15.2.10 · 2026-08-20
+- Embedded the canonical Overview, Finance, Work, Insights, and Settings PNG artwork directly in the sidebar markup so those icons render without separate image requests.
+- Removed the obsolete V14.0.24 CSS content:url sidebar overrides that referenced missing Overview, Finance, Work, and Settings files and caused the browser broken-image placeholders seen on the live V15.2.9 app.
+- Removed the now-unneeded runtime sidebar image retry logic and sidebar-image service-worker precache/network-first route.
+- Rotated the PWA shell to `finance-v15-20260820-sidebar-icons-r46` while keeping Finance Schema 12, Cloud Schema V3, finance calculations, balances, records, storage, authentication, sync/conflict behavior, and five-minute Cloud Sync unchanged.
+
 ## 15.2.9 · 2026-08-20
 - Versioned the supplied sidebar PNG URLs, made sidebar icon requests network-first with cache fallback, and added a one-retry runtime recovery path that hides a failed image instead of leaving the browser broken-image placeholder.
 - Restored the existing native sliders SVG for More tools → Quick actions while leaving Theme, Quick add, Customize dashboard, and Search artwork unchanged.

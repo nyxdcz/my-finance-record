@@ -1,6 +1,6 @@
 (function applyV15ReleaseLayer() {
-  const VERSION = "15.2.9";
-  const RELEASE_NAME = "UI Asset Delivery Hotfix";
+  const VERSION = "15.2.10";
+  const RELEASE_NAME = "Embedded Sidebar Icon Hotfix";
   const RELEASE_DATE = "August 20, 2026";
   window.FINANCE_APP_VERSION_OVERRIDE = VERSION;
   window.FINANCE_RELEASE_OVERRIDE = { version:VERSION, name:RELEASE_NAME, released:"2026-08-20" };

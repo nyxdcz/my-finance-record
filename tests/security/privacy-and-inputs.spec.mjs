@@ -438,6 +438,8 @@ test("collapsed Monthly budget plan is compact and keeps native control semantic
   const card = page.locator("#monthlyBudgetPlannerCard");
   const toggle = page.locator("#monthlyBudgetPlannerToggle");
   const body = page.locator("#monthlyBudgetPlannerBody");
+  await expect(card).toBeVisible();
+  await expect(toggle).toBeVisible();
   if (await toggle.getAttribute("aria-expanded") === "true") await toggle.click();
   await expect(card).toHaveClass(/is-planner-collapsed/);
   await expect(toggle).toHaveAttribute("aria-expanded", "false");

@@ -5,8 +5,8 @@ const formInputs = read("form-inputs.js");
 const sw = read("sw.js");
 const version = JSON.parse(read("version.json"));
 const required = [
-  [version.version === "15.2.9", "current release is V15.2.9"],
-  [version.cacheVersion === "finance-v15-20260820-ui-asset-delivery-r45", "r42 cache is active"],
+  [version.version === "15.2.10", "current release is V15.2.10"],
+  [version.cacheVersion === "finance-v15-20260820-sidebar-icons-r46", "r42 cache is active"],
   [index.includes("./form-inputs.js?v=15.2.6-phase5a1"), "index preserves the extracted V15.2.6 form-input module pin"],
   [!index.includes("function evaluateArithmeticExpression"), "calculator implementation is no longer inline"],
   [formInputs.includes("function evaluateArithmeticExpression") && formInputs.includes("function validateMoneyInput") && formInputs.includes("function setupNumericInputs"), "extracted calculator APIs are present"],
@@ -14,4 +14,4 @@ const required = [
   [sw.includes("form-inputs.js?v=15.2.6-phase5a1"), "form-input module is precached"]
 ];
 for (const [ok, message] of required) if (!ok) throw new Error(message);
-console.log("V15.2.6 form-input extraction source contract passed under the V15.2.9 shell");
+console.log("V15.2.6 form-input extraction source contract passed under the V15.2.10 shell");

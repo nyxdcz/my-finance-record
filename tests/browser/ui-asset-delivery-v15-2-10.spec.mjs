@@ -10,7 +10,18 @@ async function unlock(page, route = "dashboard") {
   await page.evaluate(() => window.FinancePrivacyLock.setAuthenticated(true));
 }
 
-test("V15.2.9 sidebar PNGs load and broken-image recovery is bound", async ({ page }) => {
+async function assertEmbeddedSidebar(page) {
+  const images = page.locator("#sidebar .nav-icon-image");
+  await expect(images).toHaveCount(5);
+  await expect.poll(() => images.evaluateAll(nodes => nodes.every(img => img.complete && img.naturalWidth > 0 && img.naturalHeight > 0))).toBe(true);
+  const sources = await images.evaluateAll(nodes => nodes.map(img => img.getAttribute("src") || ""));
+  expect(sources.every(src => src.startsWith("data:image/png;base64,"))).toBe(true);
+  await expect.poll(() => images.evaluateAll(nodes => nodes.every(img => getComputedStyle(img).content === "normal" || getComputedStyle(img).content === "none"))).toBe(true);
+}
+
+test("V15.2.10 sidebar icons render with every external sidebar PNG request blocked", async ({ page }) => {
+  const sidebarRequests = [];
+  await page.route("**/icons/sidebar-*.png*", route => { sidebarRequests.push(route.request().url()); return route.abort(); });
   await page.setViewportSize({ width:1440, height:900 });
   await unlock(page);
   await page.locator("#sidebar").evaluate(sidebar => {
@@ -18,16 +29,26 @@ test("V15.2.9 sidebar PNGs load and broken-image recovery is bound", async ({ pa
     sidebar.classList.remove("desktop-open");
     sidebar.setAttribute("aria-hidden", "false");
   });
-  const images = page.locator("#sidebar .nav-icon-image");
-  await expect(images).toHaveCount(5);
-  await expect.poll(() => images.evaluateAll(nodes => nodes.every(img => img.complete && img.naturalWidth > 0))).toBe(true);
-  const sources = await images.evaluateAll(nodes => nodes.map(img => img.getAttribute("src")));
-  expect(sources.every(src => /v=15\.2\.9-icon1/.test(src || ""))).toBe(true);
-  await expect.poll(() => images.evaluateAll(nodes => nodes.every(img => img.dataset.sidebarIconRecoveryBound === "true"))).toBe(true);
+  await assertEmbeddedSidebar(page);
+  expect(sidebarRequests).toEqual([]);
+});
 
-  const first = images.first();
-  await first.evaluate(img => { img.dataset.sidebarIconRetried = "true"; img.src = "./icons/definitely-missing-sidebar-icon.png"; });
-  await expect.poll(() => first.evaluate(img => img.hidden && img.dataset.sidebarIconFailed === "true")).toBe(true);
+test("V15.2.10 embedded sidebar icons survive collapsed rail and phone drawer", async ({ page }) => {
+  const sidebarRequests = [];
+  await page.route("**/icons/sidebar-*.png*", route => { sidebarRequests.push(route.request().url()); return route.abort(); });
+  await page.setViewportSize({ width:1280, height:820 });
+  await unlock(page);
+  await page.locator("#sidebar").evaluate(sidebar => {
+    sidebar.classList.remove("sidebar-pinned", "desktop-open");
+    sidebar.setAttribute("aria-hidden", "false");
+  });
+  await assertEmbeddedSidebar(page);
+  await page.setViewportSize({ width:390, height:844 });
+  const menu = page.locator("#menuButton");
+  if (await menu.isVisible()) await menu.click();
+  await expect(page.locator("#sidebar")).toBeVisible();
+  await assertEmbeddedSidebar(page);
+  expect(sidebarRequests).toEqual([]);
 });
 
 test("V15.2.9 Quick actions uses the native sliders SVG", async ({ page }) => {
@@ -36,11 +57,7 @@ test("V15.2.9 Quick actions uses the native sliders SVG", async ({ page }) => {
   await page.locator("#topbarToolsTrigger").click();
   const button = page.locator("#productivityCenterButton");
   await expect(button).toBeVisible();
-  const icon = await button.locator(".toolbar-icon").evaluate(node => ({
-    background:getComputedStyle(node).backgroundImage,
-    svgOpacity:getComputedStyle(node.querySelector("svg")).opacity,
-    paths:node.querySelectorAll("svg path").length
-  }));
+  const icon = await button.locator(".toolbar-icon").evaluate(node => ({ background:getComputedStyle(node).backgroundImage, svgOpacity:getComputedStyle(node.querySelector("svg")).opacity, paths:node.querySelectorAll("svg path").length }));
   expect(icon.background).toBe("none");
   expect(icon.svgOpacity).toBe("1");
   expect(icon.paths).toBeGreaterThan(0);
@@ -60,12 +77,7 @@ for (const width of [1200,1280,1440]) {
       const visible = [...document.querySelectorAll("#monthlyBudgetPlannerCard .budget-plan-kpi")].filter(node => getComputedStyle(node).display !== "none");
       const forecast = visible.at(-1).getBoundingClientRect();
       const card = document.getElementById("monthlyBudgetPlannerCard").getBoundingClientRect();
-      return {
-        toggle:{ left:toggle.left, right:toggle.right, width:toggle.width },
-        forecast:{ left:forecast.left, right:forecast.right },
-        card:{ left:card.left, right:card.right },
-        visible:visible.length
-      };
+      return { toggle:{ left:toggle.left, right:toggle.right, width:toggle.width }, forecast:{ left:forecast.left, right:forecast.right }, card:{ left:card.left, right:card.right }, visible:visible.length };
     });
     expect(metrics.visible).toBe(3);
     expect(metrics.toggle.width).toBe(40);
