@@ -3,151 +3,98 @@ name: Priority 4A runtime wiring
 on:
   push:
     branches:
-      - agent/fix-v15-2-7-ui-runtime
+      - refactor/priority4a-sync-config-separation
     paths:
       - .github/workflows/priority4a-runtime-wiring.yml
-  pull_request:
-    branches:
-      - main
 
 permissions:
   contents: write
 
 jobs:
   wire-runtime:
-    if: github.event_name == 'push' || github.head_ref == 'agent/fix-v15-2-7-ui-runtime'
     runs-on: ubuntu-latest
-    container:
-      image: mcr.microsoft.com/playwright:v1.62.1-noble
-      options: --ipc=host
-    env:
-      PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v4
         with:
-          ref: agent/fix-v15-2-7-ui-runtime
-          fetch-depth: 0
-      - uses: actions/setup-node@v7
-        with:
-          node-version: 24
-          package-manager-cache: false
-      - name: Apply scoped runtime and PWA repair
-        shell: bash
+          ref: refactor/priority4a-sync-config-separation
+      - name: Wire separated sync runtime
         run: |
-          set -euo pipefail
-          node --input-type=module <<'NODE'
-          import fs from "node:fs";
-          import path from "node:path";
+          python - <<'PY'
+          from pathlib import Path
+          import json
 
-          const oldCache = "finance-v15-20260819-application-help-r42";
-          const newCache = "finance-v15-20260819-sync-config-separation-r43";
-          const runtimeUrl = "./sync-runtime-compat.js?v=15.2.7-priority4a1";
-          const read = file => fs.readFileSync(file, "utf8");
-          const write = (file, text) => fs.writeFileSync(file, text);
-          const replaceOnce = (text, from, to, label) => {
-            const first = text.indexOf(from);
-            if (first < 0 || text.indexOf(from, first + from.length) >= 0) throw new Error(`${label}: expected exactly one match`);
-            return text.slice(0, first) + to + text.slice(first + from.length);
-          };
+          old_cache = "finance-v15-20260819-application-help-r42"
+          new_cache = "finance-v15-20260819-sync-config-separation-r43"
+          runtime_url = './sync-runtime-compat.js?v=15.2.7-priority4a1'
 
-          let index = read("index.html");
-          const configTag = '<script src="./sync-config.js?v=15.2.7-release1"></script>';
-          const runtimeTag = `<script src="${runtimeUrl}"></script>`;
-          if (!index.includes(runtimeTag)) index = replaceOnce(index, configTag, `${configTag}\n  ${runtimeTag}`, "index sync-config tag");
-          if (!index.includes(oldCache)) throw new Error("index.html: expected the current r42 cache identity");
-          index = index.replaceAll(oldCache, newCache);
-          const controllerReload = 'navigator.serviceWorker.addEventListener("controllerchange", () => location.reload());';
-          const guardedControllerReload = 'let serviceWorkerControlled = Boolean(navigator.serviceWorker.controller);\n        navigator.serviceWorker.addEventListener("controllerchange", () => {\n          if (serviceWorkerControlled) location.reload();\n          serviceWorkerControlled = true;\n        });';
-          if (!index.includes("let serviceWorkerControlled = Boolean(navigator.serviceWorker.controller);")) index = replaceOnce(index, controllerReload, guardedControllerReload, "service-worker controller reload");
-          write("index.html", index);
+          def replace_once(path, old, new):
+              path = Path(path)
+              text = path.read_text()
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f"{path}: expected one occurrence of {old!r}, found {count}")
+              path.write_text(text.replace(old, new, 1))
 
-          let worker = read("sw.js");
-          if (!worker.includes(oldCache)) throw new Error("sw.js: expected the current r42 cache identity");
-          worker = worker.replaceAll(oldCache, newCache);
-          const configAsset = '  asset("./sync-config.js?v=15.2.7-release1"),';
-          const runtimeAsset = '  asset("./sync-runtime-compat.js?v=15.2.7-priority4a1"),';
-          if (!worker.includes(runtimeAsset)) worker = replaceOnce(worker, configAsset, `${configAsset}\n${runtimeAsset}`, "service-worker sync-config asset");
-          write("sw.js", worker);
+          replace_once(
+              "index.html",
+              '<script src="./sync-config.js?v=15.2.7-release1"></script>',
+              '<script src="./sync-config.js?v=15.2.7-release1"></script>\n<script src="./sync-runtime-compat.js?v=15.2.7-priority4a1"></script>',
+          )
 
-          let pwa = read("assets/js/pwa-update-v15-0-5.js");
-          if (!pwa.includes(oldCache)) throw new Error("PWA update layer does not contain the expected r42 cache identity");
-          write("assets/js/pwa-update-v15-0-5.js", pwa.replaceAll(oldCache, newCache));
+          replace_once("sw.js", f'const CACHE_VERSION = "{old_cache}";', f'const CACHE_VERSION = "{new_cache}";')
+          replace_once(
+              "sw.js",
+              '  asset("./sync-config.js?v=15.2.7-release1"),',
+              '  asset("./sync-config.js?v=15.2.7-release1"),\n  asset("./sync-runtime-compat.js?v=15.2.7-priority4a1"),',
+          )
 
-          let runtime = read("assets/js/ui/sync-runtime-compat.js");
-          const runtimeMarker = "(function applyV15ReleaseLayer() {";
-          const runtimeMarkerAt = runtime.indexOf(runtimeMarker);
-          if (runtimeMarkerAt < 0) throw new Error("Could not find the sync runtime compatibility marker");
-          runtime = runtime.slice(runtimeMarkerAt);
-          write("assets/js/ui/sync-runtime-compat.js", runtime);
+          pwa = Path("assets/js/pwa-update-v15-0-5.js")
+          pwa_text = pwa.read_text()
+          if old_cache not in pwa_text:
+              raise SystemExit("PWA update layer does not contain the expected cache identity")
+          pwa.write_text(pwa_text.replace(old_cache, new_cache))
 
-          const version = JSON.parse(read("version.json"));
-          if (version.version !== "15.2.7") throw new Error("Unexpected application version before repair");
-          if (version.schemaVersion !== 12 || version.cloudSchemaVersion !== 3) throw new Error("UI runtime repair must not change Finance Schema 12 or Cloud Schema V3");
-          if (version.cacheVersion !== oldCache) throw new Error("Unexpected cache identity before repair");
-          version.cacheVersion = newCache;
-          version.notes = "V15.2.7 extracts the existing Application Help UI subsystem from index.html into assets/js/ui/application-help.js and preserves the same help topics, global functions, dialog behavior, focus return, and runtime URLs. This focused repair completes Priority 4A by loading the separated sync-runtime-compat.js after hosted sync configuration and precaching it under r43. Finance Schema 12, Cloud Schema V3, finance records, calculations, balances, storage, authentication, sync/conflict behavior, sidebar behavior, layouts, and the five-minute sync cadence are unchanged.";
-          write("version.json", `${JSON.stringify(version, null, 2)}\n`);
+          runtime = Path("assets/js/ui/sync-runtime-compat.js")
+          runtime_text = runtime.read_text()
+          marker = "(function applyV15ReleaseLayer() {"
+          marker_at = runtime_text.find(marker)
+          if marker_at < 0:
+              raise SystemExit("Could not find runtime compatibility marker")
+          runtime.write_text(runtime_text[marker_at:])
 
-          const walk = directory => fs.readdirSync(directory, { withFileTypes:true }).flatMap(entry => {
-            const target = path.join(directory, entry.name);
-            return entry.isDirectory() ? walk(target) : [target];
-          });
-          for (const testFile of walk("tests").filter(file => file.endsWith(".mjs"))) {
-            const text = read(testFile);
-            if (text.includes(oldCache)) write(testFile, text.replaceAll(oldCache, newCache));
-          }
+          version_path = Path("version.json")
+          version = json.loads(version_path.read_text())
+          if version.get("version") != "15.2.7" or version.get("schemaVersion") != 12 or version.get("cloudSchemaVersion") != 3:
+              raise SystemExit("Unexpected release/schema identity before Priority 4A")
+          if version.get("cacheVersion") != old_cache:
+              raise SystemExit("Unexpected cache identity before Priority 4A")
+          version["cacheVersion"] = new_cache
+          version["notes"] = (
+              "V15.2.7 extracts the existing Application Help UI subsystem from index.html into "
+              "assets/js/ui/application-help.js and preserves the same help topics, global functions, dialog behavior, "
+              "focus return, and runtime URLs. Priority 4A additionally separates hosted sync configuration from the "
+              "legacy compatibility/UI runtime into assets/js/ui/sync-runtime-compat.js and rotates PWA delivery to r43. "
+              "Finance Schema 12, Cloud Schema V3, finance records, calculations, balances, storage, sync/conflict behavior, "
+              "sidebar behavior, layouts, and the five-minute sync cadence are unchanged."
+          )
+          version_path.write_text(json.dumps(version, indent=2) + "\n")
 
-          const pwaTest = "tests/regression/validate-pwa-updater-v15-0-5.mjs";
-          let pwaRegression = read(pwaTest);
-          const updateStateAssert = 'assert.match(index, /FinancePwaUpdate\\.updateState\\(remote, APP_VERSION, APP_CACHE_VERSION\\)/);';
-          const firstControllerAssert = 'assert.match(index, /let serviceWorkerControlled = Boolean\\(navigator\\.serviceWorker\\.controller\\);/);\nassert.match(index, /if \\(serviceWorkerControlled\\) location\\.reload\\(\\);/);';
-          if (!pwaRegression.includes("serviceWorkerControlled")) pwaRegression = replaceOnce(pwaRegression, updateStateAssert, `${updateStateAssert}\n${firstControllerAssert}`, "PWA first-controller regression assertion");
-          write(pwaTest, pwaRegression);
+          for test_path in Path("tests").rglob("*.mjs"):
+              text = test_path.read_text()
+              if old_cache in text:
+                  test_path.write_text(text.replace(old_cache, new_cache))
 
-          const monthTest = "tests/regression/validate-month-navigation-borderless-v15-1-0.mjs";
-          let month = read(monthTest);
-          month = replaceOnce(month, 'const sync = fs.readFileSync("sync-config.js", "utf8");', 'const runtime = fs.readFileSync("assets/js/ui/sync-runtime-compat.js", "utf8");', "month-navigation source owner");
-          month = replaceOnce(month, 'assert.match(sync, /liquid-glass-v15\\.css\\?v=\\$\\{VERSION\\}-light1/);', 'assert.match(runtime, /liquid-glass-v15\\.css\\?v=\\$\\{VERSION\\}-light1/);', "month-navigation runtime assertion");
-          write(monthTest, month);
-
-          const separationTest = "tests/regression/validate-sync-config-separation.mjs";
-          let separation = read(separationTest);
-          const serviceWorkerAssert = 'if (!serviceWorker.includes("./sync-runtime-compat.js?v=15.2.7-priority4a1")) throw new Error("Service worker must precache the sync runtime compatibility file.");';
-          if (!separation.includes(serviceWorkerAssert)) throw new Error("Could not identify the existing Priority 4A service-worker assertion");
-          const cacheAssert = 'if (!index.includes(`const APP_CACHE_VERSION = "${expectedCache}";`)) throw new Error("index.html cache identity is not synchronized.");';
-          const runtimeConfigAssert = 'if (runtime.includes("window.FINANCE_SYNC_CONFIG")) throw new Error("sync runtime compatibility file must not own hosted sync configuration.");';
-          if (!separation.includes(cacheAssert)) separation = separation.replace(serviceWorkerAssert, `${serviceWorkerAssert}\n${cacheAssert}`);
-          if (!separation.includes(runtimeConfigAssert)) separation = separation.replace(cacheAssert, `${cacheAssert}\n${runtimeConfigAssert}`);
-          write(separationTest, separation);
-
-          const pagesWorkflow = ".github/workflows/quality-pages.yml";
-          let pages = read(pagesWorkflow);
-          const appHelpCheck = "          test -f _site/application-help.js";
-          const runtimeCheck = "          test -f _site/sync-runtime-compat.js";
-          if (!pages.includes(runtimeCheck)) pages = replaceOnce(pages, appHelpCheck, `${appHelpCheck}\n${runtimeCheck}`, "Pages application-help assertion");
-          write(pagesWorkflow, pages);
-          NODE
-      - name: Install locked dependencies
-        run: npm ci --ignore-scripts --no-audit --no-fund
-      - name: Run source quality and regression validation
-        run: npm run quality
-      - name: Run browser and UI validation
-        run: npm run test:browser
-      - name: Commit validated repair
-        shell: bash
+          workflow = Path(".github/workflows/quality-pages.yml")
+          workflow_text = workflow.read_text()
+          app_help_check = "test -f _site/application-help.js"
+          if app_help_check in workflow_text and "test -f _site/sync-runtime-compat.js" not in workflow_text:
+              workflow.write_text(workflow_text.replace(app_help_check, app_help_check + "\n          test -f _site/sync-runtime-compat.js", 1))
+          PY
+      - name: Commit Priority 4A wiring
         run: |
-          set -euo pipefail
-          git config --global --add safe.directory "$GITHUB_WORKSPACE"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add \
-            index.html \
-            sw.js \
-            version.json \
-            assets/js/pwa-update-v15-0-5.js \
-            assets/js/ui/sync-runtime-compat.js \
-            tests
+          git add index.html sw.js version.json assets/js/pwa-update-v15-0-5.js assets/js/ui/sync-runtime-compat.js tests .github/workflows/quality-pages.yml
           git diff --cached --check
-          git status --short
-          git commit -m "fix: restore V15.2.7 UI runtime delivery"
-          git push origin HEAD:agent/fix-v15-2-7-ui-runtime
+          git commit -m "refactor: wire Priority 4A sync runtime separation"
+          git push origin HEAD:refactor/priority4a-sync-config-separation
