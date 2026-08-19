@@ -9,8 +9,8 @@ const pkg = JSON.parse(fs.readFileSync("package.json", "utf8"));
 const lock = JSON.parse(fs.readFileSync("package-lock.json", "utf8"));
 
 const expectedVersion = "15.2.7";
-const expectedIndexCache = "finance-v15-20260819-application-help-r42";
-const expectedCache = "finance-v15-20260819-application-help-r42";
+const expectedIndexCache = "finance-v15-20260819-sync-config-separation-r43";
+const expectedCache = "finance-v15-20260819-sync-config-separation-r43";
 const interactionQuery = "15.2.1-ux1";
 
 for (const [pageId, marqueeId] of [["income", "incomeFinanceWeekMarquee"], ["money", "financeWeekMarquee"], ["paid-expenses", "paidFinanceWeekMarquee"]]) {

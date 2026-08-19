@@ -81,15 +81,16 @@ assert.equal(
 );
 
 const syncConfig = fs.readFileSync(path.join(root, "sync-config.js"), "utf8");
-assert.match(syncConfig, /expenseScreenshotHeaderActions/, "Add Expense should expose screenshot actions in the modal header");
-assert.match(syncConfig, /expenseScreenshotLauncherButton/, "Add Expense should expose an initial Upload launcher in the modal header");
-assert.match(syncConfig, /expenseScreenshotMenuButton/, "loaded screenshot tools should keep the Upload menu trigger in the modal header");
-assert.match(syncConfig, /button\.textContent = "Upload"/, "screenshot launcher should use the compact Upload label");
-assert.match(syncConfig, /"Analyzing…" : "AI"/, "optional AI screenshot action should use the compact AI label");
-assert.match(syncConfig, /header\.insertBefore\(shell, close\)/, "screenshot actions should be positioned immediately before the expense dialog Close button");
-assert.match(syncConfig, /expense-screenshot-parser\.js\?v=15\.0\.3/, "screenshot parser should remain on its validated V15 pin");
-assert.match(syncConfig, /expense-screenshot-detect\.js\?v=15\.0\.3/, "local screenshot detector should remain on its validated V15 pin");
-assert.match(syncConfig, /expense-screenshot-ai\.js\?v=15\.0\.3/, "optional AI screenshot detector should remain on its validated V15 pin");
+const runtimeCompat = fs.readFileSync(path.join(root, "assets/js/ui/sync-runtime-compat.js"), "utf8");
+assert.match(runtimeCompat, /expenseScreenshotHeaderActions/, "Add Expense should expose screenshot actions in the modal header");
+assert.match(runtimeCompat, /expenseScreenshotLauncherButton/, "Add Expense should expose an initial Upload launcher in the modal header");
+assert.match(runtimeCompat, /expenseScreenshotMenuButton/, "loaded screenshot tools should keep the Upload menu trigger in the modal header");
+assert.match(runtimeCompat, /button\.textContent = "Upload"/, "screenshot launcher should use the compact Upload label");
+assert.match(runtimeCompat, /"Analyzing…" : "AI"/, "optional AI screenshot action should use the compact AI label");
+assert.match(runtimeCompat, /header\.insertBefore\(shell, close\)/, "screenshot actions should be positioned immediately before the expense dialog Close button");
+assert.match(runtimeCompat, /expense-screenshot-parser\.js\?v=15\.0\.3/, "screenshot parser should remain on its validated V15 pin");
+assert.match(runtimeCompat, /expense-screenshot-detect\.js\?v=15\.0\.3/, "local screenshot detector should remain on its validated V15 pin");
+assert.match(runtimeCompat, /expense-screenshot-ai\.js\?v=15\.0\.3/, "optional AI screenshot detector should remain on its validated V15 pin");
 assert.doesNotMatch(syncConfig, /OPENAI_API_KEY/, "browser sync config must not contain an OpenAI API key");
 
 const aiClient = fs.readFileSync(path.join(root, "expense-screenshot-ai.js"), "utf8");
@@ -109,7 +110,7 @@ assert.match(edgeFunction, /type:"json_schema"/, "Edge Function should request a
 assert.match(edgeFunction, /store:false/, "AI screenshot response should disable response storage");
 
 const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
-assert.match(worker, /finance-v15-20260819-application-help-r42/, "service worker cache generation must match V15.2.7 while preserving screenshot detection");
+assert.match(worker, /finance-v15-20260819-sync-config-separation-r43/, "service worker cache generation must match V15.2.7 while preserving screenshot detection");
 assert.match(worker, /expense-screenshot-parser\.js\?v=15\.0\.3/, "service worker should precache the V15 screenshot parser");
 assert.match(worker, /expense-screenshot-detect\.js\?v=15\.0\.3/, "service worker should precache the V15 local screenshot detector");
 assert.match(worker, /expense-screenshot-ai\.js\?v=15\.0\.3/, "service worker should precache the V15 optional AI client");

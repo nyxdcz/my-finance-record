@@ -7,6 +7,7 @@ const pkg = JSON.parse(read("package.json"));
 const prod = read("productivity-tools.js");
 const desktopUx = read("desktop-ux-v15-2-0.css");
 const uiIcons = read("ui-icon-alignment-v15-0-5.css");
+const runtimeCompat = read("assets/js/ui/sync-runtime-compat.js");
 const changelog = read("CHANGELOG.md");
 const cloudFile = fs.readdirSync(".").find(name => name.endsWith(".js") && read(name).includes("financeCloudSyncV3Bootstrap"));
 if (!cloudFile) throw new Error("Cloud Sync V3 file missing");
@@ -15,7 +16,7 @@ const required = [
   [version.version === "15.2.7", "version.json is V15.2.7"],
   [pkg.version === "15.2.7", "package.json is V15.2.7"],
   [version.schemaVersion === 12 && version.cloudSchemaVersion === 3, "schemas remain 12/3"],
-  [version.cacheVersion === "finance-v15-20260819-application-help-r42", "V15.2.7 Application Help cache is declared"],
+  [version.cacheVersion === "finance-v15-20260819-sync-config-separation-r43", "V15.2.7 Application Help cache is declared"],
   [index.includes("My Finance Records · V15.2.7"), "page title is V15.2.7"],
   [changelog.startsWith("## 15.2.7 · 2026-08-19"), "CHANGELOG begins with V15.2.7"],
   [changelog.includes("## 15.2.4 · 2026-08-18"), "CHANGELOG preserves the previous V15.2.4 history"],
@@ -32,7 +33,7 @@ const required = [
   [index.includes("cloudToolbarTechnicalDetails") && cloud.includes("cloudToolbarTechnicalError"), "Cloud technical details are optional"],
   [sw.includes('const APP_VERSION = "15.2.7"') && sw.includes(version.cacheVersion), "service worker delivery matches release"],
   [sw.includes("desktop-ux-v15-2-0.css?v=15.2.5-disclosure1"), "desktop disclosure CSS is precached"],
-  [read("sync-config.js").includes('const VERSION = "15.2.7"') && read("sync-config.js").includes('const RELEASE_NAME = "Application Help Module Extraction"'), "release override matches V15.2.7"],
+  [runtimeCompat.includes('const VERSION = "15.2.7"') && runtimeCompat.includes('const RELEASE_NAME = "Application Help Module Extraction"'), "release override matches V15.2.7"],
   [index.includes("sync-config.js?v=15.2.7-release1") && sw.includes("sync-config.js?v=15.2.7-release1"), "release layer is cache-busted consistently"],
   [desktopUx.includes("--budget-disclosure-reference-size:var(--ui-disclosure-size,40px)"), "Budget disclosure buttons share the First-half control size"],
   [desktopUx.includes("--budget-disclosure-reference-inset:17px"), "Budget disclosure buttons use the First-half right inset"],

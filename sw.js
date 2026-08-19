@@ -19,7 +19,7 @@ self.__FINANCE_APP_VERSION = APP_VERSION;
 // V15.2.2 hotfix: refresh the first-half completion heart-smile artwork from the validated app shell.
 // V15.2.2 hotfix: keep interaction-patterns network-first so completion-state presentation refreshes without rotating finance caches.
 // V15.2.2 hotfix: keep the PWA update layer network-first so the Quick add topbar relocation reaches installed apps.
-const CACHE_VERSION = "finance-v15-20260819-application-help-r42";
+const CACHE_VERSION = "finance-v15-20260819-sync-config-separation-r43";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const DB_NAME = "simple-finance-project-records-v12-db";
@@ -66,6 +66,7 @@ const APP_SHELL = [
   asset("./projects-calendar-v13.0.20.js?v=15.2.1-ux1"),
   asset("./projects-calendar-v13.0.20.css?v=15.1.0-desktop2"),
   asset("./sync-config.js?v=15.2.7-release1"),
+  asset("./sync-runtime-compat.js?v=15.2.7-priority4a1"),
   asset("./expense-screenshot-parser.js?v=15.0.3"),
   asset("./expense-screenshot-detect.js?v=15.0.3"),
   asset("./expense-screenshot-ai.js?v=15.0.3"),
