@@ -3,10 +3,10 @@ import { test, expect } from "@playwright/test";
 test("Application Help external runtime preserves dialog and focus return", async ({ page }) => {
   await page.goto("/");
   await page.evaluate(() => {
-    setupApplicationHelp();
+    window.setupApplicationHelp();
     const trigger = document.getElementById("menuButton");
     trigger?.focus();
-    openContextHelp("dashboard-overview", trigger);
+    window.openContextHelp("dashboard-overview", trigger);
   });
   const dialog = page.locator("#sectionHelpDialog");
   await expect(dialog).toBeVisible();
