@@ -6,9 +6,15 @@ const from = 'page.goto(\\`${base}/?page=\\${route}\\`';
 const to = 'page.goto(\\`\\${base}/?page=\\${route}\\`';
 if (!generator.includes(from) && !generator.includes(to)) throw new Error("Missing generated Playwright URL template");
 generator = generator.replace(from, to);
+
 const broadEscapedVersionRewrite = '        value = value.replaceAll(`15\\\\.2\\\\.9`, `15\\\\.2\\\\.10`);\n';
 if (!generator.includes(broadEscapedVersionRewrite)) throw new Error("Missing broad escaped-version rewrite");
 generator = generator.replace(broadEscapedVersionRewrite, "");
+
+const brokenSidebarRouteRemoval = '  value = mustReplace(value, ` || url.pathname.includes("/icons/sidebar-")`, "", "sidebar network-first route");';
+const fixedSidebarRouteRemoval = '  const sidebarNetworkRoute = ` || url.pathname.includes("/icons/sidebar-")`;\n  if (!value.includes(sidebarNetworkRoute)) throw new Error("Missing sidebar network-first route");\n  value = value.replace(sidebarNetworkRoute, "");';
+if (!generator.includes(brokenSidebarRouteRemoval) && !generator.includes(fixedSidebarRouteRemoval)) throw new Error("Missing sidebar network-route removal transform");
+generator = generator.replace(brokenSidebarRouteRemoval, fixedSidebarRouteRemoval);
 fs.writeFileSync(generatorFile, generator);
 
 const inspectorFile = "tests/helpers/inspect-project.mjs";
@@ -27,3 +33,12 @@ consistency = consistency.replace(oldIndexAssertion, 'assert.equal((index.match(
 consistency = consistency.replace(oldCssAssertion, 'assert.doesNotMatch(dashboard, /nav-icon-image\\{content:url/);');
 consistency = consistency.replaceAll("sync-config.js?v=15.2.9-release1", "sync-config.js?v=15.2.10-release1");
 fs.writeFileSync(consistencyFile, consistency);
+
+const pwaTestFile = "tests/regression/validate-pwa-updater-v15-0-5.mjs";
+let pwaTest = fs.readFileSync(pwaTestFile, "utf8");
+const oldWorkerVersion = 'assert.match(worker, /const APP_VERSION = "15\\.2\\.9";/);';
+const newWorkerVersion = 'assert.match(worker, /const APP_VERSION = "15\\.2\\.10";/);';
+if (!pwaTest.includes(oldWorkerVersion) && !pwaTest.includes(newWorkerVersion)) throw new Error("Missing PWA worker version assertion");
+pwaTest = pwaTest.replace(oldWorkerVersion, newWorkerVersion);
+pwaTest = pwaTest.replaceAll("V15.2.9 PWA updater regression passed", "V15.2.10 PWA updater regression passed");
+fs.writeFileSync(pwaTestFile, pwaTest);
