@@ -25,3 +25,10 @@ update("tests/security/privacy-and-inputs.spec.mjs", value => {
   if (!value.includes(marker)) throw new Error("Missing Monthly budget planner browser setup");
   return value.replace(marker, replacement);
 });
+
+update("tests/browser/more-tools-theme-alignment-v15-2-4.spec.mjs", value => {
+  const marker = '  await expect(page.locator("#topbarToolsPanel")).toBeVisible();\n\n  const layout = await page.locator("#themeToggleButton").evaluate(button => {';
+  const replacement = '  await expect(page.locator("#topbarToolsPanel")).toBeVisible();\n  const appearanceButton = page.locator("#themeToggleButton");\n  const searchButton = page.locator("#globalSearchButton");\n  await expect(appearanceButton).toBeVisible();\n  await expect(searchButton).toBeVisible();\n  await expect.poll(async () => page.evaluate(() => {\n    const appearanceIcon = document.querySelector("#themeToggleButton > .toolbar-icon");\n    const searchIcon = document.querySelector("#globalSearchButton > .toolbar-icon");\n    if (!appearanceIcon || !searchIcon) return Infinity;\n    return Math.abs(appearanceIcon.getBoundingClientRect().left - searchIcon.getBoundingClientRect().left);\n  })).toBeLessThanOrEqual(1);\n\n  const layout = await appearanceButton.evaluate(button => {';
+  if (!value.includes(marker)) throw new Error("Missing More tools layout snapshot setup");
+  return value.replace(marker, replacement);
+});
