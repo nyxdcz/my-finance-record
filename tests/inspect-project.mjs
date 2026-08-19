@@ -14,15 +14,32 @@ const rel = file => path.relative(root, file).replaceAll(path.sep, "/");
 const fail = message => errors.push(message);
 const warn = message => warnings.push(message);
 
+const runtimeCssFiles = [
+  "account-ledger.css", "app.css", "black-canvas-v15-1-0.css", "budget-planning.css", "dashboard-interactions-core-v14-0-23.css", "dashboard-interactions.css", "desktop-ui-phase1-v15-1-0.css", "desktop-ux-v15-2-0.css", "liquid-glass-v15.css", "mobile-v14-0-23.css", "productivity-tools.css", "projects-calendar-v13.0.20.css", "reminders-alerts.css", "reports-insights.css", "security-profiles.css", "ui-icon-alignment-v15-0-5.css"
+];
+const runtimeJsFiles = [
+  "account-ledger.js", "budget-planning.js", "cloud-conflict-resolution.js", "cloud-conflict-review.js", "cloud-sync-lifecycle.js", "cloud-sync.js", "expense-screenshot-ai.js", "expense-screenshot-detect.js", "expense-screenshot-parser.js", "interaction-patterns.js", "privacy-lock.js", "productivity-tools.js", "projects-calendar-v13.0.20.js", "pwa-update-v15-0-5.js", "reminders-alerts.js", "reports-insights.js", "security-profiles.js"
+];
+const runtimeCssSet = new Set(runtimeCssFiles);
+const runtimeJsSet = new Set(runtimeJsFiles);
+const sourcePathForRuntime = value => {
+  const normalized = String(value || "").replace(/^\.\//, "");
+  if (runtimeCssSet.has(normalized)) return `assets/css/${normalized}`;
+  if (runtimeJsSet.has(normalized)) return `assets/js/${normalized}`;
+  return normalized;
+};
+
 const requiredFiles = [
-  "index.html", "app.css", "dashboard-interactions.css", "ui-icon-alignment-v15-0-5.css", "black-canvas-v15-1-0.css", "desktop-ui-phase1-v15-1-0.css", "desktop-ux-v15-2-0.css", "pwa-update-v15-0-5.js", "liquid-glass-v15.css", "mobile-v14-0-23.css", "interaction-patterns.js", "offline.html", "manifest.webmanifest", "version.json", "sw.js",
+  "index.html", "offline.html", "manifest.webmanifest", "version.json", "sw.js",
+  ...runtimeCssFiles.map(file => `assets/css/${file}`),
+  ...runtimeJsFiles.map(file => `assets/js/${file}`),
   "package.json", "package-lock.json", "README.md", "CHANGELOG.md", ".gitignore",
   ".github/workflows/quality-pages.yml", "vendor/supabase.min.js",
-  "sync-config.js", "sync-config.example.js", "privacy-lock.js", "cloud-conflict-review.js", "cloud-conflict-resolution.js", "cloud-sync-lifecycle.js", "projects-calendar-v13.0.20.js", "projects-calendar-v13.0.20.css",
-  "expense-screenshot-parser.js", "expense-screenshot-detect.js", "expense-screenshot-ai.js", "supabase/functions/detect-payment/index.ts", "docs/setup/AI_SCREENSHOT_DETECTOR_SETUP.md",
+  "sync-config.js", "sync-config.example.js",
+  "supabase/functions/detect-payment/index.ts", "docs/setup/AI_SCREENSHOT_DETECTOR_SETUP.md",
   "docs/setup/CLOUD_SYNC_SETUP.md", "docs/setup/GITHUB_SECURITY_SETUP.md", "docs/setup/MACBOOK_IPHONE_INSTALLATION.md",
   "docs/migration/CLOUD_SYNC_V2_MIGRATION.md", "docs/migration/V13_MIGRATION_GUIDE.md", "docs/release/RELEASE_CHECKLIST.md",
-  "scripts/Install_V15_2_0.command", "scripts/run_audit.sh", "eslint.config.js", "playwright.config.mjs",
+  "scripts/Install_V15_2_0.command", "scripts/run_audit.sh", "scripts/prepare-runtime.mjs", "eslint.config.js", "playwright.config.mjs",
   "tests/validate-v15-2-0-desktop-ux.mjs", "tests/validate-pwa-updater-v15-0-5.mjs", "tests/validate-record-spending-v15-0-4.mjs", "tests/validate-safe-multidevice-sync.mjs", "tests/validate-expense-screenshot.mjs", "tests/expense-screenshot.spec.mjs", "tests/privacy-and-inputs.spec.mjs", "tests/check-maintainability.mjs"
 ];
 for (const file of requiredFiles) if (!exists(file)) fail(`Missing required file: ${file}`);
@@ -33,9 +50,10 @@ for (const match of html.matchAll(/\b(?:src|href)="([^"]+)"/g)) {
   if (/^(?:https?:|data:|#|javascript:|\$\{)/.test(value)) continue;
   const local = value.split(/[?#]/, 1)[0];
   if (!local) continue;
-  const target = path.resolve(root, local);
+  const sourceLocal = sourcePathForRuntime(local);
+  const target = path.resolve(root, sourceLocal);
   if (!target.startsWith(`${root}${path.sep}`) && target !== root) fail(`HTML path escapes project: ${value}`);
-  else if (!fs.existsSync(target)) fail(`Broken HTML local path: ${value}`);
+  else if (!fs.existsSync(target)) fail(`Broken HTML local path: ${value} (source: ${sourceLocal})`);
 }
 
 let manifest;
@@ -50,7 +68,9 @@ const worker = read("sw.js");
 for (const match of worker.matchAll(/asset\("([^"]+)"\)/g)) {
   const value = match[1];
   if (/^https?:/.test(value)) continue;
-  if (!exists(value.split("?", 1)[0])) fail(`Missing service-worker asset: ${value}`);
+  const local = value.split("?", 1)[0];
+  const sourceLocal = sourcePathForRuntime(local);
+  if (!exists(sourceLocal)) fail(`Missing service-worker asset: ${value} (source: ${sourceLocal})`);
 }
 
 const workflow = read(".github/workflows/quality-pages.yml");
@@ -64,7 +84,6 @@ for (const line of workflow.split(/\r?\n/)) {
   }
 }
 
-// Ensure every local asset referenced by production HTML or the service worker is packaged by GitHub Pages.
 const deploySources = new Set();
 const deployPrefixes = [];
 for (const line of workflow.split(/\r?\n/)) {
@@ -73,7 +92,9 @@ for (const line of workflow.split(/\r?\n/)) {
   const sources = trimmed.slice(3).split(" _site", 1)[0].trim().split(/\s+/);
   for (const source of sources) {
     const normalized = source.replace(/^\.\//, "");
-    if (normalized.includes("*")) deployPrefixes.push(normalized.slice(0, normalized.indexOf("*")));
+    if (normalized === "assets/css/*.css") runtimeCssFiles.forEach(file => deploySources.add(file));
+    else if (normalized === "assets/js/*.js") runtimeJsFiles.forEach(file => deploySources.add(file));
+    else if (normalized.includes("*")) deployPrefixes.push(normalized.slice(0, normalized.indexOf("*")));
     else deploySources.add(normalized);
   }
 }
@@ -104,7 +125,7 @@ try { version = JSON.parse(read("version.json")); } catch (error) { fail(`versio
 if (pkg.version !== lock.version) fail(`package.json (${pkg.version}) and package-lock.json (${lock.version}) versions differ`);
 if (pkg.version !== lock.packages?.[""]?.version) fail(`package-lock root package version (${lock.packages?.[""]?.version}) differs from package.json (${pkg.version})`);
 if (pkg.version !== version.version) fail(`package.json (${pkg.version}) and version.json (${version.version}) versions differ`);
-for (const script of ["inspect", "lint", "maintainability", "test", "test:browser", "quality", "quality:ci"]) {
+for (const script of ["prepare:runtime", "inspect", "lint", "maintainability", "test", "test:browser", "quality", "quality:ci"]) {
   if (!pkg.scripts?.[script]) fail(`Required package script is missing: ${script}`);
 }
 const testTargets = [...String(pkg.scripts?.test || "").matchAll(/\bnode\s+(\S+)/g)].map(match => match[1]);
@@ -145,4 +166,4 @@ console.log(`Repository inspection: ${errors.length} error(s), ${warnings.length
 for (const message of errors) console.error(`ERROR: ${message}`);
 for (const message of warnings) console.warn(`WARN: ${message}`);
 if (errors.length) process.exit(1);
-console.log("Repository inspection passed: V15.2.5 release files, local paths, deploy paths, package metadata, permissions, and public sync configuration are consistent.");
+console.log("Repository inspection passed: V15.2.5 release sources, local paths, deploy paths, package metadata, permissions, and public sync configuration are consistent.");
