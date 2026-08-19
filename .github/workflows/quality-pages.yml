@@ -75,6 +75,11 @@ jobs:
           text = text.replace(topPaddingLine, '    expect(metrics.summaryPaddingTop).toBe(width >= 1101 ? "7px" : "10px");');
           text = text.replace(rightPaddingLine, '    expect(metrics.summaryPaddingRight).toBe(width >= 1101 ? "7px" : "10px");');
           fs.writeFileSync(file, text);
+
+          const readmeFile = 'README.md';
+          let readme = fs.readFileSync(readmeFile, 'utf8');
+          readme = readme.replace('Current release: **V15.2.8 · PWA UI Ownership Cleanup**  \n', 'Current release: **V15.2.8 · PWA UI Ownership Cleanup**\n');
+          fs.writeFileSync(readmeFile, readme);
           NODE
       - name: Install locked project metadata
         run: npm ci --ignore-scripts --no-audit --no-fund
