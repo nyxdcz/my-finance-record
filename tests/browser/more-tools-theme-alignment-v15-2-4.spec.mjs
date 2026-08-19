@@ -1,6 +1,8 @@
 import fs from "node:fs";
 import { test, expect } from "@playwright/test";
 
+test.use({ serviceWorkers:"block" });
+
 test("More tools Appearance stays compact, left-aligned, and network-first", async ({ page }) => {
   const alignmentCss = fs.readFileSync("ui-icon-alignment-v15-0-5.css", "utf8");
   const serviceWorker = fs.readFileSync("sw.js", "utf8");
@@ -13,7 +15,8 @@ test("More tools Appearance stays compact, left-aligned, and network-first", asy
 
   await page.setViewportSize({ width:1440, height:900 });
   await page.goto("http://127.0.0.1:3000/index.html?page=dashboard", { waitUntil:"networkidle" });
-  await page.evaluate(() => window.FinancePrivacyLock?.unlock?.({ email:"theme-alignment-test@example.invalid" }));
+  await page.waitForFunction(() => typeof window.FinancePrivacyLock?.unlock === "function" && Boolean(document.getElementById("topbarToolsTrigger")));
+  await page.evaluate(() => window.FinancePrivacyLock.unlock({ email:"theme-alignment-test@example.invalid" }));
   await page.locator("#topbarToolsTrigger").click();
   await expect(page.locator("#topbarToolsPanel")).toBeVisible();
 
