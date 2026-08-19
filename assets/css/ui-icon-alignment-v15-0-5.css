@@ -595,3 +595,11 @@ html body #projects .completed-project-record .project-revision-inline {
     min-height:42px !important;
   }
 }
+
+/* V15.2.9 · Quick actions keeps the native sliders SVG. */
+html body #topbarToolsPanel #productivityCenterButton .toolbar-icon {
+  background-image:none !important;
+}
+html body #topbarToolsPanel #productivityCenterButton .toolbar-icon > svg {
+  opacity:1 !important;
+}

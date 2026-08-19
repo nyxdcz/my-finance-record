@@ -1,16 +1,16 @@
-# My Finance Records · V15.2.8
+# My Finance Records · V15.2.9
 
 Local-first personal and household finance PWA with multi-profile support and optional encrypted Supabase synchronization.
 
 ## Project status
 
-Current release: **V15.2.8 · PWA UI Ownership Cleanup**
-Released: **August 19, 2026**  
-Finance Schema: **12**  
-Cloud Schema: **V3**  
+Current release: **V15.2.9 · UI Asset Delivery Hotfix**
+Released: **August 20, 2026**
+Finance Schema: **12**
+Cloud Schema: **V3**
 Routine cloud sync cadence: **5 minutes**
 
-V15.2.8 consolidates Cash Flow presentation ownership in `assets/css/desktop-ux-v15-2-0.css` and removes the duplicate runtime-injected Cash Flow stylesheet from the PWA update module while preserving the current rendered UI, finance behavior, storage, sync/conflict handling, and installed-PWA compatibility.
+V15.2.9 refreshes sidebar icon delivery so stale installed PWAs recover the supplied PNG navigation artwork, restores the native sliders glyph for Quick actions, and gives the collapsed Monthly budget plan disclosure its own aligned column without changing finance behavior, storage, sync/conflict handling, or schemas.
 
 For complete release history, see [`CHANGELOG.md`](CHANGELOG.md).
 

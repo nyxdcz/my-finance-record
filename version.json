@@ -1,5 +1,5 @@
 {
-  "version": "15.2.8",
+  "version": "15.2.9",
   "schemaVersion": 12,
   "cloudSchemaVersion": 3,
   "ledgerVersion": 1,
@@ -10,8 +10,8 @@
   "profileArchitectureVersion": 1,
   "encryptionVersion": 1,
   "authSecurityVersion": 1,
-  "cacheVersion": "finance-v15-20260819-pwa-ui-ownership-r44",
-  "released": "2026-08-19",
-  "name": "PWA UI Ownership Cleanup",
-  "notes": "V15.2.8 moves Cash Flow presentation ownership out of the PWA update runtime and into the existing desktop UX stylesheet while preserving the current rendered geometry and Cash Flow summary behavior. The PWA update module keeps cache/update responsibilities and existing UI behavior, including Quick add, header tools, sidebar brand, and phone compact enhancements. Finance Schema 12, Cloud Schema V3, finance records, calculations, balances, storage, authentication, sync/conflict behavior, and the five-minute sync cadence are unchanged."
+  "cacheVersion": "finance-v15-20260820-ui-asset-delivery-r45",
+  "released": "2026-08-20",
+  "name": "UI Asset Delivery Hotfix",
+  "notes": "V15.2.9 refreshes sidebar PNG delivery with versioned, network-first recovery, restores the native Quick actions sliders glyph, and gives the collapsed Monthly budget plan disclosure its own non-overlapping grid column. Finance Schema 12, Cloud Schema V3, finance records, calculations, balances, storage, authentication, sync/conflict behavior, and the five-minute sync cadence are unchanged."
 }
