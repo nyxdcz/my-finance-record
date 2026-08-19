@@ -410,3 +410,25 @@
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", setupInteractionPatterns, { once:true });
   else setupInteractionPatterns();
 })();
+
+/* V15.2.5 · Expose Available Money account types for scoped contrast styling. */
+(() => {
+  let observer = null;
+  function syncAvailableMoneyAccountTypes() {
+    document.querySelectorAll("#money #moneyAccounts .account-card").forEach(card => {
+      const type = card.querySelector(".account-card-label > small")?.textContent?.trim() || "";
+      if (card.dataset.accountType !== type) card.dataset.accountType = type;
+    });
+  }
+  function setupAvailableMoneyAccountTypeTags() {
+    syncAvailableMoneyAccountTypes();
+    const root = document.getElementById("moneyAccounts");
+    if (root && !observer) {
+      observer = new MutationObserver(syncAvailableMoneyAccountTypes);
+      observer.observe(root, { childList:true, subtree:true, characterData:true });
+    }
+    window.addEventListener("finance:page-changed", syncAvailableMoneyAccountTypes);
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", setupAvailableMoneyAccountTypeTags, { once:true });
+  else setupAvailableMoneyAccountTypeTags();
+})();
