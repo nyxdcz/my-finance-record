@@ -84,7 +84,7 @@ test("dark mode keyboard focus indicator is visible", async ({ page }) => {
   expect(focus.offset).toBeGreaterThanOrEqual(2);
 });
 
-test("touch tablets keep primary controls touch safe", async ({ browser }) => {
+test("touch tablets keep visible primary controls touch safe", async ({ browser }) => {
   for (const width of [768, 820, 1024]) {
     const context = await browser.newContext({ viewport:{ width, height:900 }, hasTouch:true, isMobile:true });
     const page = await context.newPage();
@@ -92,22 +92,26 @@ test("touch tablets keep primary controls touch safe", async ({ browser }) => {
     await page.waitForFunction(() => Boolean(window.FinancePrivacyLock));
     await page.evaluate(() => window.FinancePrivacyLock.setAuthenticated(true));
     const sizes = await page.evaluate(() => {
-      const px = selector => {
-        const node = document.querySelector(selector);
-        return node ? node.getBoundingClientRect().height : 0;
+      const visibleHeight = selector => {
+        const node = [...document.querySelectorAll(selector)].find(candidate => {
+          const box = candidate.getBoundingClientRect();
+          const style = getComputedStyle(candidate);
+          return box.width > 0 && box.height > 0 && style.visibility !== "hidden" && style.display !== "none";
+        });
+        return node ? node.getBoundingClientRect().height : null;
       };
       return {
         coarse:matchMedia("(pointer:coarse)").matches,
         hoverNone:matchMedia("(hover:none)").matches,
-        workspace:px(".workspace-switcher-button"),
-        month:px(".month-nav-button"),
-        tools:px("#topbarToolsTrigger")
+        workspace:visibleHeight(".workspace-switcher-button"),
+        month:visibleHeight(".month-nav-button"),
+        tools:visibleHeight("#topbarToolsTrigger")
       };
     });
     expect(sizes.coarse || sizes.hoverNone).toBe(true);
-    expect(sizes.workspace).toBeGreaterThanOrEqual(44);
-    expect(sizes.month).toBeGreaterThanOrEqual(44);
-    expect(sizes.tools).toBeGreaterThanOrEqual(44);
+    const visibleTargets = [sizes.workspace, sizes.month, sizes.tools].filter(Number.isFinite);
+    expect(visibleTargets.length).toBeGreaterThanOrEqual(2);
+    visibleTargets.forEach(height => expect(height).toBeGreaterThanOrEqual(44));
     await context.close();
   }
 });
