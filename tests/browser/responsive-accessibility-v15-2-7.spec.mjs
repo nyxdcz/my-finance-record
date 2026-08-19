@@ -94,7 +94,7 @@ test("touch tablets keep primary controls touch safe", async ({ browser }) => {
     const sizes = await page.evaluate(() => {
       const px = selector => {
         const node = document.querySelector(selector);
-        return node ? parseFloat(getComputedStyle(node).minHeight) : 0;
+        return node ? node.getBoundingClientRect().height : 0;
       };
       return {
         coarse:matchMedia("(pointer:coarse)").matches,
