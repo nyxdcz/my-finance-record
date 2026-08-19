@@ -13,12 +13,12 @@ const cloudFile = fs.readdirSync(".").find(name => name.endsWith(".js") && read(
 if (!cloudFile) throw new Error("Cloud Sync V3 file missing");
 const cloud = read(cloudFile);
 const required = [
-  [version.version === "15.2.8", "version.json is V15.2.8"],
-  [pkg.version === "15.2.8", "package.json is V15.2.8"],
+  [version.version === "15.2.9", "version.json is V15.2.9"],
+  [pkg.version === "15.2.9", "package.json is V15.2.9"],
   [version.schemaVersion === 12 && version.cloudSchemaVersion === 3, "schemas remain 12/3"],
-  [version.cacheVersion === "finance-v15-20260819-pwa-ui-ownership-r44", "V15.2.8 Application Help cache is declared"],
-  [index.includes("My Finance Records · V15.2.8"), "page title is V15.2.8"],
-  [changelog.startsWith("## 15.2.8 · 2026-08-19"), "CHANGELOG begins with V15.2.8"],
+  [version.cacheVersion === "finance-v15-20260820-ui-asset-delivery-r45", "V15.2.9 Application Help cache is declared"],
+  [index.includes("My Finance Records · V15.2.9"), "page title is V15.2.9"],
+  [changelog.startsWith("## 15.2.9 · 2026-08-20"), "CHANGELOG begins with V15.2.9"],
   [changelog.includes("## 15.2.4 · 2026-08-18"), "CHANGELOG preserves the previous V15.2.4 history"],
   [index.includes("recurring items checked"), "month navigation explains recurring preparation"],
   [index.includes("cleared because filters changed"), "selection reset is announced"],
@@ -31,10 +31,10 @@ const required = [
   [prod.includes("synchronize through Cloud Sync") && !prod.includes("Cloud Sync V2"), "Cloud terminology is current"],
   [cloud.includes("Your local changes are safe"), "Cloud error copy is plain-language"],
   [index.includes("cloudToolbarTechnicalDetails") && cloud.includes("cloudToolbarTechnicalError"), "Cloud technical details are optional"],
-  [sw.includes('const APP_VERSION = "15.2.8"') && sw.includes(version.cacheVersion), "service worker delivery matches release"],
+  [sw.includes('const APP_VERSION = "15.2.9"') && sw.includes(version.cacheVersion), "service worker delivery matches release"],
   [sw.includes("desktop-ux-v15-2-0.css?v=15.2.5-disclosure1"), "desktop disclosure CSS is precached"],
-  [runtimeCompat.includes('const VERSION = "15.2.8"') && runtimeCompat.includes('const RELEASE_NAME = "PWA UI Ownership Cleanup"'), "release override matches V15.2.8"],
-  [index.includes("sync-config.js?v=15.2.8-release1") && sw.includes("sync-config.js?v=15.2.8-release1"), "release layer is cache-busted consistently"],
+  [runtimeCompat.includes('const VERSION = "15.2.9"') && runtimeCompat.includes('const RELEASE_NAME = "UI Asset Delivery Hotfix"'), "release override matches V15.2.9"],
+  [index.includes("sync-config.js?v=15.2.9-release1") && sw.includes("sync-config.js?v=15.2.9-release1"), "release layer is cache-busted consistently"],
   [desktopUx.includes("--budget-disclosure-reference-size:var(--ui-disclosure-size,40px)"), "Budget disclosure buttons share the First-half control size"],
   [desktopUx.includes("--budget-disclosure-reference-inset:17px"), "Budget disclosure buttons use the First-half right inset"],
   [desktopUx.includes("#money .period-card .period-header") && desktopUx.includes("padding-right:var(--budget-disclosure-reference-inset) !important"), "First, second, and other period headers pin the reference disclosure edge"],
@@ -49,4 +49,4 @@ const required = [
   [read("mobile-v14-0-23.css").length > 0, "mobile stylesheet remains present"]
 ];
 for (const [ok, message] of required) { if (!ok) throw new Error(message); }
-console.log("V15.2.8 release preserves the desktop UX source contract");
+console.log("V15.2.9 release preserves the desktop UX source contract");

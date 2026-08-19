@@ -15,10 +15,10 @@ const index = read("index.html");
 const sw = read("sw.js");
 const version = JSON.parse(read("version.json"));
 
-assert.equal(version.version, "15.2.8");
+assert.equal(version.version, "15.2.9");
 assert.equal(version.schemaVersion, 12);
 assert.equal(version.cloudSchemaVersion, 3);
-assert.equal(version.cacheVersion, "finance-v15-20260819-pwa-ui-ownership-r44");
+assert.equal(version.cacheVersion, "finance-v15-20260820-ui-asset-delivery-r45");
 assert.match(app, /--desktop-header-height:\s*64px/);
 assert.match(app, /--desktop-page-gutter:\s*24px/);
 assert.match(app, /--workspace-card-radius:\s*9px/);
@@ -46,7 +46,7 @@ assert.match(blackCanvas,/html\[data-theme="dark"\][\s\S]*--bg:#000000/);
 assert.doesNotMatch(liquid, /\.workspace-switcher,\n\.workspace-switcher button,/);
 assert.match(liquid, /--liquid-glass-radius:7px/);
 assert.match(dashboard, /\.finance-workspace-marquee-row\{[^}]*top:var\(--desktop-header-height,72px\)/);
-assert.match(index, /data-page="reports"[^>]*data-nav-label="Insights"[\s\S]*?<span class="nav-icon"><img class="nav-icon-image" src="\.\/icons\/sidebar-insights-v14-0-24\.png"/);
+assert.match(index, /data-page="reports"[^>]*data-nav-label="Insights"[\s\S]*?<span class="nav-icon"><img class="nav-icon-image" src="\.\/icons\/sidebar-insights-v14-0-24\.png\?v=15\.2\.9-icon1"/);
 assert.match(dashboard, /data-page="reports"\] \.nav-icon-image\{content:url\("\.\/icons\/sidebar-insights-v14-0-24\.png"\)\}/);
 assert.doesNotMatch(dashboard, /insights-nav-button\{padding-inline-start:46px/);
 assert.doesNotMatch(dashboard, /\.sidebar \.insights-nav-button::before\{/);
@@ -57,22 +57,22 @@ for (const pin of [
   "dashboard-interactions.css?v=15.1.0-desktop3",
   "security-profiles.css?v=15.1.0-desktop2",
   "reports-insights.css?v=15.1.0-desktop1",
-  "budget-planning.css?v=15.1.0-desktop3",
+  "budget-planning.css?v=15.2.9-ui1",
   "projects-calendar-v13.0.20.css?v=15.1.0-desktop2",
   "black-canvas-v15-1-0.css?v=15.1.0-light1",
-  "sync-config.js?v=15.2.8-release1"
+  "sync-config.js?v=15.2.9-release1"
 ]) assert.ok(index.includes(pin), `index missing ${pin}`);
-assert.ok(index.includes('const APP_CACHE_VERSION = "finance-v15-20260819-pwa-ui-ownership-r44";'));
-assert.ok(sw.includes("finance-v15-20260819-pwa-ui-ownership-r44"));
+assert.ok(index.includes('const APP_CACHE_VERSION = "finance-v15-20260820-ui-asset-delivery-r45";'));
+assert.ok(sw.includes("finance-v15-20260820-ui-asset-delivery-r45"));
 for (const pin of [
   "app.css?v=15.1.0-desktop3",
   "dashboard-interactions.css?v=15.1.0-desktop3",
   "security-profiles.css?v=15.1.0-desktop2",
   "reports-insights.css?v=15.1.0-desktop1",
-  "budget-planning.css?v=15.1.0-desktop3",
+  "budget-planning.css?v=15.2.9-ui1",
   "projects-calendar-v13.0.20.css?v=15.1.0-desktop2",
   "black-canvas-v15-1-0.css?v=15.1.0-light1",
-  "sync-config.js?v=15.2.8-release1",
+  "sync-config.js?v=15.2.9-release1",
   "liquid-glass-v15.css?v=15.2.2-light1"
 ]) assert.ok(sw.includes(pin), `service worker missing ${pin}`);
-console.log("V15.2.8 desktop UI consistency validation passed.");
+console.log("V15.2.9 desktop UI consistency validation passed.");

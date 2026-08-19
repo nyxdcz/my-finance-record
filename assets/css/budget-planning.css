@@ -174,3 +174,50 @@
   .budget-planner-card.is-planner-collapsed .budget-plan-kpi strong { margin-top:2px; font-size:.78rem; }
   .budget-planner-card.is-planner-collapsed .budget-plan-kpi:last-child { grid-column:auto; }
 }
+
+/* V15.2.9 · collapsed Monthly budget plan uses a dedicated disclosure column. */
+@media (min-width:701px) {
+  html body #monthlyBudgetPlannerCard.is-planner-collapsed {
+    grid-template-columns:minmax(150px,.55fr) minmax(0,1.45fr) 44px;
+    gap:10px;
+    padding:6px 8px 6px 12px;
+  }
+  html body #monthlyBudgetPlannerCard.is-planner-collapsed .budget-planner-header {
+    grid-column:1;
+    grid-row:1;
+  }
+  html body #monthlyBudgetPlannerCard.is-planner-collapsed .budget-planner-body {
+    grid-column:2;
+    grid-row:1;
+  }
+  html body #monthlyBudgetPlannerCard.is-planner-collapsed .budget-planner-actions {
+    position:absolute;
+    top:50%;
+    right:8px;
+    margin:0;
+    transform:translateY(-50%);
+    align-self:center;
+    justify-content:center;
+    z-index:1;
+  }
+  html body #monthlyBudgetPlannerCard.is-planner-collapsed #monthlyBudgetPlannerToggle {
+    box-sizing:border-box;
+    width:40px;
+    min-width:40px;
+    height:40px;
+    min-height:40px;
+    padding:0;
+  }
+}
+@media (min-width:701px) and (max-width:1024px) and (pointer:coarse),
+       (min-width:701px) and (max-width:1024px) and (hover:none) {
+  html body #monthlyBudgetPlannerCard.is-planner-collapsed {
+    grid-template-columns:minmax(150px,.55fr) minmax(0,1.45fr) 48px;
+  }
+  html body #monthlyBudgetPlannerCard.is-planner-collapsed #monthlyBudgetPlannerToggle {
+    width:44px !important;
+    min-width:44px !important;
+    height:44px !important;
+    min-height:44px !important;
+  }
+}

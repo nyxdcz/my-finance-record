@@ -1,6 +1,7 @@
 "use strict";
-const APP_VERSION = "15.2.8";
+const APP_VERSION = "15.2.9";
 self.__FINANCE_APP_VERSION = APP_VERSION;
+// V15.2.9 refreshes sidebar icon delivery and disclosure/icon presentation without changing Finance or sync behavior.
 // V15.2.8 consolidates Cash Flow presentation ownership in static CSS without changing Finance or sync behavior.
 // V15.2.7 extracted Application Help UI into a dedicated precached runtime module without changing Finance or sync behavior.
 // V15.2.6 extracts calculator/form-input behavior into a dedicated precached runtime module without changing Finance calculations or schemas.
@@ -20,7 +21,7 @@ self.__FINANCE_APP_VERSION = APP_VERSION;
 // V15.2.2 hotfix: refresh the first-half completion heart-smile artwork from the validated app shell.
 // V15.2.2 hotfix: keep interaction-patterns network-first so completion-state presentation refreshes without rotating finance caches.
 // V15.2.2 hotfix: keep the PWA update layer network-first so the Quick add topbar relocation reaches installed apps.
-const CACHE_VERSION = "finance-v15-20260819-pwa-ui-ownership-r44";
+const CACHE_VERSION = "finance-v15-20260820-ui-asset-delivery-r45";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const DB_NAME = "simple-finance-project-records-v12-db";
@@ -36,13 +37,13 @@ const APP_SHELL = [
   asset("./version.json"),
   asset("./app.css?v=15.1.0-desktop3"),
   asset("./dashboard-interactions.css?v=15.1.0-desktop3"),
-  asset("./ui-icon-alignment-v15-0-5.css?v=15.2.4-ui1"),
+  asset("./ui-icon-alignment-v15-0-5.css?v=15.2.9-ui2"),
   asset("./black-canvas-v15-1-0.css?v=15.1.0-light1"),
   asset("./desktop-ui-phase1-v15-1-0.css?v=15.1.0-phase1"),
   asset("./desktop-ux-v15-2-0.css?v=15.2.5-disclosure1"),
   asset("./form-inputs.js?v=15.2.6-phase5a1"),
-  asset("./application-help.js?v=15.2.8-phase5b1"),
-  asset("./pwa-update-v15-0-5.js?v=15.2.8-release1"),
+  asset("./application-help.js?v=15.2.9-phase5b1"),
+  asset("./pwa-update-v15-0-5.js?v=15.2.9-release1"),
   asset("./dashboard-interactions-core-v14-0-23.css"),
   asset("./liquid-glass-v15.css?v=15.2.2-light1"),
   asset("./mobile-v14-0-23.css?v=15.2.2-mobile1"),
@@ -57,7 +58,7 @@ const APP_SHELL = [
   asset("./account-ledger.js?v=15.0.4"),
   asset("./account-ledger.css?v=14.0.23"),
   asset("./budget-planning.js?v=15.2.1-ux1"),
-  asset("./budget-planning.css?v=15.1.0-desktop3"),
+  asset("./budget-planning.css?v=15.2.9-ui1"),
   asset("./reports-insights.js?v=14.0.23"),
   asset("./reports-insights.css?v=15.1.0-desktop1"),
   asset("./productivity-tools.js?v=15.2.1-ux2"),
@@ -66,8 +67,8 @@ const APP_SHELL = [
   asset("./reminders-alerts.css?v=14.0.23"),
   asset("./projects-calendar-v13.0.20.js?v=15.2.1-ux1"),
   asset("./projects-calendar-v13.0.20.css?v=15.1.0-desktop2"),
-  asset("./sync-config.js?v=15.2.8-release1"),
-  asset("./sync-runtime-compat.js?v=15.2.8-priority4a1"),
+  asset("./sync-config.js?v=15.2.9-release1"),
+  asset("./sync-runtime-compat.js?v=15.2.9-priority4a1"),
   asset("./expense-screenshot-parser.js?v=15.0.3"),
   asset("./expense-screenshot-detect.js?v=15.0.3"),
   asset("./expense-screenshot-ai.js?v=15.0.3"),
@@ -77,11 +78,11 @@ const APP_SHELL = [
   asset("./icons/icon-maskable-512.png"),
   asset("./icons/apple-touch-icon.png"),
   asset("./icons/favicon-32.png"),
-  asset("./icons/sidebar-overview.png"),
-  asset("./icons/sidebar-finance.png"),
-  asset("./icons/sidebar-work.png"),
-  asset("./icons/sidebar-settings.png"),
-  asset("./icons/sidebar-insights-v14-0-24.png"),
+  asset("./icons/sidebar-overview.png?v=15.2.9-icon1"),
+  asset("./icons/sidebar-finance.png?v=15.2.9-icon1"),
+  asset("./icons/sidebar-work.png?v=15.2.9-icon1"),
+  asset("./icons/sidebar-settings.png?v=15.2.9-icon1"),
+  asset("./icons/sidebar-insights-v14-0-24.png?v=15.2.9-icon1"),
   asset("./icons/action-add-record.png"),
   asset("./icons/action-add-widget.png"),
   asset("./icons/customize-dashboard-v15.png"),
@@ -176,7 +177,7 @@ self.addEventListener("fetch", event => {
     return;
   }
   if (url.origin !== self.location.origin) return;
-  if (url.pathname.endsWith("privacy-lock.js") || url.pathname.endsWith("cloud-sync-lifecycle.js") || url.pathname.endsWith("interaction-patterns.js") || url.pathname.endsWith("pwa-update-v15-0-5.js") || url.pathname.endsWith("ui-icon-alignment-v15-0-5.css") || url.pathname.endsWith("mobile-v14-0-23.css") || url.pathname.endsWith("budget-planning.css") || url.pathname.endsWith("black-canvas-v15-1-0.css")) {
+  if (url.pathname.endsWith("privacy-lock.js") || url.pathname.endsWith("cloud-sync-lifecycle.js") || url.pathname.endsWith("interaction-patterns.js") || url.pathname.endsWith("pwa-update-v15-0-5.js") || url.pathname.endsWith("ui-icon-alignment-v15-0-5.css") || url.pathname.endsWith("mobile-v14-0-23.css") || url.pathname.endsWith("budget-planning.css") || url.pathname.endsWith("black-canvas-v15-1-0.css") || url.pathname.includes("/icons/sidebar-")) {
     event.respondWith(networkFirstCriticalAsset(request));
     return;
   }

@@ -1,3 +1,9 @@
+## 15.2.9 · 2026-08-20
+- Versioned the supplied sidebar PNG URLs, made sidebar icon requests network-first with cache fallback, and added a one-retry runtime recovery path that hides a failed image instead of leaving the browser broken-image placeholder.
+- Restored the existing native sliders SVG for More tools → Quick actions while leaving Theme, Quick add, Customize dashboard, and Search artwork unchanged.
+- Moved the collapsed Monthly budget plan disclosure into its own 40px desktop grid column, preserving 44px phone/touch sizing and preventing overlap with Forecast month-end.
+- Rotated the PWA shell to `finance-v15-20260820-ui-asset-delivery-r45` and kept Finance Schema 12, Cloud Schema V3, finance calculations, balances, records, storage, authentication, sync/conflict behavior, and five-minute Cloud Sync behavior unchanged.
+
 ## 15.2.8 · 2026-08-19
 - Consolidated Dashboard Cash Flow presentation ownership into `assets/css/desktop-ux-v15-2-0.css` and removed the duplicate runtime-injected Cash Flow stylesheet from `assets/js/pwa-update-v15-0-5.js`.
 - Preserved the current Cash Flow legend spacing, summary padding, responsive one/two-column geometry, and DOM summary upgrade behavior while keeping the legacy PWA updater URL compatible.
