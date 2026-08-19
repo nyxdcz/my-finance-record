@@ -65,9 +65,15 @@ jobs:
           const fs = require('node:fs');
           const file = 'tests/browser/cash-flow-style-ownership.spec.mjs';
           let text = fs.readFileSync(file, 'utf8');
-          const oldLine = '    expect(metrics.legendMarginTop).toBe("6px");';
-          if (!text.includes(oldLine)) throw new Error('Cash Flow margin assertion marker missing');
-          text = text.replace(oldLine, '    expect(metrics.legendMarginTop).toBe(width >= 1101 ? "5px" : "6px");');
+          const marginLine = '    expect(metrics.legendMarginTop).toBe("6px");';
+          const topPaddingLine = '    expect(metrics.summaryPaddingTop).toBe("10px");';
+          const rightPaddingLine = '    expect(metrics.summaryPaddingRight).toBe("10px");';
+          for (const marker of [marginLine, topPaddingLine, rightPaddingLine]) {
+            if (!text.includes(marker)) throw new Error(`Cash Flow assertion marker missing: ${marker}`);
+          }
+          text = text.replace(marginLine, '    expect(metrics.legendMarginTop).toBe(width >= 1101 ? "5px" : "6px");');
+          text = text.replace(topPaddingLine, '    expect(metrics.summaryPaddingTop).toBe(width >= 1101 ? "7px" : "10px");');
+          text = text.replace(rightPaddingLine, '    expect(metrics.summaryPaddingRight).toBe(width >= 1101 ? "7px" : "10px");');
           fs.writeFileSync(file, text);
           NODE
       - name: Install locked project metadata
