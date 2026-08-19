@@ -28,6 +28,11 @@ const legacyCssFallbackPin = [
   String.raw`data-page="reports"\] \.nav-icon-image\{content:url\("\.\/icons\/sidebar-insights-v14-0-24\.png\?v=15\.2\.9-icon1"\)\}`,
   String.raw`data-page="reports"\] \.nav-icon-image\{content:url\("\.\/icons\/sidebar-insights-v14-0-24\.png"\)\}`
 ];
+const escapedReleasePins = [
+  [String.raw`15\.2\.8`, String.raw`15\.2\.9`],
+  [String.raw`ui-icon-alignment-v15-0-5\.css\?v=15\.2\.4-ui1`, String.raw`ui-icon-alignment-v15-0-5\.css\?v=15\.2\.9-ui2`],
+  [String.raw`budget-planning\.css\?v=15\.1\.0-desktop3`, String.raw`budget-planning\.css\?v=15\.2\.9-ui1`]
+];
 
 const visit = directory => {
   for (const entry of fs.readdirSync(directory, { withFileTypes:true })) {
@@ -37,6 +42,7 @@ const visit = directory => {
       let value = fs.readFileSync(full, "utf8");
       value = value.replaceAll("## 15.2.9 · 2026-08-19", "## 15.2.9 · 2026-08-20");
       value = value.replaceAll("V15.2.9 · UI Asset Delivery Hotfix · August 19, 2026", "V15.2.9 · UI Asset Delivery Hotfix · August 20, 2026");
+      for (const [from, to] of escapedReleasePins) value = value.replaceAll(from, to);
       for (const [from, to] of sidebarRegexPins) value = value.replaceAll(from, to);
       value = value.replaceAll(...legacyCssFallbackPin);
       fs.writeFileSync(full, value);
@@ -45,4 +51,4 @@ const visit = directory => {
 };
 visit(path.join(root, "tests"));
 
-console.log("Normalized V15.2.9 release and sidebar asset pins while preserving the legacy CSS fallback contract.");
+console.log("Normalized V15.2.9 release, escaped asset, and sidebar delivery pins while preserving the legacy CSS fallback contract.");
