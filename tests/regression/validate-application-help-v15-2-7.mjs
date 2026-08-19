@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import assert from "node:assert/strict";
 
-const read = file => fs.readFileSync(new URL(`../${file}`, import.meta.url), "utf8");
+const read = file => fs.readFileSync(new URL(`../../${file}`, import.meta.url), "utf8");
 const html = read("index.html");
 const help = read("assets/js/ui/application-help.js");
 const prepare = read("scripts/prepare-runtime.mjs");
