@@ -1,6 +1,21 @@
-# My Finance Records · V15.2.4
+# My Finance Records · V15.2.5
 
 Local-first personal finance PWA with multi-profile support and optional encrypted cloud synchronization.
+
+## V15.2.5 · Finance Disclosure Alignment
+
+Released **August 18, 2026** with PWA cache `finance-v15-20260818-disclosure-alignment-r40`.
+
+### New updates since V15.2.4
+
+- **Budget disclosure alignment** — Aligns Monthly budget plan, Available money, First half, Second half, and Other expenses disclosure controls to a shared **40px** desktop size and the exact **17px** right inset established by First half.
+- **Responsive preservation** — Keeps the existing **44px** mobile touch targets and phone layouts unchanged.
+- **Delivery refresh** — Cache-busts the disclosure stylesheet, service worker, and release layer so GitHub Pages and installed PWA clients receive the fix.
+- **Regression coverage** — Updates current-release source contracts for V15.2.5 while preserving older feature-specific asset versions.
+
+### Preserved in V15.2.5
+
+Finance Schema **12**, Cloud Schema **V3**, finance records, calculations, account balances, conflict-resolution behavior, and the routine **five-minute sync cadence** are unchanged.
 
 ## V15.2.4 · Finance UI & Header Refinement
 

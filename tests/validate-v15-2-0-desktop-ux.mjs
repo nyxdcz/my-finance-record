@@ -5,15 +5,19 @@ const sw = read("sw.js");
 const version = JSON.parse(read("version.json"));
 const pkg = JSON.parse(read("package.json"));
 const prod = read("productivity-tools.js");
+const desktopUx = read("desktop-ux-v15-2-0.css");
+const changelog = read("CHANGELOG.md");
 const cloudFile = fs.readdirSync(".").find(name => name.endsWith(".js") && read(name).includes("financeCloudSyncV3Bootstrap"));
 if (!cloudFile) throw new Error("Cloud Sync V3 file missing");
 const cloud = read(cloudFile);
 const required = [
-  [version.version === "15.2.4", "version.json is V15.2.4"],
-  [pkg.version === "15.2.4", "package.json is V15.2.4"],
+  [version.version === "15.2.5", "version.json is V15.2.5"],
+  [pkg.version === "15.2.5", "package.json is V15.2.5"],
   [version.schemaVersion === 12 && version.cloudSchemaVersion === 3, "schemas remain 12/3"],
-  [version.cacheVersion === "finance-v15-20260818-ui-refinement-r39", "V15.2.4 refresh cache is declared"],
-  [index.includes("My Finance Records · V15.2.4"), "page title is V15.2.4"],
+  [version.cacheVersion === "finance-v15-20260818-disclosure-alignment-r40", "V15.2.5 disclosure cache is declared"],
+  [index.includes("My Finance Records · V15.2.5"), "page title is V15.2.5"],
+  [changelog.startsWith("## 15.2.5 · 2026-08-18"), "CHANGELOG begins with V15.2.5"],
+  [changelog.includes("## 15.2.4 · 2026-08-18"), "CHANGELOG preserves the previous V15.2.4 history"],
   [index.includes("recurring items checked"), "month navigation explains recurring preparation"],
   [index.includes("cleared because filters changed"), "selection reset is announced"],
   [index.includes("Enter an account name."), "account name has inline validation"],
@@ -25,11 +29,17 @@ const required = [
   [prod.includes("synchronize through Cloud Sync") && !prod.includes("Cloud Sync V2"), "Cloud terminology is current"],
   [cloud.includes("Your local changes are safe"), "Cloud error copy is plain-language"],
   [index.includes("cloudToolbarTechnicalDetails") && cloud.includes("cloudToolbarTechnicalError"), "Cloud technical details are optional"],
-  [sw.includes('const APP_VERSION = "15.2.4"') && sw.includes(version.cacheVersion), "service worker delivery matches release"],
-  [sw.includes("desktop-ux-v15-2-0.css?v=15.2.4-header1"), "desktop UX CSS is precached"],
-  [read("sync-config.js").includes('const VERSION = "15.2.4"') && read("sync-config.js").includes('const RELEASE_NAME = "Finance UI & Header Refinement"'), "release override matches V15.2.4"],
-  [index.includes("sync-config.js?v=15.2.4-release1") && sw.includes("sync-config.js?v=15.2.4-release1"), "release layer is cache-busted consistently"],
+  [sw.includes('const APP_VERSION = "15.2.5"') && sw.includes(version.cacheVersion), "service worker delivery matches release"],
+  [sw.includes("desktop-ux-v15-2-0.css?v=15.2.5-disclosure1"), "desktop disclosure CSS is precached"],
+  [read("sync-config.js").includes('const VERSION = "15.2.5"') && read("sync-config.js").includes('const RELEASE_NAME = "Finance Disclosure Alignment"'), "release override matches V15.2.5"],
+  [index.includes("sync-config.js?v=15.2.5-release1") && sw.includes("sync-config.js?v=15.2.5-release1"), "release layer is cache-busted consistently"],
+  [desktopUx.includes("--budget-disclosure-reference-size:var(--ui-disclosure-size,40px)"), "Budget disclosure buttons share the First-half control size"],
+  [desktopUx.includes("--budget-disclosure-reference-inset:17px"), "Budget disclosure buttons use the First-half right inset"],
+  [desktopUx.includes("#money .period-card .period-header") && desktopUx.includes("padding-right:var(--budget-disclosure-reference-inset) !important"), "First, second, and other period headers pin the reference disclosure edge"],
+  [desktopUx.includes("padding-right:calc(var(--budget-disclosure-reference-inset) - var(--budget-available-card-inset)) !important"), "Available money header resolves to the First-half right edge"],
+  [desktopUx.includes("#monthlyBudgetPlannerCard.is-planner-collapsed .budget-planner-actions") && desktopUx.includes("right:var(--budget-disclosure-reference-inset) !important"), "Collapsed Monthly budget plan disclosure aligns to the First-half column"],
+  [!desktopUx.includes("margin-right:5px !important"), "Budget disclosure alignment no longer relies on hard-coded margin offsets"],
   [read("mobile-v14-0-23.css").length > 0, "mobile stylesheet remains present"]
 ];
 for (const [ok, message] of required) { if (!ok) throw new Error(message); }
-console.log("V15.2.4 release preserves the desktop UX source contract");
+console.log("V15.2.5 release preserves the desktop UX source contract");

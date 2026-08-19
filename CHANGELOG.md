@@ -1,3 +1,9 @@
+## 15.2.5 · 2026-08-18
+- Aligned the Budget & Expenses disclosure controls for Monthly budget plan, Available money, First half, Second half, and Other expenses to the First-half reference geometry: 40px desktop controls on one exact 17px right-side column.
+- Replaced the previous margin approximation with a derived Available money header inset that accounts for its existing 12px card padding, and anchored the collapsed Monthly budget plan control to the same reference edge.
+- Preserved the existing 44px mobile disclosure touch targets and phone layouts while adding source-contract regression coverage for the shared desktop size and right edge.
+- Released the alignment fix as V15.2.5 with cache `finance-v15-20260818-disclosure-alignment-r40`; Finance Schema 12, Cloud Schema V3, finance calculations, account balances, conflict-resolution behavior, and the five-minute routine sync cadence are unchanged.
+
 ## 15.2.4 · 2026-08-18
 - Replaced the More tools presentation with the exact supplied light/dark PNG artwork and finalized Appearance as a compact 38px, left-aligned **Auto / Light / Dark** control with the existing 20px icon and theme behavior.
 - Refined Finance visuals with the revised monthly-save toggle artwork and press feedback, scalloped Available/First-half/Second-half/Other-expenses legend markers, supplied receipt artwork for Spend, and clean theme-aware heart-smile completion icons for First half, First-half difference, and zero Other expenses.
