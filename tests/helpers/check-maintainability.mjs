@@ -3,7 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const root = path.resolve(here, "..");
+const root = path.resolve(here, "../..");
 const failures = [];
 const read = file => fs.readFileSync(path.join(root, file), "utf8");
 const lines = file => read(file).split(/\r?\n/).length;
@@ -28,8 +28,18 @@ for (const script of ["lint", "inspect", "test", "test:browser", "maintainabilit
   if (!pkg.scripts?.[script] || /echo ['"]No .*required/i.test(pkg.scripts[script])) fail(`package script ${script} is missing or a no-op`);
 }
 
-for (const file of fs.readdirSync(path.join(root, "tests")).filter(name => /\.(?:mjs|py)$/.test(name))) {
-  const source = read(path.join("tests", file));
+const testFiles = [];
+const visitTests = directory => {
+  for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+    const full = path.join(directory, entry.name);
+    if (entry.isDirectory()) visitTests(full);
+    else if (entry.isFile() && /\.(?:mjs|py)$/.test(entry.name)) testFiles.push(full);
+  }
+};
+visitTests(path.join(root, "tests"));
+for (const full of testFiles) {
+  const file = path.relative(root, full).replaceAll(path.sep, "/");
+  const source = fs.readFileSync(full, "utf8");
   if (/\/mnt\/data\//.test(source)) fail(`${file} contains a non-portable /mnt/data path`);
   if (/executable_path\s*=\s*['"]\/usr\/bin\/chromium/.test(source)) fail(`${file} hardcodes a Chromium executable`);
 }
