@@ -18,13 +18,14 @@ const runtimeCssFiles = [
   "account-ledger.css", "app.css", "black-canvas-v15-1-0.css", "budget-planning.css", "dashboard-interactions-core-v14-0-23.css", "dashboard-interactions.css", "desktop-ui-phase1-v15-1-0.css", "desktop-ux-v15-2-0.css", "liquid-glass-v15.css", "mobile-v14-0-23.css", "productivity-tools.css", "projects-calendar-v13.0.20.css", "reminders-alerts.css", "reports-insights.css", "security-profiles.css", "ui-icon-alignment-v15-0-5.css"
 ];
 const runtimeJsFiles = [
-  "account-ledger.js", "budget-planning.js", "cloud-conflict-resolution.js", "cloud-conflict-review.js", "cloud-sync-lifecycle.js", "cloud-sync.js", "expense-screenshot-ai.js", "expense-screenshot-detect.js", "expense-screenshot-parser.js", "form-inputs.js", "interaction-patterns.js", "privacy-lock.js", "productivity-tools.js", "projects-calendar-v13.0.20.js", "pwa-update-v15-0-5.js", "reminders-alerts.js", "reports-insights.js", "security-profiles.js"
+  "account-ledger.js", "budget-planning.js", "cloud-conflict-resolution.js", "cloud-conflict-review.js", "cloud-sync-lifecycle.js", "cloud-sync.js", "expense-screenshot-ai.js", "expense-screenshot-detect.js", "expense-screenshot-parser.js", "form-inputs.js", "application-help.js", "interaction-patterns.js", "privacy-lock.js", "productivity-tools.js", "projects-calendar-v13.0.20.js", "pwa-update-v15-0-5.js", "reminders-alerts.js", "reports-insights.js", "security-profiles.js"
 ];
 const runtimeCssSet = new Set(runtimeCssFiles);
 const runtimeJsSet = new Set(runtimeJsFiles);
 const sourcePathForRuntime = value => {
   const normalized = String(value || "").replace(/^\.\//, "");
   if (runtimeCssSet.has(normalized)) return `assets/css/${normalized}`;
+  if (normalized === "application-help.js") return "assets/js/ui/application-help.js";
   if (runtimeJsSet.has(normalized)) return `assets/js/${normalized}`;
   return normalized;
 };
@@ -32,7 +33,7 @@ const sourcePathForRuntime = value => {
 const requiredFiles = [
   "index.html", "offline.html", "manifest.webmanifest", "version.json", "sw.js",
   ...runtimeCssFiles.map(file => `assets/css/${file}`),
-  ...runtimeJsFiles.map(file => `assets/js/${file}`),
+  ...runtimeJsFiles.map(sourcePathForRuntime),
   "package.json", "package-lock.json", "README.md", "CHANGELOG.md", ".gitignore",
   ".github/workflows/quality-pages.yml", "vendor/supabase.min.js",
   "sync-config.js", "sync-config.example.js",
@@ -40,7 +41,7 @@ const requiredFiles = [
   "docs/setup/CLOUD_SYNC_SETUP.md", "docs/setup/GITHUB_SECURITY_SETUP.md", "docs/setup/MACBOOK_IPHONE_INSTALLATION.md",
   "docs/migration/CLOUD_SYNC_V2_MIGRATION.md", "docs/migration/V13_MIGRATION_GUIDE.md", "docs/release/RELEASE_CHECKLIST.md",
   "scripts/Install_V15_2_0.command", "scripts/run_audit.sh", "scripts/prepare-runtime.mjs", "eslint.config.js", "playwright.config.mjs",
-  "tests/validate-v15-2-0-desktop-ux.mjs", "tests/validate-pwa-updater-v15-0-5.mjs", "tests/validate-record-spending-v15-0-4.mjs", "tests/validate-safe-multidevice-sync.mjs", "tests/validate-expense-screenshot.mjs", "tests/expense-screenshot.spec.mjs", "tests/privacy-and-inputs.spec.mjs", "tests/check-maintainability.mjs"
+  "tests/validate-v15-2-0-desktop-ux.mjs", "tests/validate-pwa-updater-v15-0-5.mjs", "tests/validate-record-spending-v15-0-4.mjs", "tests/validate-safe-multidevice-sync.mjs", "tests/validate-expense-screenshot.mjs", "tests/expense-screenshot.spec.mjs", "tests/privacy-and-inputs.spec.mjs", "tests/application-help.spec.mjs", "tests/validate-application-help-v15-2-7.mjs", "tests/check-maintainability.mjs"
 ];
 for (const file of requiredFiles) if (!exists(file)) fail(`Missing required file: ${file}`);
 
@@ -93,7 +94,8 @@ for (const line of workflow.split(/\r?\n/)) {
   for (const source of sources) {
     const normalized = source.replace(/^\.\//, "");
     if (normalized === "assets/css/*.css") runtimeCssFiles.forEach(file => deploySources.add(file));
-    else if (normalized === "assets/js/*.js") runtimeJsFiles.forEach(file => deploySources.add(file));
+    else if (normalized === "assets/js/*.js") runtimeJsFiles.filter(file => file !== "application-help.js").forEach(file => deploySources.add(file));
+    else if (normalized === "assets/js/ui/*.js") deploySources.add("application-help.js");
     else if (normalized.includes("*")) deployPrefixes.push(normalized.slice(0, normalized.indexOf("*")));
     else deploySources.add(normalized);
   }
@@ -132,9 +134,9 @@ const testTargets = [...String(pkg.scripts?.test || "").matchAll(/\bnode\s+(\S+)
 if (!testTargets.length) fail(`Test script target is missing: ${pkg.scripts?.test || "(not configured)"}`);
 for (const target of testTargets) if (!exists(target)) fail(`Test script target is missing: ${target}`);
 if (!String(pkg.engines?.node || "").includes("22")) warn(`Node engine is ${pkg.engines?.node || "not set"}; project validation expects Node 22+`);
-if (pkg.version !== "15.2.6") fail(`Expected current package version 15.2.6, found ${pkg.version || "(missing)"}`);
-if (!read("README.md").startsWith("# My Finance Records · V15.2.6")) fail("README release heading is not V15.2.6");
-if (!read("CHANGELOG.md").startsWith("## 15.2.6 · 2026-08-19")) fail("CHANGELOG latest entry is not V15.2.6");
+if (pkg.version !== "15.2.7") fail(`Expected current package version 15.2.7, found ${pkg.version || "(missing)"}`);
+if (!read("README.md").startsWith("# My Finance Records · V15.2.7")) fail("README release heading is not V15.2.7");
+if (!read("CHANGELOG.md").startsWith("## 15.2.7 · 2026-08-19")) fail("CHANGELOG latest entry is not V15.2.7");
 
 const syncConfig = read("sync-config.js");
 const syncConfigCode = syncConfig.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|\s)\/\/.*$/gm, "$1");
@@ -166,4 +168,4 @@ console.log(`Repository inspection: ${errors.length} error(s), ${warnings.length
 for (const message of errors) console.error(`ERROR: ${message}`);
 for (const message of warnings) console.warn(`WARN: ${message}`);
 if (errors.length) process.exit(1);
-console.log("Repository inspection passed: V15.2.6 release sources, local paths, deploy paths, package metadata, permissions, and public sync configuration are consistent.");
+console.log("Repository inspection passed: V15.2.7 release sources, local paths, deploy paths, package metadata, permissions, and public sync configuration are consistent.");

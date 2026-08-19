@@ -1,6 +1,21 @@
-# My Finance Records · V15.2.6
+# My Finance Records · V15.2.7
 
 Local-first personal finance PWA with multi-profile support and optional encrypted cloud synchronization.
+
+## V15.2.7 · Application Help Module Extraction
+
+Released **August 19, 2026** with PWA cache `finance-v15-20260819-application-help-r42`.
+
+### New updates since V15.2.6
+
+- **Application Help module extraction** — Moves the existing contextual Help topic registry and Help dialog wiring out of the large inline application script into `assets/js/ui/application-help.js` without changing user-facing Help behavior.
+- **Nested runtime source mapping** — Adds the first focused `assets/js/ui/` source mapping while preserving the existing flat production runtime URL through the Phase 4 compatibility layer.
+- **PWA delivery** — Precaches `application-help.js` and rotates the shell cache to r42 so installed clients receive the extracted runtime safely.
+- **Regression coverage** — Adds source and browser checks for Help topics, dialog opening, Escape close behavior, focus return, subsystem boundaries, and Pages packaging.
+
+### Preserved in V15.2.7
+
+Finance Schema **12**, Cloud Schema **V3**, finance records, calculations, account balances, storage, sync/conflict behavior, sidebar behavior, desktop/mobile layouts, and the routine **five-minute sync cadence** are unchanged.
 
 ## V15.2.6 · Form Input Module Extraction
 
