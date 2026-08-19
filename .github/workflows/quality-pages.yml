@@ -15,6 +15,45 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  phase5b:
+    name: Apply approved Phase 5B extraction
+    if: github.event_name == 'pull_request' && github.head_ref == 'agent/phase5b-application-help'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - name: Check out Phase 5B branch
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+      - name: Use Node.js 24
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          package-manager-cache: false
+      - name: Apply idempotent Phase 5B extraction
+        run: node scripts/phase5b-extract.mjs
+      - name: Validate focused source contracts
+        run: node tests/validate-application-help-v15-2-7.mjs
+      - name: Commit approved Phase 5B changes
+        shell: bash
+        env:
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git reset scripts/phase5b-extract.mjs .github/workflows/phase5b-application-help.yml .phase5b-trigger
+          if git diff --cached --quiet; then
+            echo "Phase 5B is already applied; nothing to commit."
+            exit 0
+          fi
+          git commit -m "refactor: extract application help runtime V15.2.7"
+          git push origin HEAD:"${HEAD_REF}"
+
   quality:
     name: Regression quality
     runs-on: ubuntu-latest
