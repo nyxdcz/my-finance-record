@@ -128,3 +128,56 @@ jobs:
         uses: actions/deploy-pages@v5
         with:
           artifact_name: github-pages-${{ github.run_attempt }}
+
+  agent_v1529_apply:
+    name: Agent V15.2.9 validated apply
+    if: github.event_name == 'pull_request' && github.head_ref == 'agent/ui-asset-delivery-v15-2-9'
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    permissions:
+      contents: write
+    container:
+      image: mcr.microsoft.com/playwright:v1.62.1-noble
+      options: --ipc=host
+    env:
+      PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
+    steps:
+      - name: Check out hotfix branch
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+      - name: Use Node.js 24
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          package-manager-cache: false
+      - name: Install locked project metadata
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Apply approved V15.2.9 hotfix
+        run: node scripts/agent-v15-2-9-hotfix.mjs
+      - name: Refresh compatibility runtime files
+        run: npm run prepare:runtime
+      - name: Run source quality
+        run: npm run quality
+      - name: Run focused screenshot-regression coverage without retries
+        run: npx playwright test tests/browser/ui-asset-delivery-v15-2-9.spec.mjs --retries=0
+      - name: Run complete browser suite without retries
+        run: npx playwright test --retries=0
+      - name: Audit production dependencies
+        run: npm run audit
+      - name: Commit validated hotfix
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          if git diff --cached --quiet; then
+            echo "Validated V15.2.9 tree already committed."
+            exit 0
+          fi
+          git commit -m "fix(ui): repair V15.2.9 asset delivery"
+          git push origin "HEAD:${GITHUB_HEAD_REF}"
