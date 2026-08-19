@@ -154,6 +154,8 @@ jobs:
           package-manager-cache: false
       - name: Install locked project metadata
         run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Repair validation generator escaping
+        run: node scripts/agent-v15-2-10-fix-generator.mjs
       - name: Apply approved V15.2.10 hotfix
         run: node scripts/agent-v15-2-10-sidebar-icons.mjs
       - name: Refresh compatibility runtime files
