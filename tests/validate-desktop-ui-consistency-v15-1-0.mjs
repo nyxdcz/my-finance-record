@@ -15,7 +15,7 @@ const index = read("index.html");
 const sw = read("sw.js");
 const version = JSON.parse(read("version.json"));
 
-assert.equal(version.version, "15.2.5");
+assert.equal(version.version, "15.2.6");
 assert.equal(version.schemaVersion, 12);
 assert.equal(version.cloudSchemaVersion, 3);
 assert.equal(version.cacheVersion, "finance-v15-20260819-form-inputs-r41");
@@ -75,4 +75,4 @@ for (const pin of [
   "sync-config.js?v=15.2.6-release1",
   "liquid-glass-v15.css?v=15.2.2-light1"
 ]) assert.ok(sw.includes(pin), `service worker missing ${pin}`);
-console.log("V15.2.5 desktop UI consistency validation passed.");
+console.log("V15.2.6 desktop UI consistency validation passed.");
