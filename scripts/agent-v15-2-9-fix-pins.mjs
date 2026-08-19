@@ -75,6 +75,12 @@ replaceIn("assets/css/budget-planning.css", [[
     justify-content:center;
     z-index:1;
   }`
+], [
+  "grid-template-columns:minmax(150px,.55fr) minmax(0,1.45fr) 40px;",
+  "grid-template-columns:minmax(150px,.55fr) minmax(0,1.45fr) 44px;"
+], [
+  "grid-template-columns:minmax(150px,.55fr) minmax(0,1.45fr) 44px;\n  }\n  html body #monthlyBudgetPlannerCard.is-planner-collapsed #monthlyBudgetPlannerToggle {\n    width:44px !important;",
+  "grid-template-columns:minmax(150px,.55fr) minmax(0,1.45fr) 48px;\n  }\n  html body #monthlyBudgetPlannerCard.is-planner-collapsed #monthlyBudgetPlannerToggle {\n    width:44px !important;"
 ]]);
 
 // Keep the screenshot-specific cases deterministic against the same local app.
@@ -92,4 +98,4 @@ replaceIn("assets/css/budget-planning.css", [[
   }
 }
 
-console.log("Normalized V15.2.9 release, asset pins, and deterministic disclosure geometry.");
+console.log("Normalized V15.2.9 release, asset pins, and disclosure spacing.");
