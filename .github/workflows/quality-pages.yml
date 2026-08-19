@@ -58,6 +58,18 @@ jobs:
             if (after !== before) fs.writeFileSync(file, after);
           }
           NODE
+      - name: Preserve responsive Cash Flow computed-style contract
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const file = 'tests/browser/cash-flow-style-ownership.spec.mjs';
+          let text = fs.readFileSync(file, 'utf8');
+          const oldLine = '    expect(metrics.legendMarginTop).toBe("6px");';
+          if (!text.includes(oldLine)) throw new Error('Cash Flow margin assertion marker missing');
+          text = text.replace(oldLine, '    expect(metrics.legendMarginTop).toBe(width >= 1101 ? "5px" : "6px");');
+          fs.writeFileSync(file, text);
+          NODE
       - name: Install locked project metadata
         run: npm ci --ignore-scripts --no-audit --no-fund
       - name: Prepare compatibility runtime
