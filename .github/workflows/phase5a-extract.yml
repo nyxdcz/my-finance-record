@@ -25,7 +25,21 @@ jobs:
           node-version: 24
           package-manager-cache: false
       - name: Apply Phase 5A extraction
-        run: node scripts/phase5a-extract.mjs
+        shell: bash
+        run: |
+          set -euo pipefail
+          # README/CHANGELOG intentionally keep historical V15.2.5/r40 entries. Restrict the helper's final stale-cache guard to current runtime metadata only.
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('scripts/phase5a-extract.mjs')
+          text = p.read_text()
+          old = 'for (const file of ["index.html", "sw.js", "version.json", "package.json", "sync-config.js", "README.md", "CHANGELOG.md"]) {'
+          new = 'for (const file of ["index.html", "sw.js", "version.json", "package.json", "sync-config.js"]) {'
+          if old not in text:
+              raise SystemExit('Phase 5A final cache-guard marker not found')
+          p.write_text(text.replace(old, new, 1))
+          PY
+          node scripts/phase5a-extract.mjs
       - name: Commit approved Phase 5A changes to feature branch
         shell: bash
         env:
@@ -35,7 +49,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
-          git reset scripts/phase5a-extract.mjs .github/workflows/phase5a-extract.yml .github/workflows/quality-pages.yml
+          git reset scripts/phase5a-extract.mjs .github/workflows/phase5a-extract.yml .github/workflows/quality-pages.yml .phase5a-trigger
           if git diff --cached --quiet; then
             echo "No Phase 5A changes to commit."
             exit 1
