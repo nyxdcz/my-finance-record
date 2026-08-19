@@ -51,4 +51,45 @@ const visit = directory => {
 };
 visit(path.join(root, "tests"));
 
-console.log("Normalized V15.2.9 release, escaped asset, and sidebar delivery pins while preserving the legacy CSS fallback contract.");
+// The action wrapper lives inside the header, so keep the card's third column
+// reserved for it while positioning the nested wrapper into that reserved area.
+replaceIn("assets/css/budget-planning.css", [[
+`  html body #monthlyBudgetPlannerCard.is-planner-collapsed .budget-planner-actions {
+    position:static;
+    grid-column:3;
+    grid-row:1;
+    top:auto;
+    right:auto;
+    margin:0;
+    transform:none;
+    align-self:center;
+    justify-content:center;
+  }`,
+`  html body #monthlyBudgetPlannerCard.is-planner-collapsed .budget-planner-actions {
+    position:absolute;
+    top:50%;
+    right:8px;
+    margin:0;
+    transform:translateY(-50%);
+    align-self:center;
+    justify-content:center;
+    z-index:1;
+  }`
+]]);
+
+// Keep the screenshot-specific cases deterministic against the same local app.
+{
+  const file = path.join(root, "tests/browser/ui-asset-delivery-v15-2-9.spec.mjs");
+  if (fs.existsSync(file)) {
+    let value = fs.readFileSync(file, "utf8");
+    if (!value.includes('test.describe.configure({ mode:"serial" });')) {
+      value = value.replace(
+        'const base = "http://127.0.0.1:3000";\n',
+        'const base = "http://127.0.0.1:3000";\n\ntest.describe.configure({ mode:"serial" });\n'
+      );
+    }
+    fs.writeFileSync(file, value);
+  }
+}
+
+console.log("Normalized V15.2.9 release, asset pins, and deterministic disclosure geometry.");
