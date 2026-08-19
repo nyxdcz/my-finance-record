@@ -1,5 +1,5 @@
 name: Quality and GitHub Pages
-# Temporary V15.2.10 validation trigger 5; removed before final review.
+# Temporary V15.2.10 validation trigger 6; removed before final review.
 
 on:
   pull_request:
@@ -157,10 +157,14 @@ jobs:
         run: npm ci --ignore-scripts --no-audit --no-fund
       - name: Repair validation generator escaping
         run: node scripts/agent-v15-2-10-fix-generator.mjs
+      - name: Register embedded-sidebar source regression
+        run: node scripts/agent-v15-2-10-register-test.mjs
       - name: Apply approved V15.2.10 hotfix
         run: node scripts/agent-v15-2-10-sidebar-icons.mjs
       - name: Refresh compatibility runtime files
         run: npm run prepare:runtime
+      - name: Align V15.2.10 browser contracts
+        run: node scripts/agent-v15-2-10-fix-browser-contracts.mjs
       - name: Run source quality
         run: npm run quality
       - name: Run embedded-sidebar source regression
