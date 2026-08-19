@@ -1,0 +1,71 @@
+name: Apply approved Available Money text colors
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/ui-account-text-v15-2-5.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Apply approved text colors
+        shell: bash
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+
+          path = Path("ui-icon-alignment-v15-0-5.css")
+          css = path.read_text()
+          old = '''/* V15.2.5-r4 · Bank/E-wallet label contrast and completed-project readability. */
+html body #money #moneyAccounts .account-card:is([data-account-type="Bank" i],[data-account-type="E-wallet" i]) .account-card-label > span,
+html body #money #moneyAccounts .account-card:is([data-account-type="Bank" i],[data-account-type="E-wallet" i]) .account-card-label > small {
+  color:#fff !important;
+}
+'''
+          new = '''/* V15.2.5-r5 · Available Money account names are white and account types use #AEB6C1. */
+html body #money #moneyAccounts .account-card .account-card-label > span {
+  color:#fff !important;
+}
+html body #money #moneyAccounts .account-card .account-card-label > small {
+  color:#aeb6c1 !important;
+}
+'''
+          if old not in css:
+              raise SystemExit("Approved account text-color anchor not found")
+          css = css.replace(old, new, 1)
+          path.write_text(css)
+
+          updated = path.read_text()
+          checks = {
+              "all account names white": '#money #moneyAccounts .account-card .account-card-label > span' in updated and 'color:#fff !important' in updated,
+              "all account types gray": '#money #moneyAccounts .account-card .account-card-label > small' in updated and 'color:#aeb6c1 !important' in updated,
+              "35px badge preserved": 'width:35px !important' in updated and 'height:35px !important' in updated,
+              "no-crop preserved": 'object-fit:contain !important' in updated,
+              "completed project contrast preserved": '#projects .completed-project-record .project-source-line' in updated,
+          }
+          failed = [name for name, ok in checks.items() if not ok]
+          if failed:
+              raise SystemExit("Patch self-check failed: " + ", ".join(failed))
+          print("Available Money text-color self-check passed")
+          PY
+
+      - name: Commit approved patch and remove temporary workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm .github/workflows/ui-account-text-v15-2-5.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add ui-icon-alignment-v15-0-5.css .github/workflows/ui-account-text-v15-2-5.yml
+          git commit -m "fix: unify Available Money account text colors"
+          git push origin HEAD:main
