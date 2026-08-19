@@ -1,0 +1,175 @@
+name: Scoped V15.2.7 UI runtime repair
+
+on:
+  push:
+    branches:
+      - agent/fix-v15-2-7-ui-runtime
+    paths:
+      - .github/workflows/agent-ui-runtime-repair.yml
+
+permissions:
+  contents: write
+
+jobs:
+  repair-and-validate:
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.62.1-noble
+      options: --ipc=host
+    env:
+      PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: agent/fix-v15-2-7-ui-runtime
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          package-manager-cache: false
+      - name: Apply scoped runtime and PWA repair
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          import json
+
+          old_cache = "finance-v15-20260819-application-help-r42"
+          new_cache = "finance-v15-20260819-sync-config-separation-r43"
+          runtime_url = './sync-runtime-compat.js?v=15.2.7-priority4a1'
+
+          def replace_once(path, old, new):
+              path = Path(path)
+              text = path.read_text()
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f"{path}: expected one occurrence of {old!r}, found {count}")
+              path.write_text(text.replace(old, new, 1))
+
+          # Complete the existing Priority 4A extraction without changing finance/sync semantics.
+          index = Path("index.html")
+          index_text = index.read_text()
+          config_tag = '<script src="./sync-config.js?v=15.2.7-release1"></script>'
+          runtime_tag = f'<script src="{runtime_url}"></script>'
+          if runtime_tag not in index_text:
+              if index_text.count(config_tag) != 1:
+                  raise SystemExit("index.html: could not identify the unique sync-config script tag")
+              index_text = index_text.replace(config_tag, config_tag + "\n  " + runtime_tag, 1)
+          if old_cache not in index_text:
+              raise SystemExit("index.html: expected current r42 cache identity before repair")
+          index_text = index_text.replace(old_cache, new_cache)
+          index.write_text(index_text)
+
+          sw = Path("sw.js")
+          sw_text = sw.read_text()
+          if old_cache not in sw_text:
+              raise SystemExit("sw.js: expected r42 cache identity before repair")
+          sw_text = sw_text.replace(old_cache, new_cache)
+          config_asset = '  asset("./sync-config.js?v=15.2.7-release1"),'
+          runtime_asset = '  asset("./sync-runtime-compat.js?v=15.2.7-priority4a1"),'
+          if runtime_asset not in sw_text:
+              if sw_text.count(config_asset) != 1:
+                  raise SystemExit("sw.js: could not identify the sync-config shell asset")
+              sw_text = sw_text.replace(config_asset, config_asset + "\n" + runtime_asset, 1)
+          sw.write_text(sw_text)
+
+          pwa = Path("assets/js/pwa-update-v15-0-5.js")
+          pwa_text = pwa.read_text()
+          if old_cache not in pwa_text:
+              raise SystemExit("PWA update layer does not contain the expected r42 cache identity")
+          pwa.write_text(pwa_text.replace(old_cache, new_cache))
+
+          runtime = Path("assets/js/ui/sync-runtime-compat.js")
+          runtime_text = runtime.read_text()
+          marker = "(function applyV15ReleaseLayer() {"
+          marker_at = runtime_text.find(marker)
+          if marker_at < 0:
+              raise SystemExit("Could not find sync runtime compatibility marker")
+          # The hosted configuration now belongs only to sync-config.js.
+          if runtime_text[:marker_at].strip():
+              runtime_text = runtime_text[marker_at:]
+          runtime.write_text(runtime_text)
+
+          version_path = Path("version.json")
+          version = json.loads(version_path.read_text())
+          if version.get("version") != "15.2.7":
+              raise SystemExit("Unexpected app version before repair")
+          if version.get("schemaVersion") != 12 or version.get("cloudSchemaVersion") != 3:
+              raise SystemExit("UI runtime repair must not change finance/cloud schema versions")
+          if version.get("cacheVersion") != old_cache:
+              raise SystemExit("Unexpected cache identity before repair")
+          version["cacheVersion"] = new_cache
+          version["notes"] = (
+              "V15.2.7 extracts the existing Application Help UI subsystem from index.html into "
+              "assets/js/ui/application-help.js and preserves the same help topics, global functions, dialog behavior, "
+              "focus return, and runtime URLs. This UI runtime repair completes Priority 4A by loading the separated "
+              "sync-runtime-compat.js after hosted sync configuration and precaching it under r43. Finance Schema 12, "
+              "Cloud Schema V3, finance records, calculations, balances, storage, authentication, sync/conflict behavior, "
+              "sidebar behavior, layouts, and the five-minute sync cadence are unchanged."
+          )
+          version_path.write_text(json.dumps(version, indent=2) + "\n")
+
+          # Keep cache-identity regression contracts synchronized.
+          for test_path in Path("tests").rglob("*.mjs"):
+              text = test_path.read_text()
+              if old_cache in text:
+                  test_path.write_text(text.replace(old_cache, new_cache))
+
+          month_test = Path("tests/regression/validate-month-navigation-borderless-v15-1-0.mjs")
+          month_text = month_test.read_text()
+          month_text = month_text.replace(
+              'const sync = fs.readFileSync("sync-config.js", "utf8");',
+              'const runtime = fs.readFileSync("assets/js/ui/sync-runtime-compat.js", "utf8");'
+          ).replace(
+              'assert.match(sync, /liquid-glass-v15\\.css\\?v=\\$\\{VERSION\\}-light1/);',
+              'assert.match(runtime, /liquid-glass-v15\\.css\\?v=\\$\\{VERSION\\}-light1/);'
+          )
+          month_test.write_text(month_text)
+
+          separation_test = Path("tests/regression/validate-sync-config-separation.mjs")
+          separation_text = separation_test.read_text()
+          marker_line = 'if (!serviceWorker.includes("./sync-runtime-compat.js?v=15.2.7-priority4a1")) throw new Error("Service worker must precache the sync runtime compatibility file.");'
+          extra = '\nif (!index.includes(`const APP_CACHE_VERSION = "${expectedCache}";`)) throw new Error("index.html cache identity is not synchronized.");\nif (runtime.includes("window.FINANCE_SYNC_CONFIG")) throw new Error("sync runtime compatibility file must not own hosted sync configuration.");'
+          if extra.strip() not in separation_text:
+              if marker_line not in separation_text:
+                  raise SystemExit("Could not strengthen sync-config separation regression")
+              separation_text = separation_text.replace(marker_line, marker_line + extra, 1)
+          separation_test.write_text(separation_text)
+
+          pages = Path(".github/workflows/quality-pages.yml")
+          pages_text = pages.read_text()
+          app_help_check = "          test -f _site/application-help.js"
+          runtime_check = "          test -f _site/sync-runtime-compat.js"
+          if runtime_check not in pages_text:
+              if app_help_check not in pages_text:
+                  raise SystemExit("Could not find Pages application-help assertion")
+              pages_text = pages_text.replace(app_help_check, app_help_check + "\n" + runtime_check, 1)
+          pages.write_text(pages_text)
+          PY
+
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Run source quality and regressions
+        run: npm run quality
+      - name: Run browser and UI validation
+        run: npm run test:browser
+      - name: Commit validated repair and remove one-time workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm .github/workflows/agent-ui-runtime-repair.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            index.html \
+            sw.js \
+            version.json \
+            assets/js/pwa-update-v15-0-5.js \
+            assets/js/ui/sync-runtime-compat.js \
+            .github/workflows/quality-pages.yml \
+            tests \
+            .github/workflows/agent-ui-runtime-repair.yml
+          git diff --cached --check
+          git status --short
+          git commit -m "fix: restore V15.2.7 UI runtime delivery"
+          git push origin HEAD:agent/fix-v15-2-7-ui-runtime
