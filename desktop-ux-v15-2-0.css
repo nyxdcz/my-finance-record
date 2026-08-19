@@ -240,3 +240,35 @@
     margin-right:0 !important;
   }
 }
+
+/* V15.2.5-r2 · Approved scalloped badge shape for current Bank / E-wallet logos. */
+:is(
+  .record-icon:has(> img[alt="UnionBank icon" i]),
+  .record-icon:has(> img[alt="RCBC icon" i]),
+  .record-icon:has(> img[alt="Maya icon" i]),
+  .record-icon:has(> img[alt="GCash icon" i]),
+  .record-icon:has(> img[alt="GoTyme icon" i])
+){
+  border-radius:0 !important;
+  background:#e3e7ed !important;
+  -webkit-mask-image:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAMAAAAp4XiDAAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAEVQTFRFAAAA3+/v4+fu4+ft4+ju4ufs4+bt3+fs5Oft4uft5+fv4+fs4+bs59/v5Ojt5Ofv4+bt5OTv5OTq4ufs4ubt3+Tv4+jsMCIv+AAAABd0Uk5TABC//89g/2Cf/yD//yCPn+8wMP//MK9rXdHQAAABiklEQVR4nK2WUXODIAyAQVa03ebV7v//we1ha3tWh8UWUFBJELxrnjySjyQkQSjZLPRlCKWU0PsWZKeWJSFZl4zkdn+UwZBd7z4xBkEmgkmMmSHFpOUC7NNC5EBb34wxQfaN2U3pDlcfYQtjCeMlds0iZW0MucCsORHK0cd5iRyv0HIwn9KSS2QPEoYxegiDxkBQBE3baSBSdEHACG8AEnYRDExXLii6mEukumBd4snYb9QRceH3ziGn8/HPuE5iaLIPF5tGUspIhhMg/UMjb49kJ0TfITTZiREupEbe43nPmEYj2ZbrbwjMRBbrFltnufWQCzEecjqT2VJqJtpgjpi35XpIrdeWCcUpWmTE1vrSTCwcsWg6PhLPv6iBl6iAwKrfoK2OQGXqIfqCjc2lh5Q1FyODZaXX7C/GdTGP3WI2+9kv6d8pl11tneY3H1GxZV0gGS4++6mjkPGqLsaNTozJ0w/QYxOpYrSxlcjJo0Ns8+L0hmjxuR+ZHCOCLyX1CPj6xlWve1ytyRMuvYMzfn/h6gAAAABJRU5ErkJggg==") !important;
+  mask-image:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAMAAAAp4XiDAAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAEVQTFRFAAAA3+/v4+fu4+ft4+ju4ufs4+bt3+fs5Oft4uft5+fv4+fs4+bs59/v5Ojt5Ofv4+bt5OTv5OTq4ufs4ubt3+Tv4+jsMCIv+AAAABd0Uk5TABC//89g/2Cf/yD//yCPn+8wMP//MK9rXdHQAAABiklEQVR4nK2WUXODIAyAQVa03ebV7v//we1ha3tWh8UWUFBJELxrnjySjyQkQSjZLPRlCKWU0PsWZKeWJSFZl4zkdn+UwZBd7z4xBkEmgkmMmSHFpOUC7NNC5EBb34wxQfaN2U3pDlcfYQtjCeMlds0iZW0MucCsORHK0cd5iRyv0HIwn9KSS2QPEoYxegiDxkBQBE3baSBSdEHACG8AEnYRDExXLii6mEukumBd4snYb9QRceH3ziGn8/HPuE5iaLIPF5tGUspIhhMg/UMjb49kJ0TfITTZiREupEbe43nPmEYj2ZbrbwjMRBbrFltnufWQCzEecjqT2VJqJtpgjpi35XpIrdeWCcUpWmTE1vrSTCwcsWg6PhLPv6iBl6iAwKrfoK2OQGXqIfqCjc2lh5Q1FyODZaXX7C/GdTGP3WI2+9kv6d8pl11tneY3H1GxZV0gGS4++6mjkPGqLsaNTozJ0w/QYxOpYrSxlcjJo0Ns8+L0hmjxuR+ZHCOCLyX1CPj6xlWve1ytyRMuvYMzfn/h6gAAAABJRU5ErkJggg==") !important;
+  -webkit-mask-repeat:no-repeat !important;
+  mask-repeat:no-repeat !important;
+  -webkit-mask-position:center !important;
+  mask-position:center !important;
+  -webkit-mask-size:100% 100% !important;
+  mask-size:100% 100% !important;
+}
+:is(
+  .record-icon:has(> img[alt="UnionBank icon" i]),
+  .record-icon:has(> img[alt="RCBC icon" i]),
+  .record-icon:has(> img[alt="Maya icon" i]),
+  .record-icon:has(> img[alt="GCash icon" i]),
+  .record-icon:has(> img[alt="GoTyme icon" i])
+) > img{
+  width:100% !important;
+  height:100% !important;
+  object-fit:cover !important;
+  border-radius:0 !important;
+}
