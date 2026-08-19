@@ -15,6 +15,39 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  phase5a:
+    name: Apply approved Phase 5A extraction
+    if: github.event_name == 'push' && contains(github.event.head_commit.message, 'trigger Phase 5A')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Use Node.js 24
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          package-manager-cache: false
+      - name: Apply approved form-input extraction
+        run: node scripts/phase5a-extract.mjs
+      - name: Commit extracted runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git reset scripts/phase5a-extract.mjs .github/workflows/phase5a-extract.yml .github/workflows/quality-pages.yml
+          if git diff --cached --quiet; then
+            echo "No Phase 5A changes to commit."
+            exit 1
+          fi
+          git commit -m "refactor: extract form input runtime V15.2.6"
+          git push origin HEAD:main
+
   quality:
     name: Regression quality
     runs-on: ubuntu-latest
