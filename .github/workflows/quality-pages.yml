@@ -41,6 +41,7 @@ jobs:
   browser:
     name: Browser privacy and accessibility
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - name: Check out repository
         uses: actions/checkout@v7
@@ -52,7 +53,26 @@ jobs:
       - name: Install locked project metadata
         run: npm ci --ignore-scripts --no-audit --no-fund
       - name: Install Chromium
-        run: npx playwright install --with-deps chromium
+        timeout-minutes: 22
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in 1 2; do
+            echo "::group::Playwright Chromium install attempt ${attempt}/2"
+            if timeout --signal=TERM --kill-after=30s 10m npx playwright install --with-deps chromium; then
+              echo "::endgroup::"
+              exit 0
+            else
+              status=$?
+              echo "::endgroup::"
+              if [ "$attempt" -eq 2 ]; then
+                echo "::error::Playwright Chromium installation failed after 2 attempts (last exit code: $status)."
+                exit "$status"
+              fi
+              echo "::warning::Chromium installation attempt ${attempt} failed or timed out (exit code: $status). Retrying in 20 seconds..."
+              sleep 20
+            fi
+          done
       - name: Run portable browser validation
         run: npm run test:browser
 
