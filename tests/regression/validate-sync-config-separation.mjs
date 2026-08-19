@@ -1,0 +1,38 @@
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const here = path.dirname(fileURLToPath(import.meta.url));
+const root = path.resolve(here, "../..");
+const read = relative => fs.readFileSync(path.join(root, relative), "utf8");
+
+const config = read("sync-config.js");
+const runtime = read("assets/js/ui/sync-runtime-compat.js");
+const index = read("index.html");
+const serviceWorker = read("sw.js");
+const prepareRuntime = read("scripts/prepare-runtime.mjs");
+const version = JSON.parse(read("version.json"));
+
+if (!config.includes("window.FINANCE_SYNC_CONFIG")) throw new Error("sync-config.js must expose FINANCE_SYNC_CONFIG.");
+for (const runtimeMarker of ["MutationObserver", "applyV15ReleaseLayer", "loadExpenseScreenshotTools", "document.createElement(\"style\")"]) {
+  if (config.includes(runtimeMarker)) throw new Error(`sync-config.js still contains runtime marker: ${runtimeMarker}`);
+}
+for (const expectedMarker of ["applyV15ReleaseLayer", "loadExpenseScreenshotTools", "MutationObserver"]) {
+  if (!runtime.includes(expectedMarker)) throw new Error(`sync-runtime-compat.js is missing runtime marker: ${expectedMarker}`);
+}
+if (!prepareRuntime.includes('"sync-runtime-compat.js"')) throw new Error("prepare-runtime must map sync-runtime-compat.js to the flat runtime root.");
+
+const configPosition = index.indexOf("./sync-config.js?v=15.2.7-release1");
+const runtimePosition = index.indexOf("./sync-runtime-compat.js?v=15.2.7-priority4a1");
+if (configPosition < 0 || runtimePosition < 0 || runtimePosition <= configPosition) {
+  throw new Error("index.html must load sync-config.js before sync-runtime-compat.js.");
+}
+
+const expectedCache = "finance-v15-20260819-sync-config-separation-r43";
+if (version.version !== "15.2.7") throw new Error(`Unexpected app version: ${version.version}`);
+if (version.schemaVersion !== 12 || version.cloudSchemaVersion !== 3) throw new Error("Priority 4A must not change finance/cloud schema versions.");
+if (version.cacheVersion !== expectedCache) throw new Error(`Unexpected cache version: ${version.cacheVersion}`);
+if (!serviceWorker.includes(`const CACHE_VERSION = "${expectedCache}";`)) throw new Error("Service worker cache identity is not synchronized.");
+if (!serviceWorker.includes("./sync-runtime-compat.js?v=15.2.7-priority4a1")) throw new Error("Service worker must precache the sync runtime compatibility file.");
+
+console.log("Priority 4A sync configuration separation validated.");
