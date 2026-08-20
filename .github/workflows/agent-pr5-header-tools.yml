@@ -60,6 +60,8 @@ jobs:
             tests/helpers/inspect-project.mjs
             tests/regression/validate-pwa-updater-v15-0-5.mjs
             tests/browser/phone-finance-css-ownership-v15-2-10.spec.mjs
+            tests/browser/topbar-dashboard-history-tools-menu.spec.mjs
+            tests/browser/topbar-quick-add-tools-menu.spec.mjs
             .github/workflows/quality-pages.yml
           )
 
