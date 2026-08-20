@@ -4,7 +4,9 @@ import fs from "node:fs";
 const source = name => fs.readFileSync(new URL(`../../${name}`, import.meta.url), "utf8");
 
 test("expanded sidebar uses My Finance Records and a compact stable pin", async ({ page }) => {
-  expect(source("pwa-update-v15-0-5.js")).toContain('brand.textContent = "My Finance Records"');
+  expect(source("index.html")).toContain('<strong>My Finance Records</strong>');
+  expect(source("pwa-update-v15-0-5.js")).not.toContain("installSidebarBrand");
+  expect(source("pwa-update-v15-0-5.js")).not.toContain("brand.textContent");
   expect(source("ui-icon-alignment-v15-0-5.css")).toContain("width:28px !important");
   expect(source("ui-icon-alignment-v15-0-5.css")).toContain("white-space:nowrap !important");
 
