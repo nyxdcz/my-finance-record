@@ -2,6 +2,7 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
 
+// PR8 contract: sidebar identity is static markup; the updater owns only PWA/cache behavior.
 const index = fs.readFileSync("index.html", "utf8");
 const updater = fs.readFileSync("assets/js/pwa-update-v15-0-5.js", "utf8");
 const worker = fs.readFileSync("sw.js", "utf8");
