@@ -1,16 +1,16 @@
-# My Finance Records · V15.2.12
+# My Finance Records · V15.2.13
 
 Local-first personal and household finance PWA with multi-profile support and optional encrypted Supabase synchronization.
 
 ## Project status
 
-Current release: **V15.2.12 · Auth & Sync State Stabilization**
+Current release: **V15.2.13 · Production UI/UX Consistency**
 Released: **August 20, 2026**
 Finance Schema: **12**
 Cloud Schema: **V3**
 Routine cloud sync cadence: **5 minutes**
 
-V15.2.12 makes cloud startup deterministic: one Supabase client, one signed-in initialization, no duplicate profile creation when an existing encrypted profile needs its passphrase, and one readiness state across the header and Settings. Finance data, calculations, schemas, and the five-minute sync cadence remain unchanged.
+V15.2.13 compacts the phone Budget & Expenses layout, standardizes desktop toolbar and summary-card spacing, and removes moving summary feedback while retaining accessible touch targets and reduced-motion support. Finance data, calculations, schemas, and the five-minute sync cadence remain unchanged.
 
 For complete release history, see [`CHANGELOG.md`](CHANGELOG.md).
 

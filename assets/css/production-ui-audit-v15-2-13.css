@@ -1,0 +1,221 @@
+/* My Finance Records · V15.2.13 production UI/UX consistency audit */
+
+/* Summary updates should acknowledge a change without moving the layout. */
+.legend-item.legend-live-update {
+  animation: financeSummaryConfirm 420ms ease-out;
+}
+
+@keyframes financeSummaryConfirm {
+  0%, 100% { box-shadow: none; }
+  50% { box-shadow: 0 0 0 2px color-mix(in srgb, var(--green) 28%, transparent); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .legend-item.legend-live-update { animation: none !important; }
+}
+
+/* Keep the desktop header on one compact 38px control rhythm. */
+@media (min-width: 851px) {
+  html body .topbar-actions {
+    gap: 6px !important;
+  }
+
+  html body .topbar-actions > .cloud-sync-toolbar-button,
+  html body .topbar-actions .topbar-history-button,
+  html body .topbar-actions .topbar-add-button,
+  html body .topbar-actions .topbar-tools-trigger,
+  html body .topbar-actions .month-navigator,
+  html body .topbar-actions .month-navigator > .month-nav-button,
+  html body .topbar-actions .month-navigator > .month-control,
+  html body .topbar-actions .month-navigator > .month-current-button,
+  html body .topbar-actions .month-navigator > .month-status-chip {
+    box-sizing: border-box !important;
+    height: 38px !important;
+    min-height: 38px !important;
+    max-height: 38px !important;
+  }
+
+  html body .topbar-actions .month-navigator > .month-control {
+    width: 174px !important;
+  }
+
+  html body .topbar-actions .month-navigator > .month-current-button,
+  html body .topbar-actions .month-navigator > .month-status-chip {
+    min-width: 68px !important;
+    margin-inline-start: 6px !important;
+  }
+
+  html body .topbar-actions .topbar-add-button {
+    padding-inline: 10px !important;
+  }
+
+  /* Both rows of Budget summary cards use the same compact geometry. */
+  html body #money :is(.legend, .summary-strip) {
+    gap: 8px !important;
+    margin-block: 8px !important;
+  }
+
+  html body #money :is(.legend-item, .summary-item) {
+    min-height: 56px !important;
+    padding: 7px 10px !important;
+    gap: 8px !important;
+    align-items: center !important;
+  }
+
+  html body #money :is(.legend-total, .summary-card-value) {
+    align-self: center !important;
+    font-variant-numeric: tabular-nums;
+  }
+
+  html body #money .summary-card::after {
+    display: none !important;
+  }
+}
+
+@media (min-width: 851px) and (max-width: 1120px) {
+  html body .topbar-actions .month-navigator > .month-control {
+    width: 158px !important;
+  }
+
+  html body #money :is(.legend-text small, .summary-card-copy small) {
+    display: none !important;
+  }
+
+  html body #money :is(.legend-text strong, .summary-card-label) {
+    display: block !important;
+    overflow: hidden !important;
+    white-space: nowrap !important;
+    text-overflow: ellipsis !important;
+  }
+
+  html body #money :is(.legend-item, .summary-item) {
+    height: 56px !important;
+    max-height: 56px !important;
+    overflow: hidden !important;
+  }
+}
+
+/* Pointer-coarse tablets retain touch-safe controls at desktop widths. */
+@media (min-width: 701px) and (max-width: 1024px) and (pointer: coarse),
+       (min-width: 701px) and (max-width: 1024px) and (hover: none) {
+  html body .topbar-actions > .cloud-sync-toolbar-button,
+  html body .topbar-actions .topbar-history-button,
+  html body .topbar-actions .topbar-add-button,
+  html body .topbar-actions .topbar-tools-trigger,
+  html body .topbar-actions .month-navigator,
+  html body .topbar-actions .month-navigator > .month-nav-button,
+  html body .topbar-actions .month-navigator > .month-control,
+  html body .topbar-actions .month-navigator > .month-current-button,
+  html body .topbar-actions .month-navigator > .month-status-chip {
+    height: 44px !important;
+    min-height: 44px !important;
+    max-height: 44px !important;
+  }
+}
+
+/* Phone: compact the containers, not the touch targets. */
+@media (max-width: 700px) {
+  :root { --mobile-topbar-offset: calc(env(safe-area-inset-top) + 106px); }
+
+  html body .topbar {
+    gap: 6px 5px !important;
+    padding: max(7px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) 7px max(8px, env(safe-area-inset-left)) !important;
+  }
+
+  html body .topbar-left { gap: 7px !important; }
+  html body .topbar h1 { font-size: .94rem !important; }
+  html body .topbar-actions .month-navigator { gap: 5px !important; }
+
+  html body #money .section-stack {
+    gap: 8px !important;
+  }
+
+  html body #money .period-card {
+    margin-top: 0 !important;
+    padding: 0 !important;
+    border-radius: 10px !important;
+    overflow: visible !important;
+  }
+
+  html body #money .period-header {
+    min-height: 68px !important;
+    margin: 0 !important;
+    padding: 10px 12px !important;
+    border-radius: 9px 9px 0 0 !important;
+    border-bottom: 1px solid color-mix(in srgb, var(--line) 78%, transparent) !important;
+  }
+
+  html body #money .period-card.is-collapsed {
+    overflow: hidden !important;
+  }
+
+  html body #money .period-card.is-collapsed .period-header {
+    min-height: 68px !important;
+    border-bottom: 0 !important;
+    border-radius: 9px !important;
+  }
+
+  html body #money .period-header .collapse-toggle {
+    width: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    max-height: 44px !important;
+    margin: 0 !important;
+  }
+
+  html body #money :is(#earlyExpenses, #lateExpenses, #otherExpenses) {
+    display: grid;
+    gap: 0 !important;
+  }
+
+  html body #money .record-row[data-expense-row] {
+    margin: 0 !important;
+    padding: 9px 10px !important;
+    gap: 6px 9px !important;
+    border: 0 !important;
+    border-top: 1px solid var(--line) !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  html body #money :is(#earlyExpenses, #lateExpenses, #otherExpenses) > .record-row[data-expense-row]:first-child {
+    border-top: 0 !important;
+  }
+
+  html body #money .expense-record-title .record-title-copy > small {
+    display: -webkit-box !important;
+    overflow: hidden !important;
+    white-space: normal !important;
+    text-overflow: clip !important;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+  }
+
+  html body #money .expense-record-title .record-statuses {
+    row-gap: 3px !important;
+  }
+
+  html body #money .record-row[data-expense-row] > .mobile-record-actions {
+    margin-top: 0 !important;
+    gap: 6px !important;
+  }
+
+  html body #money .record-row[data-expense-row] > .mobile-record-actions > .button,
+  html body #money .record-row[data-expense-row] .overflow-menu-trigger {
+    min-height: 44px !important;
+    height: 44px !important;
+  }
+}
+
+@media (max-width: 380px) {
+  html body .topbar {
+    grid-template-columns: minmax(0, 1fr) 42px 42px 42px !important;
+  }
+
+  html body #money .period-header {
+    padding-inline: 10px !important;
+  }
+}

@@ -15,7 +15,7 @@ const fail = message => errors.push(message);
 const warn = message => warnings.push(message);
 
 const runtimeCssFiles = [
-  "account-ledger.css", "app.css", "shell-ui-v15-2-11.css", "black-canvas-v15-1-0.css", "budget-planning.css", "dashboard-interactions-core-v14-0-23.css", "dashboard-interactions.css", "desktop-ui-phase1-v15-1-0.css", "desktop-ux-v15-2-0.css", "liquid-glass-v15.css", "mobile-v14-0-23.css", "productivity-tools.css", "projects-calendar-v13.0.20.css", "reminders-alerts.css", "reports-insights.css", "security-profiles.css", "ui-icon-alignment-v15-0-5.css"
+  "account-ledger.css", "app.css", "shell-ui-v15-2-11.css", "black-canvas-v15-1-0.css", "budget-planning.css", "dashboard-interactions-core-v14-0-23.css", "dashboard-interactions.css", "desktop-ui-phase1-v15-1-0.css", "desktop-ux-v15-2-0.css", "liquid-glass-v15.css", "mobile-v14-0-23.css", "productivity-tools.css", "production-ui-audit-v15-2-13.css", "projects-calendar-v13.0.20.css", "reminders-alerts.css", "reports-insights.css", "security-profiles.css", "ui-icon-alignment-v15-0-5.css"
 ];
 const runtimeJsFiles = [
   "account-ledger.js", "budget-planning.js", "cloud-conflict-resolution.js", "cloud-conflict-review.js", "cloud-sync-lifecycle.js", "cloud-sync.js", "expense-screenshot-ai.js", "expense-screenshot-detect.js", "expense-screenshot-parser.js", "form-inputs.js", "cash-flow-summary.js", "application-help.js", "header-tools-compat.js", "phone-finance-compat.js", "sync-runtime-compat.js", "interaction-patterns.js", "privacy-lock.js", "productivity-tools.js", "projects-calendar-v13.0.20.js", "pwa-update-v15-0-5.js", "reminders-alerts.js", "reports-insights.js", "security-profiles.js"
@@ -42,7 +42,7 @@ const requiredFiles = [
   "docs/setup/CLOUD_SYNC_SETUP.md", "docs/setup/GITHUB_SECURITY_SETUP.md", "docs/setup/MACBOOK_IPHONE_INSTALLATION.md",
   "docs/migration/CLOUD_SYNC_V2_MIGRATION.md", "docs/migration/V13_MIGRATION_GUIDE.md", "docs/release/RELEASE_CHECKLIST.md",
   "scripts/Install_V15_2_0.command", "scripts/run_audit.sh", "scripts/prepare-runtime.mjs", "eslint.config.js", "playwright.config.mjs",
-  "tests/regression/validate-v15-2-0-desktop-ux.mjs", "tests/regression/validate-pwa-updater-v15-0-5.mjs", "tests/finance/validate-record-spending-v15-0-4.mjs", "tests/sync/validate-safe-multidevice-sync.mjs", "tests/finance/validate-expense-screenshot.mjs", "tests/finance/expense-screenshot.spec.mjs", "tests/security/privacy-and-inputs.spec.mjs", "tests/browser/application-help.spec.mjs", "tests/regression/validate-application-help-v15-2-7.mjs", "tests/regression/validate-shell-ui-css-ownership-v15-2-11.mjs", "tests/helpers/check-maintainability.mjs"
+  "tests/regression/validate-v15-2-0-desktop-ux.mjs", "tests/regression/validate-pwa-updater-v15-0-5.mjs", "tests/finance/validate-record-spending-v15-0-4.mjs", "tests/sync/validate-safe-multidevice-sync.mjs", "tests/finance/validate-expense-screenshot.mjs", "tests/finance/expense-screenshot.spec.mjs", "tests/security/privacy-and-inputs.spec.mjs", "tests/browser/application-help.spec.mjs", "tests/regression/validate-application-help-v15-2-7.mjs", "tests/regression/validate-shell-ui-css-ownership-v15-2-11.mjs", "tests/regression/validate-production-ui-audit-v15-2-13.mjs", "tests/browser/production-ui-audit-v15-2-13.spec.mjs", "tests/helpers/check-maintainability.mjs"
 ];
 for (const file of requiredFiles) if (!exists(file)) fail(`Missing required file: ${file}`);
 
@@ -122,6 +122,7 @@ if (!deploySources.has("black-canvas-v15-1-0.css")) fail("GitHub Pages must pack
 if (!deploySources.has("desktop-ui-phase1-v15-1-0.css")) fail("GitHub Pages must package desktop-ui-phase1-v15-1-0.css");
 if (!deploySources.has("desktop-ux-v15-2-0.css")) fail("GitHub Pages must package desktop-ux-v15-2-0.css");
 if (!deploySources.has("shell-ui-v15-2-11.css")) fail("GitHub Pages must package shell-ui-v15-2-11.css");
+if (!deploySources.has("production-ui-audit-v15-2-13.css")) fail("GitHub Pages must package production-ui-audit-v15-2-13.css");
 
 let pkg = {}, lock = {}, version = {};
 try { pkg = JSON.parse(read("package.json")); } catch (error) { fail(`package.json is invalid JSON: ${error.message}`); }
@@ -137,9 +138,9 @@ const testTargets = [...String(pkg.scripts?.test || "").matchAll(/\bnode\s+(\S+)
 if (!testTargets.length) fail(`Test script target is missing: ${pkg.scripts?.test || "(not configured)"}`);
 for (const target of testTargets) if (!exists(target)) fail(`Test script target is missing: ${target}`);
 if (!String(pkg.engines?.node || "").includes("22")) warn(`Node engine is ${pkg.engines?.node || "not set"}; project validation expects Node 22+`);
-if (pkg.version !== "15.2.12") fail(`Expected current package version 15.2.12, found ${pkg.version || "(missing)"}`);
-if (!read("README.md").startsWith("# My Finance Records · V15.2.12")) fail("README release heading is not V15.2.12");
-if (!read("CHANGELOG.md").startsWith("## 15.2.12 · 2026-08-20")) fail("CHANGELOG latest entry is not V15.2.12");
+if (pkg.version !== "15.2.13") fail(`Expected current package version 15.2.13, found ${pkg.version || "(missing)"}`);
+if (!read("README.md").startsWith("# My Finance Records · V15.2.13")) fail("README release heading is not V15.2.13");
+if (!read("CHANGELOG.md").startsWith("## 15.2.13 · 2026-08-20")) fail("CHANGELOG latest entry is not V15.2.13");
 
 const syncConfig = read("sync-config.js");
 const syncConfigCode = syncConfig.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|\s)\/\/.*$/gm, "$1");
@@ -171,4 +172,4 @@ console.log(`Repository inspection: ${errors.length} error(s), ${warnings.length
 for (const message of errors) console.error(`ERROR: ${message}`);
 for (const message of warnings) console.warn(`WARN: ${message}`);
 if (errors.length) process.exit(1);
-console.log("Repository inspection passed: V15.2.12 release sources, local paths, deploy paths, package metadata, permissions, and public sync configuration are consistent.");
+console.log("Repository inspection passed: V15.2.13 release sources, local paths, deploy paths, package metadata, permissions, and public sync configuration are consistent.");

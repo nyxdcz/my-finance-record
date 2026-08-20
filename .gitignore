@@ -28,6 +28,7 @@ __pycache__/
 /liquid-glass-v15.css
 /mobile-v14-0-23.css
 /productivity-tools.css
+/production-ui-audit-v15-2-13.css
 /projects-calendar-v13.0.20.css
 /reminders-alerts.css
 /reports-insights.css
@@ -44,6 +45,9 @@ __pycache__/
 /expense-screenshot-parser.js
 /form-inputs.js
 /application-help.js
+/cash-flow-summary.js
+/header-tools-compat.js
+/phone-finance-compat.js
 /interaction-patterns.js
 /privacy-lock.js
 /productivity-tools.js

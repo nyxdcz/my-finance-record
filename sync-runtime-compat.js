@@ -1,6 +1,6 @@
 (function applyV15ReleaseLayer() {
-  const VERSION = "15.2.12";
-  const RELEASE_NAME = "Auth & Sync State Stabilization";
+  const VERSION = "15.2.13";
+  const RELEASE_NAME = "Production UI/UX Consistency";
   const RELEASE_DATE = "August 20, 2026";
   window.FINANCE_APP_VERSION_OVERRIDE = VERSION;
   window.FINANCE_RELEASE_OVERRIDE = { version:VERSION, name:RELEASE_NAME, released:"2026-08-20" };

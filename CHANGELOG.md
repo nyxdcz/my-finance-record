@@ -1,3 +1,9 @@
+## 15.2.13 · 2026-08-20
+- Compacted phone Budget period shells and expense records, replaced heavy nested separators with single-pixel dividers, and allowed useful secondary details to wrap to two lines while preserving 44px actions.
+- Standardized desktop toolbar controls on one 38px height and 6px spacing rhythm, and compacted both Budget summary rows to matching 56px cards.
+- Removed the moving summary update effect in favor of a static outline acknowledgement with a reduced-motion fallback.
+- Preserved the V15.2.5 disclosure-column alignment and V15.2.2 Dashboard chart-with-summary layout, added responsive regression coverage, and rotated the PWA shell to `finance-v15-20260820-production-ui-audit-r49`.
+
 ## 15.2.12 · 2026-08-20
 - Single-flighted Supabase client creation and signed-in initialization so session restoration and auth-state events cannot create duplicate clients or repeat cloud startup work.
 - Stopped automatic cloud-profile creation when an existing encrypted profile cannot be unlocked, replacing repeated passphrase/profile console errors with a clear Profile & Security recovery path.

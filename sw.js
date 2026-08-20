@@ -1,5 +1,5 @@
 "use strict";
-const APP_VERSION = "15.2.12";
+const APP_VERSION = "15.2.13";
 self.__FINANCE_APP_VERSION = APP_VERSION;
 // V15.2.9 refreshes sidebar icon delivery and disclosure/icon presentation without changing Finance or sync behavior.
 // V15.2.8 consolidates Cash Flow presentation ownership in static CSS without changing Finance or sync behavior.
@@ -21,7 +21,7 @@ self.__FINANCE_APP_VERSION = APP_VERSION;
 // V15.2.2 hotfix: refresh the first-half completion heart-smile artwork from the validated app shell.
 // V15.2.2 hotfix: keep interaction-patterns network-first so completion-state presentation refreshes without rotating finance caches.
 // V15.2.2 hotfix: keep the PWA update layer network-first so the Quick add topbar relocation reaches installed apps.
-const CACHE_VERSION = "finance-v15-20260820-auth-sync-r48";
+const CACHE_VERSION = "finance-v15-20260820-production-ui-audit-r49";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const DB_NAME = "simple-finance-project-records-v12-db";
@@ -42,9 +42,10 @@ const APP_SHELL = [
   asset("./black-canvas-v15-1-0.css?v=15.1.0-light1"),
   asset("./desktop-ui-phase1-v15-1-0.css?v=15.1.0-phase1"),
   asset("./desktop-ux-v15-2-0.css?v=15.2.5-disclosure1"),
+  asset("./production-ui-audit-v15-2-13.css?v=15.2.13-audit1"),
   asset("./form-inputs.js?v=15.2.6-phase5a1"),
   asset("./application-help.js?v=15.2.9-phase5b1"),
-  asset("./pwa-update-v15-0-5.js?v=15.2.12-release8"),
+  asset("./pwa-update-v15-0-5.js?v=15.2.13-release9"),
   asset("./phone-finance-compat.js?v=15.2.10-phone1"),
   asset("./cash-flow-summary.js?v=15.2.10-cashflow1"),
   asset("./header-tools-compat.js?v=15.2.10-header1"),
@@ -72,7 +73,7 @@ const APP_SHELL = [
   asset("./projects-calendar-v13.0.20.js?v=15.2.1-ux1"),
   asset("./projects-calendar-v13.0.20.css?v=15.1.0-desktop2"),
   asset("./sync-config.js?v=15.2.10-release1"),
-  asset("./sync-runtime-compat.js?v=15.2.12-release3"),
+  asset("./sync-runtime-compat.js?v=15.2.13-release4"),
   asset("./expense-screenshot-parser.js?v=15.0.3"),
   asset("./expense-screenshot-detect.js?v=15.0.3"),
   asset("./expense-screenshot-ai.js?v=15.0.3"),
@@ -176,7 +177,7 @@ self.addEventListener("fetch", event => {
     return;
   }
   if (url.origin !== self.location.origin) return;
-  if (url.pathname.endsWith("privacy-lock.js") || url.pathname.endsWith("cloud-sync-lifecycle.js") || url.pathname.endsWith("interaction-patterns.js") || url.pathname.endsWith("pwa-update-v15-0-5.js") || url.pathname.endsWith("ui-icon-alignment-v15-0-5.css") || url.pathname.endsWith("mobile-v14-0-23.css") || url.pathname.endsWith("budget-planning.css") || url.pathname.endsWith("black-canvas-v15-1-0.css")) {
+  if (url.pathname.endsWith("privacy-lock.js") || url.pathname.endsWith("cloud-sync-lifecycle.js") || url.pathname.endsWith("interaction-patterns.js") || url.pathname.endsWith("pwa-update-v15-0-5.js") || url.pathname.endsWith("ui-icon-alignment-v15-0-5.css") || url.pathname.endsWith("mobile-v14-0-23.css") || url.pathname.endsWith("production-ui-audit-v15-2-13.css") || url.pathname.endsWith("budget-planning.css") || url.pathname.endsWith("black-canvas-v15-1-0.css")) {
     event.respondWith(networkFirstCriticalAsset(request));
     return;
   }
