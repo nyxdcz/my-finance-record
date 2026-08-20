@@ -3,14 +3,22 @@ import fs from "node:fs";
 
 const source = name => fs.readFileSync(new URL(`../../${name}`, import.meta.url), "utf8");
 
-test("expanded sidebar uses My Finance Records and a compact stable pin", async ({ page }) => {
-  expect(source("pwa-update-v15-0-5.js")).toContain('brand.textContent = "My Finance Records"');
+async function unlockApp(page, width, pageName = "dashboard") {
+  await page.setViewportSize({ width, height:width <= 430 ? 852 : 800 });
+  await page.goto(`http://127.0.0.1:3000/?page=${pageName}`, { waitUntil:"domcontentloaded" });
+  await page.waitForFunction(() => Boolean(window.FinancePrivacyLock));
+  await page.evaluate(() => window.FinancePrivacyLock.setAuthenticated(true));
+  await page.waitForFunction(() => document.querySelector(".sidebar .brand strong")?.textContent === "My Finance Records");
+}
+
+test("expanded and collapsed desktop sidebar use the static My Finance Records brand", async ({ page }) => {
+  expect(source("index.html")).toContain("<strong>My Finance Records</strong>");
+  expect(source("pwa-update-v15-0-5.js")).not.toContain("installSidebarBrand");
+  expect(source("pwa-update-v15-0-5.js")).not.toContain("document");
   expect(source("ui-icon-alignment-v15-0-5.css")).toContain("width:28px !important");
   expect(source("ui-icon-alignment-v15-0-5.css")).toContain("white-space:nowrap !important");
 
-  await page.setViewportSize({ width:1280, height:800 });
-  await page.goto("http://127.0.0.1:3000/?page=dashboard", { waitUntil:"domcontentloaded" });
-  await page.waitForFunction(() => document.querySelector(".sidebar .brand strong")?.textContent === "My Finance Records");
+  await unlockApp(page, 1280);
 
   await page.locator("#sidebar").evaluate(sidebar => {
     sidebar.classList.add("desktop-open");
@@ -50,6 +58,15 @@ test("expanded sidebar uses My Finance Records and a compact stable pin", async 
     brandWhiteSpace:"nowrap",
     brandText:"My Finance Records"
   });
+});
+
+test("mobile drawer keeps the static My Finance Records brand", async ({ page }) => {
+  await unlockApp(page, 390, "money");
+  const menuButton = page.locator("#menuButton");
+  await expect(menuButton).toBeVisible();
+  await menuButton.click();
+  await expect(page.locator("#sidebar")).toHaveAttribute("aria-hidden", "false");
+  await expect(page.locator(".sidebar .brand strong")).toHaveText("My Finance Records");
 });
 
 test("sidebar brand shell cache is synchronized", () => {
