@@ -1,0 +1,71 @@
+name: PR6 Cash Flow JS Ownership
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  validate-and-apply:
+    if: github.head_ref == 'agent/cash-flow-js-ownership-v15-2-10'
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    container:
+      image: mcr.microsoft.com/playwright:v1.62.1-noble
+      options: --ipc=host
+    env:
+      PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
+    steps:
+      - name: Check out PR6 branch
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+      - name: Use Node.js 24
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          package-manager-cache: false
+      - name: Install locked project metadata
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Apply Cash Flow JS ownership extraction
+        run: node scripts/agent-pr6-cash-flow-js-ownership.mjs
+      - name: Refresh compatibility runtime files
+        run: npm run prepare:runtime
+      - name: Run source quality
+        run: npm run quality
+      - name: Run focused Cash Flow ownership coverage
+        run: npx playwright test tests/browser/cash-flow-style-ownership.spec.mjs tests/browser/cash-flow-js-ownership.spec.mjs --retries=0
+      - name: Run complete browser suite without retries
+        run: npx playwright test --retries=0
+      - name: Audit production dependencies
+        run: npm run audit
+      - name: Verify and commit validated PR6 patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm -rf test-results
+
+          unexpected=0
+          while IFS= read -r file; do
+            [[ -z "$file" ]] && continue
+            case "$file" in
+              index.html|sw.js|scripts/prepare-runtime.mjs|tests/helpers/inspect-project.mjs|tests/*.mjs|tests/*/*.mjs|tests/*/*/*.mjs) ;;
+              *) echo "Unexpected transformed path: $file" >&2; unexpected=1 ;;
+            esac
+          done < <(git diff --name-only)
+          [[ $unexpected -eq 0 ]] || exit 1
+
+          git add index.html sw.js scripts/prepare-runtime.mjs tests
+          git diff --cached --check
+          if git diff --cached --quiet; then
+            echo "Validated PR6 transformed tree already committed."
+            exit 0
+          fi
+          git commit -m "refactor(ui): wire Cash Flow feature ownership"
+          git push origin "HEAD:${GITHUB_HEAD_REF}"
