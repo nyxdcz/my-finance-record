@@ -186,6 +186,14 @@
     let toastDeadline = 0;
     let toastRemaining = 5000;
     let undoAction = null;
+    const interactiveSelector = "button,a,input,select,textarea,summary,[contenteditable=true]";
+    const dragActor = target => {
+      const handle = target?.closest?.("[data-structured-drag-handle]");
+      if (handle) return handle;
+      const card = target?.closest?.("[data-structured-card-draggable]");
+      if (!card || (target !== card && target?.closest?.(interactiveSelector))) return null;
+      return card;
+    };
 
     const announce = message => {
       if (!announcer) return;
@@ -193,7 +201,17 @@
       requestAnimationFrame(() => { announcer.textContent = String(message || ""); });
     };
     const zoneLabel = zone => zone?.dataset.structuredDropLabel || zone?.querySelector("h3,h4")?.textContent?.trim() || "destination";
-    const zonesFor = kind => [...document.querySelectorAll(`[data-structured-drop-kind="${CSS.escape(kind)}"]`)];
+    const zonesFor = kind => [...(active?.card?.closest?.(".finance-kanban-board") || document).querySelectorAll(`[data-structured-drop-kind="${CSS.escape(kind)}"]`)];
+    const autoScrollBoard = clientX => {
+      const board = active?.card?.closest?.(".finance-kanban-board");
+      if (!board || !Number.isFinite(clientX) || board.scrollWidth <= board.clientWidth) return;
+      const bounds = board.getBoundingClientRect();
+      const edge = Math.min(72, Math.max(40, bounds.width * .16));
+      const leftStrength = Math.max(0, Math.min(1, (bounds.left + edge - clientX) / edge));
+      const rightStrength = Math.max(0, Math.min(1, (clientX - (bounds.right - edge)) / edge));
+      const delta = Math.round((rightStrength - leftStrength) * 18);
+      if (delta) board.scrollLeft += delta;
+    };
     const isValidZone = (zone, state = active) => Boolean(zone && state && zone.dataset.structuredDropKind === state.kind && zone.dataset.structuredDropDestination !== state.origin);
     const clearZoneState = () => document.querySelectorAll(".is-structured-drop-available,.is-structured-drop-target,.is-structured-drop-origin").forEach(zone => {
       zone.classList.remove("is-structured-drop-available", "is-structured-drop-target", "is-structured-drop-origin");
@@ -298,7 +316,7 @@
         if (!result?.success) {
           restoreCompletedProjects(state);
           announce(result?.message || `${state.label} move cancelled.`);
-          requestAnimationFrame(() => document.querySelector(`[data-structured-id="${CSS.escape(state.id)}"] [data-structured-drag-handle]`)?.focus());
+          requestAnimationFrame(() => document.querySelector(`[data-structured-id="${CSS.escape(state.id)}"] [data-structured-drag-handle], [data-structured-id="${CSS.escape(state.id)}"][data-structured-card-draggable]`)?.focus());
           return;
         }
         announce(result.message || `${state.label} moved to ${zoneLabel(zone)}.`);
@@ -311,7 +329,7 @@
     };
 
     document.addEventListener("dragstart", event => {
-      const handle = event.target.closest?.("[data-structured-drag-handle]");
+      const handle = dragActor(event.target);
       const state = handle ? begin(handle, "mouse") : null;
       if (!state) return;
       event.dataTransfer.effectAllowed = "move";
@@ -321,6 +339,7 @@
     });
     document.addEventListener("dragover", event => {
       if (!active || active.input !== "mouse") return;
+      autoScrollBoard(event.clientX);
       const zone = event.target.closest?.("[data-structured-drop-zone]");
       if (!isValidZone(zone)) return setTarget(null);
       event.preventDefault();
@@ -338,7 +357,7 @@
       if (active?.input === "mouse") cancel(`${active.label} returned to its original position.`);
     });
     document.addEventListener("pointerdown", event => {
-      const handle = event.target.closest?.("[data-structured-drag-handle]");
+      const handle = dragActor(event.target);
       if (!handle || event.pointerType === "mouse" || event.button !== 0) return;
       pointerPending = { handle, pointerId:event.pointerId, startX:event.clientX, startY:event.clientY };
     });
@@ -355,6 +374,7 @@
       event.preventDefault();
       active.card.style.setProperty("--structured-drag-x", `${dx}px`);
       active.card.style.setProperty("--structured-drag-y", `${dy}px`);
+      autoScrollBoard(event.clientX);
       const zone = document.elementFromPoint(event.clientX, event.clientY)?.closest?.("[data-structured-drop-zone]");
       setTarget(isValidZone(zone) ? zone : null);
     });
@@ -371,7 +391,7 @@
       if (active) cancel(`${active.label} move cancelled.`);
     });
     document.addEventListener("keydown", event => {
-      const handle = event.target.closest?.("[data-structured-drag-handle]");
+      const handle = dragActor(event.target);
       if (!handle || ![" ", "Enter", "Escape", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(event.key)) return;
       if (!active && [" ", "Enter"].includes(event.key)) {
         event.preventDefault();

@@ -240,12 +240,14 @@ test("Projects provides compact, full-view, completed, and externally refreshed 
 
   await agenda.locator("[data-pc-view]").first().click();
   const fullAgenda = page.locator("#projectAgendaFullDialog");
+  const fullUpcoming = fullAgenda.locator('[data-pc-full-board] [data-structured-drop-destination="upcoming"]');
+  const fullCompleted = fullAgenda.locator('[data-pc-full-board] [data-structured-drop-destination="completed"]');
   await expect(fullAgenda).toBeVisible();
-  await expect(fullAgenda.locator("[data-pc-full-upcoming] .pc-event-card")).toHaveCount(4);
+  await expect(fullUpcoming.locator(".pc-event-card")).toHaveCount(4);
   await expect(fullAgenda.getByText("External deadline", { exact:true })).toBeVisible();
   await fullAgenda.locator('[data-pc-complete="agenda-earlier"]').click();
-  await expect(fullAgenda.locator("[data-pc-full-upcoming] .pc-event-card")).toHaveCount(3);
-  await expect(fullAgenda.locator("[data-pc-full-completed] .pc-event-card")).toHaveCount(1);
+  await expect(fullUpcoming.locator(".pc-event-card")).toHaveCount(3);
+  await expect(fullCompleted.locator(".pc-event-card")).toHaveCount(1);
   await expect(agenda.locator("[data-pc-count]")).toHaveText("3 upcoming · 1 completed");
   await expect.poll(() => page.evaluate(() => {
     const stored = JSON.parse(localStorage.getItem("simple-finance-project-calendar-v13.0.20") || "[]");
