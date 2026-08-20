@@ -1,11 +1,11 @@
-# My Finance Records · V15.2.16
+# My Finance Records · V15.2.17
 
 <div align="center">
 
 **A local-first personal and household finance PWA built for privacy, resilience, and everyday use.**
 
 [![Quality checks](https://github.com/nyxdcz/my-finance-record/actions/workflows/quality-pages.yml/badge.svg?branch=main)](https://github.com/nyxdcz/my-finance-record/actions/workflows/quality-pages.yml)
-![Version](https://img.shields.io/badge/version-V15.2.16-2563eb)
+![Version](https://img.shields.io/badge/version-V15.2.17-2563eb)
 ![PWA](https://img.shields.io/badge/PWA-offline--ready-16a34a)
 ![Node](https://img.shields.io/badge/Node.js-22%2B-339933?logo=nodedotjs&logoColor=white)
 
@@ -15,9 +15,9 @@
 
 | Release | Finance schema | Cloud schema | Sync cadence |
 | --- | ---: | ---: | ---: |
-| **V15.2.16** · Production Audit Reliability | **12** | **V3** | **5 minutes** |
+| **V15.2.17** · Runtime-Stable UI Audit | **12** | **V3** | **5 minutes** |
 
-The current release hardens production UI verification across supported desktop and phone widths by waiting for the Finance view to finish rendering and checking only controls that are actually visible. Application behavior, finance calculations, stored data, schemas, and sync behavior are unchanged.
+The current release makes production UI verification resilient to service-worker activation and authentication timing by measuring only after the current runtime controls the page and Budget & Expenses is visibly ready. Application behavior, finance calculations, stored data, schemas, and sync behavior are unchanged.
 
 ## What it offers
 

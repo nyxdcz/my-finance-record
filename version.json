@@ -1,5 +1,5 @@
 {
-  "version": "15.2.16",
+  "version": "15.2.17",
   "schemaVersion": 12,
   "cloudSchemaVersion": 3,
   "ledgerVersion": 1,
@@ -10,8 +10,8 @@
   "profileArchitectureVersion": 1,
   "encryptionVersion": 1,
   "authSecurityVersion": 1,
-  "cacheVersion": "finance-v15-20260821-production-audit-r52",
+  "cacheVersion": "finance-v15-20260821-runtime-stable-audit-r53",
   "released": "2026-08-21",
-  "name": "Production Audit Reliability",
-  "notes": "V15.2.16 makes the production UI audit wait for the Finance view to finish rendering, validates the compact named desktop controls instead of counting hidden legacy actions, and measures only visible phone disclosure controls. Finance Schema 12, Cloud Schema V3, finance records, calculations, balances, and the five-minute sync cadence are unchanged."
+  "name": "Runtime-Stable UI Audit",
+  "notes": "V15.2.17 makes responsive Finance verification wait for the current service-worker controller, network completion, authenticated privacy state, and the visible Budget & Expenses workspace before measuring layout. Finance Schema 12, Cloud Schema V3, finance records, calculations, balances, and the five-minute sync cadence are unchanged."
 }

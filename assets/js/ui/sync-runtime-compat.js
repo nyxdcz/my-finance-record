@@ -1,6 +1,6 @@
 (function applyV15ReleaseLayer() {
-  const VERSION = "15.2.16";
-  const RELEASE_NAME = "Production Audit Reliability";
+  const VERSION = "15.2.17";
+  const RELEASE_NAME = "Runtime-Stable UI Audit";
   const RELEASE_DATE = "August 21, 2026";
   window.FINANCE_APP_VERSION_OVERRIDE = VERSION;
   window.FINANCE_RELEASE_OVERRIDE = { version:VERSION, name:RELEASE_NAME, released:"2026-08-21" };

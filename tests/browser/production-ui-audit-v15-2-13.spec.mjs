@@ -1,18 +1,37 @@
 import { test, expect } from "@playwright/test";
 
 const APP_URL = "http://127.0.0.1:3000/index.html?page=money";
+const APP_CACHE = "finance-v15-20260821-runtime-stable-audit-r53";
 
 async function openFinance(page, viewport) {
   await page.setViewportSize(viewport);
-  await page.goto(APP_URL, { waitUntil:"domcontentloaded" });
-  await page.waitForFunction(() => Boolean(window.FinancePrivacyLock));
-  await page.evaluate(() => window.FinancePrivacyLock.setAuthenticated(true));
-  await page.waitForFunction(() => {
-    const money = document.querySelector("#money");
-    return money?.classList.contains("active")
-      && money.querySelectorAll(".legend-item, .summary-item").length === 8
-      && money.querySelectorAll(".period-card").length >= 3;
-  });
+  await page.goto(APP_URL, { waitUntil:"networkidle" });
+  await expect.poll(async () => {
+    try { return await page.evaluate(() => navigator.serviceWorker?.controller?.scriptURL || ""); }
+    catch { return ""; }
+  }, { timeout:15000 }).toContain(`cache=${APP_CACHE}`);
+  await page.waitForLoadState("networkidle");
+  await page.waitForTimeout(350);
+  await expect.poll(async () => {
+    try {
+      return await page.evaluate(() => {
+        if (!window.FinancePrivacyLock || typeof window.goToPage !== "function") return null;
+        window.FinancePrivacyLock.setAuthenticated(true);
+        window.goToPage("money", { historyMode:"none", smooth:false });
+        const visible = selector => [...document.querySelectorAll(selector)].filter(node => {
+          const box = node.getBoundingClientRect();
+          const style = getComputedStyle(node);
+          return box.width > 0 && box.height > 0 && style.display !== "none" && style.visibility !== "hidden";
+        });
+        return {
+          auth:document.body.classList.contains("finance-signed-in"),
+          page:document.querySelector("#money")?.classList.contains("active") || false,
+          summaries:visible("#money .legend-item, #money .summary-item").length,
+          periods:visible("#money .period-card").length
+        };
+      });
+    } catch { return null; }
+  }, { timeout:15000 }).toEqual({ auth:true, page:true, summaries:8, periods:3 });
 }
 
 for (const width of [1024, 1280, 1366, 1440, 1920]) {
