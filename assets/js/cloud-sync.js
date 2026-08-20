@@ -37,8 +37,16 @@
   ]);
 
   let client = null;
+  let clientPromise = null;
   let session = null;
   let cloudUser = null;
+  let signedInInitialization = null;
+  let signedInInitializationScope = "";
+  let signedInReadyUserId = "";
+  let profileSetupPromise = null;
+  let profileSetupScope = "";
+  let profileSetupState = "idle";
+  let profileSetupDetail = "";
   let realtimeChannel = null;
   let syncTimer = null;
   let retryTimer = null;
@@ -76,7 +84,7 @@
   let baseRecords = normalizeRecordStore(loadJson(BASE_KEY, {}));
   let pending = normalizeQueue(loadJson(QUEUE_KEY, {}));
   let conflicts = normalizeConflicts(loadJson(CONFLICT_KEY, []));
-  const lifecycle = window.FinanceCloudSyncLifecycle?.create?.({canPoll:()=>Boolean(cloudUser&&state.autoSync!==false&&navigator.onLine&&!document.hidden),canRetry:()=>Boolean(cloudUser&&state.autoSync!==false),pull:reason=>syncNow({reason}),reconnect:()=>setupRealtime()});
+  const lifecycle = window.FinanceCloudSyncLifecycle?.create?.({canPoll:()=>Boolean(cloudReadiness().ready&&state.autoSync!==false&&navigator.onLine&&!document.hidden),canRetry:()=>Boolean(cloudReadiness().ready&&state.autoSync!==false),pull:reason=>syncNow({reason}),reconnect:()=>setupRealtime()});
   if(!lifecycle)throw new Error("Cloud Sync lifecycle support is unavailable. Reload the latest app version."); const {clearForegroundPoll,scheduleForegroundPoll,clearRealtimeRetry,scheduleRealtimeRecovery,noteRealtimeSubscribed}=lifecycle;
   function appVersion() {
     return window.FINANCE_APP_VERSION_OVERRIDE || (typeof APP_VERSION !== "undefined" ? APP_VERSION : APP_VERSION_FALLBACK);
@@ -515,6 +523,20 @@
   function pendingCount() { return Object.keys(pending).length; }
   function conflictCount() { return conflicts.filter(item => !item.resolved).length; }
 
+  function cloudReadiness() {
+    if (!configStatus().ok) return { key:"cloud-off", label:"Cloud off", detail:"Cloud sync is not configured on this device.", ready:false };
+    if (!cloudUser) return { key:"signed-out", label:"Sign in", detail:"Sign in to connect encrypted Cloud Sync.", ready:false };
+    if (profileSetupState === "checking") return { key:"connecting", label:"Connecting…", detail:"Checking the encrypted cloud profile for this account.", ready:false };
+    if (profileSetupState === "profile-error") return { key:"profile-error", label:"Profile issue", detail:profileSetupDetail || "The cloud profile could not be checked. Open Profile & Security to try again.", ready:false };
+    if (!cloudProfileId()) {
+      if (profileSetupState === "profile-locked") return { key:"profile-locked", label:"Unlock profile", detail:profileSetupDetail || "An existing encrypted cloud profile was found. Unlock it in Profile & Security to continue.", ready:false };
+      return { key:"profile-required", label:"Set up profile", detail:"Create or join an encrypted cloud profile in Profile & Security to continue.", ready:false };
+    }
+    if (!PROFILE_ARCH()?.isCloudUnlocked?.()) return { key:"profile-locked", label:"Unlock profile", detail:"Unlock this profile’s passphrase in Profile & Security before synchronizing.", ready:false };
+    if (state.initializedUserId !== initializedScope()) return { key:"connecting", label:"Connecting…", detail:"Preparing this device to use the current encrypted cloud profile.", ready:false };
+    return { key:"ready", label:"Ready", detail:"This device is connected to the current encrypted cloud profile.", ready:true };
+  }
+
   function recoverStoredConflicts() {
     let recovered = 0;
     conflicts.filter(item => !item.resolved).forEach(conflict => {
@@ -557,7 +579,10 @@
     if (!configStatus().ok) return "Cloud off";
     if (!navigator.onLine) return pendingCount() ? `${pendingCount()} pending` : "Offline";
     if (syncing) return "Syncing…";
+    if (passwordRecoveryActive || passwordRecoveryRouteActive) return "Reset password";
     if (!cloudUser) return "Sign in";
+    const readiness = cloudReadiness();
+    if (!readiness.ready) return readiness.label;
     if (conflictCount()) return "Sync issue";
     if (pendingCount()) return "Needs sync";
     if (state.lastError) return "Sync issue";
@@ -574,7 +599,7 @@
   }
 
   function updateTopSyncUi(detail = "") {
-    const top=document.getElementById("cloudSyncStatusButton"), label=topStatusLabel();
+    const top=document.getElementById("cloudSyncStatusButton"), label=topStatusLabel(), readiness=cloudReadiness();
     if (top) {
       top.dataset.syncState=topSyncStateKey(label);
       const text=top.querySelector(".cloud-sync-label") || top.querySelector("span:last-child");
@@ -589,15 +614,19 @@
     if (!activeDetail) {
       if (conflictsNow > 0) activeDetail = `${conflictsNow} record conflict${conflictsNow === 1 ? "" : "s"} preserved for review. Neither version will be silently discarded.`;
       else if (pendingErrors > 0) activeDetail = `${pendingErrors} pending record change${pendingErrors === 1 ? "" : "s"} failed to sync.`;
+      else if (!readiness.ready && cloudUser && !passwordRecoveryActive && !passwordRecoveryRouteActive) activeDetail = readiness.detail;
       else if (state.lastError) activeDetail = "Cloud Sync could not finish. Your local changes are safe. Check your connection, then try Sync now or review the issue.";
       else activeDetail = state.status || (label === "Synced" ? "This device matches the latest cloud state." : label === "Cloud off" ? "Cloud sync is not configured on this device." : "Cloud is checked before this device can upload changes.");
     }
     if (detailNode) detailNode.textContent=activeDetail;
     const technicalDetails=document.getElementById("cloudToolbarTechnicalDetails"),technicalError=document.getElementById("cloudToolbarTechnicalError"); if(technicalDetails){technicalDetails.hidden=!state.lastError;if(technicalError)technicalError.textContent=state.lastError||"";}
     if (lastNode) lastNode.textContent=formatDateTime(state.lastSyncAt);
-    if (syncButton) syncButton.disabled=syncing || !cloudUser || !navigator.onLine || !configStatus().ok;
+    if (syncButton) syncButton.disabled=syncing || !navigator.onLine || !readiness.ready;
     if (fixButton) {
-      if (conflictsNow > 0 || pendingErrors > 0 || label === "Sync issue" || Boolean(state.lastError)) {
+      if (!readiness.ready && cloudUser && !passwordRecoveryActive && !passwordRecoveryRouteActive) {
+        fixButton.hidden = false;
+        fixButton.textContent = readiness.key === "profile-locked" ? "Unlock profile" : readiness.key === "profile-required" ? "Set up profile" : "Review profile";
+      } else if (conflictsNow > 0 || pendingErrors > 0 || label === "Sync issue" || Boolean(state.lastError)) {
         fixButton.hidden = false;
         fixButton.textContent = conflictsNow > 0 ? "Review conflicts" : pendingErrors > 0 ? `Fix ${pendingErrors} sync issue${pendingErrors === 1 ? "" : "s"}` : "Review & fix issue";
       } else fixButton.hidden = true;
@@ -606,6 +635,11 @@
 
   function closeTopSyncPopover() { const pop=document.getElementById("cloudSyncToolbarPopover"), button=document.getElementById("cloudSyncStatusButton"); if(pop)pop.hidden=true; if(button)button.setAttribute("aria-expanded","false"); }
   function toggleTopSyncPopover() { const pop=document.getElementById("cloudSyncToolbarPopover"), button=document.getElementById("cloudSyncStatusButton"); if(!pop||!button)return; const opening=pop.hidden; pop.hidden=!opening; button.setAttribute("aria-expanded",String(opening)); updateTopSyncUi(); if(opening && typeof positionCloudToolbarPopover === "function") requestAnimationFrame(positionCloudToolbarPopover); }
+  function openCloudRecoveryTarget() {
+    closeTopSyncPopover();
+    if (typeof goToPage === "function") goToPage("settings", { smooth:false });
+    if (typeof activateSettingsPanel === "function") activateSettingsPanel(cloudReadiness().ready ? "sync" : "profiles", true);
+  }
 
   function setStatus(status, detail = "", tone = "info") {
     state.status = status;
@@ -637,7 +671,8 @@
   function renderCloudStats() {
     injectV2Ui();
     const configured = configStatus().ok;
-    const ready = Boolean(cloudUser && state.initializedUserId === initializedScope());
+    const readiness = cloudReadiness();
+    const ready = readiness.ready;
     const disconnected = document.getElementById("cloudDisconnectedSection");
     const connected = document.getElementById("cloudConnectedSection");
     const recovery = document.getElementById("cloudPasswordRecoveryCard");
@@ -648,11 +683,14 @@
     if (disconnected) disconnected.hidden = recoveryUiActive || !configured || Boolean(cloudUser);
     if (connected) connected.hidden = recoveryUiActive || !configured || !ready;
     const configChip = document.getElementById("cloudConfigStatusChip"); if (configChip) { configChip.textContent = configured ? "Configured" : "Setup required"; configChip.className = `v12-chip ${configured ? "success" : "warning"}`; }
+    const overviewStatusChip = document.getElementById("cloudStatusChip"), overviewStatusDetail = document.getElementById("cloudStatusDetail");
+    if (cloudUser && !ready && !recoveryUiActive) { if (overviewStatusChip) { overviewStatusChip.textContent = readiness.label; overviewStatusChip.className = "v12-chip warning"; } if (overviewStatusDetail) overviewStatusDetail.textContent = readiness.detail; }
+    const connectionChip = document.getElementById("cloudConnectionChip"); if (connectionChip) { connectionChip.textContent = ready ? "Connected" : readiness.label; connectionChip.className = `v12-chip ${ready ? "success" : "warning"}`; }
     const user = document.getElementById("cloudUserEmail"); if (user) user.textContent = cloudUser?.email || "—";
     const pendingNode = document.getElementById("cloudPendingCount"); if (pendingNode) pendingNode.textContent = String(pendingCount());
     const pendingLabel = pendingNode?.parentElement?.querySelector("span"); if (pendingLabel) pendingLabel.textContent = "Queued device changes";
     const overviewHelp = document.querySelector(".cloud-sync-overview-card .v12-help");
-    if (overviewHelp) overviewHelp.textContent = cloudUser ? "Cloud revisions are checked before upload. Device edits stay pending until safely merged or explicitly resolved. Keep a downloaded backup for recovery." : "Connect Cloud Sync to keep encrypted finance records coordinated across your devices.";
+    if (overviewHelp) overviewHelp.textContent = cloudUser && !ready ? readiness.detail : cloudUser ? "Cloud revisions are checked before upload. Device edits stay pending until safely merged or explicitly resolved. Keep a downloaded backup for recovery." : "Connect Cloud Sync to keep encrypted finance records coordinated across your devices.";
     const lastSync = document.getElementById("cloudLastSync"); if (lastSync) lastSync.textContent = formatDateTime(state.lastSyncAt);
     const device = document.getElementById("cloudCurrentDevice"); if (device) device.textContent = currentDeviceName();
     const deviceInput = document.getElementById("cloudDeviceName"); if (deviceInput && document.activeElement !== deviceInput) deviceInput.value = currentDeviceName();
@@ -666,10 +704,11 @@
     const overviewFix = document.getElementById("cloudOverviewFixButton");
     const overviewSync = document.getElementById("cloudOverviewSyncNow");
     if (overviewFix) {
-      if (conflictsNow > 0 || pendingErrors > 0 || state.lastError) { overviewFix.hidden = false; overviewFix.textContent = conflictsNow > 0 ? "Review conflicts" : pendingErrors > 0 ? `Fix ${pendingErrors} sync issue${pendingErrors === 1 ? "" : "s"}` : "Review & fix issue"; }
+      if (!ready && cloudUser && !recoveryUiActive) { overviewFix.hidden = false; overviewFix.textContent = readiness.key === "profile-locked" ? "Unlock profile" : readiness.key === "profile-required" ? "Set up profile" : "Review profile"; }
+      else if (conflictsNow > 0 || pendingErrors > 0 || state.lastError) { overviewFix.hidden = false; overviewFix.textContent = conflictsNow > 0 ? "Review conflicts" : pendingErrors > 0 ? `Fix ${pendingErrors} sync issue${pendingErrors === 1 ? "" : "s"}` : "Review & fix issue"; }
       else overviewFix.hidden = true;
     }
-    if (overviewSync) overviewSync.disabled = syncing || !cloudUser || !navigator.onLine || !configStatus().ok;
+    if (overviewSync) overviewSync.disabled = syncing || !navigator.onLine || !ready;
     renderSyncHealth(); renderConflicts();
   }
 
@@ -695,18 +734,24 @@
   function versionFromCode(code) { const value = Number(code || 0); if (!value) return "Unknown"; const major = Math.floor(value / 10000); const minor = Math.floor((value % 10000) / 10); const patch = value % 10; return `V${major}.${minor}.${patch}`; }
   function escape(value) { if (typeof escapeHtml === "function") return escapeHtml(value); return String(value ?? "").replace(/[&<>"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[char]); }
   function scheduleSync(delay = SYNC_DELAY) { clearTimeout(syncTimer); syncTimer = setTimeout(() => syncNow({ reason:"automatic" }).catch(() => {}), delay); }
-  function requestLifecycleSync(reason) { if(!cloudUser||state.autoSync===false||!navigator.onLine||document.hidden)return; scheduleSync(); scheduleForegroundPoll(); }
+  function requestLifecycleSync(reason) { if(!cloudReadiness().ready||state.autoSync===false||!navigator.onLine||document.hidden)return; scheduleSync(); scheduleForegroundPoll(); }
   function scheduleRetry() { clearTimeout(retryTimer); const times = Object.values(pending).filter(item => item.status === "error" && item.nextAttemptAt > Date.now()).map(item => item.nextAttemptAt); if (!times.length || state.autoSync === false) return; const delay = Math.max(250, Math.min(...times) - Date.now()); retryTimer = setTimeout(() => syncNow({ reason:"retry" }).catch(() => {}), delay); }
   function retryDelay(attempts) { const exponential = Math.min(RETRY_MAX_MS, RETRY_BASE_MS * (2 ** Math.min(Number(attempts || 0), 8))); return Math.min(RETRY_MAX_MS, exponential + Math.floor(Math.random() * Math.min(1500, exponential * .2))); }
   function setPrivacyAuthentication(authenticated, detail = {}) { try { window.FinancePrivacyLock?.setAuthenticated?.(Boolean(authenticated), { email:String(detail.email || cloudUser?.email || "") }); } catch (error) {} }
 
   async function loadClient() {
     if (client) return client;
-    const config = getStoredConfig(); const status = configStatus(config); if (!status.ok) throw new Error(status.message); if (typeof window.financeLoadSupabase !== "function") throw new Error("Supabase loader is missing.");
-    const library = await window.financeLoadSupabase(); const createClient = library?.createClient || library?.default?.createClient || window.supabase?.createClient; if (typeof createClient !== "function") throw new Error("Supabase client could not be loaded.");
-    client = createClient(config.supabaseUrl, config.supabasePublishableKey, { auth:{ persistSession:true, autoRefreshToken:true, detectSessionInUrl:true, experimental:{ passkey:true } }, realtime:{ params:{ eventsPerSecond:8 } }, global:{ headers:{ "x-client-info":`my-finance-records/${appVersion()}` } } });
-    client.auth.onAuthStateChange((event,nextSession) => { session = nextSession || null; cloudUser = nextSession?.user || null; if (event === "PASSWORD_RECOVERY") { setPrivacyAuthentication(false, { email:nextSession?.user?.email || "" }); passwordRecoveryRouteActive = true; passwordRecoveryError = null; passwordRecoveryActive = true; cleanPasswordRecoveryUrl({ keepRoute:true }); focusPasswordRecoverySettings(); renderCloudStats(); setAuthMessage("Choose a new password to finish account recovery.", "warning", "recovery"); setStatus("Reset password", "Choose a new password before continuing cloud sync.", "warning"); return; } if (cloudUser) onSignedIn().catch(error => setStatus("Sync needs attention", friendlyAuthError(error,"sync"), "danger")); else onSignedOut(); });
-    return client;
+    if (clientPromise) return clientPromise;
+    clientPromise = (async () => {
+      const config = getStoredConfig(); const status = configStatus(config); if (!status.ok) throw new Error(status.message); if (typeof window.financeLoadSupabase !== "function") throw new Error("Supabase loader is missing.");
+      const library = await window.financeLoadSupabase(); const createClient = library?.createClient || library?.default?.createClient || window.supabase?.createClient; if (typeof createClient !== "function") throw new Error("Supabase client could not be loaded.");
+      const nextClient = createClient(config.supabaseUrl, config.supabasePublishableKey, { auth:{ persistSession:true, autoRefreshToken:true, detectSessionInUrl:true, experimental:{ passkey:true } }, realtime:{ params:{ eventsPerSecond:8 } }, global:{ headers:{ "x-client-info":`my-finance-records/${appVersion()}` } } });
+      nextClient.auth.onAuthStateChange((event,nextSession) => { session = nextSession || null; cloudUser = nextSession?.user || null; if (event === "PASSWORD_RECOVERY") { setPrivacyAuthentication(false, { email:nextSession?.user?.email || "" }); passwordRecoveryRouteActive = true; passwordRecoveryError = null; passwordRecoveryActive = true; cleanPasswordRecoveryUrl({ keepRoute:true }); focusPasswordRecoverySettings(); renderCloudStats(); setAuthMessage("Choose a new password to finish account recovery.", "warning", "recovery"); setStatus("Reset password", "Choose a new password before continuing cloud sync.", "warning"); return; } if (cloudUser) ensureSignedInReady().catch(error => setStatus("Sync needs attention", friendlyAuthError(error,"sync"), "danger")); else onSignedOut(); });
+      client = nextClient;
+      return client;
+    })();
+    try { return await clientPromise; }
+    catch (error) { clientPromise = null; throw error; }
   }
   async function rpc(name,args = {}) { const sdk = await loadClient(); const result = await sdk.rpc(name,args); if (result.error) { const message = result.error.message || String(result.error); if (/finance_v3_|schema cache|could not find the function/i.test(message)) throw new Error("Cloud Schema V3 is not installed. Run supabase/cloud-profiles-v13.sql in the Supabase SQL Editor."); throw result.error; } return result.data || {}; }
   function friendlyAuthError(error, context = "sign-in") { const message = String(error?.message || error || "").trim(); if (/invalid login credentials|invalid credentials|email or password/i.test(message)) return "Wrong email or password. If you have not created a cloud account with this email yet, click 'Create account' first."; if (/email not confirmed|confirm.*email/i.test(message)) return "Your email is not confirmed yet. Open the confirmation email sent to your inbox, click the confirmation link, then sign in again."; if (/user already registered|already been registered|already exists/i.test(message)) return "An account with this email already exists. Click 'Sign in' or use 'Forgot password?'."; if (/password.*(?:short|weak|least)|should be at least/i.test(message)) return "Use a stronger password with at least 6 characters."; if (/rate limit|too many requests/i.test(message)) return "Too many authentication attempts. Wait a moment, then try again."; if (/failed to fetch|network|load failed|networkerror|timeout|timed out/i.test(message)) return "Could not reach the cloud service. Check your internet connection and cloud configuration."; if (/redirect.*not.*allow|redirect.*not.*permitted|redirect_to/i.test(message)) return "Password-reset redirect is not allowed by the cloud project. Add this app URL to Supabase Auth redirect URLs."; if (/session.*missing|auth session missing/i.test(message)) return "The password-reset session has expired. Request a new password reset email."; if (context === "reset-request" && !message) return "Could not request a password reset email."; return message || (context === "sign-in" ? "Could not sign in. Check your email, password, and internet connection." : "The cloud request could not be completed."); }
@@ -725,26 +770,91 @@
   async function testCloudConnection() { const config = getStoredConfig(); const status = configStatus(config); if (!status.ok) throw new Error(status.message); const controller = typeof AbortController !== "undefined" ? new AbortController() : null; const timer = controller ? setTimeout(() => controller.abort(), 8000) : null; try { const endpoint = `${String(config.supabaseUrl).replace(/\/$/,"")}/auth/v1/health`; const response = await fetch(endpoint, { method:"GET", cache:"no-store", headers:{ apikey:config.supabasePublishableKey }, signal:controller?.signal }); if (!response.ok) throw new Error(`Cloud service responded with HTTP ${response.status}.`); return { ok:true, status:response.status, endpoint }; } finally { if (timer) clearTimeout(timer); } }
   async function requestPasswordReset(email) { const value = String(email || "").trim(); if (!value || !/^\S+@\S+\.\S+$/.test(value)) throw new Error("Enter the email address used for your cloud account."); const sdk = await loadClient(); const redirectTo = passwordRecoveryRedirect(); if (!redirectTo) throw new Error("Open the hosted HTTPS app to reset a cloud password. Local file copies cannot receive the secure reset link."); const result = await sdk.auth.resetPasswordForEmail(value, { redirectTo }); if (result.error) throw result.error; return true; }
   async function completePasswordReset(password, confirmPassword) { const next = String(password || ""); if (next.length < 6) throw new Error("Use a password with at least 6 characters."); if (next !== String(confirmPassword || "")) throw new Error("The new passwords do not match."); const sdk = await loadClient(); const result = await sdk.auth.updateUser({ password:next }); if (result.error) throw result.error; passwordRecoveryActive = false; passwordRecoveryRouteActive = false; passwordRecoveryError = null; cleanPasswordRecoveryUrl({ keepRoute:false }); session = result.data?.session || session; cloudUser = result.data?.user || session?.user || cloudUser; return result.data?.user || cloudUser; }
-  async function restoreSession() { if (!configStatus().ok) return; try { const sdk = await loadClient(); const result = await sdk.auth.getSession(); if (result.error) throw result.error; session = result.data?.session || null; cloudUser = session?.user || null; if (cloudUser) await onSignedIn(); else onSignedOut(); } catch (error) { setStatus("Cloud sync unavailable", error.message || "Could not load cloud sync.", "danger"); } }
-  async function signIn(email,password) { const normalizedEmail = String(email || "").trim().toLowerCase(); const sdk = await loadClient(); setStatus("Signing in", "Checking your cloud account…", "info"); setAuthMessage("Checking your email and password…", "info"); const result = await sdk.auth.signInWithPassword({ email: normalizedEmail, password }); if (result.error) throw result.error; session = result.data?.session || null; cloudUser = result.data?.user || session?.user || null; setCloudConnectionStatus("Cloud reached", "success"); setAuthMessage("Signed in successfully. Preparing cloud sync…", "success"); if (typeof showToast === "function") showToast("Signed in successfully!", "success"); if (cloudUser) await onSignedIn(); }
-  async function createAccount(email,password) { const normalizedEmail = String(email || "").trim().toLowerCase(); const sdk = await loadClient(); setStatus("Creating account", "Creating your private cloud account…", "info"); setAuthMessage("Creating your private cloud account…", "info"); const result = await sdk.auth.signUp({ email: normalizedEmail, password }); if (result.error) throw result.error; setCloudConnectionStatus("Cloud reached", "success"); if (!result.data?.session) { setAuthMessage("Account created. Check your email and confirm it, then return here to sign in.", "warning"); if (typeof showToast === "function") showToast("Account created! Check your email to confirm.", "info"); return setStatus("Check your email", "Confirm the sign-up email, then return and sign in.", "warning"); } session = result.data.session; cloudUser = result.data.user; setAuthMessage("Account created and signed in.", "success"); if (typeof showToast === "function") showToast("Account created and signed in!", "success"); await onSignedIn(); }
+  async function restoreSession() { if (!configStatus().ok) return; try { const sdk = await loadClient(); const result = await sdk.auth.getSession(); if (result.error) throw result.error; session = result.data?.session || null; cloudUser = session?.user || null; if (cloudUser) await ensureSignedInReady(); else onSignedOut(); } catch (error) { setStatus("Cloud sync unavailable", error.message || "Could not load cloud sync.", "danger"); } }
+  async function signIn(email,password) { const normalizedEmail = String(email || "").trim().toLowerCase(); const sdk = await loadClient(); setStatus("Signing in", "Checking your cloud account…", "info"); setAuthMessage("Checking your email and password…", "info"); const result = await sdk.auth.signInWithPassword({ email: normalizedEmail, password }); if (result.error) throw result.error; session = result.data?.session || null; cloudUser = result.data?.user || session?.user || null; setCloudConnectionStatus("Cloud reached", "success"); setAuthMessage("Signed in successfully. Preparing cloud sync…", "success"); if (typeof showToast === "function") showToast("Signed in successfully!", "success"); if (cloudUser) await ensureSignedInReady(); }
+  async function createAccount(email,password) { const normalizedEmail = String(email || "").trim().toLowerCase(); const sdk = await loadClient(); setStatus("Creating account", "Creating your private cloud account…", "info"); setAuthMessage("Creating your private cloud account…", "info"); const result = await sdk.auth.signUp({ email: normalizedEmail, password }); if (result.error) throw result.error; setCloudConnectionStatus("Cloud reached", "success"); if (!result.data?.session) { setAuthMessage("Account created. Check your email and confirm it, then return here to sign in.", "warning"); if (typeof showToast === "function") showToast("Account created! Check your email to confirm.", "info"); return setStatus("Check your email", "Confirm the sign-up email, then return and sign in.", "warning"); } session = result.data.session; cloudUser = result.data.user; setAuthMessage("Account created and signed in.", "success"); if (typeof showToast === "function") showToast("Account created and signed in!", "success"); await ensureSignedInReady(); }
   async function signOut() { if (client) { const result = await client.auth.signOut({ scope:"local" }); if (result?.error) throw result.error; } onSignedOut(); }
-  function onSignedOut() { session = null; cloudUser = null; setPrivacyAuthentication(false); passwordRecoveryActive = false; clearForegroundPoll(); clearRealtimeRetry({resetAttempts:true}); if (realtimeChannel && client) client.removeChannel(realtimeChannel).catch(() => {}); realtimeChannel = null; setStatus("Not connected", "Local finance records remain on this device until Cloud Sync is connected again.", "info"); }
+  function onSignedOut() { session = null; cloudUser = null; signedInInitialization = null; signedInInitializationScope = ""; signedInReadyUserId = ""; profileSetupPromise = null; profileSetupScope = ""; profileSetupState = "idle"; profileSetupDetail = ""; setPrivacyAuthentication(false); passwordRecoveryActive = false; clearForegroundPoll(); clearRealtimeRetry({resetAttempts:true}); if (realtimeChannel && client) client.removeChannel(realtimeChannel).catch(() => {}); realtimeChannel = null; setStatus("Not connected", "Local finance records remain on this device until Cloud Sync is connected again.", "info"); }
 
   async function registerDevice() { const profileId = requireCloudProfile(); const result = await rpc("finance_v3_register_device", { p_profile_id:profileId, p_device_id:currentDeviceId(), p_device_name:currentDeviceName(), p_platform:navigator.userAgent || navigator.platform || "Browser", p_app_version:appVersion(), p_app_version_code:APP_VERSION_CODE, p_last_pull_audit_id:Number(state.lastAuditId || 0) }); if (result.status === "revoked") { await handleRevoked(result); return false; } state.profileRole = result.role || profileRole(); return true; }
   async function handleRevoked(result = {}) { state.enabled = false; state.lastError = "This device was signed out remotely."; persist(); try { await client?.auth?.signOut?.({ scope:"local" }); } catch (error) {} session = null; cloudUser = null; setPrivacyAuthentication(false); setStatus("Signed out remotely", `This installation was revoked${result.revoked_at ? ` on ${formatDateTime(result.revoked_at)}` : ""}. Local records remain available.`, "danger"); }
   async function getProfileArchWithRetry(maxWaitMs = 2000) { const start = Date.now(); while (Date.now() - start < maxWaitMs) { const arch = PROFILE_ARCH(); if (arch && typeof arch.listCloudProfiles === "function") return arch; await new Promise(res => setTimeout(res, 50)); } return PROFILE_ARCH(); }
   async function autoEnsureCloudProfile() {
-    if (!cloudUser) return false; const arch = await getProfileArchWithRetry(); if (!arch || typeof arch.cloudProfileId !== "function") return false; const accountPassphrase = `${cloudUser.id}:my-finance-v13:${(cloudUser.email || "").toLowerCase()}`;
-    if (arch.cloudProfileId()) { if (!arch.isCloudUnlocked?.()) { try { await arch.unlockProfile(accountPassphrase, true); } catch (err) { console.warn("Account passphrase unlock failed", err); } } return Boolean(arch.cloudProfileId() && arch.isCloudUnlocked?.()); }
-    try { const listRes = await arch.listCloudProfiles(); const profiles = listRes?.profiles || []; if (profiles.length > 0) { const target = profiles[0]; try { await arch.connectCloudProfile(target.profile_id, accountPassphrase, true, { auto: true }); return true; } catch (err) { console.warn("Auto connect profile failed", err); } } } catch (err) { console.warn("Listing cloud profiles failed", err); }
-    try { const active = arch.activeProfile?.() || {}; if (!active.encryption?.enabled) await arch.configureEncryption(accountPassphrase); else if (!arch.isCloudUnlocked?.()) { try { await arch.unlockProfile(accountPassphrase, true); } catch (err) {} } await arch.createCloudProfile({ name: active.name || "My Cloud Finances", type: active.type || "personal", passphrase: accountPassphrase }, { auto: true }); return true; } catch (err) { console.error("Auto creation of cloud profile failed", err); return false; }
+    if (!cloudUser) return false;
+    const userId = String(cloudUser.id || "");
+    if (profileSetupPromise && profileSetupScope === userId) return profileSetupPromise;
+    profileSetupScope = userId;
+    profileSetupState = "checking";
+    profileSetupDetail = "";
+    profileSetupPromise = (async () => {
+      const arch = await getProfileArchWithRetry();
+      if (!arch || typeof arch.cloudProfileId !== "function") {
+        profileSetupState = "profile-error";
+        profileSetupDetail = "Profile & Security is unavailable. Reload the app and try again.";
+        return false;
+      }
+      const accountPassphrase = `${cloudUser.id}:my-finance-v13:${(cloudUser.email || "").toLowerCase()}`;
+      if (arch.cloudProfileId()) {
+        if (!arch.isCloudUnlocked?.()) {
+          try { await arch.unlockProfile(accountPassphrase, true); }
+          catch (error) {
+            profileSetupState = "profile-locked";
+            profileSetupDetail = "This encrypted cloud profile uses a different passphrase. Unlock it in Profile & Security to continue.";
+            return false;
+          }
+        }
+        profileSetupState = arch.isCloudUnlocked?.() ? "ready" : "profile-locked";
+        return profileSetupState === "ready";
+      }
+      let profiles;
+      try { profiles = (await arch.listCloudProfiles())?.profiles || []; }
+      catch (error) {
+        profileSetupState = "profile-error";
+        profileSetupDetail = "Existing cloud profiles could not be checked. Try again from Profile & Security.";
+        return false;
+      }
+      if (profiles.length > 0) {
+        try { await arch.connectCloudProfile(profiles[0].profile_id, accountPassphrase, true, { auto:true }); profileSetupState = "ready"; return true; }
+        catch (error) {
+          profileSetupState = "profile-locked";
+          profileSetupDetail = "An existing encrypted cloud profile was found, but its passphrase is required. Unlock it in Profile & Security; no duplicate profile was created.";
+          return false;
+        }
+      }
+      try {
+        const active = arch.activeProfile?.() || {};
+        if (!active.encryption?.enabled) await arch.configureEncryption(accountPassphrase);
+        else if (!arch.isCloudUnlocked?.()) await arch.unlockProfile(accountPassphrase, true);
+        await arch.createCloudProfile({ name:active.name || "My Cloud Finances", type:active.type || "personal", passphrase:accountPassphrase }, { auto:true });
+        profileSetupState = "ready";
+        return true;
+      } catch (error) {
+        profileSetupState = "profile-error";
+        profileSetupDetail = error?.message || "The encrypted cloud profile could not be created.";
+        return false;
+      }
+    })();
+    try { return await profileSetupPromise; }
+    finally { if (profileSetupScope === userId) profileSetupPromise = null; }
+  }
+
+  function ensureSignedInReady({ force = false } = {}) {
+    const userId = String(cloudUser?.id || "");
+    if (!userId) return Promise.resolve();
+    if (!force && signedInReadyUserId === userId) return Promise.resolve();
+    if (signedInInitialization && signedInInitializationScope === userId) return signedInInitialization;
+    signedInInitializationScope = userId;
+    signedInInitialization = onSignedIn().then(result => { if (cloudUser?.id === userId) signedInReadyUserId = userId; return result; });
+    return signedInInitialization.finally(() => {
+      if (signedInInitializationScope === userId) { signedInInitialization = null; signedInInitializationScope = ""; }
+    });
   }
 
   async function onSignedIn() {
     if (!cloudUser) return; setPrivacyAuthentication(true, { email:cloudUser.email || "" }); state.enabled = true; state.currentDeviceId = currentDeviceId(); state.currentDeviceName = currentDeviceName(); await autoEnsureCloudProfile();
-    if (!cloudProfileId()) { persist(); setStatus("Cloud profile required", "Open Profiles & Security to create or join an encrypted Cloud Schema V3 profile.", "warning"); renderCloudStats(); return; }
-    if (!PROFILE_ARCH()?.isCloudUnlocked?.()) { persist(); setStatus("Encryption locked", "Unlock this profile’s passphrase in Profiles & Security before synchronizing.", "warning"); renderCloudStats(); return; }
+    const readiness = cloudReadiness();
+    if (!cloudProfileId()) { state.lastError = ""; persist(); setStatus(readiness.key === "profile-locked" ? "Profile unlock required" : readiness.key === "profile-error" ? "Cloud profile unavailable" : "Cloud profile required", readiness.detail, "warning"); renderCloudStats(); return; }
+    if (!PROFILE_ARCH()?.isCloudUnlocked?.()) { state.lastError = ""; persist(); setStatus("Profile unlock required", readiness.detail, "warning"); renderCloudStats(); return; }
     persist(); if (!await registerDevice()) return; await setupRealtime();
     const first = state.initializedUserId !== initializedScope();
     if (first) {
@@ -1016,7 +1126,7 @@
 
   async function syncNow({ reason="manual" } = {}) {
     if (syncing) return; if (!cloudUser) { renderCloudStats(); return; }
-    if (state.initializedUserId !== initializedScope()) { setStatus("Initializing sync", "Setting up encrypted cloud synchronization...", "info"); await onSignedIn(); if (state.initializedUserId !== initializedScope()) { renderCloudStats(); return; } }
+    if (state.initializedUserId !== initializedScope()) { setStatus("Initializing sync", "Setting up encrypted cloud synchronization...", "info"); await ensureSignedInReady({force:true}); if (state.initializedUserId !== initializedScope()) { renderCloudStats(); return; } }
     if (!navigator.onLine) { setStatus("Offline", `${pendingCount()} device change${pendingCount()===1?"":"s"} waiting for cloud.`, "info"); return; }
     requireCloudProfile(); syncing=true; setStatus("Syncing", `Reading current cloud revisions first (${reason})…`, "info");
     try {
@@ -1085,9 +1195,9 @@
     document.getElementById("cloudToolbarClose")?.addEventListener("click",closeTopSyncPopover);
     document.getElementById("cloudToolbarSyncNow")?.addEventListener("click",()=>syncNow({reason:"toolbar"}).catch(error=>showToast(error.message,"warning")));
     document.getElementById("cloudToolbarOpenSettings")?.addEventListener("click",()=>{closeTopSyncPopover();goToPage("settings",{smooth:false});activateSettingsPanel("cloud",true);});
-    document.getElementById("cloudToolbarFixIssue")?.addEventListener("click",()=>{closeTopSyncPopover();syncNow({reason:"fix-cloud-authority"}).catch(error=>showToast(error.message,"warning"));});
+    document.getElementById("cloudToolbarFixIssue")?.addEventListener("click",()=>{if(!cloudReadiness().ready)return openCloudRecoveryTarget();closeTopSyncPopover();syncNow({reason:"fix-cloud-authority"}).catch(error=>showToast(error.message,"warning"));});
     document.getElementById("cloudOverviewSyncNow")?.addEventListener("click", () => syncNow({reason:"overview"}).catch(error => showToast(error.message, "warning")));
-    document.getElementById("cloudOverviewFixButton")?.addEventListener("click", () => { closeTopSyncPopover(); goToPage("settings",{smooth:false}); activateSettingsPanel("cloud",true); });
+    document.getElementById("cloudOverviewFixButton")?.addEventListener("click", openCloudRecoveryTarget);
     document.getElementById("cloudReplaceFromDevice")?.addEventListener("click",async()=>{if(!confirm("Make this device the current cloud copy? A local recovery point will be saved first. Other connected devices will download this copy before uploading their own changes."))return;try{await replaceCloudWithThisDevice();}catch(error){setStatus("Cloud replacement needs attention",error.message,"danger");showToast(error.message,"warning");}});
     document.addEventListener("click",event=>{if(!event.target.closest("#cloudSyncToolbarPopover")&&!event.target.closest("#cloudSyncStatusButton"))closeTopSyncPopover();});
     window.addEventListener("resize",()=>{if(!document.getElementById("cloudSyncToolbarPopover")?.hidden&&typeof positionCloudToolbarPopover==="function")positionCloudToolbarPopover();});
@@ -1104,7 +1214,7 @@
     document.getElementById("cloudRecoveryResend")?.addEventListener("click",event=>withAuthButtonBusy(event.currentTarget,"Sending…",async()=>{const email=document.getElementById("cloudRecoveryEmail")?.value?.trim()||document.getElementById("cloudAuthEmail")?.value?.trim()||"";try{await requestPasswordReset(email);passwordRecoveryRouteActive=true;passwordRecoveryError=null;setRecoveryHelpMessage("A new reset email was requested. If the account exists, check your inbox and spam folder.","success");setStatus("Password reset sent","Use the newest reset email only.","success");}catch(error){setRecoveryHelpMessage(friendlyAuthError(error,"reset-request"),"danger");}}));
     document.getElementById("cloudVerifyRecoveryCode")?.addEventListener("click",event=>withAuthButtonBusy(event.currentTarget,"Verifying…",async()=>{const email=document.getElementById("cloudRecoveryEmail")?.value?.trim()||"",token=document.getElementById("cloudRecoveryCode")?.value||"";try{await verifyRecoveryCode(email,token);}catch(error){setRecoveryHelpMessage(friendlyAuthError(error,"recovery-code"),"danger");}}));
     document.getElementById("cloudRecoveryBackToSignIn")?.addEventListener("click",()=>{passwordRecoveryRouteActive=false;passwordRecoveryError=null;passwordRecoveryActive=false;cleanPasswordRecoveryUrl({keepRoute:false});renderCloudStats();});
-    document.getElementById("cloudCompletePasswordReset")?.addEventListener("click",event=>withAuthButtonBusy(event.currentTarget,"Saving…",async()=>{const next=document.getElementById("cloudNewPassword")?.value||"",confirmPassword=document.getElementById("cloudConfirmPassword")?.value||"";try{await completePasswordReset(next,confirmPassword);document.getElementById("cloudNewPassword").value="";document.getElementById("cloudConfirmPassword").value="";setAuthMessage("Password updated successfully. Continuing cloud sign-in…","success","recovery");setStatus("Password updated","Your new cloud password is active.","success");renderCloudStats();if(cloudUser)await onSignedIn();}catch(error){const message=friendlyAuthError(error,"password-reset");setAuthMessage(message,"danger","recovery");}}));
+    document.getElementById("cloudCompletePasswordReset")?.addEventListener("click",event=>withAuthButtonBusy(event.currentTarget,"Saving…",async()=>{const next=document.getElementById("cloudNewPassword")?.value||"",confirmPassword=document.getElementById("cloudConfirmPassword")?.value||"";try{await completePasswordReset(next,confirmPassword);document.getElementById("cloudNewPassword").value="";document.getElementById("cloudConfirmPassword").value="";setAuthMessage("Password updated successfully. Continuing cloud sign-in…","success","recovery");setStatus("Password updated","Your new cloud password is active.","success");renderCloudStats();if(cloudUser)await ensureSignedInReady({force:true});}catch(error){const message=friendlyAuthError(error,"password-reset");setAuthMessage(message,"danger","recovery");}}));
     document.getElementById("cloudCancelPasswordReset")?.addEventListener("click",async()=>{passwordRecoveryActive=false;passwordRecoveryRouteActive=false;passwordRecoveryError=null;cleanPasswordRecoveryUrl({keepRoute:false});try{const sdk=await loadClient();await sdk.auth.signOut({scope:"local"});}catch(error){}onSignedOut();renderCloudStats();});
     document.getElementById("cloudSyncNow")?.addEventListener("click",()=>syncNow({reason:"manual"}).catch(error=>showToast(error.message,"warning")));
     document.getElementById("cloudSignOut")?.addEventListener("click",()=>signOut().catch(error=>showToast(error.message,"warning")));
@@ -1122,7 +1232,7 @@
     window.addEventListener("pagehide",clearForegroundPoll); document.addEventListener("visibilitychange",()=>{if(document.hidden)clearForegroundPoll();else if(state.autoSync!==false&&cloudUser){ensureRealtime().catch(()=>scheduleRealtimeRecovery("CHANNEL_ERROR"));requestLifecycleSync("visible",80);}});
     window.addEventListener("storage",event=>{if(event.key===STORAGE_KEY&&!suppressQueue){try{const next=normalizeData(JSON.parse(event.newValue||"{}"));queueDiff(lastObservedData,next,"Another tab changed finance records");lastObservedData=clone(next);}catch(error){}}});
     window.addEventListener("finance:cloud-profile-linked",event=>{if(event?.detail?.auto)return;state={...defaultState()};baseRecords={};pending={};conflicts=[];persist();setStatus("Cloud profile linked","Reloading encrypted Cloud Sync 3.0…","success");setTimeout(()=>location.reload(),400);});
-    window.addEventListener("finance:profile-unlocked",()=>{if(cloudUser)requestLifecycleSync("profile-unlocked",100);});
+    window.addEventListener("finance:profile-unlocked",()=>{if(cloudUser)ensureSignedInReady({force:true}).catch(error=>setStatus("Sync needs attention",friendlyAuthError(error,"sync"),"danger"));});
   }
 
   function handlePendingClick(event) { const retry=event.target.closest("[data-sync-retry]"),discard=event.target.closest("[data-sync-discard]"),review=event.target.closest("[data-sync-review]"); if(review)return openConflictReview(keyFromToken(review.dataset.syncReview)); if(retry)retryRecord(keyFromToken(retry.dataset.syncRetry)); if(discard&&confirm("Replace this device’s pending version with the current cloud-confirmed record?"))discardLocal(keyFromToken(discard.dataset.syncDiscard)); }
@@ -1130,11 +1240,11 @@
   async function initialize() {
     if(initialized)return; initialized=true; setPrivacyAuthentication(false); persist(); injectV2Ui(); wrapSaveData(); bindEvents();
     const recoveryRoute = parsePasswordRecoveryUrl(); if (recoveryRoute.requested) { passwordRecoveryRouteActive = true; passwordRecoveryError = recoveryRoute.error || recoveryRoute.errorCode ? recoveryRoute : null; focusPasswordRecoverySettings(); if (passwordRecoveryError) { cleanPasswordRecoveryUrl({ keepRoute:true }); setStatus("Password reset needs attention", recoveryErrorMessage(passwordRecoveryError), "danger"); } }
-    renderCloudStats(); if (passwordRecoveryError) setRecoveryHelpMessage(recoveryErrorMessage(passwordRecoveryError), "danger"); const status=configStatus(); if(!status.ok){setStatus("Cloud sync not configured",status.message,"warning");return;} await restoreSession(); setInterval(()=>{if(cloudUser&&state.autoSync!==false&&navigator.onLine&&!document.hidden)syncNow({reason:"periodic"}).catch(()=>{});},5*60*1000); scheduleForegroundPoll(); scheduleRetry();
+    renderCloudStats(); if (passwordRecoveryError) setRecoveryHelpMessage(recoveryErrorMessage(passwordRecoveryError), "danger"); const status=configStatus(); if(!status.ok){setStatus("Cloud sync not configured",status.message,"warning");return;} await restoreSession(); setInterval(()=>{if(cloudReadiness().ready&&state.autoSync!==false&&navigator.onLine&&!document.hidden)syncNow({reason:"periodic"}).catch(()=>{});},5*60*1000); scheduleForegroundPoll(); scheduleRetry();
   }
 
-  window.FinanceCloudSync={ initialize,syncNow,replaceCloudWithThisDevice, buildRecordMap:()=>toRecordMap(data), get status(){return{...state,pendingCount:pendingCount(),conflictCount:conflictCount(),signedIn:Boolean(cloudUser),email:cloudUser?.email||""};} };
-  window.FinanceCloudSyncInternals={loadClient,stable,checksum,deepMerge,threeWayMerge,toRecordMap,fromRecordStore,changesBetween,recordKey,keyToken,keyFromToken,retryDelay,detectFinancialOperations,encryptRecordPayload,decryptRecordPayload,toRpcChange,decryptRow,sanitizeRecordPayload,reconcileDerivedSettingsState,reconcileUnqueuedLocalChanges,seedBaseFromSnapshot,applyRemoteEvent,resolveConflict,persist,handlePersistedData,requestLifecycleSync,scheduleForegroundPoll,scheduleRealtimeRecovery,ensureRealtime,friendlyAuthError,passwordRecoveryRedirect,parsePasswordRecoveryUrl,recoveryErrorMessage,cleanPasswordRecoveryUrl,testCloudConnection,requestPasswordReset,verifyRecoveryCode,completePasswordReset,setPasswordVisibility,recoverStoredConflicts,reconcilePendingWithRemote,replaceCloudWithThisDevice};
+  window.FinanceCloudSync={ initialize,syncNow,replaceCloudWithThisDevice, buildRecordMap:()=>toRecordMap(data), get status(){const readiness=cloudReadiness();return{...state,pendingCount:pendingCount(),conflictCount:conflictCount(),signedIn:Boolean(cloudUser),email:cloudUser?.email||"",readiness:readiness.key,ready:readiness.ready};} };
+  window.FinanceCloudSyncInternals={loadClient,ensureSignedInReady,autoEnsureCloudProfile,cloudReadiness,stable,checksum,deepMerge,threeWayMerge,toRecordMap,fromRecordStore,changesBetween,recordKey,keyToken,keyFromToken,retryDelay,detectFinancialOperations,encryptRecordPayload,decryptRecordPayload,toRpcChange,decryptRow,sanitizeRecordPayload,reconcileDerivedSettingsState,reconcileUnqueuedLocalChanges,seedBaseFromSnapshot,applyRemoteEvent,resolveConflict,persist,handlePersistedData,requestLifecycleSync,scheduleForegroundPoll,scheduleRealtimeRecovery,ensureRealtime,friendlyAuthError,passwordRecoveryRedirect,parsePasswordRecoveryUrl,recoveryErrorMessage,cleanPasswordRecoveryUrl,testCloudConnection,requestPasswordReset,verifyRecoveryCode,completePasswordReset,setPasswordVisibility,recoverStoredConflicts,reconcilePendingWithRemote,replaceCloudWithThisDevice};
 
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",()=>initialize().catch(error=>setStatus("Cloud sync unavailable",error.message,"danger")),{once:true});
   else initialize().catch(error=>setStatus("Cloud sync unavailable",error.message,"danger"));

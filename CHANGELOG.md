@@ -1,3 +1,9 @@
+## 15.2.12 · 2026-08-20
+- Single-flighted Supabase client creation and signed-in initialization so session restoration and auth-state events cannot create duplicate clients or repeat cloud startup work.
+- Stopped automatic cloud-profile creation when an existing encrypted profile cannot be unlocked, replacing repeated passphrase/profile console errors with a clear Profile & Security recovery path.
+- Unified header, Settings summary, recovery actions, and sync-control availability behind one authoritative cloud-readiness state.
+- Rotated the PWA shell to `finance-v15-20260820-auth-sync-r48` while preserving Finance Schema 12, Cloud Schema V3, finance calculations, balances, records, and the five-minute sync cadence.
+
 ## 15.2.11 · 2026-08-20
 - Extracted stable shell, privacy, navigation, header-history, Settings-search, install-guidance, and iPhone input-protection rules from `app.css` into `shell-ui-v15-2-11.css`.
 - Preserved the existing cascade by loading the dedicated stylesheet immediately after `app.css`, including it in local runtime preparation, and precaching it for installed clients.
