@@ -28,15 +28,4 @@
   };
   root.FinancePwaUpdate = api;
 
-  function installSidebarBrand() {
-    const doc = root.document;
-    if (!doc) return;
-    const apply = () => {
-      const brand = doc.querySelector(".sidebar .brand strong");
-      if (brand && brand.textContent !== "My Finance Records") brand.textContent = "My Finance Records";
-    };
-    if (doc.readyState === "loading") doc.addEventListener("DOMContentLoaded", apply, { once:true });
-    else apply();
-  }
-  installSidebarBrand();
 })(typeof window !== "undefined" ? window : globalThis);
