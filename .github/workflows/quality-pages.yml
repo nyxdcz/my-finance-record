@@ -97,6 +97,7 @@ jobs:
           test -f _site/pwa-update-v15-0-5.js
           test -f _site/form-inputs.js
           test -f _site/application-help.js
+          test -f _site/header-tools-compat.js
           test -f _site/sync-runtime-compat.js
       - name: Upload GitHub Pages artifact
         uses: actions/upload-pages-artifact@v5

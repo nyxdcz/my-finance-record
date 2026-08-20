@@ -34,7 +34,7 @@ async function loadHeaderRelocation(page, width = 1280) {
       </header>`;
     document.getElementById("customizeDashboardButton").addEventListener("click", () => { window.__customizeCalls += 1; });
   });
-  await page.addScriptTag({ url:"http://127.0.0.1:3000/pwa-update-v15-0-5.js?v=dashboard-history-menu-test" });
+  await page.addScriptTag({ url:"http://127.0.0.1:3000/header-tools-compat.js?v=dashboard-history-menu-test" });
   await expect(page.locator("#customizeDashboardMenuButton")).toHaveCount(1);
 }
 
