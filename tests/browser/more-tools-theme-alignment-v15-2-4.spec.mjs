@@ -23,6 +23,7 @@ test("More tools Appearance stays compact, left-aligned, and network-first", asy
     const redo = document.getElementById("redoMoneyMenuButton");
     const quickActions = document.getElementById("productivityCenterButton");
     if (!panel || !search || search.parentElement !== panel || search.getAttribute("role") !== "menuitem") return false;
+    if (search.hidden || search.getAttribute("aria-hidden") === "true" || getComputedStyle(search).display === "none") return false;
     if (redo && redo.nextElementSibling !== search) return false;
     if (quickActions?.parentElement === panel && search.nextElementSibling !== quickActions) return false;
     return true;
