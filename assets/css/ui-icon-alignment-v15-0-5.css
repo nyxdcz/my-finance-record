@@ -127,7 +127,7 @@ html body #customizeDashboardButton[data-dashboard-toolbar-action]::before {
     overflow:hidden !important;
     white-space:nowrap !important;
     text-overflow:ellipsis !important;
-    font-size:.92rem !important;
+    font-size:1rem !important;
     line-height:1.1 !important;
     font-weight:850 !important;
     letter-spacing:-.015em !important;
@@ -137,8 +137,13 @@ html body #customizeDashboardButton[data-dashboard-toolbar-action]::before {
 @media (max-width:850px) {
   html body .sidebar .brand strong {
     white-space:nowrap !important;
-    font-size:.92rem !important;
+    font-size:1rem !important;
   }
+}
+
+/* Exact sidebar typography requested for every expanded desktop and mobile label. */
+html body .sidebar .nav-label {
+  font-size:.6875rem !important;
 }
 
 /* V15.2.3 · More tools uses the user's exact uploaded 50px PNG artwork. */
