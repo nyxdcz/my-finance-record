@@ -1,4 +1,4 @@
-/* My Finance Records · V15.2.13 production UI/UX consistency audit */
+/* My Finance Records · V15.2.13 audit, refined for common desktops in V15.2.14 */
 
 /* Summary updates should acknowledge a change without moving the layout. */
 .legend-item.legend-live-update {
@@ -72,7 +72,7 @@
   }
 }
 
-@media (min-width: 851px) and (max-width: 1120px) {
+@media (min-width: 851px) and (max-width: 1400px) {
   html body .topbar-actions .month-navigator > .month-control {
     width: 158px !important;
   }

@@ -41,7 +41,7 @@
     })();
   </script>
 
-  <title>My Finance Records · V15.2.13</title>
+  <title>My Finance Records · V15.2.14</title>
   <link rel="stylesheet" href="./app.css?v=15.1.0-desktop3">
   <link rel="stylesheet" href="./shell-ui-v15-2-11.css?v=15.2.11-shell1">
   <link rel="stylesheet" href="./dashboard-interactions.css?v=15.2.10-icons1">
@@ -49,10 +49,10 @@
   <link rel="stylesheet" href="./black-canvas-v15-1-0.css?v=15.1.0-light1">
   <link rel="stylesheet" href="./desktop-ui-phase1-v15-1-0.css?v=15.1.0-phase1">
   <link rel="stylesheet" href="./desktop-ux-v15-2-0.css?v=15.2.5-disclosure1">
-  <link rel="stylesheet" href="./production-ui-audit-v15-2-13.css?v=15.2.13-audit1">
+  <link rel="stylesheet" href="./production-ui-audit-v15-2-13.css?v=15.2.14-audit2">
   <script src="./form-inputs.js?v=15.2.6-phase5a1"></script>
   <script src="./application-help.js?v=15.2.9-phase5b1"></script>
-  <script src="./pwa-update-v15-0-5.js?v=15.2.13-release9"></script>
+  <script src="./pwa-update-v15-0-5.js?v=15.2.14-release10"></script>
   <script src="./phone-finance-compat.js?v=15.2.10-phone1"></script>
   <script src="./cash-flow-summary.js?v=15.2.10-cashflow1"></script>
   <script src="./header-tools-compat.js?v=15.2.10-header1"></script>
@@ -97,7 +97,7 @@
           <div>
             <h1 id="topTitle">Budget &amp; Expenses</h1>
             <p id="todayLabel">Tuesday, July 21, 2026</p>
-            <small id="buildBadge" title="V15.2.13 · Production UI/UX Consistency · August 20, 2026">V15.2.13</small>
+            <small id="buildBadge" title="V15.2.14 · Common Desktop Summary Alignment · August 20, 2026">V15.2.14</small>
           </div>
         </div>
         <div class="topbar-actions">
@@ -5455,6 +5455,8 @@
 
     VERSION_HISTORY.unshift({"version":"V15.2.13","title":"Production UI/UX Consistency","changes":["Compacts phone Budget period shells and expense records while preserving 44px touch targets.","Standardizes the desktop toolbar and both Budget summary rows on one compact sizing and spacing rhythm.","Replaces moving summary feedback with a reduced-motion-safe outline acknowledgement while preserving disclosure alignment and the Dashboard chart layout."]});
 
+    VERSION_HISTORY.unshift({"version":"V15.2.14","title":"Common Desktop Summary Alignment","changes":["Keeps both Budget summary rows at 56px on common 1280px and 1366px desktops.","Preserves primary labels and full amounts while suppressing only secondary copy that would cause row-height drift.","Adds common-desktop browser coverage while preserving the V15.2.13 phone, touch, motion, disclosure, and Dashboard behavior."]});
+
     function normalizeSettingsPanelKey(key) {
       const normalized = SETTINGS_PANEL_ALIASES[key] || key;
       return SETTINGS_PANELS.includes(normalized) ? normalized : "overview";
@@ -7612,10 +7614,10 @@
     });
 
     // ---------------- V12.10.0 PWA, Phase 11 interface refinement, Phase 10 calculator number inputs, projects, savings goals, and number inputs, Phase 7 secure reset, Phase 6 savings + dashboard insights, Phase 5 reports + dark mode, Phase 4 dashboard + Apple Calendar, Phase 3 monthly navigation, Phase 2 expense workflow, device registry, sync history, offline packs, reminders, and migration ----------------
-    const APP_VERSION = "15.2.13";
-    const APP_RELEASE_NAME = "Production UI/UX Consistency";
+    const APP_VERSION = "15.2.14";
+    const APP_RELEASE_NAME = "Common Desktop Summary Alignment";
     const APP_RELEASE_DATE = "August 20, 2026";
-    const APP_CACHE_VERSION = "finance-v15-20260820-production-ui-audit-r49";
+    const APP_CACHE_VERSION = "finance-v15-20260820-common-desktop-r50";
 
     function synchronizeVersionDisplay() {
       document.title = `My Finance Records · V${APP_VERSION}`;
@@ -8903,7 +8905,7 @@
   </script>
   <script src="./vendor/supabase.min.js"></script>
   <script src="./sync-config.js?v=15.2.10-release1"></script>
-  <script src="./sync-runtime-compat.js?v=15.2.13-release4"></script>
+  <script src="./sync-runtime-compat.js?v=15.2.14-release5"></script>
   <script src="./privacy-lock.js?v=15.1.0-ui1"></script>
   <script src="./security-profiles.js?v=14.0.23"></script>
   <script src="./cloud-conflict-review.js?v=14.0.23"></script>

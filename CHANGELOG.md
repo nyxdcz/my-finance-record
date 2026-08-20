@@ -1,3 +1,8 @@
+## 15.2.14 · 2026-08-20
+- Extended the compact 56px Budget summary geometry to common 1280px and 1366px desktop widths so both rows remain aligned.
+- Preserved full amounts and primary labels while hiding secondary summary descriptions only where their wrapping would cause row-height drift.
+- Added 1280px and 1366px Playwright coverage and rotated the PWA shell to `finance-v15-20260820-common-desktop-r50`.
+
 ## 15.2.13 · 2026-08-20
 - Compacted phone Budget period shells and expense records, replaced heavy nested separators with single-pixel dividers, and allowed useful secondary details to wrap to two lines while preserving 44px actions.
 - Standardized desktop toolbar controls on one 38px height and 6px spacing rhythm, and compacted both Budget summary rows to matching 56px cards.
