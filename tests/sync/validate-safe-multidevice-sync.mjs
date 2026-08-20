@@ -39,7 +39,7 @@ const firstPull = cloud.indexOf("await pullChanges();", syncStart);
 const pushLoop = cloud.indexOf("while (Object.values(pending)", syncStart);
 assert(syncStart >= 0 && firstPull > syncStart && pushLoop > firstPull, "sync must pull current cloud revisions before queued device uploads");
 assert(cloud.includes("5*60*1000"), "five-minute routine sync cadence changed");
-assert(worker.includes('finance-v15-20260820-production-ui-audit-r49'), "PWA cache was not rotated for the V15.2.13 production UI audit");
+assert(worker.includes('finance-v15-20260820-common-desktop-r50'), "PWA cache was not rotated for the V15.2.14 production UI audit");
 assert(worker.includes('asset("./cloud-sync.js?v=15.2.12-sync2")'), "PWA shell does not pin the stabilized cloud sync client");
 assert(worker.includes('new Request(url, { cache:"reload" })'), "PWA precache no longer bypasses stale HTTP cache");
 
@@ -48,4 +48,4 @@ if (failures.length) {
   failures.forEach(item => console.error(`- ${item}`));
   process.exit(1);
 }
-console.log("Safe multi-device sync validation passed under the V15.2.13 release shell.");
+console.log("Safe multi-device sync validation passed under the V15.2.14 release shell.");

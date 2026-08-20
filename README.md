@@ -1,16 +1,16 @@
-# My Finance Records · V15.2.13
+# My Finance Records · V15.2.14
 
 Local-first personal and household finance PWA with multi-profile support and optional encrypted Supabase synchronization.
 
 ## Project status
 
-Current release: **V15.2.13 · Production UI/UX Consistency**
+Current release: **V15.2.14 · Common Desktop Summary Alignment**
 Released: **August 20, 2026**
 Finance Schema: **12**
 Cloud Schema: **V3**
 Routine cloud sync cadence: **5 minutes**
 
-V15.2.13 compacts the phone Budget & Expenses layout, standardizes desktop toolbar and summary-card spacing, and removes moving summary feedback while retaining accessible touch targets and reduced-motion support. Finance data, calculations, schemas, and the five-minute sync cadence remain unchanged.
+V15.2.14 keeps both Budget summary rows at the same compact height on common 1280px and 1366px desktops while preserving the V15.2.13 phone compaction, accessible touch targets, and reduced-motion behavior. Finance data, calculations, schemas, and the five-minute sync cadence remain unchanged.
 
 For complete release history, see [`CHANGELOG.md`](CHANGELOG.md).
 

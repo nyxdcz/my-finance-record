@@ -10,7 +10,7 @@ async function openFinance(page, viewport) {
   await page.waitForFunction(() => document.querySelector("#money")?.classList.contains("active"));
 }
 
-for (const width of [1024, 1440, 1920]) {
+for (const width of [1024, 1280, 1366, 1440, 1920]) {
   test(`desktop toolbar and Budget summaries share compact geometry at ${width}px`, async ({ page }) => {
     await openFinance(page, { width, height:1000 });
     const metrics = await page.evaluate(() => {
