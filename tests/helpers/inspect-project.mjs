@@ -18,13 +18,14 @@ const runtimeCssFiles = [
   "account-ledger.css", "app.css", "black-canvas-v15-1-0.css", "budget-planning.css", "dashboard-interactions-core-v14-0-23.css", "dashboard-interactions.css", "desktop-ui-phase1-v15-1-0.css", "desktop-ux-v15-2-0.css", "liquid-glass-v15.css", "mobile-v14-0-23.css", "productivity-tools.css", "projects-calendar-v13.0.20.css", "reminders-alerts.css", "reports-insights.css", "security-profiles.css", "ui-icon-alignment-v15-0-5.css"
 ];
 const runtimeJsFiles = [
-  "account-ledger.js", "budget-planning.js", "cloud-conflict-resolution.js", "cloud-conflict-review.js", "cloud-sync-lifecycle.js", "cloud-sync.js", "expense-screenshot-ai.js", "expense-screenshot-detect.js", "expense-screenshot-parser.js", "form-inputs.js", "application-help.js", "header-tools-compat.js", "sync-runtime-compat.js", "interaction-patterns.js", "privacy-lock.js", "productivity-tools.js", "projects-calendar-v13.0.20.js", "pwa-update-v15-0-5.js", "reminders-alerts.js", "reports-insights.js", "security-profiles.js"
+  "account-ledger.js", "budget-planning.js", "cloud-conflict-resolution.js", "cloud-conflict-review.js", "cloud-sync-lifecycle.js", "cloud-sync.js", "expense-screenshot-ai.js", "expense-screenshot-detect.js", "expense-screenshot-parser.js", "form-inputs.js", "cash-flow-summary.js", "application-help.js", "header-tools-compat.js", "sync-runtime-compat.js", "interaction-patterns.js", "privacy-lock.js", "productivity-tools.js", "projects-calendar-v13.0.20.js", "pwa-update-v15-0-5.js", "reminders-alerts.js", "reports-insights.js", "security-profiles.js"
 ];
 const runtimeCssSet = new Set(runtimeCssFiles);
 const runtimeJsSet = new Set(runtimeJsFiles);
 const sourcePathForRuntime = value => {
   const normalized = String(value || "").replace(/^\.\//, "");
   if (runtimeCssSet.has(normalized)) return `assets/css/${normalized}`;
+  if (normalized === "cash-flow-summary.js") return `assets/js/features/${normalized}`;
   if (["application-help.js", "header-tools-compat.js", "sync-runtime-compat.js"].includes(normalized)) return `assets/js/ui/${normalized}`;
   if (runtimeJsSet.has(normalized)) return `assets/js/${normalized}`;
   return normalized;
@@ -94,8 +95,9 @@ for (const line of workflow.split(/\r?\n/)) {
   for (const source of sources) {
     const normalized = source.replace(/^\.\//, "");
     if (normalized === "assets/css/*.css") runtimeCssFiles.forEach(file => deploySources.add(file));
-    else if (normalized === "assets/js/*.js") runtimeJsFiles.filter(file => !["application-help.js", "header-tools-compat.js", "sync-runtime-compat.js"].includes(file)).forEach(file => deploySources.add(file));
+    else if (normalized === "assets/js/*.js") runtimeJsFiles.filter(file => !["cash-flow-summary.js", "application-help.js", "header-tools-compat.js", "sync-runtime-compat.js"].includes(file)).forEach(file => deploySources.add(file));
     else if (normalized === "assets/js/ui/*.js") ["application-help.js", "header-tools-compat.js", "sync-runtime-compat.js"].forEach(file => deploySources.add(file));
+    else if (normalized === "assets/js/features/*.js") ["cash-flow-summary.js"].forEach(file => deploySources.add(file));
     else if (normalized.includes("*")) deployPrefixes.push(normalized.slice(0, normalized.indexOf("*")));
     else deploySources.add(normalized);
   }
