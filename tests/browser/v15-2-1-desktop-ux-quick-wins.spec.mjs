@@ -15,7 +15,7 @@ test("V15.2.1 source keeps the approved desktop UX quick wins", async () => {
   expect(index).toContain('id="incomeActiveFilterChips"');
   expect(index).toContain("No income matches these filters");
   expect(index).toContain("No expenses match these filters");
-  expect(index).toContain("No active projects match these filters");
+  expect(index).toContain("No projects in this column match the filters.");
   expect(index).toContain("View unpaid expenses");
   expect(index).toContain('action:"clear-income-filters"');
   expect(source("interaction-patterns.js")).toContain("emptyStateHtml");
