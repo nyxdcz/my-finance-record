@@ -15,7 +15,7 @@
   <link rel="stylesheet" href="./productivity-tools.css?v=14.0.23">
   <link rel="stylesheet" href="./reminders-alerts.css?v=14.0.23">
   <link rel="stylesheet" href="./account-ledger.css?v=14.0.23">
-  <link rel="stylesheet" href="./projects-calendar-v13.0.20.css?v=15.2.15-project-drag1"><link rel="stylesheet" href="./mobile-v14-0-23.css?v=15.2.10-mobile2">
+  <link rel="stylesheet" href="./projects-calendar-v13.0.20.css?v=15.2.18-kanban1"><link rel="stylesheet" href="./mobile-v14-0-23.css?v=15.2.10-mobile2">
   <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png">
   <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
   <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
@@ -41,7 +41,7 @@
     })();
   </script>
 
-  <title>My Finance Records · V15.2.17</title>
+  <title>My Finance Records · V15.2.18</title>
   <link rel="stylesheet" href="./app.css?v=15.1.0-desktop3">
   <link rel="stylesheet" href="./shell-ui-v15-2-11.css?v=15.2.11-shell1">
   <link rel="stylesheet" href="./dashboard-interactions.css?v=15.2.10-icons1">
@@ -52,7 +52,7 @@
   <link rel="stylesheet" href="./production-ui-audit-v15-2-13.css?v=15.2.14-audit2">
   <script src="./form-inputs.js?v=15.2.6-phase5a1"></script>
   <script src="./application-help.js?v=15.2.9-phase5b1"></script>
-  <script src="./pwa-update-v15-0-5.js?v=15.2.17-release13"></script>
+  <script src="./pwa-update-v15-0-5.js?v=15.2.18-release14"></script>
   <script src="./phone-finance-compat.js?v=15.2.10-phone1"></script>
   <script src="./cash-flow-summary.js?v=15.2.10-cashflow1"></script>
   <script src="./header-tools-compat.js?v=15.2.10-header1"></script>
@@ -97,7 +97,7 @@
           <div>
             <h1 id="topTitle">Budget &amp; Expenses</h1>
             <p id="todayLabel">Tuesday, July 21, 2026</p>
-            <small id="buildBadge" title="V15.2.17 · Runtime-Stable UI Audit · August 21, 2026">V15.2.17</small>
+            <small id="buildBadge" title="V15.2.18 · Horizontal Project Kanban · August 21, 2026">V15.2.18</small>
           </div>
         </div>
         <div class="topbar-actions">
@@ -662,10 +662,10 @@
             <div><h2 id="projects-title">Projects</h2><p>Track project value, deadlines, status, and client payments.</p></div>
           </div>
 
-          <article class="card project-section-card" id="activeProjectsCard">
+          <article class="card project-section-card project-kanban-shell" id="activeProjectsCard">
             <div class="card-header project-section-header">
-              <div><h3>Active projects</h3><p>Nearest deadlines appear first; revisions remain active until completed</p></div>
-              <div class="project-section-summary"><strong id="activeProjectCount">0 projects</strong><small id="activeProjectSummary">No active deadlines</small></div>
+              <div><h3>Project board</h3><p>Drag a project from left to right as work advances.</p></div>
+              <div class="project-kanban-header-actions"><div class="project-section-summary"><strong id="activeProjectCount">0 active</strong><small id="activeProjectSummary">No active deadlines</small></div><button class="button button-secondary button-small" type="button" data-kanban-add-column="project">+ Add column</button></div>
             </div>
             <details class="project-filters-panel" id="projectFiltersPanel" open>
               <summary>Project filters <small id="projectFilterSummary">All projects</small></summary>
@@ -677,16 +677,10 @@
                 <button class="button button-secondary project-clear-filters" id="clearProjectFilters" type="button" hidden>Clear</button>
               </div>
             </details>
-            <div class="record-header project-record-header"><span>Project</span><span>Type</span><span>Deadline</span><span>Value</span><span>Status</span><span>Payment</span><span>Calendar</span><span>Actions</span></div>
-            <div id="activeProjectList"><div class="empty-state"><strong>Loading projects</strong>Active project records will appear here.</div></div>
-          </article>
-
-          <article class="card project-section-card collapsible-section" id="completedProjectsCard" data-collapse-key="completed-projects" data-structured-drop-zone data-structured-drop-kind="project" data-structured-drop-destination="completed" data-structured-drop-label="Completed Projects" style="margin-top:16px">
-            <div class="card-header collapsible-header project-section-header">
-              <div><h3>Completed projects</h3><p>Completed status is separate from client payment status</p></div>
-              <div class="collapse-actions"><div class="project-section-summary"><strong id="completedProjectCount">0 projects</strong><small id="completedProjectSummary">No completed projects</small></div><button class="collapse-toggle" type="button" data-collapse-toggle="completed-projects" aria-expanded="false" aria-controls="completedProjectList" title="Expand Completed projects"><span class="collapse-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="m6 9 6 6 6-6"/></svg></span><span class="sr-only">Expand Completed projects</span></button></div>
+            <div class="finance-kanban-board project-kanban-board" id="projectKanbanBoard" aria-label="Project workflow columns">
+              <section class="finance-kanban-column" data-structured-drop-zone data-structured-drop-kind="project" data-structured-drop-destination="active" data-structured-drop-label="Active Projects"><div class="finance-kanban-column-header"><div><h4>Active projects</h4><small>Loading projects</small></div></div><div class="finance-kanban-card-list" id="activeProjectList"></div></section>
+              <section class="finance-kanban-column finance-kanban-column-completed" id="completedProjectsCard" data-structured-drop-zone data-structured-drop-kind="project" data-structured-drop-destination="completed" data-structured-drop-label="Completed Projects"><div class="finance-kanban-column-header"><div><h4>Completed projects</h4><small id="completedProjectSummary">No completed projects</small></div><strong id="completedProjectCount">0</strong></div><div class="finance-kanban-card-list" id="completedProjectList"></div></section>
             </div>
-            <div id="completedProjectList"><div class="empty-state"><strong>No completed projects</strong>Projects marked Completed will appear here, even while a balance remains.</div></div>
           </article>
         </section>
 
@@ -1587,6 +1581,19 @@
     </div>
   </dialog>
 
+  <dialog id="kanbanColumnDialog" class="app-dialog dialog-form dialog-standard" aria-labelledby="kanbanColumnDialogTitle">
+    <form id="kanbanColumnForm">
+      <div class="modal-header"><h3 id="kanbanColumnDialogTitle">Add workflow column</h3><button type="button" class="button button-secondary button-small" data-close-kanban-column>Close</button></div>
+      <div class="modal-body">
+        <input type="hidden" id="kanbanColumnBoard"><input type="hidden" id="kanbanColumnId">
+        <div class="dialog-context-note">Custom columns organize work without changing project values, payments, deadlines, or completion history.</div>
+        <div class="field"><label for="kanbanColumnName">Column name</label><input class="input" id="kanbanColumnName" maxlength="32" required placeholder="Example: In progress"><small class="field-error" id="kanbanColumnNameError" hidden></small></div>
+        <div class="field"><label for="kanbanColumnColor">Column color</label><select class="select" id="kanbanColumnColor"><option value="blue">Blue</option><option value="teal">Teal</option><option value="amber">Amber</option><option value="violet">Violet</option><option value="rose">Rose</option><option value="slate">Slate</option></select></div>
+      </div>
+      <div class="modal-footer form-action-footer"><button type="button" class="button button-danger dialog-danger-leading" id="deleteKanbanColumnButton" hidden>Delete column</button><span class="footer-spacer"></span><button type="button" class="button button-secondary" data-close-kanban-column>Cancel</button><button type="submit" class="button button-primary">Save column</button></div>
+    </form>
+  </dialog>
+
   <div id="pwaUpdateBanner" hidden role="status" aria-live="polite">
     <div class="pwa-update-inner"><div><strong>App update available</strong><p>The new version is ready. Your current data stays in browser storage.</p></div><div class="pwa-update-actions"><button class="button button-secondary" id="laterUpdateButton" type="button">Later</button><button class="button button-primary" id="applyUpdateButton" type="button">Update now</button></div></div>
   </div>
@@ -1602,7 +1609,7 @@
   <div class="sr-only" id="dashboardDragAnnouncer" role="status" aria-live="polite" aria-atomic="true"></div>
   <div class="sr-only" id="structuredDragAnnouncer" role="status" aria-live="polite" aria-atomic="true"></div>
 
-  <script src="./interaction-patterns.js?v=15.2.15-project-drag1"></script>
+  <script src="./interaction-patterns.js?v=15.2.18-kanban1"></script>
   <script>
     (() => {
       const dataKey = "simple-finance-project-records-v2";
@@ -1744,6 +1751,24 @@
       return null;
     }
 
+    const KANBAN_COLUMN_COLORS = ["blue", "teal", "amber", "violet", "rose", "slate"];
+    function normalizeKanbanColumns(value, board) {
+      const seen = new Set();
+      return (Array.isArray(value) ? value : []).map((column, index) => {
+        const rawId = String(column?.id || `${board}-column-${index + 1}`).toLowerCase().replace(/[^a-z0-9_-]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 52);
+        const id = rawId.startsWith(`${board}-`) ? rawId : `${board}-${rawId || `column-${index + 1}`}`;
+        const name = String(column?.name || "").trim().replace(/\s+/g, " ").slice(0, 32);
+        if (!name || seen.has(id) || ["active", "completed", "upcoming"].includes(id)) return null;
+        seen.add(id);
+        return { id, name, color:KANBAN_COLUMN_COLORS.includes(column?.color) ? column.color : "blue", createdAt:String(column?.createdAt || "") };
+      }).filter(Boolean).slice(0, 8);
+    }
+
+    function normalizeProjectKanban(value) {
+      const source = value && typeof value === "object" && !Array.isArray(value) ? value : {};
+      return { version:1, projectColumns:normalizeKanbanColumns(source.projectColumns, "project"), agendaColumns:normalizeKanbanColumns(source.agendaColumns, "agenda") };
+    }
+
     function dateForMonth(month, day) {
       const [year, monthNumber] = month.split("-").map(Number);
       const safeDay = Math.min(day, new Date(year, monthNumber, 0).getDate());
@@ -1798,6 +1823,7 @@
         budgetTemplates: [],
         budgetSettings: { version: 1, defaultLowBalanceThreshold: 1000, includeExpectedIncome: true, includeRecurringEstimates: true },
         projectCalendarSettings: { autoPrepare: true, defaultReminder: "P1D", includeNotes: true, includeFinancialValues: false },
+        projectKanban: { version:1, projectColumns:[], agendaColumns:[] },
         salaryWorkSettings: { includedProjectsPerMonth: 3, officeDays: ["Tuesday", "Thursday", "Saturday"], homeDays: ["Monday", "Wednesday", "Friday"], compensationModel: "fixed-monthly-salary" }
       };
     }
@@ -1897,6 +1923,8 @@
         seenExpenseRecurrenceSkips.add(key);
         expenseRecurrenceSkips.push({ seriesId, month });
       });
+      const projectKanban = normalizeProjectKanban(source.projectKanban);
+      const validProjectKanbanIds = new Set(projectKanban.projectColumns.map(column => column.id));
       const projects = (Array.isArray(source.projects) ? source.projects : sample.projects).map(project => {
         const paid = Number(project.paid || 0);
         const paymentDate = project.paymentDate || "";
@@ -1930,6 +1958,7 @@
           compensationType,
           salaryProjectNumber: Math.max(0, Number(project.salaryProjectNumber || 0)),
           status: normalizedStatus,
+          kanbanColumnId: normalizedStatus === "Completed" || !validProjectKanbanIds.has(String(project.kanbanColumnId || "")) ? "" : String(project.kanbanColumnId),
           revisionHistory,
           createdDate: project.createdDate || paymentDate || project.deadline || dateForMonth(currentMonth, 1),
           updatedDate: project.updatedDate || paymentDate || project.deadline || project.createdDate || dateForMonth(currentMonth, 1),
@@ -2026,7 +2055,7 @@
       };
       return {
         accounts, accountTypes, accountOrder, accountIcons, iconLibrary, savingsSettings, savingsGoals, incomeRecords, expenses, expenseRecurrenceSkips,
-        projects, monthlyReports, monthlyChecklists, monthlyBudgets, budgetTemplates, budgetSettings, projectCalendarSettings, salaryWorkSettings,
+        projects, monthlyReports, monthlyChecklists, monthlyBudgets, budgetTemplates, budgetSettings, projectCalendarSettings, projectKanban, salaryWorkSettings,
         accountLedger:Array.isArray(source.accountLedger) ? source.accountLedger.map(entry => ({ ...entry })) : [],
         accountReconciliations:Array.isArray(source.accountReconciliations) ? source.accountReconciliations.map(item => ({ ...item })) : [],
         ledgerSettings:source.ledgerSettings && typeof source.ledgerSettings === "object" && !Array.isArray(source.ledgerSettings) ? { ...source.ledgerSettings } : {}
@@ -3366,6 +3395,64 @@
       return "status-hold";
     }
 
+    function kanbanCustomColumns(board) {
+      const key = board === "agenda" ? "agendaColumns" : "projectColumns";
+      return Array.isArray(data.projectKanban?.[key]) ? data.projectKanban[key] : [];
+    }
+
+    function kanbanColumnInUse(board, id) {
+      if (board === "project") return data.projects.some(project => project.status !== "Completed" && project.kanbanColumnId === id);
+      return Boolean(window.FinanceAgendaKanban?.columnHasItems?.(id));
+    }
+
+    function notifyKanbanColumnsChanged(board, action, id = "") {
+      window.dispatchEvent(new CustomEvent("finance:kanban-columns-changed", { detail:{ board, action, id } }));
+    }
+
+    function saveKanbanColumns(board, columns, message, action, id = "") {
+      const key = board === "agenda" ? "agendaColumns" : "projectColumns";
+      data.projectKanban = { ...(data.projectKanban || { version:1 }), version:1, [key]:normalizeKanbanColumns(columns, board) };
+      const saved = saveData(message);
+      if (saved) notifyKanbanColumnsChanged(board, action, id);
+      return saved;
+    }
+
+    function kanbanColumnMenu(board, column, index, total) {
+      const key = escapeAttribute(column.id);
+      return `<div class="kanban-column-menu overflow-menu"><button class="button button-secondary button-small overflow-menu-trigger" type="button" aria-label="Manage ${escapeAttribute(column.name)} column" title="Manage column" aria-haspopup="menu" aria-controls="kanban-column-menu-${key}" aria-expanded="false"><span class="kebab-icon" aria-hidden="true">&#8942;</span></button><div class="record-more-panel" id="kanban-column-menu-${key}" role="menu" aria-label="Manage ${escapeAttribute(column.name)} column" hidden><button class="button button-secondary" role="menuitem" type="button" data-kanban-edit-column="${key}" data-kanban-board="${board}">Rename or recolor</button><button class="button button-secondary" role="menuitem" type="button" data-kanban-move-column="left" data-kanban-column="${key}" data-kanban-board="${board}" ${index === 0 ? "disabled" : ""}>Move left</button><button class="button button-secondary" role="menuitem" type="button" data-kanban-move-column="right" data-kanban-column="${key}" data-kanban-board="${board}" ${index === total - 1 ? "disabled" : ""}>Move right</button></div></div>`;
+    }
+
+    function openKanbanColumnDialog(board, id = "") {
+      const dialog = document.getElementById("kanbanColumnDialog");
+      const column = kanbanCustomColumns(board).find(item => item.id === id);
+      document.getElementById("kanbanColumnBoard").value = board;
+      document.getElementById("kanbanColumnId").value = column?.id || "";
+      document.getElementById("kanbanColumnName").value = column?.name || "";
+      document.getElementById("kanbanColumnColor").value = column?.color || "blue";
+      document.getElementById("kanbanColumnDialogTitle").textContent = column ? `Edit ${column.name}` : `Add ${board === "agenda" ? "agenda" : "project"} column`;
+      document.getElementById("deleteKanbanColumnButton").hidden = !column;
+      const error = document.getElementById("kanbanColumnNameError");
+      error.hidden = true; error.textContent = "";
+      dialog.showModal();
+      requestAnimationFrame(() => document.getElementById("kanbanColumnName")?.focus());
+    }
+
+    function createKanbanColumn(board, name, color) {
+      const columns = kanbanCustomColumns(board);
+      if (columns.length >= 8) { showToast("A workflow board can have up to 8 custom columns.", "warning"); return false; }
+      const base = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 28) || "column";
+      let id = `${board}-${base}`, suffix = 2;
+      while (columns.some(column => column.id === id)) id = `${board}-${base}-${suffix++}`;
+      const next = [...columns, { id, name, color, createdAt:new Date().toISOString() }];
+      return saveKanbanColumns(board, next, `${name} column added`, "added", id);
+    }
+
+    window.FinanceKanbanPreferences = {
+      columns:board => kanbanCustomColumns(board).map(column => ({ ...column })),
+      menu:kanbanColumnMenu,
+      open:openKanbanColumnDialog
+    };
+
     async function completeProjectFromAgenda(projectId, eventTitle = "") {
       const project = data.projects.find(item => item.id === projectId);
       if (!project || project.status === "Completed") return true;
@@ -3382,6 +3469,7 @@
       pushUndo(`Complete ${project.name} from Project Agenda`);
       if (revision && !revision.completedDate) revision.completedDate = today;
       project.status = "Completed";
+      project.kanbanColumnId = "";
       project.updatedDate = today;
       project.completedDate = project.completedDate || today;
       return saveData(`Agenda event completed · project ${project.name} completed`);
@@ -3395,8 +3483,21 @@
     async function completeProjectByDrop(projectId, destination) {
       const project = data.projects.find(item => item.id === projectId);
       if (!project) return { success:false, message:"Project is no longer available." };
-      if (destination !== "completed") return { success:false, message:"That project destination is not available." };
-      if (project.status === "Completed") return { success:false, message:`${project.name} is already completed.` };
+      const custom = kanbanCustomColumns("project").find(column => column.id === destination);
+      if (!["active", "completed"].includes(destination) && !custom) return { success:false, message:"That project destination is not available." };
+      if (project.status === "Completed") return { success:false, message:`Use Reopen before moving ${project.name} into an active workflow column.` };
+
+      if (destination !== "completed") {
+        const current = project.kanbanColumnId || "active";
+        if (current === destination || (current === "active" && destination === "active")) return { success:false, message:`${project.name} is already in that column.` };
+        const destinationName = destination === "active" ? "Active" : custom.name;
+        const label = `Move ${project.name} to ${destinationName}`;
+        pushUndo(label);
+        project.kanbanColumnId = destination === "active" ? "" : destination;
+        project.updatedDate = new Date().toISOString().slice(0, 10);
+        if (!saveData(`${project.name} moved to ${destinationName}`)) { undoLastChange(); return { success:false, message:`${project.name} could not be moved.` }; }
+        return { success:true, message:`${project.name} moved to ${destinationName}.`, undo:projectDropUndo(label) };
+      }
 
       const balance = projectBalance(project);
       if (projectIsFinancial(project) && balance > 0) {
@@ -3416,6 +3517,7 @@
       pushUndo(label);
       if (revision && !revision.completedDate) revision.completedDate = today;
       project.status = "Completed";
+      project.kanbanColumnId = "";
       project.updatedDate = today;
       project.completedDate = project.completedDate || today;
       if (!saveData(`${project.name} moved to Completed Projects`)) {
@@ -4612,13 +4714,13 @@
         .filter(project => !sourceFilter || projectWorkSource(project) === sourceFilter);
       const active = filtered.filter(project => project.status !== "Completed").sort(compareProjectsByNearestDeadline);
       const completed = filtered.filter(project => project.status === "Completed").sort((a,b) => String(b.completedDate || b.updatedDate || "").localeCompare(String(a.completedDate || a.updatedDate || "")) || String(a.name).localeCompare(String(b.name)));
+      const customColumns = kanbanCustomColumns("project");
+      const validCustomColumns = new Set(customColumns.map(column => column.id));
       const activeBalance = active.reduce((total, project) => total + projectBalance(project), 0);
       const nearest = active.filter(project => project.status !== "Completed" && projectEffectiveDeadline(project)).sort(compareProjectsByNearestDeadline)[0];
-      document.getElementById("activeProjectCount").textContent = `${active.length} ${active.length === 1 ? "project" : "projects"} · ${money(activeBalance)} balance`;
+      document.getElementById("activeProjectCount").textContent = `${active.length} active · ${money(activeBalance)} balance`;
       document.getElementById("activeProjectSummary").textContent = nearest ? `${nearest.name} · ${projectDeadlineInfo(nearest).label}` : "No active deadlines";
-      document.getElementById("completedProjectCount").textContent = `${completed.length} ${completed.length === 1 ? "project" : "projects"}`;
       const completedBalanceDue = completed.filter(project => projectIsFinancial(project) && projectBalance(project) > 0).length;
-      document.getElementById("completedProjectSummary").textContent = completed.length ? `${completed.filter(projectIsFixedSalary).length} salary · ${completedBalanceDue} balance due` : "No completed projects";
       const hasFilters = Boolean(search || statusFilter || typeFilter || sourceFilter);
       document.getElementById("clearProjectFilters").hidden = !hasFilters;
       document.getElementById("projectFilterSummary").textContent = hasFilters ? `${filtered.length} matching` : "All projects";
@@ -4639,42 +4741,37 @@
         const calendarButton = projectCalendarContext(project).deadline ? `<button class="button button-small project-calendar-button ${calendar.className === "ready" ? "button-secondary is-added" : calendar.className === "update" ? "button-secondary needs-update" : "button-secondary"}" data-calendar-project="${project.id}" aria-label="${escapeAttribute(calendar.label)}" title="${escapeAttribute(calendar.label)}">${calendarShortLabel}</button>` : `<button class="button button-small button-secondary project-calendar-button no-deadline" type="button" aria-label="No project deadline" title="No project deadline" disabled>—</button>`;
         const financialValue = projectIsFinancial(project) ? money(project.value) : "—";
         const paidButton = projectIsFinancial(project) && balance > 0 ? `<button class="button button-primary button-small project-compact-action" data-mark-project-paid="${project.id}" aria-label="Mark ${escapeAttribute(project.name)} fully paid" title="Mark fully paid">Mark paid</button>` : "";
-        const revisionAction = project.status === "Completed" ? `<button class="button button-secondary button-small project-compact-action" data-reopen-project-revision="${project.id}" aria-label="Reopen ${escapeAttribute(project.name)} for revision" title="Reopen for revision">Revise</button>` : (project.status === "In revision" ? `<button class="button button-primary button-small project-compact-action" data-complete-project-revision="${project.id}" aria-label="Mark revision complete for ${escapeAttribute(project.name)}" title="Mark revision complete">Finish revision</button>` : "");
+        const revisionAction = project.status === "Completed" ? `<button class="button button-secondary button-small project-compact-action" data-reopen-project-revision="${project.id}" aria-label="Reopen ${escapeAttribute(project.name)} for revision" title="Reopen for revision">Reopen</button>` : (project.status === "In revision" ? `<button class="button button-primary button-small project-compact-action" data-complete-project-revision="${project.id}" aria-label="Mark revision complete for ${escapeAttribute(project.name)}" title="Mark revision complete">Finish revision</button>` : "");
         const editButton = `<button class="button button-secondary button-small project-compact-action" data-edit-project="${project.id}">Edit</button>`;
-        const primaryDesktopAction = project.status === "In revision" ? revisionAction : (project.status === "Completed" && paidButton ? paidButton : (project.status === "Completed" ? revisionAction : editButton));
+        const completeAction = project.status !== "Completed" ? `<button class="button button-primary button-small project-compact-action" data-complete-project-by-button="${project.id}">Complete</button>` : "";
+        const primaryDesktopAction = project.status === "In revision" ? revisionAction : (project.status === "Completed" && paidButton ? paidButton : (project.status === "Completed" ? revisionAction : completeAction));
         const desktopMoreActions = [
           primaryDesktopAction !== revisionAction ? revisionAction : "",
           primaryDesktopAction !== paidButton ? paidButton : "",
+          primaryDesktopAction !== completeAction ? completeAction : "",
           primaryDesktopAction !== editButton ? editButton : ""
         ].filter(Boolean).join("");
         const projectMenuKey = escapeAttribute(project.id);
         const desktopActionMenu = desktopMoreActions ? `<div class="project-action-more overflow-menu"><button class="button button-secondary button-small project-compact-action overflow-menu-trigger" type="button" aria-label="More actions for ${escapeAttribute(project.name)}" title="More actions" aria-haspopup="menu" aria-controls="project-more-${projectMenuKey}" aria-expanded="false"><span class="kebab-icon" aria-hidden="true">&#8942;</span><span class="sr-only">More actions</span></button><div class="record-more-panel" id="project-more-${projectMenuKey}" role="menu" aria-label="More actions for ${escapeAttribute(project.name)}" hidden>${desktopMoreActions}</div></div>` : "";
-        const primaryMobileAction = project.status === "In revision" ? revisionAction : (project.status === "Completed" && paidButton ? paidButton : (project.status === "Completed" ? revisionAction : `<button class="button button-primary project-compact-action" data-edit-project="${project.id}">Edit</button>`));
-        const mobileMoreActions = [
-          primaryMobileAction !== revisionAction ? revisionAction : "",
-          primaryMobileAction !== paidButton ? paidButton : "",
-          `<button class="button button-secondary" data-edit-project="${project.id}">Edit project</button>`,
-          projectCalendarContext(project).deadline ? `<button class="button button-secondary" data-calendar-project="${project.id}">${calendar.label}</button>` : ""
-        ].filter(Boolean).join("");
         const mobileDeadlineLabel = completedBox ? `Completed ${formatDate(project.completedDate || project.updatedDate)}` : (currentRevision ? `Revision due ${formatDate(effectiveDeadline)}` : (effectiveDeadline ? `Due ${formatDate(effectiveDeadline)}` : "No deadline"));
-        const structuredCardAttributes = completedBox ? "" : ` data-structured-card="project" data-structured-id="${escapeAttribute(project.id)}" data-structured-label="${escapeAttribute(project.name)}" data-structured-origin="active"`;
-        const dragHandle = completedBox ? "" : `<button type="button" class="structured-drag-handle project-drag-handle" draggable="true" data-structured-drag-handle aria-label="Move ${escapeAttribute(project.name)} to Completed Projects. Press Space for keyboard controls." title="Move to Completed Projects"><span aria-hidden="true">⠿</span></button>`;
-        return `<article class="record-row responsive-record project-record ${completedBox ? "completed-project-record" : ""}"${structuredCardAttributes}>
-          <div class="record-title">${dragHandle}<strong>${noteHtml}</strong><small class="project-source-line ${projectWorkSource(project)}">${escapeHtml(projectSourceLabel(project))}${project.workSource === "salary" && project.workMonth ? ` · ${escapeHtml(monthLabel(project.workMonth))}` : ""}</small>${deadlineBadge}${revisionInline}</div>
-          <div class="project-mobile-summary" aria-label="Project summary"><div class="project-mobile-facts"><span>${escapeHtml(project.type)}</span><span>${escapeHtml(mobileDeadlineLabel)}</span>${projectIsFinancial(project) ? `<span>${financialValue}</span>` : ""}</div><div class="project-mobile-statuses"><span class="status-pill ${projectStatusClass(project.status)}">${escapeHtml(statusCopy)}</span><span class="status-pill ${payment.className}">${escapeHtml(payment.label)}</span></div></div>
-          <div class="project-cell" data-label="Type"><strong>${escapeHtml(project.type)}</strong></div>
-          <div class="project-cell" data-label="${completedBox ? "Completed" : (currentRevision ? "Revision deadline" : "Deadline")}"><strong>${formatDate(completedBox ? (project.completedDate || project.updatedDate) : effectiveDeadline)}</strong></div>
-          <div class="project-cell project-value-cell" data-label="Value"><strong class="amount">${financialValue}</strong></div>
-          <div class="project-cell" data-label="Status"><strong><span class="status-pill ${projectStatusClass(project.status)}">${escapeHtml(statusCopy)}</span></strong></div>
-          <div class="project-cell" data-label="Payment"><strong><span class="status-pill ${payment.className}">${escapeHtml(payment.label)}</span></strong></div>
-          <div class="project-calendar-cell" data-label="Calendar">${calendarButton}</div>
-          <div class="record-actions desktop-record-actions project-row-actions">${primaryDesktopAction}${desktopActionMenu}</div>
-          <div class="mobile-record-actions project-mobile-actions">${primaryMobileAction}<div class="record-more-menu overflow-menu"><button class="button button-secondary overflow-menu-trigger" type="button" aria-label="More actions for ${escapeAttribute(project.name)}" title="More actions" aria-haspopup="menu" aria-controls="project-mobile-more-${projectMenuKey}" aria-expanded="false"><span class="kebab-icon" aria-hidden="true">&#8942;</span><span class="sr-only">More actions</span></button><div class="record-more-panel" id="project-mobile-more-${projectMenuKey}" role="menu" aria-label="More actions for ${escapeAttribute(project.name)}" hidden>${mobileMoreActions}</div></div></div>
+        const origin = completedBox ? "completed" : (validCustomColumns.has(project.kanbanColumnId) ? project.kanbanColumnId : "active");
+        const structuredCardAttributes = completedBox ? "" : ` draggable="true" tabindex="0" aria-roledescription="draggable project card" data-structured-card="project" data-structured-card-draggable data-structured-id="${escapeAttribute(project.id)}" data-structured-label="${escapeAttribute(project.name)}" data-structured-origin="${escapeAttribute(origin)}" aria-label="${escapeAttribute(project.name)}. Drag or press Space to move between project columns."`;
+        return `<article class="finance-kanban-card project-record ${completedBox ? "completed-project-record" : ""}"${structuredCardAttributes}>
+          <div class="finance-kanban-card-header"><span class="finance-kanban-card-grip" aria-hidden="true">⠿</span><div class="record-title"><strong>${noteHtml}</strong><small class="project-source-line ${projectWorkSource(project)}">${escapeHtml(projectSourceLabel(project))}${project.workSource === "salary" && project.workMonth ? ` · ${escapeHtml(monthLabel(project.workMonth))}` : ""}</small></div></div>
+          <div class="finance-kanban-card-meta"><span>${escapeHtml(project.type)}</span><span>${escapeHtml(mobileDeadlineLabel)}</span></div>
+          <div class="finance-kanban-card-value"><span>${financialValue}</span>${projectIsFinancial(project) ? `<small>${money(balance)} balance</small>` : ""}</div>
+          <div class="finance-kanban-card-statuses"><span class="status-pill ${projectStatusClass(project.status)}">${escapeHtml(statusCopy)}</span><span class="status-pill ${payment.className}">${escapeHtml(payment.label)}</span>${deadlineBadge}${revisionInline}</div>
+          <div class="record-actions project-row-actions"><span class="project-kanban-calendar">${calendarButton}</span>${primaryDesktopAction}${desktopActionMenu}</div>
         </article>`;
       };
-      document.getElementById("activeProjectList").innerHTML = active.length ? active.map(project => projectCard(project, false)).join("") : (hasProjectFilters ? emptyHtml("No active projects match these filters", "Try clearing the active project filters.", { label:"Clear filters", action:"clear-project-filters" }) : emptyHtml("No active projects", "Add a project to start tracking work, deadlines, and client payments.", { label:"Add project", action:"add-project" }));
-      document.getElementById("completedProjectList").innerHTML = completed.length ? completed.map(project => projectCard(project, true)).join("") : (hasProjectFilters ? emptyHtml("No completed projects match these filters", "Try clearing the active project filters.", { label:"Clear filters", action:"clear-project-filters" }) : emptyHtml("No completed projects", "Projects with Completed status appear here, whether paid or still carrying a balance."));
-      applyCollapseState(document.getElementById("completedProjectsCard"));
+      const emptyColumn = (title, text) => `<div class="finance-kanban-empty"><strong>${escapeHtml(title)}</strong><span>${escapeHtml(text)}</span></div>`;
+      const activeItems = active.filter(project => !validCustomColumns.has(project.kanbanColumnId));
+      const columnMarkup = (id, name, color, items, options = {}) => `<section class="finance-kanban-column ${options.completed ? "finance-kanban-column-completed" : ""}"${options.completed ? ' id="completedProjectsCard"' : ""} data-kanban-color="${color}" data-structured-drop-zone data-structured-drop-kind="project" data-structured-drop-destination="${escapeAttribute(id)}" data-structured-drop-label="${escapeAttribute(name)}"><div class="finance-kanban-column-header"><div><h4>${escapeHtml(name)}</h4><small>${items.length} ${items.length === 1 ? "project" : "projects"}${options.completed && completedBalanceDue ? ` · ${completedBalanceDue} balance due` : ""}</small></div>${options.custom ? kanbanColumnMenu("project", options.custom, options.index, customColumns.length) : `<strong>${items.length}</strong>`}</div><div class="finance-kanban-card-list"${id === "active" ? ' id="activeProjectList"' : id === "completed" ? ' id="completedProjectList"' : ""}>${items.length ? items.map(project => projectCard(project, options.completed)).join("") : emptyColumn(`No ${name.toLowerCase()} projects`, hasProjectFilters ? "No projects in this column match the filters." : (id === "active" ? "Add a project or drag one back from a workflow column." : id === "completed" ? "Drag an active project here to complete it." : "Drag a project into this column."))}</div></section>`;
+      document.getElementById("projectKanbanBoard").innerHTML = [
+        columnMarkup("active", "Active", "blue", activeItems),
+        ...customColumns.map((column, index) => columnMarkup(column.id, column.name, column.color, active.filter(project => project.kanbanColumnId === column.id), { custom:column, index })),
+        columnMarkup("completed", "Completed", "teal", completed, { completed:true })
+      ].join("");
     }
 
     function renderPayments() {
@@ -5523,6 +5620,7 @@
     VERSION_HISTORY.unshift({"version":"V15.2.15","title":"Structured Project Drag & Drop","changes":["Moves Project Agenda entries between Upcoming and Completed with mouse, touch, or keyboard controls.","Moves Active Projects into Completed Projects without changing values, received payments, or remaining balances.","Adds valid destination cues, safe cancellation, screen-reader updates, reduced-motion behavior, and a five-second Undo action."]});
     VERSION_HISTORY.unshift({"version":"V15.2.16","title":"Production Audit Reliability","changes":["Waits for the Finance view to finish rendering before responsive geometry is measured.","Checks the named compact desktop controls instead of counting hidden legacy actions.","Measures only visible phone disclosure controls while preserving the 44px touch-target requirement."]});
     VERSION_HISTORY.unshift({"version":"V15.2.17","title":"Runtime-Stable UI Audit","changes":["Waits for the current service-worker controller and network completion before responsive Finance measurements.","Reapplies the authenticated privacy state and activates Budget & Expenses after PWA initialization.","Requires the signed-in state plus visible summaries and period cards before testing layout geometry."]});
+    VERSION_HISTORY.unshift({"version":"V15.2.18","title":"Horizontal Project Kanban","changes":["Rebuilds Project Agenda and Projects as horizontal boards with full-card mouse, touch, and keyboard dragging.","Adds protected start and Completed columns plus named, colored, reorderable custom workflow columns.","Preserves completion confirmation, payments, balances, revisions, safe invalid-drop return, and five-second Undo."]});
 
     function normalizeSettingsPanelKey(key) {
       const normalized = SETTINGS_PANEL_ALIASES[key] || key;
@@ -6459,6 +6557,7 @@
       pushUndo(`Complete revision ${revision.number} for ${project.name}`);
       revision.completedDate = today;
       project.status = "Completed";
+      project.kanbanColumnId = "";
       project.updatedDate = today;
       project.completedDate = project.completedDate || today;
       saveData(`Revision ${revision.number} completed`);
@@ -6665,6 +6764,7 @@
       const editProject = event.target.closest("[data-edit-project]");
       const duplicateProject = event.target.closest("[data-duplicate-project]");
       const markProjectPaid = event.target.closest("[data-mark-project-paid]");
+      const completeProjectByButton = event.target.closest("[data-complete-project-by-button]");
       const reopenProjectRevision = event.target.closest("[data-reopen-project-revision]");
       const completeProjectRevisionButton = event.target.closest("[data-complete-project-revision]");
       const deleteProject = event.target.closest("[data-delete-project]");
@@ -6770,6 +6870,7 @@
         if (sourceProject) openProjectDialog(sourceProject, { duplicate:true });
       }
       if (markProjectPaid) openProjectPaidDialog(data.projects.find(item => item.id === markProjectPaid.dataset.markProjectPaid));
+      if (completeProjectByButton) await completeProjectByDrop(completeProjectByButton.dataset.completeProjectByButton, "completed");
       if (reopenProjectRevision) { const project = data.projects.find(item => item.id === reopenProjectRevision.dataset.reopenProjectRevision); if (project) openProjectRevisionDialog(project); }
       if (completeProjectRevisionButton) { const project = data.projects.find(item => item.id === completeProjectRevisionButton.dataset.completeProjectRevision); if (project) { const confirmed = await openAppConfirmation({ title:"Mark revision complete?", message:`Finish the active revision for “${project.name}”?`, details:"The original completion date stays unchanged and this revision receives its own completion date.", confirmLabel:"Mark revision complete", danger:false }); if (confirmed) { completeProjectRevision(project); if (completeProjectRevisionButton.closest("#projectDialog")) closeTrackedFormAfterAction("projectDialog"); } } }
       if (editSavingsGoal) openSavingsGoalDialog((data.savingsGoals || []).find(goal => goal.id === editSavingsGoal.dataset.editSavingsGoal));
@@ -7107,6 +7208,52 @@
       document.getElementById("paidCategoryFilter").value = "";
       renderPaidExpenses();
     });
+    document.getElementById("kanbanColumnForm").addEventListener("submit", event => {
+      event.preventDefault();
+      const board = document.getElementById("kanbanColumnBoard").value === "agenda" ? "agenda" : "project";
+      const id = document.getElementById("kanbanColumnId").value;
+      const name = document.getElementById("kanbanColumnName").value.trim().replace(/\s+/g, " ").slice(0, 32);
+      const color = KANBAN_COLUMN_COLORS.includes(document.getElementById("kanbanColumnColor").value) ? document.getElementById("kanbanColumnColor").value : "blue";
+      const error = document.getElementById("kanbanColumnNameError");
+      const duplicate = kanbanCustomColumns(board).some(column => column.id !== id && column.name.toLocaleLowerCase() === name.toLocaleLowerCase());
+      if (!name || !/[\p{L}\p{N}]/u.test(name) || duplicate) {
+        error.textContent = duplicate ? "Use a different column name." : "Enter a column name with at least one letter or number.";
+        error.hidden = false;
+        document.getElementById("kanbanColumnName").focus();
+        return;
+      }
+      const saved = id
+        ? saveKanbanColumns(board, kanbanCustomColumns(board).map(column => column.id === id ? { ...column, name, color } : column), `${name} column updated`, "updated", id)
+        : createKanbanColumn(board, name, color);
+      if (saved) document.getElementById("kanbanColumnDialog").close();
+    });
+    document.querySelectorAll("[data-close-kanban-column]").forEach(button => button.addEventListener("click", () => document.getElementById("kanbanColumnDialog").close()));
+    document.getElementById("kanbanColumnName").addEventListener("input", () => { const error = document.getElementById("kanbanColumnNameError"); error.hidden = true; error.textContent = ""; });
+    document.getElementById("deleteKanbanColumnButton").addEventListener("click", async () => {
+      const board = document.getElementById("kanbanColumnBoard").value === "agenda" ? "agenda" : "project";
+      const id = document.getElementById("kanbanColumnId").value;
+      const column = kanbanCustomColumns(board).find(item => item.id === id);
+      if (!column) return;
+      if (kanbanColumnInUse(board, id)) { showToast(`Move every card out of ${column.name} before deleting it.`, "warning"); return; }
+      const accepted = await openAppConfirmation({ title:"Delete workflow column?", message:`Delete “${column.name}”?`, details:"The protected starting and Completed columns cannot be deleted.", confirmLabel:"Delete column", danger:true });
+      if (!accepted) return;
+      if (saveKanbanColumns(board, kanbanCustomColumns(board).filter(item => item.id !== id), `${column.name} column deleted`, "deleted", id)) document.getElementById("kanbanColumnDialog").close();
+    });
+    document.addEventListener("click", event => {
+      const add = event.target.closest("[data-kanban-add-column]");
+      if (add) return openKanbanColumnDialog(add.dataset.kanbanAddColumn);
+      const edit = event.target.closest("[data-kanban-edit-column]");
+      if (edit) return openKanbanColumnDialog(edit.dataset.kanbanBoard, edit.dataset.kanbanEditColumn);
+      const move = event.target.closest("[data-kanban-move-column]");
+      if (!move || move.disabled) return;
+      const board = move.dataset.kanbanBoard === "agenda" ? "agenda" : "project";
+      const columns = [...kanbanCustomColumns(board)], index = columns.findIndex(column => column.id === move.dataset.kanbanColumn);
+      const target = index + (move.dataset.kanbanMoveColumn === "left" ? -1 : 1);
+      if (index < 0 || target < 0 || target >= columns.length) return;
+      [columns[index], columns[target]] = [columns[target], columns[index]];
+      saveKanbanColumns(board, columns, "Workflow columns reordered", "reordered", move.dataset.kanbanColumn);
+    });
+
     document.getElementById("projectSearch").addEventListener("input", renderProjects);
     document.getElementById("projectStatusFilter").addEventListener("change", renderProjects);
     document.getElementById("projectTypeFilter").addEventListener("change", renderProjects);
@@ -7302,6 +7449,7 @@
         compensationType,
         salaryProjectNumber,
         status: selectedStatus,
+        kanbanColumnId: selectedStatus === "Completed" ? "" : (existing?.kanbanColumnId || ""),
         deadline: document.getElementById("projectDeadline").value,
         value, paid, paymentDate, paymentHistory: history,
         revisionHistory: cloneData(existing?.revisionHistory || []),
@@ -7681,10 +7829,10 @@
     });
 
     // ---------------- V12.10.0 PWA, Phase 11 interface refinement, Phase 10 calculator number inputs, projects, savings goals, and number inputs, Phase 7 secure reset, Phase 6 savings + dashboard insights, Phase 5 reports + dark mode, Phase 4 dashboard + Apple Calendar, Phase 3 monthly navigation, Phase 2 expense workflow, device registry, sync history, offline packs, reminders, and migration ----------------
-    const APP_VERSION = "15.2.17";
-    const APP_RELEASE_NAME = "Runtime-Stable UI Audit";
+    const APP_VERSION = "15.2.18";
+    const APP_RELEASE_NAME = "Horizontal Project Kanban";
     const APP_RELEASE_DATE = "August 21, 2026";
-    const APP_CACHE_VERSION = "finance-v15-20260821-runtime-stable-audit-r53";
+    const APP_CACHE_VERSION = "finance-v15-20260821-horizontal-kanban-r54";
 
     function synchronizeVersionDisplay() {
       document.title = `My Finance Records · V${APP_VERSION}`;
@@ -8101,6 +8249,7 @@
       });
       if (checksum(normalized.savingsSettings || {}) !== checksum(data.savingsSettings || {})) conflicts += 1;
       if (checksum(normalized.accountOrder || []) !== checksum(data.accountOrder || [])) conflicts += 1;
+      if (checksum(normalized.projectKanban || {}) !== checksum(data.projectKanban || {})) conflicts += 1;
       return { normalized, conflicts, summary: dataSummary(normalized) };
     }
 
@@ -8130,6 +8279,7 @@
       next.monthlyReports = { ...(incoming.monthlyReports || {}), ...(next.monthlyReports || {}) };
       next.monthlyChecklists = { ...(incoming.monthlyChecklists || {}), ...(next.monthlyChecklists || {}) };
       next.projectCalendarSettings = { ...(incoming.projectCalendarSettings || {}), ...(next.projectCalendarSettings || {}) };
+      next.projectKanban = { ...(incoming.projectKanban || {}), ...(next.projectKanban || {}) };
       next.salaryWorkSettings = { ...(incoming.salaryWorkSettings || {}), ...(next.salaryWorkSettings || {}) };
       if (conflictPolicy === "incoming") {
         next.accountTypes = { ...(next.accountTypes || {}), ...(incoming.accountTypes || {}) };
@@ -8138,6 +8288,7 @@
         next.monthlyReports = { ...(next.monthlyReports || {}), ...(incoming.monthlyReports || {}) };
         next.monthlyChecklists = { ...(next.monthlyChecklists || {}), ...(incoming.monthlyChecklists || {}) };
         next.projectCalendarSettings = { ...(next.projectCalendarSettings || {}), ...(incoming.projectCalendarSettings || {}) };
+        next.projectKanban = { ...(next.projectKanban || {}), ...(incoming.projectKanban || {}) };
         next.salaryWorkSettings = { ...(next.salaryWorkSettings || {}), ...(incoming.salaryWorkSettings || {}) };
         next.iconLibrary = { ...(next.iconLibrary || {}), ...(incoming.iconLibrary || {}) };
         next.accountIcons = { ...(next.accountIcons || {}), ...(incoming.accountIcons || {}) };
@@ -8972,7 +9123,7 @@
   </script>
   <script src="./vendor/supabase.min.js"></script>
   <script src="./sync-config.js?v=15.2.10-release1"></script>
-  <script src="./sync-runtime-compat.js?v=15.2.17-release8"></script>
+  <script src="./sync-runtime-compat.js?v=15.2.18-release9"></script>
   <script src="./privacy-lock.js?v=15.1.0-ui1"></script>
   <script src="./security-profiles.js?v=14.0.23"></script>
   <script src="./cloud-conflict-review.js?v=14.0.23"></script>
@@ -8982,6 +9133,6 @@
   <script src="./reports-insights.js?v=14.0.23"></script>
   <script src="./productivity-tools.js?v=15.2.1-ux2"></script>
   <script src="./reminders-alerts.js?v=14.0.23"></script>
-  <script src="./projects-calendar-v13.0.20.js?v=15.2.15-project-drag1"></script>
+  <script src="./projects-calendar-v13.0.20.js?v=15.2.18-kanban1"></script>
 
 </body></html>

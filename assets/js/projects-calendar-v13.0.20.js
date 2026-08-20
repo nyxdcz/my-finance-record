@@ -124,18 +124,29 @@
     return { key:"later", label:"Scheduled" };
   }
 
+  function agendaCustomColumns() {
+    return window.FinanceKanbanPreferences?.columns?.("agenda") || [];
+  }
+
+  function agendaColumnId(event) {
+    if (event.completedAt) return "completed";
+    const id = String(event.kanbanColumnId || "");
+    return agendaCustomColumns().some(column => column.id === id) ? id : "upcoming";
+  }
+
   function eventCard(event, { compact = false } = {}) {
     const dateState = agendaDateState(event);
     const completed = Boolean(event.completedAt);
     const title = escapeHtml(event.title || "Untitled agenda event");
     const project = event.projectId ? ` · ${escapeHtml(projectName(event.projectId))}` : "";
     const externalUrl = safeExternalUrl(event.link);
-    const mainTag = compact ? "button" : "div";
-    const mainAttributes = compact ? `type="button" data-pc-edit="${escapeHtml(event.id)}" aria-label="Edit ${title}"` : "";
+    const mainTag = "div";
+    const mainAttributes = "";
     const eventTitle = compact ? `<span class="pc-event-title">${title}</span>` : `<h4>${title}</h4>`;
     const eventMeta = compact ? `<span class="pc-event-meta">${escapeHtml(formatEventDate(event))}${project}</span>` : `<p>${escapeHtml(formatEventDate(event))}${project}</p>`;
-    const structuredAttributes = compact ? "" : ` data-structured-card="agenda" data-structured-id="${escapeHtml(event.id)}" data-structured-label="${title}" data-structured-origin="${completed ? "completed" : "upcoming"}"`;
-    const dragHandle = compact ? "" : `<button type="button" class="structured-drag-handle pc-event-drag-handle" draggable="true" data-structured-drag-handle aria-label="Move ${title} between Upcoming and Completed. Press Space for keyboard controls." title="Move between Upcoming and Completed"><span aria-hidden="true">⠿</span></button>`;
+    const origin = agendaColumnId(event);
+    const structuredAttributes = completed ? "" : ` draggable="true" tabindex="0" aria-roledescription="draggable agenda card" data-structured-card="agenda" data-structured-card-draggable data-structured-id="${escapeHtml(event.id)}" data-structured-label="${title}" data-structured-origin="${escapeHtml(origin)}" aria-label="${title}. Drag or press Space to move between agenda columns."`;
+    const dragHandle = completed ? "" : `<span class="finance-kanban-card-grip pc-event-drag-handle" aria-hidden="true">⠿</span>`;
     const details = compact ? "" : `
       ${event.location ? `<small>Location · ${escapeHtml(event.location)}</small>` : ""}
       ${event.attendees ? `<small>Attendees · ${escapeHtml(event.attendees)}</small>` : ""}
@@ -143,7 +154,8 @@
       ${externalUrl ? `<small><a href="${externalUrl}" target="_blank" rel="noopener noreferrer">Open meeting link</a></small>` : ""}
       ${event.notes ? `<small class="pc-event-notes">${escapeHtml(event.notes)}</small>` : ""}`;
     return `
-      <article class="pc-event-card pc-type-${escapeHtml(event.type)} pc-date-${dateState.key} ${compact ? "pc-event-compact" : ""}" data-pc-event-card="${escapeHtml(event.id)}"${structuredAttributes}>
+      <article class="pc-event-card finance-kanban-card pc-type-${escapeHtml(event.type)} pc-date-${dateState.key} ${compact ? "pc-event-compact" : ""}" data-pc-event-card="${escapeHtml(event.id)}"${structuredAttributes}>
+        ${dragHandle}
         <${mainTag} class="pc-event-main" ${mainAttributes}>
           <span class="pc-event-topline"><span class="pc-event-type">${escapeHtml(typeLabel(event.type))}</span><span class="pc-event-date-state">${escapeHtml(dateState.label)}</span></span>
           ${eventTitle}
@@ -151,9 +163,8 @@
           ${details}
         </${mainTag}>
         <div class="pc-event-actions">
-          ${dragHandle}
           <button type="button" class="button ${completed ? "button-secondary" : "button-primary"} button-small" data-pc-complete="${escapeHtml(event.id)}">${completed ? "Reopen" : "Complete"}</button>
-          ${compact ? "" : `<button type="button" class="button button-secondary button-small" data-pc-edit="${escapeHtml(event.id)}">Edit</button><div class="record-more-menu overflow-menu pc-event-more-menu"><button type="button" class="button button-secondary button-small overflow-menu-trigger" aria-label="More actions for ${title}" title="More actions" aria-haspopup="menu" aria-controls="pc-event-more-${escapeHtml(event.id)}" aria-expanded="false"><span class="kebab-icon" aria-hidden="true">&#8942;</span><span class="sr-only">More actions</span></button><div class="record-more-panel pc-event-more-panel" id="pc-event-more-${escapeHtml(event.id)}" role="menu" aria-label="More actions for ${title}" hidden><button type="button" class="button button-secondary" role="menuitem" data-pc-ics="${escapeHtml(event.id)}">Export ICS</button><button type="button" class="button button-danger" role="menuitem" data-pc-delete="${escapeHtml(event.id)}">Delete event</button></div></div>`}
+          <button type="button" class="button button-secondary button-small" data-pc-edit="${escapeHtml(event.id)}">Edit</button>${compact ? "" : `<div class="record-more-menu overflow-menu pc-event-more-menu"><button type="button" class="button button-secondary button-small overflow-menu-trigger" aria-label="More actions for ${title}" title="More actions" aria-haspopup="menu" aria-controls="pc-event-more-${escapeHtml(event.id)}" aria-expanded="false"><span class="kebab-icon" aria-hidden="true">&#8942;</span><span class="sr-only">More actions</span></button><div class="record-more-panel pc-event-more-panel" id="pc-event-more-${escapeHtml(event.id)}" role="menu" aria-label="More actions for ${title}" hidden><button type="button" class="button button-secondary" role="menuitem" data-pc-ics="${escapeHtml(event.id)}">Export ICS</button><button type="button" class="button button-danger" role="menuitem" data-pc-delete="${escapeHtml(event.id)}">Delete event</button></div></div>`}
         </div>
       </article>`;
   }
@@ -164,22 +175,26 @@
     const agendaEvents = sortedEvents(events);
     const upcoming = agendaEvents.filter(event => !event.completedAt);
     const completed = agendaEvents.filter(event => event.completedAt).sort((a, b) => String(b.completedAt).localeCompare(String(a.completedAt)));
-    const preview = upcoming.slice(0, 3);
-    const previewList = root.querySelector("[data-pc-event-list]");
-    previewList.innerHTML = preview.length
-      ? preview.map(event => eventCard(event, { compact:true })).join("")
-      : `<div class="pc-empty"><strong>No upcoming events</strong><span>${completed.length ? "Open the full agenda to review completed work." : "Add a meeting, presentation, site visit, or project deadline."}</span></div>`;
-    const remaining = root.querySelector("[data-pc-remaining]");
-    if (remaining) {
-      remaining.hidden = upcoming.length <= preview.length;
-      remaining.textContent = upcoming.length > preview.length ? `+${upcoming.length - preview.length} more upcoming` : "";
-    }
+    const customColumns = agendaCustomColumns();
+    const validColumns = new Set(customColumns.map(column => column.id));
+    const grouped = new Map([["upcoming", upcoming.filter(event => !validColumns.has(event.kanbanColumnId))], ["completed", completed]]);
+    customColumns.forEach(column => grouped.set(column.id, upcoming.filter(event => event.kanbanColumnId === column.id)));
+    const emptyColumn = (name, completedColumn = false) => `<div class="finance-kanban-empty"><strong>No ${escapeHtml(name.toLowerCase())} events</strong><span>${completedColumn ? "Drag an upcoming event here to complete it." : "Schedule an event or drag one into this column."}</span></div>`;
+    const columnMarkup = (id, name, color, items, { compact = false, custom = null, index = 0, completedColumn = false, manage = false } = {}) => {
+      const shown = compact ? items.slice(0, 3) : items;
+      const menu = manage && custom ? window.FinanceKanbanPreferences?.menu?.("agenda", custom, index, customColumns.length) || "" : "";
+      return `<section class="finance-kanban-column ${completedColumn ? "finance-kanban-column-completed" : ""}" data-kanban-color="${color}" data-structured-drop-zone data-structured-drop-kind="agenda" data-structured-drop-destination="${escapeHtml(id)}" data-structured-drop-label="${escapeHtml(name)} agenda"><div class="finance-kanban-column-header"><div><h4>${escapeHtml(name)}</h4><small>${items.length} ${items.length === 1 ? "event" : "events"}</small></div>${menu || `<strong>${items.length}</strong>`}</div><div class="finance-kanban-card-list">${shown.length ? shown.map(event => eventCard(event, { compact })).join("") : emptyColumn(name, completedColumn)}</div>${compact && items.length > shown.length ? `<button type="button" class="pc-agenda-more" data-pc-view>+${items.length - shown.length} more</button>` : ""}</section>`;
+    };
+    const boardColumns = options => [
+      columnMarkup("upcoming", "Upcoming", "blue", grouped.get("upcoming"), options),
+      ...customColumns.map((column, index) => columnMarkup(column.id, column.name, column.color, grouped.get(column.id), { ...options, custom:column, index })),
+      columnMarkup("completed", "Completed", "teal", grouped.get("completed"), { ...options, completedColumn:true })
+    ].join("");
+    const previewBoard = root.querySelector("[data-pc-board]");
+    if (previewBoard) previewBoard.innerHTML = boardColumns({ compact:true, manage:true });
     root.querySelector("[data-pc-count]").textContent = `${upcoming.length} upcoming · ${completed.length} completed`;
-
-    const fullUpcoming = document.querySelector("[data-pc-full-upcoming]");
-    const fullCompleted = document.querySelector("[data-pc-full-completed]");
-    if (fullUpcoming) fullUpcoming.innerHTML = upcoming.length ? upcoming.map(event => eventCard(event)).join("") : `<div class="pc-empty"><strong>No upcoming events</strong><span>Schedule a project date to add it here.</span></div>`;
-    if (fullCompleted) fullCompleted.innerHTML = completed.length ? completed.map(event => eventCard(event)).join("") : `<div class="pc-empty"><strong>No completed events</strong><span>Completed agenda entries will remain available here.</span></div>`;
+    const fullBoard = document.querySelector("[data-pc-full-board]");
+    if (fullBoard) fullBoard.innerHTML = boardColumns({ compact:false, manage:false });
     document.querySelectorAll("[data-pc-full-count]").forEach(node => { node.textContent = `${agendaEvents.length} total`; });
   }
 
@@ -301,6 +316,7 @@
       reminder: document.getElementById("pcEventReminder").value,
       notes: document.getElementById("pcEventNotes").value.trim().slice(0, 1000),
       completedAt: existing?.completedAt || "",
+      kanbanColumnId: existing?.completedAt ? "" : (existing?.kanbanColumnId || ""),
       updatedAt: new Date().toISOString(),
       createdAt: existing?.createdAt || new Date().toISOString()
     };
@@ -346,7 +362,7 @@
       if (!accepted) return;
     }
     const timestamp = new Date().toISOString();
-    const next = events.map(item => item.id === id ? { ...item, completedAt:completing ? timestamp : "", updatedAt:timestamp } : item);
+    const next = events.map(item => item.id === id ? { ...item, completedAt:completing ? timestamp : "", kanbanColumnId:"", updatedAt:timestamp } : item);
     if (!safeWrite(next)) return;
     events = next;
     render();
@@ -357,8 +373,9 @@
   async function moveAgendaEventByDrop(id, destination) {
     const event = events.find(item => item.id === id);
     const completing = destination === "completed";
-    if (!event || !["upcoming", "completed"].includes(destination)) return { success:false, message:"Agenda event is no longer available." };
-    if (Boolean(event.completedAt) === completing) return { success:false, message:`${event.title || "Agenda event"} is already in ${destination}.` };
+    const custom = agendaCustomColumns().find(column => column.id === destination);
+    if (!event || (!["upcoming", "completed"].includes(destination) && !custom)) return { success:false, message:"Agenda event is no longer available." };
+    if (agendaColumnId(event) === destination) return { success:false, message:`${event.title || "Agenda event"} is already in that column.` };
 
     const original = { ...event };
     let linkedProjectAction = null;
@@ -368,7 +385,7 @@
     }
 
     const timestamp = new Date().toISOString();
-    const next = events.map(item => item.id === id ? { ...item, completedAt:completing ? timestamp : "", updatedAt:timestamp } : item);
+    const next = events.map(item => item.id === id ? { ...item, completedAt:completing ? timestamp : "", kanbanColumnId:custom ? custom.id : "", updatedAt:timestamp } : item);
     if (!safeWrite(next)) {
       if (linkedProjectAction?.undo) await linkedProjectAction.undo();
       return { success:false, message:"Agenda event could not be saved." };
@@ -377,9 +394,10 @@
     render();
     notifyAgendaChanged(completing ? "drop-completed" : "drop-reopened", id);
     const title = event.title || "Agenda event";
+    const destinationName = completing ? "Completed" : custom?.name || "Upcoming";
     return {
       success:true,
-      message:`${title} moved to ${completing ? "Completed" : "Upcoming"} agenda.`,
+      message:`${title} moved to ${destinationName}.`,
       undo:async () => {
         const current = events.find(item => item.id === id);
         if (!current) return false;
@@ -485,14 +503,11 @@
         <div class="pc-header-actions">
           <span class="pc-count" data-pc-count>0 events</span>
           <button type="button" class="button button-secondary button-small" data-pc-view>View full agenda</button>
+          <button type="button" class="button button-secondary button-small" data-kanban-add-column="agenda">+ Add column</button>
           <button type="button" class="button button-primary button-small" data-pc-add>+ Schedule event</button>
         </div>
       </div>
-      <div class="pc-agenda pc-agenda-preview">
-        <div class="pc-agenda-heading"><strong>Next events</strong><small>Click an event to edit</small></div>
-        <div class="pc-agenda-list" data-pc-event-list></div>
-        <button type="button" class="pc-agenda-more" data-pc-view data-pc-remaining hidden></button>
-      </div>
+      <div class="pc-agenda pc-agenda-preview"><div class="finance-kanban-board agenda-kanban-board" data-pc-board aria-label="Project Agenda workflow columns"></div></div>
       <p class="pc-message" data-pc-message aria-live="polite"></p>
     `;
     heading.insertAdjacentElement("afterend", card);
@@ -531,10 +546,7 @@
     fullDialog.setAttribute("aria-labelledby", "projectAgendaFullDialogTitle");
     fullDialog.innerHTML = `
       <div class="modal-header pc-full-header"><div><h3 id="projectAgendaFullDialogTitle">Project Agenda</h3><small data-pc-full-count>0 total</small></div><div><button type="button" class="button button-primary button-small" data-pc-full-add>+ Schedule event</button><button type="button" class="button button-secondary button-small" data-pc-full-close>Close</button></div></div>
-      <div class="modal-body pc-full-body">
-        <section class="pc-full-section" aria-labelledby="pcUpcomingAgendaTitle" data-structured-drop-zone data-structured-drop-kind="agenda" data-structured-drop-destination="upcoming" data-structured-drop-label="Upcoming agenda"><div class="pc-full-section-heading"><h4 id="pcUpcomingAgendaTitle">Upcoming</h4><small>Ordered by date and time</small></div><div class="pc-agenda-list pc-full-list" data-pc-full-upcoming></div></section>
-        <section class="pc-full-section" aria-labelledby="pcCompletedAgendaTitle" data-structured-drop-zone data-structured-drop-kind="agenda" data-structured-drop-destination="completed" data-structured-drop-label="Completed agenda"><div class="pc-full-section-heading"><h4 id="pcCompletedAgendaTitle">Completed</h4><small>Kept for project history</small></div><div class="pc-agenda-list pc-full-list" data-pc-full-completed></div></section>
-      </div>
+      <div class="modal-body pc-full-body"><div class="finance-kanban-board agenda-kanban-board agenda-kanban-board-full" data-pc-full-board aria-label="Full Project Agenda workflow columns"></div></div>
       <div class="modal-footer"><button type="button" class="button button-secondary" data-pc-full-close>Close</button></div>`;
     document.body.appendChild(fullDialog);
 
@@ -569,7 +581,7 @@
 
     // Add a Schedule button to each rendered project without modifying the core project renderer.
     const observeProjects = () => {
-      document.querySelectorAll("#activeProjectList .project-record, #completedProjectList .project-record").forEach(row => {
+      document.querySelectorAll("#projectKanbanBoard .project-record").forEach(row => {
         if (row.querySelector("[data-pc-project-schedule]")) return;
         const projectId = row.querySelector("[data-edit-project]")?.dataset.editProject;
         if (!projectId) return;
@@ -608,6 +620,20 @@
 
   window.FinanceStructuredDropActions = window.FinanceStructuredDropActions || {};
   window.FinanceStructuredDropActions.agenda = { move:moveAgendaEventByDrop };
+  window.FinanceAgendaKanban = { columnHasItems:id => events.some(event => !event.completedAt && event.kanbanColumnId === id) };
+
+  window.addEventListener("finance:kanban-columns-changed", event => {
+    if (event.detail?.board !== "agenda") return;
+    const valid = new Set(agendaCustomColumns().map(column => column.id));
+    let changed = false;
+    events = events.map(item => {
+      if (!item.kanbanColumnId || valid.has(item.kanbanColumnId)) return item;
+      changed = true;
+      return { ...item, kanbanColumnId:"", updatedAt:new Date().toISOString() };
+    });
+    if (changed) safeWrite(events);
+    render();
+  });
 
   window.addEventListener("finance:page-changed", event => {
     if (event.detail?.pageId === "projects") {

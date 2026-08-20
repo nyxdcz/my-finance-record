@@ -52,6 +52,88 @@
 .pc-full-section-heading small { color:var(--muted); font-size:.57rem; }
 .pc-full-list { max-height:none; overflow:visible; }
 
+.project-kanban-header-actions { display:flex; align-items:center; justify-content:flex-end; gap:8px; flex-wrap:wrap; }
+.finance-kanban-board {
+  min-width:0;
+  padding:8px;
+  display:flex;
+  align-items:stretch;
+  gap:9px;
+  overflow-x:auto;
+  overscroll-behavior-inline:contain;
+  scrollbar-gutter:stable;
+  scroll-snap-type:inline proximity;
+}
+.finance-kanban-column {
+  --kanban-accent:var(--primary);
+  min-width:260px;
+  flex:1 0 280px;
+  scroll-snap-align:start;
+  padding:8px;
+  border:1px solid var(--line);
+  border-top:3px solid var(--kanban-accent);
+  border-radius:9px;
+  background:color-mix(in srgb,var(--surface-soft) 82%,var(--kanban-accent) 3%);
+}
+.finance-kanban-column[data-kanban-color="teal"] { --kanban-accent:#20b7a5; }
+.finance-kanban-column[data-kanban-color="amber"] { --kanban-accent:#e8a52a; }
+.finance-kanban-column[data-kanban-color="violet"] { --kanban-accent:#8b73e6; }
+.finance-kanban-column[data-kanban-color="rose"] { --kanban-accent:#db657b; }
+.finance-kanban-column[data-kanban-color="slate"] { --kanban-accent:#8491a3; }
+.finance-kanban-column-header { min-height:34px; margin-bottom:7px; display:flex; align-items:flex-start; justify-content:space-between; gap:8px; }
+.finance-kanban-column-header h4 { margin:0; font-size:.76rem; line-height:1.2; }
+.finance-kanban-column-header small { display:block; margin-top:2px; color:var(--muted); font-size:.58rem; }
+.finance-kanban-column-header > strong { min-width:25px; min-height:25px; padding:2px 6px; display:inline-flex; align-items:center; justify-content:center; border-radius:999px; background:color-mix(in srgb,var(--kanban-accent) 14%,var(--surface)); color:var(--kanban-accent); font-size:.62rem; }
+.kanban-column-menu .overflow-menu-trigger { width:30px; min-width:30px; min-height:30px; padding:0; }
+.finance-kanban-card-list { min-height:104px; display:grid; align-content:start; gap:7px; }
+.finance-kanban-card {
+  position:relative;
+  min-width:0;
+  border:1px solid var(--line);
+  border-left:3px solid var(--kanban-accent, var(--line));
+  border-radius:8px;
+  background:var(--surface);
+  box-shadow:0 2px 8px rgb(0 0 0 / .08);
+}
+.finance-kanban-card[data-structured-card-draggable] { cursor:grab; touch-action:pan-y; user-select:none; -webkit-user-select:none; }
+.finance-kanban-card[data-structured-card-draggable]:active,.finance-kanban-card.is-structured-dragging { cursor:grabbing; }
+.finance-kanban-card[data-structured-card-draggable]:focus-visible { outline:2px solid var(--primary); outline-offset:2px; }
+.finance-kanban-card-grip { color:var(--muted); font-size:1rem; line-height:1; letter-spacing:-.12em; }
+.project-kanban-board { padding:0; }
+#projects .project-kanban-board .finance-kanban-card.project-record {
+  display:flex !important;
+  flex-direction:column;
+  gap:7px !important;
+  min-height:0 !important;
+  padding:10px !important;
+  font-size:.7rem;
+  grid-template-columns:none !important;
+}
+.finance-kanban-card-header { display:flex; align-items:flex-start; gap:7px; }
+.finance-kanban-card-header .record-title { min-width:0; flex:1; }
+.finance-kanban-card-header .record-title strong { display:block; font-size:.77rem; }
+.finance-kanban-card-header .record-title small { display:block; margin-top:2px; font-size:.58rem; }
+.finance-kanban-card-meta { display:flex; justify-content:space-between; gap:8px; color:var(--muted); font-size:.6rem; }
+.finance-kanban-card-value { display:flex; align-items:baseline; justify-content:space-between; gap:8px; }
+.finance-kanban-card-value > span { font-size:.82rem; font-weight:850; }
+.finance-kanban-card-value small { color:var(--muted); font-size:.58rem; }
+.finance-kanban-card-statuses { display:flex; align-items:center; gap:5px; flex-wrap:wrap; }
+.finance-kanban-card-statuses .project-deadline-state,.finance-kanban-card-statuses .project-revision-inline { margin:0; }
+#projects .project-kanban-board .project-row-actions { min-height:34px; padding-top:7px; display:flex; align-items:center; justify-content:flex-start; gap:5px; border-top:1px solid var(--line); }
+.project-kanban-calendar { margin-right:auto; }
+#projects .project-kanban-board .project-calendar-button { min-height:30px; height:30px; margin:0; }
+#projects .project-kanban-board .project-row-actions .button { min-height:30px; height:30px; padding:4px 8px; }
+.finance-kanban-empty { min-height:84px; padding:12px 9px; display:flex; flex-direction:column; align-items:center; justify-content:center; border:1px dashed color-mix(in srgb,var(--kanban-accent) 40%,var(--line)); border-radius:7px; color:var(--muted); text-align:center; }
+.finance-kanban-empty strong { color:var(--text); font-size:.67rem; }
+.finance-kanban-empty span { margin-top:3px; font-size:.56rem; line-height:1.35; }
+.agenda-kanban-board { padding:0; }
+.agenda-kanban-board .pc-event-card { display:block; padding:8px; }
+.agenda-kanban-board .pc-event-drag-handle { position:absolute; top:7px; right:8px; z-index:1; }
+.agenda-kanban-board .pc-event-main { display:block; padding-right:18px; }
+.agenda-kanban-board .pc-event-actions { margin-top:7px; padding-top:6px; border-top:1px solid var(--line); }
+.agenda-kanban-board-full .finance-kanban-column { flex-basis:310px; }
+.pc-full-dialog { width:min(1180px,calc(100vw - 28px)) !important; }
+
 .structured-drag-handle {
   width:32px;
   min-width:32px;
@@ -82,7 +164,7 @@
 .is-structured-drop-available { outline:2px dashed color-mix(in srgb,var(--primary) 78%,transparent); outline-offset:-4px; background:color-mix(in srgb,var(--primary) 7%,var(--surface)) !important; }
 .is-structured-drop-target { outline-style:solid; outline-color:var(--primary); background:color-mix(in srgb,var(--primary) 15%,var(--surface)) !important; box-shadow:0 0 0 3px color-mix(in srgb,var(--primary) 20%,transparent); }
 .is-structured-drop-origin { opacity:.58; }
-.is-structured-dragging { opacity:.72; box-shadow:0 16px 38px rgb(0 0 0 / .24); }
+.is-structured-dragging { opacity:.78; box-shadow:0 18px 42px rgb(0 0 0 / .3); transform:rotate(1.2deg) scale(1.015); }
 .is-pointer-dragging { position:relative; z-index:1200; pointer-events:none; transform:translate3d(var(--structured-drag-x,0),var(--structured-drag-y,0),0) scale(1.015); }
 .is-structured-returning { animation:structured-drag-return 220ms ease-out; }
 @keyframes structured-drag-return { from { opacity:.72; transform:scale(.985); } to { opacity:1; transform:scale(1); } }
@@ -127,8 +209,18 @@ html[data-theme="dark"] .pc-date-soon .pc-event-date-state { background:#4a3e17;
   .pc-event-card { display:block; }
   .pc-event-actions { margin-top:6px; justify-content:flex-start; }
   .pc-event-actions .button { min-height:40px; padding:7px 10px; }
-  .pc-event-compact { display:flex; align-items:center; }
-  .pc-event-compact .pc-event-actions { margin-top:0; }
+  .pc-event-compact { display:block; }
+  .pc-event-compact .pc-event-actions { margin-top:7px; }
+  .project-kanban-header-actions { justify-content:flex-start; margin-top:7px; }
+  .finance-kanban-board { margin-inline:-1px; padding:5px 1px 9px; gap:8px; }
+  .finance-kanban-column { min-width:min(82vw,310px); flex:0 0 min(82vw,310px); padding:7px; }
+  .finance-kanban-card-list { min-height:118px; }
+  #projects .project-kanban-board .finance-kanban-card.project-record { padding:10px !important; }
+  #projects .project-kanban-board .project-row-actions { flex-wrap:wrap; }
+  .project-kanban-calendar { width:100%; margin:0; }
+  #projects .project-kanban-board .project-calendar-button { width:100%; min-height:40px; height:40px; }
+  #projects .project-kanban-board .project-row-actions .button { min-height:40px; height:40px; }
+  .finance-kanban-card-grip { min-width:22px; min-height:22px; display:inline-flex; align-items:center; justify-content:center; }
   .pc-full-header { align-items:flex-start !important; }
   .pc-full-header > div:last-child { flex-wrap:wrap; justify-content:flex-end; }
   .pc-full-section-heading { align-items:flex-start; flex-direction:column; }

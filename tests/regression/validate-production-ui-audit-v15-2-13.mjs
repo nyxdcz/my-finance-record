@@ -11,9 +11,9 @@ const browserAudit = read("tests/browser/production-ui-audit-v15-2-13.spec.mjs")
 const version = JSON.parse(read("version.json"));
 const pkg = JSON.parse(read("package.json"));
 
-assert.equal(version.version, "15.2.17");
-assert.equal(pkg.version, "15.2.17");
-assert.equal(version.cacheVersion, "finance-v15-20260821-runtime-stable-audit-r53");
+assert.equal(version.version, "15.2.18");
+assert.equal(pkg.version, "15.2.18");
+assert.equal(version.cacheVersion, "finance-v15-20260821-horizontal-kanban-r54");
 assert.match(index, /production-ui-audit-v15-2-13\.css\?v=15\.2\.14-audit2/);
 assert.ok(index.indexOf("production-ui-audit-v15-2-13.css") > index.indexOf("desktop-ux-v15-2-0.css"));
 assert.match(worker, /production-ui-audit-v15-2-13\.css\?v=15\.2\.14-audit2/);
@@ -37,4 +37,4 @@ assert.match(browserAudit, /finance-signed-in/);
 assert.match(browserAudit, /window\.goToPage\("money"/);
 assert.match(browserAudit, /summaries:8, periods:3/);
 
-console.log("V15.2.17 production UI/UX audit source contract passed.");
+console.log("V15.2.18 production UI/UX audit source contract passed.");

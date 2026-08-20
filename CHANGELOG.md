@@ -1,3 +1,8 @@
+## 15.2.18 · 2026-08-21
+- Rebuilt Project Agenda and Projects as horizontal Kanban boards that move full cards from left to right with mouse, touch, or keyboard controls.
+- Added protected starting and Completed columns plus user-created, named, colored, reorderable columns that persist with synchronized project settings.
+- Preserved completion confirmation, project values, received payments, balances, revision history, agenda records, invalid-drop return animation, and five-second Undo while rotating the PWA shell to `finance-v15-20260821-horizontal-kanban-r54`.
+
 ## 15.2.17 · 2026-08-21
 - Waited for the current service-worker controller and network activity to settle before responsive Finance measurements begin.
 - Reapplied the test privacy-authentication state and explicitly activated Budget & Expenses after PWA initialization, preventing controller changes from hiding the measured workspace.

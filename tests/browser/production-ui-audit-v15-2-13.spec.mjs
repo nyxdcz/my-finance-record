@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 const APP_URL = "http://127.0.0.1:3000/index.html?page=money";
-const APP_CACHE = "finance-v15-20260821-runtime-stable-audit-r53";
+const APP_CACHE = "finance-v15-20260821-horizontal-kanban-r54";
 
 async function openFinance(page, viewport) {
   await page.setViewportSize(viewport);

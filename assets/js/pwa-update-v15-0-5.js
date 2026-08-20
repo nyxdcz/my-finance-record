@@ -2,7 +2,7 @@
 (function exposeFinancePwaUpdate(root) {
   const FINANCE_CACHE_PATTERN = /^finance-v\d+-/;
   const LEGACY_INDEX_CACHE = "finance-v15-20260816-mobile-ui-ux-r32";
-  const CURRENT_CACHE_VERSION = "finance-v15-20260821-runtime-stable-audit-r53";
+  const CURRENT_CACHE_VERSION = "finance-v15-20260821-horizontal-kanban-r54";
   const normalizeCacheVersion = cacheVersion => cacheVersion === LEGACY_INDEX_CACHE ? CURRENT_CACHE_VERSION : cacheVersion;
   const api = {
     financeCachePattern:FINANCE_CACHE_PATTERN,
