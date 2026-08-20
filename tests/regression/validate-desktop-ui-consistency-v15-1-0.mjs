@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 
 const read = path => fs.readFileSync(path, "utf8");
 const app = read("app.css");
+const shell = read("assets/css/shell-ui-v15-2-11.css");
 const reports = read("reports-insights.css");
 const budget = read("budget-planning.css");
 const calendar = read("projects-calendar-v13.0.20.css");
@@ -15,10 +16,10 @@ const index = read("index.html");
 const sw = read("sw.js");
 const version = JSON.parse(read("version.json"));
 
-assert.equal(version.version, "15.2.10");
+assert.equal(version.version, "15.2.11");
 assert.equal(version.schemaVersion, 12);
 assert.equal(version.cloudSchemaVersion, 3);
-assert.equal(version.cacheVersion, "finance-v15-20260820-sidebar-icons-r46");
+assert.equal(version.cacheVersion, "finance-v15-20260820-shell-ui-r47");
 assert.match(app, /--desktop-header-height:\s*64px/);
 assert.match(app, /--desktop-page-gutter:\s*24px/);
 assert.match(app, /--workspace-card-radius:\s*9px/);
@@ -32,7 +33,7 @@ assert.doesNotMatch(app, /top:71px|top:74px/);
 assert.match(app, /#projects \.project-summary-strip > \* \{ min-height:70px/);
 assert.match(app, /#payments \.kpi-card \{ min-height:70px/);
 assert.match(app, /#reports \.report-section-nav button \{ min-height:35px/);
-assert.match(app, /\.sidebar-close-button \{[^}]*width:44px; height:44px;/s);
+assert.match(shell, /\.sidebar-close-button \{[^}]*width:44px; height:44px;/s);
 assert.match(app, /\.record-header \{[^}]*background: var\(--surface-soft\)/s);
 assert.match(app, /\.input, \.select, \.textarea \{[^}]*background: var\(--surface\)/s);
 assert.match(reports, /report-insights-filters \.input,.report-insights-filters \.select \{ min-height:35px; height:35px/);
@@ -54,6 +55,7 @@ assert.match(dashboard, /#customizeDashboardButton\[data-dashboard-toolbar-actio
 assert.doesNotMatch(sync, /@media\(min-width:701px\)\{#dashboard\.page\.active/);
 for (const pin of [
   "app.css?v=15.1.0-desktop3",
+  "shell-ui-v15-2-11.css?v=15.2.11-shell1",
   "dashboard-interactions.css?v=15.2.10-icons1",
   "security-profiles.css?v=15.1.0-desktop2",
   "reports-insights.css?v=15.1.0-desktop1",
@@ -62,10 +64,11 @@ for (const pin of [
   "black-canvas-v15-1-0.css?v=15.1.0-light1",
   "sync-config.js?v=15.2.10-release1"
 ]) assert.ok(index.includes(pin), `index missing ${pin}`);
-assert.ok(index.includes('const APP_CACHE_VERSION = "finance-v15-20260820-sidebar-icons-r46";'));
-assert.ok(sw.includes("finance-v15-20260820-sidebar-icons-r46"));
+assert.ok(index.includes('const APP_CACHE_VERSION = "finance-v15-20260820-shell-ui-r47";'));
+assert.ok(sw.includes("finance-v15-20260820-shell-ui-r47"));
 for (const pin of [
   "app.css?v=15.1.0-desktop3",
+  "shell-ui-v15-2-11.css?v=15.2.11-shell1",
   "dashboard-interactions.css?v=15.2.10-icons1",
   "security-profiles.css?v=15.1.0-desktop2",
   "reports-insights.css?v=15.1.0-desktop1",
@@ -75,4 +78,4 @@ for (const pin of [
   "sync-config.js?v=15.2.10-release1",
   "liquid-glass-v15.css?v=15.2.2-light1"
 ]) assert.ok(sw.includes(pin), `service worker missing ${pin}`);
-console.log("V15.2.9 desktop UI consistency validation passed.");
+console.log("V15.2.11 desktop UI consistency validation passed.");

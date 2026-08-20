@@ -3,6 +3,7 @@ import { test, expect } from "@playwright/test";
 const widths = [1024, 1280, 1366, 1440, 1920];
 const css = [
   "app.css?v=15.1.0-desktop3",
+  "shell-ui-v15-2-11.css?v=15.2.11-shell1",
   "reports-insights.css?v=15.1.0-desktop1",
   "budget-planning.css?v=15.2.9-ui1",
   "security-profiles.css?v=15.1.0-desktop2",

@@ -20,6 +20,7 @@ const testPlan = [
   { suite: "regression", file: "tests/regression/validate-application-help-v15-2-7.mjs" },
   { suite: "regression", file: "tests/regression/validate-sidebar-embedded-v15-2-10.mjs" },
   { suite: "regression", file: "tests/regression/validate-sidebar-brand-static-v15-2-10.mjs" },
+  { suite: "regression", file: "tests/regression/validate-shell-ui-css-ownership-v15-2-11.mjs" },
   { suite: "regression", file: "tests/regression/validate-sync-config-separation.mjs" },
 ];
 

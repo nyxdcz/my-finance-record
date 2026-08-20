@@ -1,3 +1,9 @@
+## 15.2.11 · 2026-08-20
+- Extracted stable shell, privacy, navigation, header-history, Settings-search, install-guidance, and iPhone input-protection rules from `app.css` into `shell-ui-v15-2-11.css`.
+- Preserved the existing cascade by loading the dedicated stylesheet immediately after `app.css`, including it in local runtime preparation, and precaching it for installed clients.
+- Added focused source ownership and deployment regressions, restoring `app.css` maintainability headroom without changing UI behavior.
+- Rotated the PWA shell to `finance-v15-20260820-shell-ui-r47` while keeping Finance Schema 12, Cloud Schema V3, finance calculations, balances, records, storage, authentication, sync/conflict behavior, and five-minute Cloud Sync unchanged.
+
 ## 15.2.10 · 2026-08-20
 - Embedded the canonical Overview, Finance, Work, Insights, and Settings PNG artwork directly in the sidebar markup so those icons render without separate image requests.
 - Removed the obsolete V14.0.24 CSS content:url sidebar overrides that referenced missing Overview, Finance, Work, and Settings files and caused the browser broken-image placeholders seen on the live V15.2.9 app.

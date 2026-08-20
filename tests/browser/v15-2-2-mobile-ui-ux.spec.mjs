@@ -7,6 +7,7 @@ const css = [
   "projects-calendar-v13.0.20.css?v=15.1.0-desktop2",
   "mobile-v14-0-23.css?v=15.2.10-mobile2",
   "app.css?v=15.1.0-desktop3",
+  "shell-ui-v15-2-11.css?v=15.2.11-shell1",
   "dashboard-interactions.css?v=15.2.10-icons1",
   "ui-icon-alignment-v15-0-5.css?v=15.1.0-ui3",
   "black-canvas-v15-1-0.css?v=15.1.0-light1",
