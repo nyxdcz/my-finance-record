@@ -1,11 +1,11 @@
-# My Finance Records · V15.2.15
+# My Finance Records · V15.2.16
 
 <div align="center">
 
 **A local-first personal and household finance PWA built for privacy, resilience, and everyday use.**
 
 [![Quality checks](https://github.com/nyxdcz/my-finance-record/actions/workflows/quality-pages.yml/badge.svg?branch=main)](https://github.com/nyxdcz/my-finance-record/actions/workflows/quality-pages.yml)
-![Version](https://img.shields.io/badge/version-V15.2.15-2563eb)
+![Version](https://img.shields.io/badge/version-V15.2.16-2563eb)
 ![PWA](https://img.shields.io/badge/PWA-offline--ready-16a34a)
 ![Node](https://img.shields.io/badge/Node.js-22%2B-339933?logo=nodedotjs&logoColor=white)
 
@@ -15,9 +15,9 @@
 
 | Release | Finance schema | Cloud schema | Sync cadence |
 | --- | ---: | ---: | ---: |
-| **V15.2.15** · Structured Project Drag & Drop | **12** | **V3** | **5 minutes** |
+| **V15.2.16** · Production Audit Reliability | **12** | **V3** | **5 minutes** |
 
-The current release adds accessible mouse, touch, and keyboard movement between Project Agenda states and from Active Projects to Completed Projects. Valid destinations are clearly highlighted, invalid drops return safely, and a five-second Undo preserves control without changing project values or payment history. Finance calculations, stored data, schemas, and sync behavior are unchanged.
+The current release hardens production UI verification across supported desktop and phone widths by waiting for the Finance view to finish rendering and checking only controls that are actually visible. Application behavior, finance calculations, stored data, schemas, and sync behavior are unchanged.
 
 ## What it offers
 

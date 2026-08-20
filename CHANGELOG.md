@@ -1,3 +1,9 @@
+## 15.2.16 · 2026-08-21
+- Made the production Finance audit wait for summaries and period controls to finish rendering before measuring responsive geometry.
+- Replaced the stale desktop toolbar control count with named Month navigator and More tools checks while preserving the shared 38px compact height contract.
+- Excluded hidden duplicate period controls from phone touch-target measurements while continuing to require every visible disclosure control to be at least 44px.
+- Preserved Finance Schema 12, Cloud Schema V3, saved records, calculations, balances, project drag-and-drop behavior, and the five-minute sync cadence while rotating the PWA shell to `finance-v15-20260821-production-audit-r52`.
+
 ## 15.2.15 · 2026-08-20
 - Added structured mouse, touch, and keyboard drag-and-drop between Project Agenda Upcoming and Completed sections and from Active Projects into Completed Projects.
 - Added clear pickup, valid-destination, active-target, safe-return, screen-reader, and reduced-motion states plus a five-second Undo notification that pauses while hovered or focused.

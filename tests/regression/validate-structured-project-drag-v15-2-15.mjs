@@ -8,7 +8,7 @@ const agenda = read("assets/js/projects-calendar-v13.0.20.js");
 const agendaCss = read("assets/css/projects-calendar-v13.0.20.css");
 const version = JSON.parse(read("version.json"));
 
-assert.equal(version.version, "15.2.15");
+assert.equal(version.version, "15.2.16");
 assert.equal(version.schemaVersion, 12, "Finance Schema must remain 12");
 assert.equal(version.cloudSchemaVersion, 3, "Cloud Schema must remain V3");
 
@@ -38,4 +38,4 @@ assert.match(agendaCss, /\.is-structured-drop-target/);
 assert.match(agendaCss, /@media \(prefers-reduced-motion:reduce\)/);
 assert.match(agendaCss, /\.structured-drag-handle \{ width:44px; min-width:44px; height:44px; \}/);
 
-console.log("V15.2.15 structured Project Agenda and Active-to-Completed drag source contract passed.");
+console.log("V15.2.16 structured Project Agenda and Active-to-Completed drag source contract passed.");

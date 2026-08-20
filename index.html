@@ -41,7 +41,7 @@
     })();
   </script>
 
-  <title>My Finance Records · V15.2.15</title>
+  <title>My Finance Records · V15.2.16</title>
   <link rel="stylesheet" href="./app.css?v=15.1.0-desktop3">
   <link rel="stylesheet" href="./shell-ui-v15-2-11.css?v=15.2.11-shell1">
   <link rel="stylesheet" href="./dashboard-interactions.css?v=15.2.10-icons1">
@@ -52,7 +52,7 @@
   <link rel="stylesheet" href="./production-ui-audit-v15-2-13.css?v=15.2.14-audit2">
   <script src="./form-inputs.js?v=15.2.6-phase5a1"></script>
   <script src="./application-help.js?v=15.2.9-phase5b1"></script>
-  <script src="./pwa-update-v15-0-5.js?v=15.2.15-release11"></script>
+  <script src="./pwa-update-v15-0-5.js?v=15.2.16-release12"></script>
   <script src="./phone-finance-compat.js?v=15.2.10-phone1"></script>
   <script src="./cash-flow-summary.js?v=15.2.10-cashflow1"></script>
   <script src="./header-tools-compat.js?v=15.2.10-header1"></script>
@@ -97,7 +97,7 @@
           <div>
             <h1 id="topTitle">Budget &amp; Expenses</h1>
             <p id="todayLabel">Tuesday, July 21, 2026</p>
-            <small id="buildBadge" title="V15.2.15 · Structured Project Drag &amp; Drop · August 20, 2026">V15.2.15</small>
+            <small id="buildBadge" title="V15.2.16 · Production Audit Reliability · August 21, 2026">V15.2.16</small>
           </div>
         </div>
         <div class="topbar-actions">
@@ -5521,6 +5521,7 @@
 
     VERSION_HISTORY.unshift({"version":"V15.2.14","title":"Common Desktop Summary Alignment","changes":["Keeps both Budget summary rows at 56px on common 1280px and 1366px desktops.","Preserves primary labels and full amounts while suppressing only secondary copy that would cause row-height drift.","Adds common-desktop browser coverage while preserving the V15.2.13 phone, touch, motion, disclosure, and Dashboard behavior."]});
     VERSION_HISTORY.unshift({"version":"V15.2.15","title":"Structured Project Drag & Drop","changes":["Moves Project Agenda entries between Upcoming and Completed with mouse, touch, or keyboard controls.","Moves Active Projects into Completed Projects without changing values, received payments, or remaining balances.","Adds valid destination cues, safe cancellation, screen-reader updates, reduced-motion behavior, and a five-second Undo action."]});
+    VERSION_HISTORY.unshift({"version":"V15.2.16","title":"Production Audit Reliability","changes":["Waits for the Finance view to finish rendering before responsive geometry is measured.","Checks the named compact desktop controls instead of counting hidden legacy actions.","Measures only visible phone disclosure controls while preserving the 44px touch-target requirement."]});
 
     function normalizeSettingsPanelKey(key) {
       const normalized = SETTINGS_PANEL_ALIASES[key] || key;
@@ -7679,10 +7680,10 @@
     });
 
     // ---------------- V12.10.0 PWA, Phase 11 interface refinement, Phase 10 calculator number inputs, projects, savings goals, and number inputs, Phase 7 secure reset, Phase 6 savings + dashboard insights, Phase 5 reports + dark mode, Phase 4 dashboard + Apple Calendar, Phase 3 monthly navigation, Phase 2 expense workflow, device registry, sync history, offline packs, reminders, and migration ----------------
-    const APP_VERSION = "15.2.15";
-    const APP_RELEASE_NAME = "Structured Project Drag & Drop";
-    const APP_RELEASE_DATE = "August 20, 2026";
-    const APP_CACHE_VERSION = "finance-v15-20260820-structured-project-drag-r51";
+    const APP_VERSION = "15.2.16";
+    const APP_RELEASE_NAME = "Production Audit Reliability";
+    const APP_RELEASE_DATE = "August 21, 2026";
+    const APP_CACHE_VERSION = "finance-v15-20260821-production-audit-r52";
 
     function synchronizeVersionDisplay() {
       document.title = `My Finance Records · V${APP_VERSION}`;
@@ -8970,7 +8971,7 @@
   </script>
   <script src="./vendor/supabase.min.js"></script>
   <script src="./sync-config.js?v=15.2.10-release1"></script>
-  <script src="./sync-runtime-compat.js?v=15.2.15-release6"></script>
+  <script src="./sync-runtime-compat.js?v=15.2.16-release7"></script>
   <script src="./privacy-lock.js?v=15.1.0-ui1"></script>
   <script src="./security-profiles.js?v=14.0.23"></script>
   <script src="./cloud-conflict-review.js?v=14.0.23"></script>

@@ -7,7 +7,12 @@ async function openFinance(page, viewport) {
   await page.goto(APP_URL, { waitUntil:"domcontentloaded" });
   await page.waitForFunction(() => Boolean(window.FinancePrivacyLock));
   await page.evaluate(() => window.FinancePrivacyLock.setAuthenticated(true));
-  await page.waitForFunction(() => document.querySelector("#money")?.classList.contains("active"));
+  await page.waitForFunction(() => {
+    const money = document.querySelector("#money");
+    return money?.classList.contains("active")
+      && money.querySelectorAll(".legend-item, .summary-item").length === 8
+      && money.querySelectorAll(".period-card").length >= 3;
+  });
 }
 
 for (const width of [1024, 1280, 1366, 1440, 1920]) {
@@ -20,10 +25,15 @@ for (const width of [1024, 1280, 1366, 1440, 1920]) {
         return box.width > 0 && box.height > 0 && style.display !== "none" && style.visibility !== "hidden";
       });
       const heights = selector => visible(selector).map(node => node.getBoundingClientRect().height);
+      const height = selector => visible(selector)[0]?.getBoundingClientRect().height || 0;
       return {
         overflow:Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) > innerWidth + 1,
         toolbarGap:parseFloat(getComputedStyle(document.querySelector(".topbar-actions")).gap),
-        toolbarHeights:heights(".topbar-actions > .cloud-sync-toolbar-button, .topbar-actions .topbar-history-button, .topbar-actions .topbar-add-button, .topbar-actions .topbar-tools-trigger, .topbar-actions .month-navigator"),
+        requiredToolbarHeights:{
+          monthNavigator:height(".topbar-actions .month-navigator"),
+          moreTools:height(".topbar-actions .topbar-tools-trigger")
+        },
+        visibleToolbarHeights:heights(".topbar-actions > .cloud-sync-toolbar-button, .topbar-actions .topbar-history-button, .topbar-actions .topbar-add-button, .topbar-actions .topbar-tools-trigger, .topbar-actions .month-navigator"),
         summaryHeights:heights("#money .legend-item, #money .summary-item"),
         disclosureSizes:visible("#money .period-card .collapse-toggle, #money #availableMoneySection [data-collapse-toggle='available-money'], #money #monthlyBudgetPlannerToggle").map(node => {
           const box = node.getBoundingClientRect();
@@ -33,8 +43,9 @@ for (const width of [1024, 1280, 1366, 1440, 1920]) {
     });
     expect(metrics.overflow).toBe(false);
     expect(metrics.toolbarGap).toBe(6);
-    expect(metrics.toolbarHeights.length).toBeGreaterThanOrEqual(3);
-    metrics.toolbarHeights.forEach(height => expect(height).toBeCloseTo(38, 0));
+    expect(metrics.requiredToolbarHeights.monthNavigator).toBeCloseTo(38, 0);
+    expect(metrics.requiredToolbarHeights.moreTools).toBeCloseTo(38, 0);
+    metrics.visibleToolbarHeights.forEach(height => expect(height).toBeCloseTo(38, 0));
     expect(metrics.summaryHeights).toHaveLength(8);
     metrics.summaryHeights.forEach(height => expect(height).toBeLessThanOrEqual(58));
     expect(metrics.disclosureSizes.length).toBeGreaterThanOrEqual(4);
@@ -52,8 +63,13 @@ for (const width of [390, 430]) {
       document.querySelectorAll("#money .period-card").forEach(card => card.classList.add("is-collapsed"));
     });
     const metrics = await page.evaluate(() => {
-      const periods = [...document.querySelectorAll("#money .period-card")];
-      const toggles = [...document.querySelectorAll("#money .period-card .collapse-toggle")];
+      const visible = selector => [...document.querySelectorAll(selector)].filter(node => {
+        const box = node.getBoundingClientRect();
+        const style = getComputedStyle(node);
+        return box.width > 0 && box.height > 0 && style.display !== "none" && style.visibility !== "hidden";
+      });
+      const periods = visible("#money .period-card");
+      const toggles = visible("#money .period-card .collapse-toggle");
       const stack = document.querySelector("#money .section-stack");
       return {
         overflow:Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) > innerWidth + 1,
@@ -68,6 +84,8 @@ for (const width of [390, 430]) {
     });
     expect(metrics.overflow).toBe(false);
     expect(metrics.stackGap).toBeLessThanOrEqual(8);
+    expect(metrics.periodHeights.length).toBeGreaterThanOrEqual(3);
+    expect(metrics.toggleSizes).toHaveLength(metrics.periodHeights.length);
     metrics.periodHeights.forEach(height => expect(height).toBeLessThanOrEqual(72));
     metrics.periodMargins.forEach(margin => expect(margin).toBe(0));
     metrics.toggleSizes.forEach(([widthValue, heightValue]) => {
