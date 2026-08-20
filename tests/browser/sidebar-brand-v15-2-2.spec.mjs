@@ -33,8 +33,10 @@ test("expanded and collapsed desktop sidebar use the static My Finance Records b
       buttonWidth:button.width,
       buttonHeight:button.height,
       buttonTop:button.top,
+      brandFontSize:brand.fontSize,
       brandWhiteSpace:brand.whiteSpace,
-      brandText:document.querySelector(".sidebar .brand strong")?.textContent
+      brandText:document.querySelector(".sidebar .brand strong")?.textContent,
+      navFontSizes:[...document.querySelectorAll(".sidebar .nav-label")].map(label => getComputedStyle(label).fontSize)
     };
   });
 
@@ -42,8 +44,10 @@ test("expanded and collapsed desktop sidebar use the static My Finance Records b
     buttonWidth:"28px",
     buttonHeight:"28px",
     buttonTop:"15px",
+    brandFontSize:"16px",
     brandWhiteSpace:"nowrap",
-    brandText:"My Finance Records"
+    brandText:"My Finance Records",
+    navFontSizes:["11px","11px","11px","11px","11px"]
   });
 
   await page.locator("#sidebar").evaluate(sidebar => {
@@ -55,8 +59,10 @@ test("expanded and collapsed desktop sidebar use the static My Finance Records b
     buttonWidth:"28px",
     buttonHeight:"28px",
     buttonTop:"15px",
+    brandFontSize:"16px",
     brandWhiteSpace:"nowrap",
-    brandText:"My Finance Records"
+    brandText:"My Finance Records",
+    navFontSizes:["11px","11px","11px","11px","11px"]
   });
 });
 
@@ -67,6 +73,10 @@ test("mobile drawer keeps the static My Finance Records brand", async ({ page })
   await menuButton.click();
   await expect(page.locator("#sidebar")).toHaveAttribute("aria-hidden", "false");
   await expect(page.locator(".sidebar .brand strong")).toHaveText("My Finance Records");
+  await expect(page.locator(".sidebar .brand strong")).toHaveCSS("font-size", "16px");
+  for (const label of await page.locator(".sidebar .nav-label").all()) {
+    await expect(label).toHaveCSS("font-size", "11px");
+  }
 });
 
 test("sidebar brand shell cache is synchronized", () => {
