@@ -35,4 +35,4 @@ assert.ok(
 );
 assert.ok(legacy.split(/\r?\n/).length < 5400, "app.css has restored maintainability headroom");
 
-console.log("V15.2.16 shell UI CSS ownership validation passed.");
+console.log("V15.2.17 shell UI CSS ownership validation passed.");

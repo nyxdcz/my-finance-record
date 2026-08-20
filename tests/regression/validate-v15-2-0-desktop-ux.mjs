@@ -13,12 +13,12 @@ const cloudFile = fs.readdirSync(".").find(name => name.endsWith(".js") && read(
 if (!cloudFile) throw new Error("Cloud Sync V3 file missing");
 const cloud = read(cloudFile);
 const required = [
-  [version.version === "15.2.16", "version.json is V15.2.16"],
-  [pkg.version === "15.2.16", "package.json is V15.2.16"],
+  [version.version === "15.2.17", "version.json is V15.2.17"],
+  [pkg.version === "15.2.17", "package.json is V15.2.17"],
   [version.schemaVersion === 12 && version.cloudSchemaVersion === 3, "schemas remain 12/3"],
-  [version.cacheVersion === "finance-v15-20260821-production-audit-r52", "V15.2.16 production UI audit cache is declared"],
-  [index.includes("My Finance Records · V15.2.16"), "page title is V15.2.16"],
-  [changelog.startsWith("## 15.2.16 · 2026-08-21"), "CHANGELOG begins with V15.2.16"],
+  [version.cacheVersion === "finance-v15-20260821-runtime-stable-audit-r53", "V15.2.17 production UI audit cache is declared"],
+  [index.includes("My Finance Records · V15.2.17"), "page title is V15.2.17"],
+  [changelog.startsWith("## 15.2.17 · 2026-08-21"), "CHANGELOG begins with V15.2.17"],
   [changelog.includes("## 15.2.4 · 2026-08-18"), "CHANGELOG preserves the previous V15.2.4 history"],
   [index.includes("recurring items checked"), "month navigation explains recurring preparation"],
   [index.includes("cleared because filters changed"), "selection reset is announced"],
@@ -31,9 +31,9 @@ const required = [
   [prod.includes("synchronize through Cloud Sync") && !prod.includes("Cloud Sync V2"), "Cloud terminology is current"],
   [cloud.includes("Your local changes are safe"), "Cloud error copy is plain-language"],
   [index.includes("cloudToolbarTechnicalDetails") && cloud.includes("cloudToolbarTechnicalError"), "Cloud technical details are optional"],
-  [sw.includes('const APP_VERSION = "15.2.16"') && sw.includes(version.cacheVersion), "service worker delivery matches release"],
+  [sw.includes('const APP_VERSION = "15.2.17"') && sw.includes(version.cacheVersion), "service worker delivery matches release"],
   [sw.includes("desktop-ux-v15-2-0.css?v=15.2.5-disclosure1"), "desktop disclosure CSS is precached"],
-  [runtimeCompat.includes('const VERSION = "15.2.16"') && runtimeCompat.includes('const RELEASE_NAME = "Production Audit Reliability"'), "release override matches V15.2.16"],
+  [runtimeCompat.includes('const VERSION = "15.2.17"') && runtimeCompat.includes('const RELEASE_NAME = "Runtime-Stable UI Audit"'), "release override matches V15.2.17"],
   [index.includes("sync-config.js?v=15.2.10-release1") && sw.includes("sync-config.js?v=15.2.10-release1"), "release layer is cache-busted consistently"],
   [desktopUx.includes("--budget-disclosure-reference-size:var(--ui-disclosure-size,40px)"), "Budget disclosure buttons share the First-half control size"],
   [desktopUx.includes("--budget-disclosure-reference-inset:17px"), "Budget disclosure buttons use the First-half right inset"],
@@ -49,4 +49,4 @@ const required = [
   [read("mobile-v14-0-23.css").length > 0, "mobile stylesheet remains present"]
 ];
 for (const [ok, message] of required) { if (!ok) throw new Error(message); }
-console.log("V15.2.16 release preserves the desktop UX source contract");
+console.log("V15.2.17 release preserves the desktop UX source contract");

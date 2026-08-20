@@ -7,12 +7,13 @@ const index = read("index.html");
 const worker = read("sw.js");
 const prepare = read("scripts/prepare-runtime.mjs");
 const desktopUx = read("assets/css/desktop-ux-v15-2-0.css");
+const browserAudit = read("tests/browser/production-ui-audit-v15-2-13.spec.mjs");
 const version = JSON.parse(read("version.json"));
 const pkg = JSON.parse(read("package.json"));
 
-assert.equal(version.version, "15.2.16");
-assert.equal(pkg.version, "15.2.16");
-assert.equal(version.cacheVersion, "finance-v15-20260821-production-audit-r52");
+assert.equal(version.version, "15.2.17");
+assert.equal(pkg.version, "15.2.17");
+assert.equal(version.cacheVersion, "finance-v15-20260821-runtime-stable-audit-r53");
 assert.match(index, /production-ui-audit-v15-2-13\.css\?v=15\.2\.14-audit2/);
 assert.ok(index.indexOf("production-ui-audit-v15-2-13.css") > index.indexOf("desktop-ux-v15-2-0.css"));
 assert.match(worker, /production-ui-audit-v15-2-13\.css\?v=15\.2\.14-audit2/);
@@ -31,5 +32,9 @@ assert.match(css, /-webkit-line-clamp:\s*2/);
 
 assert.match(desktopUx, /--budget-disclosure-reference-size/);
 assert.match(desktopUx, /#dashCashFlowChart \.cash-flow-chart-grid/);
+assert.match(browserAudit, /navigator\.serviceWorker\?\.controller\?\.scriptURL/);
+assert.match(browserAudit, /finance-signed-in/);
+assert.match(browserAudit, /window\.goToPage\("money"/);
+assert.match(browserAudit, /summaries:8, periods:3/);
 
-console.log("V15.2.16 production UI/UX audit source contract passed.");
+console.log("V15.2.17 production UI/UX audit source contract passed.");

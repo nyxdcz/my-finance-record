@@ -1,3 +1,9 @@
+## 15.2.17 · 2026-08-21
+- Waited for the current service-worker controller and network activity to settle before responsive Finance measurements begin.
+- Reapplied the test privacy-authentication state and explicitly activated Budget & Expenses after PWA initialization, preventing controller changes from hiding the measured workspace.
+- Required the signed-in body state plus eight visible summaries and three visible period cards before desktop or phone geometry assertions run.
+- Preserved Finance Schema 12, Cloud Schema V3, saved records, calculations, balances, project behavior, and the five-minute sync cadence while rotating the PWA shell to `finance-v15-20260821-runtime-stable-audit-r53`.
+
 ## 15.2.16 · 2026-08-21
 - Made the production Finance audit wait for summaries and period controls to finish rendering before measuring responsive geometry.
 - Replaced the stale desktop toolbar control count with named Month navigator and More tools checks while preserving the shared 38px compact height contract.
