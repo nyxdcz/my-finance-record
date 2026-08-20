@@ -28,6 +28,6 @@ test("V15.2.9 Cloud Sync uses supplied state icons and matching colors", async (
 
 test("V15.2.11 release metadata is visible", async ({ page }) => {
   await page.goto("http://127.0.0.1:3000/index.html?page=dashboard", { waitUntil:"networkidle" });
-  await expect(page).toHaveTitle(/V15\.2\.10/);
+  await expect(page).toHaveTitle(/V15\.2\.11/);
   await expect(page.locator("#buildBadge")).toContainText("V15.2.11");
 });
