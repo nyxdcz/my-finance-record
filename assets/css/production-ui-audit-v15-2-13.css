@@ -78,10 +78,20 @@
   }
 
   html body #money :is(.legend-text small, .summary-card-copy small) {
+    display: none !important;
+  }
+
+  html body #money :is(.legend-text strong, .summary-card-label) {
+    display: block !important;
     overflow: hidden !important;
     white-space: nowrap !important;
     text-overflow: ellipsis !important;
-    text-wrap: nowrap !important;
+  }
+
+  html body #money :is(.legend-item, .summary-item) {
+    height: 56px !important;
+    max-height: 56px !important;
+    overflow: hidden !important;
   }
 }
 
