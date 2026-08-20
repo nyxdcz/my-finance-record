@@ -52,8 +52,6 @@ jobs:
 
           allowed=(
             assets/js/pwa-update-v15-0-5.js
-            pwa-update-v15-0-5.js
-            header-tools-compat.js
             index.html
             sw.js
             scripts/prepare-runtime.mjs
@@ -62,7 +60,6 @@ jobs:
             tests/browser/phone-finance-css-ownership-v15-2-10.spec.mjs
             tests/browser/topbar-dashboard-history-tools-menu.spec.mjs
             tests/browser/topbar-quick-add-tools-menu.spec.mjs
-            .github/workflows/quality-pages.yml
           )
 
           unexpected=0
