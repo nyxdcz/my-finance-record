@@ -8,6 +8,7 @@ const sw = read("sw.js");
 const runtimeCompat = read("assets/js/ui/sync-runtime-compat.js");
 const cloud = read("cloud-sync.js");
 const updater = read("pwa-update-v15-0-5.js");
+const phoneFinance = read("assets/js/ui/phone-finance-compat.js");
 const version = JSON.parse(read("version.json"));
 const pkg = JSON.parse(read("package.json"));
 
@@ -41,10 +42,12 @@ assert.doesNotMatch(updater, /phoneFinanceCompactV1522|installPhoneFinanceCompac
 assert.match(mobile, /V15\.2\.10 · static Phone Finance compact CSS ownership/);
 assert.match(mobile, /\.phone-icon-only-action/);
 assert.match(mobile, /#availableMoneySection \.collapse-actions/);
-assert.match(updater, /phone-icon-only-action/);
-assert.match(updater, /data-pc-add/);
+assert.doesNotMatch(updater, /phone-icon-only-action|bindPhoneIconOnlyButton|installPhoneFinanceCompactUi/);
+assert.match(phoneFinance, /phone-icon-only-action/);
+assert.match(phoneFinance, /data-pc-add/);
+assert.match(phoneFinance, /phoneCompactIconBound/);
 assert.match(mobile, /grid-template-areas:"title amount" "due account" "actions actions"/);
 assert.match(mobile, /#income \.income-record-row/);
 assert.match(mobile, /#paid-expenses \[data-paid-expense-row\]/);
 assert.match(cloud, /5\*60\*1000/);
-console.log("V15.2.10 preserves V15.2.2 mobile UI/UX with static Phone Finance compact CSS ownership.");
+console.log("V15.2.10 preserves V15.2.2 mobile UI/UX with static CSS and dedicated Phone Finance JS ownership.");

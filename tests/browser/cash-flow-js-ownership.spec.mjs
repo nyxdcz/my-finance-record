@@ -34,7 +34,7 @@ for (const width of widths) {
       scripts:[...document.scripts].map(script => script.getAttribute("src") || "").filter(Boolean)
     }));
     expect(delivery.scripts.some(src => src.includes("cash-flow-summary.js?v=15.2.10-cashflow1"))).toBe(true);
-    expect(delivery.scripts.some(src => src.includes("pwa-update-v15-0-5.js?v=15.2.10-release4"))).toBe(true);
+    expect(delivery.scripts.some(src => src.includes("pwa-update-v15-0-5.js?v=15.2.10-release5"))).toBe(true);
 
     await seedCashFlow(page);
 
