@@ -14,6 +14,7 @@ test("More tools Appearance stays compact, left-aligned, and network-first", asy
   expect(serviceWorker).toContain('url.pathname.endsWith("ui-icon-alignment-v15-0-5.css")');
 
   await page.setViewportSize({ width:1440, height:900 });
+  await page.route("**/cloud-sync.js*", route => route.abort());
   await page.goto("http://127.0.0.1:3000/index.html?page=dashboard", { waitUntil:"networkidle" });
   await page.waitForFunction(() => typeof window.FinancePrivacyLock?.unlock === "function" && Boolean(document.getElementById("topbarToolsTrigger")));
   await page.evaluate(() => window.FinancePrivacyLock.unlock({ email:"theme-alignment-test@example.invalid" }));
@@ -27,7 +28,6 @@ test("More tools Appearance stays compact, left-aligned, and network-first", asy
     if (quickActions?.parentElement === panel && search.nextElementSibling !== quickActions) return false;
     return true;
   });
-  await page.evaluate(() => window.FinancePrivacyLock.unlock({ email:"theme-alignment-test@example.invalid" }));
   await expect(page.locator("body")).toHaveClass(/finance-signed-in/);
   await page.locator("#topbarToolsTrigger").click();
   await expect(page.locator("#topbarToolsPanel")).toBeVisible();
