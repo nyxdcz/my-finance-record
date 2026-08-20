@@ -62,6 +62,16 @@ regression = regression.replace(
 );
 write(regressionPath, regression);
 
+const runnerPath = "tests/run.mjs";
+let runner = read(runnerPath);
+const sidebarRegressionEntry = '  { suite: "regression", file: "tests/regression/validate-sidebar-brand-static-v15-2-10.mjs" },';
+if (!runner.includes(sidebarRegressionEntry)) {
+  const runnerAnchor = '  { suite: "regression", file: "tests/regression/validate-sidebar-embedded-v15-2-10.mjs" },';
+  if (!runner.includes(runnerAnchor)) throw new Error("Source regression runner anchor missing");
+  runner = runner.replace(runnerAnchor, `${runnerAnchor}\n${sidebarRegressionEntry}`);
+  write(runnerPath, runner);
+}
+
 const finalIndex = read("index.html");
 const finalUpdater = read("assets/js/pwa-update-v15-0-5.js");
 const finalWorker = read("sw.js");
@@ -70,5 +80,6 @@ if (finalIndex.includes("<strong>Records</strong>")) throw new Error("Legacy sid
 if (!finalIndex.includes(newUpdaterAsset) || !finalWorker.includes(newUpdaterAsset)) throw new Error("Updater release6 delivery pin missing");
 if (/installSidebarBrand|\.sidebar \.brand strong|My Finance Records|root\.document|querySelector/.test(finalUpdater)) throw new Error("PWA updater still contains sidebar UI ownership");
 if (!finalUpdater.includes("root.FinancePwaUpdate = api")) throw new Error("PWA updater API was damaged");
+if (!read(runnerPath).includes(sidebarRegressionEntry)) throw new Error("Static Sidebar Brand regression is not registered");
 
 console.log("Applied PR8 static Sidebar Brand ownership cleanup.");
