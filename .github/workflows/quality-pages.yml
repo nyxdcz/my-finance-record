@@ -85,6 +85,7 @@ jobs:
           cp index.html offline.html manifest.webmanifest version.json sw.js sync-config.js _site/
           cp assets/css/*.css _site/
           cp assets/js/*.js _site/
+          cp assets/js/features/*.js _site/
           cp assets/js/ui/*.js _site/
           cp vendor/supabase.min.js _site/vendor/
           cp icons/* _site/icons/
@@ -95,6 +96,7 @@ jobs:
           test -f _site/desktop-ui-phase1-v15-1-0.css
           test -f _site/desktop-ux-v15-2-0.css
           test -f _site/pwa-update-v15-0-5.js
+          test -f _site/cash-flow-summary.js
           test -f _site/form-inputs.js
           test -f _site/application-help.js
           test -f _site/header-tools-compat.js

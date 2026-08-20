@@ -44,6 +44,9 @@ const runtimeGroups = {
     "reports-insights.js",
     "security-profiles.js"
   ],
+  "assets/js/features": [
+    "cash-flow-summary.js"
+  ],
   "assets/js/ui": [
     "application-help.js",
     "header-tools-compat.js",
