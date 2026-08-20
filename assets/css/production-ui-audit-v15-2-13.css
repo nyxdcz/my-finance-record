@@ -76,6 +76,31 @@
   html body .topbar-actions .month-navigator > .month-control {
     width: 158px !important;
   }
+
+  html body #money :is(.legend-text small, .summary-card-copy small) {
+    overflow: hidden !important;
+    white-space: nowrap !important;
+    text-overflow: ellipsis !important;
+    text-wrap: nowrap !important;
+  }
+}
+
+/* Pointer-coarse tablets retain touch-safe controls at desktop widths. */
+@media (min-width: 701px) and (max-width: 1024px) and (pointer: coarse),
+       (min-width: 701px) and (max-width: 1024px) and (hover: none) {
+  html body .topbar-actions > .cloud-sync-toolbar-button,
+  html body .topbar-actions .topbar-history-button,
+  html body .topbar-actions .topbar-add-button,
+  html body .topbar-actions .topbar-tools-trigger,
+  html body .topbar-actions .month-navigator,
+  html body .topbar-actions .month-navigator > .month-nav-button,
+  html body .topbar-actions .month-navigator > .month-control,
+  html body .topbar-actions .month-navigator > .month-current-button,
+  html body .topbar-actions .month-navigator > .month-status-chip {
+    height: 44px !important;
+    min-height: 44px !important;
+    max-height: 44px !important;
+  }
 }
 
 /* Phone: compact the containers, not the touch targets. */

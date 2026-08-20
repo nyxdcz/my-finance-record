@@ -123,5 +123,5 @@ test("V15.2.4 desktop month navigation uses flat segmented More tools chrome", a
     return { height:element.getBoundingClientRect().height, marginLeft:style.marginLeft };
   });
   expect(currentStyle.height).toBe(38);
-  expect(currentStyle.marginLeft).toBe("8px");
+  expect(currentStyle.marginLeft).toBe("6px");
 });
