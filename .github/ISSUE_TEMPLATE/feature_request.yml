@@ -1,0 +1,57 @@
+name: Feature request
+description: Propose a focused improvement to the product or contributor experience.
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Describe the problem before the solution. Avoid sharing real balances, account names, record details, credentials, or other private information.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or opportunity
+      description: Who is affected, and what is difficult today?
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed improvement
+      description: Describe the smallest useful outcome and how it should behave.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Note current workarounds or other designs you considered.
+
+  - type: checkboxes
+    id: areas
+    attributes:
+      label: Affected areas
+      options:
+        - label: Finance data or calculations
+        - label: Cloud sync, encryption, backup, or restore
+        - label: PWA installation, offline use, or caching
+        - label: User interface or accessibility
+        - label: Documentation, testing, or contributor tooling
+
+  - type: checkboxes
+    id: compatibility
+    attributes:
+      label: Compatibility acknowledgment
+      options:
+        - label: I understand that existing finance data, installed PWA clients, backups, and sync compatibility must remain safe or include an explicit migration plan.
+          required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Add sanitized examples or mockups. Do not include private finance data or credentials.

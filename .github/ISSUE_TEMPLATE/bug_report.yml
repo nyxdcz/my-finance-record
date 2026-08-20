@@ -1,0 +1,90 @@
+name: Bug report
+description: Report a reproducible problem without including private finance data.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve My Finance Records. Search existing issues first and redact balances, names, emails, keys, and record details from screenshots or logs.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Problem summary
+      description: What went wrong, and what were you trying to do?
+      placeholder: A concise description of the problem.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Environment
+      options:
+        - Desktop browser
+        - Mobile browser
+        - Installed PWA
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: App version
+      description: The version shown in the application header or About screen.
+      placeholder: V15.2.14
+    validations:
+      required: true
+
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and operating system
+      placeholder: Brave 1.x on macOS 15, Safari on iOS 19, etc.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Use sample values where possible.
+      placeholder: |
+        1. Open ...
+        2. Select ...
+        3. Observe ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Data-safety confirmation
+      options:
+        - label: I removed or redacted finance records, names, balances, email addresses, keys, and passphrases.
+          required: true
+        - label: I used sample data or created a backup before reproducing any destructive workflow.
+          required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Additional context
+      description: Add sanitized screenshots, console output, or other context. Do not paste secrets or private finance data.
