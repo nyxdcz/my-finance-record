@@ -7,14 +7,14 @@ const sw = fs.readFileSync("sw.js", "utf8");
 const index = fs.readFileSync("index.html", "utf8");
 const version = JSON.parse(fs.readFileSync("version.json", "utf8"));
 
-assert.equal(version.version, "15.2.14");
+assert.equal(version.version, "15.2.15");
 assert.equal(version.schemaVersion, 12);
 assert.equal(version.cloudSchemaVersion, 3);
-assert.equal(version.cacheVersion, "finance-v15-20260820-common-desktop-r50");
+assert.equal(version.cacheVersion, "finance-v15-20260820-structured-project-drag-r51");
 assert.match(liquid, /\.topbar \.month-navigator \{[\s\S]*?border-color:transparent!important;[\s\S]*?background:transparent!important;[\s\S]*?box-shadow:none!important;/);
 assert.doesNotMatch(liquid, /\.topbar :is\(\.month-navigator,\.topbar-history-actions\),\s*\.topbar :is\(\.cloud-sync-toolbar-button/);
 assert.match(runtime, /liquid-glass-v15\.css\?v=\$\{VERSION\}-light1/);
 assert.match(sw, /liquid-glass-v15\.css\?v=15\.2\.2-light1/);
-assert.match(sw, /finance-v15-20260820-common-desktop-r50/);
-assert.match(index, /finance-v15-20260820-common-desktop-r50/);
+assert.match(sw, /finance-v15-20260820-structured-project-drag-r51/);
+assert.match(index, /finance-v15-20260820-structured-project-drag-r51/);
 console.log("V15.2.9 borderless month-navigation regression passed.");

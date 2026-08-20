@@ -1,5 +1,5 @@
 {
-  "version": "15.2.14",
+  "version": "15.2.15",
   "schemaVersion": 12,
   "cloudSchemaVersion": 3,
   "ledgerVersion": 1,
@@ -10,8 +10,8 @@
   "profileArchitectureVersion": 1,
   "encryptionVersion": 1,
   "authSecurityVersion": 1,
-  "cacheVersion": "finance-v15-20260820-common-desktop-r50",
+  "cacheVersion": "finance-v15-20260820-structured-project-drag-r51",
   "released": "2026-08-20",
-  "name": "Common Desktop Summary Alignment",
-  "notes": "V15.2.14 extends the compact 56px Budget summary geometry to common 1280px and 1366px desktops, keeping primary labels and amounts readable without row-height drift. Finance Schema 12, Cloud Schema V3, finance records, calculations, balances, and the five-minute sync cadence are unchanged."
+  "name": "Structured Project Drag & Drop",
+  "notes": "V15.2.15 adds accessible, structured drag-and-drop transitions for Project Agenda Upcoming and Completed entries and for moving Active Projects into Completed Projects. Keyboard, mouse, and touch controls, valid destination cues, safe cancellation, and a five-second Undo preserve existing project values and payment history. Finance Schema 12, Cloud Schema V3, finance records, calculations, balances, and the five-minute sync cadence are unchanged."
 }

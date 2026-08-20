@@ -1,3 +1,8 @@
+## 15.2.15 · 2026-08-20
+- Added structured mouse, touch, and keyboard drag-and-drop between Project Agenda Upcoming and Completed sections and from Active Projects into Completed Projects.
+- Added clear pickup, valid-destination, active-target, safe-return, screen-reader, and reduced-motion states plus a five-second Undo notification that pauses while hovered or focused.
+- Preserved project values, received payments, remaining balances, revision history, completion confirmation, Finance Schema 12, Cloud Schema V3, and the five-minute sync cadence while rotating the PWA shell to `finance-v15-20260820-structured-project-drag-r51`.
+
 ## 15.2.14 · 2026-08-20
 - Extended the compact 56px Budget summary geometry to common 1280px and 1366px desktop widths so both rows remain aligned.
 - Preserved full amounts and primary labels while hiding secondary summary descriptions only where their wrapping would cause row-height drift.

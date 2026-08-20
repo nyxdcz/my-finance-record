@@ -8,10 +8,10 @@ const version = JSON.parse(fs.readFileSync("version.json", "utf8"));
 const pkg = JSON.parse(fs.readFileSync("package.json", "utf8"));
 const lock = JSON.parse(fs.readFileSync("package-lock.json", "utf8"));
 
-const expectedVersion = "15.2.14";
-const expectedIndexCache = "finance-v15-20260820-common-desktop-r50";
-const expectedCache = "finance-v15-20260820-common-desktop-r50";
-const interactionQuery = "15.2.1-ux1";
+const expectedVersion = "15.2.15";
+const expectedIndexCache = "finance-v15-20260820-structured-project-drag-r51";
+const expectedCache = "finance-v15-20260820-structured-project-drag-r51";
+const interactionQuery = "15.2.15-project-drag1";
 
 for (const [pageId, marqueeId] of [["income", "incomeFinanceWeekMarquee"], ["money", "financeWeekMarquee"], ["paid-expenses", "paidFinanceWeekMarquee"]]) {
   const start = index.indexOf(`id="${pageId}"`);
