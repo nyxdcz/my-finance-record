@@ -5,7 +5,7 @@ const css = [
   "budget-planning.css?v=15.2.9-ui1",
   "productivity-tools.css?v=14.0.23",
   "projects-calendar-v13.0.20.css?v=15.1.0-desktop2",
-  "mobile-v14-0-23.css?v=15.2.2-mobile1",
+  "mobile-v14-0-23.css?v=15.2.10-mobile2",
   "app.css?v=15.1.0-desktop3",
   "dashboard-interactions.css?v=15.2.10-icons1",
   "ui-icon-alignment-v15-0-5.css?v=15.1.0-ui3",
@@ -75,7 +75,7 @@ for (const width of widths) {
     expect(metrics.budgetInside).toBe(true);
     expect(metrics.agendaInside).toBe(true);
     expect(metrics.horizontalOverflow).toBe(false);
-    expect(metrics.paidSameColumn).toBe(width <= 340);
+    expect(metrics.paidSameColumn).toBe(false); // Static ownership now matches the live two-column compact layout previously supplied by the runtime style layer.
   });
 }
 

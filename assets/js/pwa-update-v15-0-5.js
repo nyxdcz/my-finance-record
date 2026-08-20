@@ -249,104 +249,6 @@
   }
   installHeaderToolsRelocation();
 
-  function installPhoneFinanceCompactStyles() {
-    const doc = root.document;
-    if (!doc || doc.getElementById("phoneFinanceCompactV1522")) return;
-    const style = doc.createElement("style");
-    style.id = "phoneFinanceCompactV1522";
-    style.textContent = `
-      .phone-only-action-icon{display:none;width:20px;height:20px;place-items:center;pointer-events:none}
-      .phone-only-action-icon svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
-      @media (max-width:700px){
-        .phone-icon-only-action{width:44px!important;min-width:44px!important;max-width:44px!important;height:44px!important;min-height:44px!important;padding:0!important;gap:0!important;flex:0 0 44px!important}
-        .phone-icon-only-action .phone-only-action-icon{display:grid}
-        .phone-icon-only-action .phone-only-action-label{display:none!important}
-
-        #availableMoneySection .card-header{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;gap:8px!important;align-items:start!important;margin-bottom:7px!important}
-        #availableMoneySection .card-header>div:first-child{min-width:0}
-        #availableMoneySection .card-header>div:first-child p{margin-top:2px!important;font-size:.62rem!important;line-height:1.25!important}
-        #availableMoneySection .collapse-actions{display:grid!important;grid-template-columns:auto 44px 44px!important;gap:6px!important;align-items:center!important;justify-content:end!important;min-width:0}
-        #availableMoneySection .available-money-total-wrap{min-width:0;text-align:right}
-        #availableMoneySection .available-money-total-wrap strong{font-size:.82rem!important;white-space:nowrap}
-        #availableMoneySection .available-money-account-count{font-size:.58rem!important;white-space:nowrap}
-        #availableMoneySection .collapse-toggle{width:44px!important;min-width:44px!important;height:44px!important;min-height:44px!important}
-        #availableMoneySection .account-grid{gap:8px!important}
-
-        .project-calendar-v13020 .pc-header{display:block!important;padding-bottom:6px!important}
-        .project-calendar-v13020 .pc-header>div:first-child p{margin-top:2px!important;font-size:.62rem!important;line-height:1.25!important}
-        .project-calendar-v13020 .pc-header-actions{display:grid!important;grid-template-columns:auto minmax(0,1fr) 44px!important;gap:6px!important;align-items:center!important;justify-content:stretch!important;width:100%!important;margin-top:6px!important}
-        .project-calendar-v13020 .pc-count{min-width:0;justify-content:center;white-space:nowrap}
-        .project-calendar-v13020 [data-pc-view]{width:100%!important;min-width:0!important;min-height:44px!important;padding-inline:8px!important;white-space:nowrap}
-
-        #money .period-card{padding:10px!important}
-        #money .period-header{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;gap:8px!important;align-items:center!important;margin-bottom:6px!important;padding-bottom:0!important}
-        #money .period-header>div:first-child{min-width:0}
-        #money .period-header h3{margin:0!important;font-size:.82rem!important;line-height:1.2!important}
-        #money .period-header p{margin:2px 0 0!important;font-size:.61rem!important;line-height:1.25!important}
-        #money .period-header .collapse-actions{display:flex!important;align-items:center!important;gap:6px!important;min-width:0}
-        #money .period-header .period-total{font-size:.8rem!important;white-space:nowrap}
-        #money .period-header .collapse-toggle{width:40px!important;min-width:40px!important;height:40px!important;min-height:40px!important}
-        #money .record-header{display:none!important}
-        #money .record-row[data-expense-row]{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;grid-template-areas:"title amount" "due account" "actions actions"!important;gap:6px 10px!important;align-items:start!important;padding:9px 10px!important;overflow:visible!important}
-        #money .record-row[data-expense-row]>.record-title{grid-area:title!important;grid-column:auto!important;min-width:0!important;padding:0!important;border:0!important;align-items:flex-start!important;gap:6px!important}
-        #money .record-row[data-expense-row]>.amount{grid-area:amount!important;grid-column:auto!important;align-self:start!important;justify-self:end!important;min-width:78px!important;padding:1px 0!important;border:0!important;background:transparent!important;text-align:right!important;font-size:.84rem!important;font-weight:850!important;white-space:nowrap!important}
-        #money .record-row[data-expense-row]>.amount::before{content:none!important}
-        #money .record-row[data-expense-row]>.due-cell{grid-area:due!important;grid-column:auto!important;display:flex!important;align-items:center!important;flex-wrap:wrap!important;gap:3px!important;min-width:0!important;padding:0!important;border:0!important;background:transparent!important;text-align:left!important;font-size:.67rem!important}
-        #money .record-row[data-expense-row]>.due-cell::before{content:"Due ·"!important;display:inline!important;margin:0 1px 0 0!important;color:var(--muted)!important;font-size:.6rem!important;font-weight:750!important;line-height:1.2!important}
-        #money .record-row[data-expense-row]>[data-label="Planned account"]{grid-area:account!important;grid-column:auto!important;min-width:0!important;padding:0!important;border:0!important;background:transparent!important;text-align:right!important;font-size:.67rem!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
-        #money .record-row[data-expense-row]>[data-label="Planned account"]::before{content:"Account ·"!important;display:inline!important;margin:0 2px 0 0!important;color:var(--muted)!important;font-size:.6rem!important;font-weight:750!important;line-height:1.2!important}
-        #money .record-row[data-expense-row]>.mobile-record-actions{grid-area:actions!important;grid-column:1/-1!important;display:grid!important;grid-template-columns:minmax(0,1fr) 44px!important;gap:6px!important;align-items:stretch!important;width:100%!important;margin-top:1px!important}
-        #money .record-row[data-expense-row]>.mobile-record-actions::before{content:none!important}
-        #money .record-row[data-expense-row]>.mobile-record-actions>.button,#money .record-row[data-expense-row] .overflow-menu-trigger{width:100%!important;min-width:44px!important;height:44px!important;min-height:44px!important;padding:7px 10px!important}
-        #money .record-row[data-expense-row] .record-more-menu{width:44px!important;min-width:44px!important}
-        #money .record-row[data-expense-row] .record-more-panel{left:auto!important;right:0!important;bottom:calc(100% + 6px)!important;width:min(230px,calc(100vw - 32px))!important}
-        #money .expense-record-title .record-title-copy{min-width:0!important}
-        #money .expense-record-title .record-title-copy>strong{display:block!important;max-width:100%!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;font-size:.77rem!important}
-        #money .expense-record-title .record-title-copy>small{display:block!important;max-width:100%!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;font-size:.61rem!important;line-height:1.25!important}
-        #money .expense-record-title .record-statuses{gap:4px!important;margin-top:3px!important}
-        #money .expense-record-title .status-badge{min-height:21px!important;padding:2px 6px!important;font-size:.58rem!important;line-height:1.1!important}
-        #money .expense-select-checkbox{width:18px!important;height:18px!important}
-
-        #income .income-record-row{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;grid-template-areas:"title amount" "category date" "account actions"!important;gap:6px 10px!important;align-items:center!important;padding:9px 10px!important;overflow:visible!important}
-        #income .income-record-row>.record-title{grid-area:title!important;grid-column:auto!important;min-width:0!important;padding:0!important;border:0!important}
-        #income .income-record-row>.amount{grid-area:amount!important;grid-column:auto!important;justify-self:end!important;padding:0!important;border:0!important;background:transparent!important;text-align:right!important;font-size:.84rem!important;white-space:nowrap!important}
-        #income .income-record-row>.amount::before{content:none!important}
-        #income .income-record-row>[data-label="Category"]{grid-area:category!important}
-        #income .income-record-row>[data-label="Date received"]{grid-area:date!important;text-align:right!important}
-        #income .income-record-row>[data-label="Account"]{grid-area:account!important}
-        #income .income-record-row>.record-actions{grid-area:actions!important;grid-column:auto!important;justify-self:end!important;width:auto!important}
-        #income .income-record-row>[data-label]:not(.amount){min-width:0!important;padding:0!important;border:0!important;background:transparent!important;font-size:.66rem!important}
-        #income .income-record-row>[data-label]::before{display:inline!important;margin-right:2px!important;font-size:.58rem!important}
-        #income .income-record-row>.record-title .record-title-copy>strong,#income .income-record-row>.record-title .record-title-copy>small{overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
-        #income .income-record-row>.record-actions .button{min-height:44px!important;padding:7px 10px!important}
-
-        #paid-expenses [data-paid-expense-row]{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;grid-template-areas:"title amount" "date account" "actions actions"!important;gap:6px 10px!important;align-items:start!important;padding:9px 10px!important}
-        #paid-expenses [data-paid-expense-row]>.record-title{grid-area:title!important;grid-column:auto!important;min-width:0!important;padding:0!important;border:0!important}
-        #paid-expenses [data-paid-expense-row]>.amount{grid-area:amount!important;grid-column:auto!important;justify-self:end!important;min-width:78px!important;padding:1px 0!important;border:0!important;background:transparent!important;text-align:right!important;font-size:.84rem!important;white-space:nowrap!important}
-        #paid-expenses [data-paid-expense-row]>.amount::before{content:none!important}
-        #paid-expenses [data-paid-expense-row]>[data-label="Paid date"]{grid-area:date!important}
-        #paid-expenses [data-paid-expense-row]>[data-label="Paid from"]{grid-area:account!important;text-align:right!important}
-        #paid-expenses [data-paid-expense-row]>[data-label]:not(.amount){grid-column:auto!important;min-width:0!important;padding:0!important;border:0!important;background:transparent!important;font-size:.67rem!important}
-        #paid-expenses [data-paid-expense-row]>[data-label]:not(.amount)::before{display:inline!important;margin:0 2px 0 0!important;font-size:.58rem!important}
-        #paid-expenses [data-paid-expense-row]>.mobile-record-actions{grid-area:actions!important;grid-column:1/-1!important;grid-template-columns:minmax(0,1fr) 44px!important;gap:6px!important;margin-top:1px!important}
-        #paid-expenses [data-paid-expense-row]>.mobile-record-actions::before{content:none!important}
-        #paid-expenses [data-paid-expense-row] .record-title-copy>strong,#paid-expenses [data-paid-expense-row] .record-title-copy>small{overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
-
-        #quickAddExpense:not([hidden]){position:absolute!important;top:10px!important;right:108px!important;width:44px!important;min-width:44px!important;height:44px!important;min-height:44px!important;padding:0!important;z-index:2!important}
-        #quickAddExpense:not([hidden]) .topbar-add-label{display:none!important}
-      }
-      @media (max-width:390px){
-        #availableMoneySection .card-header{grid-template-columns:1fr!important}
-        #availableMoneySection .collapse-actions{grid-template-columns:minmax(0,1fr) 44px 44px!important;width:100%!important}
-        #availableMoneySection .available-money-total-wrap{text-align:left!important}
-        #money .record-row[data-expense-row]{grid-template-columns:minmax(0,1fr) auto!important;gap:6px 7px!important;padding:8px 9px!important}
-        #money .record-row[data-expense-row]>.amount{min-width:72px!important;font-size:.8rem!important}
-        .project-calendar-v13020 .pc-header-actions{grid-template-columns:auto minmax(0,1fr) 44px!important}
-      }
-    `;
-    doc.head.appendChild(style);
-  }
-
   function bindPhoneIconOnlyButton(button, label, iconMarkup) {
     if (!button || button.dataset.phoneCompactIconBound === "true") return;
     const visibleLabel = String(button.textContent || label).trim() || label;
@@ -383,7 +285,6 @@
   function installPhoneFinanceCompactUi() {
     const doc = root.document;
     if (!doc) return;
-    installPhoneFinanceCompactStyles();
     const apply = () => enhancePhoneCompactButtons();
     if (doc.readyState === "loading") doc.addEventListener("DOMContentLoaded", apply, { once:true }); else apply();
     const startObserver = () => {
