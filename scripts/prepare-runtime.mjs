@@ -9,6 +9,7 @@ const runtimeGroups = {
   "assets/css": [
     "account-ledger.css",
     "app.css",
+    "shell-ui-v15-2-11.css",
     "black-canvas-v15-1-0.css",
     "budget-planning.css",
     "dashboard-interactions-core-v14-0-23.css",

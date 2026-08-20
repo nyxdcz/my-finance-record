@@ -1,5 +1,5 @@
 {
-  "version": "15.2.10",
+  "version": "15.2.11",
   "schemaVersion": 12,
   "cloudSchemaVersion": 3,
   "ledgerVersion": 1,
@@ -10,8 +10,8 @@
   "profileArchitectureVersion": 1,
   "encryptionVersion": 1,
   "authSecurityVersion": 1,
-  "cacheVersion": "finance-v15-20260820-sidebar-icons-r46",
+  "cacheVersion": "finance-v15-20260820-shell-ui-r47",
   "released": "2026-08-20",
-  "name": "Embedded Sidebar Icon Hotfix",
-  "notes": "V15.2.10 embeds the canonical sidebar PNG artwork directly in the application shell, removes obsolete CSS content:url overrides and sidebar-image network recovery, and keeps sidebar rendering independent of external PNG requests. Finance Schema 12, Cloud Schema V3, finance records, calculations, balances, storage, authentication, sync/conflict behavior, and the five-minute sync cadence are unchanged."
+  "name": "Shell UI CSS Ownership",
+  "notes": "V15.2.11 extracts stable shell, privacy, navigation, header-history, Settings-search, install-guidance, and iPhone input-protection styles from app.css into a dedicated precached stylesheet without changing their cascade. Finance Schema 12, Cloud Schema V3, finance records, calculations, balances, storage, authentication, sync/conflict behavior, and the five-minute sync cadence are unchanged."
 }

@@ -27,6 +27,8 @@ test("More tools Appearance stays compact, left-aligned, and network-first", asy
     if (quickActions?.parentElement === panel && search.nextElementSibling !== quickActions) return false;
     return true;
   });
+  await page.evaluate(() => window.FinancePrivacyLock.unlock({ email:"theme-alignment-test@example.invalid" }));
+  await expect(page.locator("body")).toHaveClass(/finance-signed-in/);
   await page.locator("#topbarToolsTrigger").click();
   await expect(page.locator("#topbarToolsPanel")).toBeVisible();
   const appearanceButton = page.locator("#themeToggleButton");

@@ -8,6 +8,7 @@ const css = [
   "projects-calendar-v13.0.20.css?v=15.1.0-desktop2",
   "mobile-v14-0-23.css?v=15.2.10-mobile2",
   "app.css?v=15.1.0-desktop3",
+  "shell-ui-v15-2-11.css?v=15.2.11-shell1",
   "dashboard-interactions.css?v=15.2.10-icons1",
   "ui-icon-alignment-v15-0-5.css?v=15.2.9-ui2",
   "black-canvas-v15-1-0.css?v=15.1.0-light1",
@@ -92,5 +93,5 @@ test("live V15.2.10 shell owns Phone Finance compact styles statically", async (
     scripts:[...document.scripts].map(script => script.getAttribute("src") || "").filter(Boolean)
   }));
   expect(delivery.styles.some(href => href.includes("mobile-v14-0-23.css?v=15.2.10-mobile2"))).toBe(true);
-  expect(delivery.scripts.some(src => src.includes("pwa-update-v15-0-5.js?v=15.2.10-release6"))).toBe(true);
+  expect(delivery.scripts.some(src => src.includes("pwa-update-v15-0-5.js?v=15.2.11-release7"))).toBe(true);
 });

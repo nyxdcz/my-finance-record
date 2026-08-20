@@ -9,11 +9,12 @@ const privacyScript = path.join(root, "privacy-lock.js");
 const interactionScript = path.join(root, "interaction-patterns.js");
 const projectAgendaScript = path.join(root, "projects-calendar-v13.0.20.js");
 const appCss = fs.readFileSync(path.join(root, "app.css"), "utf8");
+const shellUiCss = fs.readFileSync(path.join(root, "shell-ui-v15-2-11.css"), "utf8");
 const dashboardInteractionCss = fs.readFileSync(path.join(root, "dashboard-interactions.css"), "utf8");
 const mobileCss = fs.readFileSync(path.join(root, "mobile-v14-0-23.css"), "utf8");
 const projectAgendaCss = fs.readFileSync(path.join(root, "projects-calendar-v13.0.20.css"), "utf8");
 const sourceHtml = fs.readFileSync(path.join(root, "index.html"), "utf8")
-  .replace("</head>", `<style>${appCss}\n${dashboardInteractionCss}\n${projectAgendaCss}\n${mobileCss}</style></head>`);
+  .replace("</head>", `<style>${appCss}\n${shellUiCss}\n${dashboardInteractionCss}\n${projectAgendaCss}\n${mobileCss}</style></head>`);
 const testHtml = sourceHtml
   .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, "")
   .replace(/<script\b[^>]*\/?\s*>/gi, "")

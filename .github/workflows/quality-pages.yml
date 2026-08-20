@@ -95,6 +95,7 @@ jobs:
           test -f _site/black-canvas-v15-1-0.css
           test -f _site/desktop-ui-phase1-v15-1-0.css
           test -f _site/desktop-ux-v15-2-0.css
+          test -f _site/shell-ui-v15-2-11.css
           test -f _site/pwa-update-v15-0-5.js
           test -f _site/cash-flow-summary.js
           test -f _site/form-inputs.js
