@@ -16,8 +16,8 @@ const version = JSON.parse(read("version.json"));
 if (!html.includes('href="./desktop-ui-phase1-v15-1-0.css?v=15.1.0-phase1"')) fail("Production HTML does not load the desktop Phase 1 stylesheet.");
 if (!worker.includes('asset("./desktop-ui-phase1-v15-1-0.css?v=15.1.0-phase1")')) fail("Service worker does not precache the desktop Phase 1 stylesheet.");
 if (!workflow.includes("desktop-ui-phase1-v15-1-0.css")) fail("GitHub Pages packaging omits the desktop Phase 1 stylesheet.");
-if (version.cacheVersion !== "finance-v15-20260820-common-desktop-r50") fail(`Unexpected cache version: ${version.cacheVersion}`);
-if (!worker.includes('const CACHE_VERSION = "finance-v15-20260820-common-desktop-r50";')) fail("Service worker cache version is not the V15.2.14 production UI audit cache.");
+if (version.cacheVersion !== "finance-v15-20260820-structured-project-drag-r51") fail(`Unexpected cache version: ${version.cacheVersion}`);
+if (!worker.includes('const CACHE_VERSION = "finance-v15-20260820-structured-project-drag-r51";')) fail("Service worker cache version is not the V15.2.15 production UI audit cache.");
 
 for (const token of [
   '#income > .page-heading',

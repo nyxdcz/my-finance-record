@@ -134,6 +134,8 @@
     const mainAttributes = compact ? `type="button" data-pc-edit="${escapeHtml(event.id)}" aria-label="Edit ${title}"` : "";
     const eventTitle = compact ? `<span class="pc-event-title">${title}</span>` : `<h4>${title}</h4>`;
     const eventMeta = compact ? `<span class="pc-event-meta">${escapeHtml(formatEventDate(event))}${project}</span>` : `<p>${escapeHtml(formatEventDate(event))}${project}</p>`;
+    const structuredAttributes = compact ? "" : ` data-structured-card="agenda" data-structured-id="${escapeHtml(event.id)}" data-structured-label="${title}" data-structured-origin="${completed ? "completed" : "upcoming"}"`;
+    const dragHandle = compact ? "" : `<button type="button" class="structured-drag-handle pc-event-drag-handle" draggable="true" data-structured-drag-handle aria-label="Move ${title} between Upcoming and Completed. Press Space for keyboard controls." title="Move between Upcoming and Completed"><span aria-hidden="true">⠿</span></button>`;
     const details = compact ? "" : `
       ${event.location ? `<small>Location · ${escapeHtml(event.location)}</small>` : ""}
       ${event.attendees ? `<small>Attendees · ${escapeHtml(event.attendees)}</small>` : ""}
@@ -141,7 +143,7 @@
       ${externalUrl ? `<small><a href="${externalUrl}" target="_blank" rel="noopener noreferrer">Open meeting link</a></small>` : ""}
       ${event.notes ? `<small class="pc-event-notes">${escapeHtml(event.notes)}</small>` : ""}`;
     return `
-      <article class="pc-event-card pc-type-${escapeHtml(event.type)} pc-date-${dateState.key} ${compact ? "pc-event-compact" : ""}" data-pc-event-card="${escapeHtml(event.id)}">
+      <article class="pc-event-card pc-type-${escapeHtml(event.type)} pc-date-${dateState.key} ${compact ? "pc-event-compact" : ""}" data-pc-event-card="${escapeHtml(event.id)}"${structuredAttributes}>
         <${mainTag} class="pc-event-main" ${mainAttributes}>
           <span class="pc-event-topline"><span class="pc-event-type">${escapeHtml(typeLabel(event.type))}</span><span class="pc-event-date-state">${escapeHtml(dateState.label)}</span></span>
           ${eventTitle}
@@ -149,6 +151,7 @@
           ${details}
         </${mainTag}>
         <div class="pc-event-actions">
+          ${dragHandle}
           <button type="button" class="button ${completed ? "button-secondary" : "button-primary"} button-small" data-pc-complete="${escapeHtml(event.id)}">${completed ? "Reopen" : "Complete"}</button>
           ${compact ? "" : `<button type="button" class="button button-secondary button-small" data-pc-edit="${escapeHtml(event.id)}">Edit</button><div class="record-more-menu overflow-menu pc-event-more-menu"><button type="button" class="button button-secondary button-small overflow-menu-trigger" aria-label="More actions for ${title}" title="More actions" aria-haspopup="menu" aria-controls="pc-event-more-${escapeHtml(event.id)}" aria-expanded="false"><span class="kebab-icon" aria-hidden="true">&#8942;</span><span class="sr-only">More actions</span></button><div class="record-more-panel pc-event-more-panel" id="pc-event-more-${escapeHtml(event.id)}" role="menu" aria-label="More actions for ${title}" hidden><button type="button" class="button button-secondary" role="menuitem" data-pc-ics="${escapeHtml(event.id)}">Export ICS</button><button type="button" class="button button-danger" role="menuitem" data-pc-delete="${escapeHtml(event.id)}">Delete event</button></div></div>`}
         </div>
@@ -351,6 +354,50 @@
     showCalendarMessage(completing ? "Agenda event completed." : "Agenda event reopened.", "success");
   }
 
+  async function moveAgendaEventByDrop(id, destination) {
+    const event = events.find(item => item.id === id);
+    const completing = destination === "completed";
+    if (!event || !["upcoming", "completed"].includes(destination)) return { success:false, message:"Agenda event is no longer available." };
+    if (Boolean(event.completedAt) === completing) return { success:false, message:`${event.title || "Agenda event"} is already in ${destination}.` };
+
+    const original = { ...event };
+    let linkedProjectAction = null;
+    if (completing && event.projectId && window.FinanceProjectDropActions?.completeLinkedAgenda) {
+      linkedProjectAction = await window.FinanceProjectDropActions.completeLinkedAgenda(event.projectId, event.title);
+      if (!linkedProjectAction?.success) return { success:false, message:linkedProjectAction?.message || "Agenda move cancelled." };
+    }
+
+    const timestamp = new Date().toISOString();
+    const next = events.map(item => item.id === id ? { ...item, completedAt:completing ? timestamp : "", updatedAt:timestamp } : item);
+    if (!safeWrite(next)) {
+      if (linkedProjectAction?.undo) await linkedProjectAction.undo();
+      return { success:false, message:"Agenda event could not be saved." };
+    }
+    events = next;
+    render();
+    notifyAgendaChanged(completing ? "drop-completed" : "drop-reopened", id);
+    const title = event.title || "Agenda event";
+    return {
+      success:true,
+      message:`${title} moved to ${completing ? "Completed" : "Upcoming"} agenda.`,
+      undo:async () => {
+        const current = events.find(item => item.id === id);
+        if (!current) return false;
+        const currentSnapshot = { ...current };
+        const restored = events.map(item => item.id === id ? { ...original } : item);
+        if (!safeWrite(restored)) return false;
+        if (linkedProjectAction?.undo && !await linkedProjectAction.undo()) {
+          safeWrite(events.map(item => item.id === id ? currentSnapshot : item));
+          return false;
+        }
+        events = restored;
+        render();
+        notifyAgendaChanged("drop-undone", id);
+        return true;
+      }
+    };
+  }
+
   function openFullAgenda() {
     const dialog = document.getElementById("projectAgendaFullDialog");
     if (!dialog) return;
@@ -485,8 +532,8 @@
     fullDialog.innerHTML = `
       <div class="modal-header pc-full-header"><div><h3 id="projectAgendaFullDialogTitle">Project Agenda</h3><small data-pc-full-count>0 total</small></div><div><button type="button" class="button button-primary button-small" data-pc-full-add>+ Schedule event</button><button type="button" class="button button-secondary button-small" data-pc-full-close>Close</button></div></div>
       <div class="modal-body pc-full-body">
-        <section class="pc-full-section" aria-labelledby="pcUpcomingAgendaTitle"><div class="pc-full-section-heading"><h4 id="pcUpcomingAgendaTitle">Upcoming</h4><small>Ordered by date and time</small></div><div class="pc-agenda-list pc-full-list" data-pc-full-upcoming></div></section>
-        <section class="pc-full-section" aria-labelledby="pcCompletedAgendaTitle"><div class="pc-full-section-heading"><h4 id="pcCompletedAgendaTitle">Completed</h4><small>Kept for project history</small></div><div class="pc-agenda-list pc-full-list" data-pc-full-completed></div></section>
+        <section class="pc-full-section" aria-labelledby="pcUpcomingAgendaTitle" data-structured-drop-zone data-structured-drop-kind="agenda" data-structured-drop-destination="upcoming" data-structured-drop-label="Upcoming agenda"><div class="pc-full-section-heading"><h4 id="pcUpcomingAgendaTitle">Upcoming</h4><small>Ordered by date and time</small></div><div class="pc-agenda-list pc-full-list" data-pc-full-upcoming></div></section>
+        <section class="pc-full-section" aria-labelledby="pcCompletedAgendaTitle" data-structured-drop-zone data-structured-drop-kind="agenda" data-structured-drop-destination="completed" data-structured-drop-label="Completed agenda"><div class="pc-full-section-heading"><h4 id="pcCompletedAgendaTitle">Completed</h4><small>Kept for project history</small></div><div class="pc-agenda-list pc-full-list" data-pc-full-completed></div></section>
       </div>
       <div class="modal-footer"><button type="button" class="button button-secondary" data-pc-full-close>Close</button></div>`;
     document.body.appendChild(fullDialog);
@@ -558,6 +605,9 @@
   }
 
   window.addEventListener("finance:privacy-auth-change", bootWhenAuthenticated);
+
+  window.FinanceStructuredDropActions = window.FinanceStructuredDropActions || {};
+  window.FinanceStructuredDropActions.agenda = { move:moveAgendaEventByDrop };
 
   window.addEventListener("finance:page-changed", event => {
     if (event.detail?.pageId === "projects") {

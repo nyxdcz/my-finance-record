@@ -10,9 +10,9 @@ const desktopUx = read("assets/css/desktop-ux-v15-2-0.css");
 const version = JSON.parse(read("version.json"));
 const pkg = JSON.parse(read("package.json"));
 
-assert.equal(version.version, "15.2.14");
-assert.equal(pkg.version, "15.2.14");
-assert.equal(version.cacheVersion, "finance-v15-20260820-common-desktop-r50");
+assert.equal(version.version, "15.2.15");
+assert.equal(pkg.version, "15.2.15");
+assert.equal(version.cacheVersion, "finance-v15-20260820-structured-project-drag-r51");
 assert.match(index, /production-ui-audit-v15-2-13\.css\?v=15\.2\.14-audit2/);
 assert.ok(index.indexOf("production-ui-audit-v15-2-13.css") > index.indexOf("desktop-ux-v15-2-0.css"));
 assert.match(worker, /production-ui-audit-v15-2-13\.css\?v=15\.2\.14-audit2/);
@@ -32,4 +32,4 @@ assert.match(css, /-webkit-line-clamp:\s*2/);
 assert.match(desktopUx, /--budget-disclosure-reference-size/);
 assert.match(desktopUx, /#dashCashFlowChart \.cash-flow-chart-grid/);
 
-console.log("V15.2.14 production UI/UX audit source contract passed.");
+console.log("V15.2.15 production UI/UX audit source contract passed.");

@@ -1,5 +1,5 @@
 "use strict";
-const APP_VERSION = "15.2.14";
+const APP_VERSION = "15.2.15";
 self.__FINANCE_APP_VERSION = APP_VERSION;
 // V15.2.9 refreshes sidebar icon delivery and disclosure/icon presentation without changing Finance or sync behavior.
 // V15.2.8 consolidates Cash Flow presentation ownership in static CSS without changing Finance or sync behavior.
@@ -21,7 +21,7 @@ self.__FINANCE_APP_VERSION = APP_VERSION;
 // V15.2.2 hotfix: refresh the first-half completion heart-smile artwork from the validated app shell.
 // V15.2.2 hotfix: keep interaction-patterns network-first so completion-state presentation refreshes without rotating finance caches.
 // V15.2.2 hotfix: keep the PWA update layer network-first so the Quick add topbar relocation reaches installed apps.
-const CACHE_VERSION = "finance-v15-20260820-common-desktop-r50";
+const CACHE_VERSION = "finance-v15-20260820-structured-project-drag-r51";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const DB_NAME = "simple-finance-project-records-v12-db";
@@ -45,14 +45,14 @@ const APP_SHELL = [
   asset("./production-ui-audit-v15-2-13.css?v=15.2.14-audit2"),
   asset("./form-inputs.js?v=15.2.6-phase5a1"),
   asset("./application-help.js?v=15.2.9-phase5b1"),
-  asset("./pwa-update-v15-0-5.js?v=15.2.14-release10"),
+  asset("./pwa-update-v15-0-5.js?v=15.2.15-release11"),
   asset("./phone-finance-compat.js?v=15.2.10-phone1"),
   asset("./cash-flow-summary.js?v=15.2.10-cashflow1"),
   asset("./header-tools-compat.js?v=15.2.10-header1"),
   asset("./dashboard-interactions-core-v14-0-23.css"),
   asset("./liquid-glass-v15.css?v=15.2.2-light1"),
   asset("./mobile-v14-0-23.css?v=15.2.10-mobile2"),
-  asset("./interaction-patterns.js?v=15.2.1-ux1"),
+  asset("./interaction-patterns.js?v=15.2.15-project-drag1"),
   asset("./privacy-lock.js?v=15.1.0-ui1"),
   asset("./security-profiles.js?v=14.0.23"),
   asset("./security-profiles.css?v=15.1.0-desktop2"),
@@ -70,10 +70,10 @@ const APP_SHELL = [
   asset("./productivity-tools.css?v=14.0.23"),
   asset("./reminders-alerts.js?v=14.0.23"),
   asset("./reminders-alerts.css?v=14.0.23"),
-  asset("./projects-calendar-v13.0.20.js?v=15.2.1-ux1"),
-  asset("./projects-calendar-v13.0.20.css?v=15.1.0-desktop2"),
+  asset("./projects-calendar-v13.0.20.js?v=15.2.15-project-drag1"),
+  asset("./projects-calendar-v13.0.20.css?v=15.2.15-project-drag1"),
   asset("./sync-config.js?v=15.2.10-release1"),
-  asset("./sync-runtime-compat.js?v=15.2.14-release5"),
+  asset("./sync-runtime-compat.js?v=15.2.15-release6"),
   asset("./expense-screenshot-parser.js?v=15.0.3"),
   asset("./expense-screenshot-detect.js?v=15.0.3"),
   asset("./expense-screenshot-ai.js?v=15.0.3"),

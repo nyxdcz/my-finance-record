@@ -24,6 +24,7 @@ const testPlan = [
   { suite: "regression", file: "tests/regression/validate-sync-config-separation.mjs" },
   { suite: "regression", file: "tests/regression/validate-auth-sync-state-v15-2-12.mjs" },
   { suite: "regression", file: "tests/regression/validate-production-ui-audit-v15-2-13.mjs" },
+  { suite: "regression", file: "tests/regression/validate-structured-project-drag-v15-2-15.mjs" },
 ];
 
 const supportedSuites = new Set(["all", ...testPlan.map(({ suite }) => suite)]);

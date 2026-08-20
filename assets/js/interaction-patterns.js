@@ -172,6 +172,245 @@
     return { announce, cancel, createHandle };
   }
 
+  function setupStructuredDragTransitions() {
+    if (document.documentElement.dataset.structuredDragReady === "true") return;
+    document.documentElement.dataset.structuredDragReady = "true";
+    const announcer = document.getElementById("structuredDragAnnouncer");
+    const toast = document.getElementById("structuredDragToast");
+    const toastMessage = toast?.querySelector("[data-structured-toast-message]");
+    const toastUndo = toast?.querySelector("[data-structured-toast-undo]");
+    const toastDismiss = toast?.querySelector("[data-structured-toast-dismiss]");
+    let active = null;
+    let pointerPending = null;
+    let toastTimer = 0;
+    let toastDeadline = 0;
+    let toastRemaining = 5000;
+    let undoAction = null;
+
+    const announce = message => {
+      if (!announcer) return;
+      announcer.textContent = "";
+      requestAnimationFrame(() => { announcer.textContent = String(message || ""); });
+    };
+    const zoneLabel = zone => zone?.dataset.structuredDropLabel || zone?.querySelector("h3,h4")?.textContent?.trim() || "destination";
+    const zonesFor = kind => [...document.querySelectorAll(`[data-structured-drop-kind="${CSS.escape(kind)}"]`)];
+    const isValidZone = (zone, state = active) => Boolean(zone && state && zone.dataset.structuredDropKind === state.kind && zone.dataset.structuredDropDestination !== state.origin);
+    const clearZoneState = () => document.querySelectorAll(".is-structured-drop-available,.is-structured-drop-target,.is-structured-drop-origin").forEach(zone => {
+      zone.classList.remove("is-structured-drop-available", "is-structured-drop-target", "is-structured-drop-origin");
+    });
+    const setTarget = zone => {
+      if (!active) return;
+      document.querySelectorAll(".is-structured-drop-target").forEach(node => node.classList.remove("is-structured-drop-target"));
+      active.target = isValidZone(zone) ? zone : null;
+      if (active.target) {
+        active.target.classList.add("is-structured-drop-target");
+        announce(`${zoneLabel(active.target)} is ready. Drop to move ${active.label}.`);
+      }
+    };
+    const expandCompletedProjects = state => {
+      if (state.kind !== "project") return;
+      const section = document.getElementById("completedProjectsCard");
+      const toggle = section?.querySelector('[data-collapse-toggle="completed-projects"]');
+      if (!section?.classList.contains("is-collapsed") || !toggle) return;
+      state.openedCompleted = true;
+      toggle.click();
+    };
+    const restoreCompletedProjects = state => {
+      if (!state?.openedCompleted) return;
+      const section = document.getElementById("completedProjectsCard");
+      const toggle = section?.querySelector('[data-collapse-toggle="completed-projects"]');
+      if (section && !section.classList.contains("is-collapsed") && toggle) toggle.click();
+    };
+    const clearActiveVisuals = (state, { restoreCollapsed = false } = {}) => {
+      state?.card?.classList.remove("is-structured-dragging", "is-pointer-dragging");
+      state?.card?.style.removeProperty("--structured-drag-x");
+      state?.card?.style.removeProperty("--structured-drag-y");
+      document.body.classList.remove("structured-drag-active");
+      clearZoneState();
+      if (restoreCollapsed) restoreCompletedProjects(state);
+    };
+    const begin = (handle, input = "pointer") => {
+      const card = handle?.closest?.("[data-structured-card]");
+      const kind = card?.dataset.structuredCard;
+      const id = card?.dataset.structuredId;
+      if (!card || !kind || !id || !window.FinanceStructuredDropActions?.[kind]?.move) return null;
+      if (active) clearActiveVisuals(active, { restoreCollapsed:true });
+      active = { handle, card, kind, id, input, label:card.dataset.structuredLabel || "item", origin:card.dataset.structuredOrigin || "", target:null, openedCompleted:false, keyboardIndex:0 };
+      expandCompletedProjects(active);
+      card.classList.add("is-structured-dragging");
+      document.body.classList.add("structured-drag-active");
+      zonesFor(kind).forEach(zone => {
+        if (zone.dataset.structuredDropDestination === active.origin) zone.classList.add("is-structured-drop-origin");
+        else zone.classList.add("is-structured-drop-available");
+      });
+      announce(`${active.label} picked up. Choose a highlighted destination, then drop or press Escape to cancel.`);
+      return active;
+    };
+    const cancel = (message = "Move cancelled.") => {
+      const state = active;
+      if (!state) return;
+      active = null;
+      clearActiveVisuals(state, { restoreCollapsed:true });
+      state.card?.classList.add("is-structured-returning");
+      setTimeout(() => state.card?.classList.remove("is-structured-returning"), 240);
+      announce(message);
+      requestAnimationFrame(() => state.handle?.focus?.());
+    };
+    const hideUndoToast = () => {
+      clearTimeout(toastTimer);
+      toastTimer = 0;
+      undoAction = null;
+      if (toast) toast.hidden = true;
+    };
+    const scheduleUndoDismiss = (delay = 5000) => {
+      clearTimeout(toastTimer);
+      toastRemaining = Math.max(250, Number(delay) || 5000);
+      toastDeadline = Date.now() + toastRemaining;
+      toastTimer = setTimeout(hideUndoToast, toastRemaining);
+    };
+    const pauseUndoDismiss = () => {
+      if (!toastTimer) return;
+      toastRemaining = Math.max(250, toastDeadline - Date.now());
+      clearTimeout(toastTimer);
+      toastTimer = 0;
+    };
+    const resumeUndoDismiss = () => {
+      if (!toast || toast.hidden || toast.matches(":hover") || toast.contains(document.activeElement)) return;
+      scheduleUndoDismiss(toastRemaining);
+    };
+    const showUndoToast = result => {
+      if (!toast || !toastMessage || !toastUndo) return;
+      clearTimeout(toastTimer);
+      undoAction = typeof result.undo === "function" ? result.undo : null;
+      toastMessage.textContent = result.message || "Item moved.";
+      toastUndo.hidden = !undoAction;
+      toast.hidden = false;
+      scheduleUndoDismiss(5000);
+    };
+    const commit = async zone => {
+      const state = active;
+      if (!state || !isValidZone(zone, state)) return cancel(`${state?.label || "Item"} returned to its original position.`);
+      active = null;
+      clearActiveVisuals(state);
+      const destination = zone.dataset.structuredDropDestination;
+      try {
+        const result = await window.FinanceStructuredDropActions[state.kind].move(state.id, destination);
+        if (!result?.success) {
+          restoreCompletedProjects(state);
+          announce(result?.message || `${state.label} move cancelled.`);
+          requestAnimationFrame(() => document.querySelector(`[data-structured-id="${CSS.escape(state.id)}"] [data-structured-drag-handle]`)?.focus());
+          return;
+        }
+        announce(result.message || `${state.label} moved to ${zoneLabel(zone)}.`);
+        showUndoToast(result);
+      } catch (error) {
+        restoreCompletedProjects(state);
+        announce(`${state.label} could not be moved.`);
+        window.showToast?.(error?.message || "The item could not be moved.", "error");
+      }
+    };
+
+    document.addEventListener("dragstart", event => {
+      const handle = event.target.closest?.("[data-structured-drag-handle]");
+      const state = handle ? begin(handle, "mouse") : null;
+      if (!state) return;
+      event.dataTransfer.effectAllowed = "move";
+      event.dataTransfer.setData("application/x-finance-structured-item", `${state.kind}:${state.id}`);
+      event.dataTransfer.setData("text/plain", state.label);
+      event.dataTransfer.setDragImage(state.card, 28, 22);
+    });
+    document.addEventListener("dragover", event => {
+      if (!active || active.input !== "mouse") return;
+      const zone = event.target.closest?.("[data-structured-drop-zone]");
+      if (!isValidZone(zone)) return setTarget(null);
+      event.preventDefault();
+      event.dataTransfer.dropEffect = "move";
+      setTarget(zone);
+    });
+    document.addEventListener("drop", event => {
+      if (!active || active.input !== "mouse") return;
+      const zone = event.target.closest?.("[data-structured-drop-zone]");
+      if (!isValidZone(zone)) return;
+      event.preventDefault();
+      commit(zone);
+    });
+    document.addEventListener("dragend", () => {
+      if (active?.input === "mouse") cancel(`${active.label} returned to its original position.`);
+    });
+    document.addEventListener("pointerdown", event => {
+      const handle = event.target.closest?.("[data-structured-drag-handle]");
+      if (!handle || event.pointerType === "mouse" || event.button !== 0) return;
+      pointerPending = { handle, pointerId:event.pointerId, startX:event.clientX, startY:event.clientY };
+    });
+    document.addEventListener("pointermove", event => {
+      if (!pointerPending || pointerPending.pointerId !== event.pointerId) return;
+      const dx = event.clientX - pointerPending.startX, dy = event.clientY - pointerPending.startY;
+      if (!active && Math.hypot(dx, dy) < 7) return;
+      if (!active) {
+        const state = begin(pointerPending.handle, "touch");
+        if (!state) { pointerPending = null; return; }
+        state.card.classList.add("is-pointer-dragging");
+        pointerPending.handle.setPointerCapture?.(event.pointerId);
+      }
+      event.preventDefault();
+      active.card.style.setProperty("--structured-drag-x", `${dx}px`);
+      active.card.style.setProperty("--structured-drag-y", `${dy}px`);
+      const zone = document.elementFromPoint(event.clientX, event.clientY)?.closest?.("[data-structured-drop-zone]");
+      setTarget(isValidZone(zone) ? zone : null);
+    });
+    document.addEventListener("pointerup", event => {
+      if (!pointerPending || pointerPending.pointerId !== event.pointerId) return;
+      const zone = active?.target;
+      pointerPending = null;
+      if (active && zone) commit(zone);
+      else if (active) cancel(`${active.label} returned to its original position.`);
+    });
+    document.addEventListener("pointercancel", event => {
+      if (!pointerPending || pointerPending.pointerId !== event.pointerId) return;
+      pointerPending = null;
+      if (active) cancel(`${active.label} move cancelled.`);
+    });
+    document.addEventListener("keydown", event => {
+      const handle = event.target.closest?.("[data-structured-drag-handle]");
+      if (!handle || ![" ", "Enter", "Escape", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(event.key)) return;
+      if (!active && [" ", "Enter"].includes(event.key)) {
+        event.preventDefault();
+        const state = begin(handle, "keyboard");
+        if (!state) return;
+        const zones = zonesFor(state.kind).filter(zone => isValidZone(zone, state));
+        if (zones.length) { state.keyboardIndex = 0; setTarget(zones[0]); }
+        return;
+      }
+      if (!active || active.input !== "keyboard" || active.handle !== handle) return;
+      event.preventDefault();
+      if (event.key === "Escape") return cancel(`${active.label} move cancelled.`);
+      if ([" ", "Enter"].includes(event.key)) return active.target ? commit(active.target) : cancel(`${active.label} returned to its original position.`);
+      const zones = zonesFor(active.kind).filter(zone => isValidZone(zone));
+      if (!zones.length) return;
+      const delta = ["ArrowDown", "ArrowRight"].includes(event.key) ? 1 : -1;
+      active.keyboardIndex = (active.keyboardIndex + delta + zones.length) % zones.length;
+      setTarget(zones[active.keyboardIndex]);
+    });
+
+    toastUndo?.addEventListener("click", async () => {
+      if (!undoAction) return;
+      const action = undoAction;
+      toastUndo.disabled = true;
+      const restored = await action();
+      toastUndo.disabled = false;
+      undoAction = null;
+      toastUndo.hidden = true;
+      toastMessage.textContent = restored ? "Move undone. The item was restored." : "Undo is no longer available because another change was made.";
+      announce(toastMessage.textContent);
+      scheduleUndoDismiss(restored ? 2600 : 4200);
+    });
+    toastDismiss?.addEventListener("click", hideUndoToast);
+    toast?.addEventListener("mouseenter", pauseUndoDismiss);
+    toast?.addEventListener("mouseleave", resumeUndoDismiss);
+    toast?.addEventListener("focusin", pauseUndoDismiss);
+    toast?.addEventListener("focusout", () => requestAnimationFrame(resumeUndoDismiss));
+  }
+
   function emptyStateHtml(title, text, action = null) {
     const escape = value => String(value ?? "").replace(/[&<>"']/g, character => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" })[character]);
     const label = String(action?.label || "");
@@ -404,9 +643,10 @@
     setupOverflowMenus();
     setupEmptyStateActions();
     setupFirstHalfCompletionIcons();
+    setupStructuredDragTransitions();
   }
 
-  window.FinanceInteractionPatterns = { closeOverflowMenu, setupOverflowMenus, renderDuplicatedMarquee, renderActiveFilterChips, emptyStateHtml, renderIncomeFilterChips, setupEmptyStateActions, middleTruncateFilename, createDashboardDragController, updateFirstHalfCompletionIcons, firstHalfFinished };
+  window.FinanceInteractionPatterns = { closeOverflowMenu, setupOverflowMenus, renderDuplicatedMarquee, renderActiveFilterChips, emptyStateHtml, renderIncomeFilterChips, setupEmptyStateActions, setupStructuredDragTransitions, middleTruncateFilename, createDashboardDragController, updateFirstHalfCompletionIcons, firstHalfFinished };
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", setupInteractionPatterns, { once:true });
   else setupInteractionPatterns();
 })();

@@ -52,6 +52,66 @@
 .pc-full-section-heading small { color:var(--muted); font-size:.57rem; }
 .pc-full-list { max-height:none; overflow:visible; }
 
+.structured-drag-handle {
+  width:32px;
+  min-width:32px;
+  height:32px;
+  padding:0;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border:1px solid var(--line);
+  border-radius:7px;
+  background:var(--surface-soft);
+  color:var(--muted);
+  font:inherit;
+  font-size:1rem;
+  line-height:1;
+  cursor:grab;
+  touch-action:none;
+  user-select:none;
+  -webkit-user-select:none;
+}
+.structured-drag-handle:hover,.structured-drag-handle:focus-visible { border-color:var(--primary); color:var(--primary); background:color-mix(in srgb,var(--primary) 9%,var(--surface)); }
+.structured-drag-handle:active,.is-structured-dragging .structured-drag-handle { cursor:grabbing; }
+.project-record .record-title { position:relative; }
+.project-drag-handle { float:left; margin:0 7px 4px 0; }
+.pc-event-drag-handle { order:-1; }
+
+[data-structured-drop-zone] { transition:border-color 140ms ease,background-color 140ms ease,box-shadow 140ms ease,opacity 140ms ease; }
+.is-structured-drop-available { outline:2px dashed color-mix(in srgb,var(--primary) 78%,transparent); outline-offset:-4px; background:color-mix(in srgb,var(--primary) 7%,var(--surface)) !important; }
+.is-structured-drop-target { outline-style:solid; outline-color:var(--primary); background:color-mix(in srgb,var(--primary) 15%,var(--surface)) !important; box-shadow:0 0 0 3px color-mix(in srgb,var(--primary) 20%,transparent); }
+.is-structured-drop-origin { opacity:.58; }
+.is-structured-dragging { opacity:.72; box-shadow:0 16px 38px rgb(0 0 0 / .24); }
+.is-pointer-dragging { position:relative; z-index:1200; pointer-events:none; transform:translate3d(var(--structured-drag-x,0),var(--structured-drag-y,0),0) scale(1.015); }
+.is-structured-returning { animation:structured-drag-return 220ms ease-out; }
+@keyframes structured-drag-return { from { opacity:.72; transform:scale(.985); } to { opacity:1; transform:scale(1); } }
+
+.structured-drag-toast {
+  position:fixed;
+  right:18px;
+  bottom:76px;
+  z-index:2400;
+  width:min(420px,calc(100vw - 32px));
+  min-height:52px;
+  padding:9px 10px;
+  display:flex;
+  align-items:center;
+  gap:9px;
+  border:1px solid color-mix(in srgb,var(--primary) 52%,var(--line));
+  border-radius:9px;
+  background:color-mix(in srgb,var(--primary) 20%,#07111f);
+  color:#fff;
+  box-shadow:0 16px 44px rgb(0 0 0 / .38);
+}
+.structured-drag-toast[hidden] { display:none; }
+.structured-drag-toast-icon { color:#9fc5ff; font-size:1.1rem; }
+.structured-drag-toast-message { min-width:0; flex:1; font-size:.78rem; font-weight:700; }
+.structured-drag-toast-undo,.structured-drag-toast-dismiss { min-width:42px; min-height:36px; border:0; border-radius:6px; background:transparent; color:#fff; font:inherit; font-weight:850; cursor:pointer; }
+.structured-drag-toast-undo { padding:0 9px; color:#b7d2ff; }
+.structured-drag-toast-undo:hover,.structured-drag-toast-undo:focus-visible,.structured-drag-toast-dismiss:hover,.structured-drag-toast-dismiss:focus-visible { background:rgb(255 255 255 / .12); outline:2px solid #b7d2ff; outline-offset:1px; }
+.structured-drag-toast-dismiss { min-width:36px; padding:0; font-size:1.15rem; }
+
 html[data-theme="dark"] .pc-date-soon { background:color-mix(in srgb,#66551b 48%,var(--surface)); }
 html[data-theme="dark"] .pc-date-soon .pc-event-date-state { background:#4a3e17; color:#f5d66b; }
 
@@ -73,4 +133,11 @@ html[data-theme="dark"] .pc-date-soon .pc-event-date-state { background:#4a3e17;
   .pc-full-header > div:last-child { flex-wrap:wrap; justify-content:flex-end; }
   .pc-full-section-heading { align-items:flex-start; flex-direction:column; }
   #projectCalendarEventDialog { width:min(680px,calc(100vw - 20px)); }
+  .structured-drag-handle { width:44px; min-width:44px; height:44px; }
+  .project-drag-handle { margin-right:9px; }
+  .structured-drag-toast { right:10px; bottom:68px; width:calc(100vw - 20px); }
+}
+
+@media (prefers-reduced-motion:reduce) {
+  [data-structured-drop-zone],.is-structured-dragging,.is-pointer-dragging,.is-structured-returning { transition:none !important; animation:none !important; }
 }

@@ -15,7 +15,7 @@
   <link rel="stylesheet" href="./productivity-tools.css?v=14.0.23">
   <link rel="stylesheet" href="./reminders-alerts.css?v=14.0.23">
   <link rel="stylesheet" href="./account-ledger.css?v=14.0.23">
-  <link rel="stylesheet" href="./projects-calendar-v13.0.20.css?v=15.1.0-desktop2"><link rel="stylesheet" href="./mobile-v14-0-23.css?v=15.2.10-mobile2">
+  <link rel="stylesheet" href="./projects-calendar-v13.0.20.css?v=15.2.15-project-drag1"><link rel="stylesheet" href="./mobile-v14-0-23.css?v=15.2.10-mobile2">
   <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png">
   <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
   <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
@@ -41,7 +41,7 @@
     })();
   </script>
 
-  <title>My Finance Records · V15.2.14</title>
+  <title>My Finance Records · V15.2.15</title>
   <link rel="stylesheet" href="./app.css?v=15.1.0-desktop3">
   <link rel="stylesheet" href="./shell-ui-v15-2-11.css?v=15.2.11-shell1">
   <link rel="stylesheet" href="./dashboard-interactions.css?v=15.2.10-icons1">
@@ -52,7 +52,7 @@
   <link rel="stylesheet" href="./production-ui-audit-v15-2-13.css?v=15.2.14-audit2">
   <script src="./form-inputs.js?v=15.2.6-phase5a1"></script>
   <script src="./application-help.js?v=15.2.9-phase5b1"></script>
-  <script src="./pwa-update-v15-0-5.js?v=15.2.14-release10"></script>
+  <script src="./pwa-update-v15-0-5.js?v=15.2.15-release11"></script>
   <script src="./phone-finance-compat.js?v=15.2.10-phone1"></script>
   <script src="./cash-flow-summary.js?v=15.2.10-cashflow1"></script>
   <script src="./header-tools-compat.js?v=15.2.10-header1"></script>
@@ -97,7 +97,7 @@
           <div>
             <h1 id="topTitle">Budget &amp; Expenses</h1>
             <p id="todayLabel">Tuesday, July 21, 2026</p>
-            <small id="buildBadge" title="V15.2.14 · Common Desktop Summary Alignment · August 20, 2026">V15.2.14</small>
+            <small id="buildBadge" title="V15.2.15 · Structured Project Drag &amp; Drop · August 20, 2026">V15.2.15</small>
           </div>
         </div>
         <div class="topbar-actions">
@@ -681,7 +681,7 @@
             <div id="activeProjectList"><div class="empty-state"><strong>Loading projects</strong>Active project records will appear here.</div></div>
           </article>
 
-          <article class="card project-section-card collapsible-section" id="completedProjectsCard" data-collapse-key="completed-projects" style="margin-top:16px">
+          <article class="card project-section-card collapsible-section" id="completedProjectsCard" data-collapse-key="completed-projects" data-structured-drop-zone data-structured-drop-kind="project" data-structured-drop-destination="completed" data-structured-drop-label="Completed Projects" style="margin-top:16px">
             <div class="card-header collapsible-header project-section-header">
               <div><h3>Completed projects</h3><p>Completed status is separate from client payment status</p></div>
               <div class="collapse-actions"><div class="project-section-summary"><strong id="completedProjectCount">0 projects</strong><small id="completedProjectSummary">No completed projects</small></div><button class="collapse-toggle" type="button" data-collapse-toggle="completed-projects" aria-expanded="false" aria-controls="completedProjectList" title="Expand Completed projects"><span class="collapse-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="m6 9 6 6 6-6"/></svg></span><span class="sr-only">Expand Completed projects</span></button></div>
@@ -1592,10 +1592,17 @@
   </div>
 
   <div class="toast toast-info" id="toast" role="status" aria-live="polite" aria-atomic="true"><span class="toast-icon" aria-hidden="true">i</span><span class="toast-message"></span><button class="toast-dismiss" id="toastDismissButton" type="button" aria-label="Dismiss notification" title="Dismiss notification">×</button></div>
+  <div class="structured-drag-toast" id="structuredDragToast" role="status" aria-live="polite" aria-atomic="true" hidden>
+    <span class="structured-drag-toast-icon" aria-hidden="true">↔</span>
+    <span class="structured-drag-toast-message" data-structured-toast-message></span>
+    <button class="structured-drag-toast-undo" type="button" data-structured-toast-undo hidden>Undo</button>
+    <button class="structured-drag-toast-dismiss" type="button" data-structured-toast-dismiss aria-label="Dismiss move notification" title="Dismiss move notification">×</button>
+  </div>
   <div class="sr-error-announcer" id="errorAnnouncer" role="alert" aria-live="assertive" aria-atomic="true"></div>
   <div class="sr-only" id="dashboardDragAnnouncer" role="status" aria-live="polite" aria-atomic="true"></div>
+  <div class="sr-only" id="structuredDragAnnouncer" role="status" aria-live="polite" aria-atomic="true"></div>
 
-  <script src="./interaction-patterns.js?v=15.2.1-ux1"></script>
+  <script src="./interaction-patterns.js?v=15.2.15-project-drag1"></script>
   <script>
     (() => {
       const dataKey = "simple-finance-project-records-v2";
@@ -3381,6 +3388,61 @@
     }
     window.completeProjectFromAgenda = completeProjectFromAgenda;
 
+    function projectDropUndo(label) {
+      return () => undoState?.label === label ? undoLastChange() : false;
+    }
+
+    async function completeProjectByDrop(projectId, destination) {
+      const project = data.projects.find(item => item.id === projectId);
+      if (!project) return { success:false, message:"Project is no longer available." };
+      if (destination !== "completed") return { success:false, message:"That project destination is not available." };
+      if (project.status === "Completed") return { success:false, message:`${project.name} is already completed.` };
+
+      const balance = projectBalance(project);
+      if (projectIsFinancial(project) && balance > 0) {
+        const accepted = await openAppConfirmation({
+          title:"Complete project with balance due?",
+          message:`Move “${project.name}” to Completed Projects?`,
+          details:`${money(balance)} remains to collect. Project value and payment history will not change.`,
+          confirmLabel:"Move to Completed",
+          danger:false
+        });
+        if (!accepted) return { success:false, message:`${project.name} move cancelled.` };
+      }
+
+      const today = new Date().toISOString().slice(0, 10);
+      const revision = activeProjectRevision(project);
+      const label = `Move ${project.name} to Completed Projects`;
+      pushUndo(label);
+      if (revision && !revision.completedDate) revision.completedDate = today;
+      project.status = "Completed";
+      project.updatedDate = today;
+      project.completedDate = project.completedDate || today;
+      if (!saveData(`${project.name} moved to Completed Projects`)) {
+        undoLastChange();
+        return { success:false, message:`${project.name} could not be moved.` };
+      }
+      return {
+        success:true,
+        message:`${project.name} moved to Completed Projects.`,
+        undo:projectDropUndo(label)
+      };
+    }
+
+    async function completeLinkedAgendaProject(projectId, eventTitle = "") {
+      const project = data.projects.find(item => item.id === projectId);
+      if (!project || project.status === "Completed") return { success:true, undo:null };
+      const label = `Complete ${project.name} from Project Agenda`;
+      const accepted = await completeProjectFromAgenda(projectId, eventTitle);
+      return accepted
+        ? { success:true, undo:projectDropUndo(label) }
+        : { success:false, message:`${project.name} completion cancelled.` };
+    }
+
+    window.FinanceProjectDropActions = { completeLinkedAgenda:completeLinkedAgendaProject };
+    window.FinanceStructuredDropActions = window.FinanceStructuredDropActions || {};
+    window.FinanceStructuredDropActions.project = { move:completeProjectByDrop };
+
     function salaryProjectCountForMonth(month, excludeId = "") {
       return data.projects.filter(project => project.id !== excludeId && projectWorkSource(project) === "salary" && project.workMonth === month).length;
     }
@@ -4595,8 +4657,10 @@
           projectCalendarContext(project).deadline ? `<button class="button button-secondary" data-calendar-project="${project.id}">${calendar.label}</button>` : ""
         ].filter(Boolean).join("");
         const mobileDeadlineLabel = completedBox ? `Completed ${formatDate(project.completedDate || project.updatedDate)}` : (currentRevision ? `Revision due ${formatDate(effectiveDeadline)}` : (effectiveDeadline ? `Due ${formatDate(effectiveDeadline)}` : "No deadline"));
-        return `<article class="record-row responsive-record project-record ${completedBox ? "completed-project-record" : ""}">
-          <div class="record-title"><strong>${noteHtml}</strong><small class="project-source-line ${projectWorkSource(project)}">${escapeHtml(projectSourceLabel(project))}${project.workSource === "salary" && project.workMonth ? ` · ${escapeHtml(monthLabel(project.workMonth))}` : ""}</small>${deadlineBadge}${revisionInline}</div>
+        const structuredCardAttributes = completedBox ? "" : ` data-structured-card="project" data-structured-id="${escapeAttribute(project.id)}" data-structured-label="${escapeAttribute(project.name)}" data-structured-origin="active"`;
+        const dragHandle = completedBox ? "" : `<button type="button" class="structured-drag-handle project-drag-handle" draggable="true" data-structured-drag-handle aria-label="Move ${escapeAttribute(project.name)} to Completed Projects. Press Space for keyboard controls." title="Move to Completed Projects"><span aria-hidden="true">⠿</span></button>`;
+        return `<article class="record-row responsive-record project-record ${completedBox ? "completed-project-record" : ""}"${structuredCardAttributes}>
+          <div class="record-title">${dragHandle}<strong>${noteHtml}</strong><small class="project-source-line ${projectWorkSource(project)}">${escapeHtml(projectSourceLabel(project))}${project.workSource === "salary" && project.workMonth ? ` · ${escapeHtml(monthLabel(project.workMonth))}` : ""}</small>${deadlineBadge}${revisionInline}</div>
           <div class="project-mobile-summary" aria-label="Project summary"><div class="project-mobile-facts"><span>${escapeHtml(project.type)}</span><span>${escapeHtml(mobileDeadlineLabel)}</span>${projectIsFinancial(project) ? `<span>${financialValue}</span>` : ""}</div><div class="project-mobile-statuses"><span class="status-pill ${projectStatusClass(project.status)}">${escapeHtml(statusCopy)}</span><span class="status-pill ${payment.className}">${escapeHtml(payment.label)}</span></div></div>
           <div class="project-cell" data-label="Type"><strong>${escapeHtml(project.type)}</strong></div>
           <div class="project-cell" data-label="${completedBox ? "Completed" : (currentRevision ? "Revision deadline" : "Deadline")}"><strong>${formatDate(completedBox ? (project.completedDate || project.updatedDate) : effectiveDeadline)}</strong></div>
@@ -5456,6 +5520,7 @@
     VERSION_HISTORY.unshift({"version":"V15.2.13","title":"Production UI/UX Consistency","changes":["Compacts phone Budget period shells and expense records while preserving 44px touch targets.","Standardizes the desktop toolbar and both Budget summary rows on one compact sizing and spacing rhythm.","Replaces moving summary feedback with a reduced-motion-safe outline acknowledgement while preserving disclosure alignment and the Dashboard chart layout."]});
 
     VERSION_HISTORY.unshift({"version":"V15.2.14","title":"Common Desktop Summary Alignment","changes":["Keeps both Budget summary rows at 56px on common 1280px and 1366px desktops.","Preserves primary labels and full amounts while suppressing only secondary copy that would cause row-height drift.","Adds common-desktop browser coverage while preserving the V15.2.13 phone, touch, motion, disclosure, and Dashboard behavior."]});
+    VERSION_HISTORY.unshift({"version":"V15.2.15","title":"Structured Project Drag & Drop","changes":["Moves Project Agenda entries between Upcoming and Completed with mouse, touch, or keyboard controls.","Moves Active Projects into Completed Projects without changing values, received payments, or remaining balances.","Adds valid destination cues, safe cancellation, screen-reader updates, reduced-motion behavior, and a five-second Undo action."]});
 
     function normalizeSettingsPanelKey(key) {
       const normalized = SETTINGS_PANEL_ALIASES[key] || key;
@@ -7614,10 +7679,10 @@
     });
 
     // ---------------- V12.10.0 PWA, Phase 11 interface refinement, Phase 10 calculator number inputs, projects, savings goals, and number inputs, Phase 7 secure reset, Phase 6 savings + dashboard insights, Phase 5 reports + dark mode, Phase 4 dashboard + Apple Calendar, Phase 3 monthly navigation, Phase 2 expense workflow, device registry, sync history, offline packs, reminders, and migration ----------------
-    const APP_VERSION = "15.2.14";
-    const APP_RELEASE_NAME = "Common Desktop Summary Alignment";
+    const APP_VERSION = "15.2.15";
+    const APP_RELEASE_NAME = "Structured Project Drag & Drop";
     const APP_RELEASE_DATE = "August 20, 2026";
-    const APP_CACHE_VERSION = "finance-v15-20260820-common-desktop-r50";
+    const APP_CACHE_VERSION = "finance-v15-20260820-structured-project-drag-r51";
 
     function synchronizeVersionDisplay() {
       document.title = `My Finance Records · V${APP_VERSION}`;
@@ -8905,7 +8970,7 @@
   </script>
   <script src="./vendor/supabase.min.js"></script>
   <script src="./sync-config.js?v=15.2.10-release1"></script>
-  <script src="./sync-runtime-compat.js?v=15.2.14-release5"></script>
+  <script src="./sync-runtime-compat.js?v=15.2.15-release6"></script>
   <script src="./privacy-lock.js?v=15.1.0-ui1"></script>
   <script src="./security-profiles.js?v=14.0.23"></script>
   <script src="./cloud-conflict-review.js?v=14.0.23"></script>
@@ -8915,6 +8980,6 @@
   <script src="./reports-insights.js?v=14.0.23"></script>
   <script src="./productivity-tools.js?v=15.2.1-ux2"></script>
   <script src="./reminders-alerts.js?v=14.0.23"></script>
-  <script src="./projects-calendar-v13.0.20.js?v=15.2.1-ux1"></script>
+  <script src="./projects-calendar-v13.0.20.js?v=15.2.15-project-drag1"></script>
 
 </body></html>
