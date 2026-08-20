@@ -17,6 +17,16 @@ test("More tools Appearance stays compact, left-aligned, and network-first", asy
   await page.goto("http://127.0.0.1:3000/index.html?page=dashboard", { waitUntil:"networkidle" });
   await page.waitForFunction(() => typeof window.FinancePrivacyLock?.unlock === "function" && Boolean(document.getElementById("topbarToolsTrigger")));
   await page.evaluate(() => window.FinancePrivacyLock.unlock({ email:"theme-alignment-test@example.invalid" }));
+  await page.waitForFunction(() => {
+    const panel = document.getElementById("topbarToolsPanel");
+    const search = document.getElementById("globalSearchButton");
+    const redo = document.getElementById("redoMoneyMenuButton");
+    const quickActions = document.getElementById("productivityCenterButton");
+    if (!panel || !search || search.parentElement !== panel || search.getAttribute("role") !== "menuitem") return false;
+    if (redo && redo.nextElementSibling !== search) return false;
+    if (quickActions?.parentElement === panel && search.nextElementSibling !== quickActions) return false;
+    return true;
+  });
   await page.locator("#topbarToolsTrigger").click();
   await expect(page.locator("#topbarToolsPanel")).toBeVisible();
   const appearanceButton = page.locator("#themeToggleButton");
