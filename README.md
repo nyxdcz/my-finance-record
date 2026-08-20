@@ -1,139 +1,107 @@
 # My Finance Records · V15.2.14
 
-Local-first personal and household finance PWA with multi-profile support and optional encrypted Supabase synchronization.
+<div align="center">
 
-## Project status
+**A local-first personal and household finance PWA built for privacy, resilience, and everyday use.**
 
-Current release: **V15.2.14 · Common Desktop Summary Alignment**
-Released: **August 20, 2026**
-Finance Schema: **12**
-Cloud Schema: **V3**
-Routine cloud sync cadence: **5 minutes**
+[![Quality checks](https://github.com/nyxdcz/my-finance-record/actions/workflows/quality-pages.yml/badge.svg?branch=main)](https://github.com/nyxdcz/my-finance-record/actions/workflows/quality-pages.yml)
+![Version](https://img.shields.io/badge/version-V15.2.14-2563eb)
+![PWA](https://img.shields.io/badge/PWA-offline--ready-16a34a)
+![Node](https://img.shields.io/badge/Node.js-22%2B-339933?logo=nodedotjs&logoColor=white)
 
-V15.2.14 keeps both Budget summary rows at the same compact height on common 1280px and 1366px desktops while preserving the V15.2.13 phone compaction, accessible touch targets, and reduced-motion behavior. Finance data, calculations, schemas, and the five-minute sync cadence remain unchanged.
+</div>
 
-For complete release history, see [`CHANGELOG.md`](CHANGELOG.md).
+## At a glance
 
-## Repository map
+| Release | Finance schema | Cloud schema | Sync cadence |
+| --- | ---: | ---: | ---: |
+| **V15.2.14** · Common Desktop Summary Alignment | **12** | **V3** | **5 minutes** |
 
-```text
-.github/        GitHub Actions, Dependabot, CODEOWNERS, PR template
-assets/         Application CSS and JavaScript source
-  css/          Stylesheets and compatibility layers
-  js/           Finance, sync, UI, and feature modules
-  js/ui/        Focused user-interface modules
-docs/           Setup, migration, release, and architecture documentation
-icons/          Runtime icon assets
-scripts/        Runtime preparation, install, and audit helpers
-supabase/       Database schema, policies, SQL helpers, and Edge Functions
-tests/          Browser, finance, regression, security, sync, and helper tests
-vendor/         Vendored browser dependencies
-```
+The current release keeps the Budget summary rows compact and consistent on common desktop widths while preserving the phone layout, accessible touch targets, and reduced-motion behavior. Finance calculations, stored data, schemas, and sync behavior are unchanged.
 
-See [`docs/architecture/README.md`](docs/architecture/README.md) for ownership rules and the staged repository-organization plan.
+## What it offers
 
-## Main application files
+| Capability | What it means |
+| --- | --- |
+| Local-first records | Core finance workflows remain available without a cloud dependency. |
+| Optional encrypted sync | Multi-device synchronization uses client-side AES-256-GCM encryption with Supabase-compatible storage. |
+| Multi-profile support | Personal and household records can stay separated inside one installation. |
+| Offline-ready PWA | The app can be installed and used through a service-worker-backed experience. |
+| Practical finance tools | Track income, expenses, budgets, accounts, recurring payments, savings goals, and schedules. |
+| Compatibility-focused releases | Schema, cache, sync, backup, and restore behavior are treated as protected contracts. |
 
-- `index.html` — application shell and remaining legacy inline runtime
-- `assets/js/` — extracted JavaScript modules
-- `assets/css/` — application and responsive styles
-- `sw.js` — service worker and PWA cache delivery
-- `manifest.webmanifest` — PWA metadata
-- `sync-config.js` — hosted sync/release compatibility layer
-- `version.json` — canonical release and schema metadata
-- `server.js` — local development server
+## Quick start
 
-## Development
-
-Requirements:
-
-- Node.js **22 or newer**
-- npm
-
-Install dependencies:
+Requirements: Node.js **22 or newer** and npm.
 
 ```bash
+git clone https://github.com/nyxdcz/my-finance-record.git
+cd my-finance-record
 npm ci --ignore-scripts --no-audit --no-fund
-```
-
-Run locally:
-
-```bash
 npm run dev
 ```
 
-Run source quality checks:
+Open `http://localhost:3000` in a browser. See [`docs/setup/`](docs/setup/) for configuration guidance.
+
+## Architecture
+
+```mermaid
+flowchart LR
+    UI["PWA interface"] --> Local["Local finance state"]
+    Local --> Backup["Encrypted backup"]
+    Local <--> Sync["Optional encrypted sync"]
+    Sync <--> Cloud["Supabase + RLS"]
+```
+
+The runtime is being modularized incrementally so installed PWA clients keep working across releases. New code belongs in focused modules under `assets/`; compatibility-sensitive entry points remain stable until a migration is explicitly planned.
+
+<details>
+<summary><strong>Repository layout</strong></summary>
+
+| Path | Responsibility |
+| --- | --- |
+| `.github/` | Actions, dependency updates, ownership, and contribution templates |
+| `assets/css/` | Application and responsive styles |
+| `assets/js/` | Finance, sync, UI, and feature modules |
+| `docs/` | Setup, migration, release, and architecture documentation |
+| `icons/` | Runtime icon assets |
+| `scripts/` | Runtime preparation, installation, and audit helpers |
+| `supabase/` | Database schema, policies, SQL helpers, and Edge Functions |
+| `tests/` | Browser, finance, regression, security, sync, and helper tests |
+| `vendor/` | Vendored browser dependencies |
+
+See [`docs/architecture/README.md`](docs/architecture/README.md) for module ownership and repository-organization rules.
+
+</details>
+
+## Quality and testing
 
 ```bash
 npm run quality
-```
-
-Run browser validation:
-
-```bash
 npx playwright install chromium
 npm run test:browser
-```
-
-Run the full CI-equivalent validation:
-
-```bash
 npm run quality:ci
 ```
 
-## Test organization
+Tests are grouped by responsibility under `tests/browser`, `tests/finance`, `tests/regression`, `tests/security`, `tests/sync`, and `tests/helpers`.
 
-Tests are grouped by responsibility:
+## Privacy and security
 
-- `tests/browser/` — browser behavior, accessibility, and interaction coverage
-- `tests/finance/` — finance workflows and calculations
-- `tests/regression/` — release and UI regression contracts
-- `tests/security/` — privacy, import, and security behavior
-- `tests/sync/` — multi-device and cloud-sync behavior
-- `tests/helpers/` — repository inspection and maintenance utilities
+Cloud synchronization is optional. Browser-delivered configuration may contain only Supabase-compatible publishable/anonymous credentials—never a `service_role` key or another privileged secret.
 
-## Architecture direction
-
-Repository cleanup is intentionally incremental because the application is installed as a PWA and must preserve old client compatibility while modules are extracted.
-
-The current direction is:
-
-1. Keep `index.html` moving toward an application shell rather than a monolithic runtime.
-2. Group new JavaScript modules by responsibility instead of expanding the flat `assets/js/` directory.
-3. Keep active filenames stable; preserve release history in Git, `CHANGELOG.md`, Releases, and `version.json` rather than adding new versioned filenames when compatibility does not require them.
-4. Keep configuration, sync logic, UI behavior, and release compatibility in separate modules as extraction continues.
-5. Keep tests organized by subsystem and make CI paths follow that structure.
-6. Move historical release detail out of this README so the project entry page stays useful to contributors.
-
-## Cloud sync and privacy
-
-The application is local-first. Cloud synchronization is optional and uses Supabase-compatible publishable/anon browser credentials only. Never place a Supabase `service_role` key or other privileged secret in browser-delivered files.
-
-Changes to sync, encryption, finance records, balances, payment state, or storage migrations require explicit regression coverage and a recovery-safe migration plan.
-
-See [`PRIVACY.md`](PRIVACY.md) and [`SECURITY.md`](SECURITY.md).
+Changes to encryption, finance records, balances, payment state, backups, restores, or storage migrations require regression coverage and a recovery-safe migration plan. Read [`PRIVACY.md`](PRIVACY.md), [`SECURITY.md`](SECURITY.md), and the repository's [security policy](https://github.com/nyxdcz/my-finance-record/security/policy) before reporting sensitive issues.
 
 ## Contributing
 
-Read [`CONTRIBUTING.md`](CONTRIBUTING.md) before changing the project. In particular:
-
-- start from the latest `main`
-- keep branches and pull requests focused
-- use Conventional Commit titles
-- preserve finance and sync compatibility unless the approved scope explicitly changes it
-- run quality and browser validation before merge
+Contributions should begin with [`CONTRIBUTING.md`](CONTRIBUTING.md). Keep each branch focused, use a Conventional Commit pull-request title, preserve data compatibility, and run the relevant quality checks before requesting review.
 
 ## Documentation
 
-Documentation is indexed in [`docs/README.md`](docs/README.md).
-
-Key areas:
-
-- [`docs/setup/`](docs/setup/) — setup guidance
-- [`docs/migration/`](docs/migration/) — migration notes
-- [`docs/release/`](docs/release/) — release documentation
-- [`docs/architecture/`](docs/architecture/) — repository and module organization
-
-## Release history
-
-The full chronological history belongs in [`CHANGELOG.md`](CHANGELOG.md). GitHub Releases and repository history should be used for older implementation details so this README remains compact and current.
+| Area | Guide |
+| --- | --- |
+| Project index | [`docs/README.md`](docs/README.md) |
+| Setup | [`docs/setup/`](docs/setup/) |
+| Architecture | [`docs/architecture/`](docs/architecture/) |
+| Migrations | [`docs/migration/`](docs/migration/) |
+| Release operations | [`docs/release/`](docs/release/) |
+| Release history | [`CHANGELOG.md`](CHANGELOG.md) |

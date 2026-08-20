@@ -8,6 +8,7 @@ This directory keeps repository documentation grouped by purpose so the root REA
 - [`setup/`](setup/) — local and hosted setup guidance
 - [`migration/`](migration/) — data, schema, and compatibility migration notes
 - [`release/`](release/) — release-specific documentation and operational notes
+- [`assets/`](assets/) — sanitized repository presentation assets
 
 ## Documentation rules
 
