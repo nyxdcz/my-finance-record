@@ -20,19 +20,26 @@ for (const file of ["mascot-red.svg", "mascot-green.svg", "mascot-blue.svg", "ma
   assert.match(workflow, new RegExp(file.replace(".", "\\.")), `Pages packaging must validate ${file}`);
 }
 
+assert.match(prepare, /const QUERY = "15\.2\.24-mascot2"/);
 assert.match(prepare, /summary-mascots-v15-2-25\.css\?v=\$\{QUERY\}/);
 assert.match(prepare, /summary-mascots-v15-2-25\.js\?v=\$\{QUERY\}/);
 assert.match(prepare, /assets\/mascots\/mascot-red\.svg/);
 assert.match(prepare, /assets\/mascots\/mascot-orange\.svg/);
 
-assert.match(css, /\.summary-mascot-slot::after[\s\S]*width:\s*25px;[\s\S]*height:\s*25px;/);
+assert.match(css, /img\[data-first-half-complete-icon\][\s\S]*display:\s*none !important/);
+assert.match(css, /img\[data-other-expenses-complete-icon\][\s\S]*display:\s*none !important/);
+assert.match(css, /\.summary-mascot-slot::after[\s\S]*width:\s*30px;[\s\S]*height:\s*30px;/);
 assert.match(css, /data-summary-mascot="red"[\s\S]*mascot-red\.svg/);
 assert.match(css, /data-summary-mascot="green"[\s\S]*mascot-green\.svg/);
 assert.match(css, /#money \.legend-total\.summary-mascot-slot,[\s\S]*19px from the positioning edge[\s\S]*right:\s*19px !important;/);
 assert.doesNotMatch(css, /#financeLegend/);
-assert.match(css, /\.collapse-actions\.has-period-mascot[\s\S]*gap:\s*10px !important;/);
+assert.match(css, /\.collapse-actions\.has-period-mascot[\s\S]*gap:\s*10px !important;[\s\S]*align-items:\s*center !important;/);
+assert.match(css, /\.period-total\.summary-mascot-slot[\s\S]*align-self:\s*center !important;/);
 assert.match(css, /\.period-header[\s\S]*padding-right:\s*10px !important;/);
 
+assert.match(js, /storedAmountText/);
+assert.match(js, /firstHalfOriginalText/);
+assert.match(js, /otherExpensesOriginalText/);
 assert.match(js, /zeroTotal\("legendEarlyTotal", "red"/);
 assert.match(js, /zeroTotal\("legendLateTotal", "orange"/);
 assert.match(js, /zeroTotal\("legendOtherTotal", "blue"/);
@@ -46,4 +53,4 @@ assert.match(js, /DESKTOP_QUERY/);
 assert.match(js, /FinanceSummaryMascots = Object\.freeze\(\{ refresh:schedule, apply/);
 assert.doesNotMatch(js, /replaceChildren\(mascot/);
 
-console.log("V15.2.24 Budget & Expenses mascot source contract passed without schema or sync changes.");
+console.log("V15.2.24 Budget & Expenses 30px mascot source contract passed without schema or sync changes.");
