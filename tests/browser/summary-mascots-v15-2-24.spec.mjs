@@ -80,8 +80,7 @@ test("desktop Budget & Expenses uses the approved supplied mascots and exact spa
     };
 
     const top = document.getElementById("legendEarlyTotal");
-    const topCard = top.closest(".summary-card").getBoundingClientRect();
-    const topBox = top.getBoundingClientRect();
+    const topStyle = getComputedStyle(top);
     const firstSection = document.getElementById("firstHalfSection");
     const header = firstSection.querySelector(".period-header").getBoundingClientRect();
     const lowerMascot = document.getElementById("earlyTotal").getBoundingClientRect();
@@ -99,7 +98,8 @@ test("desktop Budget & Expenses uses the approved supplied mascots and exact spa
         otherTotal:readSlot("otherTotal")
       },
       legacySmileDisplay:getComputedStyle(legacySmile).display,
-      topRightInset:topCard.right - topBox.right,
+      topPosition:topStyle.position,
+      topRightOffset:parseFloat(topStyle.right),
       lower:{
         mascotWidth:lowerMascot.width,
         mascotHeight:lowerMascot.height,
@@ -131,7 +131,8 @@ test("desktop Budget & Expenses uses the approved supplied mascots and exact spa
   }
 
   expect(state.legacySmileDisplay).toBe("none");
-  expect(state.topRightInset).toBeCloseTo(20, 0);
+  expect(state.topPosition).toBe("absolute");
+  expect(state.topRightOffset).toBeCloseTo(19, 0);
   expect(state.lower.mascotWidth).toBeCloseTo(30, 0);
   expect(state.lower.mascotHeight).toBeCloseTo(30, 0);
   expect(state.lower.mascotGap).toBeCloseTo(10, 0);
