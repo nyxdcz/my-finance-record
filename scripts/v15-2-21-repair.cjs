@@ -105,6 +105,7 @@ for (const file of tests) {
     .replaceAll('sync-runtime-compat.js?v=15.2.20-release10', 'sync-runtime-compat.js?v=15.2.21-release11')
     .replaceAll('sync-runtime-compat\\.js\\?v=15\\.2\\.20-release10', 'sync-runtime-compat\\.js\\?v=15\\.2\\.21-release11')
     .replaceAll('Compact Expense Cards Stability', RELEASE_NAME)
+    .replaceAll('## 15.2.20 · 2026-08-21', '## 15.2.21 · 2026-08-21')
     .replaceAll('"15.2.20"', '"15.2.21"')
     .replaceAll("'15.2.20'", "'15.2.21'")
     .replaceAll('15\\.2\\.20', '15\\.2\\.21')
