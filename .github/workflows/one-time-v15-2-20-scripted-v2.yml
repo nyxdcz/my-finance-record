@@ -1,0 +1,118 @@
+name: Scripted V15.2.20 validation v2
+
+on:
+  push:
+    branches:
+      - v15.2.20-staging
+
+permissions:
+  contents: write
+
+concurrency:
+  group: scripted-v15-2-20-v2
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Fetch repair script
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api "repos/$GITHUB_REPOSITORY/contents/scripts/v15-2-20-repair.cjs?ref=v15.2.20-staging" --jq .content | tr -d '\n' | base64 -d > /tmp/v15-repair.cjs
+          test -s /tmp/v15-repair.cjs
+
+      - name: Clone main
+        shell: bash
+        run: |
+          set -o pipefail
+          git clone --branch main --depth 1 "https://github.com/$GITHUB_REPOSITORY.git" . 2>&1 | tee /tmp/v15-clone.log
+          git rev-parse HEAD | tee -a /tmp/v15-clone.log
+
+      - name: Use Node 24
+        shell: bash
+        run: |
+          NODE24="$(find /opt/hostedtoolcache/node -mindepth 2 -maxdepth 2 -type d -path '*/24.*/*' 2>/dev/null | sort -V | tail -1 || true)"
+          test -x "$NODE24/bin/node"
+          echo "$NODE24/bin" >> "$GITHUB_PATH"
+
+      - name: Apply release repair
+        shell: bash
+        run: |
+          set -o pipefail
+          node /tmp/v15-repair.cjs 2>&1 | tee /tmp/v15-apply.log
+          node <<'NODE' 2>&1 | tee -a /tmp/v15-apply.log
+          const fs = require('node:fs');
+          const path = require('node:path');
+          const files = [];
+          const walk = dir => fs.readdirSync(dir, {withFileTypes:true}).forEach(entry => {
+            const file = path.join(dir, entry.name);
+            if (entry.isDirectory()) walk(file);
+            else if (entry.isFile() && entry.name.endsWith('.mjs')) files.push(file);
+          });
+          walk('tests');
+          for (const file of files) {
+            const source = fs.readFileSync(file, 'utf8');
+            const next = source.replaceAll('## 15.2.19 · 2026-08-21', '## 15.2.20 · 2026-08-21');
+            if (next !== source) fs.writeFileSync(file, next);
+          }
+          console.log('Aligned embedded CHANGELOG-heading expectations to V15.2.20.');
+          NODE
+          {
+            echo "--- changelog ---"
+            head -5 CHANGELOG.md
+            echo "--- inspect release checks ---"
+            grep -n "15.2.20" tests/helpers/inspect-project.mjs | tail -8 || true
+            echo "--- diff ---"
+            git diff --stat
+          } | tee /tmp/v15-diff.log
+          git diff --check
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Run source quality
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run quality 2>&1 | tee /tmp/v15-quality.log
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run browser suite
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run test:browser 2>&1 | tee /tmp/v15-browser.log
+
+      - name: Publish validated candidate
+        shell: bash
+        run: |
+          gh auth setup-git
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -u
+          git diff --cached --check
+          git commit -m "release: stabilize V15.2.20 compact expense cards"
+          git push --force origin HEAD:refs/heads/v15.2.20-ready
+          git rev-parse HEAD | tee /tmp/v15-ready-sha.log
+
+      - name: Upload diagnostics
+        if: failure()
+        shell: bash
+        run: |
+          set +e
+          for file in /tmp/v15-clone.log /tmp/v15-apply.log /tmp/v15-diff.log /tmp/v15-quality.log /tmp/v15-browser.log; do
+            if [ -f "$file" ]; then
+              name="$(basename "$file")"
+              content="$(base64 -w0 "$file")"
+              gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/.ci-diagnostics/scripted2-$GITHUB_RUN_ID-$name" \
+                -f message="chore: capture V15.2.20 validator v2 diagnostics" \
+                -f branch="v15.2.20-diagnostics" \
+                -f content="$content" >/dev/null
+            fi
+          done
