@@ -20,7 +20,7 @@ for (const file of ["mascot-red.svg", "mascot-green.svg", "mascot-blue.svg", "ma
   assert.match(workflow, new RegExp(file.replace(".", "\\.")), `Pages packaging must validate ${file}`);
 }
 
-assert.match(prepare, /const QUERY = "15\.2\.24-mascot3"/);
+assert.match(prepare, /const QUERY = "15\.2\.24-mascot5"/);
 assert.match(prepare, /summary-mascots-v15-2-25\.css\?v=\$\{QUERY\}/);
 assert.match(prepare, /summary-mascots-v15-2-25\.js\?v=\$\{QUERY\}/);
 assert.match(prepare, /assets\/mascots\/mascot-red\.svg/);
@@ -34,7 +34,7 @@ assert.match(css, /data-summary-mascot="green"[\s\S]*mascot-green\.svg/);
 assert.match(css, /#money \.legend-total\.summary-mascot-slot,[\s\S]*19px from the positioning edge[\s\S]*right:\s*19px !important;/);
 assert.doesNotMatch(css, /#financeLegend/);
 assert.match(css, /\.collapse-actions\.has-period-mascot[\s\S]*gap:\s*10px !important;[\s\S]*align-items:\s*center !important;/);
-assert.match(css, /\.period-total\.summary-mascot-slot[\s\S]*align-self:\s*center !important;[\s\S]*transform:\s*translateY\(-5px\) !important;/);
+assert.match(css, /\.period-total\.summary-mascot-slot[\s\S]*align-self:\s*center !important;[\s\S]*transform:\s*translateY\(-8px\) !important;/);
 assert.match(css, /\.period-header[\s\S]*padding-right:\s*10px !important;/);
 
 assert.match(js, /storedAmountText/);
