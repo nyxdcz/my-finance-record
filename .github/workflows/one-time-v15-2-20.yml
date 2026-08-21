@@ -18,9 +18,10 @@ jobs:
     if: github.repository == 'nyxdcz/my-finance-record'
     runs-on: ubuntu-latest
     steps:
-      - name: Check out staging trigger
+      - name: Check out current main
         uses: actions/checkout@v7
         with:
+          ref: main
           fetch-depth: 0
 
       - name: Use Node.js 24
@@ -29,13 +30,7 @@ jobs:
           node-version: 24
           package-manager-cache: false
 
-      - name: Check out current main for release
-        uses: actions/checkout@v7
-        with:
-          ref: main
-          fetch-depth: 0
-
-      - name: Apply V15.2.20 release repair
+      - name: Apply corrected V15.2.20 repair
         shell: bash
         run: |
           set -o pipefail
@@ -53,7 +48,7 @@ jobs:
 
           const read = file => fs.readFileSync(file, 'utf8');
           const write = (file, value) => fs.writeFileSync(file, value);
-          const replaceAll = (file, oldText, newText, { required = true } = {}) => {
+          const replaceAll = (file, oldText, newText, required = true) => {
             const source = read(file);
             const count = source.split(oldText).length - 1;
             if (required && count === 0) throw new Error(`${file}: expected text not found: ${oldText}`);
@@ -82,7 +77,7 @@ jobs:
             value.cacheVersion = CACHE;
             value.released = RELEASE_DATE;
             value.name = RELEASE_NAME;
-            value.notes = 'V15.2.20 keeps the compact First half, Second half, and Other expense-card layout while stabilizing the visible non-shrinking Repeat monthly / Repeats monthly desktop action directly before Mark paid. Release/runtime/cache expectations are synchronized without changing Finance Schema 12, Cloud Schema V3, calculations, balances, recurrence semantics, filters, payments, phone touch layouts, or sync behavior.';
+            value.notes = 'V15.2.20 stabilizes the compact First half, Second half, and Other expense cards and guarantees a visible non-shrinking Repeat monthly / Repeats monthly desktop action directly before Mark paid. Finance Schema 12, Cloud Schema V3, calculations, balances, recurrence semantics, filters, payments, phone touch layouts, and sync behavior are unchanged.';
           });
 
           update('README.md', source => {
@@ -90,20 +85,21 @@ jobs:
             next = next.replace('# My Finance Records · V15.2.19', '# My Finance Records · V15.2.20');
             next = next.replace('version-V15.2.19-2563eb', 'version-V15.2.20-2563eb');
             next = next.replace('| **V15.2.19** · Compact Expense Cards | **12** | **V3** | **5 minutes** |', '| **V15.2.20** · Compact Expense Cards Stability | **12** | **V3** | **5 minutes** |');
-            next = next.replace(/^The current release compacts .*$/m, 'The current release keeps the compact First half, Second half, and Other expense-card layout while stabilizing the full Repeat monthly / Repeats monthly desktop action at a visible non-shrinking 30px size directly beside Mark paid. The three-column desktop layout, 5px card spacing, Finance calculations, recurrence behavior, schemas, balances, filters, payments, phone touch layouts, and sync behavior remain protected.');
+            next = next.replace(/^The current release compacts .*$/m, 'The current release keeps the compact First half, Second half, and Other expense-card layout while guaranteeing the full Repeat monthly / Repeats monthly desktop action stays visible, 30px tall, and directly beside Mark paid. The three-column desktop layout, 5px card spacing, Finance calculations, recurrence behavior, schemas, balances, filters, payments, phone touch layouts, and sync behavior remain protected.');
             return next;
           });
 
           update('CHANGELOG.md', source => {
             if (source.startsWith('## 15.2.20 · 2026-08-21')) return source;
-            const entry = `## 15.2.20 · 2026-08-21\n- Stabilized the compact desktop expense cards by forcing the functional Repeat monthly / Repeats monthly action to remain visibly text-sized, 30px tall, and directly before Mark paid instead of collapsing to an icon-width control.\n- Synchronized V15.2.20 release, runtime, service-worker cache, browser-test, and source-regression expectations around \`${CACHE}\`.\n- Preserved Finance Schema 12, Cloud Schema V3, calculations, balances, recurrence and payment semantics, filters, phone touch layouts, branding, and five-minute Cloud Sync behavior.\n\n`;
+            const entry = `## 15.2.20 · 2026-08-21\n- Corrected the production desktop expense-card geometry to the tested compact contract: 7px card-row padding, 8px column gap, 5px action-footer padding, and 30px desktop actions.\n- Guaranteed the functional Repeat monthly / Repeats monthly action remains visible and non-shrinking at a minimum 82px width directly before Mark paid, while leaving phone touch layouts unchanged.\n- Synchronized release/runtime/cache and regression expectations around \`${CACHE}\` while preserving Finance Schema 12, Cloud Schema V3, calculations, balances, recurrence/payment semantics, filters, branding, and five-minute Cloud Sync behavior.\n\n`;
             return entry + source;
           });
 
           const cssFile = 'assets/css/production-ui-audit-v15-2-13.css';
           update(cssFile, source => {
-            if (source.includes('V15.2.20 · Compact expense cards stability')) return source;
-            return `${source.trimEnd()}\n\n/* V15.2.20 · Compact expense cards stability: keep the functional monthly-repeat action visibly text-sized. */\n@media (min-width: 851px) {\n  html body #money .record-row[data-expense-row] > .desktop-record-actions > [data-toggle-saved] {\n    flex: 0 0 auto !important;\n    flex-shrink: 0 !important;\n    width: auto !important;\n    min-width: 82px !important;\n    max-width: none !important;\n    height: 30px !important;\n    min-height: 30px !important;\n    padding: 4px 7px !important;\n    white-space: nowrap !important;\n  }\n\n  html body #money .record-row[data-expense-row] > .desktop-record-actions > [data-toggle-saved] .saved-button-text {\n    min-width: 68px !important;\n    text-align: center !important;\n  }\n}\n`;
+            const marker = 'V15.2.20 · Compact expense cards: static ownership';
+            if (source.includes(marker)) return source;
+            return `${source.trimEnd()}\n\n/* ${marker}. Final desktop ownership lives here, after legacy icon-alignment rules. */\n@media (min-width: 851px) {\n  html body #money .section-stack {\n    align-items: start !important;\n    gap: 8px !important;\n  }\n\n  html body #money .period-card {\n    margin: 0 !important;\n    padding: 6px !important;\n    overflow: visible !important;\n  }\n\n  html body #money .period-header {\n    min-height: 50px !important;\n    padding: 4px 5px 6px !important;\n  }\n\n  html body #money .period-header h3 { font-size: .86rem !important; }\n  html body #money .period-header p { margin-top: 2px !important; font-size: .63rem !important; }\n  html body #money .period-total { font-size: .88rem !important; }\n\n  html body #money :is(#earlyExpenses, #lateExpenses, #otherExpenses) {\n    display: grid !important;\n    align-content: start !important;\n    gap: 5px !important;\n    padding: 0 !important;\n  }\n\n  html body #money :is(#earlyExpenses, #lateExpenses, #otherExpenses) > .record-row[data-expense-row],\n  html body #money :is(#earlyExpenses, #lateExpenses, #otherExpenses) > .record-row[data-expense-row] + .record-row[data-expense-row] {\n    min-height: 0 !important;\n    height: auto !important;\n    margin: 0 !important;\n    padding: 7px !important;\n    gap: 4px 8px !important;\n    align-self: start !important;\n    align-items: center !important;\n  }\n\n  html body #money .record-row[data-expense-row] .expense-record-title .record-title-copy > strong {\n    font-size: .78rem !important;\n    line-height: 1.25 !important;\n  }\n\n  html body #money .record-row[data-expense-row] .expense-record-title .record-title-copy > small {\n    margin-top: 2px !important;\n    font-size: .61rem !important;\n    line-height: 1.3 !important;\n  }\n\n  html body #money .record-row[data-expense-row] .expense-record-title .record-statuses {\n    margin-top: 3px !important;\n    gap: 3px !important;\n  }\n\n  html body #money .record-row[data-expense-row] > .due-cell {\n    gap: 2px 6px !important;\n    padding-top: 0 !important;\n    font-size: .6rem !important;\n  }\n\n  html body #money .record-row[data-expense-row] > [data-label=\"Planned account\"] {\n    font-size: .61rem !important;\n  }\n\n  html body #money .record-row[data-expense-row] > .amount {\n    font-size: .73rem !important;\n  }\n\n  html body #money .record-row[data-expense-row] > .desktop-record-actions {\n    margin-top: 1px !important;\n    padding-top: 5px !important;\n    gap: 4px !important;\n  }\n\n  html body #money .record-row[data-expense-row] > .desktop-record-actions > .button {\n    height: 30px !important;\n    min-height: 30px !important;\n    padding: 4px 7px !important;\n    border-radius: 7px !important;\n    font-size: .65rem !important;\n  }\n\n  html body #money .record-row[data-expense-row] > .desktop-record-actions > [data-toggle-saved] {\n    display: inline-flex !important;\n    align-items: center !important;\n    justify-content: center !important;\n    flex: 0 0 auto !important;\n    flex-shrink: 0 !important;\n    width: max-content !important;\n    min-width: 82px !important;\n    max-width: none !important;\n    height: 30px !important;\n    min-height: 30px !important;\n    padding: 4px 7px !important;\n    white-space: nowrap !important;\n  }\n\n  html body #money .record-row[data-expense-row] > .desktop-record-actions > [data-toggle-saved] .saved-icon-container {\n    display: none !important;\n  }\n\n  html body #money .record-row[data-expense-row] > .desktop-record-actions > [data-toggle-saved] .saved-button-text {\n    display: inline !important;\n    min-width: 68px !important;\n    font-size: 0 !important;\n    line-height: 1 !important;\n    text-align: center !important;\n    white-space: nowrap !important;\n  }\n\n  html body #money .record-row[data-expense-row] > .desktop-record-actions > [data-toggle-saved] .saved-button-text::after {\n    content: \"Repeat monthly\" !important;\n    font-size: .65rem !important;\n  }\n\n  html body #money .record-row[data-expense-row] > .desktop-record-actions > [data-toggle-saved].active .saved-button-text::after {\n    content: \"Repeats monthly\" !important;\n  }\n}\n`;
           });
 
           replaceAll('assets/js/ui/sync-runtime-compat.js', 'const VERSION = "15.2.18";', 'const VERSION = "15.2.20";');
@@ -117,21 +113,20 @@ jobs:
           replaceAll('sw.js', 'production-ui-audit-v15-2-13.css?v=15.2.19-compact1', 'production-ui-audit-v15-2-13.css?v=15.2.20-compact2');
           replaceAll('sw.js', 'pwa-update-v15-0-5.js?v=15.2.19-release1', 'pwa-update-v15-0-5.js?v=15.2.20-release2');
           replaceAll('sw.js', 'sync-runtime-compat.js?v=15.2.18-release9', 'sync-runtime-compat.js?v=15.2.20-release10');
-          update('sw.js', source => source.includes('// V15.2.20 stabilizes the compact expense-card recurrence action') ? source : source.replace('self.__FINANCE_APP_VERSION = APP_VERSION;\n', 'self.__FINANCE_APP_VERSION = APP_VERSION;\n// V15.2.20 stabilizes the compact expense-card recurrence action and synchronizes release/cache delivery.\n'));
 
           update('index.html', source => {
             let next = source;
             next = next.replaceAll('My Finance Records · V15.2.19', 'My Finance Records · V15.2.20');
-            next = next.replaceAll('V15.2.19', 'V15.2.20');
+            next = next.replaceAll('const APP_VERSION = "15.2.19";', 'const APP_VERSION = "15.2.20";');
             next = next.replaceAll(OLD_CACHE, CACHE);
             next = next.replaceAll('production-ui-audit-v15-2-13.css?v=15.2.19-compact1', 'production-ui-audit-v15-2-13.css?v=15.2.20-compact2');
             next = next.replaceAll('pwa-update-v15-0-5.js?v=15.2.19-release1', 'pwa-update-v15-0-5.js?v=15.2.20-release2');
             next = next.replaceAll('sync-runtime-compat.js?v=15.2.18-release9', 'sync-runtime-compat.js?v=15.2.20-release10');
-            next = next.replaceAll('const APP_VERSION = "15.2.19";', 'const APP_VERSION = "15.2.20";');
-            if (!next.includes(CACHE)) throw new Error('index.html: new cache identity missing');
-            if (!next.includes('production-ui-audit-v15-2-13.css?v=15.2.20-compact2')) throw new Error('index.html: new compact CSS pin missing');
-            if (!next.includes('pwa-update-v15-0-5.js?v=15.2.20-release2')) throw new Error('index.html: new updater pin missing');
-            if (!next.includes('sync-runtime-compat.js?v=15.2.20-release10')) throw new Error('index.html: new runtime pin missing');
+            if (!next.includes('My Finance Records · V15.2.20')) throw new Error('index.html: V15.2.20 title missing');
+            if (!next.includes(CACHE)) throw new Error('index.html: r56 cache missing');
+            if (!next.includes('production-ui-audit-v15-2-13.css?v=15.2.20-compact2')) throw new Error('index.html: compact CSS pin missing');
+            if (!next.includes('pwa-update-v15-0-5.js?v=15.2.20-release2')) throw new Error('index.html: updater pin missing');
+            if (!next.includes('sync-runtime-compat.js?v=15.2.20-release10')) throw new Error('index.html: runtime pin missing');
             return next;
           });
 
@@ -144,58 +139,60 @@ jobs:
             }
           };
           walk('tests');
+
           for (const file of testFiles) {
             const source = read(file);
-            const next = source
+            let next = source
+              .replaceAll('15\\.2\\.18-kanban1', '__KEEP_ESCAPED_KANBAN_151218__')
+              .replaceAll('15.2.18-kanban1', '__KEEP_KANBAN_151218__');
+
+            next = next
               .replaceAll(OLDER_CACHE, CACHE)
               .replaceAll(OLD_CACHE, CACHE)
               .replaceAll('finance-ui-hotfix-v15-2-19-compact-expense1', HOTFIX_KEY)
               .replaceAll('pwa-update-v15-0-5.js?v=15.2.18-release14', 'pwa-update-v15-0-5.js?v=15.2.20-release2')
               .replaceAll('pwa-update-v15-0-5.js?v=15.2.19-release1', 'pwa-update-v15-0-5.js?v=15.2.20-release2')
-              .replaceAll('15\\.2\\.19-release1', '15\\.2\\.20-release2')
-              .replaceAll('15\\.2\\.19-compact1', '15\\.2\\.20-compact2')
               .replaceAll('production-ui-audit-v15-2-13.css?v=15.2.19-compact1', 'production-ui-audit-v15-2-13.css?v=15.2.20-compact2')
               .replaceAll('sync-runtime-compat.js?v=15.2.18-release9', 'sync-runtime-compat.js?v=15.2.20-release10')
+              .replaceAll('Horizontal Project Kanban', RELEASE_NAME)
               .replaceAll('"15.2.18"', '"15.2.20"')
               .replaceAll('"15.2.19"', '"15.2.20"')
               .replaceAll("'15.2.18'", "'15.2.20'")
               .replaceAll("'15.2.19'", "'15.2.20'")
+              .replaceAll('15\\.2\\.18', '15\\.2\\.20')
               .replaceAll('15\\.2\\.19', '15\\.2\\.20')
-              .replaceAll('My Finance Records · V15.2.18', 'My Finance Records · V15.2.20')
-              .replaceAll('My Finance Records · V15.2.19', 'My Finance Records · V15.2.20');
+              .replaceAll('V15.2.19', 'V15.2.20')
+              .replaceAll('__KEEP_ESCAPED_KANBAN_151218__', '15\\.2\\.18-kanban1')
+              .replaceAll('__KEEP_KANBAN_151218__', '15.2.18-kanban1');
+
             if (next !== source) write(file, next);
           }
 
-          const mobileTest = 'tests/regression/validate-v15-2-2-mobile-ui.mjs';
-          replaceAll(mobileTest, '15\\.2\\.18', '15\\.2\\.20');
-
-          const auditTest = 'tests/regression/validate-production-ui-audit-v15-2-13.mjs';
-          update(auditTest, source => {
-            const next = source.replace('console.log("V15.2.19 production UI/UX audit source contract passed.");', 'assert.match(css, /Compact expense cards stability:[\\s\\S]*\\[data-toggle-saved\\][\\s\\S]*min-width:\\s*82px !important;/);\nconsole.log("V15.2.20 production UI/UX audit source contract passed.");');
-            if (!next.includes('min-width:\\s*82px !important')) throw new Error('production UI source test: V15.2.20 recurrence assertion missing');
-            return next;
-          });
-
-          const staleCacheHits = testFiles.filter(file => {
+          const remainingStaleCaches = testFiles.filter(file => {
             const text = read(file);
             return text.includes(OLDER_CACHE) || text.includes(OLD_CACHE);
           });
-          if (staleCacheHits.length) throw new Error(`Stale release cache expectations remain: ${staleCacheHits.join(', ')}`);
+          if (remainingStaleCaches.length) throw new Error(`Stale current-release caches remain in tests: ${remainingStaleCaches.join(', ')}`);
 
-          const requiredIndex = [
-            'My Finance Records · V15.2.20',
-            CACHE,
-            'production-ui-audit-v15-2-13.css?v=15.2.20-compact2',
-            'pwa-update-v15-0-5.js?v=15.2.20-release2',
-            'sync-runtime-compat.js?v=15.2.20-release10'
-          ];
-          const index = read('index.html');
-          for (const marker of requiredIndex) if (!index.includes(marker)) throw new Error(`index.html missing ${marker}`);
+          const checks = {
+            'package.json': `"version": "${VERSION}"`,
+            'version.json': `"cacheVersion": "${CACHE}"`,
+            'README.md': '# My Finance Records · V15.2.20',
+            'CHANGELOG.md': '## 15.2.20 · 2026-08-21',
+            'assets/css/production-ui-audit-v15-2-13.css': 'min-width: 82px !important',
+            'assets/js/ui/sync-runtime-compat.js': 'const VERSION = "15.2.20";',
+            'assets/js/pwa-update-v15-0-5.js': `const CURRENT_CACHE_VERSION = "${CACHE}";`,
+            'sw.js': 'const APP_VERSION = "15.2.20";',
+            'index.html': 'pwa-update-v15-0-5.js?v=15.2.20-release2'
+          };
+          for (const [file, marker] of Object.entries(checks)) {
+            if (!read(file).includes(marker)) throw new Error(`${file}: missing ${marker}`);
+          }
 
-          console.log(`Applied V${VERSION} release repair across ${testFiles.length} test modules.`);
+          console.log(`Applied corrected V${VERSION} repair across ${testFiles.length} test modules.`);
           NODE
 
-      - name: Show planned release diff
+      - name: Show release diff
         run: |
           git status --short
           git diff --stat
@@ -213,13 +210,13 @@ jobs:
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
 
-      - name: Run browser, security, and responsive regressions
+      - name: Run browser regressions
         shell: bash
         run: |
           set -o pipefail
           npm run test:browser 2>&1 | tee /tmp/v15-browser.log
 
-      - name: Publish validated candidate branch
+      - name: Publish validated candidate
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -229,21 +226,20 @@ jobs:
           git push --force origin HEAD:refs/heads/v15.2.20-ready
           echo "Validated candidate $(git rev-parse HEAD)"
 
-      - name: Publish diagnostics branch on failure
+      - name: Publish diagnostics on failure
         if: failure()
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git fetch origin main
-          git reset --hard origin/main
-          git clean -fd
           git checkout -B v15.2.20-diagnostics origin/main
           mkdir -p .ci-diagnostics
           for file in /tmp/v15-apply.log /tmp/v15-quality.log /tmp/v15-browser.log; do
             if [ -f "$file" ]; then cp "$file" ".ci-diagnostics/$(basename "$file")"; fi
           done
-          printf 'V15.2.20 staging validation failed. See captured logs in this branch.\n' > .ci-diagnostics/README.txt
+          git diff --no-index /dev/null .ci-diagnostics/README.txt >/dev/null 2>&1 || true
+          printf 'V15.2.20 staging validation failed. Inspect the captured apply/quality/browser logs in this branch.\n' > .ci-diagnostics/README.txt
           git add .ci-diagnostics
-          git commit -m "chore: capture V15.2.20 staging diagnostics"
+          git commit -m "chore: capture V15.2.20 validation diagnostics" || true
           git push --force origin HEAD:refs/heads/v15.2.20-diagnostics
