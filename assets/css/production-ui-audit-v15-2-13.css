@@ -219,3 +219,15 @@
     padding-inline: 10px !important;
   }
 }
+
+/* V15.2.18 · Preserve the approved rounded standalone month-selector geometry after audit compaction. */
+@media (min-width: 851px) {
+  html body .topbar-actions .month-navigator > .month-control {
+    width: 178px !important;
+  }
+
+  html body .topbar-actions .month-navigator > .month-current-button,
+  html body .topbar-actions .month-navigator > .month-status-chip {
+    margin-inline-start: 2px !important;
+  }
+}
