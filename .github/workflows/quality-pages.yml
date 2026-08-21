@@ -98,7 +98,7 @@ jobs:
           cp vendor/supabase.min.js _site/vendor/
           cp icons/* _site/icons/
           # Runtime preparation combines the scoped V15.2.24 desktop CSS/JS overlays and release override into the existing compatibility entry points.
-          cp production-ui-audit-v15-2-13.css phone-finance-compat.js sync-runtime-compat.js _site/
+          cp production-ui-audit-v15-2-13.css phone-finance-compat.js sync-runtime-compat.js summary-mascots-v15-2-25.css summary-mascots-v15-2-25.js _site/
           test -f _site/dashboard-interactions-core-v14-0-23.css
           test -f _site/liquid-glass-v15.css
           test -f _site/ui-icon-alignment-v15-0-5.css
