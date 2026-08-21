@@ -39,17 +39,17 @@
     background-image: url("./assets/mascots/mascot-orange.svg");
   }
 
-  #financeLegend .legend-item.summary-card,
+  #money .legend-item.summary-card,
   #moneySummary .summary-card {
     position: relative !important;
   }
 
-  #financeLegend .legend-item.summary-card.has-summary-mascot,
+  #money .legend-item.summary-card.has-summary-mascot,
   #moneySummary .summary-card.has-summary-mascot {
     padding-right: 52px !important;
   }
 
-  #financeLegend .legend-total.summary-mascot-slot,
+  #money .legend-total.summary-mascot-slot,
   #moneySummary .summary-card-value.summary-mascot-slot {
     position: absolute !important;
     right: 20px !important;
