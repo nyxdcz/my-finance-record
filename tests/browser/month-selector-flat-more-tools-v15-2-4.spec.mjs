@@ -46,7 +46,6 @@ test("desktop month selector uses rounded standalone controls and a compact 4x3 
   const nav = page.locator(".month-navigator");
   const previous = page.locator("#previousMonthButton");
   const control = page.locator("#monthControl");
-  const display = page.locator("#monthDisplayButton");
   const label = page.locator(".month-display-label");
   const separator = page.locator(".month-display-separator");
   const popover = page.locator("#monthPickerPopover");
