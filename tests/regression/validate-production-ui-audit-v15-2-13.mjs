@@ -29,6 +29,8 @@ assert.match(css, /#money \.period-card[\s\S]*margin-top:\s*0 !important/);
 assert.match(css, /#money \.period-header \.collapse-toggle[\s\S]*min-width:\s*44px !important/);
 assert.match(css, /border-top:\s*1px solid var\(--line\) !important/);
 assert.match(css, /-webkit-line-clamp:\s*2/);
+assert.match(css, /Finance expense-period cleanup:[\s\S]*#money \.period-card \{[\s\S]*background:\s*var\(--surface\) !important;[\s\S]*border-color:\s*var\(--line\) !important;/);
+assert.match(css, /#money :is\(#earlyExpenses, #lateExpenses, #otherExpenses\) > \.record-row\[data-expense-row\] \+ \.record-row\[data-expense-row\][\s\S]*margin-top:\s*5px !important;/);
 
 assert.match(desktopUx, /--budget-disclosure-reference-size/);
 assert.match(desktopUx, /#dashCashFlowChart \.cash-flow-chart-grid/);
