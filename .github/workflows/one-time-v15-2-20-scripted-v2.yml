@@ -57,6 +57,7 @@ jobs:
           for (const file of files) {
             const source = fs.readFileSync(file, 'utf8');
             const next = source
+              .replaceAll('## 15.2.18 · 2026-08-21', '## 15.2.20 · 2026-08-21')
               .replaceAll('## 15.2.19 · 2026-08-21', '## 15.2.20 · 2026-08-21')
               .replaceAll('My Finance Records · V15.2.18', 'My Finance Records · V15.2.20')
               .replaceAll('My Finance Records · V15.2.19', 'My Finance Records · V15.2.20')
@@ -72,7 +73,7 @@ jobs:
             echo "--- inspect release checks ---"
             grep -n "15.2.20" tests/helpers/inspect-project.mjs | tail -8 || true
             echo "--- desktop UX release checks ---"
-            grep -n "15.2.20" tests/regression/validate-v15-2-0-desktop-ux.mjs | head -12 || true
+            grep -n "15.2.20" tests/regression/validate-v15-2-0-desktop-ux.mjs | head -15 || true
             echo "--- diff ---"
             git diff --stat
           } | tee /tmp/v15-diff.log
