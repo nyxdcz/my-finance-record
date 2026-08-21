@@ -51,7 +51,7 @@ test("V15.2.2 header moves Dashboard customization into More tools", async ({ pa
 });
 
 
-test("V15.2.2 desktop topbar keeps only persistent controls at the Synced 38px height", async ({ page }) => {
+test("V15.2.18 desktop topbar keeps persistent controls at the compact 34px height", async ({ page }) => {
   await page.setViewportSize({ width:1440, height:900 });
   await page.goto("http://127.0.0.1:3000/index.html?page=money", { waitUntil:"networkidle" });
 
@@ -64,7 +64,7 @@ test("V15.2.2 desktop topbar keeps only persistent controls at the Synced 38px h
   await expect(page.locator("#cloudSyncStatusButton")).toBeVisible();
   const heightOf = selector => page.locator(selector).first().evaluate(element => element.getBoundingClientRect().height);
   const reference = await heightOf("#cloudSyncStatusButton");
-  expect(reference).toBe(38);
+  expect(reference).toBe(34);
 
   for (const selector of [
     ".month-navigator",
@@ -72,6 +72,18 @@ test("V15.2.2 desktop topbar keeps only persistent controls at the Synced 38px h
     "#topbarToolsTrigger"
   ]) {
     expect(await heightOf(selector), `${selector} should match Synced height`).toBe(reference);
+  }
+
+  const toolbarGap = await page.locator(".topbar-actions").evaluate(element => getComputedStyle(element).gap);
+  expect(toolbarGap).toBe("4px");
+
+  for (const selector of ["#cloudSyncStatusButton", "#quickAddExpense", "#topbarToolsTrigger"]) {
+    const style = await page.locator(selector).evaluate(element => {
+      const computed = getComputedStyle(element);
+      return { borderRadius:computed.borderRadius, width:element.getBoundingClientRect().width };
+    });
+    expect(style.borderRadius, `${selector} should use the shared 7px radius`).toBe("7px");
+    if (selector === "#topbarToolsTrigger") expect(style.width).toBe(34);
   }
 
   await expect(page.locator(".topbar-history-actions")).toBeHidden();
@@ -82,7 +94,7 @@ test("V15.2.2 desktop topbar keeps only persistent controls at the Synced 38px h
 });
 
 
-test("V15.2.18 desktop month navigation uses rounded standalone controls", async ({ page }) => {
+test("V15.2.18 desktop month navigation uses compact standalone controls", async ({ page }) => {
   await page.setViewportSize({ width:1440, height:900 });
   await page.goto("http://127.0.0.1:3000/index.html?page=dashboard", { waitUntil:"networkidle" });
   await page.evaluate(() => window.FinancePrivacyLock?.unlock?.({ email:"month-nav-border-test@example.invalid" }));
@@ -94,13 +106,15 @@ test("V15.2.18 desktop month navigation uses rounded standalone controls", async
     const rect = element.getBoundingClientRect();
     return {
       height:rect.height,
+      gap:style.gap,
       borderWidth:style.borderTopWidth,
       background:style.backgroundColor,
       shadow:style.boxShadow,
       backdrop:style.backdropFilter
     };
   });
-  expect(shellStyle.height).toBe(38);
+  expect(shellStyle.height).toBe(34);
+  expect(shellStyle.gap).toBe("4px");
   expect(shellStyle.borderWidth).toBe("0px");
   expect(shellStyle.background).toBe("rgba(0, 0, 0, 0)");
   expect(shellStyle.shadow).toBe("none");
@@ -109,10 +123,18 @@ test("V15.2.18 desktop month navigation uses rounded standalone controls", async
   for (const selector of ["#previousMonthButton", "#monthControl", "#nextMonthButton"]) {
     const style = await page.locator(selector).evaluate(element => {
       const computed = getComputedStyle(element);
-      return { height:element.getBoundingClientRect().height, borderWidth:computed.borderTopWidth, backdrop:computed.backdropFilter };
+      return {
+        height:element.getBoundingClientRect().height,
+        borderWidth:computed.borderTopWidth,
+        borderRadius:computed.borderRadius,
+        shadow:computed.boxShadow,
+        backdrop:computed.backdropFilter
+      };
     });
-    expect(style.height, `${selector} should stay at the compact toolbar height`).toBe(38);
+    expect(style.height, `${selector} should stay at the compact toolbar height`).toBe(34);
     expect(style.borderWidth, `${selector} should use the standalone outline`).toBe("1px");
+    expect(style.borderRadius, `${selector} should use the shared radius`).toBe("7px");
+    expect(style.shadow, `${selector} should stay shadow-free`).toBe("none");
     expect(style.backdrop, `${selector} should not use glass blur`).toBe("none");
   }
 
@@ -120,8 +142,10 @@ test("V15.2.18 desktop month navigation uses rounded standalone controls", async
   await expect(current).toBeVisible();
   const currentStyle = await current.evaluate(element => {
     const style = getComputedStyle(element);
-    return { height:element.getBoundingClientRect().height, marginLeft:style.marginLeft };
+    return { height:element.getBoundingClientRect().height, marginLeft:style.marginLeft, borderRadius:style.borderRadius, shadow:style.boxShadow };
   });
-  expect(currentStyle.height).toBe(38);
-  expect(currentStyle.marginLeft).toBe("2px");
+  expect(currentStyle.height).toBe(34);
+  expect(currentStyle.marginLeft).toBe("0px");
+  expect(currentStyle.borderRadius).toBe("7px");
+  expect(currentStyle.shadow).toBe("none");
 });
