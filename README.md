@@ -1,11 +1,11 @@
-# My Finance Records · V15.2.24
+# My Finance Records · V2.0.0
 
 <div align="center">
 
 **A local-first personal and household finance PWA built for privacy, resilience, and everyday use.**
 
 [![Quality checks](https://github.com/nyxdcz/my-finance-record/actions/workflows/quality-pages.yml/badge.svg?branch=main)](https://github.com/nyxdcz/my-finance-record/actions/workflows/quality-pages.yml)
-![Version](https://img.shields.io/badge/version-V15.2.24-2563eb)
+![Version](https://img.shields.io/badge/version-V2.0.0-2563eb)
 ![PWA](https://img.shields.io/badge/PWA-offline--ready-16a34a)
 ![Node](https://img.shields.io/badge/Node.js-22%2B-339933?logo=nodedotjs&logoColor=white)
 
@@ -15,9 +15,9 @@
 
 | Release | Finance schema | Cloud schema | Sync cadence |
 | --- | ---: | ---: | ---: |
-| **V15.2.24** · Compact Expense Status & Collapse | **12** | **V3** | **5 minutes** |
+| **V2.0.0** · Organized Complete | **12** | **V3** | **5 minutes** |
 
-The current release compacts the three desktop expense columns and keeps their controls predictable. Active Past due / Due soon status now sits directly beside **Unpaid** instead of using a separate Deadline/Expense prefix row. Each period keeps an independent **20×20** collapse control, while the card footer follows the approved **30×30 Repeat → 74×30 Mark paid → 48×30 Edit** arrangement with 5px gaps and the **18×18** selection checkbox fixed 7px from the lower-left. Phone and coarse-pointer tablet touch layouts, Finance calculations, recurrence, schemas, balances, filters, payments, and sync behavior remain protected.
+V2.0.0 adopts a clean product history from **V1.0.0 (Created)** through **V2.0.0 (Organized Complete)**. It combines the complete local-first finance system, Account Ledger, budgeting, reporting, projects, productivity, reminders, encrypted multi-profile Cloud Schema V3 synchronization, responsive desktop/phone interface, PWA delivery, and final Budget & Expenses experience into one organized production baseline. The original V12.19.0–V15.2.24 release history is retained in `CHANGELOG.md` for auditability.
 
 ## What it offers
 
@@ -26,9 +26,19 @@ The current release compacts the three desktop expense columns and keeps their c
 | Local-first records | Core finance workflows remain available without a cloud dependency. |
 | Optional encrypted sync | Multi-device synchronization uses client-side AES-256-GCM encryption with Supabase-compatible storage. |
 | Multi-profile support | Personal and household records can stay separated inside one installation. |
+| Account Ledger | Transfers, reconciliations, direct spending, payment reversals, and account balances remain auditable. |
+| Budgeting and insights | Monthly planning, forecasts, savings allocation, reports, trends, and exports are integrated. |
+| Projects and productivity | Project Agenda, revisions, Kanban workflow, Quick Add, search, filters, reminders, and undo/redo are included. |
 | Offline-ready PWA | The app can be installed and used through a service-worker-backed experience. |
-| Practical finance tools | Track income, expenses, budgets, accounts, recurring payments, savings goals, and schedules. |
-| Compatibility-focused releases | Schema, cache, sync, backup, and restore behavior are treated as protected contracts. |
+| Compatibility-focused releases | Schema, cache, sync, backup, restore, and finance-data behavior are treated as protected contracts. |
+
+## Version roadmap
+
+The organized product history is documented in [`version.md`](version.md):
+
+**V1.0.0 Created → Cloud Sync → Ledger → Budgeting → Insights → Productivity → Reminders → Profiles & Encryption → Mobile Finance → Projects & Navigation → Sync Hardening → Modern PWA → Production Organization → Final Budget & Expenses Polish → V2.0.0 Organized Complete.**
+
+The historical repository release log remains in [`CHANGELOG.md`](CHANGELOG.md).
 
 ## Quick start
 
@@ -53,7 +63,7 @@ flowchart LR
     Sync <--> Cloud["Supabase + RLS"]
 ```
 
-The runtime is being modularized incrementally so installed PWA clients keep working across releases. New code belongs in focused modules under `assets/`; compatibility-sensitive entry points remain stable until a migration is explicitly planned.
+The V2 runtime keeps compatibility-sensitive legacy asset filenames where changing them would create unnecessary PWA risk. New work should continue moving toward focused module ownership under `assets/` while preserving explicit migration paths for stored finance data and installed clients.
 
 <details>
 <summary><strong>Repository layout</strong></summary>
@@ -63,6 +73,7 @@ The runtime is being modularized incrementally so installed PWA clients keep wor
 | `.github/` | Actions, dependency updates, ownership, and contribution templates |
 | `assets/css/` | Application and responsive styles |
 | `assets/js/` | Finance, sync, UI, and feature modules |
+| `assets/mascots/` | Budget summary mascot artwork |
 | `docs/` | Setup, migration, release, and architecture documentation |
 | `icons/` | Runtime icon assets |
 | `scripts/` | Runtime preparation, installation, and audit helpers |
@@ -104,4 +115,5 @@ Contributions should begin with [`CONTRIBUTING.md`](CONTRIBUTING.md). Keep each 
 | Architecture | [`docs/architecture/`](docs/architecture/) |
 | Migrations | [`docs/migration/`](docs/migration/) |
 | Release operations | [`docs/release/`](docs/release/) |
-| Release history | [`CHANGELOG.md`](CHANGELOG.md) |
+| Organized V1 → V2 roadmap | [`version.md`](version.md) |
+| Historical release history | [`CHANGELOG.md`](CHANGELOG.md) |
