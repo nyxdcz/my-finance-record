@@ -6,6 +6,15 @@
   const UI_HOTFIX_REFRESH_KEY = "finance-ui-hotfix-v15-2-18-kanban-menu3-neutral-border1-light-label3";
   const normalizeCacheVersion = cacheVersion => cacheVersion === LEGACY_INDEX_CACHE ? CURRENT_CACHE_VERSION : cacheVersion;
 
+  async function installBrowserBrandIcons() {
+    try {
+      await import("./brand-icons-v15-2-18.js");
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
   async function refreshCachedHeaderToolsOnce() {
     if (!root.navigator?.serviceWorker?.controller || !("caches" in root)) return false;
     try {
@@ -54,5 +63,6 @@
     }
   };
   root.FinancePwaUpdate = api;
+  void installBrowserBrandIcons();
   void refreshCachedHeaderToolsOnce();
 })(typeof window !== "undefined" ? window : globalThis);
