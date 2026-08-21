@@ -326,3 +326,19 @@
     box-shadow: none !important;
   }
 }
+
+/* V15.2.18 · Finance expense-period cleanup: neutral outer cards with 5px row rhythm on desktop. */
+@media (min-width: 851px) {
+  html body #money .period-card {
+    background: var(--surface) !important;
+    border-color: var(--line) !important;
+  }
+
+  html body #money :is(#earlyExpenses, #lateExpenses, #otherExpenses) {
+    background: var(--surface) !important;
+  }
+
+  html body #money :is(#earlyExpenses, #lateExpenses, #otherExpenses) > .record-row[data-expense-row] + .record-row[data-expense-row] {
+    margin-top: 5px !important;
+  }
+}
