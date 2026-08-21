@@ -54,19 +54,19 @@
   }
 
   #money .summary-mascot-slot[data-summary-mascot="red"]::after {
-    background-image: url("./assets/mascots/mascot-red.png");
+    background-image: url("./assets/mascots/mascot-red.png?v=15.2.24-mascot7");
   }
 
   #money .summary-mascot-slot[data-summary-mascot="green"]::after {
-    background-image: url("./assets/mascots/mascot-green.png");
+    background-image: url("./assets/mascots/mascot-green.png?v=15.2.24-mascot7");
   }
 
   #money .summary-mascot-slot[data-summary-mascot="blue"]::after {
-    background-image: url("./assets/mascots/mascot-blue.png");
+    background-image: url("./assets/mascots/mascot-blue.png?v=15.2.24-mascot7");
   }
 
   #money .summary-mascot-slot[data-summary-mascot="orange"]::after {
-    background-image: url("./assets/mascots/mascot-orange.png");
+    background-image: url("./assets/mascots/mascot-orange.png?v=15.2.24-mascot7");
   }
 
   #money .legend-item.summary-card,
