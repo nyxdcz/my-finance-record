@@ -220,16 +220,109 @@
   }
 }
 
-/* V15.2.18 · Preserve the approved rounded standalone month-selector geometry after audit compaction. */
-@media (min-width: 851px) {
+/* V15.2.18 · Fine-pointer desktop toolbar: 34px controls, 7px corners, 4px rhythm. */
+@media (min-width: 851px) and (hover: hover) and (pointer: fine) {
+  html body .topbar-actions {
+    gap: 4px !important;
+  }
+
+  html body .topbar-actions > .cloud-sync-toolbar-button,
+  html body .topbar-actions .topbar-history-button,
+  html body .topbar-actions .topbar-add-button,
+  html body .topbar-actions .topbar-tools-trigger,
+  html body .topbar-actions .month-navigator,
+  html body .topbar-actions .month-navigator > .month-nav-button,
+  html body .topbar-actions .month-navigator > .month-control,
+  html body .topbar-actions .month-navigator > .month-current-button,
+  html body .topbar-actions .month-navigator > .month-status-chip {
+    box-sizing: border-box !important;
+    height: 34px !important;
+    min-height: 34px !important;
+    max-height: 34px !important;
+  }
+
+  html body .topbar-actions > .cloud-sync-toolbar-button,
+  html body .topbar-actions .topbar-history-button,
+  html body .topbar-actions .topbar-add-button,
+  html body .topbar-actions .topbar-tools-trigger,
+  html body .topbar-actions .month-navigator > .month-nav-button,
+  html body .topbar-actions .month-navigator > .month-control,
+  html body .topbar-actions .month-navigator > .month-current-button,
+  html body .topbar-actions .month-navigator > .month-status-chip {
+    border-radius: 7px !important;
+  }
+
+  html body .topbar-actions .topbar-tools-trigger {
+    width: 34px !important;
+    min-width: 34px !important;
+    max-width: 34px !important;
+    padding-inline: 0 !important;
+  }
+
+  html body .topbar-actions .month-navigator {
+    gap: 4px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    overflow: visible !important;
+  }
+
+  html body .topbar-actions .month-navigator > #previousMonthButton,
+  html body .topbar-actions .month-navigator > #nextMonthButton {
+    width: 34px !important;
+    min-width: 34px !important;
+    max-width: 34px !important;
+    padding: 0 !important;
+    border-inline: 1px solid var(--line) !important;
+    border-radius: 7px !important;
+    box-shadow: none !important;
+  }
+
   html body .topbar-actions .month-navigator > .month-control {
-    width: 178px !important;
-    min-width: 178px !important;
-    max-width: 178px !important;
+    width: 175px !important;
+    min-width: 175px !important;
+    max-width: 175px !important;
+    padding: 0 !important;
+    border-inline: 1px solid var(--line) !important;
+    border-radius: 7px !important;
+    box-shadow: none !important;
+  }
+
+  html body .topbar-actions .month-navigator .month-display-button {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    padding: 4px 8px !important;
+    border: 0 !important;
+    border-radius: 6px !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+
+  html body .topbar-actions .month-navigator .month-display-button::before {
+    flex: 0 0 14px !important;
+  }
+
+  html body .topbar-actions .month-display-value {
+    flex: 0 0 auto !important;
+    text-align: left !important;
   }
 
   html body .topbar-actions .month-navigator > .month-current-button,
   html body .topbar-actions .month-navigator > .month-status-chip {
-    margin-inline-start: 2px !important;
+    margin-inline-start: 0 !important;
+    border-radius: 7px !important;
+    box-shadow: none !important;
   }
 }
