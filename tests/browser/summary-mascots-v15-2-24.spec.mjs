@@ -23,6 +23,16 @@ test("desktop Budget & Expenses uses the approved supplied mascots and exact spa
       element.removeAttribute("aria-label");
       element.removeAttribute("title");
     }
+
+    /* Reproduce the legacy completion smile that previously won this slot. */
+    const legacyFirst = document.getElementById("legendEarlyTotal");
+    legacyFirst.dataset.firstHalfOriginalText = "₱0.00";
+    legacyFirst.textContent = "";
+    const legacySmile = document.createElement("img");
+    legacySmile.dataset.firstHalfCompleteIcon = "true";
+    legacySmile.src = "./icons/heart-smile-light-v15-2-4.png";
+    legacyFirst.appendChild(legacySmile);
+
     window.FinanceSummaryMascots.apply();
 
     const readSlot = id => {
@@ -57,9 +67,11 @@ test("desktop Budget & Expenses uses the approved supplied mascots and exact spa
         lateTotal:readSlot("lateTotal"),
         otherTotal:readSlot("otherTotal")
       },
+      legacySmileDisplay:getComputedStyle(legacySmile).display,
       topRightInset:topCard.right - topBox.right,
       lower:{
         mascotGap:collapse.left - lowerMascot.right,
+        centerDelta:Math.abs(((collapse.top + collapse.bottom) / 2) - ((lowerMascot.top + lowerMascot.bottom) / 2)),
         collapseWidth:collapse.width,
         collapseHeight:collapse.height,
         collapseRightInset:header.right - collapse.right
@@ -80,15 +92,17 @@ test("desktop Budget & Expenses uses the approved supplied mascots and exact spa
     const slot = state.slots[id];
     expect(slot.mascot).toBe(color);
     expect(slot.aria).toContain("₱0.00");
-    expect(slot.width).toBeCloseTo(25, 0);
-    expect(slot.height).toBeCloseTo(25, 0);
-    expect(slot.pseudoWidth).toBeCloseTo(25, 0);
-    expect(slot.pseudoHeight).toBeCloseTo(25, 0);
+    expect(slot.width).toBeCloseTo(30, 0);
+    expect(slot.height).toBeCloseTo(30, 0);
+    expect(slot.pseudoWidth).toBeCloseTo(30, 0);
+    expect(slot.pseudoHeight).toBeCloseTo(30, 0);
     expect(slot.background).toContain(asset);
   }
 
+  expect(state.legacySmileDisplay).toBe("none");
   expect(state.topRightInset).toBeCloseTo(20, 0);
   expect(state.lower.mascotGap).toBeCloseTo(10, 0);
+  expect(state.lower.centerDelta).toBeLessThanOrEqual(0.5);
   expect(state.lower.collapseWidth).toBeCloseTo(20, 0);
   expect(state.lower.collapseHeight).toBeCloseTo(20, 0);
   expect(state.lower.collapseRightInset).toBeCloseTo(10, 0);
@@ -106,6 +120,7 @@ test("difference cards follow green and red state while phone disables mascot ov
     });
     const value = card.querySelector(".summary-card-value");
     value.textContent = negative ? "-₱100.00" : "₱100.00";
+    delete value.dataset.firstHalfOriginalText;
     value.classList.toggle("text-danger", negative);
     value.classList.toggle("text-green", !negative);
     card.classList.toggle("summary-card-danger", negative);
