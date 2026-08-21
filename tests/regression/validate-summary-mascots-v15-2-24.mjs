@@ -28,7 +28,8 @@ assert.match(prepare, /assets\/mascots\/mascot-orange\.svg/);
 assert.match(css, /\.summary-mascot-slot::after[\s\S]*width:\s*25px;[\s\S]*height:\s*25px;/);
 assert.match(css, /data-summary-mascot="red"[\s\S]*mascot-red\.svg/);
 assert.match(css, /data-summary-mascot="green"[\s\S]*mascot-green\.svg/);
-assert.match(css, /#financeLegend \.legend-total\.summary-mascot-slot,[\s\S]*right:\s*20px !important;/);
+assert.match(css, /#money \.legend-total\.summary-mascot-slot,[\s\S]*right:\s*20px !important;/);
+assert.doesNotMatch(css, /#financeLegend/);
 assert.match(css, /\.collapse-actions\.has-period-mascot[\s\S]*gap:\s*10px !important;/);
 assert.match(css, /\.period-header[\s\S]*padding-right:\s*10px !important;/);
 
