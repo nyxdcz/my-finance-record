@@ -11,12 +11,12 @@ const browserAudit = read("tests/browser/production-ui-audit-v15-2-13.spec.mjs")
 const version = JSON.parse(read("version.json"));
 const pkg = JSON.parse(read("package.json"));
 
-assert.equal(version.version, "15.2.19");
-assert.equal(pkg.version, "15.2.19");
-assert.equal(version.cacheVersion, "finance-v15-20260821-compact-expense-cards-r55");
-assert.match(index, /production-ui-audit-v15-2-13\.css\?v=15\.2\.19-compact1/);
+assert.equal(version.version, "15.2.20");
+assert.equal(pkg.version, "15.2.20");
+assert.equal(version.cacheVersion, "finance-v15-20260821-compact-expense-stability-r56");
+assert.match(index, /production-ui-audit-v15-2-13\.css\?v=15\.2\.20-compact2/);
 assert.ok(index.indexOf("production-ui-audit-v15-2-13.css") > index.indexOf("desktop-ux-v15-2-0.css"));
-assert.match(worker, /production-ui-audit-v15-2-13\.css\?v=15\.2\.19-compact1/);
+assert.match(worker, /production-ui-audit-v15-2-13\.css\?v=15\.2\.20-compact2/);
 assert.match(prepare, /production-ui-audit-v15-2-13\.css/);
 
 assert.match(css, /animation:\s*financeSummaryConfirm 420ms ease-out/);
@@ -40,4 +40,4 @@ assert.match(browserAudit, /finance-signed-in/);
 assert.match(browserAudit, /window\.goToPage\("money"/);
 assert.match(browserAudit, /summaries:8, periods:3/);
 
-console.log("V15.2.19 production UI/UX audit source contract passed.");
+console.log("V15.2.20 production UI/UX audit source contract passed.");

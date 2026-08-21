@@ -19,8 +19,8 @@ const refreshAt = ledger.indexOf("refreshReconciledAccountState(account, expecte
 assert.ok(saveAt >= 0 && refreshAt > saveAt, "verified persistence must happen before final UI refresh");
 assert.match(index, /account-ledger\.js\?v=15\.0\.4/, "account-ledger asset must remain on its repaired pin");
 assert.match(index, /budget-planning\.js\?v=15\.2\.1-ux1/, "budget-planning asset must remain on its repaired pin");
-assert.match(worker, /finance-v15-20260821-horizontal-kanban-r54/, "PWA cache must match the V15.2.18 production UI audit");
+assert.match(worker, /finance-v15-20260821-compact-expense-stability-r56/, "PWA cache must match the V15.2.18 production UI audit");
 assert.match(worker, /account-ledger\.js\?v=15\.0\.4/, "worker must precache repaired account ledger");
 assert.match(worker, /budget-planning\.js\?v=15\.2\.1-ux1/, "worker must precache repaired budget planning");
-assert.equal(pkg.version, "15.2.18");
+assert.equal(pkg.version, "15.2.20");
 console.log("Record spending regression validation passed under V15.2.9.");

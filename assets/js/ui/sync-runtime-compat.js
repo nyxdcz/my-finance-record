@@ -1,6 +1,6 @@
 (function applyV15ReleaseLayer() {
-  const VERSION = "15.2.18";
-  const RELEASE_NAME = "Horizontal Project Kanban";
+  const VERSION = "15.2.20";
+  const RELEASE_NAME = "Compact Expense Cards Stability";
   const RELEASE_DATE = "August 21, 2026";
   window.FINANCE_APP_VERSION_OVERRIDE = VERSION;
   window.FINANCE_RELEASE_OVERRIDE = { version:VERSION, name:RELEASE_NAME, released:"2026-08-21" };
