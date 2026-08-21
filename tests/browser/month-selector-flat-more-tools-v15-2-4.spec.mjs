@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-test("desktop month selector uses rounded standalone controls and a compact 4x3 picker", async ({ page }) => {
+test("desktop month selector uses compact standalone controls and a centered 4x3 picker", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 800 });
   await page.goto("http://127.0.0.1:3000/offline.html", { waitUntil:"networkidle" });
   await page.evaluate(() => {
@@ -53,21 +53,27 @@ test("desktop month selector uses rounded standalone controls and a compact 4x3 
   const next = page.locator("#nextMonthButton");
   const current = page.locator(".month-status-chip");
 
+  await expect(nav).toHaveCSS("height", "34px");
   await expect(nav).toHaveCSS("box-shadow", "none");
   await expect(nav).toHaveCSS("backdrop-filter", "none");
-  await expect(nav).toHaveCSS("gap", "6px");
+  await expect(nav).toHaveCSS("gap", "4px");
 
-  await expect(previous).toHaveCSS("height", "38px");
+  await expect(previous).toHaveCSS("width", "34px");
+  await expect(previous).toHaveCSS("height", "34px");
   await expect(previous).toHaveCSS("border-right-width", "1px");
-  await expect(previous).toHaveCSS("border-radius", "9px");
-  await expect(next).toHaveCSS("height", "38px");
+  await expect(previous).toHaveCSS("border-radius", "7px");
+  await expect(previous).toHaveCSS("box-shadow", "none");
+  await expect(next).toHaveCSS("width", "34px");
+  await expect(next).toHaveCSS("height", "34px");
   await expect(next).toHaveCSS("border-left-width", "1px");
-  await expect(next).toHaveCSS("border-radius", "9px");
+  await expect(next).toHaveCSS("border-radius", "7px");
+  await expect(next).toHaveCSS("box-shadow", "none");
 
-  await expect(control).toHaveCSS("height", "38px");
-  await expect(control).toHaveCSS("width", "178px");
+  await expect(control).toHaveCSS("height", "34px");
+  await expect(control).toHaveCSS("width", "175px");
   await expect(control).toHaveCSS("border-right-width", "1px");
-  await expect(control).toHaveCSS("border-radius", "9px");
+  await expect(control).toHaveCSS("border-radius", "7px");
+  await expect(control).toHaveCSS("box-shadow", "none");
   await expect(control).toHaveCSS("backdrop-filter", "none");
   await expect(label).toHaveCSS("display", "none");
   await expect(separator).toHaveCSS("display", "none");
@@ -81,11 +87,16 @@ test("desktop month selector uses rounded standalone controls and a compact 4x3 
     const before = getComputedStyle(display, "::before");
     const previousStyle = getComputedStyle(previous);
     const controlStyle = getComputedStyle(control);
+    const displayStyle = getComputedStyle(display);
     const popoverStyle = getComputedStyle(popover);
     const gridStyle = getComputedStyle(grid);
     return {
       previousShadow:previousStyle.boxShadow,
       controlShadow:controlStyle.boxShadow,
+      displayMode:displayStyle.display,
+      displayJustify:displayStyle.justifyContent,
+      displayGap:displayStyle.gap,
+      displayHeight:display.getBoundingClientRect().height,
       calendarMask:before.webkitMaskImage || before.maskImage,
       popoverWidth:popoverStyle.width,
       popoverTransform:popoverStyle.transform,
@@ -96,8 +107,12 @@ test("desktop month selector uses rounded standalone controls and a compact 4x3 
     };
   });
 
-  expect(geometry.previousShadow).not.toBe("none");
-  expect(geometry.controlShadow).not.toBe("none");
+  expect(geometry.previousShadow).toBe("none");
+  expect(geometry.controlShadow).toBe("none");
+  expect(geometry.displayMode).toBe("flex");
+  expect(geometry.displayJustify).toBe("center");
+  expect(geometry.displayGap).toBe("6px");
+  expect(geometry.displayHeight).toBe(32);
   expect(geometry.calendarMask).not.toBe("none");
   expect(geometry.popoverWidth).toBe("280px");
   expect(geometry.popoverTransform).toBe("none");
@@ -108,6 +123,8 @@ test("desktop month selector uses rounded standalone controls and a compact 4x3 
 
   await expect(popover).toHaveCSS("border-radius", "12px");
   await expect(grid.locator(".month-picker-option").nth(7)).toHaveCSS("background-color", "rgb(23, 62, 118)");
-  await expect(current).toHaveCSS("margin-left", "2px");
-  await expect(current).toHaveCSS("height", "38px");
+  await expect(current).toHaveCSS("margin-left", "0px");
+  await expect(current).toHaveCSS("height", "34px");
+  await expect(current).toHaveCSS("border-radius", "7px");
+  await expect(current).toHaveCSS("box-shadow", "none");
 });
