@@ -224,6 +224,8 @@
 @media (min-width: 851px) {
   html body .topbar-actions .month-navigator > .month-control {
     width: 178px !important;
+    min-width: 178px !important;
+    max-width: 178px !important;
   }
 
   html body .topbar-actions .month-navigator > .month-current-button,
