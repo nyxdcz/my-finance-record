@@ -37,7 +37,7 @@ assert.match(css, /data-summary-mascot="orange"[\s\S]*mascot-orange\.png\?v=15\.
 assert.match(css, /#money \.legend-total\.summary-mascot-slot,[\s\S]*19px from the positioning edge[\s\S]*right:\s*19px !important;/);
 assert.doesNotMatch(css, /#financeLegend/);
 assert.match(css, /\.collapse-actions\.has-period-mascot[\s\S]*gap:\s*10px !important;[\s\S]*align-items:\s*center !important;/);
-assert.match(css, /\.period-total\.summary-mascot-slot[\s\S]*align-self:\s*center !important;[\s\S]*transform:\s*translateY\(-8px\) !important;/);
+assert.match(css, /\.period-total\.summary-mascot-slot[\s\S]*align-self:\s*center !important;[\s\S]*transform:\s*translateY\(-16px\) !important;/);
 assert.match(css, /\.period-header[\s\S]*padding-right:\s*10px !important;/);
 
 assert.match(js, /mascot-red\.png\?v=15\.2\.24-mascot7/);
@@ -60,4 +60,4 @@ assert.match(js, /DESKTOP_QUERY/);
 assert.match(js, /FinanceSummaryMascots = Object\.freeze\(\{ refresh:schedule, apply/);
 assert.doesNotMatch(js, /replaceChildren\(mascot/);
 
-console.log("V15.2.24 Budget & Expenses versioned PNG mascot source contract passed without schema or sync changes.");
+console.log("V15.2.24 Budget & Expenses versioned PNG mascot source contract passed with the 16px lower optical lift and without schema or sync changes.");
