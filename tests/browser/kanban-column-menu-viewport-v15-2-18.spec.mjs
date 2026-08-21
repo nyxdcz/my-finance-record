@@ -134,7 +134,7 @@ test("phone Kanban column menu is clamped to both viewport edges and outside cli
   expect(opened.top).toBeGreaterThanOrEqual(7);
   expect(opened.bottom).toBeLessThanOrEqual(opened.viewportHeight - 7);
 
-  await page.locator("#todayLabel").click({ force:true });
+  await page.mouse.click(20, 20);
   await expect(page.locator("#kanbanViewportPanel")).toBeHidden();
   await expect(page.locator("#kanbanViewportTrigger")).toHaveAttribute("aria-expanded", "false");
 });
