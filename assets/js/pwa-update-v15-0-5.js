@@ -6,7 +6,7 @@
   const UI_HOTFIX_REFRESH_KEY = "finance-ui-hotfix-v15-2-18-kanban-menu3-neutral-border1";
   const normalizeCacheVersion = cacheVersion => cacheVersion === LEGACY_INDEX_CACHE ? CURRENT_CACHE_VERSION : cacheVersion;
 
-  async function refreshCachedUiHotfixOnce() {
+  async function refreshCachedHeaderToolsOnce() {
     if (!root.navigator?.serviceWorker?.controller || !("caches" in root)) return false;
     try {
       if (root.localStorage?.getItem(UI_HOTFIX_REFRESH_KEY) === "done") return false;
@@ -54,5 +54,5 @@
     }
   };
   root.FinancePwaUpdate = api;
-  void refreshCachedUiHotfixOnce();
+  void refreshCachedHeaderToolsOnce();
 })(typeof window !== "undefined" ? window : globalThis);
