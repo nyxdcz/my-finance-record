@@ -14,6 +14,22 @@ async function openMoney(page, width = 1440) {
 test("desktop Budget & Expenses uses the approved supplied mascots and exact spacing", async ({ page }) => {
   await openMoney(page, 1440);
 
+  const imageLoads = await page.evaluate(async () => Promise.all(
+    Object.values(window.FinanceSummaryMascots.assets).map(src => new Promise(resolve => {
+      const image = new Image();
+      image.onload = () => resolve({ src:image.src, ok:true, width:image.naturalWidth, height:image.naturalHeight });
+      image.onerror = () => resolve({ src:image.src, ok:false, width:0, height:0 });
+      image.src = src;
+    }))
+  ));
+
+  for (const image of imageLoads) {
+    expect(image.ok).toBe(true);
+    expect(image.src).toContain("?v=15.2.24-mascot7");
+    expect(image.width).toBe(256);
+    expect(image.height).toBe(256);
+  }
+
   const state = await page.evaluate(() => {
     for (const id of ["legendEarlyTotal", "legendLateTotal", "legendOtherTotal", "earlyTotal", "lateTotal", "otherTotal"]) {
       const element = document.getElementById(id);
@@ -82,12 +98,12 @@ test("desktop Budget & Expenses uses the approved supplied mascots and exact spa
   });
 
   const expected = {
-    legendEarlyTotal:["red", "mascot-red.png"],
-    legendLateTotal:["orange", "mascot-orange.png"],
-    legendOtherTotal:["blue", "mascot-blue.png"],
-    earlyTotal:["red", "mascot-red.png"],
-    lateTotal:["orange", "mascot-orange.png"],
-    otherTotal:["blue", "mascot-blue.png"]
+    legendEarlyTotal:["red", "mascot-red.png?v=15.2.24-mascot7"],
+    legendLateTotal:["orange", "mascot-orange.png?v=15.2.24-mascot7"],
+    legendOtherTotal:["blue", "mascot-blue.png?v=15.2.24-mascot7"],
+    earlyTotal:["red", "mascot-red.png?v=15.2.24-mascot7"],
+    lateTotal:["orange", "mascot-orange.png?v=15.2.24-mascot7"],
+    otherTotal:["blue", "mascot-blue.png?v=15.2.24-mascot7"]
   };
 
   for (const [id, [color, asset]] of Object.entries(expected)) {
@@ -140,13 +156,13 @@ test("difference cards follow green and red state while phone disables mascot ov
   expect(positive.mascot).toBe("green");
   expect(positive.aria).toContain("₱100.00");
   expect(positive.text).toBe("₱100.00");
-  expect(positive.background).toContain("mascot-green.png");
+  expect(positive.background).toContain("mascot-green.png?v=15.2.24-mascot7");
 
   const negative = await setDifference(true);
   expect(negative.mascot).toBe("red");
   expect(negative.aria).toContain("-₱100.00");
   expect(negative.text).toBe("-₱100.00");
-  expect(negative.background).toContain("mascot-red.png");
+  expect(negative.background).toContain("mascot-red.png?v=15.2.24-mascot7");
 
   await page.setViewportSize({ width:390, height:844 });
 
