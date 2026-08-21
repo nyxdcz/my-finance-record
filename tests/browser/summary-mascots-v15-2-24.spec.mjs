@@ -82,12 +82,12 @@ test("desktop Budget & Expenses uses the approved supplied mascots and exact spa
   });
 
   const expected = {
-    legendEarlyTotal:["red", "mascot-red.svg"],
-    legendLateTotal:["orange", "mascot-orange.svg"],
-    legendOtherTotal:["blue", "mascot-blue.svg"],
-    earlyTotal:["red", "mascot-red.svg"],
-    lateTotal:["orange", "mascot-orange.svg"],
-    otherTotal:["blue", "mascot-blue.svg"]
+    legendEarlyTotal:["red", "mascot-red.png"],
+    legendLateTotal:["orange", "mascot-orange.png"],
+    legendOtherTotal:["blue", "mascot-blue.png"],
+    earlyTotal:["red", "mascot-red.png"],
+    lateTotal:["orange", "mascot-orange.png"],
+    otherTotal:["blue", "mascot-blue.png"]
   };
 
   for (const [id, [color, asset]] of Object.entries(expected)) {
@@ -140,13 +140,13 @@ test("difference cards follow green and red state while phone disables mascot ov
   expect(positive.mascot).toBe("green");
   expect(positive.aria).toContain("₱100.00");
   expect(positive.text).toBe("₱100.00");
-  expect(positive.background).toContain("mascot-green.svg");
+  expect(positive.background).toContain("mascot-green.png");
 
   const negative = await setDifference(true);
   expect(negative.mascot).toBe("red");
   expect(negative.aria).toContain("-₱100.00");
   expect(negative.text).toBe("-₱100.00");
-  expect(negative.background).toContain("mascot-red.svg");
+  expect(negative.background).toContain("mascot-red.png");
 
   await page.setViewportSize({ width:390, height:844 });
 
