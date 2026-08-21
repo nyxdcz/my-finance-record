@@ -1,0 +1,10 @@
+name: Retired V15.2.20 runner debug
+
+on:
+  workflow_dispatch:
+
+jobs:
+  retired:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Runner debug complete."

@@ -1,0 +1,10 @@
+name: Retired embedded V15.2.20 validator
+
+on:
+  workflow_dispatch:
+
+jobs:
+  retired:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Replaced by script-based V15.2.20 validator."
