@@ -1,50 +1,10 @@
-name: V15.2.20 runner debug
+name: Retired V15.2.20 runner debug
 
 on:
-  push:
-    branches:
-      - v15.2.20-staging
-
-permissions:
-  contents: write
+  workflow_dispatch:
 
 jobs:
-  debug:
+  retired:
     runs-on: ubuntu-latest
-    env:
-      GH_TOKEN: ${{ github.token }}
     steps:
-      - name: Capture runner state
-        shell: bash
-        run: |
-          {
-            echo "run_id=$GITHUB_RUN_ID"
-            echo "sha=$GITHUB_SHA"
-            echo "workspace=$GITHUB_WORKSPACE"
-            echo "pwd=$(pwd)"
-            echo "--- ls workspace ---"
-            ls -la "$GITHUB_WORKSPACE" || true
-            echo "--- git status ---"
-            git -C "$GITHUB_WORKSPACE" status --short --branch 2>&1 || true
-            echo "--- versions ---"
-            node --version 2>&1 || true
-            npm --version 2>&1 || true
-            gh --version 2>&1 | head -3 || true
-            git --version 2>&1 || true
-            echo "--- hosted node dirs ---"
-            find /opt/hostedtoolcache/node -mindepth 1 -maxdepth 3 -type d 2>/dev/null | sort -V | tail -30 || true
-            echo "--- network ---"
-            getent hosts github.com || true
-            curl -sS -I --max-time 10 https://api.github.com/ | head -8 || true
-          } > /tmp/v15-runner-debug.txt
-          cat /tmp/v15-runner-debug.txt
-
-      - name: Publish runner state to diagnostics branch
-        shell: bash
-        run: |
-          set -euo pipefail
-          CONTENT="$(base64 -w0 /tmp/v15-runner-debug.txt)"
-          gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/.ci-diagnostics/runner-$GITHUB_RUN_ID.txt" \
-            -f message="chore: capture V15.2.20 runner state" \
-            -f branch="v15.2.20-diagnostics" \
-            -f content="$CONTENT"
+      - run: echo "Runner debug complete."
