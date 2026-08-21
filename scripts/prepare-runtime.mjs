@@ -28,6 +28,7 @@ const runtimeGroups = {
   ],
   "assets/js": [
     "account-ledger.js",
+    "brand-icons-v15-2-18.js",
     "budget-planning.js",
     "cloud-conflict-resolution.js",
     "cloud-conflict-review.js",
