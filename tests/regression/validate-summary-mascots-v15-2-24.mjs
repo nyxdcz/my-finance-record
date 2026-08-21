@@ -20,7 +20,7 @@ for (const file of ["mascot-red.png", "mascot-green.png", "mascot-blue.png", "ma
   assert.match(workflow, new RegExp(file.replace(".", "\\.")), `Pages packaging must validate ${file}`);
 }
 
-assert.match(prepare, /const QUERY = "15\.2\.24-mascot7"/);
+assert.match(prepare, /const QUERY = "15\.2\.24-mascot8"/);
 assert.match(prepare, /summary-mascots-v15-2-25\.css\?v=\$\{QUERY\}/);
 assert.match(prepare, /summary-mascots-v15-2-25\.js\?v=\$\{QUERY\}/);
 assert.match(prepare, /mascot-\$\{color\}\.png\?v=\$\{QUERY\}/);
@@ -60,4 +60,4 @@ assert.match(js, /DESKTOP_QUERY/);
 assert.match(js, /FinanceSummaryMascots = Object\.freeze\(\{ refresh:schedule, apply/);
 assert.doesNotMatch(js, /replaceChildren\(mascot/);
 
-console.log("V15.2.24 Budget & Expenses versioned PNG mascot source contract passed with the 16px lower optical lift and without schema or sync changes.");
+console.log("V15.2.24 Budget & Expenses versioned PNG mascot source contract passed with mascot8 runtime cache bust, the 16px lower optical lift, and without schema or sync changes.");
