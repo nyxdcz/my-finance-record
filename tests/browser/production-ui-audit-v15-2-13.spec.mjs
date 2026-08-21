@@ -61,10 +61,10 @@ for (const width of [1024, 1280, 1366, 1440, 1920]) {
       };
     });
     expect(metrics.overflow).toBe(false);
-    expect(metrics.toolbarGap).toBe(6);
-    expect(metrics.requiredToolbarHeights.monthNavigator).toBeCloseTo(38, 0);
-    expect(metrics.requiredToolbarHeights.moreTools).toBeCloseTo(38, 0);
-    metrics.visibleToolbarHeights.forEach(height => expect(height).toBeCloseTo(38, 0));
+    expect(metrics.toolbarGap).toBe(4);
+    expect(metrics.requiredToolbarHeights.monthNavigator).toBeCloseTo(34, 0);
+    expect(metrics.requiredToolbarHeights.moreTools).toBeCloseTo(34, 0);
+    metrics.visibleToolbarHeights.forEach(height => expect(height).toBeCloseTo(34, 0));
     expect(metrics.summaryHeights).toHaveLength(8);
     metrics.summaryHeights.forEach(height => expect(height).toBeLessThanOrEqual(58));
     expect(metrics.disclosureSizes.length).toBeGreaterThanOrEqual(4);
