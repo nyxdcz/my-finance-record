@@ -52,7 +52,6 @@ const runtimeGroups = {
   "assets/js/ui": [
     "application-help.js",
     "header-tools-compat.js",
-    "kanban-menu-compat.js",
     "phone-finance-compat.js",
     "sync-runtime-compat.js"
   ]
