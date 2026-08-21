@@ -1,5 +1,7 @@
 # Contributing
 
+My Finance Records is currently organized around **V2.0.0 — Organized Complete**. The product roadmap runs from **V1.0.0 (Created)** through **V2.0.0**, and new releases continue forward from V2 using semantic versioning.
+
 This repository contains a personal finance application. Changes must prioritize data preservation, payment correctness, recovery, and installed-PWA compatibility.
 
 ## Workflow
@@ -8,7 +10,7 @@ This repository contains a personal finance application. Changes must prioritize
 2. Create a focused branch such as `fix/installer-permissions`, `feat/budget-export`, or `docs/repository-organization`.
 3. Change only the approved scope.
 4. Use a Conventional Commit subject such as `fix: restore installer permissions`; avoid subjects such as `fix`, `update`, or `f`.
-5. When behavior/runtime output changes, update the release number, cache key, README/release history, changelog, and validation metadata required by the current release process.
+5. When behavior/runtime output changes, update the release number, cache key, `version.json`, README/release documentation, changelog, and validation metadata required by the current release process.
 6. Run:
 
 ```bash
@@ -46,17 +48,23 @@ See `docs/architecture/README.md` for the staged repository-cleanup strategy.
 
 ### Filename guidance
 
-Prefer stable, responsibility-oriented active filenames. Do not create a new version-numbered production filename solely to record when a change was made; Git history, `CHANGELOG.md`, Releases, and `version.json` already preserve release history.
+Prefer stable, responsibility-oriented active filenames. Do not create a new version-numbered production filename solely to record when a change was made; Git history, `CHANGELOG.md`, Releases, `version.md`, and `version.json` already preserve release history.
 
-Versioned filenames are acceptable when an installed PWA, service worker, cache contract, or other compatibility requirement depends on that exact URL. When extracting such code, keep the legacy URL available through a compatibility loader or mapping until regression coverage proves it is safe to remove.
+Some active files still contain V13, V14, or V15 in their filenames because installed PWAs, service workers, cache contracts, or other compatibility paths depend on those URLs. Those filenames are compatibility identifiers and do **not** represent the current product version.
+
+When extracting or replacing compatibility-sensitive code, keep the legacy URL available through a compatibility loader or mapping until regression coverage proves it is safe to remove.
 
 ### Documentation guidance
 
-Keep the root `README.md` focused on project orientation, development, architecture, and links. Put chronological release detail in `CHANGELOG.md` and GitHub Releases instead of duplicating long release histories in the README.
+- Keep `README.md` focused on project orientation, development, architecture, and current release information.
+- Keep `version.md` as the organized V1.0.0 → V2.0.0 development roadmap and milestone mapping.
+- Keep `CHANGELOG.md` as the organized semantic-version release history going forward from V2.0.0.
+- Do not reintroduce V12–V15 as current product versions. That numbering is historical and remains traceable through Git history and the legacy mapping tables.
 
 ## Compatibility rules
 
-- Do not change core schema 12 without a documented migration and rollback plan.
+- Do not change Finance Schema 12 without a documented migration and rollback plan.
+- Do not change Cloud Schema V3 without a documented cloud migration, compatibility review, and recovery plan.
 - Preserve unknown fields when normalizing imported records.
 - Never rewrite historical paid status or account deductions silently.
 - Use stable IDs for recurring series and payment operations.
@@ -64,17 +72,29 @@ Keep the root `README.md` focused on project orientation, development, architect
 - Keep the app usable offline when cloud sync is unavailable.
 - Do not remove backup or recovery safeguards to simplify a feature.
 - Do not move or rename a production asset only for aesthetics when installed clients or cache/service-worker rules still depend on the old URL.
+- UI-only changes must not reset finance records, balances, recurrence, payments, projects, or synchronization state.
 
 ## Versioning
 
-- Patch: reliability, documentation, security, or compatible UI fixes when a deployed application release is required.
-- Minor: new compatible finance features.
-- Major: migrations or architecture changes that require explicit user action.
-- Documentation-only repository organization does not require an application version bump when runtime/PWA output is unchanged.
+The current production baseline is **V2.0.0**.
+
+- **Patch** (`2.0.x`): compatible reliability, documentation, security, delivery, or UI fixes that require a deployed application release.
+- **Minor** (`2.x.0`): new backward-compatible finance, productivity, reporting, project, or interface features.
+- **Major** (`x.0.0`): intentional breaking architecture/schema changes or migrations that require explicit compatibility planning or user action.
+- Documentation-only changes do not require an application version bump when runtime/PWA output, cache identity, and stored-data behavior are unchanged.
+
+Any release bump must keep `package.json`, `package-lock.json`, `version.json`, runtime release metadata, service-worker/cache identity, README, changelog, and release validation aligned where applicable.
 
 ## Releases
 
 1. Merge the validated version change to `main`.
 2. Confirm the hosted application and `version.json` report the intended version.
-3. Create and push an annotated tag matching `package.json`, for example `git tag -a v15.2.8 -m "My Finance Records v15.2.8"` followed by `git push origin v15.2.8`.
+3. Create and push an annotated tag matching `package.json`, for example:
+
+```bash
+git tag -a v2.0.1 -m "My Finance Records v2.0.1"
+git push origin v2.0.1
+```
+
 4. The Tagged Release workflow validates the tag and creates the GitHub release with generated notes.
+5. Verify that the deployed PWA is using the intended app version and cache generation before considering the release complete.
