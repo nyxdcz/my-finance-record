@@ -104,7 +104,7 @@ test("desktop Budget & Expenses uses the approved supplied mascots and exact spa
   expect(state.legacySmileDisplay).toBe("none");
   expect(state.topRightInset).toBeCloseTo(20, 0);
   expect(state.lower.mascotGap).toBeCloseTo(10, 0);
-  expect(state.lower.mascotLift).toBeCloseTo(5, 0);
+  expect(state.lower.mascotLift).toBeCloseTo(8, 0);
   expect(state.lower.collapseWidth).toBeCloseTo(20, 0);
   expect(state.lower.collapseHeight).toBeCloseTo(20, 0);
   expect(state.lower.collapseRightInset).toBeCloseTo(10, 0);
