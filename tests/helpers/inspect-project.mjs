@@ -35,6 +35,7 @@ const requiredFiles = [
   "index.html", "offline.html", "manifest.webmanifest", "version.json", "sw.js",
   ...runtimeCssFiles.map(file => `assets/css/${file}`),
   ...runtimeJsFiles.map(sourcePathForRuntime),
+  "assets/css/expense-compact-v15-2-24.css", "assets/js/ui/expense-compact-v15-2-24.js",
   "package.json", "package-lock.json", "README.md", "CHANGELOG.md", ".gitignore",
   ".github/workflows/quality-pages.yml", "vendor/supabase.min.js",
   "sync-config.js", "sync-config.example.js",
@@ -117,12 +118,9 @@ for (const match of worker.matchAll(/asset\("([^"]+)"\)/g)) {
 for (const assetPath of productionAssets) {
   if (!deployedByPages(assetPath)) fail(`GitHub Pages deploy omits production asset: ${assetPath}`);
 }
-if (!deploySources.has("ui-icon-alignment-v15-0-5.css")) fail("GitHub Pages must package ui-icon-alignment-v15-0-5.css");
-if (!deploySources.has("black-canvas-v15-1-0.css")) fail("GitHub Pages must package black-canvas-v15-1-0.css");
-if (!deploySources.has("desktop-ui-phase1-v15-1-0.css")) fail("GitHub Pages must package desktop-ui-phase1-v15-1-0.css");
-if (!deploySources.has("desktop-ux-v15-2-0.css")) fail("GitHub Pages must package desktop-ux-v15-2-0.css");
-if (!deploySources.has("shell-ui-v15-2-11.css")) fail("GitHub Pages must package shell-ui-v15-2-11.css");
-if (!deploySources.has("production-ui-audit-v15-2-13.css")) fail("GitHub Pages must package production-ui-audit-v15-2-13.css");
+for (const file of ["ui-icon-alignment-v15-0-5.css", "black-canvas-v15-1-0.css", "desktop-ui-phase1-v15-1-0.css", "desktop-ux-v15-2-0.css", "shell-ui-v15-2-11.css", "production-ui-audit-v15-2-13.css"]) {
+  if (!deploySources.has(file)) fail(`GitHub Pages must package ${file}`);
+}
 
 let pkg = {}, lock = {}, version = {};
 try { pkg = JSON.parse(read("package.json")); } catch (error) { fail(`package.json is invalid JSON: ${error.message}`); }
@@ -138,9 +136,11 @@ const testTargets = [...String(pkg.scripts?.test || "").matchAll(/\bnode\s+(\S+)
 if (!testTargets.length) fail(`Test script target is missing: ${pkg.scripts?.test || "(not configured)"}`);
 for (const target of testTargets) if (!exists(target)) fail(`Test script target is missing: ${target}`);
 if (!String(pkg.engines?.node || "").includes("22")) warn(`Node engine is ${pkg.engines?.node || "not set"}; project validation expects Node 22+`);
-if (pkg.version !== "15.2.23") fail(`Expected current package version 15.2.19, found ${pkg.version || "(missing)"}`);
-if (!read("README.md").startsWith("# My Finance Records · V15.2.23")) fail("README release heading is not V15.2.23");
-if (!read("CHANGELOG.md").startsWith("## 15.2.23 · 2026-08-21")) fail("CHANGELOG latest entry is not V15.2.23");
+if (pkg.version !== "15.2.24") fail(`Expected current package version 15.2.24, found ${pkg.version || "(missing)"}`);
+if (!read("README.md").startsWith("# My Finance Records · V15.2.24")) fail("README release heading is not V15.2.24");
+if (!read("CHANGELOG.md").startsWith("## 15.2.24 · 2026-08-22")) fail("CHANGELOG latest entry is not V15.2.24");
+if (!html.includes('const APP_VERSION = "15.2.24";')) fail("Prepared index runtime is not V15.2.24");
+if (!worker.includes('const APP_VERSION = "15.2.24";')) fail("Prepared service worker is not V15.2.24");
 
 const syncConfig = read("sync-config.js");
 const syncConfigCode = syncConfig.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|\s)\/\/.*$/gm, "$1");
@@ -172,4 +172,4 @@ console.log(`Repository inspection: ${errors.length} error(s), ${warnings.length
 for (const message of errors) console.error(`ERROR: ${message}`);
 for (const message of warnings) console.warn(`WARN: ${message}`);
 if (errors.length) process.exit(1);
-console.log("Repository inspection passed: V15.2.23 release sources, local paths, deploy paths, package metadata, permissions, and public sync configuration are consistent.");
+console.log("Repository inspection passed: V15.2.24 release sources, local paths, deploy paths, package metadata, permissions, and public sync configuration are consistent.");

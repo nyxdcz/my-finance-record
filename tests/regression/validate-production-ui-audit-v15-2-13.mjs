@@ -3,6 +3,10 @@ import fs from "node:fs";
 
 const read = file => fs.readFileSync(file, "utf8");
 const css = read("assets/css/production-ui-audit-v15-2-13.css");
+const compactCss = read("assets/css/expense-compact-v15-2-24.css");
+const compactJs = read("assets/js/ui/expense-compact-v15-2-24.js");
+const runtimeCss = read("production-ui-audit-v15-2-13.css");
+const runtimePhone = read("phone-finance-compat.js");
 const index = read("index.html");
 const worker = read("sw.js");
 const prepare = read("scripts/prepare-runtime.mjs");
@@ -11,36 +15,55 @@ const browserAudit = read("tests/browser/production-ui-audit-v15-2-13.spec.mjs")
 const version = JSON.parse(read("version.json"));
 const pkg = JSON.parse(read("package.json"));
 
-assert.equal(version.version, "15.2.23");
-assert.equal(pkg.version, "15.2.23");
-assert.equal(version.cacheVersion, "finance-v15-20260821-monthly-repeat-icon-r59");
-assert.match(index, /production-ui-audit-v15-2-13\.css\?v=15\.2\.23-repeat3/);
+assert.equal(version.version, "15.2.24");
+assert.equal(pkg.version, "15.2.24");
+assert.equal(version.schemaVersion, 12);
+assert.equal(version.cloudSchemaVersion, 3);
+assert.equal(version.cacheVersion, "finance-v15-20260822-compact-expense-collapse-r60");
+assert.match(index, /production-ui-audit-v15-2-13\.css\?v=15\.2\.24-compact1/);
 assert.ok(index.indexOf("production-ui-audit-v15-2-13.css") > index.indexOf("desktop-ux-v15-2-0.css"));
-assert.match(worker, /production-ui-audit-v15-2-13\.css\?v=15\.2\.23-repeat3/);
-assert.match(prepare, /production-ui-audit-v15-2-13\.css/);
+assert.match(worker, /production-ui-audit-v15-2-13\.css\?v=15\.2\.24-compact1/);
+assert.match(prepare, /expense-compact-v15-2-24\.css/);
+assert.match(prepare, /expense-compact-v15-2-24\.js/);
+assert.match(runtimeCss, /V15\.2\.24 · Compact Expense Status & Collapse/);
+assert.match(runtimePhone, /installCompactExpenseCardEnhancements/);
 
 assert.match(css, /animation:\s*financeSummaryConfirm 420ms ease-out/);
 assert.doesNotMatch(css, /translateY\s*\(/);
 assert.match(css, /@media \(prefers-reduced-motion: reduce\)/);
-assert.match(css, /height:\s*38px !important/);
 assert.match(css, /min-height:\s*56px !important/);
 assert.match(css, /#money \.section-stack[\s\S]*gap:\s*8px !important/);
-assert.match(css, /#money \.period-card[\s\S]*margin-top:\s*0 !important/);
 assert.match(css, /#money \.period-header \.collapse-toggle[\s\S]*min-width:\s*44px !important/);
-assert.match(css, /border-top:\s*1px solid var\(--line\) !important/);
-assert.match(css, /-webkit-line-clamp:\s*2/);
 assert.match(css, /Finance expense-period cleanup:[\s\S]*#money \.period-card \{[\s\S]*background:\s*var\(--surface\) !important;[\s\S]*border-color:\s*var\(--line\) !important;/);
-assert.match(css, /#money :is\(#earlyExpenses, #lateExpenses, #otherExpenses\) > \.record-row\[data-expense-row\] \+ \.record-row\[data-expense-row\][\s\S]*margin-top:\s*5px !important;/);
 assert.match(index, /data-toggle-saved="\$\{item\.id\}"[^>]*>[\s\S]*class="saved-icon-container"/);
-
-assert.match(css, /V15\.2\.23 · Monthly repeat icon footer[\s\S]*expense-select-footer[\s\S]*bottom:7px !important;[\s\S]*flex:0 0 34px !important;[\s\S]*finance-save-unsaved-v15-2-3-r2\.png[\s\S]*finance-save-saved-v15-2-3-r2\.png[\s\S]*monthly-repeat-label[\s\S]*display:none !important;/);
 assert.match(index, /class="expense-select-footer"><input class="expense-select-checkbox"/);
 assert.match(index, /class="saved-icon-container" aria-hidden="true">[\s\S]*class="monthly-repeat-label">\$\{item\.recurring === "Monthly" \? "Repeats monthly" : "Repeat monthly"\}<\/span>/);
+
+assert.match(compactCss, /\.period-header h3[\s\S]*font-size:\s*15px !important;[\s\S]*font-weight:\s*700 !important/);
+assert.match(compactCss, /\.period-header p[\s\S]*font-size:\s*10px !important;[\s\S]*font-weight:\s*400 !important/);
+assert.match(compactCss, /\.period-card \.period-header \.collapse-toggle[\s\S]*width:\s*20px !important;[\s\S]*height:\s*20px !important/);
+assert.match(compactCss, /\.collapse-icon[\s\S]*width:\s*16px !important;[\s\S]*height:\s*16px !important/);
+assert.match(compactCss, /\.due-cell::before[\s\S]*content:\s*none !important;[\s\S]*display:\s*none !important/);
+assert.match(compactCss, /\.record-statuses > \.expense-inline-due-warning[\s\S]*font-size:\s*10px !important;[\s\S]*font-weight:\s*700 !important/);
+assert.match(compactCss, /\[data-toggle-saved\][\s\S]*width:\s*30px !important;[\s\S]*height:\s*30px !important/);
+assert.match(compactCss, /finance-save-unsaved-v15-2-3-r2\.png/);
+assert.match(compactCss, /finance-save-saved-v15-2-3-r2\.png/);
+assert.match(compactCss, /\[data-mark-paid\][\s\S]*width:\s*74px !important;[\s\S]*height:\s*30px !important;[\s\S]*background:\s*#173A63 !important/);
+assert.match(compactCss, /\[data-edit-expense\][\s\S]*width:\s*48px !important;[\s\S]*height:\s*30px !important;[\s\S]*border:\s*1px solid #D5DCE5 !important/);
+assert.match(compactCss, /expense-select-footer[\s\S]*left:\s*7px !important;[\s\S]*bottom:\s*7px !important;[\s\S]*width:\s*18px !important/);
+assert.match(compactJs, /statuses\.insertBefore\(warning/);
+assert.match(compactJs, /ensureCollapseChanged/);
+assert.match(compactJs, /toggleCollapsibleSection/);
+
 assert.match(desktopUx, /--budget-disclosure-reference-size/);
 assert.match(desktopUx, /#dashCashFlowChart \.cash-flow-chart-grid/);
 assert.match(browserAudit, /navigator\.serviceWorker\?\.controller\?\.scriptURL/);
 assert.match(browserAudit, /finance-signed-in/);
 assert.match(browserAudit, /window\.goToPage\("money"/);
 assert.match(browserAudit, /summaries:8, periods:3/);
+assert.match(browserAudit, /collapse independently and restore their cards/);
+assert.match(browserAudit, /toBeCloseTo\(20, 0\)/);
+assert.match(browserAudit, /toBeCloseTo\(74, 0\)/);
+assert.match(browserAudit, /toBeCloseTo\(48, 0\)/);
 
-console.log("V15.2.23 production UI/UX audit source contract passed.");
+console.log("V15.2.24 production UI/UX audit source contract passed with compact expense status and independent collapse coverage.");

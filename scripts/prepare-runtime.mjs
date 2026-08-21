@@ -5,6 +5,18 @@ import { fileURLToPath } from "node:url";
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, "..");
 
+const RELEASE = Object.freeze({
+  version:"15.2.24",
+  displayVersion:"V15.2.24",
+  name:"Compact Expense Status & Collapse",
+  date:"August 22, 2026",
+  dateIso:"2026-08-22",
+  cache:"finance-v15-20260822-compact-expense-collapse-r60",
+  cssQuery:"15.2.24-compact1",
+  pwaQuery:"15.2.24-release1",
+  phoneQuery:"15.2.24-compact1"
+});
+
 const runtimeGroups = {
   "assets/css": [
     "account-ledger.css",
@@ -58,18 +70,93 @@ const runtimeGroups = {
   ]
 };
 
-let copied = 0;
+let changed = 0;
+const writeIfChanged = (target, content) => {
+  const next = Buffer.isBuffer(content) ? content : Buffer.from(content);
+  if (fs.existsSync(target) && Buffer.compare(next, fs.readFileSync(target)) === 0) return false;
+  fs.writeFileSync(target, next);
+  changed += 1;
+  return true;
+};
+
 for (const [sourceDirectory, files] of Object.entries(runtimeGroups)) {
   for (const file of files) {
     const source = path.join(root, sourceDirectory, file);
     const target = path.join(root, file);
     if (!fs.existsSync(source)) throw new Error(`Missing runtime source: ${path.relative(root, source)}`);
-    const sourceBytes = fs.readFileSync(source);
-    const targetMatches = fs.existsSync(target) && Buffer.compare(sourceBytes, fs.readFileSync(target)) === 0;
-    if (targetMatches) continue;
-    fs.writeFileSync(target, sourceBytes);
-    copied += 1;
+    writeIfChanged(target, fs.readFileSync(source));
   }
 }
 
-console.log(`Runtime compatibility files ready${copied ? ` · refreshed ${copied}` : ""}.`);
+function appendRuntimeOverlay(targetFile, overlayFile, marker) {
+  const target = path.join(root, targetFile);
+  const overlay = path.join(root, overlayFile);
+  if (!fs.existsSync(target)) throw new Error(`Missing runtime target: ${targetFile}`);
+  if (!fs.existsSync(overlay)) throw new Error(`Missing runtime overlay: ${overlayFile}`);
+  const base = fs.readFileSync(target, "utf8").replace(new RegExp(`\\n?${marker}[\\s\\S]*$`), "").trimEnd();
+  const overlayText = fs.readFileSync(overlay, "utf8").trim();
+  writeIfChanged(target, `${base}\n\n${marker}\n${overlayText}\n`);
+}
+
+appendRuntimeOverlay(
+  "production-ui-audit-v15-2-13.css",
+  "assets/css/expense-compact-v15-2-24.css",
+  "/* V15.2.24 RUNTIME OVERLAY */"
+);
+appendRuntimeOverlay(
+  "phone-finance-compat.js",
+  "assets/js/ui/expense-compact-v15-2-24.js",
+  "/* V15.2.24 RUNTIME OVERLAY */"
+);
+
+function patchTextFile(file, transform) {
+  const target = path.join(root, file);
+  if (!fs.existsSync(target)) throw new Error(`Missing release file: ${file}`);
+  const current = fs.readFileSync(target, "utf8");
+  writeIfChanged(target, transform(current));
+}
+
+patchTextFile("index.html", source => {
+  let next = source
+    .replace(/<title>My Finance Records · V\d+\.\d+\.\d+<\/title>/, `<title>My Finance Records · ${RELEASE.displayVersion}</title>`)
+    .replace(/const APP_VERSION = "\d+\.\d+\.\d+";/, `const APP_VERSION = "${RELEASE.version}";`)
+    .replace(/const APP_RELEASE_NAME = "[^"]+";/, `const APP_RELEASE_NAME = "${RELEASE.name}";`)
+    .replace(/const APP_RELEASE_DATE = "[^"]+";/, `const APP_RELEASE_DATE = "${RELEASE.date}";`)
+    .replace(/const APP_CACHE_VERSION = "finance-v15-[^"]+";/, `const APP_CACHE_VERSION = "${RELEASE.cache}";`)
+    .replace(/production-ui-audit-v15-2-13\.css\?v=[^"]+/, `production-ui-audit-v15-2-13.css?v=${RELEASE.cssQuery}`)
+    .replace(/pwa-update-v15-0-5\.js\?v=[^"]+/, `pwa-update-v15-0-5.js?v=${RELEASE.pwaQuery}`)
+    .replace(/phone-finance-compat\.js\?v=[^"]+/, `phone-finance-compat.js?v=${RELEASE.phoneQuery}`);
+
+  if (!next.includes(`"version":"${RELEASE.displayVersion}"`)) {
+    const historyEntry = `    VERSION_HISTORY.unshift({"version":"${RELEASE.displayVersion}","title":"${RELEASE.name}","changes":["Compacts desktop expense cards to the approved 15px/13px/10px type rhythm and exact 20px section disclosure controls.","Moves active due warnings beside Unpaid, removes standalone Deadline/Expense prefixes, and keeps date details compact below the status row.","Uses the existing 30px monthly-repeat artwork followed by 74×30 Mark paid and 48×30 Edit controls, preserves the 18px checkbox at 7px left/bottom, and keeps independent section collapse behavior with phone and coarse-pointer tablet layouts unchanged."]});\n`;
+    next = next.replace(/(\n\s*function normalizeSettingsPanelKey\()/, `\n${historyEntry}$1`);
+  }
+  return next;
+});
+
+patchTextFile("sw.js", source => source
+  .replace(/const APP_VERSION = "\d+\.\d+\.\d+";/, `const APP_VERSION = "${RELEASE.version}";`)
+  .replace(/const CACHE_VERSION = "finance-v15-[^"]+";/, `const CACHE_VERSION = "${RELEASE.cache}";`)
+  .replace(/production-ui-audit-v15-2-13\.css\?v=[^"]+/, `production-ui-audit-v15-2-13.css?v=${RELEASE.cssQuery}`)
+  .replace(/pwa-update-v15-0-5\.js\?v=[^"]+/, `pwa-update-v15-0-5.js?v=${RELEASE.pwaQuery}`)
+  .replace(/phone-finance-compat\.js\?v=[^"]+/, `phone-finance-compat.js?v=${RELEASE.phoneQuery}`));
+
+const lockPath = path.join(root, "package-lock.json");
+if (fs.existsSync(lockPath)) {
+  const lock = JSON.parse(fs.readFileSync(lockPath, "utf8"));
+  lock.version = RELEASE.version;
+  if (lock.packages?.[""]) lock.packages[""].version = RELEASE.version;
+  writeIfChanged(lockPath, `${JSON.stringify(lock, null, 2)}\n`);
+}
+
+const changelogPath = path.join(root, "CHANGELOG.md");
+if (fs.existsSync(changelogPath)) {
+  const changelog = fs.readFileSync(changelogPath, "utf8");
+  const heading = `## ${RELEASE.version} · ${RELEASE.dateIso}`;
+  if (!changelog.startsWith(heading)) {
+    const entry = `${heading}\n\n### Compact expense status and collapse\n\n- Compacts the three desktop expense columns to the approved typography, spacing, and 20×20 collapse control geometry.\n- Removes the standalone Deadline/Expense prefix and places active Past due/Due soon status directly beside Unpaid while keeping the date detail available below.\n- Sets the desktop footer to the approved 30×30 Repeat, 74×30 Mark paid, and 48×30 Edit controls with 5px gaps and the 18×18 selection checkbox at 7px left/bottom.\n- Preserves independent First half, Second half, and Other expenses collapse behavior, phone/coarse-pointer touch layouts, Finance Schema 12, Cloud Schema V3, recurrence, payments, calculations, and sync behavior.\n\n`;
+    writeIfChanged(changelogPath, `${entry}${changelog}`);
+  }
+}
+
+console.log(`Runtime compatibility files ready for ${RELEASE.displayVersion}${changed ? ` · refreshed ${changed}` : ""}.`);
