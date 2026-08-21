@@ -16,8 +16,7 @@ const version = JSON.parse(read("version.json"));
 if (!html.includes('href="./desktop-ui-phase1-v15-1-0.css?v=15.1.0-phase1"')) fail("Production HTML does not load the desktop Phase 1 stylesheet.");
 if (!worker.includes('asset("./desktop-ui-phase1-v15-1-0.css?v=15.1.0-phase1")')) fail("Service worker does not precache the desktop Phase 1 stylesheet.");
 if (!workflow.includes("desktop-ui-phase1-v15-1-0.css")) fail("GitHub Pages packaging omits the desktop Phase 1 stylesheet.");
-if (version.cacheVersion !== "finance-v15-20260822-compact-expense-collapse-r60") fail(`Unexpected cache version: ${version.cacheVersion}`);
-if (!worker.includes('const CACHE_VERSION = "finance-v15-20260822-compact-expense-collapse-r60";')) fail("Service worker cache version is not the V15.2.24 compact expense status cache.");
+if (!worker.includes(`const CACHE_VERSION = "${version.cacheVersion}";`)) fail(`Service worker cache version does not match version.json: ${version.cacheVersion}`);
 
 for (const token of [
   '#income > .page-heading',
@@ -38,7 +37,7 @@ if (/max-width\s*:\s*700px/.test(css)) fail("Desktop Phase 1 stylesheet must not
 if (!/#availableMoneySection\s*\{[\s\S]*?border-color\s*:\s*var\(--line\)\s*;[\s\S]*?\}/.test(css)) fail("Available money outer section must use the standard neutral line border.");
 if (/border-color\s*:\s*color-mix\(in srgb,var\(--green\) 22%,var\(--line\)\)/.test(css)) fail("Available money outer section must not retain the green-tinted desktop border.");
 
-if (!html.includes('id="settingsOverviewAppStatus">Version 15.2.2</strong>')) fail("Settings overview starts with a stale app version.");
+if (!html.includes('id="settingsOverviewAppStatus">Version 15.2.2</strong>')) fail("Settings overview source baseline changed unexpectedly; runtime release synchronization owns the current displayed version.");
 if (!html.includes('class="paid-expenses-info-note"')) fail("Paid Expenses contextual behavior note is missing.");
 if (!html.includes('class="advanced-settings-disclosure"')) fail("Advanced cloud connection disclosure is missing.");
 if (!html.includes('id="reportExportMenuPanel" role="menu"')) fail("Report export menu panel is missing.");
@@ -48,4 +47,4 @@ for (const id of ["exportMonthlyReportCsv","exportMonthlyReportJson","exportInco
   if ((html.match(new RegExp(`id=\\"${id}\\"`, "g")) || []).length !== 1) fail(`${id} must remain unique after export-menu consolidation.`);
 }
 
-console.log("Desktop UI Phase 1 validation passed under V15.2.24: neutral Available money section border, desktop hierarchy, compact Income, report export menu, calendar states, Settings disclosure, contextual Paid note, deployment packaging, and preserved phone-Finance/cloud-profile delivery are source-aligned.");
+console.log(`Desktop UI Phase 1 validation passed under V${version.version}: neutral Available money section border, desktop hierarchy, compact Income, report export menu, calendar states, Settings disclosure, contextual Paid note, deployment packaging, and preserved phone-Finance/cloud-profile delivery are source-aligned.`);
