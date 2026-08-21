@@ -35,11 +35,13 @@ async function panelState(page) {
   return page.evaluate(() => {
     const panel = document.getElementById("kanbanViewportPanel");
     const rect = panel.getBoundingClientRect();
+    const paintedNode = panel.hidden ? null : document.elementFromPoint(Math.min(rect.right - 2, rect.left + 12), Math.min(rect.bottom - 2, rect.top + 12));
     return {
       hidden:panel.hidden,
       expanded:document.getElementById("kanbanViewportTrigger").getAttribute("aria-expanded"),
       position:getComputedStyle(panel).position,
       placement:panel.dataset.viewportPlacement || "",
+      painted:Boolean(paintedNode && (paintedNode === panel || panel.contains(paintedNode))),
       left:rect.left,
       right:rect.right,
       top:rect.top,
@@ -52,18 +54,19 @@ async function panelState(page) {
   });
 }
 
-test("Kanban menu compatibility is shipped through the network-first updater and runtime preparation", () => {
+test("Kanban menu positioning is owned by Header Tools and receives a one-time PWA cache refresh", () => {
   const updater = fs.readFileSync("assets/js/pwa-update-v15-0-5.js", "utf8");
-  const runtime = fs.readFileSync("scripts/prepare-runtime.mjs", "utf8");
-  const compat = fs.readFileSync("assets/js/ui/kanban-menu-compat.js", "utf8");
-  expect(updater).toContain("kanban-menu-compat.js?v=15.2.18-kanban-menu1");
-  expect(runtime).toContain('"kanban-menu-compat.js"');
-  expect(compat).toContain('panel.style.setProperty("position", "fixed", "important")');
-  expect(compat).toContain("spaceAbove > spaceBelow");
-  expect(compat).toContain('root.addEventListener("resize", scheduleSync)');
+  const headerTools = fs.readFileSync("assets/js/ui/header-tools-compat.js", "utf8");
+  expect(updater).toContain("refreshCachedHeaderToolsOnce");
+  expect(updater).toContain('/header-tools-compat.js');
+  expect(updater).not.toContain("installKanbanColumnMenuViewportPositioning");
+  expect(headerTools).toContain("installKanbanColumnMenuViewportPositioning");
+  expect(headerTools).toContain('panel.style.setProperty("position", "fixed", "important")');
+  expect(headerTools).toContain("spaceAbove > spaceBelow");
+  expect(headerTools).toContain('root.addEventListener("resize", scheduleSync)');
 });
 
-test("desktop Kanban column menu flips above, stays inside the viewport, and keeps keyboard behavior", async ({ page }) => {
+test("desktop Kanban column menu flips above, escapes board clipping, and keeps keyboard behavior", async ({ page }) => {
   await page.setViewportSize({ width:1280, height:720 });
   await page.goto("http://127.0.0.1:3000/index.html?page=projects", { waitUntil:"networkidle" });
   await unlock(page, "kanban-menu-desktop@example.invalid");
@@ -71,7 +74,7 @@ test("desktop Kanban column menu flips above, stays inside the viewport, and kee
   await installFixture(page, { top:642, right:8, width:330, panelWidth:240, scrollLeft:570 });
 
   await page.locator("#kanbanViewportTrigger").click();
-  await expect.poll(() => panelState(page)).toMatchObject({ hidden:false, expanded:"true", position:"fixed", placement:"above" });
+  await expect.poll(() => panelState(page)).toMatchObject({ hidden:false, expanded:"true", position:"fixed", placement:"above", painted:true });
   const opened = await panelState(page);
   expect(opened.left).toBeGreaterThanOrEqual(7);
   expect(opened.right).toBeLessThanOrEqual(opened.viewportWidth - 7);
@@ -82,13 +85,14 @@ test("desktop Kanban column menu flips above, stays inside the viewport, and kee
   await page.evaluate(() => { document.getElementById("kanbanMenuViewportFixture").scrollLeft = 500; });
   await expect.poll(async () => (await panelState(page)).left).not.toBe(initialLeft);
   const afterScroll = await panelState(page);
+  expect(afterScroll.painted).toBe(true);
   expect(afterScroll.left).toBeGreaterThanOrEqual(7);
   expect(afterScroll.right).toBeLessThanOrEqual(afterScroll.viewportWidth - 7);
 
   await page.setViewportSize({ width:900, height:620 });
   await expect.poll(async () => {
     const state = await panelState(page);
-    return state.right <= state.viewportWidth - 7 && state.bottom <= state.viewportHeight - 7;
+    return state.painted && state.right <= state.viewportWidth - 7 && state.bottom <= state.viewportHeight - 7;
   }).toBe(true);
 
   await page.locator("#kanbanViewportTrigger").focus();
@@ -114,7 +118,7 @@ test("phone Kanban column menu is clamped to both viewport edges and outside cli
   await installFixture(page, { top:150, right:0, width:286, panelWidth:280, scrollLeft:596 });
 
   await page.locator("#kanbanViewportTrigger").click();
-  await expect.poll(() => panelState(page)).toMatchObject({ hidden:false, expanded:"true", position:"fixed", placement:"below" });
+  await expect.poll(() => panelState(page)).toMatchObject({ hidden:false, expanded:"true", position:"fixed", placement:"below", painted:true });
   const opened = await panelState(page);
   expect(opened.left).toBeGreaterThanOrEqual(7);
   expect(opened.right).toBeLessThanOrEqual(opened.viewportWidth - 7);
