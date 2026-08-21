@@ -7,16 +7,22 @@ for (const theme of ["light", "dark"]) {
       <link rel="stylesheet" href="http://127.0.0.1:3000/app.css?v=15.1.0-desktop3">
       <link rel="stylesheet" href="http://127.0.0.1:3000/shell-ui-v15-2-11.css?v=15.2.11-shell1">
       <link rel="stylesheet" href="http://127.0.0.1:3000/black-canvas-v15-1-0.css?v=15.1.0-light1">
+      <link rel="stylesheet" href="http://127.0.0.1:3000/desktop-ui-phase1-v15-1-0.css?v=15.1.0-phase1">
+      <link rel="stylesheet" href="http://127.0.0.1:3000/desktop-ux-v15-2-0.css?v=15.2.5-disclosure1">
+      <link rel="stylesheet" href="http://127.0.0.1:3000/production-ui-audit-v15-2-13.css?v=15.2.14-audit2">
       <style>*,*::before,*::after{animation:none!important;transition:none!important}</style>
     </head><body>
       <button class="button button-paid" id="paid">Mark paid</button>
-      <section id="availableMoneySection">
-        <button class="button button-secondary button-small account-spend-button"><span id="spendLabel">Spend</span></button>
-        <article class="account-card" id="accountCard">
-          <div class="account-card-label"><span id="accountName">UnionBank</span><small id="accountType">Bank</small></div>
-          <strong>₱3,140.00</strong>
-        </article>
-      </section>
+      <main id="money">
+        <section id="availableMoneySection">
+          <button class="button button-secondary button-small account-spend-button"><span id="spendLabel">Spend</span></button>
+          <article class="account-card" id="accountCard">
+            <div class="account-card-main">
+              <div><div class="account-card-label"><span id="accountName">UnionBank</span><small id="accountType">Bank</small></div><strong id="accountAmount">₱3,140.00</strong></div>
+            </div>
+          </article>
+        </section>
+      </main>
     </body></html>`, { waitUntil:"load" });
 
     const expectedBg = theme === "light" ? "#efefef" : "#000000";
@@ -35,7 +41,8 @@ for (const theme of ["light", "dark"]) {
         spendColor:getComputedStyle(document.querySelector("#spendLabel")).color,
         accountBorder:getComputedStyle(document.querySelector("#accountCard")).borderTopColor,
         accountNameColor:getComputedStyle(document.querySelector("#accountName")).color,
-        accountTypeColor:getComputedStyle(document.querySelector("#accountType")).color
+        accountTypeColor:getComputedStyle(document.querySelector("#accountType")).color,
+        accountAmountColor:getComputedStyle(document.querySelector("#accountAmount")).color
       };
     });
 
@@ -46,8 +53,8 @@ for (const theme of ["light", "dark"]) {
       expect(result.paidBg).toBe("rgb(23, 59, 103)");
       expect(result.paidBorder).toBe("rgb(23, 59, 103)");
       expect(result.accountBorder).not.toBe("rgba(207, 231, 213, 0.24)");
-      expect(result.accountNameColor).toBe("rgb(24, 34, 48)");
-      expect(result.accountTypeColor).toBe("rgb(102, 112, 133)");
+      expect(result.accountNameColor).toBe(result.accountAmountColor);
+      expect(result.accountTypeColor).toBe(result.accountAmountColor);
     } else {
       expect(result.bg).toBe("#000000");
       expect(result.primary).toBe("#173e76");

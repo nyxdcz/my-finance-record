@@ -3,7 +3,7 @@
   const FINANCE_CACHE_PATTERN = /^finance-v\d+-/;
   const LEGACY_INDEX_CACHE = "finance-v15-20260816-mobile-ui-ux-r32";
   const CURRENT_CACHE_VERSION = "finance-v15-20260821-horizontal-kanban-r54";
-  const UI_HOTFIX_REFRESH_KEY = "finance-ui-hotfix-v15-2-18-kanban-menu3-neutral-border1-light-label1";
+  const UI_HOTFIX_REFRESH_KEY = "finance-ui-hotfix-v15-2-18-kanban-menu3-neutral-border1-light-label2";
   const normalizeCacheVersion = cacheVersion => cacheVersion === LEGACY_INDEX_CACHE ? CURRENT_CACHE_VERSION : cacheVersion;
 
   async function refreshCachedHeaderToolsOnce() {

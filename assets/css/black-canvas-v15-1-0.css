@@ -83,11 +83,9 @@ html[data-theme="dark"] #availableMoneySection .account-spend-button span {
 }
 
 /* V15.2.18 Available money light-mode account-label contrast hotfix. */
-html[data-theme="light"] #availableMoneySection .account-card-label span {
+html[data-theme="light"] body #money #availableMoneySection .account-card .account-card-main .account-card-label span,
+html[data-theme="light"] body #money #availableMoneySection .account-card .account-card-main .account-card-label small {
   color:var(--text) !important;
-}
-html[data-theme="light"] #availableMoneySection .account-card-label small {
-  color:var(--muted) !important;
 }
 
 /* V15.1.0 Available money account-border softening. */
