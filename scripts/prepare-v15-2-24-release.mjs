@@ -5,12 +5,13 @@ import { fileURLToPath } from "node:url";
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, "..");
 
+/* Legacy filename retained so existing automation paths remain stable. */
 const RELEASE = Object.freeze({
-  version:"15.2.24",
-  name:"Compact Expense Status & Collapse",
+  version:"2.0.0",
+  name:"Organized Complete",
   date:"August 22, 2026",
   dateIso:"2026-08-22",
-  syncQuery:"15.2.24-release1"
+  syncQuery:"2.0.0-release1"
 });
 
 let changed = 0;
@@ -34,4 +35,4 @@ for (const file of ["index.html", "sw.js"]) {
   patch(file, source => source.replace(/sync-runtime-compat\.js\?v=[^"]+/, `sync-runtime-compat.js?v=${RELEASE.syncQuery}`));
 }
 
-console.log(`V15.2.24 release override ready${changed ? ` · refreshed ${changed}` : ""}.`);
+console.log(`V2.0.0 release override ready${changed ? ` · refreshed ${changed}` : ""}.`);
