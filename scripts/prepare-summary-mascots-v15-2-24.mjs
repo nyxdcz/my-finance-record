@@ -76,8 +76,8 @@ patch("sw.js", source => {
   }
   if (!next.includes(mascotEntries[0])) {
     next = next.replace(
-      new RegExp(`(\\s+${jsEntry.replace(/[.*+?^${}()|[\\]\\]/g, "\\$&")})`),
-      `$1\n  ${mascotEntries.join("\n  ")}`
+      `  ${jsEntry}`,
+      `  ${jsEntry}\n  ${mascotEntries.join("\n  ")}`
     );
   }
   return next;
