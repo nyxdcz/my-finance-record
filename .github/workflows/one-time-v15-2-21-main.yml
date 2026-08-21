@@ -55,6 +55,7 @@ jobs:
           set -o pipefail
           {
             node /tmp/v15-2-21-repair.cjs
+            node -e 'const fs=require("node:fs"); const s=fs.readFileSync("CHANGELOG.md","utf8"); console.log("CHANGELOG_HEAD", JSON.stringify(s.slice(0,100))); console.log("CHANGELOG_MATCH", s.startsWith("## 15.2.21 · 2026-08-21"));'
             git diff --check
             git diff --stat
           } 2>&1 | tee /tmp/v15-apply.log
