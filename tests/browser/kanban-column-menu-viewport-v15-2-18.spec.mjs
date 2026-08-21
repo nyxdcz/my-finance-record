@@ -34,14 +34,19 @@ async function installFixture(page, { top, right, width, panelWidth, scrollLeft 
 async function panelState(page) {
   return page.evaluate(() => {
     const panel = document.getElementById("kanbanViewportPanel");
+    const menu = panel.closest(".kanban-column-menu");
     const rect = panel.getBoundingClientRect();
     const paintedNode = panel.hidden ? null : document.elementFromPoint(Math.min(rect.right - 2, rect.left + 12), Math.min(rect.bottom - 2, rect.top + 12));
+    const menuStyle = getComputedStyle(menu);
     return {
       hidden:panel.hidden,
       expanded:document.getElementById("kanbanViewportTrigger").getAttribute("aria-expanded"),
       position:getComputedStyle(panel).position,
       placement:panel.dataset.viewportPlacement || "",
       painted:Boolean(paintedNode && (paintedNode === panel || panel.contains(paintedNode))),
+      portaled:menu.parentElement === document.body && menu.dataset.viewportPortal === "true",
+      backdropFilter:menuStyle.backdropFilter,
+      overflow:menuStyle.overflow,
       left:rect.left,
       right:rect.right,
       top:rect.top,
@@ -59,9 +64,12 @@ test("Kanban menu positioning is owned by Header Tools and receives a one-time P
   const headerTools = fs.readFileSync("assets/js/ui/header-tools-compat.js", "utf8");
   expect(updater).toContain("refreshCachedHeaderToolsOnce");
   expect(updater).toContain('/header-tools-compat.js');
+  expect(updater).toContain("kanban-menu3");
   expect(updater).not.toContain("installKanbanColumnMenuViewportPositioning");
   expect(headerTools).toContain("installKanbanColumnMenuViewportPositioning");
   expect(headerTools).toContain('panel.style.setProperty("position", "fixed", "important")');
+  expect(headerTools).toContain('menu.style.setProperty("backdrop-filter", "none", "important")');
+  expect(headerTools).toContain('menu.style.setProperty("overflow", "visible", "important")');
   expect(headerTools).toContain("spaceAbove > spaceBelow");
   expect(headerTools).toContain('root.addEventListener("resize", scheduleSync)');
 });
@@ -74,7 +82,7 @@ test("desktop Kanban column menu flips above, escapes board clipping, and keeps 
   await installFixture(page, { top:642, right:8, width:330, panelWidth:240, scrollLeft:570 });
 
   await page.locator("#kanbanViewportTrigger").click();
-  await expect.poll(() => panelState(page)).toMatchObject({ hidden:false, expanded:"true", position:"fixed", placement:"above", painted:true });
+  await expect.poll(() => panelState(page)).toMatchObject({ hidden:false, expanded:"true", position:"fixed", placement:"above", painted:true, portaled:true, backdropFilter:"none", overflow:"visible" });
   const opened = await panelState(page);
   expect(opened.left).toBeGreaterThanOrEqual(7);
   expect(opened.right).toBeLessThanOrEqual(opened.viewportWidth - 7);
@@ -86,13 +94,14 @@ test("desktop Kanban column menu flips above, escapes board clipping, and keeps 
   await expect.poll(async () => (await panelState(page)).left).not.toBe(initialLeft);
   const afterScroll = await panelState(page);
   expect(afterScroll.painted).toBe(true);
+  expect(afterScroll.portaled).toBe(true);
   expect(afterScroll.left).toBeGreaterThanOrEqual(7);
   expect(afterScroll.right).toBeLessThanOrEqual(afterScroll.viewportWidth - 7);
 
   await page.setViewportSize({ width:900, height:620 });
   await expect.poll(async () => {
     const state = await panelState(page);
-    return state.painted && state.right <= state.viewportWidth - 7 && state.bottom <= state.viewportHeight - 7;
+    return state.painted && state.portaled && state.backdropFilter === "none" && state.right <= state.viewportWidth - 7 && state.bottom <= state.viewportHeight - 7;
   }).toBe(true);
 
   await page.locator("#kanbanViewportTrigger").focus();
@@ -118,7 +127,7 @@ test("phone Kanban column menu is clamped to both viewport edges and outside cli
   await installFixture(page, { top:150, right:0, width:286, panelWidth:280, scrollLeft:596 });
 
   await page.locator("#kanbanViewportTrigger").click();
-  await expect.poll(() => panelState(page)).toMatchObject({ hidden:false, expanded:"true", position:"fixed", placement:"below", painted:true });
+  await expect.poll(() => panelState(page)).toMatchObject({ hidden:false, expanded:"true", position:"fixed", placement:"below", painted:true, portaled:true, backdropFilter:"none", overflow:"visible" });
   const opened = await panelState(page);
   expect(opened.left).toBeGreaterThanOrEqual(7);
   expect(opened.right).toBeLessThanOrEqual(opened.viewportWidth - 7);
