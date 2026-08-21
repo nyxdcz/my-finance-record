@@ -20,8 +20,14 @@ jobs:
           ref: main
           fetch-depth: 0
 
+      - name: Prepare runtime compatibility input
+        run: cp assets/js/pwa-update-v15-0-5.js pwa-update-v15-0-5.js
+
       - name: Apply approved V15.2.19 release
         run: python scripts/finalize-v15-2-19.py
+
+      - name: Remove generated runtime compatibility copies
+        run: rm -f pwa-update-v15-0-5.js brand-icons-v15-2-18.js production-ui-audit-v15-2-13.css
 
       - name: Verify generated diff
         run: git diff --check
