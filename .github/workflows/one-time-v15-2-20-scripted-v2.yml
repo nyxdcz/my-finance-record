@@ -65,7 +65,30 @@ jobs:
               .replaceAll('V15.2.19 release preserves', 'V15.2.20 release preserves');
             if (next !== source) fs.writeFileSync(file, next);
           }
-          console.log('Aligned embedded current-release heading/title expectations to V15.2.20.');
+
+          const pwaFile = 'tests/browser/pwa-upgrade-v15-0-5.spec.mjs';
+          let pwa = fs.readFileSync(pwaFile, 'utf8');
+          pwa = pwa
+            .replaceAll('V15.2.19 registers the cache-qualified worker', 'V15.2.20 registers the cache-qualified worker')
+            .replaceAll('"v=15.2.19"', '"v=15.2.20"');
+          fs.writeFileSync(pwaFile, pwa);
+
+          const syncFile = 'tests/sync/sync-status-v15-2-3.spec.mjs';
+          let sync = fs.readFileSync(syncFile, 'utf8');
+          sync = sync
+            .replaceAll('V15.2.18 release metadata is visible', 'V15.2.20 release metadata is visible')
+            .replaceAll('toContainText("V15.2.18")', 'toContainText("V15.2.20")');
+          fs.writeFileSync(syncFile, sync);
+
+          const cssFile = 'assets/css/production-ui-audit-v15-2-13.css';
+          let css = fs.readFileSync(cssFile, 'utf8');
+          const summaryMarker = 'V15.2.20 · 1440px Budget summary compaction';
+          if (!css.includes(summaryMarker)) {
+            css += `\n\n/* ${summaryMarker}: prevent the eight Finance summary cards from growing beyond the compact desktop contract at the 1440px breakpoint. */\n@media (min-width: 1401px) and (max-width: 1440px) {\n  html body #money :is(.legend-text small, .summary-card-copy small) {\n    display: none !important;\n  }\n\n  html body #money :is(.legend-text strong, .summary-card-label) {\n    display: block !important;\n    overflow: hidden !important;\n    white-space: nowrap !important;\n    text-overflow: ellipsis !important;\n  }\n\n  html body #money :is(.legend-item, .summary-item) {\n    box-sizing: border-box !important;\n    height: 56px !important;\n    min-height: 56px !important;\n    max-height: 56px !important;\n    overflow: hidden !important;\n  }\n}\n`;
+            fs.writeFileSync(cssFile, css);
+          }
+
+          console.log('Aligned current-release browser assertions and compacted 1440px Budget summaries for V15.2.20.');
           NODE
           {
             echo "--- changelog ---"
@@ -74,6 +97,12 @@ jobs:
             grep -n "15.2.20" tests/helpers/inspect-project.mjs | tail -8 || true
             echo "--- desktop UX release checks ---"
             grep -n "15.2.20" tests/regression/validate-v15-2-0-desktop-ux.mjs | head -15 || true
+            echo "--- PWA browser release check ---"
+            grep -n "v=15.2.20\|cache-qualified worker" tests/browser/pwa-upgrade-v15-0-5.spec.mjs || true
+            echo "--- sync badge release check ---"
+            grep -n "release metadata\|buildBadge" tests/sync/sync-status-v15-2-3.spec.mjs | tail -6 || true
+            echo "--- summary compaction ---"
+            grep -n "1440px Budget summary compaction" assets/css/production-ui-audit-v15-2-13.css || true
             echo "--- diff ---"
             git diff --stat
           } | tee /tmp/v15-diff.log
