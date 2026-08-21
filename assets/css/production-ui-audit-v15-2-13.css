@@ -342,3 +342,241 @@
     margin-top: 5px !important;
   }
 }
+
+/* V15.2.19 · Expense card-list columns, matching the Project Agenda card rhythm. */
+@media (min-width: 851px) {
+  html body #money .section-stack {
+    align-items: start !important;
+    gap: 10px !important;
+  }
+
+  html body #money .period-card {
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 8px !important;
+    overflow: visible !important;
+    border: 1px solid var(--line) !important;
+    border-top-width: 3px !important;
+    border-radius: 9px !important;
+    box-shadow: none !important;
+  }
+
+  html body #money .period-card.period-early {
+    border-top-color: var(--red) !important;
+    background: color-mix(in srgb, var(--red-soft) 28%, var(--surface-soft)) !important;
+  }
+
+  html body #money .period-card.period-late {
+    border-top-color: var(--orange) !important;
+    background: color-mix(in srgb, var(--orange-soft) 30%, var(--surface-soft)) !important;
+  }
+
+  html body #money .period-card.period-other {
+    border-top-color: var(--blue) !important;
+    background: color-mix(in srgb, var(--blue-soft) 30%, var(--surface-soft)) !important;
+  }
+
+  html body #money .period-header {
+    min-height: 58px !important;
+    margin: 0 !important;
+    padding: 6px 6px 9px !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+  }
+
+  html body #money .period-header h3 {
+    font-size: .9rem !important;
+  }
+
+  html body #money .period-header p {
+    margin-top: 3px !important;
+    font-size: .66rem !important;
+  }
+
+  html body #money .period-total {
+    font-size: .92rem !important;
+  }
+
+  html body #money .record-header {
+    display: none !important;
+  }
+
+  html body #money :is(#earlyExpenses, #lateExpenses, #otherExpenses) {
+    display: grid !important;
+    align-content: start !important;
+    gap: 5px !important;
+    padding: 0 !important;
+    background: transparent !important;
+  }
+
+  html body #money :is(#earlyExpenses, #lateExpenses, #otherExpenses) > .record-row[data-expense-row],
+  html body #money :is(#earlyExpenses, #lateExpenses, #otherExpenses) > .record-row[data-expense-row] + .record-row[data-expense-row] {
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 10px !important;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    gap: 6px 10px !important;
+    align-items: center !important;
+    border: 1px solid var(--line) !important;
+    border-left-width: 3px !important;
+    border-radius: 8px !important;
+    background: var(--surface) !important;
+    box-shadow: 0 2px 8px rgb(0 0 0 / .06) !important;
+  }
+
+  html body #money .period-early .record-row[data-expense-row] { border-left-color: var(--red) !important; }
+  html body #money .period-late .record-row[data-expense-row] { border-left-color: var(--orange) !important; }
+  html body #money .period-other .record-row[data-expense-row] { border-left-color: var(--blue) !important; }
+
+  html body #money .record-row[data-expense-row] > .expense-record-title {
+    grid-column: 1 / -1 !important;
+    min-width: 0 !important;
+  }
+
+  html body #money .record-row[data-expense-row] .expense-record-title .record-title-copy > strong {
+    font-size: .8rem !important;
+    line-height: 1.3 !important;
+  }
+
+  html body #money .record-row[data-expense-row] .expense-record-title .record-title-copy > small {
+    margin-top: 3px !important;
+    font-size: .62rem !important;
+    line-height: 1.35 !important;
+  }
+
+  html body #money .record-row[data-expense-row] .expense-record-title .record-statuses {
+    margin-top: 5px !important;
+    gap: 4px !important;
+  }
+
+  html body #money .record-row[data-expense-row] .expense-record-title .record-statuses > .status-saved {
+    display: none !important;
+  }
+
+  html body #money .record-row[data-expense-row] > .due-cell {
+    grid-column: 1 / -1 !important;
+    display: grid !important;
+    grid-template-columns: auto minmax(0, 1fr) !important;
+    align-items: center !important;
+    justify-content: start !important;
+    gap: 4px 7px !important;
+    padding-top: 1px !important;
+    color: var(--muted) !important;
+    font-size: .61rem !important;
+  }
+
+  html body #money .record-row[data-expense-row] > .due-cell::before {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    color: var(--primary) !important;
+    font-size: .58rem !important;
+    font-weight: 850 !important;
+    letter-spacing: .06em !important;
+    text-transform: uppercase !important;
+  }
+
+  html body #money .period-early .record-row[data-expense-row] > .due-cell::before,
+  html body #money .period-late .record-row[data-expense-row] > .due-cell::before {
+    content: "Deadline";
+  }
+
+  html body #money .period-other .record-row[data-expense-row] > .due-cell::before {
+    content: "Expense";
+  }
+
+  html body #money .record-row[data-expense-row] > .due-cell > span:first-child {
+    grid-column: 1 / -1 !important;
+    grid-row: 2 !important;
+  }
+
+  html body #money .record-row[data-expense-row] > .due-cell > .due-warning {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    justify-self: start !important;
+  }
+
+  html body #money .record-row[data-expense-row] > [data-label="Planned account"] {
+    grid-column: 1 !important;
+    min-width: 0 !important;
+    color: var(--muted) !important;
+    font-size: .62rem !important;
+  }
+
+  html body #money .record-row[data-expense-row] > [data-label="Planned account"]::before {
+    content: "Account · ";
+    color: var(--muted) !important;
+    font-weight: 700 !important;
+  }
+
+  html body #money .record-row[data-expense-row] > .amount {
+    grid-column: 2 !important;
+    justify-self: end !important;
+    font-size: .75rem !important;
+  }
+
+  html body #money .record-row[data-expense-row] > .desktop-record-actions {
+    grid-column: 1 / -1 !important;
+    width: 100% !important;
+    margin-top: 2px !important;
+    padding-top: 8px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 6px !important;
+    border-top: 1px solid var(--line) !important;
+  }
+
+  html body #money .record-row[data-expense-row] > .desktop-record-actions > .button {
+    min-height: 32px !important;
+    height: 32px !important;
+    padding: 5px 8px !important;
+    border-radius: 7px !important;
+    font-size: .67rem !important;
+  }
+
+  html body #money .record-row[data-expense-row] .button-saved .saved-icon-container {
+    display: none !important;
+  }
+
+  html body #money .record-row[data-expense-row] .button-saved .saved-button-text {
+    font-size: 0 !important;
+  }
+
+  html body #money .record-row[data-expense-row] .button-saved .saved-button-text::after {
+    content: "Repeat monthly";
+    font-size: .67rem !important;
+  }
+
+  html body #money .record-row[data-expense-row] .button-saved.active .saved-button-text::after {
+    content: "Repeats monthly";
+  }
+
+  html body #money .record-row[data-expense-row] > .mobile-record-actions {
+    display: none !important;
+  }
+}
+
+@media (min-width: 1100px) {
+  html body #money .section-stack {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (min-width: 851px) and (max-width: 1099px) {
+  html body #money .section-stack {
+    display: flex !important;
+    overflow-x: auto !important;
+    overscroll-behavior-inline: contain !important;
+    scrollbar-gutter: stable !important;
+    scroll-snap-type: inline proximity !important;
+    padding-bottom: 4px !important;
+  }
+
+  html body #money .section-stack > .period-card {
+    flex: 0 0 340px !important;
+    scroll-snap-align: start !important;
+  }
+}
