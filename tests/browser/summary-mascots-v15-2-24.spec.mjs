@@ -57,6 +57,8 @@ test("desktop Budget & Expenses uses the approved supplied mascots and exact spa
     const header = firstSection.querySelector(".period-header").getBoundingClientRect();
     const lowerMascot = document.getElementById("earlyTotal").getBoundingClientRect();
     const collapse = firstSection.querySelector(".collapse-toggle").getBoundingClientRect();
+    const mascotCenter = (lowerMascot.top + lowerMascot.bottom) / 2;
+    const collapseCenter = (collapse.top + collapse.bottom) / 2;
 
     return {
       slots:{
@@ -71,7 +73,7 @@ test("desktop Budget & Expenses uses the approved supplied mascots and exact spa
       topRightInset:topCard.right - topBox.right,
       lower:{
         mascotGap:collapse.left - lowerMascot.right,
-        centerDelta:Math.abs(((collapse.top + collapse.bottom) / 2) - ((lowerMascot.top + lowerMascot.bottom) / 2)),
+        mascotLift:collapseCenter - mascotCenter,
         collapseWidth:collapse.width,
         collapseHeight:collapse.height,
         collapseRightInset:header.right - collapse.right
@@ -102,7 +104,7 @@ test("desktop Budget & Expenses uses the approved supplied mascots and exact spa
   expect(state.legacySmileDisplay).toBe("none");
   expect(state.topRightInset).toBeCloseTo(20, 0);
   expect(state.lower.mascotGap).toBeCloseTo(10, 0);
-  expect(state.lower.centerDelta).toBeLessThanOrEqual(0.5);
+  expect(state.lower.mascotLift).toBeCloseTo(3, 0);
   expect(state.lower.collapseWidth).toBeCloseTo(20, 0);
   expect(state.lower.collapseHeight).toBeCloseTo(20, 0);
   expect(state.lower.collapseRightInset).toBeCloseTo(10, 0);
