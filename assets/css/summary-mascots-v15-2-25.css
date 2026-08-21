@@ -1,6 +1,6 @@
-/* My Finance Records · V15.2.25 · Budget summary mascots */
+/* My Finance Records · V15.2.24 · Budget summary mascots */
 
-@media (min-width: 851px) and (hover: hover) and (pointer: fine) {
+@media (min-width: 851px) {
   #money .summary-mascot-image {
     display: block;
     width: 25px;
