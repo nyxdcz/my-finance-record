@@ -10,8 +10,8 @@ assert.match(css,/html\[data-theme="light"\] #availableMoneySection \.account-sp
 assert.match(css,/html\[data-theme="dark"\] #availableMoneySection \.account-spend-button span\s*\{[\s\S]*color:#ffffff !important;/);
 assert.match(index,/black-canvas-v15-1-0\.css\?v=15\.1\.0-light1/);
 assert.match(sw,/black-canvas-v15-1-0\.css\?v=15\.1\.0-light1/);
-assert.equal(version.version,"15.2.23");
+assert.equal(version.version,"15.2.24");
 assert.equal(version.schemaVersion,12);
 assert.equal(version.cloudSchemaVersion,3);
-assert.equal(version.cacheVersion,"finance-v15-20260821-monthly-repeat-icon-r59");
-console.log("V15.2.9 Spend theme contrast regression passed.");
+assert.equal(version.cacheVersion,"finance-v15-20260822-compact-expense-collapse-r60");
+console.log("V15.2.9 Spend theme contrast regression passed under V15.2.24.");
