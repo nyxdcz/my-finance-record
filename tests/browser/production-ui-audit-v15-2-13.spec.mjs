@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 const APP_URL = "http://127.0.0.1:3000/index.html?page=money";
-const APP_CACHE = "finance-v15-20260821-monthly-repeat-class-r58";
+const APP_CACHE = "finance-v15-20260821-monthly-repeat-icon-r59";
 
 async function openFinance(page, viewport) {
   await page.setViewportSize(viewport);
@@ -88,6 +88,8 @@ test("desktop Budget periods use compact expense cards with monthly repeat besid
     const paid = firstRow?.querySelector(".desktop-record-actions [data-mark-paid]");
     const edit = firstRow?.querySelector(".desktop-record-actions [data-edit-expense]");
     const savedText = saved?.querySelector(".monthly-repeat-label");
+    const savedIcon = saved?.querySelector(".saved-icon-container");
+    const checkboxLabel = firstRow?.querySelector(".expense-select-footer");
     const actionBar = firstRow?.querySelector(":scope > .desktop-record-actions");
     const rowStyle = firstRow ? getComputedStyle(firstRow) : null;
     const stackStyle = stack ? getComputedStyle(stack) : null;
@@ -116,7 +118,12 @@ test("desktop Budget periods use compact expense cards with monthly repeat besid
       savedTextDisplay:savedText ? getComputedStyle(savedText).display : "",
       savedTextWidth:savedText?.getBoundingClientRect().width || 0,
       savedTextOpacity:savedText ? parseFloat(getComputedStyle(savedText).opacity) : 0,
-      savedIconDisplay:saved?.querySelector(".saved-icon-container") ? getComputedStyle(saved.querySelector(".saved-icon-container")).display : "",
+      savedIconDisplay:savedIcon ? getComputedStyle(savedIcon).display : "",
+      savedIconWidth:savedIcon?.getBoundingClientRect().width || 0,
+      savedIconBackground:savedIcon ? getComputedStyle(savedIcon).backgroundImage : "",
+      checkboxPosition:checkboxLabel ? getComputedStyle(checkboxLabel).position : "",
+      checkboxLeft:checkboxLabel ? parseFloat(getComputedStyle(checkboxLabel).left) : -1,
+      checkboxBottom:checkboxLabel ? parseFloat(getComputedStyle(checkboxLabel).bottom) : -1,
       mobileActionsDisplay:firstRow ? getComputedStyle(firstRow.querySelector(":scope > .mobile-record-actions")).display : ""
     };
   });
@@ -130,19 +137,22 @@ test("desktop Budget periods use compact expense cards with monthly repeat besid
   expect(metrics.rowPaddingTop).toBeCloseTo(7, 0);
   expect(metrics.rowColumnGap).toBeCloseTo(8, 0);
   expect(metrics.actionFooterPaddingTop).toBeCloseTo(5, 0);
-  expect(metrics.recurrenceButtonHeight).toBeCloseTo(30, 0);
-  expect(metrics.recurrenceButtonWidth).toBeGreaterThan(65);
+  expect(metrics.recurrenceButtonHeight).toBeCloseTo(34, 0);
+  expect(metrics.recurrenceButtonWidth).toBeCloseTo(34, 0);
   expect(metrics.recurrenceFlexShrink).toBe("0");
   expect(metrics.actionCount).toBeGreaterThanOrEqual(3);
   expect(metrics.savedIndex).toBeGreaterThanOrEqual(0);
   expect(metrics.paidIndex).toBe(metrics.savedIndex + 1);
   expect(metrics.editIndex).toBe(metrics.paidIndex + 1);
   expect(metrics.savedLabel).toMatch(/^Repeat(?:s)? monthly$/);
-  expect(metrics.savedTextFontSize).toBeGreaterThan(0);
-  expect(metrics.savedTextWidth).toBeGreaterThan(45);
-  expect(metrics.savedTextOpacity).toBe(1);
-  expect(metrics.savedTextDisplay).not.toBe("none");
-  expect(metrics.savedIconDisplay).toBe("none");
+  expect(metrics.savedTextDisplay).toBe("none");
+  expect(metrics.savedTextWidth).toBe(0);
+  expect(metrics.savedIconDisplay).not.toBe("none");
+  expect(metrics.savedIconWidth).toBeCloseTo(30, 0);
+  expect(metrics.savedIconBackground).toMatch(/finance-save-(?:saved|unsaved)-v15-2-3-r2\.png/);
+  expect(metrics.checkboxPosition).toBe("absolute");
+  expect(metrics.checkboxLeft).toBeCloseTo(7, 0);
+  expect(metrics.checkboxBottom).toBeCloseTo(7, 0);
   expect(metrics.mobileActionsDisplay).toBe("none");
 });
 

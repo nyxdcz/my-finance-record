@@ -1,3 +1,8 @@
+## 15.2.23 · 2026-08-21
+- Restored the existing icon-only monthly-repeat control using `icons/finance-save-unsaved-v15-2-3-r2.png` and `icons/finance-save-saved-v15-2-3-r2.png`.
+- Matched the approved desktop expense-card footer arrangement: selection checkbox at the lower-left, then repeat icon, Mark paid, and Edit grouped at the lower-right.
+- Preserved recurrence behavior, compact expense-card content, phone touch layouts, Finance Schema 12, Cloud Schema V3, calculations, balances, payments, filters, and sync behavior while rotating the PWA cache to `finance-v15-20260821-monthly-repeat-icon-r59`.
+
 ## 15.2.22 · 2026-08-21
 - Isolated the desktop Repeat monthly / Repeats monthly label from legacy icon-only saved-button CSS with a dedicated monthly-repeat-label class.
 - Preserved the existing 82px by 30px non-shrinking recurrence control, recurrence behavior, Mark paid/Edit ordering, compact expense-card geometry, and phone touch layouts.

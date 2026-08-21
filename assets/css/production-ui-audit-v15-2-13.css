@@ -862,3 +862,95 @@
     display:none !important;
   }
 }
+
+
+/* V15.2.23 · Monthly repeat icon footer: approved checkbox-left / repeat-icon + Mark paid + Edit arrangement. */
+@media (min-width: 851px) {
+  html body #money .record-row[data-expense-row] {
+    position:relative !important;
+  }
+
+  html body #money .record-row[data-expense-row] .expense-record-title > .expense-select-footer {
+    position:absolute !important;
+    left:7px !important;
+    bottom:7px !important;
+    z-index:2 !important;
+    display:inline-flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    width:18px !important;
+    height:18px !important;
+    margin:0 !important;
+  }
+
+  html body #money .record-row[data-expense-row] .expense-record-title > .expense-select-footer > .expense-select-checkbox {
+    margin:0 !important;
+  }
+
+  html body #money .record-row[data-expense-row] > .desktop-record-actions {
+    min-height:34px !important;
+    align-items:center !important;
+    justify-content:flex-end !important;
+    gap:4px !important;
+  }
+
+  html body #money .record-row[data-expense-row] > .desktop-record-actions > .button {
+    height:34px !important;
+    min-height:34px !important;
+  }
+
+  html body #money .record-row[data-expense-row] > .desktop-record-actions > [data-toggle-saved],
+  html body #money .record-row[data-expense-row] > .desktop-record-actions > [data-toggle-saved]:hover,
+  html body #money .record-row[data-expense-row] > .desktop-record-actions > [data-toggle-saved]:focus-visible,
+  html body #money .record-row[data-expense-row] > .desktop-record-actions > [data-toggle-saved]:active,
+  html body #money .record-row[data-expense-row] > .desktop-record-actions > [data-toggle-saved].active,
+  html body #money .record-row[data-expense-row] > .desktop-record-actions > [data-toggle-saved].active:hover {
+    display:inline-flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    flex:0 0 34px !important;
+    flex-shrink:0 !important;
+    width:34px !important;
+    min-width:34px !important;
+    max-width:34px !important;
+    height:34px !important;
+    min-height:34px !important;
+    max-height:34px !important;
+    padding:0 !important;
+    border-color:transparent !important;
+    border-radius:8px !important;
+    background:transparent !important;
+    color:inherit !important;
+    box-shadow:none !important;
+    overflow:visible !important;
+  }
+
+  html body #money .record-row[data-expense-row] > .desktop-record-actions > [data-toggle-saved] .saved-icon-container {
+    display:block !important;
+    width:30px !important;
+    min-width:30px !important;
+    max-width:30px !important;
+    height:30px !important;
+    min-height:30px !important;
+    max-height:30px !important;
+    flex:0 0 30px !important;
+    border:0 !important;
+    border-radius:0 !important;
+    background-image:url("./icons/finance-save-unsaved-v15-2-3-r2.png") !important;
+    background-repeat:no-repeat !important;
+    background-position:center !important;
+    background-size:30px 30px !important;
+  }
+
+  html body #money .record-row[data-expense-row] > .desktop-record-actions > [data-toggle-saved].active .saved-icon-container {
+    background-image:url("./icons/finance-save-saved-v15-2-3-r2.png") !important;
+  }
+
+  html body #money .record-row[data-expense-row] > .desktop-record-actions > [data-toggle-saved] .saved-icon {
+    opacity:0 !important;
+  }
+
+  html body #money .record-row[data-expense-row] > .desktop-record-actions > [data-toggle-saved] > .monthly-repeat-label {
+    display:none !important;
+  }
+}

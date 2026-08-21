@@ -41,7 +41,7 @@
     })();
   </script>
 
-  <title>My Finance Records · V15.2.22</title>
+  <title>My Finance Records · V15.2.23</title>
   <link rel="stylesheet" href="./app.css?v=15.1.0-desktop3">
   <link rel="stylesheet" href="./shell-ui-v15-2-11.css?v=15.2.11-shell1">
   <link rel="stylesheet" href="./dashboard-interactions.css?v=15.2.10-icons1">
@@ -49,10 +49,10 @@
   <link rel="stylesheet" href="./black-canvas-v15-1-0.css?v=15.1.0-light1">
   <link rel="stylesheet" href="./desktop-ui-phase1-v15-1-0.css?v=15.1.0-phase1">
   <link rel="stylesheet" href="./desktop-ux-v15-2-0.css?v=15.2.5-disclosure1">
-  <link rel="stylesheet" href="./production-ui-audit-v15-2-13.css?v=15.2.22-repeat2">
+  <link rel="stylesheet" href="./production-ui-audit-v15-2-13.css?v=15.2.23-repeat3">
   <script src="./form-inputs.js?v=15.2.6-phase5a1"></script>
   <script src="./application-help.js?v=15.2.9-phase5b1"></script>
-  <script src="./pwa-update-v15-0-5.js?v=15.2.22-release4"></script>
+  <script src="./pwa-update-v15-0-5.js?v=15.2.23-release5"></script>
   <script src="./phone-finance-compat.js?v=15.2.10-phone1"></script>
   <script src="./cash-flow-summary.js?v=15.2.10-cashflow1"></script>
   <script src="./header-tools-compat.js?v=15.2.10-header1"></script>
@@ -4554,7 +4554,7 @@
         return `
         <div class="record-row ${dueStatus.rowClass} ${highlightExpenseId === item.id ? "newly-duplicated-row" : ""}" data-expense-row="${item.id}">
           <div class="record-title expense-record-title">
-            <label><input class="expense-select-checkbox" type="checkbox" data-select-expense="${item.id}" ${selectedExpenseIds.has(item.id) ? "checked" : ""}><span class="sr-only">Select ${escapeHtml(item.name)}</span></label>
+            <label class="expense-select-footer"><input class="expense-select-checkbox" type="checkbox" data-select-expense="${item.id}" ${selectedExpenseIds.has(item.id) ? "checked" : ""}><span class="sr-only">Select ${escapeHtml(item.name)}</span></label>
             ${recordIconHtml(item.icon,{label:`${item.name} icon`})}<div class="record-title-copy"><strong>${escapeHtml(item.name)}</strong><small><span class="ui-tag">${escapeHtml(item.category)}</span>${expenseRecordDescription(item) ? ` · ${escapeHtml(expenseRecordDescription(item))}` : ""}</small><div class="record-statuses"><span class="status-badge ui-pill status-unpaid">Unpaid</span>${repeatBadge}${totalsBadge}${autoPayBadge}</div></div>
           </div>
           <div class="due-cell" data-label="${isOther ? "Date" : "Due date"}">
@@ -4564,9 +4564,9 @@
           <div data-label="Planned account">${escapeHtml(item.account)}</div>
           <div class="amount" data-label="Amount">${money(effectiveExpenseAmount(item))}</div>
           <div class="record-actions desktop-record-actions">
-            <button class="button button-saved button-small ${item.recurring === "Monthly" ? "active" : ""}" data-toggle-saved="${item.id}" style="display:inline-flex!important;align-items:center!important;justify-content:center!important;flex:0 0 82px!important;flex-shrink:0!important;width:82px!important;min-width:82px!important;max-width:82px!important;height:30px!important;min-height:30px!important;padding:4px 7px!important;box-sizing:border-box!important;transform:none!important;white-space:nowrap!important;" title="${item.recurring === "Monthly" ? "Repeats monthly" : "Does not repeat monthly"}" aria-label="${item.recurring === "Monthly" ? "Monthly recurrence on. Click to stop repeating" : "Repeat this expense monthly"}">
-              <span class="saved-icon-container" style="display:none!important" aria-hidden="true"><span class="saved-icon">${item.recurring === "Monthly" ? "★" : "☆"}</span></span>
-              <span class="monthly-repeat-label" style="display:inline-flex!important;align-items:center!important;justify-content:center!important;flex:0 0 auto!important;width:auto!important;min-width:0!important;max-width:none!important;height:auto!important;color:var(--text)!important;font-size:.65rem!important;font-weight:700!important;line-height:1!important;opacity:1!important;visibility:visible!important;transform:none!important;white-space:nowrap!important;overflow:visible!important">${item.recurring === "Monthly" ? "Repeats monthly" : "Repeat monthly"}</span>
+            <button class="button button-saved button-small ${item.recurring === "Monthly" ? "active" : ""}" data-toggle-saved="${item.id}" title="${item.recurring === "Monthly" ? "Repeats monthly" : "Does not repeat monthly"}" aria-label="${item.recurring === "Monthly" ? "Monthly recurrence on. Click to stop repeating" : "Repeat this expense monthly"}">
+              <span class="saved-icon-container" aria-hidden="true"><span class="saved-icon">${item.recurring === "Monthly" ? "★" : "☆"}</span></span>
+              <span class="monthly-repeat-label">${item.recurring === "Monthly" ? "Repeats monthly" : "Repeat monthly"}</span>
             </button>
             <button class="button button-paid button-small" data-mark-paid="${item.id}">Mark paid</button>
             <button class="button button-secondary button-small" data-edit-expense="${item.id}">Edit</button>
@@ -4682,9 +4682,9 @@
           <div data-label="Paid from">${escapeHtml(item.paidFromAccount || item.account || "—")}</div>
           <div class="amount text-green" data-label="Amount">${money(settledExpenseAmount(item))}</div>
           <div class="record-actions desktop-record-actions">
-            <button class="button button-saved button-small ${item.recurring === "Monthly" ? "active" : ""}" data-toggle-saved="${item.id}" style="display:inline-flex!important;align-items:center!important;justify-content:center!important;flex:0 0 82px!important;flex-shrink:0!important;width:82px!important;min-width:82px!important;max-width:82px!important;height:30px!important;min-height:30px!important;padding:4px 7px!important;box-sizing:border-box!important;transform:none!important;white-space:nowrap!important;" title="${item.recurring === "Monthly" ? "Repeats monthly" : "Does not repeat monthly"}" aria-label="${item.recurring === "Monthly" ? "Monthly recurrence on. Click to stop repeating" : "Repeat this expense monthly"}">
-              <span class="saved-icon-container" style="display:none!important" aria-hidden="true"><span class="saved-icon">${item.recurring === "Monthly" ? "★" : "☆"}</span></span>
-              <span class="monthly-repeat-label" style="display:inline-flex!important;align-items:center!important;justify-content:center!important;flex:0 0 auto!important;width:auto!important;min-width:0!important;max-width:none!important;height:auto!important;color:var(--text)!important;font-size:.65rem!important;font-weight:700!important;line-height:1!important;opacity:1!important;visibility:visible!important;transform:none!important;white-space:nowrap!important;overflow:visible!important">${item.recurring === "Monthly" ? "Repeats monthly" : "Repeat monthly"}</span>
+            <button class="button button-saved button-small ${item.recurring === "Monthly" ? "active" : ""}" data-toggle-saved="${item.id}" title="${item.recurring === "Monthly" ? "Repeats monthly" : "Does not repeat monthly"}" aria-label="${item.recurring === "Monthly" ? "Monthly recurrence on. Click to stop repeating" : "Repeat this expense monthly"}">
+              <span class="saved-icon-container" aria-hidden="true"><span class="saved-icon">${item.recurring === "Monthly" ? "★" : "☆"}</span></span>
+              <span class="monthly-repeat-label">${item.recurring === "Monthly" ? "Repeats monthly" : "Repeat monthly"}</span>
             </button>
             <button class="button button-secondary button-small" data-undo-paid="${item.id}">Move to unpaid</button>
             <button class="button button-secondary button-small" data-edit-expense="${item.id}">Edit</button>
@@ -7830,10 +7830,10 @@
     });
 
     // ---------------- V12.10.0 PWA, Phase 11 interface refinement, Phase 10 calculator number inputs, projects, savings goals, and number inputs, Phase 7 secure reset, Phase 6 savings + dashboard insights, Phase 5 reports + dark mode, Phase 4 dashboard + Apple Calendar, Phase 3 monthly navigation, Phase 2 expense workflow, device registry, sync history, offline packs, reminders, and migration ----------------
-    const APP_VERSION = "15.2.22";
-    const APP_RELEASE_NAME = "Monthly Repeat Label Isolation";
+    const APP_VERSION = "15.2.23";
+    const APP_RELEASE_NAME = "Monthly Repeat Icon Footer";
     const APP_RELEASE_DATE = "August 21, 2026";
-    const APP_CACHE_VERSION = "finance-v15-20260821-monthly-repeat-class-r58";
+    const APP_CACHE_VERSION = "finance-v15-20260821-monthly-repeat-icon-r59";
 
     function synchronizeVersionDisplay() {
       document.title = `My Finance Records · V${APP_VERSION}`;
@@ -9124,7 +9124,7 @@
   </script>
   <script src="./vendor/supabase.min.js"></script>
   <script src="./sync-config.js?v=15.2.10-release1"></script>
-  <script src="./sync-runtime-compat.js?v=15.2.22-release12"></script>
+  <script src="./sync-runtime-compat.js?v=15.2.23-release13"></script>
   <script src="./privacy-lock.js?v=15.1.0-ui1"></script>
   <script src="./security-profiles.js?v=14.0.23"></script>
   <script src="./cloud-conflict-review.js?v=14.0.23"></script>

@@ -1,6 +1,6 @@
 (function applyV15ReleaseLayer() {
-  const VERSION = "15.2.22";
-  const RELEASE_NAME = "Monthly Repeat Label Isolation";
+  const VERSION = "15.2.23";
+  const RELEASE_NAME = "Monthly Repeat Icon Footer";
   const RELEASE_DATE = "August 21, 2026";
   window.FINANCE_APP_VERSION_OVERRIDE = VERSION;
   window.FINANCE_RELEASE_OVERRIDE = { version:VERSION, name:RELEASE_NAME, released:"2026-08-21" };

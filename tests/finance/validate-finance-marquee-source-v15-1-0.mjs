@@ -8,9 +8,9 @@ const version = JSON.parse(fs.readFileSync("version.json", "utf8"));
 const pkg = JSON.parse(fs.readFileSync("package.json", "utf8"));
 const lock = JSON.parse(fs.readFileSync("package-lock.json", "utf8"));
 
-const expectedVersion = "15.2.22";
-const expectedIndexCache = "finance-v15-20260821-monthly-repeat-class-r58";
-const expectedCache = "finance-v15-20260821-monthly-repeat-class-r58";
+const expectedVersion = "15.2.23";
+const expectedIndexCache = "finance-v15-20260821-monthly-repeat-icon-r59";
+const expectedCache = "finance-v15-20260821-monthly-repeat-icon-r59";
 const interactionQuery = "15.2.18-kanban1";
 
 for (const [pageId, marqueeId] of [["income", "incomeFinanceWeekMarquee"], ["money", "financeWeekMarquee"], ["paid-expenses", "paidFinanceWeekMarquee"]]) {
@@ -40,4 +40,4 @@ assert.equal(pkg.version, expectedVersion);
 assert.equal(lock.version, expectedVersion);
 assert.equal(lock.packages[""].version, expectedVersion);
 
-console.log("Finance marquee source layout and V15.2.22 PWA cache metadata validated.");
+console.log("Finance marquee source layout and V15.2.23 PWA cache metadata validated.");

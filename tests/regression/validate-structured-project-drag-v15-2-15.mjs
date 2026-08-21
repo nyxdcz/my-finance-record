@@ -8,7 +8,7 @@ const agenda = read("assets/js/projects-calendar-v13.0.20.js");
 const agendaCss = read("assets/css/projects-calendar-v13.0.20.css");
 const version = JSON.parse(read("version.json"));
 
-assert.equal(version.version, "15.2.22");
+assert.equal(version.version, "15.2.23");
 assert.equal(version.schemaVersion, 12, "Finance Schema must remain 12");
 assert.equal(version.cloudSchemaVersion, 3, "Cloud Schema must remain V3");
 
