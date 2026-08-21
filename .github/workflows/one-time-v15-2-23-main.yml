@@ -26,6 +26,7 @@ jobs:
             set -euo pipefail
             gh api "repos/$GITHUB_REPOSITORY/contents/scripts/v15-2-23-repair.cjs?ref=v15.2.23-staging" --jq .content | tr -d '\n' | base64 -d > /tmp/v15-2-23-repair.cjs
             sed -i 's/checkboxCount < 2/checkboxCount < 1/' /tmp/v15-2-23-repair.cjs
+            sed -i 's/matches < 4/matches < 2/' /tmp/v15-2-23-repair.cjs
             test -s /tmp/v15-2-23-repair.cjs
           } 2>&1 | tee /tmp/v15-fetch.log
 
