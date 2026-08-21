@@ -75,6 +75,54 @@ for (const width of [1024, 1280, 1366, 1440, 1920]) {
   });
 }
 
+test("desktop Budget periods use three expense card-list columns with monthly repeat beside Mark paid", async ({ page }) => {
+  await openFinance(page, { width:1440, height:1100 });
+  const metrics = await page.evaluate(() => {
+    const stack = document.querySelector("#money .section-stack");
+    const periods = [...document.querySelectorAll("#money .section-stack > .period-card")];
+    const firstList = document.querySelector("#money #lateExpenses") || document.querySelector("#money #earlyExpenses") || document.querySelector("#money #otherExpenses");
+    const rows = firstList ? [...firstList.querySelectorAll(":scope > .record-row[data-expense-row]")] : [];
+    const firstRow = rows[0] || document.querySelector("#money .record-row[data-expense-row]");
+    const actions = firstRow ? [...firstRow.querySelectorAll(":scope > .desktop-record-actions > button")] : [];
+    const saved = firstRow?.querySelector(".desktop-record-actions [data-toggle-saved]");
+    const paid = firstRow?.querySelector(".desktop-record-actions [data-mark-paid]");
+    const edit = firstRow?.querySelector(".desktop-record-actions [data-edit-expense]");
+    const savedText = saved?.querySelector(".saved-button-text");
+    const rowStyle = firstRow ? getComputedStyle(firstRow) : null;
+    const stackStyle = stack ? getComputedStyle(stack) : null;
+    const periodStyle = periods[0] ? getComputedStyle(periods[0]) : null;
+    const spacing = rows.length > 1 ? rows[1].getBoundingClientRect().top - rows[0].getBoundingClientRect().bottom : 5;
+    return {
+      stackDisplay:stackStyle?.display || "",
+      stackColumns:stackStyle?.gridTemplateColumns || "",
+      periodCount:periods.length,
+      periodTopBorder:periodStyle?.borderTopWidth || "",
+      rowRadius:rowStyle?.borderRadius || "",
+      rowShadow:rowStyle?.boxShadow || "",
+      rowGap:spacing,
+      actionCount:actions.length,
+      savedIndex:actions.indexOf(saved),
+      paidIndex:actions.indexOf(paid),
+      editIndex:actions.indexOf(edit),
+      savedLabel:saved?.classList.contains("active") ? getComputedStyle(savedText, "::after").content : getComputedStyle(savedText, "::after").content,
+      mobileActionsDisplay:firstRow ? getComputedStyle(firstRow.querySelector(":scope > .mobile-record-actions")).display : ""
+    };
+  });
+  expect(metrics.stackDisplay).toBe("grid");
+  expect(metrics.periodCount).toBe(3);
+  expect(metrics.stackColumns.split(" ").filter(Boolean)).toHaveLength(3);
+  expect(metrics.periodTopBorder).toBe("3px");
+  expect(metrics.rowRadius).toBe("8px");
+  expect(metrics.rowShadow).not.toBe("none");
+  expect(metrics.rowGap).toBeCloseTo(5, 0);
+  expect(metrics.actionCount).toBeGreaterThanOrEqual(3);
+  expect(metrics.savedIndex).toBeGreaterThanOrEqual(0);
+  expect(metrics.paidIndex).toBe(metrics.savedIndex + 1);
+  expect(metrics.editIndex).toBe(metrics.paidIndex + 1);
+  expect(metrics.savedLabel).toMatch(/Repeat(?:s)? monthly/);
+  expect(metrics.mobileActionsDisplay).toBe("none");
+});
+
 for (const width of [390, 430]) {
   test(`phone Budget periods stay compact and touch safe at ${width}px`, async ({ page }) => {
     await openFinance(page, { width, height:900 });
