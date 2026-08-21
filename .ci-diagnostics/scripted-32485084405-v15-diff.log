@@ -1,0 +1,94 @@
+--- status ---
+ M CHANGELOG.md
+ M README.md
+ M assets/css/production-ui-audit-v15-2-13.css
+ M assets/js/pwa-update-v15-0-5.js
+ M assets/js/ui/sync-runtime-compat.js
+ M index.html
+ M package-lock.json
+ M package.json
+ M sw.js
+ M tests/browser/cash-flow-js-ownership.spec.mjs
+ M tests/browser/kanban-column-menu-viewport-v15-2-18.spec.mjs
+ M tests/browser/phone-finance-css-ownership-v15-2-10.spec.mjs
+ M tests/browser/production-ui-audit-v15-2-13.spec.mjs
+ M tests/browser/pwa-upgrade-v15-0-5.spec.mjs
+ M tests/browser/sidebar-brand-v15-2-2.spec.mjs
+ M tests/browser/v15-2-1-desktop-ux-quick-wins.spec.mjs
+ M tests/finance/validate-expense-screenshot.mjs
+ M tests/finance/validate-finance-marquee-source-v15-1-0.mjs
+ M tests/finance/validate-form-inputs-v15-2-6.mjs
+ M tests/finance/validate-record-spending-v15-0-4.mjs
+ M tests/finance/validate-spend-label-v15-1-0.mjs
+ M tests/helpers/inspect-project.mjs
+ M tests/regression/validate-application-help-v15-2-7.mjs
+ M tests/regression/validate-auth-sync-state-v15-2-12.mjs
+ M tests/regression/validate-available-money-border-v15-1-0.mjs
+ M tests/regression/validate-black-canvas-v15-1-0.mjs
+ M tests/regression/validate-desktop-ui-consistency-v15-1-0.mjs
+ M tests/regression/validate-desktop-ui-phase1-v15-1-0.mjs
+ M tests/regression/validate-header-ui-v15-0-5.mjs
+ M tests/regression/validate-horizontal-project-kanban-v15-2-18.mjs
+ M tests/regression/validate-month-navigation-borderless-v15-1-0.mjs
+ M tests/regression/validate-production-ui-audit-v15-2-13.mjs
+ M tests/regression/validate-pwa-updater-v15-0-5.mjs
+ M tests/regression/validate-structured-project-drag-v15-2-15.mjs
+ M tests/regression/validate-sync-config-separation.mjs
+ M tests/regression/validate-v15-2-0-desktop-ux.mjs
+ M tests/regression/validate-v15-2-2-mobile-ui.mjs
+ M tests/security/import-review-privacy.spec.mjs
+ M tests/sync/sync-status-v15-2-3.spec.mjs
+ M tests/sync/validate-safe-multidevice-sync.mjs
+ M version.json
+--- diff stat ---
+ CHANGELOG.md                                       |  5 ++++
+ README.md                                          |  8 +++----
+ assets/css/production-ui-audit-v15-2-13.css        | 27 ++++++++++++++++++++++
+ assets/js/pwa-update-v15-0-5.js                    |  4 ++--
+ assets/js/ui/sync-runtime-compat.js                |  4 ++--
+ index.html                                         | 12 +++++-----
+ package-lock.json                                  |  4 ++--
+ package.json                                       |  2 +-
+ sw.js                                              | 10 ++++----
+ tests/browser/cash-flow-js-ownership.spec.mjs      |  2 +-
+ .../kanban-column-menu-viewport-v15-2-18.spec.mjs  |  2 +-
+ .../phone-finance-css-ownership-v15-2-10.spec.mjs  |  2 +-
+ .../browser/production-ui-audit-v15-2-13.spec.mjs  |  2 +-
+ tests/browser/pwa-upgrade-v15-0-5.spec.mjs         |  4 ++--
+ tests/browser/sidebar-brand-v15-2-2.spec.mjs       |  2 +-
+ .../browser/v15-2-1-desktop-ux-quick-wins.spec.mjs |  8 +++----
+ tests/finance/validate-expense-screenshot.mjs      |  2 +-
+ .../validate-finance-marquee-source-v15-1-0.mjs    |  8 +++----
+ tests/finance/validate-form-inputs-v15-2-6.mjs     |  4 ++--
+ tests/finance/validate-record-spending-v15-0-4.mjs |  4 ++--
+ tests/finance/validate-spend-label-v15-1-0.mjs     |  4 ++--
+ tests/helpers/inspect-project.mjs                  |  8 +++----
+ .../validate-application-help-v15-2-7.mjs          |  4 ++--
+ .../validate-auth-sync-state-v15-2-12.mjs          |  4 ++--
+ .../validate-available-money-border-v15-1-0.mjs    |  4 ++--
+ tests/regression/validate-black-canvas-v15-1-0.mjs |  4 ++--
+ .../validate-desktop-ui-consistency-v15-1-0.mjs    | 10 ++++----
+ .../validate-desktop-ui-phase1-v15-1-0.mjs         |  6 ++---
+ tests/regression/validate-header-ui-v15-0-5.mjs    |  4 ++--
+ ...validate-horizontal-project-kanban-v15-2-18.mjs |  6 ++---
+ ...alidate-month-navigation-borderless-v15-1-0.mjs | 10 ++++----
+ .../validate-production-ui-audit-v15-2-13.mjs      | 12 +++++-----
+ tests/regression/validate-pwa-updater-v15-0-5.mjs  | 18 +++++++--------
+ .../validate-structured-project-drag-v15-2-15.mjs  |  2 +-
+ .../regression/validate-sync-config-separation.mjs |  8 +++----
+ tests/regression/validate-v15-2-0-desktop-ux.mjs   | 10 ++++----
+ tests/regression/validate-v15-2-2-mobile-ui.mjs    | 18 +++++++--------
+ tests/security/import-review-privacy.spec.mjs      |  2 +-
+ tests/sync/sync-status-v15-2-3.spec.mjs            |  2 +-
+ tests/sync/validate-safe-multidevice-sync.mjs      |  2 +-
+ version.json                                       |  8 +++----
+ 41 files changed, 147 insertions(+), 115 deletions(-)
+--- changelog head ---
+## 15.2.20 · 2026-08-21
+- Corrected production desktop expense-card geometry to 7px row padding, 8px column gap, 5px action-footer padding, and 30px desktop actions.
+- Guaranteed Repeat monthly / Repeats monthly remains visible and non-shrinking at a minimum 82px width directly before Mark paid while leaving phone touch layouts unchanged.
+- Synchronized V15.2.20 runtime, cache, and regression expectations around `finance-v15-20260821-compact-expense-stability-r56` while preserving Finance Schema 12, Cloud Schema V3, calculations, balances, recurrence/payment semantics, filters, branding, and five-minute Cloud Sync.
+
+## 15.2.19 · 2026-08-21
+- Compacted First half, Second half, and Other expense cards with 7px card padding, tighter metadata rhythm, 30px desktop actions, and the existing 5px spacing between separate expense cards.
+- Restored the functional Repeat monthly / Repeats monthly control directly beside Mark paid and prevented it from shrinking to an icon-sized button in three-column layouts.
