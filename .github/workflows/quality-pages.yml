@@ -8,43 +8,13 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: pages-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  finalize_release:
-    name: Finalize compact V15.2.19
-    if: github.event_name == 'push' && github.event.head_commit.message == 'chore: activate compact V15.2.19 finalizer'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v7
-        with:
-          ref: main
-          fetch-depth: 0
-      - name: Apply approved compact expense-card release
-        run: python scripts/finalize-compact-v15-2-19.py
-      - name: Verify generated diff
-        run: git diff --check
-      - name: Commit release
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add \
-            assets/css/production-ui-audit-v15-2-13.css \
-            tests/browser/production-ui-audit-v15-2-13.spec.mjs \
-            index.html \
-            package.json package-lock.json version.json README.md CHANGELOG.md \
-            sw.js assets/js/pwa-update-v15-0-5.js \
-            tests/helpers/inspect-project.mjs \
-            tests/regression/validate-production-ui-audit-v15-2-13.mjs \
-            tests/regression/validate-pwa-updater-v15-0-5.mjs
-          git commit -m "release: V15.2.19 compact expense cards"
-          git push origin HEAD:main
-
   quality:
     name: Regression quality
     runs-on: ubuntu-latest
