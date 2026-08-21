@@ -1,0 +1,61 @@
+--- changelog ---
+## 15.2.20 · 2026-08-21
+- Corrected production desktop expense-card geometry to 7px row padding, 8px column gap, 5px action-footer padding, and 30px desktop actions.
+- Guaranteed Repeat monthly / Repeats monthly remains visible and non-shrinking at a minimum 82px width directly before Mark paid while leaving phone touch layouts unchanged.
+- Synchronized V15.2.20 runtime, cache, and regression expectations around `finance-v15-20260821-compact-expense-stability-r56` while preserving Finance Schema 12, Cloud Schema V3, calculations, balances, recurrence/payment semantics, filters, branding, and five-minute Cloud Sync.
+
+--- inspect release checks ---
+141:if (pkg.version !== "15.2.20") fail(`Expected current package version 15.2.19, found ${pkg.version || "(missing)"}`);
+142:if (!read("README.md").startsWith("# My Finance Records · V15.2.20")) fail("README release heading is not V15.2.20");
+143:if (!read("CHANGELOG.md").startsWith("## 15.2.20 · 2026-08-21")) fail("CHANGELOG latest entry is not V15.2.20");
+175:console.log("Repository inspection passed: V15.2.20 release sources, local paths, deploy paths, package metadata, permissions, and public sync configuration are consistent.");
+--- desktop UX release checks ---
+16:  [version.version === "15.2.20", "version.json is V15.2.18"],
+17:  [pkg.version === "15.2.20", "package.json is V15.2.18"],
+20:  [index.includes("My Finance Records · V15.2.20"), "page title is V15.2.18"],
+34:  [sw.includes('const APP_VERSION = "15.2.20"') && sw.includes(version.cacheVersion), "service worker delivery matches release"],
+36:  [runtimeCompat.includes('const VERSION = "15.2.20"') && runtimeCompat.includes('const RELEASE_NAME = "Compact Expense Cards Stability"'), "release override matches V15.2.18"],
+52:console.log("V15.2.20 release preserves the desktop UX source contract");
+--- diff ---
+ CHANGELOG.md                                       |  5 ++++
+ README.md                                          |  8 +++----
+ assets/css/production-ui-audit-v15-2-13.css        | 27 ++++++++++++++++++++++
+ assets/js/pwa-update-v15-0-5.js                    |  4 ++--
+ assets/js/ui/sync-runtime-compat.js                |  4 ++--
+ index.html                                         | 12 +++++-----
+ package-lock.json                                  |  4 ++--
+ package.json                                       |  2 +-
+ sw.js                                              | 10 ++++----
+ tests/browser/cash-flow-js-ownership.spec.mjs      |  2 +-
+ .../kanban-column-menu-viewport-v15-2-18.spec.mjs  |  2 +-
+ .../phone-finance-css-ownership-v15-2-10.spec.mjs  |  2 +-
+ .../browser/production-ui-audit-v15-2-13.spec.mjs  |  2 +-
+ tests/browser/pwa-upgrade-v15-0-5.spec.mjs         |  4 ++--
+ tests/browser/sidebar-brand-v15-2-2.spec.mjs       |  2 +-
+ .../browser/v15-2-1-desktop-ux-quick-wins.spec.mjs |  8 +++----
+ tests/finance/validate-expense-screenshot.mjs      |  2 +-
+ .../validate-finance-marquee-source-v15-1-0.mjs    |  8 +++----
+ tests/finance/validate-form-inputs-v15-2-6.mjs     |  4 ++--
+ tests/finance/validate-record-spending-v15-0-4.mjs |  4 ++--
+ tests/finance/validate-spend-label-v15-1-0.mjs     |  4 ++--
+ tests/helpers/inspect-project.mjs                  |  8 +++----
+ .../validate-application-help-v15-2-7.mjs          |  4 ++--
+ .../validate-auth-sync-state-v15-2-12.mjs          |  4 ++--
+ .../validate-available-money-border-v15-1-0.mjs    |  4 ++--
+ tests/regression/validate-black-canvas-v15-1-0.mjs |  4 ++--
+ .../validate-desktop-ui-consistency-v15-1-0.mjs    | 10 ++++----
+ .../validate-desktop-ui-phase1-v15-1-0.mjs         |  6 ++---
+ tests/regression/validate-header-ui-v15-0-5.mjs    |  4 ++--
+ ...validate-horizontal-project-kanban-v15-2-18.mjs |  6 ++---
+ ...alidate-month-navigation-borderless-v15-1-0.mjs | 10 ++++----
+ .../validate-production-ui-audit-v15-2-13.mjs      | 12 +++++-----
+ tests/regression/validate-pwa-updater-v15-0-5.mjs  | 18 +++++++--------
+ .../validate-structured-project-drag-v15-2-15.mjs  |  2 +-
+ .../regression/validate-sync-config-separation.mjs |  8 +++----
+ tests/regression/validate-v15-2-0-desktop-ux.mjs   | 14 +++++------
+ tests/regression/validate-v15-2-2-mobile-ui.mjs    | 18 +++++++--------
+ tests/security/import-review-privacy.spec.mjs      |  2 +-
+ tests/sync/sync-status-v15-2-3.spec.mjs            |  2 +-
+ tests/sync/validate-safe-multidevice-sync.mjs      |  2 +-
+ version.json                                       |  8 +++----
+ 41 files changed, 149 insertions(+), 117 deletions(-)
