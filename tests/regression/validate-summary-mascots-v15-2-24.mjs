@@ -34,7 +34,7 @@ assert.match(css, /data-summary-mascot="green"[\s\S]*mascot-green\.svg/);
 assert.match(css, /#money \.legend-total\.summary-mascot-slot,[\s\S]*19px from the positioning edge[\s\S]*right:\s*19px !important;/);
 assert.doesNotMatch(css, /#financeLegend/);
 assert.match(css, /\.collapse-actions\.has-period-mascot[\s\S]*gap:\s*10px !important;[\s\S]*align-items:\s*center !important;/);
-assert.match(css, /\.period-total\.summary-mascot-slot[\s\S]*align-self:\s*center !important;[\s\S]*transform:\s*translateY\(-3px\) !important;/);
+assert.match(css, /\.period-total\.summary-mascot-slot[\s\S]*align-self:\s*center !important;[\s\S]*transform:\s*translateY\(-5px\) !important;/);
 assert.match(css, /\.period-header[\s\S]*padding-right:\s*10px !important;/);
 
 assert.match(js, /storedAmountText/);
