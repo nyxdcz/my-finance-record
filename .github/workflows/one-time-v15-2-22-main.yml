@@ -1,0 +1,116 @@
+name: One-time V15.2.22 validator
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+concurrency:
+  group: one-time-v15-2-22-main
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Fetch approved repair script
+        shell: bash
+        run: |
+          set -o pipefail
+          {
+            set -euo pipefail
+            gh api "repos/$GITHUB_REPOSITORY/contents/scripts/v15-2-22-repair.cjs?ref=v15.2.22-staging" --jq .content | tr -d '\n' | base64 -d > /tmp/v15-2-22-repair.cjs
+            test -s /tmp/v15-2-22-repair.cjs
+          } 2>&1 | tee /tmp/v15-fetch.log
+
+      - name: Clone current main
+        shell: bash
+        run: |
+          set -o pipefail
+          {
+            set -euo pipefail
+            git clone --branch main --depth 1 "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" .
+            git rev-parse HEAD
+          } 2>&1 | tee /tmp/v15-clone.log
+
+      - name: Use Node 24
+        shell: bash
+        run: |
+          set -o pipefail
+          {
+            set -euo pipefail
+            NODE24="$(find /opt/hostedtoolcache/node -mindepth 2 -maxdepth 2 -type d -path '*/24.*/*' 2>/dev/null | sort -V | tail -1)"
+            test -x "$NODE24/bin/node"
+            echo "$NODE24/bin" >> "$GITHUB_PATH"
+          } 2>&1 | tee /tmp/v15-node.log
+
+      - name: Apply V15.2.22 repair
+        shell: bash
+        run: |
+          set -o pipefail
+          {
+            node /tmp/v15-2-22-repair.cjs
+            git diff --check
+            git diff --stat
+          } 2>&1 | tee /tmp/v15-apply.log
+
+      - name: Install dependencies
+        shell: bash
+        run: |
+          set -o pipefail
+          npm ci --ignore-scripts --no-audit --no-fund 2>&1 | tee /tmp/v15-npm.log
+
+      - name: Run source quality
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run quality 2>&1 | tee /tmp/v15-quality.log
+
+      - name: Install Chromium
+        shell: bash
+        run: |
+          set -o pipefail
+          npx playwright install --with-deps chromium 2>&1 | tee /tmp/v15-chromium.log
+
+      - name: Run full browser suite
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run test:browser 2>&1 | tee /tmp/v15-browser.log
+
+      - name: Publish validated candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh auth setup-git
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm -f .github/workflows/one-time-v15-2-22-main.yml
+          git add -A
+          git diff --cached --check
+          git commit -m "release: V15.2.22 isolate monthly repeat label"
+          git push --force origin HEAD:refs/heads/v15.2.22-ready
+          git rev-parse HEAD
+
+      - name: Publish failure diagnostics
+        if: failure()
+        shell: bash
+        run: |
+          set +e
+          gh auth setup-git
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          cat /tmp/v15-fetch.log /tmp/v15-clone.log /tmp/v15-node.log /tmp/v15-apply.log /tmp/v15-npm.log /tmp/v15-quality.log /tmp/v15-chromium.log /tmp/v15-browser.log 2>/dev/null > /tmp/v15-2-22-validator.log
+          git reset --hard HEAD
+          git clean -fd
+          git switch --detach origin/main
+          git switch -C v15.2.22-diagnostics
+          cp /tmp/v15-2-22-validator.log v15-2-22-validator.log
+          git add -f v15-2-22-validator.log
+          git commit -m "chore: capture V15.2.22 validator diagnostics"
+          git push --force origin HEAD:refs/heads/v15.2.22-diagnostics
