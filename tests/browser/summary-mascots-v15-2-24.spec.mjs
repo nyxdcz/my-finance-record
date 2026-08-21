@@ -80,7 +80,12 @@ test("difference cards follow green and red state while phone keeps numeric valu
 
   const setDifference = async ({ negative }) => {
     await page.evaluate(({ negative }) => {
-      const card = [...document.querySelectorAll("#moneySummary .summary-card")].find(item => item.querySelector(".summary-label-desktop, .summary-card-label")?.textContent?.trim() === "First-half difference");
+      const card = [...document.querySelectorAll("#moneySummary .summary-card")].find(item => {
+        const label = item.querySelector(".summary-label-desktop")?.textContent?.trim()
+          || item.querySelector(".summary-card-label")?.textContent?.trim()
+          || "";
+        return label === "First-half difference";
+      });
       const value = card.querySelector(".summary-card-value");
       value.textContent = negative ? "-₱100.00" : "₱100.00";
       value.classList.toggle("text-danger", negative);
