@@ -1,0 +1,10 @@
+
+> my-finance-record@15.2.20 quality
+> npm run inspect && npm run lint && npm run maintainability && npm run test
+
+
+> my-finance-record@15.2.20 inspect
+> node tests/helpers/inspect-project.mjs
+
+Repository inspection: 1 error(s), 0 warning(s)
+ERROR: CHANGELOG latest entry is not V15.2.20
