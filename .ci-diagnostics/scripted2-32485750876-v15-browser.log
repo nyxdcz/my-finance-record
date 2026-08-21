@@ -1,0 +1,214 @@
+
+> my-finance-record@15.2.20 pretest:browser
+> npm run prepare:runtime
+
+
+> my-finance-record@15.2.20 prepare:runtime
+> node scripts/prepare-runtime.mjs
+
+Runtime compatibility files ready.
+
+> my-finance-record@15.2.20 test:browser
+> playwright test
+
+
+Running 175 tests using 2 workers
+······················································×·F
+::error file=tests/browser/production-ui-audit-v15-2-13.spec.mjs,title=tests/browser/production-ui-audit-v15-2-13.spec.mjs:38:3 › desktop toolbar and Budget summaries share compact geometry at 1440px,line=69,col=61::  1) tests/browser/production-ui-audit-v15-2-13.spec.mjs:38:3 › desktop toolbar and Budget summaries share compact geometry at 1440px %0A    Error: expect(received).toBeLessThanOrEqual(expected)%0A%0A    Expected: <= 58%0A    Received:    63.53125%0A%0A      67 |     metrics.visibleToolbarHeights.forEach(height => expect(height).toBeCloseTo(34, 0));%0A      68 |     expect(metrics.summaryHeights).toHaveLength(8);%0A    > 69 |     metrics.summaryHeights.forEach(height => expect(height).toBeLessThanOrEqual(58));%0A         |                                                             ^%0A      70 |     expect(metrics.disclosureSizes.length).toBeGreaterThanOrEqual(4);%0A      71 |     metrics.disclosureSizes.forEach(([widthValue, heightValue]) => {%0A      72 |       expect(widthValue).toBeCloseTo(40, 0);%0A        at forEach (/home/runner/work/my-finance-record/my-finance-record/tests/browser/production-ui-audit-v15-2-13.spec.mjs:69:61)%0A        at /home/runner/work/my-finance-record/my-finance-record/tests/browser/production-ui-audit-v15-2-13.spec.mjs:69:28
+::error file=tests/browser/production-ui-audit-v15-2-13.spec.mjs,title=tests/browser/production-ui-audit-v15-2-13.spec.mjs:38:3 › desktop toolbar and Budget summaries share compact geometry at 1440px,line=69,col=61::  1) tests/browser/production-ui-audit-v15-2-13.spec.mjs:38:3 › desktop toolbar and Budget summaries share compact geometry at 1440px %0A%0A    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────%0A    Error: expect(received).toBeLessThanOrEqual(expected)%0A%0A    Expected: <= 58%0A    Received:    63.53125%0A%0A      67 |     metrics.visibleToolbarHeights.forEach(height => expect(height).toBeCloseTo(34, 0));%0A      68 |     expect(metrics.summaryHeights).toHaveLength(8);%0A    > 69 |     metrics.summaryHeights.forEach(height => expect(height).toBeLessThanOrEqual(58));%0A         |                                                             ^%0A      70 |     expect(metrics.disclosureSizes.length).toBeGreaterThanOrEqual(4);%0A      71 |     metrics.disclosureSizes.forEach(([widthValue, heightValue]) => {%0A      72 |       expect(widthValue).toBeCloseTo(40, 0);%0A        at forEach (/home/runner/work/my-finance-record/my-finance-record/tests/browser/production-ui-audit-v15-2-13.spec.mjs:69:61)%0A        at /home/runner/work/my-finance-record/my-finance-record/tests/browser/production-ui-audit-v15-2-13.spec.mjs:69:28
+·················×·····
+·············F
+::error file=tests/browser/pwa-upgrade-v15-0-5.spec.mjs,title=tests/browser/pwa-upgrade-v15-0-5.spec.mjs:3:1 › V15.2.20 registers the cache-qualified worker and clears stale Finance caches,line=12,col=126::  2) tests/browser/pwa-upgrade-v15-0-5.spec.mjs:3:1 › V15.2.20 registers the cache-qualified worker and clears stale Finance caches %0A    Error: expect(received).toContain(expected) // indexOf%0A%0A    Expected substring: "v=15.2.19"%0A    Received string:    "http://127.0.0.1:3000/sw.js?v=15.2.20&cache=finance-v15-20260821-compact-expense-stability-r56"%0A%0A    Call Log:%0A    - Timeout 15000ms exceeded while waiting on the predicate%0A%0A      10 |   });%0A      11 |%0A    > 12 |   await expect.poll(async () => page.evaluate(() => navigator.serviceWorker.controller?.scriptURL || ""), { timeout:15000 }).toContain("v=15.2.19");%0A         |                                                                                                                              ^%0A      13 |   const workerUrl = await page.evaluate(() => navigator.serviceWorker.controller?.scriptURL || "");%0A      14 |   expect(workerUrl).toContain("cache=finance-v15-20260821-compact-expense-stability-r56");%0A      15 |%0A        at /home/runner/work/my-finance-record/my-finance-record/tests/browser/pwa-upgrade-v15-0-5.spec.mjs:12:126
+::error file=tests/browser/pwa-upgrade-v15-0-5.spec.mjs,title=tests/browser/pwa-upgrade-v15-0-5.spec.mjs:3:1 › V15.2.20 registers the cache-qualified worker and clears stale Finance caches,line=12,col=126::  2) tests/browser/pwa-upgrade-v15-0-5.spec.mjs:3:1 › V15.2.20 registers the cache-qualified worker and clears stale Finance caches %0A%0A    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────%0A    Error: expect(received).toContain(expected) // indexOf%0A%0A    Expected substring: "v=15.2.19"%0A    Received string:    "http://127.0.0.1:3000/sw.js?v=15.2.20&cache=finance-v15-20260821-compact-expense-stability-r56"%0A%0A    Call Log:%0A    - Timeout 15000ms exceeded while waiting on the predicate%0A%0A      10 |   });%0A      11 |%0A    > 12 |   await expect.poll(async () => page.evaluate(() => navigator.serviceWorker.controller?.scriptURL || ""), { timeout:15000 }).toContain("v=15.2.19");%0A         |                                                                                                                              ^%0A      13 |   const workerUrl = await page.evaluate(() => navigator.serviceWorker.controller?.scriptURL || "");%0A      14 |   expect(workerUrl).toContain("cache=finance-v15-20260821-compact-expense-stability-r56");%0A      15 |%0A        at /home/runner/work/my-finance-record/my-finance-record/tests/browser/pwa-upgrade-v15-0-5.spec.mjs:12:126
+··································································
+················×F
+::error file=tests/sync/sync-status-v15-2-3.spec.mjs,title=tests/sync/sync-status-v15-2-3.spec.mjs:29:1 › V15.2.18 release metadata is visible,line=32,col=45::  3) tests/sync/sync-status-v15-2-3.spec.mjs:29:1 › V15.2.18 release metadata is visible ───────────%0A    Error: expect(locator).toContainText(expected) failed%0A%0A    Locator: locator('#buildBadge')%0A    Expected substring: "V15.2.18"%0A    Received string:    "V15.2.20"%0A    Timeout: 5000ms%0A%0A    Call log:%0A      - Expect "toContainText" with timeout 5000ms%0A      - waiting for locator('#buildBadge')%0A        14 × locator resolved to <small id="buildBadge" data-v15-observe-bound="true" title="V15.2.20 · Compact Expense Cards Stability · August 21, 2026">V15.2.20</small>%0A           - unexpected value "V15.2.20"%0A%0A%0A      30 |   await page.goto("http://127.0.0.1:3000/index.html?page=dashboard", { waitUntil:"networkidle" });%0A      31 |   await expect(page).toHaveTitle(/V15\.2\.20/);%0A    > 32 |   await expect(page.locator("#buildBadge")).toContainText("V15.2.18");%0A         |                                             ^%0A      33 | });%0A      34 |%0A        at /home/runner/work/my-finance-record/my-finance-record/tests/sync/sync-status-v15-2-3.spec.mjs:32:45
+::error file=tests/sync/sync-status-v15-2-3.spec.mjs,title=tests/sync/sync-status-v15-2-3.spec.mjs:29:1 › V15.2.18 release metadata is visible,line=32,col=45::  3) tests/sync/sync-status-v15-2-3.spec.mjs:29:1 › V15.2.18 release metadata is visible ───────────%0A%0A    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────%0A    Error: expect(locator).toContainText(expected) failed%0A%0A    Locator: locator('#buildBadge')%0A    Expected substring: "V15.2.18"%0A    Received string:    "V15.2.20"%0A    Timeout: 5000ms%0A%0A    Call log:%0A      - Expect "toContainText" with timeout 5000ms%0A      - waiting for locator('#buildBadge')%0A        14 × locator resolved to <small id="buildBadge" data-v15-observe-bound="true" title="V15.2.20 · Compact Expense Cards Stability · August 21, 2026">V15.2.20</small>%0A           - unexpected value "V15.2.20"%0A%0A%0A      30 |   await page.goto("http://127.0.0.1:3000/index.html?page=dashboard", { waitUntil:"networkidle" });%0A      31 |   await expect(page).toHaveTitle(/V15\.2\.20/);%0A    > 32 |   await expect(page.locator("#buildBadge")).toContainText("V15.2.18");%0A         |                                             ^%0A      33 | });%0A      34 |%0A        at /home/runner/work/my-finance-record/my-finance-record/tests/sync/sync-status-v15-2-3.spec.mjs:32:45
+
+
+  1) tests/browser/production-ui-audit-v15-2-13.spec.mjs:38:3 › desktop toolbar and Budget summaries share compact geometry at 1440px 
+
+    Error: expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 58
+    Received:    63.53125
+
+      67 |     metrics.visibleToolbarHeights.forEach(height => expect(height).toBeCloseTo(34, 0));
+      68 |     expect(metrics.summaryHeights).toHaveLength(8);
+    > 69 |     metrics.summaryHeights.forEach(height => expect(height).toBeLessThanOrEqual(58));
+         |                                                             ^
+      70 |     expect(metrics.disclosureSizes.length).toBeGreaterThanOrEqual(4);
+      71 |     metrics.disclosureSizes.forEach(([widthValue, heightValue]) => {
+      72 |       expect(widthValue).toBeCloseTo(40, 0);
+        at forEach (/home/runner/work/my-finance-record/my-finance-record/tests/browser/production-ui-audit-v15-2-13.spec.mjs:69:61)
+        at /home/runner/work/my-finance-record/my-finance-record/tests/browser/production-ui-audit-v15-2-13.spec.mjs:69:28
+
+    Error Context: test-results/browser-production-ui-audi-ad4bf--compact-geometry-at-1440px/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/browser-production-ui-audi-ad4bf--compact-geometry-at-1440px/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/browser-production-ui-audi-ad4bf--compact-geometry-at-1440px/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 58
+    Received:    63.53125
+
+      67 |     metrics.visibleToolbarHeights.forEach(height => expect(height).toBeCloseTo(34, 0));
+      68 |     expect(metrics.summaryHeights).toHaveLength(8);
+    > 69 |     metrics.summaryHeights.forEach(height => expect(height).toBeLessThanOrEqual(58));
+         |                                                             ^
+      70 |     expect(metrics.disclosureSizes.length).toBeGreaterThanOrEqual(4);
+      71 |     metrics.disclosureSizes.forEach(([widthValue, heightValue]) => {
+      72 |       expect(widthValue).toBeCloseTo(40, 0);
+        at forEach (/home/runner/work/my-finance-record/my-finance-record/tests/browser/production-ui-audit-v15-2-13.spec.mjs:69:61)
+        at /home/runner/work/my-finance-record/my-finance-record/tests/browser/production-ui-audit-v15-2-13.spec.mjs:69:28
+
+    Error Context: test-results/browser-production-ui-audi-ad4bf--compact-geometry-at-1440px-retry1/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/browser-production-ui-audi-ad4bf--compact-geometry-at-1440px-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/browser-production-ui-audi-ad4bf--compact-geometry-at-1440px-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) tests/browser/pwa-upgrade-v15-0-5.spec.mjs:3:1 › V15.2.20 registers the cache-qualified worker and clears stale Finance caches 
+
+    Error: expect(received).toContain(expected) // indexOf
+
+    Expected substring: "v=15.2.19"
+    Received string:    "http://127.0.0.1:3000/sw.js?v=15.2.20&cache=finance-v15-20260821-compact-expense-stability-r56"
+
+    Call Log:
+    - Timeout 15000ms exceeded while waiting on the predicate
+
+      10 |   });
+      11 |
+    > 12 |   await expect.poll(async () => page.evaluate(() => navigator.serviceWorker.controller?.scriptURL || ""), { timeout:15000 }).toContain("v=15.2.19");
+         |                                                                                                                              ^
+      13 |   const workerUrl = await page.evaluate(() => navigator.serviceWorker.controller?.scriptURL || "");
+      14 |   expect(workerUrl).toContain("cache=finance-v15-20260821-compact-expense-stability-r56");
+      15 |
+        at /home/runner/work/my-finance-record/my-finance-record/tests/browser/pwa-upgrade-v15-0-5.spec.mjs:12:126
+
+    Error Context: test-results/browser-pwa-upgrade-v15-0--706a8-clears-stale-Finance-caches/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/browser-pwa-upgrade-v15-0--706a8-clears-stale-Finance-caches/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/browser-pwa-upgrade-v15-0--706a8-clears-stale-Finance-caches/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: expect(received).toContain(expected) // indexOf
+
+    Expected substring: "v=15.2.19"
+    Received string:    "http://127.0.0.1:3000/sw.js?v=15.2.20&cache=finance-v15-20260821-compact-expense-stability-r56"
+
+    Call Log:
+    - Timeout 15000ms exceeded while waiting on the predicate
+
+      10 |   });
+      11 |
+    > 12 |   await expect.poll(async () => page.evaluate(() => navigator.serviceWorker.controller?.scriptURL || ""), { timeout:15000 }).toContain("v=15.2.19");
+         |                                                                                                                              ^
+      13 |   const workerUrl = await page.evaluate(() => navigator.serviceWorker.controller?.scriptURL || "");
+      14 |   expect(workerUrl).toContain("cache=finance-v15-20260821-compact-expense-stability-r56");
+      15 |
+        at /home/runner/work/my-finance-record/my-finance-record/tests/browser/pwa-upgrade-v15-0-5.spec.mjs:12:126
+
+    Error Context: test-results/browser-pwa-upgrade-v15-0--706a8-clears-stale-Finance-caches-retry1/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/browser-pwa-upgrade-v15-0--706a8-clears-stale-Finance-caches-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/browser-pwa-upgrade-v15-0--706a8-clears-stale-Finance-caches-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) tests/sync/sync-status-v15-2-3.spec.mjs:29:1 › V15.2.18 release metadata is visible ───────────
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: locator('#buildBadge')
+    Expected substring: "V15.2.18"
+    Received string:    "V15.2.20"
+    Timeout: 5000ms
+
+    Call log:
+      - Expect "toContainText" with timeout 5000ms
+      - waiting for locator('#buildBadge')
+        14 × locator resolved to <small id="buildBadge" data-v15-observe-bound="true" title="V15.2.20 · Compact Expense Cards Stability · August 21, 2026">V15.2.20</small>
+           - unexpected value "V15.2.20"
+
+
+      30 |   await page.goto("http://127.0.0.1:3000/index.html?page=dashboard", { waitUntil:"networkidle" });
+      31 |   await expect(page).toHaveTitle(/V15\.2\.20/);
+    > 32 |   await expect(page.locator("#buildBadge")).toContainText("V15.2.18");
+         |                                             ^
+      33 | });
+      34 |
+        at /home/runner/work/my-finance-record/my-finance-record/tests/sync/sync-status-v15-2-3.spec.mjs:32:45
+
+    Error Context: test-results/sync-sync-status-v15-2-3-V-2e8be-release-metadata-is-visible/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/sync-sync-status-v15-2-3-V-2e8be-release-metadata-is-visible/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/sync-sync-status-v15-2-3-V-2e8be-release-metadata-is-visible/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: locator('#buildBadge')
+    Expected substring: "V15.2.18"
+    Received string:    "V15.2.20"
+    Timeout: 5000ms
+
+    Call log:
+      - Expect "toContainText" with timeout 5000ms
+      - waiting for locator('#buildBadge')
+        14 × locator resolved to <small id="buildBadge" data-v15-observe-bound="true" title="V15.2.20 · Compact Expense Cards Stability · August 21, 2026">V15.2.20</small>
+           - unexpected value "V15.2.20"
+
+
+      30 |   await page.goto("http://127.0.0.1:3000/index.html?page=dashboard", { waitUntil:"networkidle" });
+      31 |   await expect(page).toHaveTitle(/V15\.2\.20/);
+    > 32 |   await expect(page.locator("#buildBadge")).toContainText("V15.2.18");
+         |                                             ^
+      33 | });
+      34 |
+        at /home/runner/work/my-finance-record/my-finance-record/tests/sync/sync-status-v15-2-3.spec.mjs:32:45
+
+    Error Context: test-results/sync-sync-status-v15-2-3-V-2e8be-release-metadata-is-visible-retry1/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/sync-sync-status-v15-2-3-V-2e8be-release-metadata-is-visible-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/sync-sync-status-v15-2-3-V-2e8be-release-metadata-is-visible-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3 failed
+    tests/browser/production-ui-audit-v15-2-13.spec.mjs:38:3 › desktop toolbar and Budget summaries share compact geometry at 1440px 
+    tests/browser/pwa-upgrade-v15-0-5.spec.mjs:3:1 › V15.2.20 registers the cache-qualified worker and clears stale Finance caches 
+    tests/sync/sync-status-v15-2-3.spec.mjs:29:1 › V15.2.18 release metadata is visible ────────────
+  172 passed (2.3m)
+::notice title=🎭 Playwright Run Summary::  3 failed%0A    tests/browser/production-ui-audit-v15-2-13.spec.mjs:38:3 › desktop toolbar and Budget summaries share compact geometry at 1440px %0A    tests/browser/pwa-upgrade-v15-0-5.spec.mjs:3:1 › V15.2.20 registers the cache-qualified worker and clears stale Finance caches %0A    tests/sync/sync-status-v15-2-3.spec.mjs:29:1 › V15.2.18 release metadata is visible ────────────%0A  172 passed (2.3m)
