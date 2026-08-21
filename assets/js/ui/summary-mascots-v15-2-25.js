@@ -11,6 +11,14 @@
 
   let queued = false;
 
+  function storedAmountText(element) {
+    if (!element) return "";
+    return element.dataset.firstHalfOriginalText
+      || element.dataset.otherExpensesOriginalText
+      || element.textContent?.trim()
+      || "";
+  }
+
   function numericAmount(value) {
     const text = String(value || "").replace(/,/g, "").trim();
     if (!text) return NaN;
@@ -22,17 +30,24 @@
 
   function clearMascot(element) {
     if (!element) return;
+    const legacyAmount = storedAmountText(element);
+    const hasLegacyCompletion = Boolean(element.querySelector("img[data-first-half-complete-icon], img[data-other-expenses-complete-icon]"));
     element.classList.remove("summary-mascot-slot");
     delete element.dataset.summaryMascot;
-    element.removeAttribute("aria-label");
-    element.removeAttribute("title");
+    if (hasLegacyCompletion && legacyAmount) {
+      element.setAttribute("aria-label", legacyAmount);
+      element.title = legacyAmount;
+    } else {
+      element.removeAttribute("aria-label");
+      element.removeAttribute("title");
+    }
     element.closest(".summary-card")?.classList.remove("has-summary-mascot");
     element.closest(".collapse-actions")?.classList.remove("has-period-mascot");
   }
 
   function useMascot(element, { color, accessibleLabel, cardClass = true, periodClass = false }) {
     if (!element) return;
-    const value = element.textContent.trim();
+    const value = storedAmountText(element);
     const nextLabel = `${accessibleLabel}: ${value}`;
     if (!element.classList.contains("summary-mascot-slot")) element.classList.add("summary-mascot-slot");
     if (element.dataset.summaryMascot !== color) element.dataset.summaryMascot = color;
@@ -45,7 +60,7 @@
   function zeroTotal(id, color, label, { period = false } = {}) {
     const element = document.getElementById(id);
     if (!element) return;
-    const amount = numericAmount(element.textContent);
+    const amount = numericAmount(storedAmountText(element));
     if (Number.isFinite(amount) && Math.abs(amount) < 0.005) {
       useMascot(element, { color, accessibleLabel:label, cardClass:!period, periodClass:period });
     } else {
