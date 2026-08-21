@@ -17,7 +17,9 @@
 | --- | ---: | ---: | ---: |
 | **V2.0.0** · Organized Complete | **12** | **V3** | **5 minutes** |
 
-V2.0.0 adopts a clean product history from **V1.0.0 (Created)** through **V2.0.0 (Organized Complete)**. It combines the complete local-first finance system, Account Ledger, budgeting, reporting, projects, productivity, reminders, encrypted multi-profile Cloud Schema V3 synchronization, responsive desktop/phone interface, PWA delivery, and final Budget & Expenses experience into one organized production baseline. The original V12.19.0–V15.2.24 release history is retained in `CHANGELOG.md` for auditability.
+V2.0.0 is the organized production baseline for My Finance Records. The product history now runs cleanly from **V1.0.0 (Created)** through **V2.0.0 (Organized Complete)**, combining the local-first finance system, Account Ledger, budgeting, reporting, projects, productivity, reminders, encrypted multi-profile Cloud Schema V3 synchronization, responsive desktop/phone interface, PWA delivery, and the final Budget & Expenses experience.
+
+The organized release history is maintained in [`CHANGELOG.md`](CHANGELOG.md), with the V1→V2 development roadmap in [`version.md`](version.md). The original detailed V12.19.0–V15.2.24 sequence remains recoverable from Git history and is mapped to the organized milestones in both documents.
 
 ## What it offers
 
@@ -38,7 +40,7 @@ The organized product history is documented in [`version.md`](version.md):
 
 **V1.0.0 Created → Cloud Sync → Ledger → Budgeting → Insights → Productivity → Reminders → Profiles & Encryption → Mobile Finance → Projects & Navigation → Sync Hardening → Modern PWA → Production Organization → Final Budget & Expenses Polish → V2.0.0 Organized Complete.**
 
-The historical repository release log remains in [`CHANGELOG.md`](CHANGELOG.md).
+The corresponding release changelog is in [`CHANGELOG.md`](CHANGELOG.md). New releases continue forward from **V2.0.0** using semantic versioning; the old V12–V15 numbering is historical only.
 
 ## Quick start
 
@@ -63,7 +65,7 @@ flowchart LR
     Sync <--> Cloud["Supabase + RLS"]
 ```
 
-The V2 runtime keeps compatibility-sensitive legacy asset filenames where changing them would create unnecessary PWA risk. New work should continue moving toward focused module ownership under `assets/` while preserving explicit migration paths for stored finance data and installed clients.
+The V2 runtime keeps compatibility-sensitive legacy asset filenames where changing them would create unnecessary PWA risk. A filename containing V13, V14, or V15 is therefore a compatibility URL, not the current product version. New work should continue moving toward focused module ownership under `assets/` while preserving explicit migration paths for stored finance data and installed clients.
 
 <details>
 <summary><strong>Repository layout</strong></summary>
@@ -116,4 +118,4 @@ Contributions should begin with [`CONTRIBUTING.md`](CONTRIBUTING.md). Keep each 
 | Migrations | [`docs/migration/`](docs/migration/) |
 | Release operations | [`docs/release/`](docs/release/) |
 | Organized V1 → V2 roadmap | [`version.md`](version.md) |
-| Historical release history | [`CHANGELOG.md`](CHANGELOG.md) |
+| Organized release changelog | [`CHANGELOG.md`](CHANGELOG.md) |
