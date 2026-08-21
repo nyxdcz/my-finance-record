@@ -23,17 +23,17 @@ for (const expectedMarker of ["applyV15ReleaseLayer", "loadExpenseScreenshotTool
 if (!prepareRuntime.includes('"sync-runtime-compat.js"')) throw new Error("prepare-runtime must map sync-runtime-compat.js to the flat runtime root.");
 
 const configPosition = index.indexOf("./sync-config.js?v=15.2.10-release1");
-const runtimePosition = index.indexOf("./sync-runtime-compat.js?v=15.2.18-release9");
+const runtimePosition = index.indexOf("./sync-runtime-compat.js?v=15.2.20-release10");
 if (configPosition < 0 || runtimePosition < 0 || runtimePosition <= configPosition) {
   throw new Error("index.html must load sync-config.js before sync-runtime-compat.js.");
 }
 
-const expectedCache = "finance-v15-20260821-horizontal-kanban-r54";
-if (version.version !== "15.2.18") throw new Error(`Unexpected app version: ${version.version}`);
+const expectedCache = "finance-v15-20260821-compact-expense-stability-r56";
+if (version.version !== "15.2.20") throw new Error(`Unexpected app version: ${version.version}`);
 if (version.schemaVersion !== 12 || version.cloudSchemaVersion !== 3) throw new Error("Priority 4A must not change finance/cloud schema versions.");
 if (version.cacheVersion !== expectedCache) throw new Error(`Unexpected cache version: ${version.cacheVersion}`);
 if (!serviceWorker.includes(`const CACHE_VERSION = "${expectedCache}";`)) throw new Error("Service worker cache identity is not synchronized.");
-if (!serviceWorker.includes("./sync-runtime-compat.js?v=15.2.18-release9")) throw new Error("Service worker must precache the sync runtime compatibility file.");
+if (!serviceWorker.includes("./sync-runtime-compat.js?v=15.2.20-release10")) throw new Error("Service worker must precache the sync runtime compatibility file.");
 if (!index.includes(`const APP_CACHE_VERSION = "${expectedCache}";`)) throw new Error("index.html cache identity is not synchronized.");
 if (runtime.includes("window.FINANCE_SYNC_CONFIG")) throw new Error("sync runtime compatibility file must not own hosted sync configuration.");
 

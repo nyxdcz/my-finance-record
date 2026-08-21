@@ -1,3 +1,8 @@
+## 15.2.20 · 2026-08-21
+- Corrected production desktop expense-card geometry to 7px row padding, 8px column gap, 5px action-footer padding, and 30px desktop actions.
+- Guaranteed Repeat monthly / Repeats monthly remains visible and non-shrinking at a minimum 82px width directly before Mark paid while leaving phone touch layouts unchanged.
+- Synchronized V15.2.20 runtime, cache, and regression expectations around `finance-v15-20260821-compact-expense-stability-r56` while preserving Finance Schema 12, Cloud Schema V3, calculations, balances, recurrence/payment semantics, filters, branding, and five-minute Cloud Sync.
+
 ## 15.2.19 · 2026-08-21
 - Compacted First half, Second half, and Other expense cards with 7px card padding, tighter metadata rhythm, 30px desktop actions, and the existing 5px spacing between separate expense cards.
 - Restored the functional Repeat monthly / Repeats monthly control directly beside Mark paid and prevented it from shrinking to an icon-sized button in three-column layouts.
