@@ -18,14 +18,16 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
     steps:
-      - name: Fetch approved repair script
+      - name: Fetch approved repair scripts
         shell: bash
         run: |
           set -o pipefail
           {
             set -euo pipefail
             gh api "repos/$GITHUB_REPOSITORY/contents/scripts/v15-2-21-repair.cjs?ref=v15.2.21-staging" --jq .content | tr -d '\n' | base64 -d > /tmp/v15-2-21-repair.cjs
+            gh api "repos/$GITHUB_REPOSITORY/contents/scripts/v15-2-21-postfix.cjs?ref=v15.2.21-staging" --jq .content | tr -d '\n' | base64 -d > /tmp/v15-2-21-postfix.cjs
             test -s /tmp/v15-2-21-repair.cjs
+            test -s /tmp/v15-2-21-postfix.cjs
           } 2>&1 | tee /tmp/v15-fetch.log
 
       - name: Clone current main
@@ -55,7 +57,7 @@ jobs:
           set -o pipefail
           {
             node /tmp/v15-2-21-repair.cjs
-            node -e 'const fs=require("node:fs"); const s=fs.readFileSync("CHANGELOG.md","utf8"); console.log("CHANGELOG_HEAD", JSON.stringify(s.slice(0,100))); console.log("CHANGELOG_MATCH", s.startsWith("## 15.2.21 · 2026-08-21"));'
+            node /tmp/v15-2-21-postfix.cjs
             git diff --check
             git diff --stat
           } 2>&1 | tee /tmp/v15-apply.log
