@@ -24,7 +24,7 @@ assert.match(updater, /const FINANCE_CACHE_PATTERN = \/\^finance-v\\d\+-\//);
 assert.match(updater, /const LEGACY_INDEX_CACHE = "finance-v15-20260816-mobile-ui-ux-r32";/);
 assert.match(updater, /const CURRENT_CACHE_VERSION = "finance-v15-20260821-horizontal-kanban-r54";/);
 assert.match(updater, /const UI_HOTFIX_REFRESH_KEY = "finance-ui-hotfix-v15-2-18-kanban-menu3-neutral-border1";/);
-assert.match(updater, /async function refreshCachedUiHotfixOnce\(\)/);
+assert.match(updater, /async function refreshCachedHeaderToolsOnce\(\)/);
 assert.match(updater, /desktop-ui-phase1-v15-1-0\.css/);
 assert.match(updater, /header-tools-compat\.js/);
 assert.match(updater, /normalizeCacheVersion/);
