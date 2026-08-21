@@ -17,6 +17,18 @@ const RELEASE = Object.freeze({
   phoneQuery:"2.0.0-organized1"
 });
 
+const CURRENT_VERSION_HISTORY = Object.freeze([{
+  version:RELEASE.displayVersion,
+  title:RELEASE.name,
+  changes:[
+    "Current production release for the complete My Finance Records experience.",
+    "Includes the local-first Finance workspace, Account Ledger, budgeting, reports, projects, productivity tools, reminders, and responsive desktop and phone layouts.",
+    "Includes encrypted multi-profile Cloud Schema V3 synchronization, offline PWA support, recovery safeguards, and five-minute routine sync.",
+    "Includes the final Budget & Expenses compact-card layout, independent First half / Second half / Other expenses collapse controls, and PNG summary mascots.",
+    "Preserves Finance Schema 12, Cloud Schema V3, saved records, balances, recurrence, payments, backups, encryption, and synchronization behavior."
+  ]
+}]);
+
 const runtimeGroups = {
   "assets/css": [
     "account-ledger.css",
@@ -127,10 +139,15 @@ patchTextFile("index.html", source => {
     .replace(/pwa-update-v15-0-5\.js\?v=[^"]+/, `pwa-update-v15-0-5.js?v=${RELEASE.pwaQuery}`)
     .replace(/phone-finance-compat\.js\?v=[^"]+/, `phone-finance-compat.js?v=${RELEASE.phoneQuery}`);
 
-  if (!next.includes(`"version":"${RELEASE.displayVersion}"`)) {
-    const historyEntry = `    VERSION_HISTORY.unshift({"version":"${RELEASE.displayVersion}","title":"${RELEASE.name}","changes":["Resets the public product version history into the organized V1.0.0-to-V2.0.0 roadmap while retaining the original V12-V15 changelog for audit history.","Combines the complete local-first Finance, account ledger, budgets, reports, projects, productivity, reminders, encrypted Cloud Schema V3 sync, responsive UI, and PWA delivery into one production release.","Preserves Finance Schema 12, Cloud Schema V3, saved records, calculations, balances, recurrence, payments, storage, encryption, and sync semantics while rotating to the V2 application cache."]});\n`;
-    next = next.replace(/(\n\s*function normalizeSettingsPanelKey\()/, `\n${historyEntry}$1`);
-  }
+  const historySource = `    const VERSION_HISTORY = ${JSON.stringify(CURRENT_VERSION_HISTORY)};`;
+  next = next.replace(
+    /    const VERSION_HISTORY = \[[\s\S]*?\n\n    function normalizeSettingsPanelKey\(/,
+    `${historySource}\n\n    function normalizeSettingsPanelKey(`
+  );
+  next = next.replace(
+    "<h3>Version history</h3><p>What changed in each app release</p>",
+    "<h3>Version history</h3><p>Latest release details</p>"
+  );
   return next;
 });
 
