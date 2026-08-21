@@ -121,7 +121,7 @@
   #money :is(.legend-item,.period-card),
   #moneySummary .summary-item { box-shadow:none; }
   #availableMoneySection {
-    border-color:color-mix(in srgb,var(--green) 22%,var(--line));
+    border-color:var(--line);
   }
 
   /* Projects: make Search the wide anchor and visually group the filter set. */

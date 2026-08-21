@@ -35,6 +35,8 @@ for (const token of [
 
 if (!css.includes('@media (min-width:851px)')) fail("Desktop Phase 1 CSS is not explicitly desktop-scoped.");
 if (/max-width\s*:\s*700px/.test(css)) fail("Desktop Phase 1 stylesheet must not own phone layout rules.");
+if (!/#availableMoneySection\s*\{[\s\S]*?border-color\s*:\s*var\(--line\)\s*;[\s\S]*?\}/.test(css)) fail("Available money outer section must use the standard neutral line border.");
+if (/border-color\s*:\s*color-mix\(in srgb,var\(--green\) 22%,var\(--line\)\)/.test(css)) fail("Available money outer section must not retain the green-tinted desktop border.");
 
 if (!html.includes('id="settingsOverviewAppStatus">Version 15.2.2</strong>')) fail("Settings overview starts with a stale app version.");
 if (!html.includes('class="paid-expenses-info-note"')) fail("Paid Expenses contextual behavior note is missing.");
@@ -46,4 +48,4 @@ for (const id of ["exportMonthlyReportCsv","exportMonthlyReportJson","exportInco
   if ((html.match(new RegExp(`id=\\"${id}\\"`, "g")) || []).length !== 1) fail(`${id} must remain unique after export-menu consolidation.`);
 }
 
-console.log("Desktop UI Phase 1 validation passed under V15.2.9: desktop hierarchy, compact Income, report export menu, calendar states, Settings disclosure, contextual Paid note, deployment packaging, and preserved phone-Finance/cloud-profile delivery are source-aligned.");
+console.log("Desktop UI Phase 1 validation passed under V15.2.18: neutral Available money section border, desktop hierarchy, compact Income, report export menu, calendar states, Settings disclosure, contextual Paid note, deployment packaging, and preserved phone-Finance/cloud-profile delivery are source-aligned.");

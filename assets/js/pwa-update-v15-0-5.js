@@ -3,24 +3,27 @@
   const FINANCE_CACHE_PATTERN = /^finance-v\d+-/;
   const LEGACY_INDEX_CACHE = "finance-v15-20260816-mobile-ui-ux-r32";
   const CURRENT_CACHE_VERSION = "finance-v15-20260821-horizontal-kanban-r54";
-  const HEADER_TOOLS_REFRESH_KEY = "finance-header-tools-hotfix-v15-2-18-kanban-menu3";
+  const UI_HOTFIX_REFRESH_KEY = "finance-ui-hotfix-v15-2-18-kanban-menu3-neutral-border1";
   const normalizeCacheVersion = cacheVersion => cacheVersion === LEGACY_INDEX_CACHE ? CURRENT_CACHE_VERSION : cacheVersion;
 
-  async function refreshCachedHeaderToolsOnce() {
+  async function refreshCachedUiHotfixOnce() {
     if (!root.navigator?.serviceWorker?.controller || !("caches" in root)) return false;
     try {
-      if (root.localStorage?.getItem(HEADER_TOOLS_REFRESH_KEY) === "done") return false;
+      if (root.localStorage?.getItem(UI_HOTFIX_REFRESH_KEY) === "done") return false;
       const cacheNames = (await root.caches.keys()).filter(name => FINANCE_CACHE_PATTERN.test(name));
       await Promise.all(cacheNames.map(async cacheName => {
         const cache = await root.caches.open(cacheName);
         const requests = await cache.keys();
         const targets = requests.filter(request => {
-          try { return new URL(request.url).pathname.endsWith("/header-tools-compat.js"); }
+          try {
+            const pathname = new URL(request.url).pathname;
+            return pathname.endsWith("/header-tools-compat.js") || pathname.endsWith("/desktop-ui-phase1-v15-1-0.css");
+          }
           catch (error) { return false; }
         });
         await Promise.all(targets.map(request => cache.delete(request)));
       }));
-      root.localStorage?.setItem(HEADER_TOOLS_REFRESH_KEY, "done");
+      root.localStorage?.setItem(UI_HOTFIX_REFRESH_KEY, "done");
       root.location.reload();
       return true;
     } catch (error) {
@@ -51,5 +54,5 @@
     }
   };
   root.FinancePwaUpdate = api;
-  void refreshCachedHeaderToolsOnce();
+  void refreshCachedUiHotfixOnce();
 })(typeof window !== "undefined" ? window : globalThis);
