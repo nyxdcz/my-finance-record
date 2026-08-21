@@ -120,7 +120,7 @@
     place-items: center !important;
     align-self: center !important;
     /* Optical correction: the supplied mascot artwork reads low when its 30px box is mathematically centered. */
-    transform: translateY(-10px) !important;
+    transform: translateY(-5px) !important;
   }
 
   #money .period-card .period-total.summary-mascot-slot::after {
