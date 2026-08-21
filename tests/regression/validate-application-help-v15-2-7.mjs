@@ -19,6 +19,6 @@ assert.ok(html.includes("function clearAccountDropTargets()"), "Approved post-He
 assert.ok(prepare.includes('"assets/js/ui"') && prepare.includes('"application-help.js"'), "Nested runtime mapping missing");
 assert.ok(worker.includes('asset("./application-help.js?v=15.2.9-phase5b1")'), "Service worker does not precache Application Help");
 assert.ok(workflow.includes("cp assets/js/ui/*.js _site/") && workflow.includes("test -f _site/application-help.js"), "Pages nested packaging missing");
-assert.equal(version.version, "15.2.23");
-assert.equal(version.cacheVersion, "finance-v15-20260821-monthly-repeat-icon-r59");
-console.log("Application Help V15.2.9 extraction validation passed.");
+assert.equal(version.version, "15.2.24");
+assert.equal(version.cacheVersion, "finance-v15-20260822-compact-expense-collapse-r60");
+console.log("Application Help V15.2.9 extraction validation passed under V15.2.24.");

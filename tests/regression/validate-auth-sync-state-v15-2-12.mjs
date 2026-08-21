@@ -29,8 +29,8 @@ assert.match(source, /overviewSync\.disabled = syncing \|\| !navigator\.onLine \
 assert.match(source, /activateSettingsPanel\(cloudReadiness\(\)\.ready \? "sync" : "profiles"/, "Recovery actions must open Profile & Security when setup is incomplete");
 assert.match(index, /id="cloudConnectionChip">Connected<\/span>/, "The connected chip must be runtime-owned");
 
-assert.equal(version.version, "15.2.23");
-assert.equal(version.cacheVersion, "finance-v15-20260821-monthly-repeat-icon-r59");
+assert.equal(version.version, "15.2.24");
+assert.equal(version.cacheVersion, "finance-v15-20260822-compact-expense-collapse-r60");
 assert.match(worker, /cloud-sync\.js\?v=15\.2\.12-sync2/);
 
-console.log("V15.2.12 auth and sync readiness regression passed under V15.2.18.");
+console.log("V15.2.12 auth and sync readiness regression passed under V15.2.24.");

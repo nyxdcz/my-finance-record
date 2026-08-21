@@ -22,7 +22,7 @@ for (const width of widths) {
       labelDisplay:getComputedStyle(button.querySelector(".phone-only-action-label")).display,
       iconDisplay:getComputedStyle(button.querySelector(".phone-only-action-icon")).display,
       bound:button.dataset.phoneCompactIconBound,
-      script:[...document.scripts].some(script => String(script.src || "").includes("phone-finance-compat.js?v=15.2.10-phone1"))
+      script:[...document.scripts].some(script => String(script.src || "").includes("phone-finance-compat.js?v=15.2.24-compact1"))
     }));
 
     expect(state.width).toBe("44px");

@@ -14,7 +14,7 @@
     overflow: visible !important;
   }
 
-  html body #money .period-header,
+  html body #money .period-card .period-header,
   html body #money .period-card.is-collapsed .period-header {
     min-height: 42px !important;
     margin: 0 !important;
@@ -114,6 +114,10 @@
     align-content: start !important;
     gap: 5px !important;
     padding: 0 !important;
+  }
+
+  html body #money .period-card.is-collapsed > :is(#earlyExpenses, #lateExpenses, #otherExpenses) {
+    display: none !important;
   }
 
   html body #money :is(#earlyExpenses, #lateExpenses, #otherExpenses) > .record-row[data-expense-row],
