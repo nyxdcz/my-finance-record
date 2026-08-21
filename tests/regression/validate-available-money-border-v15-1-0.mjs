@@ -10,8 +10,8 @@ assert.match(css, /#availableMoneySection \.account-card \{[\s\S]*border-color:r
 assert.doesNotMatch(css, /#availableMoneySection \{[\s\S]{0,160}border-color:rgba\(207,231,213,\.24\)/);
 assert.match(index, /black-canvas-v15-1-0\.css\?v=15\.1\.0-light1/);
 assert.match(sw, /black-canvas-v15-1-0\.css\?v=15\.1\.0-light1/);
-assert.equal(version.version, "15.2.24");
+assert.equal(version.version, "2.0.0");
 assert.equal(version.schemaVersion, 12);
 assert.equal(version.cloudSchemaVersion, 3);
-assert.equal(version.cacheVersion, "finance-v15-20260822-compact-expense-collapse-r60");
-console.log("V15.2.9 Available money account-border regression passed under V15.2.24.");
+assert.equal(version.cacheVersion, "finance-v2-20260822-organized-complete-r1");
+console.log("Available money account-border regression passed under V2.0.0 while preserving the legacy Black Canvas asset pin.");
