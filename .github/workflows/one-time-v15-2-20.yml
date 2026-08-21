@@ -29,10 +29,11 @@ jobs:
           node-version: 24
           package-manager-cache: false
 
-      - name: Switch to current main
-        run: |
-          git fetch origin main
-          git checkout -B v15-2-20-release origin/main
+      - name: Check out current main for release
+        uses: actions/checkout@v7
+        with:
+          ref: main
+          fetch-depth: 0
 
       - name: Apply V15.2.20 release repair
         shell: bash
