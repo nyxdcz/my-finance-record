@@ -1,0 +1,20 @@
+import { test, expect } from "@playwright/test";
+
+test.use({ serviceWorkers:"block" });
+
+test("website Version history shows only the current V2.0.0 release", async ({ page }) => {
+  await page.goto("http://127.0.0.1:3000/?page=settings", { waitUntil:"networkidle" });
+
+  const card = page.locator(".settings-version-history-card");
+  await expect(card).toHaveCount(1);
+  await expect(card.locator("h3")).toHaveText("Version history");
+  await expect(card.locator(".card-header p")).toHaveText("Latest release details");
+
+  const entries = card.locator(".version-history-entry");
+  await expect(entries).toHaveCount(1);
+  await expect(entries.locator("summary strong")).toHaveText("V2.0.0 · Organized Complete");
+
+  const visibleText = await card.innerText();
+  expect(visibleText.match(/V\d+\.\d+\.\d+/g) || []).toEqual(["V2.0.0"]);
+  expect(visibleText).toContain("Current production release for the complete My Finance Records experience.");
+});
