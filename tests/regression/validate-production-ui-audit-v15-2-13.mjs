@@ -11,12 +11,12 @@ const browserAudit = read("tests/browser/production-ui-audit-v15-2-13.spec.mjs")
 const version = JSON.parse(read("version.json"));
 const pkg = JSON.parse(read("package.json"));
 
-assert.equal(version.version, "15.2.18");
-assert.equal(pkg.version, "15.2.18");
-assert.equal(version.cacheVersion, "finance-v15-20260821-horizontal-kanban-r54");
-assert.match(index, /production-ui-audit-v15-2-13\.css\?v=15\.2\.14-audit2/);
+assert.equal(version.version, "15.2.19");
+assert.equal(pkg.version, "15.2.19");
+assert.equal(version.cacheVersion, "finance-v15-20260821-compact-expense-cards-r55");
+assert.match(index, /production-ui-audit-v15-2-13\.css\?v=15\.2\.19-compact1/);
 assert.ok(index.indexOf("production-ui-audit-v15-2-13.css") > index.indexOf("desktop-ux-v15-2-0.css"));
-assert.match(worker, /production-ui-audit-v15-2-13\.css\?v=15\.2\.14-audit2/);
+assert.match(worker, /production-ui-audit-v15-2-13\.css\?v=15\.2\.19-compact1/);
 assert.match(prepare, /production-ui-audit-v15-2-13\.css/);
 
 assert.match(css, /animation:\s*financeSummaryConfirm 420ms ease-out/);
@@ -31,6 +31,7 @@ assert.match(css, /border-top:\s*1px solid var\(--line\) !important/);
 assert.match(css, /-webkit-line-clamp:\s*2/);
 assert.match(css, /Finance expense-period cleanup:[\s\S]*#money \.period-card \{[\s\S]*background:\s*var\(--surface\) !important;[\s\S]*border-color:\s*var\(--line\) !important;/);
 assert.match(css, /#money :is\(#earlyExpenses, #lateExpenses, #otherExpenses\) > \.record-row\[data-expense-row\] \+ \.record-row\[data-expense-row\][\s\S]*margin-top:\s*5px !important;/);
+assert.match(css, /Compact expense cards: static ownership[\s\S]*flex-shrink:\s*0 !important;[\s\S]*width:\s*max-content !important;[\s\S]*content:\s*"Repeat monthly" !important;/);
 
 assert.match(desktopUx, /--budget-disclosure-reference-size/);
 assert.match(desktopUx, /#dashCashFlowChart \.cash-flow-chart-grid/);
@@ -39,4 +40,4 @@ assert.match(browserAudit, /finance-signed-in/);
 assert.match(browserAudit, /window\.goToPage\("money"/);
 assert.match(browserAudit, /summaries:8, periods:3/);
 
-console.log("V15.2.18 production UI/UX audit source contract passed.");
+console.log("V15.2.19 production UI/UX audit source contract passed.");

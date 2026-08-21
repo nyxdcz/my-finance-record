@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 const APP_URL = "http://127.0.0.1:3000/index.html?page=money";
-const APP_CACHE = "finance-v15-20260821-horizontal-kanban-r54";
+const APP_CACHE = "finance-v15-20260821-compact-expense-cards-r55";
 
 async function openFinance(page, viewport) {
   await page.setViewportSize(viewport);
@@ -106,6 +106,7 @@ test("desktop Budget periods use compact expense cards with monthly repeat besid
       actionFooterPaddingTop:actionBar ? parseFloat(getComputedStyle(actionBar).paddingTop) : 0,
       recurrenceButtonHeight:saved?.getBoundingClientRect().height || 0,
       recurrenceButtonWidth:saved?.getBoundingClientRect().width || 0,
+      recurrenceFlexShrink:saved ? getComputedStyle(saved).flexShrink : "",
       actionCount:actions.length,
       savedIndex:actions.indexOf(saved),
       paidIndex:actions.indexOf(paid),
@@ -128,6 +129,7 @@ test("desktop Budget periods use compact expense cards with monthly repeat besid
   expect(metrics.actionFooterPaddingTop).toBeCloseTo(5, 0);
   expect(metrics.recurrenceButtonHeight).toBeCloseTo(30, 0);
   expect(metrics.recurrenceButtonWidth).toBeGreaterThan(65);
+  expect(metrics.recurrenceFlexShrink).toBe("0");
   expect(metrics.actionCount).toBeGreaterThanOrEqual(3);
   expect(metrics.savedIndex).toBeGreaterThanOrEqual(0);
   expect(metrics.paidIndex).toBe(metrics.savedIndex + 1);

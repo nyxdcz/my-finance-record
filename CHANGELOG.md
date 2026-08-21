@@ -1,3 +1,8 @@
+## 15.2.19 · 2026-08-21
+- Compacted First half, Second half, and Other expense cards with 7px card padding, tighter metadata rhythm, 30px desktop actions, and the existing 5px spacing between separate expense cards.
+- Restored the functional Repeat monthly / Repeats monthly control directly beside Mark paid and prevented it from shrinking to an icon-sized button in three-column layouts.
+- Returned branding code to icon-only ownership, kept the phone touch layout unchanged, and rotated the PWA shell to `finance-v15-20260821-compact-expense-cards-r55` while preserving Finance Schema 12, Cloud Schema V3, calculations, balances, recurrence semantics, filters, payments, and sync.
+
 ## 15.2.18 · 2026-08-21
 - Rebuilt Project Agenda and Projects as horizontal Kanban boards that move full cards from left to right with mouse, touch, or keyboard controls.
 - Added protected starting and Completed columns plus user-created, named, colored, reorderable columns that persist with synchronized project settings.

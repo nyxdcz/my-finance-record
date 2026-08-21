@@ -41,7 +41,7 @@
     })();
   </script>
 
-  <title>My Finance Records · V15.2.18</title>
+  <title>My Finance Records · V15.2.19</title>
   <link rel="stylesheet" href="./app.css?v=15.1.0-desktop3">
   <link rel="stylesheet" href="./shell-ui-v15-2-11.css?v=15.2.11-shell1">
   <link rel="stylesheet" href="./dashboard-interactions.css?v=15.2.10-icons1">
@@ -49,10 +49,10 @@
   <link rel="stylesheet" href="./black-canvas-v15-1-0.css?v=15.1.0-light1">
   <link rel="stylesheet" href="./desktop-ui-phase1-v15-1-0.css?v=15.1.0-phase1">
   <link rel="stylesheet" href="./desktop-ux-v15-2-0.css?v=15.2.5-disclosure1">
-  <link rel="stylesheet" href="./production-ui-audit-v15-2-13.css?v=15.2.14-audit2">
+  <link rel="stylesheet" href="./production-ui-audit-v15-2-13.css?v=15.2.19-compact1">
   <script src="./form-inputs.js?v=15.2.6-phase5a1"></script>
   <script src="./application-help.js?v=15.2.9-phase5b1"></script>
-  <script src="./pwa-update-v15-0-5.js?v=15.2.18-release14"></script>
+  <script src="./pwa-update-v15-0-5.js?v=15.2.19-release1"></script>
   <script src="./phone-finance-compat.js?v=15.2.10-phone1"></script>
   <script src="./cash-flow-summary.js?v=15.2.10-cashflow1"></script>
   <script src="./header-tools-compat.js?v=15.2.10-header1"></script>
@@ -97,7 +97,7 @@
           <div>
             <h1 id="topTitle">Budget &amp; Expenses</h1>
             <p id="todayLabel">Tuesday, July 21, 2026</p>
-            <small id="buildBadge" title="V15.2.18 · Horizontal Project Kanban · August 21, 2026">V15.2.18</small>
+            <small id="buildBadge" title="V15.2.19 · Compact Expense Cards · August 21, 2026">V15.2.19</small>
           </div>
         </div>
         <div class="topbar-actions">
@@ -5621,6 +5621,7 @@
     VERSION_HISTORY.unshift({"version":"V15.2.16","title":"Production Audit Reliability","changes":["Waits for the Finance view to finish rendering before responsive geometry is measured.","Checks the named compact desktop controls instead of counting hidden legacy actions.","Measures only visible phone disclosure controls while preserving the 44px touch-target requirement."]});
     VERSION_HISTORY.unshift({"version":"V15.2.17","title":"Runtime-Stable UI Audit","changes":["Waits for the current service-worker controller and network completion before responsive Finance measurements.","Reapplies the authenticated privacy state and activates Budget & Expenses after PWA initialization.","Requires the signed-in state plus visible summaries and period cards before testing layout geometry."]});
     VERSION_HISTORY.unshift({"version":"V15.2.18","title":"Horizontal Project Kanban","changes":["Rebuilds Project Agenda and Projects as horizontal boards with full-card mouse, touch, and keyboard dragging.","Adds protected start and Completed columns plus named, colored, reorderable custom workflow columns.","Preserves completion confirmation, payments, balances, revisions, safe invalid-drop return, and five-second Undo."]});
+    VERSION_HISTORY.unshift({"version":"V15.2.19","title":"Compact Expense Cards","changes":["Compacts First half, Second half, and Other expense cards while preserving the three-column desktop layout and 5px card spacing.","Restores Repeat monthly / Repeats monthly directly beside Mark paid with a non-shrinking desktop text button.","Moves compact expense-card presentation into the final static production stylesheet and preserves phone touch layouts, recurrence, calculations, filters, balances, payments, and sync behavior."]});
 
     function normalizeSettingsPanelKey(key) {
       const normalized = SETTINGS_PANEL_ALIASES[key] || key;
@@ -7829,10 +7830,10 @@
     });
 
     // ---------------- V12.10.0 PWA, Phase 11 interface refinement, Phase 10 calculator number inputs, projects, savings goals, and number inputs, Phase 7 secure reset, Phase 6 savings + dashboard insights, Phase 5 reports + dark mode, Phase 4 dashboard + Apple Calendar, Phase 3 monthly navigation, Phase 2 expense workflow, device registry, sync history, offline packs, reminders, and migration ----------------
-    const APP_VERSION = "15.2.18";
-    const APP_RELEASE_NAME = "Horizontal Project Kanban";
+    const APP_VERSION = "15.2.19";
+    const APP_RELEASE_NAME = "Compact Expense Cards";
     const APP_RELEASE_DATE = "August 21, 2026";
-    const APP_CACHE_VERSION = "finance-v15-20260821-horizontal-kanban-r54";
+    const APP_CACHE_VERSION = "finance-v15-20260821-compact-expense-cards-r55";
 
     function synchronizeVersionDisplay() {
       document.title = `My Finance Records · V${APP_VERSION}`;
