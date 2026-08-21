@@ -1,0 +1,73 @@
+name: One-time V15.2.21 validator
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+concurrency:
+  group: one-time-v15-2-21-main
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Fetch approved repair script
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api "repos/$GITHUB_REPOSITORY/contents/scripts/v15-2-21-repair.cjs?ref=v15.2.21-staging" --jq .content | tr -d '\n' | base64 -d > /tmp/v15-2-21-repair.cjs
+          test -s /tmp/v15-2-21-repair.cjs
+
+      - name: Clone current main
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone --branch main --depth 1 "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" .
+          git rev-parse HEAD
+
+      - name: Use Node 24
+        shell: bash
+        run: |
+          set -euo pipefail
+          NODE24="$(find /opt/hostedtoolcache/node -mindepth 2 -maxdepth 2 -type d -path '*/24.*/*' 2>/dev/null | sort -V | tail -1)"
+          test -x "$NODE24/bin/node"
+          echo "$NODE24/bin" >> "$GITHUB_PATH"
+
+      - name: Apply V15.2.21 repair
+        run: |
+          node /tmp/v15-2-21-repair.cjs
+          git diff --check
+          git diff --stat
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Run source quality
+        run: npm run quality
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run full browser suite
+        run: npm run test:browser
+
+      - name: Publish validated candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh auth setup-git
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm -f .github/workflows/one-time-v15-2-21-main.yml
+          git add -A
+          git diff --cached --check
+          git commit -m "release: V15.2.21 visible monthly recurrence label"
+          git push --force origin HEAD:refs/heads/v15.2.21-ready
+          git rev-parse HEAD
