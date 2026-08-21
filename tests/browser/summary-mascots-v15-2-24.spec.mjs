@@ -2,6 +2,14 @@ import { test, expect } from "@playwright/test";
 
 test.use({ serviceWorkers:"block" });
 
+async function ensureMoneyVisible(page) {
+  await page.evaluate(() => document.querySelector('.nav-button[data-page="money"]')?.click());
+  await page.waitForFunction(() => {
+    const money = document.getElementById("money");
+    return Boolean(money && getComputedStyle(money).display !== "none" && money.getBoundingClientRect().width > 0);
+  });
+}
+
 async function openMoney(page, width = 1440) {
   await page.setViewportSize({ width, height:900 });
   await page.goto("http://127.0.0.1:3000/index.html?page=money", { waitUntil:"domcontentloaded" });
@@ -9,6 +17,7 @@ async function openMoney(page, width = 1440) {
   await page.evaluate(() => window.FinancePrivacyLock.setAuthenticated(true));
   await page.waitForFunction(() => Boolean(window.FinanceSummaryMascots?.apply));
   await page.waitForTimeout(50);
+  await ensureMoneyVisible(page);
 }
 
 test("desktop Budget & Expenses uses the approved supplied mascots and exact spacing", async ({ page }) => {
@@ -29,6 +38,10 @@ test("desktop Budget & Expenses uses the approved supplied mascots and exact spa
     expect(image.width).toBe(256);
     expect(image.height).toBe(256);
   }
+
+  /* Image decoding adds an async wait long enough for startup routing to settle.
+     Re-select Finance so geometry is measured only while the page is actually visible. */
+  await ensureMoneyVisible(page);
 
   const state = await page.evaluate(() => {
     for (const id of ["legendEarlyTotal", "legendLateTotal", "legendOtherTotal", "earlyTotal", "lateTotal", "otherTotal"]) {
