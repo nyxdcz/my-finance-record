@@ -1,11 +1,11 @@
-# My Finance Records · V15.2.23
+# My Finance Records · V15.2.24
 
 <div align="center">
 
 **A local-first personal and household finance PWA built for privacy, resilience, and everyday use.**
 
 [![Quality checks](https://github.com/nyxdcz/my-finance-record/actions/workflows/quality-pages.yml/badge.svg?branch=main)](https://github.com/nyxdcz/my-finance-record/actions/workflows/quality-pages.yml)
-![Version](https://img.shields.io/badge/version-V15.2.23-2563eb)
+![Version](https://img.shields.io/badge/version-V15.2.24-2563eb)
 ![PWA](https://img.shields.io/badge/PWA-offline--ready-16a34a)
 ![Node](https://img.shields.io/badge/Node.js-22%2B-339933?logo=nodedotjs&logoColor=white)
 
@@ -15,9 +15,9 @@
 
 | Release | Finance schema | Cloud schema | Sync cadence |
 | --- | ---: | ---: | ---: |
-| **V15.2.23** · Monthly Repeat Icon Footer | **12** | **V3** | **5 minutes** |
+| **V15.2.24** · Compact Expense Status & Collapse | **12** | **V3** | **5 minutes** |
 
-The current release restores the existing monthly-repeat icon control in the compact expense-card footer. On desktop, each expense card keeps the selection checkbox at the lower-left while the existing repeat icon sits immediately before Mark paid and Edit at the lower-right; the unsaved/saved PNG artwork reflects recurrence state. Finance calculations, recurrence behavior, schemas, balances, filters, payments, phone touch layouts, and sync behavior remain protected.
+The current release compacts the three desktop expense columns and keeps their controls predictable. Active Past due / Due soon status now sits directly beside **Unpaid** instead of using a separate Deadline/Expense prefix row. Each period keeps an independent **20×20** collapse control, while the card footer follows the approved **30×30 Repeat → 74×30 Mark paid → 48×30 Edit** arrangement with 5px gaps and the **18×18** selection checkbox fixed 7px from the lower-left. Phone and coarse-pointer tablet touch layouts, Finance calculations, recurrence, schemas, balances, filters, payments, and sync behavior remain protected.
 
 ## What it offers
 
