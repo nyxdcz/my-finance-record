@@ -82,9 +82,8 @@ html[data-theme="dark"] #availableMoneySection .account-spend-button span {
   color:#ffffff !important;
 }
 
-/* V15.2.18 Available money light-mode account-label contrast hotfix. */
-html[data-theme="light"] body #money #availableMoneySection .account-card .account-card-main .account-card-label span,
-html[data-theme="light"] body #money #availableMoneySection .account-card .account-card-main .account-card-label small {
+/* V15.2.18 Available money light-mode account-name contrast hotfix. */
+html[data-theme="light"] body #money #availableMoneySection .account-card .account-card-main .account-card-label span {
   color:var(--text) !important;
 }
 
