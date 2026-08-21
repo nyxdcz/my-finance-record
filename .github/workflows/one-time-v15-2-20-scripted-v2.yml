@@ -56,16 +56,23 @@ jobs:
           walk('tests');
           for (const file of files) {
             const source = fs.readFileSync(file, 'utf8');
-            const next = source.replaceAll('## 15.2.19 · 2026-08-21', '## 15.2.20 · 2026-08-21');
+            const next = source
+              .replaceAll('## 15.2.19 · 2026-08-21', '## 15.2.20 · 2026-08-21')
+              .replaceAll('My Finance Records · V15.2.18', 'My Finance Records · V15.2.20')
+              .replaceAll('My Finance Records · V15.2.19', 'My Finance Records · V15.2.20')
+              .replaceAll('V15.2.18 release preserves', 'V15.2.20 release preserves')
+              .replaceAll('V15.2.19 release preserves', 'V15.2.20 release preserves');
             if (next !== source) fs.writeFileSync(file, next);
           }
-          console.log('Aligned embedded CHANGELOG-heading expectations to V15.2.20.');
+          console.log('Aligned embedded current-release heading/title expectations to V15.2.20.');
           NODE
           {
             echo "--- changelog ---"
             head -5 CHANGELOG.md
             echo "--- inspect release checks ---"
             grep -n "15.2.20" tests/helpers/inspect-project.mjs | tail -8 || true
+            echo "--- desktop UX release checks ---"
+            grep -n "15.2.20" tests/regression/validate-v15-2-0-desktop-ux.mjs | head -12 || true
             echo "--- diff ---"
             git diff --stat
           } | tee /tmp/v15-diff.log
