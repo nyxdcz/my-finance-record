@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   repair:
-    name: Patch, validate, and publish V15.2.20
+    name: Patch and validate V15.2.20
     if: github.repository == 'nyxdcz/my-finance-record'
     runs-on: ubuntu-latest
     steps:
@@ -37,7 +37,8 @@ jobs:
       - name: Apply V15.2.20 release repair
         shell: bash
         run: |
-          node <<'NODE'
+          set -o pipefail
+          node <<'NODE' 2>&1 | tee /tmp/v15-apply.log
           const fs = require('node:fs');
           const path = require('node:path');
 
@@ -203,24 +204,45 @@ jobs:
         run: npm ci --ignore-scripts --no-audit --no-fund
 
       - name: Run source quality
-        run: npm run quality
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run quality 2>&1 | tee /tmp/v15-quality.log
 
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
 
       - name: Run browser, security, and responsive regressions
-        run: npm run test:browser
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run test:browser 2>&1 | tee /tmp/v15-browser.log
 
-      - name: Publish validated release commit
+      - name: Publish validated candidate branch
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -u
           git diff --cached --check
           git commit -m "release: stabilize V15.2.20 compact expense cards"
-          git push origin HEAD:main
-          echo "Published $(git rev-parse HEAD) to main"
+          git push --force origin HEAD:refs/heads/v15.2.20-ready
+          echo "Validated candidate $(git rev-parse HEAD)"
 
-      - name: Remove one-time staging branch
-        if: success()
-        run: git push origin --delete v15.2.20-staging || true
+      - name: Publish diagnostics branch on failure
+        if: failure()
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin main
+          git reset --hard origin/main
+          git clean -fd
+          git checkout -B v15.2.20-diagnostics origin/main
+          mkdir -p .ci-diagnostics
+          for file in /tmp/v15-apply.log /tmp/v15-quality.log /tmp/v15-browser.log; do
+            if [ -f "$file" ]; then cp "$file" ".ci-diagnostics/$(basename "$file")"; fi
+          done
+          printf 'V15.2.20 staging validation failed. See captured logs in this branch.\n' > .ci-diagnostics/README.txt
+          git add .ci-diagnostics
+          git commit -m "chore: capture V15.2.20 staging diagnostics"
+          git push --force origin HEAD:refs/heads/v15.2.20-diagnostics
