@@ -608,3 +608,213 @@ html body #topbarToolsPanel #productivityCenterButton .toolbar-icon {
 html body #topbarToolsPanel #productivityCenterButton .toolbar-icon > svg {
   opacity:1 !important;
 }
+
+/* V15.2.18 · Rounded standalone desktop month controls and compact 4×3 picker. */
+@media (min-width:851px) {
+  html body .topbar-actions .month-navigator {
+    gap:6px !important;
+    padding:0 !important;
+    border:0 !important;
+    border-radius:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
+    -webkit-backdrop-filter:none !important;
+    backdrop-filter:none !important;
+    overflow:visible !important;
+  }
+
+  html body .topbar-actions .month-navigator > .month-nav-button,
+  html body .topbar-actions .month-navigator > .month-control {
+    box-sizing:border-box !important;
+    height:38px !important;
+    min-height:38px !important;
+    max-height:38px !important;
+    margin:0 !important;
+    border:1px solid var(--line) !important;
+    border-radius:9px !important;
+    background:var(--surface) !important;
+    background-image:none !important;
+    box-shadow:0 2px 8px color-mix(in srgb,#0f172a 10%,transparent) !important;
+    -webkit-backdrop-filter:none !important;
+    backdrop-filter:none !important;
+  }
+
+  html body .topbar-actions .month-navigator > #previousMonthButton,
+  html body .topbar-actions .month-navigator > #nextMonthButton {
+    width:38px !important;
+    min-width:38px !important;
+    max-width:38px !important;
+    padding:0 !important;
+    border-inline:1px solid var(--line) !important;
+    border-radius:9px !important;
+  }
+
+  html body .topbar-actions .month-navigator > .month-control {
+    width:178px !important;
+    padding:0 !important;
+    border-inline:1px solid var(--line) !important;
+    position:relative !important;
+  }
+
+  html body .topbar-actions .month-navigator .month-display-button {
+    box-sizing:border-box !important;
+    width:100% !important;
+    height:36px !important;
+    min-height:36px !important;
+    display:grid !important;
+    grid-template-columns:14px minmax(0,1fr) !important;
+    align-items:center !important;
+    gap:7px !important;
+    padding:4px 10px !important;
+    border:0 !important;
+    border-radius:8px !important;
+    background:transparent !important;
+    color:var(--text) !important;
+    box-shadow:none !important;
+    -webkit-backdrop-filter:none !important;
+    backdrop-filter:none !important;
+  }
+
+  html body .topbar-actions .month-navigator .month-display-button::before {
+    content:"" !important;
+    width:14px !important;
+    height:14px !important;
+    display:block !important;
+    background-color:var(--muted) !important;
+    -webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 2h2v2h6V2h2v2h1a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3h1V2Zm11 8H6v9a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-9Z'/%3E%3C/svg%3E") !important;
+    mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 2h2v2h6V2h2v2h1a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3h1V2Zm11 8H6v9a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-9Z'/%3E%3C/svg%3E") !important;
+    -webkit-mask-repeat:no-repeat !important;
+    mask-repeat:no-repeat !important;
+    -webkit-mask-position:center !important;
+    mask-position:center !important;
+    -webkit-mask-size:contain !important;
+    mask-size:contain !important;
+  }
+
+  html body .topbar-actions .month-display-label,
+  html body .topbar-actions .month-display-separator {
+    display:none !important;
+  }
+
+  html body .topbar-actions .month-display-value {
+    min-width:0 !important;
+    color:var(--text) !important;
+    font-size:.76rem !important;
+    font-weight:800 !important;
+    text-align:center !important;
+  }
+
+  html body .topbar-actions .month-navigator > .month-nav-button:not(:disabled):hover,
+  html body .topbar-actions .month-navigator .month-display-button:not(:disabled):hover {
+    background:var(--surface-soft) !important;
+    border-color:var(--line) !important;
+  }
+
+  html body .topbar-actions .month-navigator > :is(.month-current-button,.month-status-chip) {
+    box-sizing:border-box !important;
+    height:38px !important;
+    min-height:38px !important;
+    max-height:38px !important;
+    margin-inline-start:2px !important;
+    border-radius:9px !important;
+    box-shadow:0 2px 8px color-mix(in srgb,#0f172a 8%,transparent) !important;
+  }
+
+  html body .topbar-actions .month-navigator > .month-current-button {
+    padding-inline:10px !important;
+    border:1px solid var(--line) !important;
+    background:var(--surface) !important;
+    background-image:none !important;
+    -webkit-backdrop-filter:none !important;
+    backdrop-filter:none !important;
+  }
+
+  html body .topbar-actions .month-picker-popover {
+    top:calc(100% + 8px) !important;
+    right:0 !important;
+    left:auto !important;
+    transform:none !important;
+    width:280px !important;
+    padding:10px !important;
+    border:1px solid var(--line) !important;
+    border-radius:12px !important;
+    background:var(--surface) !important;
+    background-image:none !important;
+    box-shadow:0 14px 34px color-mix(in srgb,#0f172a 18%,transparent) !important;
+    -webkit-backdrop-filter:none !important;
+    backdrop-filter:none !important;
+  }
+
+  html body .topbar-actions .month-picker-heading {
+    grid-template-columns:32px 1fr 32px !important;
+    gap:6px !important;
+    margin-bottom:8px !important;
+  }
+
+  html body .topbar-actions .month-picker-heading strong {
+    font-size:.8rem !important;
+    font-weight:800 !important;
+  }
+
+  html body .topbar-actions .month-picker-year-button {
+    width:32px !important;
+    height:32px !important;
+    padding:0 !important;
+    border:1px solid var(--line) !important;
+    border-radius:8px !important;
+    background:var(--surface) !important;
+    color:var(--text) !important;
+    box-shadow:0 1px 4px color-mix(in srgb,#0f172a 8%,transparent) !important;
+  }
+
+  html body .topbar-actions .month-picker-grid {
+    grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+    gap:6px !important;
+  }
+
+  html body .topbar-actions .month-picker-option {
+    min-height:36px !important;
+    padding:5px 4px !important;
+    border:1px solid var(--line) !important;
+    border-radius:8px !important;
+    background:var(--surface) !important;
+    color:var(--text) !important;
+    font-size:.65rem !important;
+    font-weight:750 !important;
+    box-shadow:none !important;
+  }
+
+  html body .topbar-actions .month-picker-option:hover,
+  html body .topbar-actions .month-picker-option:focus-visible {
+    border-color:color-mix(in srgb,var(--primary) 55%,var(--line)) !important;
+    background:var(--surface-soft) !important;
+    color:var(--text) !important;
+  }
+
+  html body .topbar-actions .month-picker-option[aria-selected="true"] {
+    border-color:var(--primary) !important;
+    background:var(--primary) !important;
+    color:var(--primary-contrast) !important;
+  }
+}
+
+@media (min-width:851px) and (max-width:1024px) and (pointer:coarse),
+       (min-width:851px) and (max-width:1024px) and (hover:none) {
+  html body .topbar-actions .month-navigator,
+  html body .topbar-actions .month-navigator > .month-nav-button,
+  html body .topbar-actions .month-navigator > .month-control {
+    height:44px !important;
+    min-height:44px !important;
+    max-height:44px !important;
+  }
+  html body .topbar-actions .month-navigator > #previousMonthButton,
+  html body .topbar-actions .month-navigator > #nextMonthButton {
+    width:44px !important;
+    min-width:44px !important;
+    max-width:44px !important;
+  }
+  html body .topbar-actions .month-navigator .month-display-button {
+    height:42px !important;
+    min-height:42px !important;
+  }
+}
