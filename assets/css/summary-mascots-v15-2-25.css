@@ -1,21 +1,42 @@
 /* My Finance Records · V15.2.24 · Budget summary mascots */
 
 @media (min-width: 851px) {
-  #money .summary-mascot-image {
+  #money .summary-mascot-slot {
+    color: transparent !important;
+    font-size: 0 !important;
+    line-height: 0 !important;
+  }
+
+  #money .summary-mascot-slot::after {
+    content: "";
+    box-sizing: border-box;
     display: block;
     width: 25px;
     height: 25px;
+    min-width: 25px;
+    min-height: 25px;
     max-width: 25px;
     max-height: 25px;
-    object-fit: contain;
-    object-position: center;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
     pointer-events: none;
-    user-select: none;
   }
 
-  #money .summary-mascot-slot {
-    font-size: 0 !important;
-    line-height: 0 !important;
+  #money .summary-mascot-slot[data-summary-mascot="red"]::after {
+    background-image: url("./assets/mascots/mascot-red.svg");
+  }
+
+  #money .summary-mascot-slot[data-summary-mascot="green"]::after {
+    background-image: url("./assets/mascots/mascot-green.svg");
+  }
+
+  #money .summary-mascot-slot[data-summary-mascot="blue"]::after {
+    background-image: url("./assets/mascots/mascot-blue.svg");
+  }
+
+  #money .summary-mascot-slot[data-summary-mascot="orange"]::after {
+    background-image: url("./assets/mascots/mascot-orange.svg");
   }
 
   #financeLegend .legend-item.summary-card,
@@ -34,6 +55,7 @@
     right: 20px !important;
     top: 50% !important;
     transform: translateY(-50%) !important;
+    box-sizing: border-box !important;
     width: 25px !important;
     min-width: 25px !important;
     max-width: 25px !important;
