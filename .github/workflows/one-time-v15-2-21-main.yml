@@ -105,13 +105,12 @@ jobs:
           gh auth setup-git
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          cat /tmp/v15-fetch.log /tmp/v15-clone.log /tmp/v15-node.log /tmp/v15-apply.log /tmp/v15-npm.log /tmp/v15-quality.log /tmp/v15-chromium.log /tmp/v15-browser.log 2>/dev/null > /tmp/v15-2-21-diagnostics.log
+          cat /tmp/v15-fetch.log /tmp/v15-clone.log /tmp/v15-node.log /tmp/v15-apply.log /tmp/v15-npm.log /tmp/v15-quality.log /tmp/v15-chromium.log /tmp/v15-browser.log 2>/dev/null > /tmp/v15-2-21-validator.log
           git reset --hard HEAD
           git clean -fd
           git switch --detach origin/main
           git switch -C v15.2.21-diagnostics
-          mkdir -p .ci-diagnostics
-          cp /tmp/v15-2-21-diagnostics.log ".ci-diagnostics/v15-2-21-${GITHUB_RUN_ID}.log"
-          git add .ci-diagnostics
+          cp /tmp/v15-2-21-validator.log v15-2-21-validator.log
+          git add -f v15-2-21-validator.log
           git commit -m "chore: capture V15.2.21 validator diagnostics"
           git push --force origin HEAD:refs/heads/v15.2.21-diagnostics
