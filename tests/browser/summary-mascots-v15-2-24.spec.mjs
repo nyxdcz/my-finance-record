@@ -94,7 +94,7 @@ test("desktop Budget & Expenses uses the approved supplied mascots and exact spa
   expect(state.lower.collapseRightInset).toBeCloseTo(10, 0);
 });
 
-test("difference cards follow green and red state while phone keeps numeric values", async ({ page }) => {
+test("difference cards follow green and red state while phone disables mascot override", async ({ page }) => {
   await openMoney(page, 1440);
 
   const setDifference = negative => page.evaluate(negative => {
@@ -133,17 +133,9 @@ test("difference cards follow green and red state while phone keeps numeric valu
 
   await page.setViewportSize({ width:390, height:844 });
 
-  await expect.poll(() => page.evaluate(() => (
-    document.querySelectorAll("#moneySummary .summary-mascot-slot, #moneySummary [data-summary-mascot]").length
-  ))).toBe(0);
-
-  await expect.poll(() => page.evaluate(() => {
-    const card = [...document.querySelectorAll("#moneySummary .summary-card")].find(item => {
-      const desktop = item.querySelector(".summary-label-desktop")?.textContent?.trim() || "";
-      const mobile = item.querySelector(".summary-label-mobile")?.textContent?.trim() || "";
-      const fallback = item.querySelector(".summary-card-label")?.textContent?.trim() || "";
-      return desktop === "First-half difference" || mobile === "1st-half diff" || fallback.includes("First-half difference");
-    });
-    return card?.querySelector(".summary-card-value")?.textContent?.trim() || "";
-  })).toMatch(/^-?₱[\d,]+\.\d{2}$/);
+  await expect.poll(() => page.evaluate(() => ({
+    slots:document.querySelectorAll("#money .summary-mascot-slot").length,
+    data:document.querySelectorAll("#money [data-summary-mascot]").length,
+    desktopMedia:window.matchMedia("(min-width: 851px)").matches
+  }))).toEqual({ slots:0, data:0, desktopMedia:false });
 });
