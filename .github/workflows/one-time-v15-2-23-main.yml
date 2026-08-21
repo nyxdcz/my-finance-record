@@ -57,6 +57,7 @@ jobs:
           set -o pipefail
           {
             node /tmp/v15-2-23-repair.cjs
+            sed -i 's/v=15\.2\.22/v=15.2.23/g' tests/browser/pwa-upgrade-v15-0-5.spec.mjs
             git diff --check
             git diff --stat
           } 2>&1 | tee /tmp/v15-apply.log
