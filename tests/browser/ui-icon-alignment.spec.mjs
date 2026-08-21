@@ -82,7 +82,7 @@ test("V15.2.2 desktop topbar keeps only persistent controls at the Synced 38px h
 });
 
 
-test("V15.2.4 desktop month navigation uses flat segmented More tools chrome", async ({ page }) => {
+test("V15.2.18 desktop month navigation uses rounded standalone controls", async ({ page }) => {
   await page.setViewportSize({ width:1440, height:900 });
   await page.goto("http://127.0.0.1:3000/index.html?page=dashboard", { waitUntil:"networkidle" });
   await page.evaluate(() => window.FinancePrivacyLock?.unlock?.({ email:"month-nav-border-test@example.invalid" }));
@@ -112,7 +112,7 @@ test("V15.2.4 desktop month navigation uses flat segmented More tools chrome", a
       return { height:element.getBoundingClientRect().height, borderWidth:computed.borderTopWidth, backdrop:computed.backdropFilter };
     });
     expect(style.height, `${selector} should stay at the compact toolbar height`).toBe(38);
-    expect(style.borderWidth, `${selector} should use the flat segmented outline`).toBe("1px");
+    expect(style.borderWidth, `${selector} should use the standalone outline`).toBe("1px");
     expect(style.backdrop, `${selector} should not use glass blur`).toBe("none");
   }
 
@@ -123,5 +123,5 @@ test("V15.2.4 desktop month navigation uses flat segmented More tools chrome", a
     return { height:element.getBoundingClientRect().height, marginLeft:style.marginLeft };
   });
   expect(currentStyle.height).toBe(38);
-  expect(currentStyle.marginLeft).toBe("6px");
+  expect(currentStyle.marginLeft).toBe("2px");
 });
