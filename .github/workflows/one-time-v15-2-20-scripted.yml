@@ -1,0 +1,113 @@
+name: Scripted V15.2.20 validation
+
+on:
+  push:
+    branches:
+      - v15.2.20-staging
+
+permissions:
+  contents: write
+
+concurrency:
+  group: scripted-v15-2-20
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Fetch repair script from staging
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api "repos/$GITHUB_REPOSITORY/contents/scripts/v15-2-20-repair.cjs?ref=v15.2.20-staging" --jq .content | tr -d '\n' | base64 -d > /tmp/v15-repair.cjs
+          test -s /tmp/v15-repair.cjs
+          wc -c /tmp/v15-repair.cjs | tee /tmp/v15-fetch-script.log
+
+      - name: Clone current main
+        shell: bash
+        run: |
+          set -o pipefail
+          git clone --branch main --depth 1 "https://github.com/$GITHUB_REPOSITORY.git" . 2>&1 | tee /tmp/v15-clone.log
+          git rev-parse HEAD | tee -a /tmp/v15-clone.log
+
+      - name: Select hosted Node 24
+        shell: bash
+        run: |
+          set -e
+          NODE24="$(find /opt/hostedtoolcache/node -mindepth 2 -maxdepth 2 -type d -path '*/24.*/*' 2>/dev/null | sort -V | tail -1 || true)"
+          if [ -z "$NODE24" ] || [ ! -x "$NODE24/bin/node" ]; then
+            echo "Node 24 not found" | tee /tmp/v15-preflight.log
+            exit 1
+          fi
+          echo "$NODE24/bin" >> "$GITHUB_PATH"
+          echo "node24=$NODE24" > /tmp/v15-preflight.log
+
+      - name: Confirm Node 24
+        shell: bash
+        run: |
+          node --version | tee -a /tmp/v15-preflight.log
+          npm --version | tee -a /tmp/v15-preflight.log
+
+      - name: Apply repair script
+        shell: bash
+        run: |
+          set -o pipefail
+          node /tmp/v15-repair.cjs 2>&1 | tee /tmp/v15-apply.log
+          {
+            echo "--- status ---"
+            git status --short
+            echo "--- diff stat ---"
+            git diff --stat
+            echo "--- changelog head ---"
+            head -8 CHANGELOG.md
+          } | tee /tmp/v15-diff.log
+          git diff --check
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Run source quality
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run quality 2>&1 | tee /tmp/v15-quality.log
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run browser suite
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run test:browser 2>&1 | tee /tmp/v15-browser.log
+
+      - name: Publish validated candidate
+        shell: bash
+        run: |
+          gh auth setup-git
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -u
+          git diff --cached --check
+          git commit -m "release: stabilize V15.2.20 compact expense cards"
+          git push --force origin HEAD:refs/heads/v15.2.20-ready
+          git rev-parse HEAD | tee /tmp/v15-ready-sha.log
+
+      - name: Upload diagnostics on failure
+        if: failure()
+        shell: bash
+        run: |
+          set +e
+          for file in /tmp/v15-fetch-script.log /tmp/v15-clone.log /tmp/v15-preflight.log /tmp/v15-apply.log /tmp/v15-diff.log /tmp/v15-quality.log /tmp/v15-browser.log; do
+            if [ -f "$file" ]; then
+              name="$(basename "$file")"
+              content="$(base64 -w0 "$file")"
+              gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/.ci-diagnostics/scripted-$GITHUB_RUN_ID-$name" \
+                -f message="chore: capture scripted V15.2.20 diagnostics" \
+                -f branch="v15.2.20-diagnostics" \
+                -f content="$content" >/dev/null
+            fi
+          done
