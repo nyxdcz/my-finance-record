@@ -21,7 +21,7 @@ async function waitForStableRuntime(page) {
   await expect.poll(async () => {
     try { return await page.evaluate(() => navigator.serviceWorker?.controller?.scriptURL || ""); }
     catch { return ""; }
-  }, { timeout:15000 }).toContain("cache=finance-v15-20260821-monthly-repeat-label-r57");
+  }, { timeout:15000 }).toContain("cache=finance-v15-20260821-monthly-repeat-class-r58");
   await page.waitForLoadState("networkidle");
   await page.waitForTimeout(350);
   await page.waitForFunction(() => typeof window.openSyncReview === "function" && typeof window.buildBundle === "function" && typeof window.applyPendingSyncImport === "function" && Boolean(window.FinancePrivacyLock?.recoveryStorage));

@@ -1,3 +1,8 @@
+## 15.2.22 · 2026-08-21
+- Isolated the desktop Repeat monthly / Repeats monthly label from legacy icon-only saved-button CSS with a dedicated monthly-repeat-label class.
+- Preserved the existing 82px by 30px non-shrinking recurrence control, recurrence behavior, Mark paid/Edit ordering, compact expense-card geometry, and phone touch layouts.
+- Strengthened browser coverage to measure the actual recurrence-label bounding box and rotated the PWA cache to `finance-v15-20260821-monthly-repeat-class-r58` without changing Finance Schema 12, Cloud Schema V3, calculations, balances, payments, or sync behavior.
+
 ## 15.2.21 · 2026-08-21
 - Replaced the desktop monthly-repeat pseudo-element label with real rendered Repeat monthly / Repeats monthly text so the control cannot appear as an empty button.
 - Preserved the 30px non-shrinking recurrence action directly before Mark paid, existing recurrence behavior, Edit ordering, compact expense-card geometry, and phone touch layouts.

@@ -80,7 +80,7 @@ test("mobile drawer keeps the static My Finance Records brand", async ({ page })
 });
 
 test("sidebar brand shell cache is synchronized", () => {
-  const expected = "finance-v15-20260821-monthly-repeat-label-r57";
+  const expected = "finance-v15-20260821-monthly-repeat-class-r58";
   expect(source("version.json")).toContain(`"cacheVersion": "${expected}"`);
   expect(source("sw.js")).toContain(`const CACHE_VERSION = "${expected}"`);
   expect(source("pwa-update-v15-0-5.js")).toContain(`const CURRENT_CACHE_VERSION = "${expected}"`);
