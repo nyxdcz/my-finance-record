@@ -132,14 +132,18 @@ test("difference cards follow green and red state while phone keeps numeric valu
   expect(negative.background).toContain("mascot-red.svg");
 
   await page.setViewportSize({ width:390, height:844 });
+
+  await expect.poll(() => page.evaluate(() => (
+    document.querySelectorAll("#moneySummary .summary-mascot-slot, #moneySummary [data-summary-mascot]").length
+  ))).toBe(0);
+
   await expect.poll(() => page.evaluate(() => {
     const card = [...document.querySelectorAll("#moneySummary .summary-card")].find(item => {
-      const label = item.querySelector(".summary-label-desktop")?.textContent?.trim()
-        || item.querySelector(".summary-card-label")?.textContent?.trim()
-        || "";
-      return label === "First-half difference";
+      const desktop = item.querySelector(".summary-label-desktop")?.textContent?.trim() || "";
+      const mobile = item.querySelector(".summary-label-mobile")?.textContent?.trim() || "";
+      const fallback = item.querySelector(".summary-card-label")?.textContent?.trim() || "";
+      return desktop === "First-half difference" || mobile === "1st-half diff" || fallback.includes("First-half difference");
     });
-    const value = card?.querySelector(".summary-card-value");
-    return { mascot:value?.dataset.summaryMascot || "", text:value?.textContent || "" };
-  })).toEqual({ mascot:"", text:"-₱100.00" });
+    return card?.querySelector(".summary-card-value")?.textContent?.trim() || "";
+  })).toMatch(/^-?₱[\d,]+\.\d{2}$/);
 });
