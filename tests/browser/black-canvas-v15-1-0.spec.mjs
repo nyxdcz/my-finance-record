@@ -54,7 +54,7 @@ for (const theme of ["light", "dark"]) {
       expect(result.paidBorder).toBe("rgb(23, 59, 103)");
       expect(result.accountBorder).not.toBe("rgba(207, 231, 213, 0.24)");
       expect(result.accountNameColor).toBe(result.accountAmountColor);
-      expect(result.accountTypeColor).toBe(result.accountAmountColor);
+      expect(result.accountTypeColor).toBe("rgb(102, 112, 133)");
     } else {
       expect(result.bg).toBe("#000000");
       expect(result.primary).toBe("#173e76");
