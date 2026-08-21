@@ -2,8 +2,8 @@
 (function exposeFinancePwaUpdate(root) {
   const FINANCE_CACHE_PATTERN = /^finance-v\d+-/;
   const LEGACY_INDEX_CACHE = "finance-v15-20260816-mobile-ui-ux-r32";
-  const CURRENT_CACHE_VERSION = "finance-v15-20260821-compact-expense-stability-r56";
-  const UI_HOTFIX_REFRESH_KEY = "finance-ui-hotfix-v15-2-20-compact-expense2";
+  const CURRENT_CACHE_VERSION = "finance-v15-20260821-monthly-repeat-label-r57";
+  const UI_HOTFIX_REFRESH_KEY = "finance-ui-hotfix-v15-2-21-monthly-repeat1";
   const normalizeCacheVersion = cacheVersion => cacheVersion === LEGACY_INDEX_CACHE ? CURRENT_CACHE_VERSION : cacheVersion;
 
   async function installBrowserBrandIcons() {

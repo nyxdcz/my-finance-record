@@ -772,3 +772,45 @@
     overflow: hidden !important;
   }
 }
+
+
+/* V15.2.21 · Real monthly recurrence label: do not rely on generated pseudo-content. */
+@media (min-width: 851px) {
+  html body #money .record-row[data-expense-row] > .desktop-record-actions > [data-toggle-saved] {
+    display:inline-flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    flex:0 0 auto !important;
+    flex-shrink:0 !important;
+    width:auto !important;
+    min-width:82px !important;
+    max-width:none !important;
+    height:30px !important;
+    min-height:30px !important;
+    padding:4px 7px !important;
+    color:var(--text) !important;
+    opacity:1 !important;
+    visibility:visible !important;
+    white-space:nowrap !important;
+  }
+  html body #money .record-row[data-expense-row] > .desktop-record-actions > [data-toggle-saved] .saved-icon-container {
+    display:none !important;
+  }
+  html body #money .record-row[data-expense-row] > .desktop-record-actions > [data-toggle-saved] .saved-button-text {
+    display:inline-flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    min-width:0 !important;
+    color:var(--text) !important;
+    font-size:.65rem !important;
+    font-weight:700 !important;
+    line-height:1 !important;
+    opacity:1 !important;
+    visibility:visible !important;
+    white-space:nowrap !important;
+  }
+  html body #money .record-row[data-expense-row] > .desktop-record-actions > [data-toggle-saved] .saved-button-text::after {
+    content:none !important;
+    display:none !important;
+  }
+}

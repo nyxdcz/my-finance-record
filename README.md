@@ -1,11 +1,11 @@
-# My Finance Records · V15.2.20
+# My Finance Records · V15.2.21
 
 <div align="center">
 
 **A local-first personal and household finance PWA built for privacy, resilience, and everyday use.**
 
 [![Quality checks](https://github.com/nyxdcz/my-finance-record/actions/workflows/quality-pages.yml/badge.svg?branch=main)](https://github.com/nyxdcz/my-finance-record/actions/workflows/quality-pages.yml)
-![Version](https://img.shields.io/badge/version-V15.2.20-2563eb)
+![Version](https://img.shields.io/badge/version-V15.2.21-2563eb)
 ![PWA](https://img.shields.io/badge/PWA-offline--ready-16a34a)
 ![Node](https://img.shields.io/badge/Node.js-22%2B-339933?logo=nodedotjs&logoColor=white)
 
@@ -15,9 +15,9 @@
 
 | Release | Finance schema | Cloud schema | Sync cadence |
 | --- | ---: | ---: | ---: |
-| **V15.2.20** · Compact Expense Cards Stability | **12** | **V3** | **5 minutes** |
+| **V15.2.21** · Visible Monthly Recurrence | **12** | **V3** | **5 minutes** |
 
-The current release keeps the compact First half, Second half, and Other expense-card layout while guaranteeing the full Repeat monthly / Repeats monthly desktop action stays visible, 30px tall, and directly beside Mark paid. The three-column desktop layout, 5px card spacing, Finance calculations, recurrence behavior, schemas, balances, filters, payments, phone touch layouts, and sync behavior remain protected.
+The current release keeps the compact First half, Second half, and Other expense-card layout while rendering Repeat monthly / Repeats monthly as real visible desktop button text directly before Mark paid. The button remains 30px tall and non-shrinking; Finance calculations, recurrence behavior, schemas, balances, filters, payments, phone touch layouts, and sync behavior remain protected.
 
 ## What it offers
 

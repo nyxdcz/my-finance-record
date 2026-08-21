@@ -41,12 +41,12 @@ test("V15.2.1 source keeps the approved desktop UX quick wins", async () => {
   expect(source("productivity-tools.js")).toContain('input.value=""');
   expect(index).toContain("./productivity-tools.js?v=15.2.1-ux2");
 
-  expect(version.version).toBe("15.2.20");
+  expect(version.version).toBe("15.2.21");
   expect(version.schemaVersion).toBe(12);
   expect(version.cloudSchemaVersion).toBe(3);
-  expect(version.cacheVersion).toBe("finance-v15-20260821-compact-expense-stability-r56");
-  expect(sw).toContain('const APP_VERSION = "15.2.20";');
-  expect(sw).toContain('finance-v15-20260821-compact-expense-stability-r56');
+  expect(version.cacheVersion).toBe("finance-v15-20260821-monthly-repeat-label-r57");
+  expect(sw).toContain('const APP_VERSION = "15.2.21";');
+  expect(sw).toContain('finance-v15-20260821-monthly-repeat-label-r57');
 });
 
 for (const width of [1024, 1280, 1366, 1440, 1920]) {

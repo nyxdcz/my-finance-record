@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 const APP_URL = "http://127.0.0.1:3000/index.html?page=money";
-const APP_CACHE = "finance-v15-20260821-compact-expense-stability-r56";
+const APP_CACHE = "finance-v15-20260821-monthly-repeat-label-r57";
 
 async function openFinance(page, viewport) {
   await page.setViewportSize(viewport);
@@ -111,7 +111,8 @@ test("desktop Budget periods use compact expense cards with monthly repeat besid
       savedIndex:actions.indexOf(saved),
       paidIndex:actions.indexOf(paid),
       editIndex:actions.indexOf(edit),
-      savedLabel:getComputedStyle(savedText, "::after").content,
+      savedLabel:(savedText?.textContent || "").trim(),
+      savedTextFontSize:savedText ? parseFloat(getComputedStyle(savedText).fontSize) : 0,
       savedTextDisplay:savedText ? getComputedStyle(savedText).display : "",
       savedIconDisplay:saved?.querySelector(".saved-icon-container") ? getComputedStyle(saved.querySelector(".saved-icon-container")).display : "",
       mobileActionsDisplay:firstRow ? getComputedStyle(firstRow.querySelector(":scope > .mobile-record-actions")).display : ""
@@ -134,7 +135,8 @@ test("desktop Budget periods use compact expense cards with monthly repeat besid
   expect(metrics.savedIndex).toBeGreaterThanOrEqual(0);
   expect(metrics.paidIndex).toBe(metrics.savedIndex + 1);
   expect(metrics.editIndex).toBe(metrics.paidIndex + 1);
-  expect(metrics.savedLabel).toMatch(/Repeat(?:s)? monthly/);
+  expect(metrics.savedLabel).toMatch(/^Repeat(?:s)? monthly$/);
+  expect(metrics.savedTextFontSize).toBeGreaterThan(0);
   expect(metrics.savedTextDisplay).not.toBe("none");
   expect(metrics.savedIconDisplay).toBe("none");
   expect(metrics.mobileActionsDisplay).toBe("none");

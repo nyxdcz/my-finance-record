@@ -1,5 +1,5 @@
 {
-  "version": "15.2.20",
+  "version": "15.2.21",
   "schemaVersion": 12,
   "cloudSchemaVersion": 3,
   "ledgerVersion": 1,
@@ -10,8 +10,8 @@
   "profileArchitectureVersion": 1,
   "encryptionVersion": 1,
   "authSecurityVersion": 1,
-  "cacheVersion": "finance-v15-20260821-compact-expense-stability-r56",
+  "cacheVersion": "finance-v15-20260821-monthly-repeat-label-r57",
   "released": "2026-08-21",
-  "name": "Compact Expense Cards Stability",
-  "notes": "V15.2.20 stabilizes compact desktop expense-card geometry and guarantees the full Repeat monthly / Repeats monthly action remains visible and non-shrinking directly before Mark paid. Finance Schema 12, Cloud Schema V3, calculations, balances, recurrence, payments, phone layouts, and sync behavior are unchanged."
+  "name": "Visible Monthly Recurrence",
+  "notes": "V15.2.21 renders Repeat monthly / Repeats monthly as real visible desktop button text instead of pseudo-element content, preserving the 30px compact action geometry, recurrence behavior, Mark paid/Edit ordering, phone touch layouts, Finance Schema 12, Cloud Schema V3, calculations, balances, and sync behavior."
 }

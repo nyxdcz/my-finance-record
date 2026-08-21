@@ -1,3 +1,8 @@
+## 15.2.21 · 2026-08-21
+- Replaced the desktop monthly-repeat pseudo-element label with real rendered Repeat monthly / Repeats monthly text so the control cannot appear as an empty button.
+- Preserved the 30px non-shrinking recurrence action directly before Mark paid, existing recurrence behavior, Edit ordering, compact expense-card geometry, and phone touch layouts.
+- Rotated the PWA cache to `finance-v15-20260821-monthly-repeat-label-r57` and synchronized release/runtime/regression metadata without changing Finance Schema 12, Cloud Schema V3, calculations, balances, payments, or sync behavior.
+
 ## 15.2.20 · 2026-08-21
 - Corrected production desktop expense-card geometry to 7px row padding, 8px column gap, 5px action-footer padding, and 30px desktop actions.
 - Guaranteed Repeat monthly / Repeats monthly remains visible and non-shrinking at a minimum 82px width directly before Mark paid while leaving phone touch layouts unchanged.

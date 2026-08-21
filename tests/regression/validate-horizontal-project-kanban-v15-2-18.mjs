@@ -8,10 +8,10 @@ const interaction = read("assets/js/interaction-patterns.js");
 const css = read("assets/css/projects-calendar-v13.0.20.css");
 const version = JSON.parse(read("version.json"));
 
-assert.equal(version.version, "15.2.20");
+assert.equal(version.version, "15.2.21");
 assert.equal(version.schemaVersion, 12);
 assert.equal(version.cloudSchemaVersion, 3);
-assert.equal(version.cacheVersion, "finance-v15-20260821-compact-expense-stability-r56");
+assert.equal(version.cacheVersion, "finance-v15-20260821-monthly-repeat-label-r57");
 
 assert.match(index, /id="projectKanbanBoard"/);
 assert.match(index, /data-kanban-add-column="project"/);
@@ -41,4 +41,4 @@ assert.match(css, /\.finance-kanban-column\s*\{/);
 assert.match(css, /\.finance-kanban-card\[data-structured-card-draggable\]/);
 assert.match(css, /min-width:min\(82vw,310px\)/);
 
-console.log("Horizontal Project Agenda and Projects Kanban source contract passed under V15.2.20.");
+console.log("Horizontal Project Agenda and Projects Kanban source contract passed under V15.2.21.");
