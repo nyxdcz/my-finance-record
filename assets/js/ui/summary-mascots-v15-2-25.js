@@ -1,6 +1,6 @@
 (() => {
   const root = window;
-  const DESKTOP_QUERY = "(min-width: 851px) and (hover: hover) and (pointer: fine)";
+  const DESKTOP_QUERY = "(min-width: 851px)";
   const media = window.matchMedia(DESKTOP_QUERY);
   const ASSETS = Object.freeze({
     red:"./assets/mascots/mascot-red.svg",
