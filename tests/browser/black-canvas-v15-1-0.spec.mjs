@@ -12,7 +12,10 @@ for (const theme of ["light", "dark"]) {
       <button class="button button-paid" id="paid">Mark paid</button>
       <section id="availableMoneySection">
         <button class="button button-secondary button-small account-spend-button"><span id="spendLabel">Spend</span></button>
-        <article class="account-card" id="accountCard">Account</article>
+        <article class="account-card" id="accountCard">
+          <div class="account-card-label"><span id="accountName">UnionBank</span><small id="accountType">Bank</small></div>
+          <strong>₱3,140.00</strong>
+        </article>
       </section>
     </body></html>`, { waitUntil:"load" });
 
@@ -30,7 +33,9 @@ for (const theme of ["light", "dark"]) {
         paidBorder:paidStyle.borderTopColor,
         paidColor:paidStyle.color,
         spendColor:getComputedStyle(document.querySelector("#spendLabel")).color,
-        accountBorder:getComputedStyle(document.querySelector("#accountCard")).borderTopColor
+        accountBorder:getComputedStyle(document.querySelector("#accountCard")).borderTopColor,
+        accountNameColor:getComputedStyle(document.querySelector("#accountName")).color,
+        accountTypeColor:getComputedStyle(document.querySelector("#accountType")).color
       };
     });
 
@@ -41,6 +46,8 @@ for (const theme of ["light", "dark"]) {
       expect(result.paidBg).toBe("rgb(23, 59, 103)");
       expect(result.paidBorder).toBe("rgb(23, 59, 103)");
       expect(result.accountBorder).not.toBe("rgba(207, 231, 213, 0.24)");
+      expect(result.accountNameColor).toBe("rgb(24, 34, 48)");
+      expect(result.accountTypeColor).toBe("rgb(102, 112, 133)");
     } else {
       expect(result.bg).toBe("#000000");
       expect(result.primary).toBe("#173e76");
