@@ -18,8 +18,9 @@ const required = [
   [version.schemaVersion === 12 && version.cloudSchemaVersion === 3, "schemas remain 12/3"],
   [version.cacheVersion === "finance-v2-20260822-organized-complete-r1", "V2 organized cache is declared"],
   [index.includes("My Finance Records · V2.0.0"), "page title is V2.0.0"],
-  [changelog.startsWith("## 2.0.0 · 2026-08-22"), "CHANGELOG begins with prepared V2.0.0 entry"],
-  [changelog.includes("## 15.2.4 · 2026-08-18"), "CHANGELOG preserves the legacy V15 history"],
+  [changelog.includes("## 2.0.0 · 2026-08-22"), "CHANGELOG includes the V2.0.0 release entry"],
+  [changelog.includes("## 1.0.0 · Created") && changelog.includes("## 1.14.0 · Budget & Expense Final Polish"), "CHANGELOG contains the organized V1 milestone history"],
+  [changelog.includes("| **1.14.0** | V15.2.19–V15.2.24 maintenance |"), "CHANGELOG keeps the legacy V15 mapping traceable"],
   [index.includes("recurring items checked"), "month navigation explains recurring preparation"],
   [index.includes("cleared because filters changed"), "selection reset is announced"],
   [index.includes("Enter an account name."), "account name has inline validation"],
@@ -49,4 +50,4 @@ const required = [
   [read("mobile-v14-0-23.css").length > 0, "mobile stylesheet remains present"]
 ];
 for (const [ok, message] of required) { if (!ok) throw new Error(message); }
-console.log("V2.0.0 release preserves the desktop UX source contract and legacy compatibility assets");
+console.log("V2.0.0 release preserves the desktop UX source contract, organized changelog, and legacy compatibility assets");
