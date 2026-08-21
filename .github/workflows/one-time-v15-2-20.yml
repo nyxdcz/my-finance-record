@@ -1,0 +1,222 @@
+name: One-time V15.2.20 repair
+
+on:
+  push:
+    branches:
+      - v15.2.20-staging
+
+permissions:
+  contents: write
+
+concurrency:
+  group: one-time-v15-2-20
+  cancel-in-progress: true
+
+jobs:
+  repair:
+    name: Patch, validate, and publish V15.2.20
+    if: github.repository == 'nyxdcz/my-finance-record'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out staging trigger
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          package-manager-cache: false
+
+      - name: Switch to current main
+        run: |
+          git fetch origin main
+          git checkout -B v15-2-20-release origin/main
+
+      - name: Apply V15.2.20 release repair
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const path = require('node:path');
+
+          const VERSION = '15.2.20';
+          const OLD_VERSION = '15.2.19';
+          const CACHE = 'finance-v15-20260821-compact-expense-stability-r56';
+          const OLD_CACHE = 'finance-v15-20260821-compact-expense-cards-r55';
+          const OLDER_CACHE = 'finance-v15-20260821-horizontal-kanban-r54';
+          const RELEASE_NAME = 'Compact Expense Cards Stability';
+          const RELEASE_DATE = '2026-08-21';
+
+          const read = file => fs.readFileSync(file, 'utf8');
+          const write = (file, value) => fs.writeFileSync(file, value);
+          const replaceAll = (file, oldText, newText, { required = true } = {}) => {
+            const source = read(file);
+            const count = source.split(oldText).length - 1;
+            if (required && count === 0) throw new Error(`${file}: expected text not found: ${oldText}`);
+            if (count) write(file, source.split(oldText).join(newText));
+            return count;
+          };
+          const update = (file, transform) => {
+            const source = read(file);
+            const next = transform(source);
+            if (next === source) throw new Error(`${file}: transform produced no change`);
+            write(file, next);
+          };
+          const jsonFile = (file, transform) => {
+            const value = JSON.parse(read(file));
+            transform(value);
+            write(file, `${JSON.stringify(value, null, 2)}\n`);
+          };
+
+          jsonFile('package.json', value => { value.version = VERSION; });
+          jsonFile('package-lock.json', value => {
+            value.version = VERSION;
+            if (value.packages?.['']) value.packages[''].version = VERSION;
+          });
+          jsonFile('version.json', value => {
+            value.version = VERSION;
+            value.cacheVersion = CACHE;
+            value.released = RELEASE_DATE;
+            value.name = RELEASE_NAME;
+            value.notes = 'V15.2.20 keeps the compact First half, Second half, and Other expense-card layout while stabilizing the visible non-shrinking Repeat monthly / Repeats monthly desktop action directly before Mark paid. Release/runtime/cache expectations are synchronized without changing Finance Schema 12, Cloud Schema V3, calculations, balances, recurrence semantics, filters, payments, phone touch layouts, or sync behavior.';
+          });
+
+          update('README.md', source => {
+            let next = source;
+            next = next.replace('# My Finance Records · V15.2.19', '# My Finance Records · V15.2.20');
+            next = next.replace('version-V15.2.19-2563eb', 'version-V15.2.20-2563eb');
+            next = next.replace('| **V15.2.19** · Compact Expense Cards | **12** | **V3** | **5 minutes** |', '| **V15.2.20** · Compact Expense Cards Stability | **12** | **V3** | **5 minutes** |');
+            next = next.replace(/^The current release compacts .*$/m, 'The current release keeps the compact First half, Second half, and Other expense-card layout while stabilizing the full Repeat monthly / Repeats monthly desktop action at a visible non-shrinking 30px size directly beside Mark paid. The three-column desktop layout, 5px card spacing, Finance calculations, recurrence behavior, schemas, balances, filters, payments, phone touch layouts, and sync behavior remain protected.');
+            return next;
+          });
+
+          update('CHANGELOG.md', source => {
+            if (source.startsWith('## 15.2.20 · 2026-08-21')) return source;
+            const entry = `## 15.2.20 · 2026-08-21\n- Stabilized the compact desktop expense cards by forcing the functional Repeat monthly / Repeats monthly action to remain visibly text-sized, 30px tall, and directly before Mark paid instead of collapsing to an icon-width control.\n- Synchronized V15.2.20 release, runtime, service-worker cache, browser-test, and source-regression expectations around \`${CACHE}\`.\n- Preserved Finance Schema 12, Cloud Schema V3, calculations, balances, recurrence and payment semantics, filters, phone touch layouts, branding, and five-minute Cloud Sync behavior.\n\n`;
+            return entry + source;
+          });
+
+          const cssFile = 'assets/css/production-ui-audit-v15-2-13.css';
+          update(cssFile, source => {
+            if (source.includes('V15.2.20 · Compact expense cards stability')) return source;
+            return `${source.trimEnd()}\n\n/* V15.2.20 · Compact expense cards stability: keep the functional monthly-repeat action visibly text-sized. */\n@media (min-width: 851px) {\n  html body #money .record-row[data-expense-row] > .desktop-record-actions > [data-toggle-saved] {\n    flex: 0 0 auto !important;\n    flex-shrink: 0 !important;\n    width: auto !important;\n    min-width: 82px !important;\n    max-width: none !important;\n    height: 30px !important;\n    min-height: 30px !important;\n    padding: 4px 7px !important;\n    white-space: nowrap !important;\n  }\n\n  html body #money .record-row[data-expense-row] > .desktop-record-actions > [data-toggle-saved] .saved-button-text {\n    min-width: 68px !important;\n    text-align: center !important;\n  }\n}\n`;
+          });
+
+          replaceAll('assets/js/ui/sync-runtime-compat.js', 'const VERSION = "15.2.18";', 'const VERSION = "15.2.20";');
+          replaceAll('assets/js/ui/sync-runtime-compat.js', 'const RELEASE_NAME = "Horizontal Project Kanban";', 'const RELEASE_NAME = "Compact Expense Cards Stability";');
+
+          replaceAll('assets/js/pwa-update-v15-0-5.js', `const CURRENT_CACHE_VERSION = "${OLD_CACHE}";`, `const CURRENT_CACHE_VERSION = "${CACHE}";`);
+          replaceAll('assets/js/pwa-update-v15-0-5.js', 'const UI_HOTFIX_REFRESH_KEY = "finance-ui-hotfix-v15-2-19-compact-expense1";', 'const UI_HOTFIX_REFRESH_KEY = "finance-ui-hotfix-v15-2-20-compact-expense2";');
+
+          replaceAll('sw.js', 'const APP_VERSION = "15.2.19";', 'const APP_VERSION = "15.2.20";');
+          replaceAll('sw.js', `const CACHE_VERSION = "${OLD_CACHE}";`, `const CACHE_VERSION = "${CACHE}";`);
+          replaceAll('sw.js', 'production-ui-audit-v15-2-13.css?v=15.2.19-compact1', 'production-ui-audit-v15-2-13.css?v=15.2.20-compact2');
+          replaceAll('sw.js', 'pwa-update-v15-0-5.js?v=15.2.19-release1', 'pwa-update-v15-0-5.js?v=15.2.20-release2');
+          replaceAll('sw.js', 'sync-runtime-compat.js?v=15.2.18-release9', 'sync-runtime-compat.js?v=15.2.20-release10');
+          update('sw.js', source => source.includes('// V15.2.20 stabilizes the compact expense-card recurrence action') ? source : source.replace('self.__FINANCE_APP_VERSION = APP_VERSION;\n', 'self.__FINANCE_APP_VERSION = APP_VERSION;\n// V15.2.20 stabilizes the compact expense-card recurrence action and synchronizes release/cache delivery.\n'));
+
+          update('index.html', source => {
+            let next = source;
+            next = next.replaceAll('My Finance Records · V15.2.19', 'My Finance Records · V15.2.20');
+            next = next.replaceAll('V15.2.19', 'V15.2.20');
+            next = next.replaceAll(OLD_CACHE, CACHE);
+            next = next.replaceAll('production-ui-audit-v15-2-13.css?v=15.2.19-compact1', 'production-ui-audit-v15-2-13.css?v=15.2.20-compact2');
+            next = next.replaceAll('pwa-update-v15-0-5.js?v=15.2.19-release1', 'pwa-update-v15-0-5.js?v=15.2.20-release2');
+            next = next.replaceAll('sync-runtime-compat.js?v=15.2.18-release9', 'sync-runtime-compat.js?v=15.2.20-release10');
+            next = next.replaceAll('const APP_VERSION = "15.2.19";', 'const APP_VERSION = "15.2.20";');
+            if (!next.includes(CACHE)) throw new Error('index.html: new cache identity missing');
+            if (!next.includes('production-ui-audit-v15-2-13.css?v=15.2.20-compact2')) throw new Error('index.html: new compact CSS pin missing');
+            if (!next.includes('pwa-update-v15-0-5.js?v=15.2.20-release2')) throw new Error('index.html: new updater pin missing');
+            if (!next.includes('sync-runtime-compat.js?v=15.2.20-release10')) throw new Error('index.html: new runtime pin missing');
+            return next;
+          });
+
+          const testFiles = [];
+          const walk = dir => {
+            for (const entry of fs.readdirSync(dir, { withFileTypes:true })) {
+              const full = path.join(dir, entry.name);
+              if (entry.isDirectory()) walk(full);
+              else if (entry.isFile() && entry.name.endsWith('.mjs')) testFiles.push(full);
+            }
+          };
+          walk('tests');
+          for (const file of testFiles) {
+            let source = read(file);
+            let next = source
+              .replaceAll(OLDER_CACHE, CACHE)
+              .replaceAll(OLD_CACHE, CACHE)
+              .replaceAll('pwa-update-v15-0-5.js?v=15.2.18-release14', 'pwa-update-v15-0-5.js?v=15.2.20-release2')
+              .replaceAll('pwa-update-v15-0-5.js?v=15.2.19-release1', 'pwa-update-v15-0-5.js?v=15.2.20-release2')
+              .replaceAll('production-ui-audit-v15-2-13.css?v=15.2.19-compact1', 'production-ui-audit-v15-2-13.css?v=15.2.20-compact2')
+              .replaceAll('sync-runtime-compat.js?v=15.2.18-release9', 'sync-runtime-compat.js?v=15.2.20-release10')
+              .replaceAll('"15.2.18"', '"15.2.20"')
+              .replaceAll('"15.2.19"', '"15.2.20"')
+              .replaceAll("'15.2.18'", "'15.2.20'")
+              .replaceAll("'15.2.19'", "'15.2.20'")
+              .replaceAll('My Finance Records · V15.2.18', 'My Finance Records · V15.2.20')
+              .replaceAll('My Finance Records · V15.2.19', 'My Finance Records · V15.2.20');
+            if (next !== source) write(file, next);
+          }
+
+          const mobileTest = 'tests/regression/validate-v15-2-2-mobile-ui.mjs';
+          replaceAll(mobileTest, '15\\.2\\.18', '15\\.2\\.20');
+
+          const auditTest = 'tests/regression/validate-production-ui-audit-v15-2-13.mjs';
+          update(auditTest, source => {
+            let next = source.replace('console.log("V15.2.19 production UI/UX audit source contract passed.");', 'assert.match(css, /Compact expense cards stability:[\\s\\S]*\\[data-toggle-saved\\][\\s\\S]*min-width:\\s*82px !important;/);\nconsole.log("V15.2.20 production UI/UX audit source contract passed.");');
+            if (!next.includes('min-width:\\s*82px !important')) throw new Error('production UI source test: V15.2.20 recurrence assertion missing');
+            return next;
+          });
+
+          const staleCacheHits = testFiles.filter(file => {
+            const text = read(file);
+            return text.includes(OLDER_CACHE) || text.includes(OLD_CACHE);
+          });
+          if (staleCacheHits.length) throw new Error(`Stale release cache expectations remain: ${staleCacheHits.join(', ')}`);
+
+          const requiredIndex = [
+            'My Finance Records · V15.2.20',
+            CACHE,
+            'production-ui-audit-v15-2-13.css?v=15.2.20-compact2',
+            'pwa-update-v15-0-5.js?v=15.2.20-release2',
+            'sync-runtime-compat.js?v=15.2.20-release10'
+          ];
+          const index = read('index.html');
+          for (const marker of requiredIndex) if (!index.includes(marker)) throw new Error(`index.html missing ${marker}`);
+
+          console.log(`Applied V${VERSION} release repair across ${testFiles.length} test modules.`);
+          NODE
+
+      - name: Show planned release diff
+        run: |
+          git status --short
+          git diff --stat
+          git diff --check
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Run source quality
+        run: npm run quality
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run browser, security, and responsive regressions
+        run: npm run test:browser
+
+      - name: Publish validated release commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -u
+          git diff --cached --check
+          git commit -m "release: stabilize V15.2.20 compact expense cards"
+          git push origin HEAD:main
+          echo "Published $(git rev-parse HEAD) to main"
+
+      - name: Remove one-time staging branch
+        if: success()
+        run: git push origin --delete v15.2.20-staging || true
