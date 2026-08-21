@@ -25,7 +25,9 @@ assert.match(prepare, /summary-mascots-v15-2-25\.js\?v=\$\{QUERY\}/);
 assert.match(prepare, /assets\/mascots\/mascot-red\.svg/);
 assert.match(prepare, /assets\/mascots\/mascot-orange\.svg/);
 
-assert.match(css, /\.summary-mascot-image[\s\S]*width:\s*25px;[\s\S]*height:\s*25px;/);
+assert.match(css, /\.summary-mascot-slot::after[\s\S]*width:\s*25px;[\s\S]*height:\s*25px;/);
+assert.match(css, /data-summary-mascot="red"[\s\S]*mascot-red\.svg/);
+assert.match(css, /data-summary-mascot="green"[\s\S]*mascot-green\.svg/);
 assert.match(css, /#financeLegend \.legend-total\.summary-mascot-slot,[\s\S]*right:\s*20px !important;/);
 assert.match(css, /\.collapse-actions\.has-period-mascot[\s\S]*gap:\s*10px !important;/);
 assert.match(css, /\.period-header[\s\S]*padding-right:\s*10px !important;/);
@@ -40,5 +42,7 @@ assert.match(js, /label !== "First-half difference" && label !== "Second-half di
 assert.match(js, /isRed \? "red" : "green"/);
 assert.match(js, /aria-label/);
 assert.match(js, /DESKTOP_QUERY/);
+assert.match(js, /FinanceSummaryMascots = Object\.freeze\(\{ refresh:schedule, apply/);
+assert.doesNotMatch(js, /replaceChildren\(mascot/);
 
 console.log("V15.2.24 Budget & Expenses mascot source contract passed without schema or sync changes.");
