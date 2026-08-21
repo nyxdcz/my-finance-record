@@ -11,6 +11,15 @@ async function unlock(page, email) {
 async function installFixture(page, { top, right, width, panelWidth, scrollLeft }) {
   await page.evaluate(({ top, right, width, panelWidth, scrollLeft }) => {
     document.getElementById("kanbanMenuViewportFixture")?.remove();
+    document.getElementById("kanbanViewportOutsideTarget")?.remove();
+
+    const outsideTarget = document.createElement("button");
+    outsideTarget.id = "kanbanViewportOutsideTarget";
+    outsideTarget.type = "button";
+    outsideTarget.textContent = "Outside menu test target";
+    outsideTarget.style.cssText = "position:fixed;left:8px;top:8px;width:120px;height:44px;z-index:3200;";
+    document.body.appendChild(outsideTarget);
+
     const board = document.createElement("div");
     board.id = "kanbanMenuViewportFixture";
     board.className = "finance-kanban-board";
@@ -134,7 +143,7 @@ test("phone Kanban column menu is clamped to both viewport edges and outside cli
   expect(opened.top).toBeGreaterThanOrEqual(7);
   expect(opened.bottom).toBeLessThanOrEqual(opened.viewportHeight - 7);
 
-  await page.mouse.click(20, 20);
+  await page.locator("#kanbanViewportOutsideTarget").click();
   await expect(page.locator("#kanbanViewportPanel")).toBeHidden();
   await expect(page.locator("#kanbanViewportTrigger")).toHaveAttribute("aria-expanded", "false");
 });
