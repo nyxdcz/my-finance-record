@@ -8,7 +8,7 @@
 
   async function installBrowserBrandIcons() {
     try {
-      await import("./brand-icons-v15-2-18.js");
+      await import("./brand-icons-v15-2-18.js?v=compact-expense-cards-1");
       return true;
     } catch (error) {
       return false;
