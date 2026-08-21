@@ -9,10 +9,10 @@ const css = read("assets/css/summary-mascots-v15-2-25.css");
 const js = read("assets/js/ui/summary-mascots-v15-2-25.js");
 const workflow = read(".github/workflows/quality-pages.yml");
 
-assert.equal(version.version, "15.2.24");
+assert.equal(version.version, "2.0.0");
 assert.equal(version.schemaVersion, 12);
 assert.equal(version.cloudSchemaVersion, 3);
-assert.equal(version.cacheVersion, "finance-v15-20260822-compact-expense-collapse-r60");
+assert.equal(version.cacheVersion, "finance-v2-20260822-organized-complete-r1");
 assert.match(pkg.scripts["prepare:runtime"], /prepare-summary-mascots-v15-2-24\.mjs/);
 
 for (const file of ["mascot-red.png", "mascot-green.png", "mascot-blue.png", "mascot-orange.png"]) {
@@ -20,6 +20,7 @@ for (const file of ["mascot-red.png", "mascot-green.png", "mascot-blue.png", "ma
   assert.match(workflow, new RegExp(file.replace(".", "\\.")), `Pages packaging must validate ${file}`);
 }
 
+/* Legacy mascot asset/query identifiers remain intentionally stable under V2.0.0. */
 assert.match(prepare, /const QUERY = "15\.2\.24-mascot8"/);
 assert.match(prepare, /summary-mascots-v15-2-25\.css\?v=\$\{QUERY\}/);
 assert.match(prepare, /summary-mascots-v15-2-25\.js\?v=\$\{QUERY\}/);
@@ -60,4 +61,4 @@ assert.match(js, /DESKTOP_QUERY/);
 assert.match(js, /FinanceSummaryMascots = Object\.freeze\(\{ refresh:schedule, apply/);
 assert.doesNotMatch(js, /replaceChildren\(mascot/);
 
-console.log("V15.2.24 Budget & Expenses versioned PNG mascot source contract passed with mascot8 runtime cache bust, the 16px lower optical lift, and without schema or sync changes.");
+console.log("V2.0.0 preserves the V15.2.24 Budget & Expenses PNG mascot contract, mascot8 delivery, the 16px lower optical lift, and unchanged schema/sync behavior.");
