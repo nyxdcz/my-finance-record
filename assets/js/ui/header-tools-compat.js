@@ -147,20 +147,88 @@
       ["position", "left", "top", "right", "bottom", "z-index", "margin", "max-width", "max-height", "overflow-y", "visibility"].forEach(property => panel.style.removeProperty(property));
       delete panel.dataset.viewportPlacement;
     };
+    const resetMenu = menu => {
+      if (!menu) return;
+      ["position", "left", "top", "right", "bottom", "width", "height", "z-index", "margin"].forEach(property => menu.style.removeProperty(property));
+      delete menu.dataset.viewportPortal;
+    };
+    const createPlaceholder = (menu, rect) => {
+      const placeholder = doc.createElement("span");
+      placeholder.className = "kanban-column-menu-portal-placeholder";
+      placeholder.setAttribute("aria-hidden", "true");
+      placeholder.style.width = `${Math.max(1, rect.width)}px`;
+      placeholder.style.height = `${Math.max(1, rect.height)}px`;
+      placeholder.style.flex = `0 0 ${Math.max(1, rect.width)}px`;
+      placeholder.style.display = "inline-block";
+      menu.parentNode?.insertBefore(placeholder, menu);
+      return placeholder;
+    };
+    const portalMenu = menu => {
+      if (!menu || menu.__financeKanbanPortal) return menu?.__financeKanbanPortal || null;
+      const trigger = menuTrigger(menu);
+      if (!trigger || !doc.body) return null;
+      const rect = trigger.getBoundingClientRect();
+      const activeElement = menu.contains(doc.activeElement) ? doc.activeElement : null;
+      const placeholder = createPlaceholder(menu, rect);
+      const state = {
+        placeholder,
+        originalParent:menu.parentNode,
+        activeElement
+      };
+      menu.__financeKanbanPortal = state;
+      doc.body.appendChild(menu);
+      menu.dataset.viewportPortal = "true";
+      menu.style.setProperty("position", "fixed", "important");
+      menu.style.setProperty("left", `${Math.round(rect.left)}px`, "important");
+      menu.style.setProperty("top", `${Math.round(rect.top)}px`, "important");
+      menu.style.setProperty("right", "auto", "important");
+      menu.style.setProperty("bottom", "auto", "important");
+      menu.style.setProperty("width", `${Math.max(1, rect.width)}px`, "important");
+      menu.style.setProperty("height", `${Math.max(1, rect.height)}px`, "important");
+      menu.style.setProperty("margin", "0", "important");
+      menu.style.setProperty("z-index", "2600", "important");
+      if (activeElement?.isConnected) activeElement.focus();
+      return state;
+    };
+    const restoreMenu = menu => {
+      const state = menu?.__financeKanbanPortal;
+      if (!menu || !state) return;
+      const activeElement = menu.contains(doc.activeElement) ? doc.activeElement : null;
+      const placeholder = state.placeholder;
+      if (placeholder?.isConnected) placeholder.replaceWith(menu);
+      else if (state.originalParent?.isConnected) state.originalParent.appendChild(menu);
+      resetMenu(menu);
+      placeholder?.remove();
+      delete menu.__financeKanbanPortal;
+      if (activeElement?.isConnected) activeElement.focus();
+    };
+    const anchorPortaledMenu = menu => {
+      const state = menu?.__financeKanbanPortal;
+      if (!state) return;
+      const rect = state.placeholder?.isConnected ? state.placeholder.getBoundingClientRect() : null;
+      if (!rect) return;
+      menu.style.setProperty("left", `${Math.round(rect.left)}px`, "important");
+      menu.style.setProperty("top", `${Math.round(rect.top)}px`, "important");
+      menu.style.setProperty("width", `${Math.max(1, rect.width)}px`, "important");
+      menu.style.setProperty("height", `${Math.max(1, rect.height)}px`, "important");
+    };
     const positionMenu = menu => {
       const trigger = menuTrigger(menu);
       const panel = menuPanel(menu);
       if (!trigger || !panel) return;
       if (!menu.classList.contains("is-open") || panel.hidden) {
         resetPanel(panel);
+        restoreMenu(menu);
         return;
       }
+      portalMenu(menu);
+      anchorPortaledMenu(menu);
       const viewportWidth = Math.max(doc.documentElement.clientWidth || 0, root.innerWidth || 0);
       const viewportHeight = Math.max(doc.documentElement.clientHeight || 0, root.innerHeight || 0);
       const availableWidth = Math.max(0, viewportWidth - edgeGap * 2);
       const availableHeight = Math.max(0, viewportHeight - edgeGap * 2);
       panel.style.setProperty("position", "fixed", "important");
-      panel.style.setProperty("z-index", "2600", "important");
+      panel.style.setProperty("z-index", "2601", "important");
       panel.style.setProperty("margin", "0", "important");
       panel.style.setProperty("right", "auto", "important");
       panel.style.setProperty("bottom", "auto", "important");
