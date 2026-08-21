@@ -55,6 +55,7 @@ jobs:
           set -o pipefail
           {
             node /tmp/v15-2-22-repair.cjs
+            node -e 'const fs=require("node:fs"); const f="tests/browser/pwa-upgrade-v15-0-5.spec.mjs"; const s=fs.readFileSync(f,"utf8"); if(!s.includes("v=15.2.21")) throw new Error("stale worker assertion not found"); fs.writeFileSync(f,s.replaceAll("v=15.2.21","v=15.2.22"));'
             git diff --check
             git diff --stat
           } 2>&1 | tee /tmp/v15-apply.log
@@ -115,4 +116,4 @@ jobs:
           git commit -m "chore: capture V15.2.22 validator diagnostics"
           git push --force origin HEAD:refs/heads/v15.2.22-diagnostics
 
-# rerun after source-regression migration fix
+# final rerun after worker assertion alignment
