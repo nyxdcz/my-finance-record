@@ -38,6 +38,7 @@ test("desktop month selector uses rounded standalone controls and a compact 4x3 
       </div>`;
   });
 
+  await page.addStyleTag({ url:"http://127.0.0.1:3000/app.css?v=month-rounded-test" });
   await page.addStyleTag({ url:"http://127.0.0.1:3000/ui-icon-alignment-v15-0-5.css?v=month-rounded-test" });
   await page.addStyleTag({ url:"http://127.0.0.1:3000/liquid-glass-v15.css?v=month-rounded-test" });
 
