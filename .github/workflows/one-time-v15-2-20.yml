@@ -42,12 +42,12 @@ jobs:
           const path = require('node:path');
 
           const VERSION = '15.2.20';
-          const OLD_VERSION = '15.2.19';
           const CACHE = 'finance-v15-20260821-compact-expense-stability-r56';
           const OLD_CACHE = 'finance-v15-20260821-compact-expense-cards-r55';
           const OLDER_CACHE = 'finance-v15-20260821-horizontal-kanban-r54';
           const RELEASE_NAME = 'Compact Expense Cards Stability';
           const RELEASE_DATE = '2026-08-21';
+          const HOTFIX_KEY = 'finance-ui-hotfix-v15-2-20-compact-expense2';
 
           const read = file => fs.readFileSync(file, 'utf8');
           const write = (file, value) => fs.writeFileSync(file, value);
@@ -108,7 +108,7 @@ jobs:
           replaceAll('assets/js/ui/sync-runtime-compat.js', 'const RELEASE_NAME = "Horizontal Project Kanban";', 'const RELEASE_NAME = "Compact Expense Cards Stability";');
 
           replaceAll('assets/js/pwa-update-v15-0-5.js', `const CURRENT_CACHE_VERSION = "${OLD_CACHE}";`, `const CURRENT_CACHE_VERSION = "${CACHE}";`);
-          replaceAll('assets/js/pwa-update-v15-0-5.js', 'const UI_HOTFIX_REFRESH_KEY = "finance-ui-hotfix-v15-2-19-compact-expense1";', 'const UI_HOTFIX_REFRESH_KEY = "finance-ui-hotfix-v15-2-20-compact-expense2";');
+          replaceAll('assets/js/pwa-update-v15-0-5.js', 'const UI_HOTFIX_REFRESH_KEY = "finance-ui-hotfix-v15-2-19-compact-expense1";', `const UI_HOTFIX_REFRESH_KEY = "${HOTFIX_KEY}";`);
 
           replaceAll('sw.js', 'const APP_VERSION = "15.2.19";', 'const APP_VERSION = "15.2.20";');
           replaceAll('sw.js', `const CACHE_VERSION = "${OLD_CACHE}";`, `const CACHE_VERSION = "${CACHE}";`);
@@ -143,18 +143,22 @@ jobs:
           };
           walk('tests');
           for (const file of testFiles) {
-            let source = read(file);
-            let next = source
+            const source = read(file);
+            const next = source
               .replaceAll(OLDER_CACHE, CACHE)
               .replaceAll(OLD_CACHE, CACHE)
+              .replaceAll('finance-ui-hotfix-v15-2-19-compact-expense1', HOTFIX_KEY)
               .replaceAll('pwa-update-v15-0-5.js?v=15.2.18-release14', 'pwa-update-v15-0-5.js?v=15.2.20-release2')
               .replaceAll('pwa-update-v15-0-5.js?v=15.2.19-release1', 'pwa-update-v15-0-5.js?v=15.2.20-release2')
+              .replaceAll('15\\.2\\.19-release1', '15\\.2\\.20-release2')
+              .replaceAll('15\\.2\\.19-compact1', '15\\.2\\.20-compact2')
               .replaceAll('production-ui-audit-v15-2-13.css?v=15.2.19-compact1', 'production-ui-audit-v15-2-13.css?v=15.2.20-compact2')
               .replaceAll('sync-runtime-compat.js?v=15.2.18-release9', 'sync-runtime-compat.js?v=15.2.20-release10')
               .replaceAll('"15.2.18"', '"15.2.20"')
               .replaceAll('"15.2.19"', '"15.2.20"')
               .replaceAll("'15.2.18'", "'15.2.20'")
               .replaceAll("'15.2.19'", "'15.2.20'")
+              .replaceAll('15\\.2\\.19', '15\\.2\\.20')
               .replaceAll('My Finance Records · V15.2.18', 'My Finance Records · V15.2.20')
               .replaceAll('My Finance Records · V15.2.19', 'My Finance Records · V15.2.20');
             if (next !== source) write(file, next);
@@ -165,7 +169,7 @@ jobs:
 
           const auditTest = 'tests/regression/validate-production-ui-audit-v15-2-13.mjs';
           update(auditTest, source => {
-            let next = source.replace('console.log("V15.2.19 production UI/UX audit source contract passed.");', 'assert.match(css, /Compact expense cards stability:[\\s\\S]*\\[data-toggle-saved\\][\\s\\S]*min-width:\\s*82px !important;/);\nconsole.log("V15.2.20 production UI/UX audit source contract passed.");');
+            const next = source.replace('console.log("V15.2.19 production UI/UX audit source contract passed.");', 'assert.match(css, /Compact expense cards stability:[\\s\\S]*\\[data-toggle-saved\\][\\s\\S]*min-width:\\s*82px !important;/);\nconsole.log("V15.2.20 production UI/UX audit source contract passed.");');
             if (!next.includes('min-width:\\s*82px !important')) throw new Error('production UI source test: V15.2.20 recurrence assertion missing');
             return next;
           });
