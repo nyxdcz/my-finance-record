@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, "..");
-const QUERY = "15.2.24-mascot6";
+const QUERY = "15.2.24-mascot7";
 
 let changed = 0;
 const writeIfChanged = (target, content) => {
@@ -60,17 +60,18 @@ patch("sw.js", source => {
   let next = source;
   const cssEntry = `asset("./summary-mascots-v15-2-25.css?v=${QUERY}"),`;
   const jsEntry = `asset("./summary-mascots-v15-2-25.js?v=${QUERY}"),`;
-  const mascotEntries = [
-    'asset("./assets/mascots/mascot-red.png"),',
-    'asset("./assets/mascots/mascot-green.png"),',
-    'asset("./assets/mascots/mascot-blue.png"),',
-    'asset("./assets/mascots/mascot-orange.png"),'
-  ];
+  const colors = ["red", "green", "blue", "orange"];
+  const mascotEntries = colors.map(color => `asset("./assets/mascots/mascot-${color}.png?v=${QUERY}"),`);
 
-  for (const color of ["red", "green", "blue", "orange"]) {
+  for (const [index, color] of colors.entries()) {
+    const entry = mascotEntries[index];
     next = next.replaceAll(
       `asset("./assets/mascots/mascot-${color}.svg"),`,
-      `asset("./assets/mascots/mascot-${color}.png"),`
+      entry
+    );
+    next = next.replace(
+      new RegExp(`asset\\("\\.\\/assets\\/mascots\\/mascot-${color}\\.png(?:\\?v=[^"]+)?"\\),`, "g"),
+      entry
     );
   }
 
