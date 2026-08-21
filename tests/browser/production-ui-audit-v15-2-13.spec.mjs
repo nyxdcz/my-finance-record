@@ -75,7 +75,7 @@ for (const width of [1024, 1280, 1366, 1440, 1920]) {
   });
 }
 
-test("desktop Budget periods use three expense card-list columns with monthly repeat beside Mark paid", async ({ page }) => {
+test("desktop Budget periods use compact expense cards with monthly repeat beside Mark paid", async ({ page }) => {
   await openFinance(page, { width:1440, height:1100 });
   const metrics = await page.evaluate(() => {
     const stack = document.querySelector("#money .section-stack");
@@ -88,6 +88,7 @@ test("desktop Budget periods use three expense card-list columns with monthly re
     const paid = firstRow?.querySelector(".desktop-record-actions [data-mark-paid]");
     const edit = firstRow?.querySelector(".desktop-record-actions [data-edit-expense]");
     const savedText = saved?.querySelector(".saved-button-text");
+    const actionBar = firstRow?.querySelector(":scope > .desktop-record-actions");
     const rowStyle = firstRow ? getComputedStyle(firstRow) : null;
     const stackStyle = stack ? getComputedStyle(stack) : null;
     const periodStyle = periods[0] ? getComputedStyle(periods[0]) : null;
@@ -100,11 +101,18 @@ test("desktop Budget periods use three expense card-list columns with monthly re
       rowRadius:rowStyle?.borderRadius || "",
       rowShadow:rowStyle?.boxShadow || "",
       rowGap:spacing,
+      rowPaddingTop:rowStyle ? parseFloat(rowStyle.paddingTop) : 0,
+      rowColumnGap:rowStyle ? parseFloat(rowStyle.columnGap) : 0,
+      actionFooterPaddingTop:actionBar ? parseFloat(getComputedStyle(actionBar).paddingTop) : 0,
+      recurrenceButtonHeight:saved?.getBoundingClientRect().height || 0,
+      recurrenceButtonWidth:saved?.getBoundingClientRect().width || 0,
       actionCount:actions.length,
       savedIndex:actions.indexOf(saved),
       paidIndex:actions.indexOf(paid),
       editIndex:actions.indexOf(edit),
-      savedLabel:saved?.classList.contains("active") ? getComputedStyle(savedText, "::after").content : getComputedStyle(savedText, "::after").content,
+      savedLabel:getComputedStyle(savedText, "::after").content,
+      savedTextDisplay:savedText ? getComputedStyle(savedText).display : "",
+      savedIconDisplay:saved?.querySelector(".saved-icon-container") ? getComputedStyle(saved.querySelector(".saved-icon-container")).display : "",
       mobileActionsDisplay:firstRow ? getComputedStyle(firstRow.querySelector(":scope > .mobile-record-actions")).display : ""
     };
   });
@@ -115,11 +123,18 @@ test("desktop Budget periods use three expense card-list columns with monthly re
   expect(metrics.rowRadius).toBe("8px");
   expect(metrics.rowShadow).not.toBe("none");
   expect(metrics.rowGap).toBeCloseTo(5, 0);
+  expect(metrics.rowPaddingTop).toBeCloseTo(7, 0);
+  expect(metrics.rowColumnGap).toBeCloseTo(8, 0);
+  expect(metrics.actionFooterPaddingTop).toBeCloseTo(5, 0);
+  expect(metrics.recurrenceButtonHeight).toBeCloseTo(30, 0);
+  expect(metrics.recurrenceButtonWidth).toBeGreaterThan(65);
   expect(metrics.actionCount).toBeGreaterThanOrEqual(3);
   expect(metrics.savedIndex).toBeGreaterThanOrEqual(0);
   expect(metrics.paidIndex).toBe(metrics.savedIndex + 1);
   expect(metrics.editIndex).toBe(metrics.paidIndex + 1);
   expect(metrics.savedLabel).toMatch(/Repeat(?:s)? monthly/);
+  expect(metrics.savedTextDisplay).not.toBe("none");
+  expect(metrics.savedIconDisplay).toBe("none");
   expect(metrics.mobileActionsDisplay).toBe("none");
 });
 
