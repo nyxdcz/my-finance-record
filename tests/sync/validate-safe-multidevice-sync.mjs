@@ -13,6 +13,7 @@ const cloud = read("cloud-sync.js");
 const worker = read("sw.js");
 const resolution = read("cloud-conflict-resolution.js");
 const review = read("cloud-conflict-review.js");
+const version = JSON.parse(read("version.json"));
 
 for (const file of ["cloud-sync.js","cloud-conflict-resolution.js","cloud-conflict-review.js","sw.js"]) {
   const result = spawnSync(process.execPath, ["--check", path.join(root, file)], { encoding:"utf8" });
@@ -39,7 +40,7 @@ const firstPull = cloud.indexOf("await pullChanges();", syncStart);
 const pushLoop = cloud.indexOf("while (Object.values(pending)", syncStart);
 assert(syncStart >= 0 && firstPull > syncStart && pushLoop > firstPull, "sync must pull current cloud revisions before queued device uploads");
 assert(cloud.includes("5*60*1000"), "five-minute routine sync cadence changed");
-assert(worker.includes('finance-v15-20260822-compact-expense-collapse-r60'), "PWA cache was not rotated for the V15.2.24 compact expense release");
+assert(worker.includes(version.cacheVersion), "PWA cache does not match the current organized release");
 assert(worker.includes('asset("./cloud-sync.js?v=15.2.12-sync2")'), "PWA shell does not pin the stabilized cloud sync client");
 assert(worker.includes('new Request(url, { cache:"reload" })'), "PWA precache no longer bypasses stale HTTP cache");
 
@@ -48,4 +49,4 @@ if (failures.length) {
   failures.forEach(item => console.error(`- ${item}`));
   process.exit(1);
 }
-console.log("Safe multi-device sync validation passed under the V15.2.24 release shell.");
+console.log("Safe multi-device sync validation passed under the V2.0.0 organized release shell.");
