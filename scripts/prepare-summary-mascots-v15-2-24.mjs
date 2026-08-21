@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, "..");
-const QUERY = "15.2.24-mascot4";
+const QUERY = "15.2.24-mascot5";
 
 let changed = 0;
 const writeIfChanged = (target, content) => {
