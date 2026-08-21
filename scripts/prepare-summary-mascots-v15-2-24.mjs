@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, "..");
-const QUERY = "15.2.24-mascot1";
+const QUERY = "15.2.24-mascot2";
 
 let changed = 0;
 const writeIfChanged = (target, content) => {
@@ -36,13 +36,18 @@ patch("index.html", source => {
   const cssTag = `<link rel="stylesheet" href="./summary-mascots-v15-2-25.css?v=${QUERY}">`;
   const jsTag = `<script src="./summary-mascots-v15-2-25.js?v=${QUERY}"></script>`;
 
-  if (!next.includes(cssTag)) {
+  if (/summary-mascots-v15-2-25\.css\?v=[^"]+/.test(next)) {
+    next = next.replace(/summary-mascots-v15-2-25\.css\?v=[^"]+/, `summary-mascots-v15-2-25.css?v=${QUERY}`);
+  } else {
     next = next.replace(
       /(<link rel="stylesheet" href="\.\/production-ui-audit-v15-2-13\.css\?v=[^"]+">)/,
       `$1\n  ${cssTag}`
     );
   }
-  if (!next.includes(jsTag)) {
+
+  if (/summary-mascots-v15-2-25\.js\?v=[^"]+/.test(next)) {
+    next = next.replace(/summary-mascots-v15-2-25\.js\?v=[^"]+/, `summary-mascots-v15-2-25.js?v=${QUERY}`);
+  } else {
     next = next.replace(
       /(<script src="\.\/phone-finance-compat\.js\?v=[^"]+"><\/script>)/,
       `$1\n  ${jsTag}`
@@ -62,18 +67,24 @@ patch("sw.js", source => {
     'asset("./assets/mascots/mascot-orange.svg"),'
   ];
 
-  if (!next.includes(cssEntry)) {
+  if (/asset\("\.\/summary-mascots-v15-2-25\.css\?v=[^"]+"\),/.test(next)) {
+    next = next.replace(/asset\("\.\/summary-mascots-v15-2-25\.css\?v=[^"]+"\),/, cssEntry);
+  } else {
     next = next.replace(
       /(\s+asset\("\.\/production-ui-audit-v15-2-13\.css\?v=[^"]+"\),)/,
       `$1\n  ${cssEntry}`
     );
   }
-  if (!next.includes(jsEntry)) {
+
+  if (/asset\("\.\/summary-mascots-v15-2-25\.js\?v=[^"]+"\),/.test(next)) {
+    next = next.replace(/asset\("\.\/summary-mascots-v15-2-25\.js\?v=[^"]+"\),/, jsEntry);
+  } else {
     next = next.replace(
       /(\s+asset\("\.\/phone-finance-compat\.js\?v=[^"]+"\),)/,
       `$1\n  ${jsEntry}`
     );
   }
+
   if (!next.includes(mascotEntries[0])) {
     next = next.replace(
       `  ${jsEntry}`,
