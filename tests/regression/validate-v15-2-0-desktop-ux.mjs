@@ -7,18 +7,18 @@ const pkg = JSON.parse(read("package.json"));
 const prod = read("productivity-tools.js");
 const desktopUx = read("desktop-ux-v15-2-0.css");
 const uiIcons = read("ui-icon-alignment-v15-0-5.css");
-const runtimeCompat = read("assets/js/ui/sync-runtime-compat.js");
+const runtimeCompat = read("sync-runtime-compat.js");
 const changelog = read("CHANGELOG.md");
 const cloudFile = fs.readdirSync(".").find(name => name.endsWith(".js") && read(name).includes("financeCloudSyncV3Bootstrap"));
 if (!cloudFile) throw new Error("Cloud Sync V3 file missing");
 const cloud = read(cloudFile);
 const required = [
-  [version.version === "15.2.23", "version.json is V15.2.18"],
-  [pkg.version === "15.2.23", "package.json is V15.2.18"],
+  [version.version === "15.2.24", "version.json is V15.2.24"],
+  [pkg.version === "15.2.24", "package.json is V15.2.24"],
   [version.schemaVersion === 12 && version.cloudSchemaVersion === 3, "schemas remain 12/3"],
-  [version.cacheVersion === "finance-v15-20260821-monthly-repeat-icon-r59", "V15.2.18 production UI audit cache is declared"],
-  [index.includes("My Finance Records · V15.2.23"), "page title is V15.2.18"],
-  [changelog.startsWith("## 15.2.23 · 2026-08-21"), "CHANGELOG begins with V15.2.18"],
+  [version.cacheVersion === "finance-v15-20260822-compact-expense-collapse-r60", "V15.2.24 compact expense cache is declared"],
+  [index.includes("My Finance Records · V15.2.24"), "page title is V15.2.24"],
+  [changelog.startsWith("## 15.2.24 · 2026-08-22"), "CHANGELOG begins with V15.2.24"],
   [changelog.includes("## 15.2.4 · 2026-08-18"), "CHANGELOG preserves the previous V15.2.4 history"],
   [index.includes("recurring items checked"), "month navigation explains recurring preparation"],
   [index.includes("cleared because filters changed"), "selection reset is announced"],
@@ -31,10 +31,10 @@ const required = [
   [prod.includes("synchronize through Cloud Sync") && !prod.includes("Cloud Sync V2"), "Cloud terminology is current"],
   [cloud.includes("Your local changes are safe"), "Cloud error copy is plain-language"],
   [index.includes("cloudToolbarTechnicalDetails") && cloud.includes("cloudToolbarTechnicalError"), "Cloud technical details are optional"],
-  [sw.includes('const APP_VERSION = "15.2.23"') && sw.includes(version.cacheVersion), "service worker delivery matches release"],
+  [sw.includes('const APP_VERSION = "15.2.24"') && sw.includes(version.cacheVersion), "service worker delivery matches release"],
   [sw.includes("desktop-ux-v15-2-0.css?v=15.2.5-disclosure1"), "desktop disclosure CSS is precached"],
-  [runtimeCompat.includes('const VERSION = "15.2.23"') && runtimeCompat.includes('const RELEASE_NAME = "Monthly Repeat Icon Footer"'), "release override matches V15.2.18"],
-  [index.includes("sync-config.js?v=15.2.10-release1") && sw.includes("sync-config.js?v=15.2.10-release1"), "release layer is cache-busted consistently"],
+  [runtimeCompat.includes('const VERSION = "15.2.24"') && runtimeCompat.includes('const RELEASE_NAME = "Compact Expense Status & Collapse"'), "release override matches V15.2.24"],
+  [index.includes("sync-runtime-compat.js?v=15.2.24-release1") && sw.includes("sync-runtime-compat.js?v=15.2.24-release1"), "release layer is cache-busted consistently"],
   [desktopUx.includes("--budget-disclosure-reference-size:var(--ui-disclosure-size,40px)"), "Budget disclosure buttons share the First-half control size"],
   [desktopUx.includes("--budget-disclosure-reference-inset:17px"), "Budget disclosure buttons use the First-half right inset"],
   [desktopUx.includes("#money .period-card .period-header") && desktopUx.includes("padding-right:var(--budget-disclosure-reference-inset) !important"), "First, second, and other period headers pin the reference disclosure edge"],
@@ -49,4 +49,4 @@ const required = [
   [read("mobile-v14-0-23.css").length > 0, "mobile stylesheet remains present"]
 ];
 for (const [ok, message] of required) { if (!ok) throw new Error(message); }
-console.log("V15.2.23 release preserves the desktop UX source contract");
+console.log("V15.2.24 release preserves the desktop UX source contract");
