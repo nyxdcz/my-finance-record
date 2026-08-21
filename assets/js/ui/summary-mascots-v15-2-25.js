@@ -31,10 +31,8 @@
     return img;
   }
 
-  function restoreSlot(element) {
-    if (!element || element.dataset.summaryMascotActive !== "true") return;
-    const value = element.dataset.summaryMascotValue || "";
-    element.textContent = value;
+  function clearMascotState(element) {
+    if (!element) return;
     delete element.dataset.summaryMascotActive;
     delete element.dataset.summaryMascotValue;
     delete element.dataset.summaryMascotColor;
@@ -43,6 +41,13 @@
     element.removeAttribute("title");
     element.closest(".summary-card")?.classList.remove("has-summary-mascot");
     element.closest(".collapse-actions")?.classList.remove("has-period-mascot");
+  }
+
+  function restoreSlot(element) {
+    if (!element || element.dataset.summaryMascotActive !== "true") return;
+    const value = element.dataset.summaryMascotValue || "";
+    element.textContent = value;
+    clearMascotState(element);
   }
 
   function useMascot(element, { color, accessibleLabel, cardClass = true, periodClass = false }) {
@@ -69,19 +74,23 @@
   function zeroTotal(id, color, label, { period = false } = {}) {
     const element = document.getElementById(id);
     if (!element) return;
-    if (element.dataset.summaryMascotActive === "true" && element.querySelector(".summary-mascot-image")) return;
+    const active = element.dataset.summaryMascotActive === "true";
+    const hasImage = Boolean(element.querySelector(".summary-mascot-image"));
+    if (active && hasImage) return;
+    if (active && !hasImage) clearMascotState(element);
+
     const amount = numericAmount(element.textContent);
     if (Number.isFinite(amount) && Math.abs(amount) < 0.005) {
       useMascot(element, { color, accessibleLabel:label, cardClass:!period, periodClass:period });
-    } else {
-      restoreSlot(element);
     }
   }
 
   function differenceCards() {
     const cards = document.querySelectorAll("#moneySummary .summary-card");
     for (const card of cards) {
-      const label = card.querySelector(".summary-label-desktop, .summary-card-label")?.textContent?.trim() || "";
+      const label = card.querySelector(".summary-label-desktop")?.textContent?.trim()
+        || card.querySelector(".summary-card-label")?.textContent?.trim()
+        || "";
       if (label !== "First-half difference" && label !== "Second-half difference") continue;
       const value = card.querySelector(".summary-card-value");
       if (!value) continue;
