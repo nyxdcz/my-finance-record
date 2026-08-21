@@ -1,0 +1,156 @@
+name: Finalize V15.2.19
+
+on:
+  push:
+    paths:
+      - '.github/workflows/release-v15-2-19.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Apply V15.2.19 release metadata
+        run: |
+          python <<'PY'
+          from pathlib import Path
+          import json
+
+          OLD_VERSION = "15.2.18"
+          NEW_VERSION = "15.2.19"
+          OLD_CACHE = "finance-v15-20260821-horizontal-kanban-r54"
+          NEW_CACHE = "finance-v15-20260821-expense-card-lists-r55"
+          RELEASE_NAME = "Expense Card Lists"
+
+          def replace_required(path, old, new, count=None):
+              p = Path(path)
+              text = p.read_text()
+              found = text.count(old)
+              if found == 0:
+                  raise SystemExit(f"Missing required release marker in {path}: {old}")
+              if count is not None and found < count:
+                  raise SystemExit(f"Expected at least {count} matches in {path}, found {found}: {old}")
+              p.write_text(text.replace(old, new, count if count is not None else -1))
+
+          pkg_path = Path("package.json")
+          pkg = json.loads(pkg_path.read_text())
+          if pkg.get("version") != OLD_VERSION:
+              raise SystemExit(f"Unexpected package version: {pkg.get('version')}")
+          pkg["version"] = NEW_VERSION
+          pkg_path.write_text(json.dumps(pkg, indent=2) + "\n")
+
+          lock_path = Path("package-lock.json")
+          lock = json.loads(lock_path.read_text())
+          if lock.get("version") != OLD_VERSION or lock.get("packages", {}).get("", {}).get("version") != OLD_VERSION:
+              raise SystemExit("Unexpected package-lock release version")
+          lock["version"] = NEW_VERSION
+          lock["packages"][""]["version"] = NEW_VERSION
+          lock_path.write_text(json.dumps(lock, indent=2) + "\n")
+
+          version_path = Path("version.json")
+          version = json.loads(version_path.read_text())
+          if version.get("version") != OLD_VERSION:
+              raise SystemExit(f"Unexpected version.json version: {version.get('version')}")
+          version.update({
+              "version": NEW_VERSION,
+              "cacheVersion": NEW_CACHE,
+              "released": "2026-08-21",
+              "name": RELEASE_NAME,
+              "notes": "V15.2.19 redesigns First half, Second half, and Other expenses as responsive card-list columns inspired by Project Agenda, keeps 5px spacing between expense cards, and restores the monthly-repeat control directly beside Mark paid. Finance Schema 12, Cloud Schema V3, calculations, balances, recurrence semantics, filters, payments, and sync behavior are unchanged."
+          })
+          version_path.write_text(json.dumps(version, indent=2) + "\n")
+
+          readme = Path("README.md")
+          text = readme.read_text()
+          text = text.replace("# My Finance Records · V15.2.18", "# My Finance Records · V15.2.19", 1)
+          text = text.replace("version-V15.2.18-2563eb", "version-V15.2.19-2563eb", 1)
+          text = text.replace("| **V15.2.18** · Horizontal Project Kanban | **12** | **V3** | **5 minutes** |", "| **V15.2.19** · Expense Card Lists | **12** | **V3** | **5 minutes** |", 1)
+          old_summary = "The current release turns Project Agenda and Projects into horizontal Kanban boards with full-card drag-and-drop, protected start and Completed columns, custom workflow columns, completion safeguards, and Undo. Project values, payments, revision history, finance calculations, schemas, and sync behavior remain protected."
+          new_summary = "The current release redesigns First half, Second half, and Other expenses as responsive card-list columns with separate expense cards, 5px card spacing, period accents, compact metadata, and the monthly-repeat control directly beside Mark paid. Finance calculations, recurrence behavior, schemas, balances, filters, payments, and sync behavior remain protected."
+          if old_summary not in text:
+              raise SystemExit("README current-release summary marker missing")
+          text = text.replace(old_summary, new_summary, 1)
+          readme.write_text(text)
+
+          changelog = Path("CHANGELOG.md")
+          old_changelog = changelog.read_text()
+          entry = """## 15.2.19 · 2026-08-21
+- Redesigned First half, Second half, and Other expenses as responsive card-list columns modeled on the Project Agenda card rhythm, with separate rounded expense cards and period accent colors.
+- Preserved 5px vertical spacing between expense cards and restored the monthly-repeat control directly beside Mark paid while keeping Edit next in the action footer.
+- Preserved Finance Schema 12, Cloud Schema V3, calculations, balances, recurrence semantics, filters, payment behavior, phone touch layouts, and sync while rotating the PWA shell to `finance-v15-20260821-expense-card-lists-r55`.
+
+"""
+          if not old_changelog.startswith("## 15.2.18 · 2026-08-21"):
+              raise SystemExit("CHANGELOG latest release marker missing")
+          changelog.write_text(entry + old_changelog)
+
+          index = Path("index.html")
+          text = index.read_text()
+          markers = [
+              ("<title>My Finance Records · V15.2.18</title>", "<title>My Finance Records · V15.2.19</title>"),
+              ('<small id="buildBadge" title="V15.2.18 · Horizontal Project Kanban · August 21, 2026">V15.2.18</small>', '<small id="buildBadge" title="V15.2.19 · Expense Card Lists · August 21, 2026">V15.2.19</small>'),
+              ('const APP_VERSION = "15.2.18";', 'const APP_VERSION = "15.2.19";'),
+              ('const APP_RELEASE_NAME = "Horizontal Project Kanban";', 'const APP_RELEASE_NAME = "Expense Card Lists";'),
+              (f'const APP_CACHE_VERSION = "{OLD_CACHE}";', f'const APP_CACHE_VERSION = "{NEW_CACHE}";'),
+              ('production-ui-audit-v15-2-13.css?v=15.2.14-audit2', 'production-ui-audit-v15-2-13.css?v=15.2.19-expensecards1'),
+              ('pwa-update-v15-0-5.js?v=15.2.18-release14', 'pwa-update-v15-0-5.js?v=15.2.19-release1')
+          ]
+          for old, new in markers:
+              if old not in text:
+                  raise SystemExit(f"index.html release marker missing: {old}")
+              text = text.replace(old, new, 1)
+          history_anchor = 'VERSION_HISTORY.unshift({"version":"V15.2.18","title":"Horizontal Project Kanban","changes":["Rebuilds Project Agenda and Projects as horizontal boards with full-card mouse, touch, and keyboard dragging.","Adds protected start and Completed columns plus named, colored, reorderable custom workflow columns.","Preserves completion confirmation, payments, balances, revisions, safe invalid-drop return, and five-second Undo."]});'
+          history_new = history_anchor + '\n    VERSION_HISTORY.unshift({"version":"V15.2.19","title":"Expense Card Lists","changes":["Redesigns First half, Second half, and Other expenses as responsive card-list columns with separate rounded expense cards.","Keeps 5px spacing between expense cards and period accent colors while preserving phone touch layouts.","Restores Repeat/Repeats monthly directly beside Mark paid and keeps recurrence, calculations, filters, balances, payments, and sync behavior unchanged."]});'
+          if history_anchor not in text:
+              raise SystemExit("index.html V15.2.18 history anchor missing")
+          text = text.replace(history_anchor, history_new, 1)
+          index.write_text(text)
+
+          for path in ["sw.js", "assets/js/pwa-update-v15-0-5.js", "pwa-update-v15-0-5.js", "tests/browser/production-ui-audit-v15-2-13.spec.mjs", "tests/regression/validate-production-ui-audit-v15-2-13.mjs", "tests/regression/validate-pwa-updater-v15-0-5.mjs"]:
+              p = Path(path)
+              if p.exists():
+                  p.write_text(p.read_text().replace(OLD_CACHE, NEW_CACHE))
+
+          replace_required("sw.js", 'const APP_VERSION = "15.2.18";', 'const APP_VERSION = "15.2.19";', 1)
+          replace_required("sw.js", 'production-ui-audit-v15-2-13.css?v=15.2.14-audit2', 'production-ui-audit-v15-2-13.css?v=15.2.19-expensecards1', 1)
+          replace_required("sw.js", 'pwa-update-v15-0-5.js?v=15.2.18-release14', 'pwa-update-v15-0-5.js?v=15.2.19-release1', 1)
+
+          inspect = Path("tests/helpers/inspect-project.mjs")
+          inspect_text = inspect.read_text()
+          inspect_text = inspect_text.replace('pkg.version !== "15.2.18"', 'pkg.version !== "15.2.19"')
+          inspect_text = inspect_text.replace('Expected current package version 15.2.18', 'Expected current package version 15.2.19')
+          inspect_text = inspect_text.replace('startsWith("# My Finance Records · V15.2.18")', 'startsWith("# My Finance Records · V15.2.19")')
+          inspect_text = inspect_text.replace('README release heading is not V15.2.18', 'README release heading is not V15.2.19')
+          inspect_text = inspect_text.replace('startsWith("## 15.2.18 · 2026-08-21")', 'startsWith("## 15.2.19 · 2026-08-21")')
+          inspect_text = inspect_text.replace('CHANGELOG latest entry is not V15.2.18', 'CHANGELOG latest entry is not V15.2.19')
+          inspect_text = inspect_text.replace('Repository inspection passed: V15.2.18 release sources', 'Repository inspection passed: V15.2.19 release sources')
+          inspect.write_text(inspect_text)
+
+          prod_test = Path("tests/regression/validate-production-ui-audit-v15-2-13.mjs")
+          text = prod_test.read_text().replace('"15.2.18"', '"15.2.19"')
+          text = text.replace('15\\.2\\.14-audit2', '15\\.2\\.19-expensecards1')
+          text = text.replace('V15.2.18 production UI/UX audit source contract passed.', 'V15.2.19 production UI/UX audit source contract passed.')
+          prod_test.write_text(text)
+
+          pwa_test = Path("tests/regression/validate-pwa-updater-v15-0-5.mjs")
+          text = pwa_test.read_text().replace('"15.2.18"', '"15.2.19"')
+          text = text.replace('15\\.2\\.18', '15\\.2\\.19')
+          text = text.replace('15.2.18-release14', '15.2.19-release1')
+          text = text.replace('V15.2.18 PWA updater regression passed', 'V15.2.19 PWA updater regression passed')
+          pwa_test.write_text(text)
+          PY
+
+      - name: Commit release metadata
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package.json package-lock.json version.json README.md CHANGELOG.md index.html sw.js assets/js/pwa-update-v15-0-5.js pwa-update-v15-0-5.js tests/helpers/inspect-project.mjs tests/browser/production-ui-audit-v15-2-13.spec.mjs tests/regression/validate-production-ui-audit-v15-2-13.mjs tests/regression/validate-pwa-updater-v15-0-5.mjs
+          git commit -m "release: V15.2.19 expense card lists"
+          git push origin HEAD:main
