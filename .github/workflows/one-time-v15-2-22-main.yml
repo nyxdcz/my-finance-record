@@ -114,3 +114,5 @@ jobs:
           git add -f v15-2-22-validator.log
           git commit -m "chore: capture V15.2.22 validator diagnostics"
           git push --force origin HEAD:refs/heads/v15.2.22-diagnostics
+
+# rerun after source-regression migration fix
