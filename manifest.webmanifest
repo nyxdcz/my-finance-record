@@ -16,19 +16,19 @@
   ],
   "icons": [
     {
-      "src": "./icons/icon-192.png",
+      "src": "./icons/icon-192.png?v=15.2.18-logo2",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "./icons/icon-512.png",
+      "src": "./icons/icon-512.png?v=15.2.18-logo2",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "./icons/icon-maskable-512.png",
+      "src": "./icons/icon-maskable-512.png?v=15.2.18-logo2",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
@@ -41,7 +41,7 @@
       "url": "./index.html?page=income&action=add-income",
       "icons": [
         {
-          "src": "./icons/icon-192.png",
+          "src": "./icons/icon-192.png?v=15.2.18-logo2",
           "sizes": "192x192"
         }
       ]
@@ -52,7 +52,7 @@
       "url": "./index.html?page=money&action=add-expense",
       "icons": [
         {
-          "src": "./icons/icon-192.png",
+          "src": "./icons/icon-192.png?v=15.2.18-logo2",
           "sizes": "192x192"
         }
       ]
@@ -63,7 +63,7 @@
       "url": "./index.html?page=money",
       "icons": [
         {
-          "src": "./icons/icon-192.png",
+          "src": "./icons/icon-192.png?v=15.2.18-logo2",
           "sizes": "192x192"
         }
       ]
@@ -74,7 +74,7 @@
       "url": "./index.html?page=paid-expenses",
       "icons": [
         {
-          "src": "./icons/icon-192.png",
+          "src": "./icons/icon-192.png?v=15.2.18-logo2",
           "sizes": "192x192"
         }
       ]
@@ -85,7 +85,7 @@
       "url": "./index.html?page=projects",
       "icons": [
         {
-          "src": "./icons/icon-192.png",
+          "src": "./icons/icon-192.png?v=15.2.18-logo2",
           "sizes": "192x192"
         }
       ]
@@ -96,7 +96,7 @@
       "url": "./index.html?page=reports",
       "icons": [
         {
-          "src": "./icons/icon-192.png",
+          "src": "./icons/icon-192.png?v=15.2.18-logo2",
           "sizes": "192x192"
         }
       ]
@@ -107,7 +107,7 @@
       "url": "./index.html?page=settings&settings=backup",
       "icons": [
         {
-          "src": "./icons/icon-192.png",
+          "src": "./icons/icon-192.png?v=15.2.18-logo2",
           "sizes": "192x192"
         }
       ]
