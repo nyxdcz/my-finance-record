@@ -121,13 +121,14 @@ for (const file of tests) {
   }
 
   if (file.endsWith('tests/regression/validate-production-ui-audit-v15-2-13.mjs')) {
-    next = next
-      .replace(/assert\.match\(css, \/V15\\\.2\\\.21 · Real monthly recurrence label[^\n]+\n?/g, '')
-      .replace(/assert\.match\(index, \/saved-button-text[^\n]+\n?/g, '');
-    const anchor = 'assert.match(css, /V15\\.2\\.20 · Expense-card compactness[\\s\\S]*max-height:\\s*56px !important;/);';
-    if (next.includes(anchor) && !next.includes('Monthly repeat label isolation')) {
-      next = next.replace(anchor, `${anchor}\nassert.match(css, /V15\\.2\\.22 · Monthly repeat label isolation[\\s\\S]*monthly-repeat-label[\\s\\S]*width:\\s*auto !important;[\\s\\S]*opacity:\\s*1 !important;[\\s\\S]*transform:\\s*none !important;/);\nassert.match(index, /class="monthly-repeat-label"[^>]*>\\$\\{item\\.recurring === "Monthly" \\? "Repeats monthly" : "Repeat monthly"\\}<\\/span>/);`);
-    }
+    const lines = next.split('\n').filter(line => !line.includes('Real monthly recurrence label') && !line.includes('/saved-button-text'));
+    const insertAt = lines.findIndex(line => line.startsWith('assert.match(desktopUx'));
+    if (insertAt < 0) throw new Error('source regression insertion anchor missing');
+    lines.splice(insertAt, 0,
+      'assert.match(css, /V15\\.2\\.22 · Monthly repeat label isolation[\\s\\S]*monthly-repeat-label[\\s\\S]*width:\\s*auto !important;[\\s\\S]*opacity:\\s*1 !important;[\\s\\S]*transform:\\s*none !important;/);',
+      'assert.match(index, /class="monthly-repeat-label"[^>]*>\\$\\{item\\.recurring === "Monthly" \\? "Repeats monthly" : "Repeat monthly"\\}<\\/span>/);'
+    );
+    next = lines.join('\n');
   }
 
   if (next !== source) write(file, next);
