@@ -1,0 +1,95 @@
+/* My Finance Records · V15.2.24 · Budget summary mascots */
+
+@media (min-width: 851px) {
+  #money .summary-mascot-slot {
+    color: transparent !important;
+    font-size: 0 !important;
+    line-height: 0 !important;
+  }
+
+  #money .summary-mascot-slot::after {
+    content: "";
+    box-sizing: border-box;
+    display: block;
+    width: 25px;
+    height: 25px;
+    min-width: 25px;
+    min-height: 25px;
+    max-width: 25px;
+    max-height: 25px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    pointer-events: none;
+  }
+
+  #money .summary-mascot-slot[data-summary-mascot="red"]::after {
+    background-image: url("./assets/mascots/mascot-red.svg");
+  }
+
+  #money .summary-mascot-slot[data-summary-mascot="green"]::after {
+    background-image: url("./assets/mascots/mascot-green.svg");
+  }
+
+  #money .summary-mascot-slot[data-summary-mascot="blue"]::after {
+    background-image: url("./assets/mascots/mascot-blue.svg");
+  }
+
+  #money .summary-mascot-slot[data-summary-mascot="orange"]::after {
+    background-image: url("./assets/mascots/mascot-orange.svg");
+  }
+
+  #money .legend-item.summary-card,
+  #moneySummary .summary-card {
+    position: relative !important;
+  }
+
+  #money .legend-item.summary-card.has-summary-mascot,
+  #moneySummary .summary-card.has-summary-mascot {
+    padding-right: 52px !important;
+  }
+
+  #money .legend-total.summary-mascot-slot,
+  #moneySummary .summary-card-value.summary-mascot-slot {
+    position: absolute !important;
+    /* 19px from the positioning edge + the card's 1px border = 20px visual inset. */
+    right: 19px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    box-sizing: border-box !important;
+    width: 25px !important;
+    min-width: 25px !important;
+    max-width: 25px !important;
+    height: 25px !important;
+    min-height: 25px !important;
+    max-height: 25px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: grid !important;
+    place-items: center !important;
+  }
+
+  #money .period-card .collapse-actions.has-period-mascot {
+    gap: 10px !important;
+  }
+
+  #money .period-card .period-total.summary-mascot-slot {
+    box-sizing: border-box !important;
+    flex: 0 0 25px !important;
+    width: 25px !important;
+    min-width: 25px !important;
+    max-width: 25px !important;
+    height: 25px !important;
+    min-height: 25px !important;
+    max-height: 25px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: grid !important;
+    place-items: center !important;
+  }
+
+  /* The compact V15.2.24 disclosure remains 20×20 and 10px from the right edge. */
+  #money .period-card .period-header {
+    padding-right: 10px !important;
+  }
+}

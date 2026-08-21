@@ -88,16 +88,17 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p _site/icons _site/vendor
+          mkdir -p _site/icons _site/vendor _site/assets/mascots
           cp index.html offline.html manifest.webmanifest version.json sw.js sync-config.js _site/
           cp assets/css/*.css _site/
           cp assets/js/*.js _site/
           cp assets/js/features/*.js _site/
           cp assets/js/ui/*.js _site/
+          cp assets/mascots/*.svg _site/assets/mascots/
           cp vendor/supabase.min.js _site/vendor/
           cp icons/* _site/icons/
           # Runtime preparation combines the scoped V15.2.24 desktop CSS/JS overlays and release override into the existing compatibility entry points.
-          cp production-ui-audit-v15-2-13.css phone-finance-compat.js sync-runtime-compat.js _site/
+          cp production-ui-audit-v15-2-13.css phone-finance-compat.js sync-runtime-compat.js summary-mascots-v15-2-25.css summary-mascots-v15-2-25.js _site/
           test -f _site/dashboard-interactions-core-v14-0-23.css
           test -f _site/liquid-glass-v15.css
           test -f _site/ui-icon-alignment-v15-0-5.css
@@ -106,13 +107,19 @@ jobs:
           test -f _site/desktop-ux-v15-2-0.css
           test -f _site/shell-ui-v15-2-11.css
           test -f _site/production-ui-audit-v15-2-13.css
+          test -f _site/summary-mascots-v15-2-25.css
           test -f _site/pwa-update-v15-0-5.js
           test -f _site/cash-flow-summary.js
           test -f _site/form-inputs.js
           test -f _site/application-help.js
           test -f _site/header-tools-compat.js
           test -f _site/phone-finance-compat.js
+          test -f _site/summary-mascots-v15-2-25.js
           test -f _site/sync-runtime-compat.js
+          test -f _site/assets/mascots/mascot-red.svg
+          test -f _site/assets/mascots/mascot-green.svg
+          test -f _site/assets/mascots/mascot-blue.svg
+          test -f _site/assets/mascots/mascot-orange.svg
       - name: Upload GitHub Pages artifact
         uses: actions/upload-pages-artifact@v5
         with:
