@@ -1,0 +1,110 @@
+
+> my-finance-record@15.2.20 quality
+> npm run inspect && npm run lint && npm run maintainability && npm run test
+
+
+> my-finance-record@15.2.20 inspect
+> node tests/helpers/inspect-project.mjs
+
+Repository inspection: 0 error(s), 0 warning(s)
+Repository inspection passed: V15.2.20 release sources, local paths, deploy paths, package metadata, permissions, and public sync configuration are consistent.
+
+> my-finance-record@15.2.20 lint
+> eslint .
+
+
+> my-finance-record@15.2.20 maintainability
+> node tests/helpers/check-maintainability.mjs
+
+Maintainability checks passed: index.html 9140/9500 lines; assets/css/app.css 5301/5500 lines; first-party modules <=1800 lines; validation scripts are active and portable.
+
+> my-finance-record@15.2.20 pretest
+> npm run prepare:runtime
+
+
+> my-finance-record@15.2.20 prepare:runtime
+> node scripts/prepare-runtime.mjs
+
+Runtime compatibility files ready · refreshed 42.
+
+> my-finance-record@15.2.20 test
+> node tests/run.mjs
+
+Running 25 source regression tests...
+
+> tests/finance/validate-finance-marquee-source-v15-1-0.mjs
+Finance marquee source layout and V15.2.20 PWA cache metadata validated.
+
+> tests/regression/validate-desktop-ui-phase1-v15-1-0.mjs
+Desktop UI Phase 1 validation passed under V15.2.20: neutral Available money section border, desktop hierarchy, compact Income, report export menu, calendar states, Settings disclosure, contextual Paid note, deployment packaging, and preserved phone-Finance/cloud-profile delivery are source-aligned.
+
+> tests/regression/validate-month-navigation-borderless-v15-1-0.mjs
+V15.2.20 borderless month-navigation regression passed.
+
+> tests/regression/validate-desktop-ui-consistency-v15-1-0.mjs
+V15.2.20 desktop UI consistency validation passed.
+
+> tests/regression/validate-available-money-border-v15-1-0.mjs
+V15.2.9 Available money account-border regression passed.
+
+> tests/finance/validate-spend-label-v15-1-0.mjs
+V15.2.9 Spend theme contrast regression passed.
+
+> tests/regression/validate-black-canvas-v15-1-0.mjs
+V15.2.18 light/dark palette regression passed with only account names matching the balance color in light mode while account types keep their original color.
+
+> tests/regression/validate-header-ui-v15-0-5.mjs
+V15.2.9 header UI regression passed while preserving the V15.2.4 icon-alignment asset pin.
+
+> tests/regression/validate-pwa-updater-v15-0-5.mjs
+V15.2.20 PWA updater regression passed with pure PWA/cache ownership, static sidebar branding, neutral Finance border delivery, and light-mode account-name-only refresh delivery.
+
+> tests/finance/validate-record-spending-v15-0-4.mjs
+Record spending regression validation passed under V15.2.9.
+
+> tests/sync/validate-safe-multidevice-sync.mjs
+Safe multi-device sync validation passed under the V15.2.18 release shell.
+
+> tests/sync/validate-mobile-cloud-revert-safety.mjs
+Mobile cloud-revert safety validation passed.
+
+> tests/finance/validate-expense-screenshot.mjs
+Expense screenshot local and optional AI detector validation passed under the V15.2.9 release shell.
+
+> tests/regression/validate-v15-2-0-desktop-ux.mjs
+V15.2.20 release preserves the desktop UX source contract
+
+> tests/regression/validate-v15-2-2-mobile-ui.mjs
+V15.2.18 preserves V15.2.2 mobile UI/UX with static CSS and dedicated Phone Finance JS ownership.
+
+> tests/finance/validate-form-inputs-v15-2-6.mjs
+V15.2.6 form-input extraction source contract passed under the V15.2.18 shell
+
+> tests/regression/validate-application-help-v15-2-7.mjs
+Application Help V15.2.9 extraction validation passed.
+
+> tests/regression/validate-sidebar-embedded-v15-2-10.mjs
+V15.2.10 embedded sidebar icon regression passed.
+
+> tests/regression/validate-sidebar-brand-static-v15-2-10.mjs
+V15.2.10 static sidebar brand ownership regression passed.
+
+> tests/regression/validate-shell-ui-css-ownership-v15-2-11.mjs
+V15.2.18 shell UI CSS ownership validation passed.
+
+> tests/regression/validate-sync-config-separation.mjs
+Priority 4A sync configuration separation validated.
+
+> tests/regression/validate-auth-sync-state-v15-2-12.mjs
+V15.2.12 auth and sync readiness regression passed under V15.2.18.
+
+> tests/regression/validate-production-ui-audit-v15-2-13.mjs
+V15.2.20 production UI/UX audit source contract passed.
+
+> tests/regression/validate-structured-project-drag-v15-2-15.mjs
+V15.2.18 structured Project Agenda and Active-to-Completed drag source contract passed.
+
+> tests/regression/validate-horizontal-project-kanban-v15-2-18.mjs
+Horizontal Project Agenda and Projects Kanban source contract passed under V15.2.20.
+
+Completed 25 tests successfully.
