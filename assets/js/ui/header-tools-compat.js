@@ -149,7 +149,7 @@
     };
     const resetMenu = menu => {
       if (!menu) return;
-      ["position", "left", "top", "right", "bottom", "width", "height", "z-index", "margin"].forEach(property => menu.style.removeProperty(property));
+      ["position", "left", "top", "right", "bottom", "width", "height", "z-index", "margin", "overflow", "-webkit-backdrop-filter", "backdrop-filter", "transform", "filter", "perspective", "contain", "clip-path", "will-change"].forEach(property => menu.style.removeProperty(property));
       delete menu.dataset.viewportPortal;
     };
     const createPlaceholder = (menu, rect) => {
@@ -187,6 +187,15 @@
       menu.style.setProperty("height", `${Math.max(1, rect.height)}px`, "important");
       menu.style.setProperty("margin", "0", "important");
       menu.style.setProperty("z-index", "2600", "important");
+      menu.style.setProperty("overflow", "visible", "important");
+      menu.style.setProperty("-webkit-backdrop-filter", "none", "important");
+      menu.style.setProperty("backdrop-filter", "none", "important");
+      menu.style.setProperty("transform", "none", "important");
+      menu.style.setProperty("filter", "none", "important");
+      menu.style.setProperty("perspective", "none", "important");
+      menu.style.setProperty("contain", "none", "important");
+      menu.style.setProperty("clip-path", "none", "important");
+      menu.style.setProperty("will-change", "auto", "important");
       if (activeElement?.isConnected) activeElement.focus();
       return state;
     };
