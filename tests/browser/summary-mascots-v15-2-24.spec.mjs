@@ -101,6 +101,8 @@ test("desktop Budget & Expenses uses the approved supplied mascots and exact spa
       legacySmileDisplay:getComputedStyle(legacySmile).display,
       topRightInset:topCard.right - topBox.right,
       lower:{
+        mascotWidth:lowerMascot.width,
+        mascotHeight:lowerMascot.height,
         mascotGap:collapse.left - lowerMascot.right,
         mascotLift:collapseCenter - mascotCenter,
         collapseWidth:collapse.width,
@@ -123,8 +125,6 @@ test("desktop Budget & Expenses uses the approved supplied mascots and exact spa
     const slot = state.slots[id];
     expect(slot.mascot).toBe(color);
     expect(slot.aria).toContain("₱0.00");
-    expect(slot.width).toBeCloseTo(30, 0);
-    expect(slot.height).toBeCloseTo(30, 0);
     expect(slot.pseudoWidth).toBeCloseTo(30, 0);
     expect(slot.pseudoHeight).toBeCloseTo(30, 0);
     expect(slot.background).toContain(asset);
@@ -132,8 +132,10 @@ test("desktop Budget & Expenses uses the approved supplied mascots and exact spa
 
   expect(state.legacySmileDisplay).toBe("none");
   expect(state.topRightInset).toBeCloseTo(20, 0);
+  expect(state.lower.mascotWidth).toBeCloseTo(30, 0);
+  expect(state.lower.mascotHeight).toBeCloseTo(30, 0);
   expect(state.lower.mascotGap).toBeCloseTo(10, 0);
-  expect(state.lower.mascotLift).toBeCloseTo(8, 0);
+  expect(state.lower.mascotLift).toBeCloseTo(16, 0);
   expect(state.lower.collapseWidth).toBeCloseTo(20, 0);
   expect(state.lower.collapseHeight).toBeCloseTo(20, 0);
   expect(state.lower.collapseRightInset).toBeCloseTo(10, 0);
