@@ -7,6 +7,7 @@ const ledger = read("account-ledger.js");
 const index = read("index.html");
 const worker = read("sw.js");
 const pkg = JSON.parse(read("package.json"));
+const version = JSON.parse(read("version.json"));
 
 assert.doesNotMatch(budget, /renderDashboardBudgetForecast\(\);/, "obsolete Dashboard forecast renderer must not be called");
 assert.match(budget, /budgetRenderDashboard\(\.\.\.args\).*injectUi\(\); return result;/s, "Budget dashboard wrapper should render only supported UI");
@@ -19,8 +20,9 @@ const refreshAt = ledger.indexOf("refreshReconciledAccountState(account, expecte
 assert.ok(saveAt >= 0 && refreshAt > saveAt, "verified persistence must happen before final UI refresh");
 assert.match(index, /account-ledger\.js\?v=15\.0\.4/, "account-ledger asset must remain on its repaired pin");
 assert.match(index, /budget-planning\.js\?v=15\.2\.1-ux1/, "budget-planning asset must remain on its repaired pin");
-assert.match(worker, /finance-v15-20260822-compact-expense-collapse-r60/, "PWA cache must match the V15.2.24 compact expense release");
+assert.ok(worker.includes(version.cacheVersion), "PWA cache must match the current organized release");
 assert.match(worker, /account-ledger\.js\?v=15\.0\.4/, "worker must precache repaired account ledger");
 assert.match(worker, /budget-planning\.js\?v=15\.2\.1-ux1/, "worker must precache repaired budget planning");
-assert.equal(pkg.version, "15.2.24");
-console.log("Record spending regression validation passed under V15.2.24.");
+assert.equal(pkg.version, "2.0.0");
+assert.equal(version.version, "2.0.0");
+console.log("Record spending regression validation passed under V2.0.0 with repaired legacy module pins preserved.");

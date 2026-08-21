@@ -16,10 +16,10 @@ const index = read("index.html");
 const sw = read("sw.js");
 const version = JSON.parse(read("version.json"));
 
-assert.equal(version.version, "15.2.24");
+assert.equal(version.version, "2.0.0");
 assert.equal(version.schemaVersion, 12);
 assert.equal(version.cloudSchemaVersion, 3);
-assert.equal(version.cacheVersion, "finance-v15-20260822-compact-expense-collapse-r60");
+assert.equal(version.cacheVersion, "finance-v2-20260822-organized-complete-r1");
 assert.match(app, /--desktop-header-height:\s*64px/);
 assert.match(app, /--desktop-page-gutter:\s*24px/);
 assert.match(app, /--workspace-card-radius:\s*9px/);
@@ -64,8 +64,8 @@ for (const pin of [
   "black-canvas-v15-1-0.css?v=15.1.0-light1",
   "sync-config.js?v=15.2.10-release1"
 ]) assert.ok(index.includes(pin), `index missing ${pin}`);
-assert.ok(index.includes('const APP_CACHE_VERSION = "finance-v15-20260822-compact-expense-collapse-r60";'));
-assert.ok(sw.includes("finance-v15-20260822-compact-expense-collapse-r60"));
+assert.ok(index.includes(`const APP_CACHE_VERSION = "${version.cacheVersion}";`));
+assert.ok(sw.includes(version.cacheVersion));
 for (const pin of [
   "app.css?v=15.1.0-desktop3",
   "shell-ui-v15-2-11.css?v=15.2.11-shell1",
@@ -78,4 +78,4 @@ for (const pin of [
   "sync-config.js?v=15.2.10-release1",
   "liquid-glass-v15.css?v=15.2.2-light1"
 ]) assert.ok(sw.includes(pin), `service worker missing ${pin}`);
-console.log("V15.2.24 desktop UI consistency validation passed.");
+console.log("V2.0.0 desktop UI consistency validation passed while preserving legacy compatibility asset pins.");

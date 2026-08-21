@@ -6,15 +6,15 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, "..");
 
 const RELEASE = Object.freeze({
-  version:"15.2.24",
-  displayVersion:"V15.2.24",
-  name:"Compact Expense Status & Collapse",
+  version:"2.0.0",
+  displayVersion:"V2.0.0",
+  name:"Organized Complete",
   date:"August 22, 2026",
   dateIso:"2026-08-22",
-  cache:"finance-v15-20260822-compact-expense-collapse-r60",
-  cssQuery:"15.2.24-compact1",
-  pwaQuery:"15.2.24-release1",
-  phoneQuery:"15.2.24-compact1"
+  cache:"finance-v2-20260822-organized-complete-r1",
+  cssQuery:"2.0.0-organized1",
+  pwaQuery:"2.0.0-release1",
+  phoneQuery:"2.0.0-organized1"
 });
 
 const runtimeGroups = {
@@ -122,13 +122,13 @@ patchTextFile("index.html", source => {
     .replace(/const APP_VERSION = "\d+\.\d+\.\d+";/, `const APP_VERSION = "${RELEASE.version}";`)
     .replace(/const APP_RELEASE_NAME = "[^"]+";/, `const APP_RELEASE_NAME = "${RELEASE.name}";`)
     .replace(/const APP_RELEASE_DATE = "[^"]+";/, `const APP_RELEASE_DATE = "${RELEASE.date}";`)
-    .replace(/const APP_CACHE_VERSION = "finance-v15-[^"]+";/, `const APP_CACHE_VERSION = "${RELEASE.cache}";`)
+    .replace(/const APP_CACHE_VERSION = "finance-v[^"]+";/, `const APP_CACHE_VERSION = "${RELEASE.cache}";`)
     .replace(/production-ui-audit-v15-2-13\.css\?v=[^"]+/, `production-ui-audit-v15-2-13.css?v=${RELEASE.cssQuery}`)
     .replace(/pwa-update-v15-0-5\.js\?v=[^"]+/, `pwa-update-v15-0-5.js?v=${RELEASE.pwaQuery}`)
     .replace(/phone-finance-compat\.js\?v=[^"]+/, `phone-finance-compat.js?v=${RELEASE.phoneQuery}`);
 
   if (!next.includes(`"version":"${RELEASE.displayVersion}"`)) {
-    const historyEntry = `    VERSION_HISTORY.unshift({"version":"${RELEASE.displayVersion}","title":"${RELEASE.name}","changes":["Compacts desktop expense cards to the approved 15px/13px/10px type rhythm and exact 20px section disclosure controls.","Moves active due warnings beside Unpaid, removes standalone Deadline/Expense prefixes, and keeps date details compact below the status row.","Uses the existing 30px monthly-repeat artwork followed by 74×30 Mark paid and 48×30 Edit controls, preserves the 18px checkbox at 7px left/bottom, and keeps independent section collapse behavior with phone and coarse-pointer tablet layouts unchanged."]});\n`;
+    const historyEntry = `    VERSION_HISTORY.unshift({"version":"${RELEASE.displayVersion}","title":"${RELEASE.name}","changes":["Resets the public product version history into the organized V1.0.0-to-V2.0.0 roadmap while retaining the original V12-V15 changelog for audit history.","Combines the complete local-first Finance, account ledger, budgets, reports, projects, productivity, reminders, encrypted Cloud Schema V3 sync, responsive UI, and PWA delivery into one production release.","Preserves Finance Schema 12, Cloud Schema V3, saved records, calculations, balances, recurrence, payments, storage, encryption, and sync semantics while rotating to the V2 application cache."]});\n`;
     next = next.replace(/(\n\s*function normalizeSettingsPanelKey\()/, `\n${historyEntry}$1`);
   }
   return next;
@@ -136,7 +136,7 @@ patchTextFile("index.html", source => {
 
 patchTextFile("sw.js", source => source
   .replace(/const APP_VERSION = "\d+\.\d+\.\d+";/, `const APP_VERSION = "${RELEASE.version}";`)
-  .replace(/const CACHE_VERSION = "finance-v15-[^"]+";/, `const CACHE_VERSION = "${RELEASE.cache}";`)
+  .replace(/const CACHE_VERSION = "finance-v[^"]+";/, `const CACHE_VERSION = "${RELEASE.cache}";`)
   .replace(/production-ui-audit-v15-2-13\.css\?v=[^"]+/, `production-ui-audit-v15-2-13.css?v=${RELEASE.cssQuery}`)
   .replace(/pwa-update-v15-0-5\.js\?v=[^"]+/, `pwa-update-v15-0-5.js?v=${RELEASE.pwaQuery}`)
   .replace(/phone-finance-compat\.js\?v=[^"]+/, `phone-finance-compat.js?v=${RELEASE.phoneQuery}`));
@@ -154,7 +154,7 @@ if (fs.existsSync(changelogPath)) {
   const changelog = fs.readFileSync(changelogPath, "utf8");
   const heading = `## ${RELEASE.version} · ${RELEASE.dateIso}`;
   if (!changelog.startsWith(heading)) {
-    const entry = `${heading}\n\n### Compact expense status and collapse\n\n- Compacts the three desktop expense columns to the approved typography, spacing, and 20×20 collapse control geometry.\n- Removes the standalone Deadline/Expense prefix and places active Past due/Due soon status directly beside Unpaid while keeping the date detail available below.\n- Sets the desktop footer to the approved 30×30 Repeat, 74×30 Mark paid, and 48×30 Edit controls with 5px gaps and the 18×18 selection checkbox at 7px left/bottom.\n- Preserves independent First half, Second half, and Other expenses collapse behavior, phone/coarse-pointer touch layouts, Finance Schema 12, Cloud Schema V3, recurrence, payments, calculations, and sync behavior.\n\n`;
+    const entry = `${heading}\n\n### Organized complete release\n\n- Adopts the reorganized product version roadmap from V1.0.0 (Created) through V2.0.0 (Organized Complete); see \`version.md\` for the combined milestone history.\n- Treats the complete local-first Finance, ledger, budgeting, reporting, projects, productivity, reminders, encrypted multi-profile Cloud Schema V3 synchronization, responsive interface, PWA delivery, and final Budget & Expenses polish as one organized production baseline.\n- Keeps the historical V12.19.0 through V15.2.24 entries below for auditability rather than rewriting or deleting the original development history.\n- Preserves Finance Schema 12, Cloud Schema V3, finance data, calculations, balances, recurrence, payments, encryption, storage, backups, and synchronization semantics while rotating the shell to \`${RELEASE.cache}\`.\n\n`;
     writeIfChanged(changelogPath, `${entry}${changelog}`);
   }
 }

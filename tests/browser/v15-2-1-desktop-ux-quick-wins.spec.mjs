@@ -3,7 +3,7 @@ import fs from "node:fs";
 
 const source = name => fs.readFileSync(new URL(`../../${name}`, import.meta.url), "utf8");
 
-test("V15.2.1 source keeps the approved desktop UX quick wins", async () => {
+test("V15.2.1 source keeps the approved desktop UX quick wins under V2.0.0", async () => {
   const index = source("index.html");
   const agenda = source("projects-calendar-v13.0.20.js");
   const budget = source("budget-planning.js");
@@ -41,12 +41,12 @@ test("V15.2.1 source keeps the approved desktop UX quick wins", async () => {
   expect(source("productivity-tools.js")).toContain('input.value=""');
   expect(index).toContain("./productivity-tools.js?v=15.2.1-ux2");
 
-  expect(version.version).toBe("15.2.24");
+  expect(version.version).toBe("2.0.0");
   expect(version.schemaVersion).toBe(12);
   expect(version.cloudSchemaVersion).toBe(3);
-  expect(version.cacheVersion).toBe("finance-v15-20260822-compact-expense-collapse-r60");
-  expect(sw).toContain('const APP_VERSION = "15.2.24";');
-  expect(sw).toContain('finance-v15-20260822-compact-expense-collapse-r60');
+  expect(version.cacheVersion).toBe("finance-v2-20260822-organized-complete-r1");
+  expect(sw).toContain('const APP_VERSION = "2.0.0";');
+  expect(sw).toContain('finance-v2-20260822-organized-complete-r1');
 });
 
 for (const width of [1024, 1280, 1366, 1440, 1920]) {

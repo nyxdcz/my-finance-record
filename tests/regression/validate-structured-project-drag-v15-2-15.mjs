@@ -8,7 +8,7 @@ const agenda = read("assets/js/projects-calendar-v13.0.20.js");
 const agendaCss = read("assets/css/projects-calendar-v13.0.20.css");
 const version = JSON.parse(read("version.json"));
 
-assert.equal(version.version, "15.2.24");
+assert.equal(version.version, "2.0.0");
 assert.equal(version.schemaVersion, 12, "Finance Schema must remain 12");
 assert.equal(version.cloudSchemaVersion, 3, "Cloud Schema must remain V3");
 
@@ -40,4 +40,4 @@ assert.match(agendaCss, /\.is-structured-drop-target/);
 assert.match(agendaCss, /@media \(prefers-reduced-motion:reduce\)/);
 assert.match(agendaCss, /\.finance-kanban-card\[data-structured-card-draggable\] \{ cursor:grab;/);
 
-console.log("V15.2.18 structured Project Agenda and Active-to-Completed drag source contract passed under V15.2.24.");
+console.log("V15.2.18 structured Project Agenda and Active-to-Completed drag source contract passed under V2.0.0.");

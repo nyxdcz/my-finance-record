@@ -84,7 +84,7 @@ for (const width of widths) {
   });
 }
 
-test("live V15.2.10 shell owns Phone Finance compact styles statically", async ({ page }) => {
+test("live V2.0.0 shell owns Phone Finance compact styles statically", async ({ page }) => {
   await page.setViewportSize({ width:390, height:844 });
   await page.goto("http://127.0.0.1:3000/index.html?page=money", { waitUntil:"networkidle" });
   await expect(page.locator("#phoneFinanceCompactV1522")).toHaveCount(0);
@@ -93,5 +93,5 @@ test("live V15.2.10 shell owns Phone Finance compact styles statically", async (
     scripts:[...document.scripts].map(script => script.getAttribute("src") || "").filter(Boolean)
   }));
   expect(delivery.styles.some(href => href.includes("mobile-v14-0-23.css?v=15.2.10-mobile2"))).toBe(true);
-  expect(delivery.scripts.some(src => src.includes("pwa-update-v15-0-5.js?v=15.2.24-release1"))).toBe(true);
+  expect(delivery.scripts.some(src => src.includes("pwa-update-v15-0-5.js?v=2.0.0-release1"))).toBe(true);
 });

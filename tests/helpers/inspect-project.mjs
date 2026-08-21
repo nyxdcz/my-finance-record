@@ -32,7 +32,7 @@ const sourcePathForRuntime = value => {
 };
 
 const requiredFiles = [
-  "index.html", "offline.html", "manifest.webmanifest", "version.json", "sw.js",
+  "index.html", "offline.html", "manifest.webmanifest", "version.json", "version.md", "sw.js",
   ...runtimeCssFiles.map(file => `assets/css/${file}`),
   ...runtimeJsFiles.map(sourcePathForRuntime),
   "assets/css/expense-compact-v15-2-24.css", "assets/js/ui/expense-compact-v15-2-24.js",
@@ -136,11 +136,12 @@ const testTargets = [...String(pkg.scripts?.test || "").matchAll(/\bnode\s+(\S+)
 if (!testTargets.length) fail(`Test script target is missing: ${pkg.scripts?.test || "(not configured)"}`);
 for (const target of testTargets) if (!exists(target)) fail(`Test script target is missing: ${target}`);
 if (!String(pkg.engines?.node || "").includes("22")) warn(`Node engine is ${pkg.engines?.node || "not set"}; project validation expects Node 22+`);
-if (pkg.version !== "15.2.24") fail(`Expected current package version 15.2.24, found ${pkg.version || "(missing)"}`);
-if (!read("README.md").startsWith("# My Finance Records · V15.2.24")) fail("README release heading is not V15.2.24");
-if (!read("CHANGELOG.md").startsWith("## 15.2.24 · 2026-08-22")) fail("CHANGELOG latest entry is not V15.2.24");
-if (!html.includes('const APP_VERSION = "15.2.24";')) fail("Prepared index runtime is not V15.2.24");
-if (!worker.includes('const APP_VERSION = "15.2.24";')) fail("Prepared service worker is not V15.2.24");
+if (pkg.version !== "2.0.0") fail(`Expected current package version 2.0.0, found ${pkg.version || "(missing)"}`);
+if (!read("README.md").startsWith("# My Finance Records · V2.0.0")) fail("README release heading is not V2.0.0");
+if (!read("CHANGELOG.md").startsWith("## 2.0.0 · 2026-08-22")) fail("CHANGELOG latest prepared entry is not V2.0.0");
+if (!read("version.md").includes("# V2.0.0 — Organized Complete")) fail("version.md does not contain the organized V2.0.0 milestone");
+if (!html.includes('const APP_VERSION = "2.0.0";')) fail("Prepared index runtime is not V2.0.0");
+if (!worker.includes('const APP_VERSION = "2.0.0";')) fail("Prepared service worker is not V2.0.0");
 
 const syncConfig = read("sync-config.js");
 const syncConfigCode = syncConfig.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|\s)\/\/.*$/gm, "$1");
@@ -172,4 +173,4 @@ console.log(`Repository inspection: ${errors.length} error(s), ${warnings.length
 for (const message of errors) console.error(`ERROR: ${message}`);
 for (const message of warnings) console.warn(`WARN: ${message}`);
 if (errors.length) process.exit(1);
-console.log("Repository inspection passed: V15.2.24 release sources, local paths, deploy paths, package metadata, permissions, and public sync configuration are consistent.");
+console.log("Repository inspection passed: V2.0.0 organized release sources, local paths, deploy paths, package metadata, permissions, and public sync configuration are consistent.");
