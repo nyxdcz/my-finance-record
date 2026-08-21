@@ -52,7 +52,8 @@
   #money .legend-total.summary-mascot-slot,
   #moneySummary .summary-card-value.summary-mascot-slot {
     position: absolute !important;
-    right: 20px !important;
+    /* 19px from the positioning edge + the card's 1px border = 20px visual inset. */
+    right: 19px !important;
     top: 50% !important;
     transform: translateY(-50%) !important;
     box-sizing: border-box !important;
