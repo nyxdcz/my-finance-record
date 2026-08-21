@@ -2,8 +2,8 @@
 (function exposeFinancePwaUpdate(root) {
   const FINANCE_CACHE_PATTERN = /^finance-v\d+-/;
   const LEGACY_INDEX_CACHE = "finance-v15-20260816-mobile-ui-ux-r32";
-  const CURRENT_CACHE_VERSION = "finance-v15-20260821-monthly-repeat-icon-r59";
-  const UI_HOTFIX_REFRESH_KEY = "finance-ui-hotfix-v15-2-23-monthly-repeat-icon1";
+  const CURRENT_CACHE_VERSION = "finance-v15-20260822-compact-expense-collapse-r60";
+  const UI_HOTFIX_REFRESH_KEY = "finance-ui-hotfix-v15-2-24-compact-expense-collapse1";
   const normalizeCacheVersion = cacheVersion => cacheVersion === LEGACY_INDEX_CACHE ? CURRENT_CACHE_VERSION : cacheVersion;
 
   async function installBrowserBrandIcons() {
@@ -26,7 +26,11 @@
         const targets = requests.filter(request => {
           try {
             const pathname = new URL(request.url).pathname;
-            return pathname.endsWith("/header-tools-compat.js") || pathname.endsWith("/desktop-ui-phase1-v15-1-0.css") || pathname.endsWith("/black-canvas-v15-1-0.css");
+            return pathname.endsWith("/header-tools-compat.js")
+              || pathname.endsWith("/desktop-ui-phase1-v15-1-0.css")
+              || pathname.endsWith("/black-canvas-v15-1-0.css")
+              || pathname.endsWith("/production-ui-audit-v15-2-13.css")
+              || pathname.endsWith("/phone-finance-compat.js");
           }
           catch (error) { return false; }
         });
