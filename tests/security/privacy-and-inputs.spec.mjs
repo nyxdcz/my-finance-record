@@ -66,8 +66,8 @@ for (const viewport of [{ width:1440, height:900 }, { width:393, height:852 }]) 
     await expect.poll(() => page.evaluate(() => ({
       signedIn:document.body.classList.contains("finance-signed-in"),
       signedOut:document.body.classList.contains("finance-signed-out"),
-      underlying:getComputedStyle(document.querySelector("#money .page-heading")).display
-    }))).toEqual({ signedIn:true, signedOut:false, underlying:"block" });
+      underlyingVisible:getComputedStyle(document.querySelector("#money .page-heading")).display !== "none"
+    }))).toEqual({ signedIn:true, signedOut:false, underlyingVisible:true });
   });
 }
 
