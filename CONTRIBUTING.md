@@ -1,6 +1,6 @@
 # Contributing
 
-My Finance Records is currently organized around **V2.0.0 — Organized Complete**. New releases continue forward from V2.0.0 using semantic versioning.
+**Talaan V2.0.1** is the current production release. New releases continue forward from V2.0.1 using semantic versioning.
 
 This repository contains a personal finance application. Changes must prioritize data preservation, payment correctness, recovery, and installed-PWA compatibility.
 
@@ -10,7 +10,7 @@ This repository contains a personal finance application. Changes must prioritize
 2. Create a focused branch such as `fix/installer-permissions`, `feat/budget-export`, or `docs/repository-organization`.
 3. Change only the approved scope.
 4. Use a Conventional Commit subject such as `fix: restore installer permissions`; avoid subjects such as `fix`, `update`, or `f`.
-5. When behavior/runtime output changes, update the release number, cache key, `version.json`, README/release documentation, changelog, and validation metadata required by the current release process.
+5. When behavior or runtime output changes, update the release number, cache key, `version.json`, README/release documentation, changelog, and validation metadata required by the current release process.
 6. Run:
 
 ```bash
@@ -46,20 +46,19 @@ Use the existing directory structure instead of adding new root-level files when
 
 See `docs/architecture/README.md` for the staged repository-cleanup strategy.
 
-### Filename guidance
+### Filename and compatibility guidance
 
-Prefer stable, responsibility-oriented active filenames. Do not create a new version-numbered production filename solely to record when a change was made; Git history, `CHANGELOG.md`, Releases, and `version.json` already preserve release information.
+Prefer stable, responsibility-oriented active filenames. Do not create a new version-numbered production filename solely to record when a change was made; Git history, `CHANGELOG.md`, Releases, and `version.json` preserve release information.
 
-Some active files use versioned compatibility filenames because installed PWAs, service workers, cache contracts, or deployed clients depend on those URLs. These filenames are compatibility identifiers and do **not** define the current product version.
-
-When extracting or replacing compatibility-sensitive code, keep the existing URL available through a compatibility loader or mapping until regression coverage proves it is safe to remove.
+Some active filenames, storage keys, cache migration paths, and identifiers are compatibility contracts for installed PWAs or saved finance data. Their technical names do **not** define the visible product brand. Do not rename them only to match **Talaan** unless the change includes migration, rollback, and regression coverage.
 
 ### Documentation guidance
 
-- Keep `README.md` focused on project orientation, development, architecture, and **V2.0.0** current-release information.
-- Keep `CHANGELOG.md` focused on the current release and future V2 semantic-version updates.
-- Keep `SECURITY.md` focused on the current security baseline.
-- Do not reintroduce previous product version numbers into current-facing documentation.
+- Keep `README.md` focused on **Talaan V2.0.1** and current project information.
+- Keep `CHANGELOG.md` focused on the current Talaan release and future V2 semantic-version updates.
+- Keep `SECURITY.md` and `PRIVACY.md` focused on the current security and privacy baseline.
+- Keep `version.md` focused on the current production release.
+- Do not reintroduce superseded product names or previous product version numbers into current-facing documentation.
 
 ## Compatibility rules
 
@@ -69,26 +68,25 @@ When extracting or replacing compatibility-sensitive code, keep the existing URL
 - Never rewrite historical paid status or account deductions silently.
 - Use stable IDs for recurring series and payment operations.
 - Do not include secret or `service_role` credentials in browser code.
-- Keep the app usable offline when cloud sync is unavailable.
+- Keep Talaan usable offline when cloud sync is unavailable.
 - Do not remove backup or recovery safeguards to simplify a feature.
-- Do not move or rename a production asset only for aesthetics when installed clients or cache/service-worker rules still depend on the existing URL.
-- UI-only changes must not reset finance records, balances, recurrence, payments, projects, or synchronization state.
+- Do not move or rename a production asset, storage key, or persistent identifier only for aesthetics when installed clients or stored data still depend on it.
+- UI-only and branding changes must not reset finance records, balances, recurrence, payments, projects, or synchronization state.
 
 ## Versioning
 
-The current production baseline is **V2.0.0**.
+The current production baseline is **V2.0.1**.
 
-- **Patch** (`2.0.x`): compatible reliability, documentation, security, delivery, or UI fixes that require a deployed application release.
+- **Patch** (`2.0.x`): compatible reliability, documentation, security, delivery, branding, or UI fixes that require a deployed application release.
 - **Minor** (`2.x.0`): new backward-compatible finance, productivity, reporting, project, or interface features.
 - **Major** (`x.0.0`): intentional breaking architecture/schema changes or migrations that require explicit compatibility planning or user action.
-- Documentation-only changes do not require an application version bump when runtime/PWA output, cache identity, and stored-data behavior are unchanged.
 
 Any release bump must keep `package.json`, `package-lock.json`, `version.json`, runtime release metadata, service-worker/cache identity, README, changelog, and release validation aligned where applicable.
 
 ## Releases
 
 1. Merge the validated version change to `main`.
-2. Confirm the hosted application and `version.json` report the intended version.
+2. Confirm the hosted Talaan application and `version.json` report the intended version.
 3. Create and push an annotated tag matching `package.json`.
 4. The Tagged Release workflow validates the tag and creates the GitHub release with generated notes.
-5. Verify that the deployed PWA is using the intended app version and cache generation before considering the release complete.
+5. Verify that the deployed PWA is using the intended app version, brand, and cache generation before considering the release complete.
