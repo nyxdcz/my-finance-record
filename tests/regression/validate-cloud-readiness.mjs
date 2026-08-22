@@ -1,0 +1,33 @@
+import assert from "node:assert/strict";
+import fs from "node:fs";
+
+const read = file => fs.readFileSync(file, "utf8");
+const source = read("assets/js/cloud-sync.js");
+const index = read("index.html");
+const worker = read("sw.js");
+const version = JSON.parse(read("version.json"));
+const query = "2.0.1-talaan1";
+
+assert.match(source, /let clientPromise = null;/);
+assert.match(source, /if \(clientPromise\) return clientPromise;/);
+assert.match(source, /const nextClient = createClient[\s\S]*nextClient\.auth\.onAuthStateChange/);
+assert.match(source, /if \(cloudUser\) ensureSignedInReady\(\)/);
+assert.match(source, /if \(cloudUser\) await ensureSignedInReady\(\); else onSignedOut\(\);/);
+assert.match(source, /signedInReadyUserId === userId/);
+const existingProfileBranch = source.indexOf("if (profiles.length > 0)");
+const profileCreation = source.indexOf("await arch.createCloudProfile", existingProfileBranch);
+assert.ok(existingProfileBranch >= 0 && profileCreation > existingProfileBranch, "existing profiles must be handled before creation");
+const existingProfileCode = source.slice(existingProfileBranch, profileCreation);
+assert.match(existingProfileCode, /profileSetupState = "profile-locked";[\s\S]*return false;/);
+assert.doesNotMatch(source, /Auto connect profile failed|Auto creation of cloud profile failed/);
+for (const marker of ["Unlock profile", "Set up profile", "Profile issue", "Connecting…"]) assert.ok(source.includes(marker), `cloud readiness must expose ${marker}`);
+assert.match(source, /syncButton\.disabled=syncing \|\| !navigator\.onLine \|\| !readiness\.ready/);
+assert.match(source, /overviewSync\.disabled = syncing \|\| !navigator\.onLine \|\| !ready/);
+assert.match(source, /activateSettingsPanel\(cloudReadiness\(\)\.ready \? "sync" : "profiles"/);
+assert.match(index, /id="cloudConnectionChip">Connected<\/span>/);
+assert.ok(index.includes(`./cloud-sync.js?v=${query}`));
+assert.ok(worker.includes(`./cloud-sync.js?v=${query}`));
+assert.equal(version.version, "2.0.1");
+assert.equal(version.cloudSchemaVersion, 3);
+
+console.log("Cloud client deduplication, profile readiness, sync gating, and Talaan runtime delivery validated.");

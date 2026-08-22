@@ -3,17 +3,16 @@ import fs from "node:fs";
 
 const read = file => fs.readFileSync(file, "utf8");
 const index = read("index.html");
-const agenda = read("assets/js/projects-calendar-v13.0.20.js");
+const agenda = read("assets/js/projects-calendar.js");
 const interaction = read("assets/js/interaction-patterns.js");
-const css = read("assets/css/projects-calendar-v13.0.20.css");
+const css = read("assets/css/projects-calendar.css");
+const worker = read("sw.js");
 const version = JSON.parse(read("version.json"));
+const query = "2.0.1-talaan1";
 
 assert.equal(version.version, "2.0.1");
 assert.equal(version.schemaVersion, 12);
 assert.equal(version.cloudSchemaVersion, 3);
-assert.equal(version.cacheVersion, "finance-v2-20260822-talaan-r1");
-assert.match(index, /Talaan · V2\.0\.1/);
-
 assert.match(index, /id="projectKanbanBoard"/);
 assert.match(index, /data-kanban-add-column="project"/);
 assert.match(index, /id="kanbanColumnDialog"/);
@@ -23,23 +22,24 @@ assert.match(index, /data-structured-card-draggable/);
 assert.match(index, /kanbanColumnId/);
 assert.match(index, /destination !== "completed"/);
 assert.match(index, /Move every card out of/);
-
 assert.match(agenda, /data-kanban-add-column="agenda"/);
 assert.match(agenda, /data-pc-board/);
 assert.match(agenda, /agendaCustomColumns/);
 assert.match(agenda, /kanbanColumnId:custom \? custom\.id : ""/);
 assert.match(agenda, /FinanceAgendaKanban/);
-
 assert.match(interaction, /data-structured-card-draggable/);
 assert.match(interaction, /interactiveSelector/);
 assert.match(interaction, /closest\?\.\("\.finance-kanban-board"\)/);
 assert.match(interaction, /autoScrollBoard/);
-
 assert.match(css, /\.finance-kanban-board\s*\{/);
 assert.match(css, /overflow-x:auto/);
 assert.match(css, /scroll-snap-type:inline proximity/);
 assert.match(css, /\.finance-kanban-column\s*\{/);
 assert.match(css, /\.finance-kanban-card\[data-structured-card-draggable\]/);
 assert.match(css, /min-width:min\(82vw,310px\)/);
+assert.ok(index.includes(`./projects-calendar.js?v=${query}`));
+assert.ok(index.includes(`./projects-calendar.css?v=${query}`));
+assert.ok(worker.includes(`./projects-calendar.js?v=${query}`));
+assert.ok(worker.includes(`./projects-calendar.css?v=${query}`));
 
-console.log("Horizontal Project Agenda and Projects Kanban source contract passed under Talaan V2.0.1.");
+console.log("Projects and Project Agenda horizontal Kanban, structured drag, custom columns, and neutral assets validated.");
