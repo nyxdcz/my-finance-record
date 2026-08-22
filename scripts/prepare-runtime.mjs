@@ -13,8 +13,8 @@ const RELEASE = Object.freeze({
   name:"Talaan",
   date:"August 22, 2026",
   dateIso:"2026-08-22",
-  cache:"finance-v2-20260822-talaan-r2",
-  assetQuery:"2.0.1-talaan2"
+  cache:"finance-v2-20260822-talaan-r3",
+  assetQuery:"2.0.1-talaan3"
 });
 
 const CURRENT_VERSION_HISTORY = Object.freeze([{

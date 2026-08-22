@@ -22,19 +22,19 @@ for (const expectedMarker of ["applyTalaanReleaseLayer", "loadExpenseScreenshotT
 }
 if (!prepareRuntime.includes('"sync-runtime-compat.js"')) throw new Error("prepare-runtime must map sync-runtime-compat.js to the flat runtime root.");
 
-const configPosition = index.indexOf("./sync-config.js?v=2.0.1-talaan2");
-const runtimePosition = index.indexOf("./sync-runtime-compat.js?v=2.0.1-talaan2");
+const configPosition = index.indexOf("./sync-config.js?v=2.0.1-talaan3");
+const runtimePosition = index.indexOf("./sync-runtime-compat.js?v=2.0.1-talaan3");
 if (configPosition < 0 || runtimePosition < 0 || runtimePosition <= configPosition) {
   throw new Error("index.html must load sync-config.js before the Talaan sync-runtime compatibility layer.");
 }
 
-const expectedCache = "finance-v2-20260822-talaan-r2";
+const expectedCache = "finance-v2-20260822-talaan-r3";
 if (version.version !== "2.0.1") throw new Error(`Unexpected Talaan app version: ${version.version}`);
 if (version.schemaVersion !== 12 || version.cloudSchemaVersion !== 3) throw new Error("Talaan versioning must not change finance/cloud schema versions.");
 if (version.cacheVersion !== expectedCache) throw new Error(`Unexpected cache version: ${version.cacheVersion}`);
 if (!serviceWorker.includes(`const CACHE_VERSION = "${expectedCache}";`)) throw new Error("Service worker cache identity is not synchronized.");
-if (!serviceWorker.includes("./sync-config.js?v=2.0.1-talaan2")) throw new Error("Service worker must precache the Talaan sync configuration file.");
-if (!serviceWorker.includes("./sync-runtime-compat.js?v=2.0.1-talaan2")) throw new Error("Service worker must precache the Talaan sync runtime compatibility file.");
+if (!serviceWorker.includes("./sync-config.js?v=2.0.1-talaan3")) throw new Error("Service worker must precache the Talaan sync configuration file.");
+if (!serviceWorker.includes("./sync-runtime-compat.js?v=2.0.1-talaan3")) throw new Error("Service worker must precache the Talaan sync runtime compatibility file.");
 if (!index.includes(`const APP_CACHE_VERSION = "${expectedCache}";`)) throw new Error("index.html cache identity is not synchronized.");
 if (!index.includes("Talaan · V2.0.1")) throw new Error("Prepared index title is not Talaan V2.0.1.");
 if (runtime.includes("window.FINANCE_SYNC_CONFIG")) throw new Error("sync runtime compatibility file must not own hosted sync configuration.");
