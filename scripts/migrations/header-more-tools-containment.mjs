@@ -30,53 +30,56 @@ if (!testSource.includes("const panelGeometry =")) {
 }
 write(testPath, testSource);
 
-const preparePath = "scripts/prepare-runtime.mjs";
-let prepare = read(preparePath);
-if (prepare.includes('cache:"finance-v2-20260822-talaan-r3"')) {
-  prepare = prepare.replace('cache:"finance-v2-20260822-talaan-r3"', 'cache:"finance-v2-20260822-talaan-r4"');
-}
-if (prepare.includes('assetQuery:"2.0.1-talaan3"')) {
-  prepare = prepare.replace('assetQuery:"2.0.1-talaan3"', 'assetQuery:"2.0.1-talaan4"');
-}
-const queryListAnchor = '    "phone-finance-compat.js",\n    "sync-runtime-compat.js"';
-const expandedQueryList = '    "phone-finance-compat.js",\n    "sync-config.js",\n    "sync-runtime-compat.js",\n    "mascot-red.png",\n    "mascot-green.png",\n    "mascot-blue.png",\n    "mascot-orange.png"';
-if (!prepare.includes('"sync-config.js"')) {
-  if (!prepare.includes(queryListAnchor)) throw new Error("Runtime query-file anchor not found");
-  prepare = prepare.replace(queryListAnchor, expandedQueryList);
-}
-if (!prepare.includes('cache:"finance-v2-20260822-talaan-r4"') || !prepare.includes('assetQuery:"2.0.1-talaan4"')) {
-  throw new Error("Unable to establish r4/talaan4 runtime generation");
-}
-write(preparePath, prepare);
-
-const versionJsonPath = "version.json";
-const versionJson = JSON.parse(read(versionJsonPath));
-versionJson.cacheVersion = "finance-v2-20260822-talaan-r4";
-write(versionJsonPath, `${JSON.stringify(versionJson, null, 2)}\n`);
-
-const versionMdPath = "version.md";
-let versionMd = read(versionMdPath);
-versionMd = versionMd.replaceAll("finance-v2-20260822-talaan-r3", "finance-v2-20260822-talaan-r4");
-if (!versionMd.includes("finance-v2-20260822-talaan-r4")) throw new Error("version.md cache metadata did not advance to r4");
-write(versionMdPath, versionMd);
-
-const testTextExtensions = new Set([".js", ".mjs", ".cjs", ".json", ".md", ".yml", ".yaml", ".html", ".css"]);
-const refreshTestPins = directory => {
+const textExtensions = new Set([".css", ".html", ".js", ".mjs", ".cjs", ".json", ".md", ".ts", ".tsx", ".yml", ".yaml", ".webmanifest"]);
+const skippedDirectories = new Set([".git", "node_modules", "test-results", "playwright-report"]);
+let rotatedFiles = 0;
+const rotateCurrentRuntimePins = directory => {
   for (const entry of fs.readdirSync(path.join(root, directory), { withFileTypes:true })) {
-    const relative = path.join(directory, entry.name);
+    if (skippedDirectories.has(entry.name)) continue;
+    const relative = directory ? path.join(directory, entry.name) : entry.name;
     if (entry.isDirectory()) {
-      refreshTestPins(relative);
+      rotateCurrentRuntimePins(relative);
       continue;
     }
-    if (!entry.isFile() || !testTextExtensions.has(path.extname(entry.name))) continue;
+    if (!entry.isFile() || !textExtensions.has(path.extname(entry.name))) continue;
     const before = read(relative);
     const after = before
       .replaceAll("2.0.1-talaan3", "2.0.1-talaan4")
       .replaceAll("2\\.0\\.1-talaan3", "2\\.0\\.1-talaan4")
       .replaceAll("finance-v2-20260822-talaan-r3", "finance-v2-20260822-talaan-r4");
-    if (after !== before) write(relative, after);
+    if (after !== before) {
+      write(relative, after);
+      rotatedFiles += 1;
+    }
   }
 };
-refreshTestPins("tests");
+rotateCurrentRuntimePins("");
 
-console.log("Header More tools containment source, regression coverage, and complete r4/talaan4 runtime pins are staged.");
+const preparePath = "scripts/prepare-runtime.mjs";
+let prepare = read(preparePath);
+if (!prepare.includes('cache:"finance-v2-20260822-talaan-r4"') || !prepare.includes('assetQuery:"2.0.1-talaan4"')) {
+  throw new Error("Unable to establish r4/talaan4 runtime generation");
+}
+
+const versionJson = JSON.parse(read("version.json"));
+if (versionJson.version !== "2.0.1") throw new Error("This maintenance change must keep Talaan V2.0.1");
+if (versionJson.cacheVersion !== "finance-v2-20260822-talaan-r4") throw new Error("version.json must use the r4 cache generation");
+
+const remaining = [];
+const findStalePins = directory => {
+  for (const entry of fs.readdirSync(path.join(root, directory), { withFileTypes:true })) {
+    if (skippedDirectories.has(entry.name)) continue;
+    const relative = directory ? path.join(directory, entry.name) : entry.name;
+    if (entry.isDirectory()) {
+      findStalePins(relative);
+      continue;
+    }
+    if (!entry.isFile() || !textExtensions.has(path.extname(entry.name))) continue;
+    const source = read(relative);
+    if (source.includes("2.0.1-talaan3") || source.includes("2\\.0\\.1-talaan3") || source.includes("finance-v2-20260822-talaan-r3")) remaining.push(relative);
+  }
+};
+findStalePins("");
+if (remaining.length) throw new Error(`Stale r3/talaan3 runtime pins remain: ${remaining.join(", ")}`);
+
+console.log(`Header More tools containment and complete r4/talaan4 rotation staged across ${rotatedFiles} text files.`);
