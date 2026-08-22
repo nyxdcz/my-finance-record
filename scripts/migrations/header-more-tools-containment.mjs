@@ -43,4 +43,15 @@ if (!prepare.includes('cache:"finance-v2-20260822-talaan-r4"') || !prepare.inclu
 }
 write(preparePath, prepare);
 
-console.log("Header More tools containment source, regression test, and r4 cache generation are staged.");
+const versionJsonPath = "version.json";
+const versionJson = JSON.parse(read(versionJsonPath));
+versionJson.cacheVersion = "finance-v2-20260822-talaan-r4";
+write(versionJsonPath, `${JSON.stringify(versionJson, null, 2)}\n`);
+
+const versionMdPath = "version.md";
+let versionMd = read(versionMdPath);
+versionMd = versionMd.replaceAll("finance-v2-20260822-talaan-r3", "finance-v2-20260822-talaan-r4");
+if (!versionMd.includes("finance-v2-20260822-talaan-r4")) throw new Error("version.md cache metadata did not advance to r4");
+write(versionMdPath, versionMd);
+
+console.log("Header More tools containment source, regression test, and aligned r4 cache generation are staged.");
