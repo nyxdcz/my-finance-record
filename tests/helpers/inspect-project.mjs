@@ -69,7 +69,7 @@ const html = read("index.html");
 const worker = read("sw.js");
 if (!html.includes(`<title>${BRAND} · ${DISPLAY_VERSION}</title>`)) fail(`Prepared title must be ${BRAND} ${DISPLAY_VERSION}`);
 if (!html.includes(`const APP_VERSION = "${CURRENT_VERSION}";`)) fail(`Prepared index runtime must be ${DISPLAY_VERSION}`);
-if (/\bV(?:12|13|14|15)(?:\.\d+)*\b/.test(html)) fail("Prepared index still contains legacy product-version terminology");
+if (/\bV(?:11|12|13|14|15)(?:\.\d+)*\b/.test(html)) fail("Prepared index still contains legacy product-version terminology");
 if (html.includes(PREVIOUS_BRAND)) fail("Prepared index still contains the superseded product brand");
 if (!worker.includes(`const APP_VERSION = "${CURRENT_VERSION}";`)) fail(`Prepared service worker must be ${DISPLAY_VERSION}`);
 if (!worker.includes(`const CACHE_VERSION = "${version.cacheVersion}"`)) fail("Prepared service-worker cache must match version.json");

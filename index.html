@@ -1101,11 +1101,11 @@
                 <progress class="migration-progress" id="migrationProgressBar" max="100" aria-label="Migration progress"></progress>
               </div>
               <div class="system-status-row"><span>Progress</span><span class="system-status-value" id="migrationProgressText">Checking</span></div>
-              <div class="system-status-row"><span>V11 recovery copy</span><span class="system-status-value" id="legacyBackupStatus">Checking</span></div>
+              <div class="system-status-row"><span>Legacy recovery copy</span><span class="system-status-value" id="legacyBackupStatus">Checking</span></div>
               <div class="system-status-row"><span>Validation</span><span class="system-status-value" id="migrationValidationStatus">Checking</span></div>
               <div class="system-actions">
-                <button class="button button-secondary" id="downloadLegacyBackupButton" type="button">Download V11 copy</button>
-                <button class="button button-secondary" id="restoreLegacyBackupButton" type="button">Restore V11 copy</button>
+                <button class="button button-secondary" id="downloadLegacyBackupButton" type="button">Download legacy copy</button>
+                <button class="button button-secondary" id="restoreLegacyBackupButton" type="button">Restore legacy copy</button>
               </div>
               <div class="system-table-wrap"><table class="system-table"><thead><tr><th>Time</th><th>Migration</th><th>Status</th></tr></thead><tbody id="migrationHistoryBody"></tbody></table></div>
             </article>
@@ -8070,7 +8070,7 @@
           return;
         }
 
-        appMeta.migration = { status: "running", progress: 20, validation: "Reading V11 records", v11Backup: false };
+        appMeta.migration = { status: "running", progress: 20, validation: "Reading legacy records", v11Backup: false };
         writeMeta();
         const sourceData = existingRaw ? JSON.parse(existingRaw) : cloneData(data);
         const before = dataSummary(sourceData);
@@ -8868,8 +8868,8 @@
     function downloadLegacyBackup() {
       const raw = localStorage.getItem(LEGACY_BACKUP_KEY);
       if (!raw) return showToast("No legacy recovery copy is available", "warning");
-      downloadFile(`finance-v11-recovery-${new Date().toISOString().slice(0, 10)}.json`, raw, "application/json");
-      showToast("V11 recovery copy downloaded", "success");
+      downloadFile(`finance-legacy-recovery-${new Date().toISOString().slice(0, 10)}.json`, raw, "application/json");
+      showToast("Legacy recovery copy downloaded", "success");
     }
 
     function restoreLegacyBackup() {
