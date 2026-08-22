@@ -3,6 +3,8 @@ Thumbs.db
 node_modules/
 _site/
 coverage/
+test-results/
+playwright-report/
 *.log
 *.tmp
 *.bak
@@ -15,26 +17,28 @@ supabase/.temp/
 __pycache__/
 *.pyc
 
-# Generated root compatibility copies from assets/css and assets/js
+# Generated root runtime copies from assets/css and assets/js
 /account-ledger.css
 /app.css
-/shell-ui-v15-2-11.css
-/black-canvas-v15-1-0.css
+/shell-ui.css
+/black-canvas.css
 /budget-planning.css
-/dashboard-interactions-core-v14-0-23.css
+/dashboard-interactions-core.css
 /dashboard-interactions.css
-/desktop-ui-phase1-v15-1-0.css
-/desktop-ux-v15-2-0.css
-/liquid-glass-v15.css
-/mobile-v14-0-23.css
+/desktop-ui-phase1.css
+/desktop-ux.css
+/liquid-glass.css
+/mobile.css
 /productivity-tools.css
-/production-ui-audit-v15-2-13.css
-/projects-calendar-v13.0.20.css
+/production-ui-audit.css
+/projects-calendar.css
 /reminders-alerts.css
 /reports-insights.css
 /security-profiles.css
-/ui-icon-alignment-v15-0-5.css
+/summary-mascots.css
+/ui-icon-alignment.css
 /account-ledger.js
+/brand-icons.js
 /budget-planning.js
 /cloud-conflict-resolution.js
 /cloud-conflict-review.js
@@ -51,8 +55,10 @@ __pycache__/
 /interaction-patterns.js
 /privacy-lock.js
 /productivity-tools.js
-/projects-calendar-v13.0.20.js
-/pwa-update-v15-0-5.js
+/projects-calendar.js
+/pwa-update.js
 /reminders-alerts.js
 /reports-insights.js
 /security-profiles.js
+/summary-mascots.js
+/sync-runtime-compat.js
