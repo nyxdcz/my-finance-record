@@ -9,11 +9,19 @@ const desktopUx = read("desktop-ux-v15-2-0.css");
 const uiIcons = read("ui-icon-alignment-v15-0-5.css");
 const runtimeCompat = read("sync-runtime-compat.js");
 const changelog = read("CHANGELOG.md");
+const readme = read("README.md");
+const contributing = read("CONTRIBUTING.md");
+const security = read("SECURITY.md");
+const versionDoc = read("version.md");
 const versionHistoryMatch = index.match(/const VERSION_HISTORY = (\[[^\n]+\]);/);
 const versionHistory = versionHistoryMatch ? JSON.parse(versionHistoryMatch[1]) : [];
 const cloudFile = fs.readdirSync(".").find(name => name.endsWith(".js") && read(name).includes("financeCloudSyncV3Bootstrap"));
 if (!cloudFile) throw new Error("Cloud Sync V3 file missing");
 const cloud = read(cloudFile);
+const currentDocs = { "CHANGELOG.md": changelog, "README.md": readme, "CONTRIBUTING.md": contributing, "SECURITY.md": security, "version.md": versionDoc };
+const previousProductVersionPrefixes = ["V1."];
+const staleVersionReference = Object.entries(currentDocs)
+  .flatMap(([name, text]) => previousProductVersionPrefixes.filter(prefix => text.includes(prefix)).map(prefix => `${name}:${prefix}`))[0] || "";
 const required = [
   [version.version === "2.0.0", "version.json is V2.0.0"],
   [pkg.version === "2.0.0", "package.json is V2.0.0"],
@@ -22,9 +30,10 @@ const required = [
   [index.includes("My Finance Records · V2.0.0"), "page title is V2.0.0"],
   [versionHistory.length === 1 && versionHistory[0]?.version === "V2.0.0" && versionHistory[0]?.title === "Organized Complete", "website Version history contains only the current V2.0.0 release"],
   [index.includes("<h3>Version history</h3><p>Latest release details</p>"), "website Version history is labeled as latest release details"],
-  [changelog.includes("## 2.0.0 · 2026-08-22"), "CHANGELOG includes the V2.0.0 release entry"],
-  [changelog.includes("## 1.0.0 · Created") && changelog.includes("## 1.14.0 · Budget & Expense Final Polish"), "CHANGELOG contains the organized V1 milestone history"],
-  [changelog.includes("| **1.14.0** | V15.2.19–V15.2.24 maintenance |"), "CHANGELOG keeps the legacy V15 mapping traceable"],
+  [changelog.includes("## V2.0.0 · Organized Complete"), "CHANGELOG focuses on the V2.0.0 current release"],
+  [versionDoc.startsWith("# V2.0.0 — Organized Complete"), "version.md focuses on the V2.0.0 current release"],
+  [!staleVersionReference, `current-facing docs do not mention previous product versions${staleVersionReference ? ` (${staleVersionReference})` : ""}`],
+  [readme.includes("# My Finance Records · V2.0.0") && contributing.includes("V2.0.0 — Organized Complete") && security.includes("# Security Policy · V2.0.0"), "current-facing docs identify V2.0.0 consistently"],
   [index.includes("recurring items checked"), "month navigation explains recurring preparation"],
   [index.includes("cleared because filters changed"), "selection reset is announced"],
   [index.includes("Enter an account name."), "account name has inline validation"],
@@ -54,4 +63,4 @@ const required = [
   [read("mobile-v14-0-23.css").length > 0, "mobile stylesheet remains present"]
 ];
 for (const [ok, message] of required) { if (!ok) throw new Error(message); }
-console.log("V2.0.0 release preserves the desktop UX source contract and shows only the current website version history");
+console.log("V2.0.0 release preserves the desktop UX source contract and current-facing docs mention only V2.0.0");

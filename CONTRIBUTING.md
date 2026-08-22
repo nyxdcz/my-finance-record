@@ -1,6 +1,6 @@
 # Contributing
 
-My Finance Records is currently organized around **V2.0.0 — Organized Complete**. The product roadmap runs from **V1.0.0 (Created)** through **V2.0.0**, and new releases continue forward from V2 using semantic versioning.
+My Finance Records is currently organized around **V2.0.0 — Organized Complete**. New releases continue forward from V2.0.0 using semantic versioning.
 
 This repository contains a personal finance application. Changes must prioritize data preservation, payment correctness, recovery, and installed-PWA compatibility.
 
@@ -48,18 +48,18 @@ See `docs/architecture/README.md` for the staged repository-cleanup strategy.
 
 ### Filename guidance
 
-Prefer stable, responsibility-oriented active filenames. Do not create a new version-numbered production filename solely to record when a change was made; Git history, `CHANGELOG.md`, Releases, `version.md`, and `version.json` already preserve release history.
+Prefer stable, responsibility-oriented active filenames. Do not create a new version-numbered production filename solely to record when a change was made; Git history, `CHANGELOG.md`, Releases, and `version.json` already preserve release information.
 
-Some active files still contain V13, V14, or V15 in their filenames because installed PWAs, service workers, cache contracts, or other compatibility paths depend on those URLs. Those filenames are compatibility identifiers and do **not** represent the current product version.
+Some active files use versioned compatibility filenames because installed PWAs, service workers, cache contracts, or deployed clients depend on those URLs. These filenames are compatibility identifiers and do **not** define the current product version.
 
-When extracting or replacing compatibility-sensitive code, keep the legacy URL available through a compatibility loader or mapping until regression coverage proves it is safe to remove.
+When extracting or replacing compatibility-sensitive code, keep the existing URL available through a compatibility loader or mapping until regression coverage proves it is safe to remove.
 
 ### Documentation guidance
 
-- Keep `README.md` focused on project orientation, development, architecture, and current release information.
-- Keep `version.md` as the organized V1.0.0 → V2.0.0 development roadmap and milestone mapping.
-- Keep `CHANGELOG.md` as the organized semantic-version release history going forward from V2.0.0.
-- Do not reintroduce V12–V15 as current product versions. That numbering is historical and remains traceable through Git history and the legacy mapping tables.
+- Keep `README.md` focused on project orientation, development, architecture, and **V2.0.0** current-release information.
+- Keep `CHANGELOG.md` focused on the current release and future V2 semantic-version updates.
+- Keep `SECURITY.md` focused on the current security baseline.
+- Do not reintroduce previous product version numbers into current-facing documentation.
 
 ## Compatibility rules
 
@@ -71,7 +71,7 @@ When extracting or replacing compatibility-sensitive code, keep the legacy URL a
 - Do not include secret or `service_role` credentials in browser code.
 - Keep the app usable offline when cloud sync is unavailable.
 - Do not remove backup or recovery safeguards to simplify a feature.
-- Do not move or rename a production asset only for aesthetics when installed clients or cache/service-worker rules still depend on the old URL.
+- Do not move or rename a production asset only for aesthetics when installed clients or cache/service-worker rules still depend on the existing URL.
 - UI-only changes must not reset finance records, balances, recurrence, payments, projects, or synchronization state.
 
 ## Versioning
@@ -89,12 +89,6 @@ Any release bump must keep `package.json`, `package-lock.json`, `version.json`, 
 
 1. Merge the validated version change to `main`.
 2. Confirm the hosted application and `version.json` report the intended version.
-3. Create and push an annotated tag matching `package.json`, for example:
-
-```bash
-git tag -a v2.0.1 -m "My Finance Records v2.0.1"
-git push origin v2.0.1
-```
-
+3. Create and push an annotated tag matching `package.json`.
 4. The Tagged Release workflow validates the tag and creates the GitHub release with generated notes.
 5. Verify that the deployed PWA is using the intended app version and cache generation before considering the release complete.

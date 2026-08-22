@@ -138,8 +138,11 @@ for (const target of testTargets) if (!exists(target)) fail(`Test script target 
 if (!String(pkg.engines?.node || "").includes("22")) warn(`Node engine is ${pkg.engines?.node || "not set"}; project validation expects Node 22+`);
 if (pkg.version !== "2.0.0") fail(`Expected current package version 2.0.0, found ${pkg.version || "(missing)"}`);
 if (!read("README.md").startsWith("# My Finance Records · V2.0.0")) fail("README release heading is not V2.0.0");
-if (!read("CHANGELOG.md").startsWith("## 2.0.0 · 2026-08-22")) fail("CHANGELOG latest prepared entry is not V2.0.0");
-if (!read("version.md").includes("# V2.0.0 — Organized Complete")) fail("version.md does not contain the organized V2.0.0 milestone");
+if (!read("CHANGELOG.md").startsWith("# Changelog\n\n## V2.0.0 · Organized Complete")) fail("CHANGELOG current release heading is not V2.0.0");
+if (!read("version.md").startsWith("# V2.0.0 — Organized Complete")) fail("version.md current release heading is not V2.0.0");
+for (const file of ["README.md", "CHANGELOG.md", "CONTRIBUTING.md", "SECURITY.md", "version.md"]) {
+  if (read(file).includes("V1.")) fail(`${file} contains a previous product version reference`);
+}
 if (!html.includes('const APP_VERSION = "2.0.0";')) fail("Prepared index runtime is not V2.0.0");
 if (!worker.includes('const APP_VERSION = "2.0.0";')) fail("Prepared service worker is not V2.0.0");
 
@@ -173,4 +176,4 @@ console.log(`Repository inspection: ${errors.length} error(s), ${warnings.length
 for (const message of errors) console.error(`ERROR: ${message}`);
 for (const message of warnings) console.warn(`WARN: ${message}`);
 if (errors.length) process.exit(1);
-console.log("Repository inspection passed: V2.0.0 organized release sources, local paths, deploy paths, package metadata, permissions, and public sync configuration are consistent.");
+console.log("Repository inspection passed: V2.0.0 release sources, current documentation, local paths, deploy paths, package metadata, permissions, and public sync configuration are consistent.");

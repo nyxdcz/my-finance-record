@@ -11,15 +11,15 @@
 
 </div>
 
-## At a glance
+## Current release
 
 | Release | Finance schema | Cloud schema | Sync cadence |
 | --- | ---: | ---: | ---: |
 | **V2.0.0** · Organized Complete | **12** | **V3** | **5 minutes** |
 
-V2.0.0 is the organized production baseline for My Finance Records. The product history now runs cleanly from **V1.0.0 (Created)** through **V2.0.0 (Organized Complete)**, combining the local-first finance system, Account Ledger, budgeting, reporting, projects, productivity, reminders, encrypted multi-profile Cloud Schema V3 synchronization, responsive desktop/phone interface, PWA delivery, and the final Budget & Expenses experience.
+**V2.0.0 — Organized Complete** is the current production baseline for My Finance Records. It combines the complete local-first finance workspace, Account Ledger, budgeting, reporting, projects, productivity tools, reminders, encrypted multi-profile synchronization, responsive desktop/phone interface, and offline-ready PWA delivery.
 
-The organized release history is maintained in [`CHANGELOG.md`](CHANGELOG.md), with the V1→V2 development roadmap in [`version.md`](version.md). The original detailed V12.19.0–V15.2.24 sequence remains recoverable from Git history and is mapped to the organized milestones in both documents.
+Current release notes are maintained in [`CHANGELOG.md`](CHANGELOG.md).
 
 ## What it offers
 
@@ -33,14 +33,6 @@ The organized release history is maintained in [`CHANGELOG.md`](CHANGELOG.md), w
 | Projects and productivity | Project Agenda, revisions, Kanban workflow, Quick Add, search, filters, reminders, and undo/redo are included. |
 | Offline-ready PWA | The app can be installed and used through a service-worker-backed experience. |
 | Compatibility-focused releases | Schema, cache, sync, backup, restore, and finance-data behavior are treated as protected contracts. |
-
-## Version roadmap
-
-The organized product history is documented in [`version.md`](version.md):
-
-**V1.0.0 Created → Cloud Sync → Ledger → Budgeting → Insights → Productivity → Reminders → Profiles & Encryption → Mobile Finance → Projects & Navigation → Sync Hardening → Modern PWA → Production Organization → Final Budget & Expenses Polish → V2.0.0 Organized Complete.**
-
-The corresponding release changelog is in [`CHANGELOG.md`](CHANGELOG.md). New releases continue forward from **V2.0.0** using semantic versioning; the old V12–V15 numbering is historical only.
 
 ## Quick start
 
@@ -65,7 +57,7 @@ flowchart LR
     Sync <--> Cloud["Supabase + RLS"]
 ```
 
-The V2 runtime keeps compatibility-sensitive legacy asset filenames where changing them would create unnecessary PWA risk. A filename containing V13, V14, or V15 is therefore a compatibility URL, not the current product version. New work should continue moving toward focused module ownership under `assets/` while preserving explicit migration paths for stored finance data and installed clients.
+The V2.0.0 runtime keeps compatibility-sensitive URLs stable where changing them would create unnecessary PWA or installed-client risk. New work should prefer responsibility-based module ownership while preserving explicit migration paths for stored finance data and deployed clients.
 
 <details>
 <summary><strong>Repository layout</strong></summary>
@@ -117,5 +109,4 @@ Contributions should begin with [`CONTRIBUTING.md`](CONTRIBUTING.md). Keep each 
 | Architecture | [`docs/architecture/`](docs/architecture/) |
 | Migrations | [`docs/migration/`](docs/migration/) |
 | Release operations | [`docs/release/`](docs/release/) |
-| Organized V1 → V2 roadmap | [`version.md`](version.md) |
-| Organized release changelog | [`CHANGELOG.md`](CHANGELOG.md) |
+| Current release changelog | [`CHANGELOG.md`](CHANGELOG.md) |
