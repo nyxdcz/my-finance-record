@@ -1,10 +1,22 @@
-# V2.0.0 — Organized Complete
+# Talaan V2.0.1
 
-**Current production version:** V2.0.0  
+**Current production version:** V2.0.1  
 **Release date:** 2026-08-22  
-**Release name:** Organized Complete
+**Release name:** Talaan
 
-V2.0.0 is the active product baseline for My Finance Records. This document describes only the current release.
+Talaan V2.0.1 is the active product baseline. This document describes only the current release.
+
+## Product identity
+
+- **Product name:** Talaan
+- **Product version:** `2.0.1`
+- **Display version:** `V2.0.1`
+- **Release name:** `Talaan`
+- **PWA cache:** `finance-v2-20260822-talaan-r1`
+- **Finance Schema:** 12
+- **Cloud Schema:** V3
+
+The visible application, PWA metadata, offline experience, installation messaging, calendar export branding, and current documentation use the **Talaan** name.
 
 ## Product scope
 
@@ -77,6 +89,7 @@ V2.0.0 is the active product baseline for My Finance Records. This document desc
 
 ### User interface
 
+- Talaan application and PWA branding
 - Responsive desktop, tablet, and phone layouts
 - Desktop navigation rail
 - Mobile navigation drawer
@@ -87,7 +100,7 @@ V2.0.0 is the active product baseline for My Finance Records. This document desc
 - Reduced-motion support
 - Visible keyboard focus
 - Automatic appearance scheduling for Asia/Manila
-- Final PNG mascot system
+- PNG mascot system
 
 ### PWA & deployment
 
@@ -102,7 +115,7 @@ V2.0.0 is the active product baseline for My Finance Records. This document desc
 
 ## Compatibility contract
 
-V2.0.0 preserves the current finance-data and synchronization contracts:
+Talaan V2.0.1 preserves the current finance-data and synchronization contracts:
 
 - **Finance Schema:** 12
 - **Cloud Schema:** V3
@@ -117,13 +130,4 @@ V2.0.0 preserves the current finance-data and synchronization contracts:
 - Cloud conflict semantics
 - Five-minute routine synchronization
 
-Compatibility-sensitive filenames and URLs may remain stable when renaming them would create unnecessary PWA or installed-client risk. Their names do not change the current product version.
-
-## Release identity
-
-- **Product version:** `2.0.0`
-- **Display version:** `V2.0.0`
-- **Release name:** `Organized Complete`
-- **PWA cache:** `finance-v2-20260822-organized-complete-r1`
-
-All future product updates continue forward from the current V2 release line using semantic versioning.
+Compatibility-sensitive storage keys, identifiers, filenames, URLs, and calendar UID domains may remain stable when renaming them would create unnecessary data, PWA, or installed-client risk. These internal compatibility identifiers do not change the visible **Talaan** product name.
