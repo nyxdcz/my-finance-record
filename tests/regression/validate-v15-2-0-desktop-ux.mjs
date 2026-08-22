@@ -17,8 +17,10 @@ const versionHistory = versionHistoryMatch ? JSON.parse(versionHistoryMatch[1]) 
 const cloudFile = fs.readdirSync(".").find(name => name.endsWith(".js") && read(name).includes("financeCloudSyncV3Bootstrap"));
 if (!cloudFile) throw new Error("Cloud Sync V3 file missing");
 const cloud = read(cloudFile);
-const currentDocs = [changelog, readme, contributing, security];
+const currentDocs = { "CHANGELOG.md": changelog, "README.md": readme, "CONTRIBUTING.md": contributing, "SECURITY.md": security };
 const previousProductVersionPrefixes = ["V1.", "V12.", "V13.", "V14.", "V15."];
+const staleVersionReference = Object.entries(currentDocs)
+  .flatMap(([name, text]) => previousProductVersionPrefixes.filter(prefix => text.includes(prefix)).map(prefix => `${name}:${prefix}`))[0] || "";
 const required = [
   [version.version === "2.0.0", "version.json is V2.0.0"],
   [pkg.version === "2.0.0", "package.json is V2.0.0"],
@@ -28,7 +30,7 @@ const required = [
   [versionHistory.length === 1 && versionHistory[0]?.version === "V2.0.0" && versionHistory[0]?.title === "Organized Complete", "website Version history contains only the current V2.0.0 release"],
   [index.includes("<h3>Version history</h3><p>Latest release details</p>"), "website Version history is labeled as latest release details"],
   [changelog.includes("## V2.0.0 · Organized Complete"), "CHANGELOG focuses on the V2.0.0 current release"],
-  [currentDocs.every(text => previousProductVersionPrefixes.every(prefix => !text.includes(prefix))), "current-facing docs do not mention previous product versions"],
+  [!staleVersionReference, `current-facing docs do not mention previous product versions${staleVersionReference ? ` (${staleVersionReference})` : ""}`],
   [readme.includes("# My Finance Records · V2.0.0") && contributing.includes("V2.0.0 — Organized Complete") && security.includes("# Security Policy · V2.0.0"), "current-facing docs identify V2.0.0 consistently"],
   [index.includes("recurring items checked"), "month navigation explains recurring preparation"],
   [index.includes("cleared because filters changed"), "selection reset is announced"],
