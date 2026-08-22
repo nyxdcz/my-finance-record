@@ -54,4 +54,22 @@ versionMd = versionMd.replaceAll("finance-v2-20260822-talaan-r3", "finance-v2-20
 if (!versionMd.includes("finance-v2-20260822-talaan-r4")) throw new Error("version.md cache metadata did not advance to r4");
 write(versionMdPath, versionMd);
 
-console.log("Header More tools containment source, regression test, and aligned r4 cache generation are staged.");
+const testTextExtensions = new Set([".js", ".mjs", ".cjs", ".json", ".md", ".yml", ".yaml", ".html", ".css"]);
+const refreshTestPins = directory => {
+  for (const entry of fs.readdirSync(path.join(root, directory), { withFileTypes:true })) {
+    const relative = path.join(directory, entry.name);
+    if (entry.isDirectory()) {
+      refreshTestPins(relative);
+      continue;
+    }
+    if (!entry.isFile() || !testTextExtensions.has(path.extname(entry.name))) continue;
+    const before = read(relative);
+    const after = before
+      .replaceAll("2.0.1-talaan3", "2.0.1-talaan4")
+      .replaceAll("finance-v2-20260822-talaan-r3", "finance-v2-20260822-talaan-r4");
+    if (after !== before) write(relative, after);
+  }
+};
+refreshTestPins("tests");
+
+console.log("Header More tools containment source, regression coverage, and aligned r4/talaan4 runtime pins are staged.");
