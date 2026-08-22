@@ -169,10 +169,9 @@ if (fs.existsSync(lockPath)) {
 const changelogPath = path.join(root, "CHANGELOG.md");
 if (fs.existsSync(changelogPath)) {
   const changelog = fs.readFileSync(changelogPath, "utf8");
-  const heading = `## ${RELEASE.version} · ${RELEASE.dateIso}`;
-  if (!changelog.startsWith(heading)) {
-    const entry = `${heading}\n\n### Organized complete release\n\n- Adopts the reorganized product version roadmap from V1.0.0 (Created) through V2.0.0 (Organized Complete); see \`version.md\` for the combined milestone history.\n- Treats the complete local-first Finance, ledger, budgeting, reporting, projects, productivity, reminders, encrypted multi-profile Cloud Schema V3 synchronization, responsive interface, PWA delivery, and final Budget & Expenses polish as one organized production baseline.\n- Keeps the historical V12.19.0 through V15.2.24 entries below for auditability rather than rewriting or deleting the original development history.\n- Preserves Finance Schema 12, Cloud Schema V3, finance data, calculations, balances, recurrence, payments, encryption, storage, backups, and synchronization semantics while rotating the shell to \`${RELEASE.cache}\`.\n\n`;
-    writeIfChanged(changelogPath, `${entry}${changelog}`);
+  const heading = `## ${RELEASE.displayVersion} · ${RELEASE.name}`;
+  if (!changelog.includes(heading)) {
+    throw new Error(`CHANGELOG.md must describe the current ${RELEASE.displayVersion} release.`);
   }
 }
 
