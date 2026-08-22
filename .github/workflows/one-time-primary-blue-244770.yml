@@ -1,0 +1,43 @@
+name: One-time Talaan Blue 244770 Migration
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  migrate:
+    if: github.event.pull_request.head.ref == 'style/talaan-blue-244770'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out migration branch
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+      - name: Use Node.js 24
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          package-manager-cache: false
+      - name: Install locked project metadata
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Apply exact blue replacement
+        run: node scripts/one-time-primary-blue-244770.mjs
+      - name: Validate repository
+        run: npm run quality
+      - name: Remove one-time migration files
+        run: |
+          rm -f scripts/one-time-primary-blue-244770.mjs
+          rm -f .github/workflows/one-time-primary-blue-244770.yml
+      - name: Commit migrated tree
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet && exit 0
+          git commit -m "style: unify remaining Talaan blue shade"
+          git push origin HEAD:${{ github.event.pull_request.head.ref }}
