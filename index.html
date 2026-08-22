@@ -999,7 +999,7 @@
           </article>
 
           <div class="system-section-heading">
-            <div><h3>V12 App, Offline &amp; Recovery</h3><p>Install controls, device records, local sync history, offline packs, reminders, and migration safety.</p></div>
+            <div><h3>App, Offline &amp; Recovery</h3><p>Install controls, device records, local sync history, offline packs, reminders, and migration safety.</p></div>
             <span class="status-chip info">Finance Schema 12</span>
           </div>
 
@@ -1101,11 +1101,11 @@
                 <progress class="migration-progress" id="migrationProgressBar" max="100" aria-label="Migration progress"></progress>
               </div>
               <div class="system-status-row"><span>Progress</span><span class="system-status-value" id="migrationProgressText">Checking</span></div>
-              <div class="system-status-row"><span>V11 recovery copy</span><span class="system-status-value" id="v11BackupStatus">Checking</span></div>
+              <div class="system-status-row"><span>V11 recovery copy</span><span class="system-status-value" id="legacyBackupStatus">Checking</span></div>
               <div class="system-status-row"><span>Validation</span><span class="system-status-value" id="migrationValidationStatus">Checking</span></div>
               <div class="system-actions">
-                <button class="button button-secondary" id="downloadV11BackupButton" type="button">Download V11 copy</button>
-                <button class="button button-secondary" id="restoreV11BackupButton" type="button">Restore V11 copy</button>
+                <button class="button button-secondary" id="downloadLegacyBackupButton" type="button">Download V11 copy</button>
+                <button class="button button-secondary" id="restoreLegacyBackupButton" type="button">Restore V11 copy</button>
               </div>
               <div class="system-table-wrap"><table class="system-table"><thead><tr><th>Time</th><th>Migration</th><th>Status</th></tr></thead><tbody id="migrationHistoryBody"></tbody></table></div>
             </article>
@@ -8205,7 +8205,7 @@
       };
     }
 
-    function exportV12Bundle(format, prefix) {
+    function exportFinanceBundle(format, prefix) {
       const bundle = buildBundle(format);
       const filename = `${prefix}-${new Date().toISOString().slice(0, 10)}.json`;
       downloadFile(filename, JSON.stringify(bundle, null, 2), "application/json");
@@ -8214,7 +8214,7 @@
       device.lastBackup = appMeta.lastBackupAt;
       writeMeta();
       addSyncHistory(format.includes("recovery") ? "Export recovery bundle" : "Export sync bundle", "success", { filename, summary: bundle.summary });
-      renderV12Settings();
+      renderFinanceSettings();
     }
 
     function recordFingerprint(item) {
@@ -8335,7 +8335,7 @@
       pendingSyncImport = null;
       saveData(mode === "replace" ? "Backup replaced after recovery snapshot" : "Sync bundle merged");
       addSyncHistory(mode === "replace" ? "Import · replace" : `Import · merge (${conflictPolicy})`, "success", details);
-      renderV12Settings();
+      renderFinanceSettings();
     }
 
     async function createVerifiedAccountSnapshot() {
@@ -8591,10 +8591,10 @@
         progressBar.setAttribute("aria-label", `Migration progress: ${progress}%`);
       } else progressBar.removeAttribute("value");
       document.getElementById("migrationProgressText").textContent = hasKnownProgress ? `${progress}% · ${status}` : "Checking migration status";
-      document.getElementById("v11BackupStatus").textContent = localStorage.getItem(LEGACY_BACKUP_KEY) ? "Stored locally" : "Not available";
+      document.getElementById("legacyBackupStatus").textContent = localStorage.getItem(LEGACY_BACKUP_KEY) ? "Stored locally" : "Not available";
       document.getElementById("migrationValidationStatus").textContent = migration.validation || "Not run";
       const history = appMeta.migrationHistory || [];
-      document.getElementById("migrationHistoryBody").innerHTML = history.length ? history.map(item => `<tr><td>${escapeHtml(formatDateTime(item.timestamp))}</td><td>${escapeHtml(`${item.from || "V11"} → ${item.to || "V12"}`)}</td><td><span class="status-chip ${item.status === "success" ? "success" : "danger"}">${escapeHtml(item.status || "info")}</span><br><span style="color:var(--muted)">${escapeHtml(item.message || "")}</span></td></tr>`).join("") : `<tr><td colspan="3"><div class="system-empty">No migration history.</div></td></tr>`;
+      document.getElementById("migrationHistoryBody").innerHTML = history.length ? history.map(item => `<tr><td>${escapeHtml(formatDateTime(item.timestamp))}</td><td>${escapeHtml(`${item.from || "Legacy"} → ${item.to || "Finance Schema 12"}`)}</td><td><span class="status-chip ${item.status === "success" ? "success" : "danger"}">${escapeHtml(item.status || "info")}</span><br><span style="color:var(--muted)">${escapeHtml(item.message || "")}</span></td></tr>`).join("") : `<tr><td colspan="3"><div class="system-empty">No migration history.</div></td></tr>`;
     }
 
     async function detectBraveBrowser() {
@@ -8807,7 +8807,7 @@
       renderPwaInstallGuide({ brave, secure, installed:false });
     }
 
-    function renderV12Settings() {
+    function renderFinanceSettings() {
       ensureCurrentDevice();
       renderKnownDevices();
       renderSyncHistory();
@@ -8823,9 +8823,9 @@
       const exportOld = document.getElementById("exportBackup");
       if (exportOld) {
         const fresh = exportOld.cloneNode(true);
-        fresh.textContent = "Export V12 recovery bundle";
+        fresh.textContent = "Export recovery bundle";
         exportOld.replaceWith(fresh);
-        fresh.addEventListener("click", () => exportV12Bundle("my-finance-v12-recovery", "finance-recovery-v12"));
+        fresh.addEventListener("click", () => exportFinanceBundle("my-finance-v12-recovery", "finance-recovery-v12"));
       }
       const importOld = document.getElementById("importBackup");
       if (importOld) {
@@ -8865,26 +8865,26 @@
       showToast("Device name saved", "success");
     }
 
-    function downloadV11Backup() {
+    function downloadLegacyBackup() {
       const raw = localStorage.getItem(LEGACY_BACKUP_KEY);
-      if (!raw) return showToast("No V11 recovery copy is available", "warning");
+      if (!raw) return showToast("No legacy recovery copy is available", "warning");
       downloadFile(`finance-v11-recovery-${new Date().toISOString().slice(0, 10)}.json`, raw, "application/json");
       showToast("V11 recovery copy downloaded", "success");
     }
 
-    function restoreV11Backup() {
+    function restoreLegacyBackup() {
       const raw = localStorage.getItem(LEGACY_BACKUP_KEY);
-      if (!raw) return showToast("No V11 recovery copy is available", "warning");
-      if (!confirm("Restore the stored V11 data? V12 will create a recovery snapshot of the current records first.")) return;
+      if (!raw) return showToast("No legacy recovery copy is available", "warning");
+      if (!confirm("Restore the stored legacy data? Talaan will create a recovery snapshot of the current records first.")) return;
       try {
         const bundle = JSON.parse(raw);
-        createRecoverySnapshot("Before V11 rollback", data);
-        pushUndo("Restore V11 recovery copy");
+        createRecoverySnapshot("Before legacy rollback", data);
+        pushUndo("Restore legacy recovery copy");
         data = normalizeData(bundle.data || bundle);
-        saveData("V11 recovery copy restored into V12");
-        addSyncHistory("Restore V11 recovery copy", "success", { sourceChecksum: bundle.checksum || "" });
+        saveData("Legacy recovery copy restored into Talaan");
+        addSyncHistory("Restore legacy recovery copy", "success", { sourceChecksum: bundle.checksum || "" });
       } catch (error) {
-        showToast("The V11 recovery copy could not be restored", "warning");
+        showToast("The legacy recovery copy could not be restored", "warning");
       }
     }
 
@@ -8930,7 +8930,7 @@
       if (params.get("action") === "add-income") setTimeout(() => openIncomeDialog(), 100);
     }
 
-    function installV12Wrappers() {
+    function installFinanceWrappers() {
       const baseSaveData = saveData;
       saveData = function(message = "Saved") {
         recordTombstones(lastPersistedData, data);
@@ -8944,24 +8944,24 @@
         ensureCurrentDevice();
         if (syncChannel) syncChannel.postMessage({ type: "data-updated", deviceId: appMeta.currentDeviceId, tabId: window.name, checksum: checksum(data), timestamp: new Date().toISOString() });
         runReviewCheck(false);
-        renderV12Settings();
+        renderFinanceSettings();
         return true;
       };
 
       const baseRenderSettings = renderSettings;
       renderSettings = function() {
         baseRenderSettings();
-        renderV12Settings();
+        renderFinanceSettings();
         setupSettingsFormDirtyState();
         updateSettingsOverview();
       };
     }
     async function runButtonTask(buttonId,busyLabel,task){const button=document.getElementById(buttonId);if(!button||button.disabled)return;const original=button.textContent;button.disabled=true;button.setAttribute("aria-busy","true");if(busyLabel)button.textContent=busyLabel;try{return await task();}finally{button.disabled=false;button.removeAttribute("aria-busy");button.textContent=original;}}
-    function setupV12EventHandlers() {
+    function setupFinanceEventHandlers() {
       replaceLegacyBackupControls();
       document.getElementById("saveDeviceNameButton").addEventListener("click", saveDeviceName);
-      document.getElementById("exportSyncBundleButton").addEventListener("click", () => exportV12Bundle("my-finance-v12-sync", "finance-sync-v12"));
-      document.getElementById("exportRecoveryButton").addEventListener("click", () => exportV12Bundle("my-finance-v12-recovery", "finance-recovery-v12"));
+      document.getElementById("exportSyncBundleButton").addEventListener("click", () => exportFinanceBundle("my-finance-v12-sync", "finance-sync-v12"));
+      document.getElementById("exportRecoveryButton").addEventListener("click", () => exportFinanceBundle("my-finance-v12-recovery", "finance-recovery-v12"));
       document.getElementById("importSyncBundleInput").addEventListener("change", event => readSyncBundleFile(event.target.files[0], event.target));
       document.getElementById("clearSyncHistoryButton").addEventListener("click", () => {
         if (!appMeta.syncHistory.length) return showToast("Sync history is already empty", "info");
@@ -9007,13 +9007,13 @@
         else checkForUpdate();
       });
       document.getElementById("laterUpdateButton").addEventListener("click", () => { document.getElementById("pwaUpdateBanner").hidden = true; document.getElementById("pwaUpdateStatus").textContent = "Update postponed"; });
-      document.getElementById("downloadV11BackupButton").addEventListener("click", downloadV11Backup);
-      document.getElementById("restoreV11BackupButton").addEventListener("click", restoreV11Backup);
+      document.getElementById("downloadLegacyBackupButton").addEventListener("click", downloadLegacyBackup);
+      document.getElementById("restoreLegacyBackupButton").addEventListener("click", restoreLegacyBackup);
       document.querySelectorAll('[data-history-action="undo"]').forEach(button => button.addEventListener("click", () => {
-        setTimeout(() => { lastPersistedData = cloneData(data); addSyncHistory("Undo last change", "success", { summary: dataSummary(data) }); renderV12Settings(); }, 0);
+        setTimeout(() => { lastPersistedData = cloneData(data); addSyncHistory("Undo last change", "success", { summary: dataSummary(data) }); renderFinanceSettings(); }, 0);
       }));
       document.querySelectorAll('[data-history-action="redo"]').forEach(button => button.addEventListener("click", () => {
-        setTimeout(() => { lastPersistedData = cloneData(data); addSyncHistory("Redo last change", "success", { summary: dataSummary(data) }); renderV12Settings(); }, 0);
+        setTimeout(() => { lastPersistedData = cloneData(data); addSyncHistory("Redo last change", "success", { summary: dataSummary(data) }); renderFinanceSettings(); }, 0);
       }));
       window.addEventListener("beforeinstallprompt", event => { event.preventDefault(); deferredInstallPrompt = event; renderPwaStatus(); showToast("This app can now be installed", "info"); });
       window.addEventListener("appinstalled", () => { deferredInstallPrompt = null; renderPwaStatus(); showToast("Talaan installed", "success"); });
@@ -9079,9 +9079,9 @@
     new MutationObserver(updateMobileFilterBadges).observe(document.body, { subtree:true, childList:true, characterData:true });
     syncThemeControls();
     runLegacyDataMigration();
-    installV12Wrappers();
+    installFinanceWrappers();
     setupCrossTabSync();
-    setupV12EventHandlers();
+    setupFinanceEventHandlers();
     registerServiceWorker();
     runReviewCheck(false);
     setTimeout(applyLaunchShortcut, 0);

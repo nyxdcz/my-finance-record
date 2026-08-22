@@ -108,7 +108,7 @@ self.addEventListener("install", event => {
 self.addEventListener("activate", event => {
   event.waitUntil((async () => {
     const keys = await caches.keys();
-    // Compatibility cleanup only: remove caches created by pre-Talaan V12-V15 releases.
+    // Compatibility cleanup only: remove caches created by pre-Talaan releases.
     await Promise.all(keys.filter(key => /^finance-v(?:12|13|14|15)-/.test(key) && ![SHELL_CACHE, RUNTIME_CACHE].includes(key)).map(key => caches.delete(key)));
     await self.clients.claim();
   })());
