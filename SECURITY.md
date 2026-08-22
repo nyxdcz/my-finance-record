@@ -12,7 +12,7 @@ My Finance Records is currently organized around **V2.0.0 — Organized Complete
 - **Cloud access:** authenticated profile membership plus Row Level Security and approved RPC paths.
 - **Browser credentials:** publishable/anonymous Supabase credentials only; privileged secrets are prohibited from client files.
 
-The organized V1.x milestones are historical product milestones. New security fixes and releases continue forward from the V2 release line using semantic versioning.
+All security fixes and releases continue forward from the current V2.0.0 baseline using semantic versioning.
 
 ## Protected architecture
 
@@ -58,7 +58,7 @@ Security work must preserve the same safety requirements as finance work:
 
 Do not include real finance records, passwords, keys, passphrases, backup files, authentication tokens, or screenshots containing sensitive values in a public issue.
 
-When reporting a security problem, provide only the minimum reproducible information needed, using sample data where possible. Include the affected app version (currently V2.0.0), the affected area, reproduction steps, expected behavior, actual behavior, and whether the issue involves local storage, cloud sync, authentication, encryption, backups, payments, or the service worker.
+When reporting a security problem, provide only the minimum reproducible information needed, using sample data where possible. Include the affected app version (currently **V2.0.0**), the affected area, reproduction steps, expected behavior, actual behavior, and whether the issue involves local storage, cloud sync, authentication, encryption, backups, payments, or the service worker.
 
 If sensitive information is required to demonstrate the issue, use the repository’s private security-reporting mechanism rather than posting the secret or private record publicly.
 
@@ -66,4 +66,4 @@ If sensitive information is required to demonstrate the issue, use the repositor
 
 Security-sensitive pull requests should include focused regression coverage and must pass the repository’s **Regression quality** and **Browser privacy and accessibility** checks before merge. Changes affecting Finance Schema 12, Cloud Schema V3, encryption, authentication, RLS/RPC behavior, payments, recovery, or stored finance data also require an explicit migration/recovery review.
 
-See [`CONTRIBUTING.md`](CONTRIBUTING.md) for the full contribution and release process, [`PRIVACY.md`](PRIVACY.md) for privacy boundaries, [`version.md`](version.md) for the organized product roadmap, and [`CHANGELOG.md`](CHANGELOG.md) for the V1→V2 release history.
+See [`CONTRIBUTING.md`](CONTRIBUTING.md) for the contribution and release process, [`PRIVACY.md`](PRIVACY.md) for privacy boundaries, and [`CHANGELOG.md`](CHANGELOG.md) for the current V2.0.0 release notes.
