@@ -8,10 +8,11 @@ const interaction = read("assets/js/interaction-patterns.js");
 const css = read("assets/css/projects-calendar-v13.0.20.css");
 const version = JSON.parse(read("version.json"));
 
-assert.equal(version.version, "2.0.0");
+assert.equal(version.version, "2.0.1");
 assert.equal(version.schemaVersion, 12);
 assert.equal(version.cloudSchemaVersion, 3);
-assert.equal(version.cacheVersion, "finance-v2-20260822-organized-complete-r1");
+assert.equal(version.cacheVersion, "finance-v2-20260822-talaan-r1");
+assert.match(index, /Talaan · V2\.0\.1/);
 
 assert.match(index, /id="projectKanbanBoard"/);
 assert.match(index, /data-kanban-add-column="project"/);
@@ -41,4 +42,4 @@ assert.match(css, /\.finance-kanban-column\s*\{/);
 assert.match(css, /\.finance-kanban-card\[data-structured-card-draggable\]/);
 assert.match(css, /min-width:min\(82vw,310px\)/);
 
-console.log("Horizontal Project Agenda and Projects Kanban source contract passed under V2.0.0.");
+console.log("Horizontal Project Agenda and Projects Kanban source contract passed under Talaan V2.0.1.");
