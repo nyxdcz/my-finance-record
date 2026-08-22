@@ -4,7 +4,8 @@ import path from 'node:path';
 const root = process.cwd();
 const skipDirs = new Set(['.git', 'node_modules', '_site', 'coverage', 'test-results']);
 const binaryExts = new Set(['.png', '.jpg', '.jpeg', '.gif', '.webp', '.ico', '.pdf', '.zip', '.woff', '.woff2', '.ttf', '.otf']);
-const oldColor = /#173b67/gi;
+const oldColors = [/#173b67/gi, /#173e76/gi];
+const oldColorCheck = /#173(?:b67|e76)/i;
 const newColor = '#356FD1';
 const replacements = [
   [/finance-v2-20260822-talaan-r1/g, 'finance-v2-20260822-talaan-r2'],
@@ -34,10 +35,12 @@ function walk(dir) {
     if (input.includes('\u0000')) continue;
 
     let output = input;
-    const matches = output.match(oldColor);
-    if (matches) {
-      colorCount += matches.length;
-      output = output.replace(oldColor, newColor);
+    for (const oldColor of oldColors) {
+      const matches = output.match(oldColor);
+      if (matches) {
+        colorCount += matches.length;
+        output = output.replace(oldColor, newColor);
+      }
     }
     for (const [pattern, replacement] of replacements) {
       const found = output.match(pattern);
@@ -56,7 +59,7 @@ function walk(dir) {
 
 walk(root);
 
-let remaining = [];
+const remaining = [];
 function verify(dir) {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     if (skipDirs.has(entry.name)) continue;
@@ -73,13 +76,13 @@ function verify(dir) {
       continue;
     }
     if (text.includes('\u0000')) continue;
-    if (/#173b67/i.test(text)) remaining.push(path.relative(root, full));
+    if (oldColorCheck.test(text)) remaining.push(path.relative(root, full));
   }
 }
 verify(root);
 
 if (remaining.length) {
-  console.error('Old primary color still exists in:', remaining.join(', '));
+  console.error('Old primary colors still exist in:', remaining.join(', '));
   process.exit(1);
 }
 
