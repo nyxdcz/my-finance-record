@@ -45,12 +45,12 @@
     .ui-pill,.status-pill { border-radius:999px; }
     .ui-tag { display:inline-flex; align-items:center; min-height:20px; padding:2px 6px; border:1px solid var(--line); border-radius:5px; background:var(--surface-soft); color:var(--muted); font-size:.62rem; font-weight:750; line-height:1.2; }
 
-    progress.progress-track, progress.v12-progress, progress.savings-goal-progress { display:block; width:100%; border:0; appearance:none; -webkit-appearance:none; overflow:hidden; background:var(--line); }
-    progress.progress-track::-webkit-progress-bar, progress.v12-progress::-webkit-progress-bar, progress.savings-goal-progress::-webkit-progress-bar { background:var(--line); border-radius:inherit; }
-    progress.progress-track::-webkit-progress-value, progress.v12-progress::-webkit-progress-value, progress.savings-goal-progress::-webkit-progress-value { background:var(--green); border-radius:inherit; transition:width .3s ease; }
-    progress.progress-track::-moz-progress-bar, progress.v12-progress::-moz-progress-bar, progress.savings-goal-progress::-moz-progress-bar { background:var(--green); border-radius:inherit; }
+    progress.progress-track, progress.migration-progress, progress.savings-goal-progress { display:block; width:100%; border:0; appearance:none; -webkit-appearance:none; overflow:hidden; background:var(--line); }
+    progress.progress-track::-webkit-progress-bar, progress.migration-progress::-webkit-progress-bar, progress.savings-goal-progress::-webkit-progress-bar { background:var(--line); border-radius:inherit; }
+    progress.progress-track::-webkit-progress-value, progress.migration-progress::-webkit-progress-value, progress.savings-goal-progress::-webkit-progress-value { background:var(--green); border-radius:inherit; transition:width .3s ease; }
+    progress.progress-track::-moz-progress-bar, progress.migration-progress::-moz-progress-bar, progress.savings-goal-progress::-moz-progress-bar { background:var(--green); border-radius:inherit; }
     progress.savings-goal-progress { height:9px; margin-top:8px; border-radius:999px; }
-    progress.v12-progress { height:9px; margin:0; border-radius:999px; }
+    progress.migration-progress { height:9px; margin:0; border-radius:999px; }
     .migration-progress-shell { min-height:22px; display:flex; align-items:center; gap:8px; margin-top:9px; }
     .migration-progress-shell.is-indeterminate progress { display:none; }
     .migration-progress-shell:not(.is-indeterminate) .indeterminate-spinner { display:none; }

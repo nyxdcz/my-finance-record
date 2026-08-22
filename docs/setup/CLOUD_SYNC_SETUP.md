@@ -7,7 +7,7 @@ Cloud Sync is optional. The app remains local-first when Supabase is not configu
 - A Supabase project already configured for V12 Cloud Sync V2
 - The browser-safe Supabase publishable key or legacy anon key
 - One HTTPS PWA address
-- `supabase/cloud-profiles-v13.sql`
+- `supabase/cloud-profiles-v3.sql`
 - A unique profile encryption passphrase stored outside the app
 
 Never place a Supabase secret key or `service_role` key in this browser application.
@@ -18,7 +18,7 @@ On the MacBook, open V12.25.0, wait for **Synced**, export a recovery backup, an
 
 ## 2. Install Cloud Schema V3
 
-Run the complete `supabase/cloud-profiles-v13.sql` file in the Supabase SQL Editor. The migration creates profile, member, encrypted record, batch, audit, device, payment-operation, invitation, and restore-point tables plus profile-scoped RLS and RPC functions.
+Run the complete `supabase/cloud-profiles-v3.sql` file in the Supabase SQL Editor. The migration creates profile, member, encrypted record, batch, audit, device, payment-operation, invitation, and restore-point tables plus profile-scoped RLS and RPC functions.
 
 The migration does not delete or alter the V2 cloud tables.
 

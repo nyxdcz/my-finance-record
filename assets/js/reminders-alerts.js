@@ -530,16 +530,16 @@
     if (!list) return;
     list.innerHTML = alerts.length ? alerts.map(item => `
       <button class="finance-alert-row" type="button" data-open-finance-alert="${escape(item.page)}" data-alert-record="${escape(item.recordId)}">
-        <span class="v12-chip ${escape(item.severity)}">${escape(ruleLabel(item.type))}</span>
+        <span class="status-chip ${escape(item.severity)}">${escape(ruleLabel(item.type))}</span>
         <span><strong>${escape(item.title)}</strong><small>${escape(item.text)}</small></span>
-      </button>`).join("") : `<div class="v12-success-box">No scheduled finance alerts.</div>`;
+      </button>`).join("") : `<div class="success-box">No scheduled finance alerts.</div>`;
   }
 
   function renderHistory() {
     const node = document.getElementById("financeAlertHistory");
     if (!node) return;
     const history = localState.history || [];
-    node.innerHTML = history.length ? history.slice(0,8).map(item => `<div class="finance-alert-history-row"><span>${escape(typeof formatDateTime === "function" ? formatDateTime(item.timestamp) : item.timestamp)}</span><strong>${escape(item.title)}</strong><small>${escape(item.reason || "scheduled")}</small></div>`).join("") : `<div class="v12-empty">No notification history on this device.</div>`;
+    node.innerHTML = history.length ? history.slice(0,8).map(item => `<div class="finance-alert-history-row"><span>${escape(typeof formatDateTime === "function" ? formatDateTime(item.timestamp) : item.timestamp)}</span><strong>${escape(item.title)}</strong><small>${escape(item.reason || "scheduled")}</small></div>`).join("") : `<div class="system-empty">No notification history on this device.</div>`;
   }
 
   function fillSettingsForm(settings = data.reminderSettings) {
@@ -564,7 +564,7 @@
     const chip = document.getElementById("reminderStatusChip");
     if (chip) {
       chip.textContent = enabled ? (isSnoozed() ? "Paused" : "On") : "Off";
-      chip.className = `v12-chip ${enabled ? (isSnoozed() ? "warning" : "success") : ""}`;
+      chip.className = `status-chip ${enabled ? (isSnoozed() ? "warning" : "success") : ""}`;
     }
     const foreground = document.getElementById("foregroundReminderStatus");
     if (foreground) foreground.textContent = `${alerts.length} active alert${alerts.length === 1 ? "" : "s"}`;
@@ -736,7 +736,7 @@
     if (!card) return;
     card.classList.add("finance-alert-card");
     card.innerHTML = `
-      <div class="card-header"><div><h3>Reminders &amp; scheduled alerts</h3><p>Daily finance digest with due-date, balance, income, Savings, Gym, sync, and backup checks</p></div><span class="v12-chip" id="reminderStatusChip">Off</span></div>
+      <div class="card-header"><div><h3>Reminders &amp; scheduled alerts</h3><p>Daily finance digest with due-date, balance, income, Savings, Gym, sync, and backup checks</p></div><span class="status-chip" id="reminderStatusChip">Off</span></div>
       <div class="finance-alert-status-grid">
         <div><span>Active alerts</span><strong id="foregroundReminderStatus">0</strong></div>
         <div><span>Notification permission</span><strong id="financeAlertPermissionStatus">Checking</strong></div>
@@ -762,7 +762,7 @@
           ["unsyncedChanges","Unsynchronized changes"],["backupReminder","Recovery backup"]
         ].map(([key,label]) => `<label><input id="financeAlertRule-${key}" type="checkbox"><span>${label}</span></label>`).join("")}
       </div>
-      <div class="v12-actions finance-alert-actions">
+      <div class="system-actions finance-alert-actions">
         <button class="button button-primary" id="enableRemindersButton" type="button">Enable notifications</button>
         <button class="button button-secondary" id="saveFinanceAlertSettings" type="button">Save schedule</button>
         <button class="button button-secondary" id="runReviewButton" type="button">Run alert check</button>
@@ -770,11 +770,11 @@
         <button class="button button-secondary" id="pauseFinanceAlertsButton" type="button">Pause 24 hours</button>
         <button class="button button-secondary" id="disableRemindersButton" type="button">Turn off</button>
       </div>
-      <div class="v12-status-row"><span>Delivery status</span><span class="v12-status-value" id="financeAlertPauseStatus">Active</span></div>
+      <div class="system-status-row"><span>Delivery status</span><span class="system-status-value" id="financeAlertPauseStatus">Active</span></div>
       <div class="finance-alert-section-title"><strong>Current alerts</strong><small>Opening an item only navigates to its record area; no payment or balance change occurs.</small></div>
-      <div class="v12-check-list finance-alert-list" id="reviewIssueList"></div>
+      <div class="system-check-list finance-alert-list" id="reviewIssueList"></div>
       <details class="finance-alert-history"><summary>Notification history on this device</summary><div id="financeAlertHistory"></div><button class="button button-secondary button-small" id="clearFinanceAlertHistory" type="button">Clear history</button></details>
-      <p class="v12-help">Exact closed-app delivery is not guaranteed. Periodic Background Sync is browser-controlled and has limited support. On iPhone and iPad, install this website to the Home Screen and allow notifications. Alerts never mark expenses paid, transfer money, reconcile balances, or change financial records automatically.</p>`;
+      <p class="system-help">Exact closed-app delivery is not guaranteed. Periodic Background Sync is browser-controlled and has limited support. On iPhone and iPad, install this website to the Home Screen and allow notifications. Alerts never mark expenses paid, transfer money, reconcile balances, or change financial records automatically.</p>`;
     window.simplifyReminderSettingsCard?.(card);
   }
 

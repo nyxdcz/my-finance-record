@@ -69,12 +69,13 @@ const html = read("index.html");
 const worker = read("sw.js");
 if (!html.includes(`<title>${BRAND} · ${DISPLAY_VERSION}</title>`)) fail(`Prepared title must be ${BRAND} ${DISPLAY_VERSION}`);
 if (!html.includes(`const APP_VERSION = "${CURRENT_VERSION}";`)) fail(`Prepared index runtime must be ${DISPLAY_VERSION}`);
+if (/\bV(?:11|12|13|14|15)(?:\.\d+)*\b/.test(html)) fail("Prepared index still contains legacy product-version terminology");
 if (html.includes(PREVIOUS_BRAND)) fail("Prepared index still contains the superseded product brand");
 if (!worker.includes(`const APP_VERSION = "${CURRENT_VERSION}";`)) fail(`Prepared service worker must be ${DISPLAY_VERSION}`);
 if (!worker.includes(`const CACHE_VERSION = "${version.cacheVersion}"`)) fail("Prepared service-worker cache must match version.json");
 
-const activeLegacyRuntimePattern = /(?:shell-ui-v15|black-canvas-v15|dashboard-interactions-core-v14|desktop-ui-phase1-v15|desktop-ux-v15|liquid-glass-v15|mobile-v14|production-ui-audit-v15|projects-calendar-v13|ui-icon-alignment-v15|brand-icons-v15|pwa-update-v15|summary-mascots-v15|expense-compact-v15)/i;
-for (const [file, text] of [["index.html", html], ["sw.js", worker]]) if (activeLegacyRuntimePattern.test(text)) fail(`${file} still exposes an active V13-V15 runtime filename`);
+const versionedRuntimeFilenamePattern = /-v(?:1[345])(?:[-.][A-Za-z0-9.-]+)?\.(?:css|js|png|svg)\b/i;
+for (const [file, text] of [["index.html", html], ["sw.js", worker]]) if (versionedRuntimeFilenamePattern.test(text)) fail(`${file} still exposes an legacy versioned runtime filename`);
 
 for (const match of html.matchAll(/\b(?:src|href)="([^"]+)"/g)) {
   const value = match[1];

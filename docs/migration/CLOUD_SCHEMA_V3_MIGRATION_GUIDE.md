@@ -1,36 +1,36 @@
-# V13.0.0 Controlled Migration Guide
+# Cloud Schema V3 Controlled Migration Guide
 
 ## Stop conditions
 
-Do not continue if the MacBook and iPhone do not show matching V12.25.0 balances, Cloud Sync is not Synced, a fresh recovery backup cannot be opened, or the Supabase V2 migration was never completed.
+Do not continue unless authoritative-device balances match, Cloud Sync is Synced, a fresh recovery backup can be opened, and the earlier Cloud Schema V2 migration has completed.
 
 ## Stage 1 — Recovery
 
-1. Export a V12.25.0 recovery backup from the authoritative MacBook.
+1. Export a recovery backup from the authoritative device.
 2. Save a second copy outside the Downloads folder.
 3. Record the current account total and one recent ledger transaction for comparison.
 
 ## Stage 2 — Database
 
 1. Open the Supabase SQL Editor.
-2. Run `supabase/cloud-profiles-v13.sql` once.
+2. Run `supabase/cloud-profiles-v3.sql` once.
 3. Confirm the transaction completes successfully.
 4. Review `supabase/rls-smoke-tests-v3.sql` and the Security Advisor.
 
-The V3 migration creates new tables. It does not delete V2 records.
+Cloud Schema V3 creates new profile-scoped tables. It does not delete earlier cloud records.
 
 ## Stage 3 — App
 
-1. Deploy V13.0.0.
-2. Open the MacBook app first.
-3. Confirm local V12 data was assigned to the default personal profile.
+1. Deploy the current Talaan release.
+2. Open the authoritative device first.
+3. Confirm existing local data is assigned to the default personal profile.
 4. Create the encrypted cloud profile and store the passphrase externally.
-5. Upload from the MacBook and wait for Synced.
+5. Upload from the authoritative device and wait for Synced.
 6. Create and test an encrypted `.mfrx` backup.
 
 ## Stage 4 — Second device
 
-1. Update the iPhone Home Screen app.
+1. Update the Home Screen app.
 2. Sign in, open **Profiles & Security**, and use **Find existing profiles** or accept the household invitation.
 3. Connect and unlock using the same passphrase.
 4. Download the cloud records.
@@ -45,4 +45,4 @@ The V3 migration creates new tables. It does not delete V2 records.
 
 ## Rollback
 
-Stop all V13 writers before rollback. Preserve V13 encrypted backups and the V12 recovery backup. Return to the exact V12.25.0 package and V2 workflow. The V13 SQL intentionally leaves V2 tables unchanged, but data written only to V3 will not automatically appear in V2.
+Stop all Cloud Schema V3 writers before rollback. Preserve encrypted backups and the pre-migration recovery backup. Earlier cloud tables remain available for controlled rollback, but records written only to Cloud Schema V3 will not automatically appear in earlier schemas.

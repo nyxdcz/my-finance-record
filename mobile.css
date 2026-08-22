@@ -17,13 +17,13 @@
 
   #settings, #settings .settings-panels, #settings .settings-panel, #settings .settings-disclosure,
   #settings .settings-disclosure-body, #settings .card, #settings .grid, #settings form,
-  #settings .field, #settings .table-scroll, #settings .v12-table-wrap { min-width: 0; max-width: 100%; }
+  #settings .field, #settings .table-scroll, #settings .system-table-wrap { min-width: 0; max-width: 100%; }
   #settings .settings-panel .card { padding: 10px; overflow: hidden; }
   #settings .card-header { flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
   #settings .card-header > div { min-width: 0; flex: 1 1 190px; }
   #settings .card-header h3 { font-size: .88rem; overflow-wrap: anywhere; }
-  #settings .card-header p, #settings .v12-help { overflow-wrap: anywhere; }
-  #settings .card-header > .v12-chip, #settings .card-header > .settings-state-chip { max-width: 100%; white-space: normal; text-align: center; }
+  #settings .card-header p, #settings .system-help { overflow-wrap: anywhere; }
+  #settings .card-header > .status-chip, #settings .card-header > .settings-state-chip { max-width: 100%; white-space: normal; text-align: center; }
   #settings .settings-mobile-back { grid-template-columns: minmax(0, 1fr) auto; gap: 7px; padding: 8px; }
   #settings .settings-mobile-back .button { min-width: 0; padding-inline: 10px; }
   #settings .settings-mobile-back strong { min-width: 0; max-width: 42vw; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
@@ -34,8 +34,8 @@
   #settings .cloud-config-grid, #settings .cloud-auth-grid, #settings .cloud-sync-status-grid { grid-template-columns: 1fr !important; }
   #settings .input, #settings .select, #settings .textarea { width: 100%; min-width: 0; max-width: 100%; }
   #settings input[inputmode="url"] { text-overflow: ellipsis; }
-  #settings .v12-inline-form { grid-template-columns: 1fr; align-items: stretch; }
-  #settings .v12-inline-form > .button, #settings .v12-actions > .button { min-width: 0; }
+  #settings .system-inline-form { grid-template-columns: 1fr; align-items: stretch; }
+  #settings .system-inline-form > .button, #settings .system-actions > .button { min-width: 0; }
   #settings .account-setting-row { grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); gap: 6px; padding: 8px; }
   #settings .account-setting-row > .account-setting-label { grid-column: 1 / -1; }
   #settings .account-setting-row > .input, #settings .account-setting-row > .select { min-height: 44px; }
@@ -52,9 +52,9 @@
   #settings .device-platform-details summary { min-height: 36px; display: flex; align-items: center; color: var(--muted); font-size: .66rem; font-weight: 750; cursor: pointer; }
   #settings .device-platform-details small { display: block; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; overflow-wrap: anywhere; }
   #settings .cloud-device-table .button { width: 100%; min-height: 44px; white-space: normal; }
-  #settings .v12-table-wrap { max-height: none; overflow: visible; border: 0; }
-  #settings .v12-table-wrap .v12-table { display: block; width: 100%; }
-  #settings .v12-table-wrap .v12-table thead { display: none; }
+  #settings .system-table-wrap { max-height: none; overflow: visible; border: 0; }
+  #settings .system-table-wrap .system-table { display: block; width: 100%; }
+  #settings .system-table-wrap .system-table thead { display: none; }
 
   #settings .cloud-pending-item, #settings .cloud-conflict-item { gap: 7px !important; padding: 9px !important; }
   #settings .cloud-pending-actions, #settings .cloud-conflict-actions { display: grid; grid-template-columns: minmax(88px, .45fr) minmax(0, 1fr); gap: 6px; }

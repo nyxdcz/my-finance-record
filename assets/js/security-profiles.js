@@ -446,7 +446,7 @@
     const result = await client.rpc(name, args);
     if (result.error) {
       const message = result.error.message || String(result.error);
-      if (/finance_v3_|schema cache|could not find the function/i.test(message)) throw new Error("Cloud Schema V3 is not installed. Run supabase/cloud-profiles-v13.sql first.");
+      if (/finance_v3_|schema cache|could not find the function/i.test(message)) throw new Error("Cloud Schema V3 is not installed. Run supabase/cloud-profiles-v3.sql first.");
       if (/owner_required/i.test(message)) throw new Error("Only the profile owner can perform this action.");
       if (/authentication_required/i.test(message)) throw new Error("Please sign in to your cloud account first.");
       throw result.error;
@@ -1177,7 +1177,7 @@
   }
 
   function injectPasskeySignIn() {
-    const actions = document.querySelector("#cloudDisconnectedSection .v12-actions");
+    const actions = document.querySelector("#cloudDisconnectedSection .system-actions");
     if (!actions || document.getElementById("cloudPasskeySignIn")) return;
     const button = document.createElement("button");
     button.className = "button button-secondary";

@@ -1,4 +1,4 @@
--- My Finance Records V12.19.1 · existing-project security migration
+-- Talaan · Legacy cloud security hardening migration
 -- Run once after the original schema and policy files.
 
 begin;

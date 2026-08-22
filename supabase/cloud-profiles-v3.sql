@@ -1,8 +1,8 @@
--- My Finance Records V13.0.0 · Cloud Schema V3
+-- Talaan · Cloud Schema V3
 -- Profile-scoped encrypted record sync, household membership roles, immutable audit,
 -- invitation codes, device revocation, and encrypted cloud restore points.
 --
--- Run after the V12.21.0 Cloud Schema V2 migration. V2 tables are intentionally
+-- Run after the legacy Cloud Schema V2 migration. V2 tables are intentionally
 -- preserved for rollback and are not modified by this migration.
 
 begin;

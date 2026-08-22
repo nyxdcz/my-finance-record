@@ -203,17 +203,17 @@
       ? `<div class="v12-callout warning" data-cloud-profile-duplicate-warning style="margin:10px 0;"><strong>${duplicateProfiles} profiles share a duplicate name.</strong><p style="margin:4px 0 0;">They are separate finance datasets. Compare the Profile ID, last updated time, account count, and device count before choosing. Nothing is deleted until you explicitly use the Delete action and confirm it.</p></div>`
       : "";
     card.hidden = false;
-    card.innerHTML = `<div class="card-header"><div><h3>${switching ? "Switch Cloud Profile" : "Choose Cloud Profile"}</h3><p>${switching ? "Choose or manage the exact cloud dataset this device should use." : "This account has more than one finance profile. Confirm one before any finance records are downloaded."}</p></div><span class="v12-chip warning">Selection required</span></div>
+    card.innerHTML = `<div class="card-header"><div><h3>${switching ? "Switch Cloud Profile" : "Choose Cloud Profile"}</h3><p>${switching ? "Choose or manage the exact cloud dataset this device should use." : "This account has more than one finance profile. Confirm one before any finance records are downloaded."}</p></div><span class="status-chip warning">Selection required</span></div>
       ${duplicateWarning}<div style="display:flex;justify-content:flex-end;margin:0 0 8px;"><button class="button button-secondary button-small" type="button" data-cloud-profile-refresh>Refresh profiles</button></div>
       <div role="radiogroup" aria-label="Available cloud profiles" style="display:grid;gap:8px;margin:0 0 12px;">${list.map((profile,index) => {
         const id = profileId(profile);
         const checked = Boolean(current && id === current);
         const sameNameCount = counts.get(normalizedName(profile)) || 0;
         const chips = [
-          checked ? `<span class="v12-chip success">Current on this device</span>` : "",
-          id === newestId ? `<span class="v12-chip">Most recently updated</span>` : "",
-          !checked && prior && id === prior ? `<span class="v12-chip">Previously used here</span>` : "",
-          sameNameCount > 1 ? `<span class="v12-chip warning">Duplicate name</span>` : ""
+          checked ? `<span class="status-chip success">Current on this device</span>` : "",
+          id === newestId ? `<span class="status-chip">Most recently updated</span>` : "",
+          !checked && prior && id === prior ? `<span class="status-chip">Previously used here</span>` : "",
+          sameNameCount > 1 ? `<span class="status-chip warning">Duplicate name</span>` : ""
         ].filter(Boolean).join(" ");
         const radioId = `cloudProfileSelectionRadio${index}`;
         return `<div data-cloud-profile-id="${escapeHtml(id)}" title="Cloud Profile ${escapeHtml(id)}" style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:var(--surface-soft);">
@@ -222,7 +222,7 @@
         </div>`;
       }).join("")}</div>
       <div class="field" style="margin-bottom:10px;"><label for="cloudProfileSelectionPassphrase">Profile encryption passphrase</label><input class="input" id="cloudProfileSelectionPassphrase" type="password" autocomplete="current-password" placeholder="Leave blank for an automatically created profile"><small style="display:block;color:var(--muted);margin-top:4px;">Enter a passphrase only when this profile was created with a custom encryption passphrase.</small></div>
-      <div class="card-actions" style="display:flex;gap:8px;flex-wrap:wrap;"><button class="button button-primary" id="cloudProfileSelectionConfirm" type="button" ${current ? "" : "disabled"}>Use selected profile</button>${switching ? `<button class="button button-secondary" id="cloudProfileSelectionCancel" type="button">Cancel</button>` : ""}</div><p class="v12-help" id="cloudProfileSelectionMessage">${current ? "Choose carefully before switching datasets." : "No profile is preselected. No finance records will be downloaded until you deliberately choose and confirm one."}</p>`;
+      <div class="card-actions" style="display:flex;gap:8px;flex-wrap:wrap;"><button class="button button-primary" id="cloudProfileSelectionConfirm" type="button" ${current ? "" : "disabled"}>Use selected profile</button>${switching ? `<button class="button button-secondary" id="cloudProfileSelectionCancel" type="button">Cancel</button>` : ""}</div><p class="system-help" id="cloudProfileSelectionMessage">${current ? "Choose carefully before switching datasets." : "No profile is preselected. No finance records will be downloaded until you deliberately choose and confirm one."}</p>`;
     hydrateProfileStats(list).catch(() => {});
     return card;
   }
@@ -245,7 +245,7 @@
     if (result?.error) {
       const message = String(result.error.message || result.error || "Cloud Profile management failed.");
       if (/could not find the function|schema cache|finance_v3_(rename|delete)_profile/i.test(message)) {
-        throw new Error("Cloud Profile Rename/Delete is not installed in Supabase yet. Run supabase/cloud-profile-management-v15-2-2.sql, then refresh profiles.");
+        throw new Error("Cloud Profile Rename/Delete is not installed in Supabase yet. Run supabase/cloud-profile-management.sql, then refresh profiles.");
       }
       if (/owner_required|profile_not_found_or_owner/i.test(message)) throw new Error("Only the Cloud Profile owner can rename or delete this profile.");
       if (/profile_name_confirmation_mismatch/i.test(message)) throw new Error("The typed profile name does not match. Delete was cancelled.");
@@ -399,8 +399,8 @@
       <div class="card-header" style="margin-bottom:12px;"><div><h3 id="cloudProfileManagementTitle">${deleting ? "Delete Cloud Profile" : "Rename Cloud Profile"}</h3><p>${deleting ? "Permanently remove this cloud dataset." : "Change the name shown on every connected device."}</p></div><button class="button button-secondary button-small" type="button" data-cloud-profile-management-close aria-label="Close">Close</button></div>
       <div style="padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface-soft);margin-bottom:12px;"><strong>${escapeHtml(profile.name || "Cloud finances")}</strong><small style="display:block;color:var(--muted);margin-top:3px;">${escapeHtml(roleLabel(profile.role))} · Profile ${escapeHtml(shortId(profileId(profile)))}</small><small style="display:block;color:var(--muted);margin-top:2px;">Updated ${escapeHtml(formatDate(profile.updated_at))} · Accounts ${accounts} · Devices ${devices}</small></div>
       ${deleting ? `<div class="v12-callout warning" style="margin-bottom:12px;"><strong>This cannot be undone.</strong><p style="margin:4px 0 0;">This permanently deletes this Cloud Profile and its synced finance data, devices, members, audit history, invites, and restore points from the cloud.${current ? " The finance data already stored on this device will be preserved locally and disconnected from this deleted cloud profile." : ""}</p></div>
-        <form id="cloudProfileManagementForm"><div class="field"><label for="cloudProfileDeleteConfirm">Type <strong>${escapeHtml(profile.name || "Cloud finances")}</strong> to confirm</label><input class="input" id="cloudProfileDeleteConfirm" autocomplete="off" data-cloud-profile-delete-confirm></div><p class="v12-help" id="cloudProfileManagementMessage">Delete stays disabled until the profile name matches exactly.</p><div class="card-actions" style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;"><button class="button button-secondary" type="button" data-cloud-profile-management-close>Cancel</button><button class="button button-primary" id="cloudProfileManagementSubmit" type="submit" disabled style="background:var(--red);border-color:var(--red);">Delete profile</button></div></form>`
-        : `<form id="cloudProfileManagementForm"><div class="field"><label for="cloudProfileRenameInput">Cloud Profile name</label><input class="input" id="cloudProfileRenameInput" maxlength="80" autocomplete="off" value="${escapeHtml(profile.name || "Cloud finances")}"></div><p class="v12-help" id="cloudProfileManagementMessage">Use 1–80 characters. Finance records are not changed by renaming.</p><div class="card-actions" style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;"><button class="button button-secondary" type="button" data-cloud-profile-management-close>Cancel</button><button class="button button-primary" id="cloudProfileManagementSubmit" type="submit">Save name</button></div></form>`}
+        <form id="cloudProfileManagementForm"><div class="field"><label for="cloudProfileDeleteConfirm">Type <strong>${escapeHtml(profile.name || "Cloud finances")}</strong> to confirm</label><input class="input" id="cloudProfileDeleteConfirm" autocomplete="off" data-cloud-profile-delete-confirm></div><p class="system-help" id="cloudProfileManagementMessage">Delete stays disabled until the profile name matches exactly.</p><div class="card-actions" style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;"><button class="button button-secondary" type="button" data-cloud-profile-management-close>Cancel</button><button class="button button-primary" id="cloudProfileManagementSubmit" type="submit" disabled style="background:var(--red);border-color:var(--red);">Delete profile</button></div></form>`
+        : `<form id="cloudProfileManagementForm"><div class="field"><label for="cloudProfileRenameInput">Cloud Profile name</label><input class="input" id="cloudProfileRenameInput" maxlength="80" autocomplete="off" value="${escapeHtml(profile.name || "Cloud finances")}"></div><p class="system-help" id="cloudProfileManagementMessage">Use 1–80 characters. Finance records are not changed by renaming.</p><div class="card-actions" style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;"><button class="button button-secondary" type="button" data-cloud-profile-management-close>Cancel</button><button class="button button-primary" id="cloudProfileManagementSubmit" type="submit">Save name</button></div></form>`}
     </section>`;
     queueMicrotask(() => document.getElementById(deleting ? "cloudProfileDeleteConfirm" : "cloudProfileRenameInput")?.focus());
   }
@@ -577,7 +577,7 @@
         card.className = "card";
         health.insertAdjacentElement("afterend", card);
       }
-      card.innerHTML = `<div class="card-header"><div><h3>Cloud profile identity</h3><p>Verify this same profile on every device.</p></div><span class="v12-chip success">Connected</span></div><div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;align-items:center;"><div><strong>${escapeHtml(current.name)}</strong><small style="display:block;color:var(--muted);margin-top:3px;">${escapeHtml(current.role)} · Profile ${escapeHtml(shortId(current.id))}</small></div><div style="display:flex;gap:6px;flex-wrap:wrap;"><button class="button button-secondary" type="button" data-cloud-profile-switch>Switch cloud profile</button>${ownerButtons}</div></div>`;
+      card.innerHTML = `<div class="card-header"><div><h3>Cloud profile identity</h3><p>Verify this same profile on every device.</p></div><span class="status-chip success">Connected</span></div><div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;align-items:center;"><div><strong>${escapeHtml(current.name)}</strong><small style="display:block;color:var(--muted);margin-top:3px;">${escapeHtml(current.role)} · Profile ${escapeHtml(shortId(current.id))}</small></div><div style="display:flex;gap:6px;flex-wrap:wrap;"><button class="button button-secondary" type="button" data-cloud-profile-switch>Switch cloud profile</button>${ownerButtons}</div></div>`;
     }
     const profileCard = document.querySelector("#settings-panel-profiles .profile-cloud-card");
     if (profileCard) {

@@ -1,6 +1,6 @@
--- My Finance Records V15.2.2 · Cloud Profile management
+-- Talaan · Cloud Profile management
 -- Adds owner-only rename and permanently destructive delete RPCs for Cloud Schema V3.
--- Run once in the Supabase SQL editor after supabase/cloud-profiles-v13.sql.
+-- Run once in the Supabase SQL editor after supabase/cloud-profiles-v3.sql.
 
 begin;
 

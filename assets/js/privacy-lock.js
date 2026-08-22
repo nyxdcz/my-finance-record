@@ -129,10 +129,10 @@
 
   function installRecoveryDbUpgrade(){
     try {
-      if(typeof openV12Db!=="function" || openV12Db.__financeRecoveryV2) return;
+      if(typeof openFinanceDatabase!=="function" || openFinanceDatabase.__financeRecoveryV2) return;
       const upgraded=function(){ return openRecoveryDb(); };
       Object.defineProperty(upgraded,"__financeRecoveryV2",{value:true});
-      openV12Db=upgraded;
+      openFinanceDatabase=upgraded;
     } catch(error){ console.warn("Could not attach recovery storage upgrade",error); }
   }
 

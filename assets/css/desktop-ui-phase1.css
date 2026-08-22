@@ -67,7 +67,7 @@
     border-radius:6px;
     font-size:.64rem;
   }
-  :is(.v12-chip,.v13-chip,.settings-state-chip,.report-lifecycle-chip,.insight-change-chip,.pc-event-date-state,.status-pill,.ui-pill) {
+  :is(.status-chip,.v13-chip,.settings-state-chip,.report-lifecycle-chip,.insight-change-chip,.pc-event-date-state,.status-pill,.ui-pill) {
     box-sizing:border-box;
     min-height:23px;
     padding:3px 8px;
