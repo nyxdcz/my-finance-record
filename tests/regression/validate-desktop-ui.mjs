@@ -10,7 +10,7 @@ const icons = read("assets/css/ui-icon-alignment.css");
 const blackCanvas = read("assets/css/black-canvas.css");
 const workflow = read(".github/workflows/quality-pages.yml");
 const version = JSON.parse(read("version.json"));
-const query = "2.0.1-talaan1";
+const query = "2.0.1-talaan2";
 
 for (const token of [
   '#income > .page-heading', '#money > .page-heading', '#projects > .page-heading',

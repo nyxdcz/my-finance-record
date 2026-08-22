@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 const APP_URL = "http://127.0.0.1:3000/index.html?page=money";
-const APP_CACHE = "finance-v2-20260822-talaan-r1";
+const APP_CACHE = "finance-v2-20260822-talaan-r2";
 
 async function openFinance(page, viewport) {
   await page.setViewportSize(viewport);
@@ -216,7 +216,7 @@ test("desktop expense cards match the approved compact type, status, and footer 
   expect(metrics.markPaidSize[1]).toBeCloseTo(30, 0);
   expect(metrics.markPaidFont.size).toBeCloseTo(11, 0);
   expect(metrics.markPaidFont.weight).toBe(600);
-  expect(metrics.markPaidBackground).toBe("rgb(23, 58, 99)");
+  expect(metrics.markPaidBackground).toBe("rgb(53, 111, 209)");
   expect(metrics.markPaidRadius).toBeCloseTo(7, 0);
   expect(metrics.editSize[0]).toBeCloseTo(48, 0);
   expect(metrics.editSize[1]).toBeCloseTo(30, 0);

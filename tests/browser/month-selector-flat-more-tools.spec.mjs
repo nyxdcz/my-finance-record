@@ -9,7 +9,7 @@ test("desktop month selector uses compact standalone controls and a centered 4x3
     document.documentElement.style.setProperty("--line", "#243247");
     document.documentElement.style.setProperty("--text", "#f8fafc");
     document.documentElement.style.setProperty("--muted", "#94a3b8");
-    document.documentElement.style.setProperty("--primary", "#173e76");
+    document.documentElement.style.setProperty("--primary", "#356FD1");
     document.documentElement.style.setProperty("--primary-contrast", "#ffffff");
     document.body.innerHTML = `
       <div class="topbar-actions">
@@ -122,7 +122,7 @@ test("desktop month selector uses compact standalone controls and a centered 4x3
   expect(geometry.optionCount).toBe(12);
 
   await expect(popover).toHaveCSS("border-radius", "12px");
-  await expect(grid.locator(".month-picker-option").nth(7)).toHaveCSS("background-color", "rgb(23, 62, 118)");
+  await expect(grid.locator(".month-picker-option").nth(7)).toHaveCSS("background-color", "rgb(53, 111, 209)");
   await expect(current).toHaveCSS("margin-left", "0px");
   await expect(current).toHaveCSS("height", "34px");
   await expect(current).toHaveCSS("border-radius", "7px");
