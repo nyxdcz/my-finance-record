@@ -1,5 +1,6 @@
 import { defineConfig, devices } from "@playwright/test";
 
+// Portable Talaan browser validation used locally and in GitHub Actions.
 export default defineConfig({
   testDir: "./tests",
   testMatch: "**/*.spec.mjs",

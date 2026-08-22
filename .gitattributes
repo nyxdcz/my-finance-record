@@ -1,5 +1,5 @@
-# Git attributes for My Finance Records
-# Ensure binary assets are never altered by CRLF/LF line-ending conversion on macOS/Windows
+# Git attributes for Talaan
+# Ensure binary assets are never altered by CRLF/LF line-ending conversion on macOS/Windows.
 
 * text=auto eol=lf
 *.png binary
