@@ -1,4 +1,4 @@
-/* My Finance Records · V15.2.24 · Budget summary mascots */
+/* Talaan · V2.0.1 · Budget summary mascots */
 
 /* The older completion layer still keeps its amount in data-* attributes.
    Never show its heart-smile artwork in Budget & Expenses; this layer owns the visual. */
@@ -128,7 +128,7 @@
     justify-self: center !important;
   }
 
-  /* The compact V15.2.24 disclosure remains 20×20 and 10px from the right edge. */
+  /* The compact disclosure remains 20×20 and 10px from the right edge. */
   #money .period-card .period-header {
     padding-right: 10px !important;
   }
