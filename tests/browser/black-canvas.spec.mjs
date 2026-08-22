@@ -4,12 +4,12 @@ for (const theme of ["light", "dark"]) {
   test(`V15.1.0 appearance uses the expected ${theme} palette`, async ({ page }) => {
     await page.setViewportSize({ width:1440, height:900 });
     await page.setContent(`<!doctype html><html data-theme="${theme}"><head>
-      <link rel="stylesheet" href="http://127.0.0.1:3000/app.css?v=15.1.0-desktop3">
-      <link rel="stylesheet" href="http://127.0.0.1:3000/shell-ui-v15-2-11.css?v=15.2.11-shell1">
-      <link rel="stylesheet" href="http://127.0.0.1:3000/black-canvas-v15-1-0.css?v=15.1.0-light1">
-      <link rel="stylesheet" href="http://127.0.0.1:3000/desktop-ui-phase1-v15-1-0.css?v=15.1.0-phase1">
-      <link rel="stylesheet" href="http://127.0.0.1:3000/desktop-ux-v15-2-0.css?v=15.2.5-disclosure1">
-      <link rel="stylesheet" href="http://127.0.0.1:3000/production-ui-audit-v15-2-13.css?v=15.2.14-audit2">
+      <link rel="stylesheet" href="http://127.0.0.1:3000/app.css?v=2.0.1-talaan1">
+      <link rel="stylesheet" href="http://127.0.0.1:3000/shell-ui-v15-2-11.css?v=2.0.1-talaan1">
+      <link rel="stylesheet" href="http://127.0.0.1:3000/black-canvas-v15-1-0.css?v=2.0.1-talaan1">
+      <link rel="stylesheet" href="http://127.0.0.1:3000/desktop-ui-phase1-v15-1-0.css?v=2.0.1-talaan1">
+      <link rel="stylesheet" href="http://127.0.0.1:3000/desktop-ux-v15-2-0.css?v=2.0.1-talaan1">
+      <link rel="stylesheet" href="http://127.0.0.1:3000/production-ui-audit-v15-2-13.css?v=2.0.1-talaan1">
       <style>*,*::before,*::after{animation:none!important;transition:none!important}</style>
     </head><body>
       <button class="button button-paid" id="paid">Mark paid</button>

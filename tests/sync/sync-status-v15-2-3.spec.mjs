@@ -1,11 +1,11 @@
 import { test, expect } from "@playwright/test";
 
 const states = [
-  ["synced", "sync-synced-v15-2-3.png", "rgb(67, 207, 120)"],
-  ["syncing", "sync-syncing-v15-2-3.png", "rgb(245, 166, 35)"],
-  ["needs-sync", "sync-needs-sync-v15-2-3.png", "rgb(255, 120, 110)"],
-  ["sync-issue", "sync-issue-offline-v15-2-3.png", "rgb(255, 120, 110)"],
-  ["offline", "sync-issue-offline-v15-2-3.png", "rgb(255, 120, 110)"]
+  ["synced", "sync-synced.png", "rgb(67, 207, 120)"],
+  ["syncing", "sync-syncing.png", "rgb(245, 166, 35)"],
+  ["needs-sync", "sync-needs-sync.png", "rgb(255, 120, 110)"],
+  ["sync-issue", "sync-issue-offline.png", "rgb(255, 120, 110)"],
+  ["offline", "sync-issue-offline.png", "rgb(255, 120, 110)"]
 ];
 
 test("Cloud Sync uses supplied state icons and matching colors", async ({ page }) => {

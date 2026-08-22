@@ -1,22 +1,22 @@
-(function applyV15ReleaseLayer() {
-  const VERSION = "15.2.23";
-  const RELEASE_NAME = "Monthly Repeat Icon Footer";
-  const RELEASE_DATE = "August 21, 2026";
+(function applyTalaanReleaseLayer() {
+  const VERSION = "2.0.1";
+  const RELEASE_NAME = "Talaan";
+  const RELEASE_DATE = "August 22, 2026";
   window.FINANCE_APP_VERSION_OVERRIDE = VERSION;
-  window.FINANCE_RELEASE_OVERRIDE = { version:VERSION, name:RELEASE_NAME, released:"2026-08-21" };
+  window.FINANCE_RELEASE_OVERRIDE = { version:VERSION, name:RELEASE_NAME, released:"2026-08-22" };
 
   function ensureLiquidGlassStyles() {
     if (document.getElementById("financeLiquidGlassStyles")) return;
     const link = document.createElement("link");
     link.id = "financeLiquidGlassStyles";
     link.rel = "stylesheet";
-    link.href = `./liquid-glass-v15.css?v=${VERSION}-light1`;
+    link.href = "./liquid-glass.css?v=2.0.1-talaan1";
     document.head.appendChild(link);
   }
 
-  function synchronizeV15ReleaseDisplay() {
+  function synchronizeTalaanReleaseDisplay() {
     document.documentElement.dataset.appVersion = VERSION;
-    document.title = `My Finance Records · V${VERSION}`;
+    document.title = `Talaan · V${VERSION}`;
     const badge = document.getElementById("buildBadge");
     if (badge) {
       badge.textContent = `V${VERSION}`;
@@ -26,17 +26,17 @@
 
   function bootReleaseLayer() {
     ensureLiquidGlassStyles();
-    synchronizeV15ReleaseDisplay();
+    synchronizeTalaanReleaseDisplay();
     const title = document.querySelector("title");
-    if (title && title.dataset.v15ObserveBound !== "true") {
-      title.dataset.v15ObserveBound = "true";
-      new MutationObserver(synchronizeV15ReleaseDisplay).observe(title, { childList:true, characterData:true, subtree:true });
+    if (title && title.dataset.releaseObserveBound !== "true") {
+      title.dataset.releaseObserveBound = "true";
+      new MutationObserver(synchronizeTalaanReleaseDisplay).observe(title, { childList:true, characterData:true, subtree:true });
     }
     const badge = document.getElementById("buildBadge");
-    if (badge && badge.dataset.v15ObserveBound !== "true") {
-      badge.dataset.v15ObserveBound = "true";
+    if (badge && badge.dataset.releaseObserveBound !== "true") {
+      badge.dataset.releaseObserveBound = "true";
       new MutationObserver(() => {
-        if (badge.textContent !== `V${VERSION}`) synchronizeV15ReleaseDisplay();
+        if (badge.textContent !== `V${VERSION}`) synchronizeTalaanReleaseDisplay();
       }).observe(badge, { childList:true, characterData:true, subtree:true, attributes:true, attributeFilter:["title"] });
     }
   }
@@ -46,7 +46,7 @@
 })();
 
 (function loadExpenseScreenshotTools() {
-  // Legacy validation marker for the unchanged detector test contract: <span>📷</span> Upload Screenshot
+  // Detector validation marker: <span>📷</span> Upload Screenshot
   let toolsPromise = null;
   let documentMenuBound = false;
   let panelObserver = null;
@@ -71,19 +71,19 @@
     const style = document.createElement("style");
     style.id = "financeUiEnhancementStyles";
     style.textContent = `
-      /* V15.2.3 · supplied Cloud Sync status artwork */
+      /* Talaan Cloud Sync status artwork */
       #cloudSyncStatusButton[data-sync-state="synced"]{color:#43cf78!important}#cloudSyncStatusButton[data-sync-state="syncing"]{color:#f5a623!important}#cloudSyncStatusButton[data-sync-state="needs-sync"],#cloudSyncStatusButton[data-sync-state="sync-issue"],#cloudSyncStatusButton[data-sync-state="offline"]{color:#ff786e!important}
       #cloudSyncStatusButton[data-sync-state] .cloud-sync-label,#cloudSyncStatusButton[data-sync-state] .toolbar-icon{color:inherit!important}
       #cloudSyncStatusButton .toolbar-icon[data-uploaded-sync-icon]{background-repeat:no-repeat!important;background-position:center!important;background-size:contain!important}
       #cloudSyncStatusButton .toolbar-icon[data-uploaded-sync-icon]::before,#cloudSyncStatusButton .toolbar-icon[data-uploaded-sync-icon] svg{display:none!important}
-      #cloudSyncStatusButton .toolbar-icon[data-uploaded-sync-icon="synced"]{background-image:url("./icons/sync-synced-v15-2-3.png")!important}
-      #cloudSyncStatusButton .toolbar-icon[data-uploaded-sync-icon="syncing"]{background-image:url("./icons/sync-syncing-v15-2-3.png")!important}
-      #cloudSyncStatusButton .toolbar-icon[data-uploaded-sync-icon="needs-sync"]{background-image:url("./icons/sync-needs-sync-v15-2-3.png")!important}
-      #cloudSyncStatusButton .toolbar-icon[data-uploaded-sync-icon="offline"]{background-image:url("./icons/sync-issue-offline-v15-2-3.png")!important}
+      #cloudSyncStatusButton .toolbar-icon[data-uploaded-sync-icon="synced"]{background-image:url("./icons/sync-synced.png")!important}
+      #cloudSyncStatusButton .toolbar-icon[data-uploaded-sync-icon="syncing"]{background-image:url("./icons/sync-syncing.png")!important}
+      #cloudSyncStatusButton .toolbar-icon[data-uploaded-sync-icon="needs-sync"]{background-image:url("./icons/sync-needs-sync.png")!important}
+      #cloudSyncStatusButton .toolbar-icon[data-uploaded-sync-icon="offline"]{background-image:url("./icons/sync-issue-offline.png")!important}
       .expense-screenshot-header-actions{position:relative;display:flex;align-items:center;gap:6px;margin-left:auto}.expense-screenshot-header-actions .button{min-width:84px;min-height:38px;white-space:nowrap}
       .expense-screenshot-panel.expense-screenshot-panel-compact{padding:9px 10px;gap:8px;margin-top:8px}.expense-screenshot-panel-compact .expense-screenshot-head{display:none!important}.expense-screenshot-panel-compact .expense-screenshot-privacy{display:none!important}
       .expense-screenshot-action-menu{position:absolute;top:calc(100% + 6px);right:0;z-index:190;display:grid;gap:4px;min-width:156px;padding:6px;border:1px solid var(--line);border-radius:10px;background:var(--surface);box-shadow:0 12px 30px rgba(0,0,0,.22)}.expense-screenshot-action-menu[hidden]{display:none!important}.expense-screenshot-action-menu .button{justify-content:flex-start;width:100%;min-height:38px;text-align:left}
-      #cloudSyncStatusButton .toolbar-icon[data-uploaded-sync-icon]::before,#themeToggleIcon[data-uploaded-theme-icon]::before{display:none!important}#cloudSyncStatusButton .toolbar-icon[data-uploaded-sync-icon],#themeToggleIcon[data-uploaded-theme-icon]{background-repeat:no-repeat;background-position:center;background-size:contain}#cloudSyncStatusButton .toolbar-icon[data-uploaded-sync-icon="syncing"]{background-image:url("./icons/sync-syncing-v14-0-23.png")}#cloudSyncStatusButton .toolbar-icon[data-uploaded-sync-icon="error"]{background-image:url("./icons/sync-error-v14-0-23.png")}#cloudSyncStatusButton .toolbar-icon[data-uploaded-sync-icon="success"]{background-image:url("./icons/sync-success-v14-0-23.png")}#themeToggleIcon[data-uploaded-theme-icon="night"]{background-image:url("./icons/theme-night-v14-0-23.png")}#themeToggleIcon[data-uploaded-theme-icon="day"]{background-image:url("./icons/theme-day-v14-0-23.png")}#themeToggleIcon[data-uploaded-theme-icon="auto"]{background-image:url("./icons/theme-auto-v14-0-23.png")}
+      #cloudSyncStatusButton .toolbar-icon[data-uploaded-sync-icon]::before,#themeToggleIcon[data-uploaded-theme-icon]::before{display:none!important}#cloudSyncStatusButton .toolbar-icon[data-uploaded-sync-icon],#themeToggleIcon[data-uploaded-theme-icon]{background-repeat:no-repeat;background-position:center;background-size:contain}#cloudSyncStatusButton .toolbar-icon[data-uploaded-sync-icon="syncing"]{background-image:url("./icons/sync-syncing-alternate.png")}#cloudSyncStatusButton .toolbar-icon[data-uploaded-sync-icon="error"]{background-image:url("./icons/sync-error.png")}#cloudSyncStatusButton .toolbar-icon[data-uploaded-sync-icon="success"]{background-image:url("./icons/sync-success.png")}#themeToggleIcon[data-uploaded-theme-icon="night"]{background-image:url("./icons/theme-night.png")}#themeToggleIcon[data-uploaded-theme-icon="day"]{background-image:url("./icons/theme-day.png")}#themeToggleIcon[data-uploaded-theme-icon="auto"]{background-image:url("./icons/theme-auto.png")}
       @media(max-width:700px){.expense-screenshot-header-actions .button{min-height:38px}.expense-screenshot-action-menu{right:0;min-width:150px}.finance-workspace-marquee-row>.project-workspace-switcher{width:100%}#dashboard>.page-heading{display:none!important}#customizeDashboardButton[data-dashboard-toolbar-action]{width:44px;min-width:44px;height:44px;padding:0;font-size:0;justify-content:center}}
     `;
     document.head.appendChild(style);
@@ -396,9 +396,9 @@
   async function start() {
     if (toolsPromise) return toolsPromise;
     toolsPromise = (async () => {
-      await loadScript("./expense-screenshot-parser.js?v=15.0.3", "expenseScreenshotParserScript");
-      await loadScript("./expense-screenshot-detect.js?v=15.0.3", "expenseScreenshotDetectScript");
-      await loadScript("./expense-screenshot-ai.js?v=15.0.3", "expenseScreenshotAiScript");
+      await loadScript("./expense-screenshot-parser.js?v=2.0.1-talaan1", "expenseScreenshotParserScript");
+      await loadScript("./expense-screenshot-detect.js?v=2.0.1-talaan1", "expenseScreenshotDetectScript");
+      await loadScript("./expense-screenshot-ai.js?v=2.0.1-talaan1", "expenseScreenshotAiScript");
       window.FinanceExpenseScreenshot?.ensurePanel?.();
       window.FinanceExpenseScreenshotAI?.ensureAiControls?.();
       ensureCompactScreenshotUi();

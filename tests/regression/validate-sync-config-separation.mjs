@@ -14,10 +14,10 @@ const prepareRuntime = read("scripts/prepare-runtime.mjs");
 const version = JSON.parse(read("version.json"));
 
 if (!config.includes("window.FINANCE_SYNC_CONFIG")) throw new Error("sync-config.js must expose FINANCE_SYNC_CONFIG.");
-for (const runtimeMarker of ["MutationObserver", "applyV15ReleaseLayer", "loadExpenseScreenshotTools", "document.createElement(\"style\")"]) {
+for (const runtimeMarker of ["MutationObserver", "applyTalaanReleaseLayer", "loadExpenseScreenshotTools", "document.createElement(\"style\")"]) {
   if (config.includes(runtimeMarker)) throw new Error(`sync-config.js still contains runtime marker: ${runtimeMarker}`);
 }
-for (const expectedMarker of ["applyV15ReleaseLayer", "loadExpenseScreenshotTools", "MutationObserver"]) {
+for (const expectedMarker of ["applyTalaanReleaseLayer", "loadExpenseScreenshotTools", "MutationObserver"]) {
   if (!runtime.includes(expectedMarker)) throw new Error(`sync-runtime-compat.js is missing runtime marker: ${expectedMarker}`);
 }
 if (!prepareRuntime.includes('"sync-runtime-compat.js"')) throw new Error("prepare-runtime must map sync-runtime-compat.js to the flat runtime root.");

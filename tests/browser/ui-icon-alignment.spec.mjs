@@ -6,11 +6,11 @@ test("production V15.2.4 UI alignment uses the delivered final stylesheet", asyn
   await page.goto("http://127.0.0.1:3000/index.html?page=dashboard", { waitUntil:"networkidle" });
 
   const styles = await page.locator('link[rel="stylesheet"]').evaluateAll(nodes => nodes.map(node => node.getAttribute("href") || ""));
-  const dashboardCss = styles.findIndex(href => href.includes("dashboard-interactions.css?v=15.2.10-icons1"));
-  const uiCss = styles.findIndex(href => href.includes("ui-icon-alignment-v15-0-5.css?v=15.2.9-ui2"));
+  const dashboardCss = styles.findIndex(href => href.includes("dashboard-interactions.css?v=2.0.1-talaan1"));
+  const uiCss = styles.findIndex(href => href.includes("ui-icon-alignment-v15-0-5.css?v=2.0.1-talaan1"));
   expect(dashboardCss).toBeGreaterThanOrEqual(0);
   expect(uiCss).toBeGreaterThan(dashboardCss);
-  expect(styles.some(href => href.includes("ui-icon-alignment-v15-0-4.css?v=15.0.4-ui1"))).toBe(false);
+  expect(styles.some(href => href.includes("ui-icon-alignment-v15-0-4.css?v=2.0.1-talaan1"))).toBe(false);
 
   const badge = await page.locator("#buildBadge").evaluate(element => {
     const before = getComputedStyle(element, "::before");

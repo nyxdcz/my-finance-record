@@ -89,7 +89,7 @@ html[data-theme="dark"] .sidebar .nav-button.active .nav-icon-image{
 }
 #quickAddExpense .toolbar-icon::before{display:none!important}
 #quickAddExpense .toolbar-icon{
-  background-image:url("./icons/action-add-sparkle-v14-0-23.png")!important;
+  background-image:url("./icons/action-add-sparkle.png")!important;
   background-repeat:no-repeat!important;
   background-position:center!important;
   background-size:20px 20px!important;
@@ -100,7 +100,7 @@ html[data-theme="dark"] .sidebar .nav-button.active .nav-icon-image{
   width:18px!important;
   height:18px!important;
   flex:0 0 18px!important;
-  background:transparent url("./icons/action-add-sparkle-v14-0-23.png") center/contain no-repeat!important;
+  background:transparent url("./icons/action-add-sparkle.png") center/contain no-repeat!important;
   -webkit-mask-image:none!important;
   mask-image:none!important;
 }
@@ -127,8 +127,8 @@ html[data-theme="dark"] .sidebar .nav-button.active .nav-icon-image{
   height:20px!important;
   flex:0 0 20px!important;
   background:currentColor!important;
-  -webkit-mask-image:url("./icons/action-add-sparkle-v14-0-23.png")!important;
-  mask-image:url("./icons/action-add-sparkle-v14-0-23.png")!important;
+  -webkit-mask-image:url("./icons/action-add-sparkle.png")!important;
+  mask-image:url("./icons/action-add-sparkle.png")!important;
   -webkit-mask-repeat:no-repeat!important;
   mask-repeat:no-repeat!important;
   -webkit-mask-position:center!important;
@@ -149,8 +149,8 @@ html[data-theme="dark"] .sidebar .nav-button.active .nav-icon-image{
   height:18px!important;
   flex:0 0 18px!important;
   background:currentColor!important;
-  -webkit-mask-image:url("./icons/action-add-sparkle-v14-0-23.png")!important;
-  mask-image:url("./icons/action-add-sparkle-v14-0-23.png")!important;
+  -webkit-mask-image:url("./icons/action-add-sparkle.png")!important;
+  mask-image:url("./icons/action-add-sparkle.png")!important;
   -webkit-mask-repeat:no-repeat!important;
   mask-repeat:no-repeat!important;
   -webkit-mask-position:center!important;

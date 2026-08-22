@@ -13,13 +13,13 @@ async function assetSha256(request, path) {
 }
 
 test("Finance completion hearts use the canonical exact clean uploaded PNGs without the line", async ({ request }) => {
-  expect(await assetSha256(request, "/icons/heart-smile-light-v15-2-4-r4.png")).toBe(EXPECTED.light);
-  expect(await assetSha256(request, "/icons/heart-smile-dark-v15-2-4-r4.png")).toBe(EXPECTED.dark);
+  expect(await assetSha256(request, "/icons/heart-smile-light-r4.png")).toBe(EXPECTED.light);
+  expect(await assetSha256(request, "/icons/heart-smile-dark-r4.png")).toBe(EXPECTED.dark);
 
   const cssResponse = await request.get("http://127.0.0.1:3000/ui-icon-alignment-v15-0-5.css", { headers:{ "cache-control":"no-cache" } });
   expect(cssResponse.ok()).toBeTruthy();
   const css = await cssResponse.text();
-  expect(css).toContain('heart-smile-light-v15-2-4-r4.png');
-  expect(css).toContain('heart-smile-dark-v15-2-4-r4.png');
+  expect(css).toContain('heart-smile-light-r4.png');
+  expect(css).toContain('heart-smile-dark-r4.png');
   expect(css).not.toMatch(/heart-smile-(?:light|dark)-v15-2-4-r[23]\.png/);
 });

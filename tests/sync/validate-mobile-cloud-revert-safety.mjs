@@ -13,7 +13,7 @@ const privacy = read("privacy-lock.js");
 const cloud = read("cloud-sync.js");
 const worker = read("sw.js");
 
-assert(privacy.includes("V15.2.2 cloud authority guard"), "cloud authority guard is missing");
+assert(privacy.includes("Talaan cloud authority guard"), "cloud authority guard is missing");
 assert(privacy.includes("simple-finance-cloud-record-base-v3:"), "guard does not inspect the Cloud Sync baseline");
 assert(privacy.includes("simple-finance-profile-data-v1:"), "guard does not require established profile-local Finance data");
 assert(privacy.includes("const source=meaningfulFinanceData(profileData) ? profileData : activeData"), "profile-scoped saved Finance data is not preferred over the active shell copy");

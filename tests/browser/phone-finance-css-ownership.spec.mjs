@@ -4,16 +4,16 @@ test.use({ serviceWorkers:"block" });
 
 const widths = [320, 360, 375, 390, 430];
 const css = [
-  "budget-planning.css?v=15.2.9-ui1",
-  "projects-calendar-v13.0.20.css?v=15.1.0-desktop2",
-  "mobile-v14-0-23.css?v=15.2.10-mobile2",
-  "app.css?v=15.1.0-desktop3",
-  "shell-ui-v15-2-11.css?v=15.2.11-shell1",
-  "dashboard-interactions.css?v=15.2.10-icons1",
-  "ui-icon-alignment-v15-0-5.css?v=15.2.9-ui2",
-  "black-canvas-v15-1-0.css?v=15.1.0-light1",
-  "desktop-ui-phase1-v15-1-0.css?v=15.1.0-phase1",
-  "desktop-ux-v15-2-0.css?v=15.2.5-disclosure1"
+  "budget-planning.css?v=2.0.1-talaan1",
+  "projects-calendar-v13.0.20.css?v=2.0.1-talaan1",
+  "mobile-v14-0-23.css?v=2.0.1-talaan1",
+  "app.css?v=2.0.1-talaan1",
+  "shell-ui-v15-2-11.css?v=2.0.1-talaan1",
+  "dashboard-interactions.css?v=2.0.1-talaan1",
+  "ui-icon-alignment-v15-0-5.css?v=2.0.1-talaan1",
+  "black-canvas-v15-1-0.css?v=2.0.1-talaan1",
+  "desktop-ui-phase1-v15-1-0.css?v=2.0.1-talaan1",
+  "desktop-ux-v15-2-0.css?v=2.0.1-talaan1"
 ];
 
 async function financeFixture(page, width) {
@@ -92,6 +92,6 @@ test("live Talaan V2.0.1 shell owns Phone Finance compact styles statically", as
     styles:[...document.querySelectorAll('link[rel="stylesheet"]')].map(link => link.getAttribute("href") || ""),
     scripts:[...document.scripts].map(script => script.getAttribute("src") || "").filter(Boolean)
   }));
-  expect(delivery.styles.some(href => href.includes("mobile-v14-0-23.css?v=15.2.10-mobile2"))).toBe(true);
+  expect(delivery.styles.some(href => href.includes("mobile-v14-0-23.css?v=2.0.1-talaan1"))).toBe(true);
   expect(delivery.scripts.some(src => src.includes("pwa-update-v15-0-5.js?v=2.0.1-talaan1"))).toBe(true);
 });

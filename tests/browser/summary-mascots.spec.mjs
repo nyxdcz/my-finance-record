@@ -43,7 +43,7 @@ test("desktop Budget & Expenses uses the approved supplied mascots and exact spa
 
   for (const image of imageLoads) {
     expect(image.ok).toBe(true);
-    expect(image.src).toContain("?v=15.2.24-mascot7");
+    expect(image.src).toContain("?v=2.0.1-talaan1");
     expect(image.width).toBe(256);
     expect(image.height).toBe(256);
   }
@@ -69,7 +69,7 @@ test("desktop Budget & Expenses uses the approved supplied mascots and exact spa
     legacyFirst.textContent = "";
     const legacySmile = document.createElement("img");
     legacySmile.dataset.firstHalfCompleteIcon = "true";
-    legacySmile.src = "./icons/heart-smile-light-v15-2-4.png";
+    legacySmile.src = "./icons/heart-smile-light.png";
     legacyFirst.appendChild(legacySmile);
 
     window.FinanceSummaryMascots.apply();
@@ -123,12 +123,12 @@ test("desktop Budget & Expenses uses the approved supplied mascots and exact spa
   });
 
   const expected = {
-    legendEarlyTotal:["red", "mascot-red.png?v=15.2.24-mascot7"],
-    legendLateTotal:["orange", "mascot-orange.png?v=15.2.24-mascot7"],
-    legendOtherTotal:["blue", "mascot-blue.png?v=15.2.24-mascot7"],
-    earlyTotal:["red", "mascot-red.png?v=15.2.24-mascot7"],
-    lateTotal:["orange", "mascot-orange.png?v=15.2.24-mascot7"],
-    otherTotal:["blue", "mascot-blue.png?v=15.2.24-mascot7"]
+    legendEarlyTotal:["red", "mascot-red.png?v=2.0.1-talaan1"],
+    legendLateTotal:["orange", "mascot-orange.png?v=2.0.1-talaan1"],
+    legendOtherTotal:["blue", "mascot-blue.png?v=2.0.1-talaan1"],
+    earlyTotal:["red", "mascot-red.png?v=2.0.1-talaan1"],
+    lateTotal:["orange", "mascot-orange.png?v=2.0.1-talaan1"],
+    otherTotal:["blue", "mascot-blue.png?v=2.0.1-talaan1"]
   };
 
   for (const [id, [color, asset]] of Object.entries(expected)) {
@@ -182,13 +182,13 @@ test("difference cards follow green and red state while phone disables mascot ov
   expect(positive.mascot).toBe("green");
   expect(positive.aria).toContain("₱100.00");
   expect(positive.text).toBe("₱100.00");
-  expect(positive.background).toContain("mascot-green.png?v=15.2.24-mascot7");
+  expect(positive.background).toContain("mascot-green.png?v=2.0.1-talaan1");
 
   const negative = await setDifference(true);
   expect(negative.mascot).toBe("red");
   expect(negative.aria).toContain("-₱100.00");
   expect(negative.text).toBe("-₱100.00");
-  expect(negative.background).toContain("mascot-red.png?v=15.2.24-mascot7");
+  expect(negative.background).toContain("mascot-red.png?v=2.0.1-talaan1");
 
   await page.setViewportSize({ width:390, height:844 });
 

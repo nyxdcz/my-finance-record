@@ -39,7 +39,7 @@ test("Talaan V2.0.1 source keeps the approved desktop UX quick wins", async () =
   expect(source("productivity-tools.js")).toContain("data-clear-global-search");
   expect(source("productivity-tools.js")).toContain("Clear search");
   expect(source("productivity-tools.js")).toContain('input.value=""');
-  expect(index).toContain("./productivity-tools.js?v=15.2.1-ux2");
+  expect(index).toContain("./productivity-tools.js?v=2.0.1-talaan1");
 
   expect(version.version).toBe("2.0.1");
   expect(version.schemaVersion).toBe(12);
@@ -52,7 +52,7 @@ test("Talaan V2.0.1 source keeps the approved desktop UX quick wins", async () =
 for (const width of [1024, 1280, 1366, 1440, 1920]) {
   test(`Talaan V2.0.1 desktop additions avoid horizontal overflow at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
-    await page.setContent(`<!doctype html><html><head><link rel="stylesheet" href="http://127.0.0.1:3000/app.css?v=15.1.0-desktop3"><link rel="stylesheet" href="http://127.0.0.1:3000/shell-ui-v15-2-11.css?v=15.2.11-shell1"><link rel="stylesheet" href="http://127.0.0.1:3000/desktop-ux-v15-2-0.css?v=15.2.1"></head><body><div class="income-active-filter-chips"><span class="ui-chip"><span>Category: Utilities</span><button class="ui-chip-remove" aria-label="Remove category filter">×</button></span></div><div class="empty-state"><strong>No records</strong>Nothing matches.<div class="empty-state-actions"><button class="button button-secondary button-small">Clear filters</button></div></div><div class="budget-planner-more-menu overflow-menu"><button class="button button-secondary button-small overflow-menu-trigger">More</button><div class="record-more-panel budget-planner-more-panel" hidden></div></div></body></html>`, { waitUntil:"networkidle" });
+    await page.setContent(`<!doctype html><html><head><link rel="stylesheet" href="http://127.0.0.1:3000/app.css?v=2.0.1-talaan1"><link rel="stylesheet" href="http://127.0.0.1:3000/shell-ui-v15-2-11.css?v=2.0.1-talaan1"><link rel="stylesheet" href="http://127.0.0.1:3000/desktop-ux-v15-2-0.css?v=2.0.1-talaan1"></head><body><div class="income-active-filter-chips"><span class="ui-chip"><span>Category: Utilities</span><button class="ui-chip-remove" aria-label="Remove category filter">×</button></span></div><div class="empty-state"><strong>No records</strong>Nothing matches.<div class="empty-state-actions"><button class="button button-secondary button-small">Clear filters</button></div></div><div class="budget-planner-more-menu overflow-menu"><button class="button button-secondary button-small overflow-menu-trigger">More</button><div class="record-more-panel budget-planner-more-panel" hidden></div></div></body></html>`, { waitUntil:"networkidle" });
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1);
     expect(overflow).toBe(false);
   });

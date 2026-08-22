@@ -480,8 +480,8 @@
     });
   }
 
-  const FIRST_HALF_COMPLETE_LIGHT_ICON = "./icons/heart-smile-light-v15-2-4.png";
-  const FIRST_HALF_COMPLETE_DARK_ICON = "./icons/heart-smile-dark-v15-2-4.png";
+  const FIRST_HALF_COMPLETE_LIGHT_ICON = "./icons/heart-smile-light.png";
+  const FIRST_HALF_COMPLETE_DARK_ICON = "./icons/heart-smile-dark.png";
   let firstHalfCompletionObserver = null;
 
   function selectedFinanceMonth() {
