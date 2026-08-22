@@ -538,7 +538,7 @@
   };
 })();
 
-/* V15.2.2 cloud authority guard.
+/* Talaan cloud authority guard.
    Runs before Cloud Sync initializes because privacy-lock.js is loaded first and is network-first in the service worker. */
 (() => {
   const PROFILE_META_KEY="simple-finance-profiles-v1";

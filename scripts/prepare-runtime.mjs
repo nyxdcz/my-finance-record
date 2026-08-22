@@ -14,9 +14,7 @@ const RELEASE = Object.freeze({
   date:"August 22, 2026",
   dateIso:"2026-08-22",
   cache:"finance-v2-20260822-talaan-r1",
-  cssQuery:"2.0.1-talaan1",
-  pwaQuery:"2.0.1-talaan1",
-  phoneQuery:"2.0.1-talaan1"
+  assetQuery:"2.0.1-talaan1"
 });
 
 const CURRENT_VERSION_HISTORY = Object.freeze([{
@@ -24,10 +22,10 @@ const CURRENT_VERSION_HISTORY = Object.freeze([{
   title:RELEASE.name,
   changes:[
     "Current production release under the Talaan product name.",
-    "Updates the website shell, installed-app metadata, offline experience, installation messages, calendar export branding, and current documentation to Talaan.",
+    "Uses responsibility-based runtime filenames instead of old V13-V15 product-era filenames.",
     "Includes the complete local-first Finance workspace, Account Ledger, budgeting, reports, projects, productivity tools, reminders, and responsive desktop and phone layouts.",
     "Includes encrypted multi-profile Cloud Schema V3 synchronization, offline PWA support, recovery safeguards, and five-minute routine sync.",
-    "Preserves Finance Schema 12, Cloud Schema V3, saved records, balances, recurrence, payments, backups, encryption, storage identifiers, and synchronization behavior."
+    "Preserves Finance Schema 12, Cloud Schema V3, saved records, balances, recurrence, payments, backups, encryption, persistent storage identifiers, and synchronization behavior."
   ]
 }]);
 
@@ -35,26 +33,27 @@ const runtimeGroups = {
   "assets/css": [
     "account-ledger.css",
     "app.css",
-    "shell-ui-v15-2-11.css",
-    "black-canvas-v15-1-0.css",
+    "shell-ui.css",
+    "black-canvas.css",
     "budget-planning.css",
-    "dashboard-interactions-core-v14-0-23.css",
+    "dashboard-interactions-core.css",
     "dashboard-interactions.css",
-    "desktop-ui-phase1-v15-1-0.css",
-    "desktop-ux-v15-2-0.css",
-    "liquid-glass-v15.css",
-    "mobile-v14-0-23.css",
+    "desktop-ui-phase1.css",
+    "desktop-ux.css",
+    "liquid-glass.css",
+    "mobile.css",
     "productivity-tools.css",
-    "production-ui-audit-v15-2-13.css",
-    "projects-calendar-v13.0.20.css",
+    "production-ui-audit.css",
+    "projects-calendar.css",
     "reminders-alerts.css",
     "reports-insights.css",
     "security-profiles.css",
-    "ui-icon-alignment-v15-0-5.css"
+    "summary-mascots.css",
+    "ui-icon-alignment.css"
   ],
   "assets/js": [
     "account-ledger.js",
-    "brand-icons-v15-2-18.js",
+    "brand-icons.js",
     "budget-planning.js",
     "cloud-conflict-resolution.js",
     "cloud-conflict-review.js",
@@ -67,22 +66,39 @@ const runtimeGroups = {
     "interaction-patterns.js",
     "privacy-lock.js",
     "productivity-tools.js",
-    "projects-calendar-v13.0.20.js",
-    "pwa-update-v15-0-5.js",
+    "projects-calendar.js",
+    "pwa-update.js",
     "reminders-alerts.js",
     "reports-insights.js",
     "security-profiles.js"
   ],
-  "assets/js/features": [
-    "cash-flow-summary.js"
-  ],
+  "assets/js/features": ["cash-flow-summary.js"],
   "assets/js/ui": [
     "application-help.js",
     "header-tools-compat.js",
     "phone-finance-compat.js",
+    "summary-mascots.js",
     "sync-runtime-compat.js"
   ]
 };
+
+const LEGACY_RUNTIME_RENAMES = new Map([
+  ["shell-ui-v15-2-11.css", "shell-ui.css"],
+  ["black-canvas-v15-1-0.css", "black-canvas.css"],
+  ["dashboard-interactions-core-v14-0-23.css", "dashboard-interactions-core.css"],
+  ["desktop-ui-phase1-v15-1-0.css", "desktop-ui-phase1.css"],
+  ["desktop-ux-v15-2-0.css", "desktop-ux.css"],
+  ["liquid-glass-v15.css", "liquid-glass.css"],
+  ["mobile-v14-0-23.css", "mobile.css"],
+  ["production-ui-audit-v15-2-13.css", "production-ui-audit.css"],
+  ["projects-calendar-v13.0.20.css", "projects-calendar.css"],
+  ["projects-calendar-v13.0.20.js", "projects-calendar.js"],
+  ["ui-icon-alignment-v15-0-5.css", "ui-icon-alignment.css"],
+  ["brand-icons-v15-2-18.js", "brand-icons.js"],
+  ["pwa-update-v15-0-5.js", "pwa-update.js"],
+  ["summary-mascots-v15-2-25.css", "summary-mascots.css"],
+  ["summary-mascots-v15-2-25.js", "summary-mascots.js"]
+]);
 
 let changed = 0;
 const writeIfChanged = (target, content) => {
@@ -113,14 +129,14 @@ function appendRuntimeOverlay(targetFile, overlayFile, marker) {
 }
 
 appendRuntimeOverlay(
-  "production-ui-audit-v15-2-13.css",
-  "assets/css/expense-compact-v15-2-24.css",
-  "/* V15.2.24 RUNTIME OVERLAY */"
+  "production-ui-audit.css",
+  "assets/css/expense-compact.css",
+  "/* TALAAN RUNTIME OVERLAY */"
 );
 appendRuntimeOverlay(
   "phone-finance-compat.js",
-  "assets/js/ui/expense-compact-v15-2-24.js",
-  "/* V15.2.24 RUNTIME OVERLAY */"
+  "assets/js/ui/expense-compact.js",
+  "/* TALAAN RUNTIME OVERLAY */"
 );
 
 function patchTextFile(file, transform) {
@@ -137,8 +153,30 @@ for (const file of runtimeJsTargets) {
     .replaceAll("Finance Records installed", `${BRAND} installed`));
 }
 
+patchTextFile("sync-runtime-compat.js", source => source
+  .replace(/const VERSION = "\d+\.\d+\.\d+";/, `const VERSION = "${RELEASE.version}";`)
+  .replace(/const RELEASE_NAME = "[^"]+";/, `const RELEASE_NAME = "${RELEASE.name}";`)
+  .replace(/const RELEASE_DATE = "[^"]+";/, `const RELEASE_DATE = "${RELEASE.date}";`)
+  .replace(/released:"\d{4}-\d{2}-\d{2}"/, `released:"${RELEASE.dateIso}"`)
+  .replace(/link\.href\s*=\s*(?:`|\")[^`\"]*liquid-glass[^`\"]*(?:`|\");/g, `link.href = "./liquid-glass.css?v=${RELEASE.assetQuery}";`));
+
+const escapeRegExp = value => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const normalizeRuntimeReferences = source => {
+  let next = source;
+  for (const [legacy, current] of LEGACY_RUNTIME_RENAMES) next = next.replaceAll(legacy, current);
+  const queryFiles = new Set([
+    ...Object.values(runtimeGroups).flat(),
+    "phone-finance-compat.js",
+    "sync-runtime-compat.js"
+  ]);
+  for (const file of queryFiles) {
+    next = next.replace(new RegExp(`${escapeRegExp(file)}\\?v=[^\"'\\s<>)]+`, "g"), `${file}?v=${RELEASE.assetQuery}`);
+  }
+  return next;
+};
+
 patchTextFile("index.html", source => {
-  let next = source
+  let next = normalizeRuntimeReferences(source)
     .replaceAll(PREVIOUS_BRAND, BRAND)
     .replaceAll("Finance Records installed", `${BRAND} installed`)
     .replaceAll("My_Finance_Records_Calendar_Test.ics", "Talaan_Calendar_Test.ics")
@@ -149,9 +187,22 @@ patchTextFile("index.html", source => {
     .replace(/const APP_RELEASE_NAME = "[^"]+";/, `const APP_RELEASE_NAME = "${RELEASE.name}";`)
     .replace(/const APP_RELEASE_DATE = "[^"]+";/, `const APP_RELEASE_DATE = "${RELEASE.date}";`)
     .replace(/const APP_CACHE_VERSION = "finance-v[^"]+";/, `const APP_CACHE_VERSION = "${RELEASE.cache}";`)
-    .replace(/production-ui-audit-v15-2-13\.css\?v=[^"]+/, `production-ui-audit-v15-2-13.css?v=${RELEASE.cssQuery}`)
-    .replace(/pwa-update-v15-0-5\.js\?v=[^"]+/, `pwa-update-v15-0-5.js?v=${RELEASE.pwaQuery}`)
-    .replace(/phone-finance-compat\.js\?v=[^"]+/, `phone-finance-compat.js?v=${RELEASE.phoneQuery}`);
+    .replace(/Version 15\.\d+\.\d+/g, RELEASE.displayVersion);
+
+  const cssTag = `<link rel="stylesheet" href="./summary-mascots.css?v=${RELEASE.assetQuery}">`;
+  if (!next.includes("summary-mascots.css")) {
+    next = next.replace(
+      /(<link rel="stylesheet" href="\.\/production-ui-audit\.css\?v=[^"]+">)/,
+      `$1\n  ${cssTag}`
+    );
+  }
+  const jsTag = `<script src="./summary-mascots.js?v=${RELEASE.assetQuery}"></script>`;
+  if (!next.includes("summary-mascots.js")) {
+    next = next.replace(
+      /(<script src="\.\/phone-finance-compat\.js\?v=[^"]+"><\/script>)/,
+      `$1\n  ${jsTag}`
+    );
+  }
 
   const historySource = `    const VERSION_HISTORY = ${JSON.stringify(CURRENT_VERSION_HISTORY)};`;
   next = next.replace(
@@ -180,12 +231,10 @@ patchTextFile("offline.html", source => source
   .replace(/<title>[^<]+ · Offline<\/title>/, `<title>${BRAND} · Offline</title>`)
   .replace(/Open [^<]+<\/button>/, `Open ${BRAND}</button>`));
 
-patchTextFile("sw.js", source => source
+patchTextFile("sw.js", source => normalizeRuntimeReferences(source)
   .replace(/const APP_VERSION = "\d+\.\d+\.\d+";/, `const APP_VERSION = "${RELEASE.version}";`)
   .replace(/const CACHE_VERSION = "finance-v[^"]+";/, `const CACHE_VERSION = "${RELEASE.cache}";`)
-  .replace(/production-ui-audit-v15-2-13\.css\?v=[^"]+/, `production-ui-audit-v15-2-13.css?v=${RELEASE.cssQuery}`)
-  .replace(/pwa-update-v15-0-5\.js\?v=[^"]+/, `pwa-update-v15-0-5.js?v=${RELEASE.pwaQuery}`)
-  .replace(/phone-finance-compat\.js\?v=[^"]+/, `phone-finance-compat.js?v=${RELEASE.phoneQuery}`));
+  .replaceAll("Open My Finance Records", `Open ${BRAND}`));
 
 const lockPath = path.join(root, "package-lock.json");
 if (fs.existsSync(lockPath)) {
@@ -199,9 +248,7 @@ const changelogPath = path.join(root, "CHANGELOG.md");
 if (fs.existsSync(changelogPath)) {
   const changelog = fs.readFileSync(changelogPath, "utf8");
   const heading = `## ${RELEASE.displayVersion} · ${RELEASE.name}`;
-  if (!changelog.includes(heading)) {
-    throw new Error(`CHANGELOG.md must describe the current ${RELEASE.displayVersion} release.`);
-  }
+  if (!changelog.includes(heading)) throw new Error(`CHANGELOG.md must describe the current ${RELEASE.displayVersion} release.`);
 }
 
 console.log(`Talaan runtime ready for ${RELEASE.displayVersion}${changed ? ` · refreshed ${changed}` : ""}.`);

@@ -37,7 +37,7 @@ for (const width of viewports) {
       const summaryStyle = getComputedStyle(summary);
       return {
         runtimeStyle:Boolean(document.getElementById("cashFlowLayoutV1522")),
-        staticOwner:[...document.styleSheets].some(sheet => String(sheet.href || "").includes("desktop-ux-v15-2-0.css")),
+        staticOwner:[...document.styleSheets].some(sheet => String(sheet.href || "").includes("desktop-ux.css")),
         gridTemplate:getComputedStyle(grid).gridTemplateColumns,
         mainRect:{ left:mainRect.left, right:mainRect.right, top:mainRect.top, bottom:mainRect.bottom },
         summaryRect:{ left:summaryRect.left, right:summaryRect.right, top:summaryRect.top, bottom:summaryRect.bottom },

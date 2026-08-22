@@ -1,0 +1,361 @@
+/* My Finance Records · V15.2.24 · Compact Expense Status & Collapse */
+
+/* Fine-pointer desktop only. Phone and coarse-pointer tablet touch geometry stays unchanged. */
+@media (min-width: 851px) and (hover: hover) and (pointer: fine) {
+  html body #money .section-stack {
+    gap: 8px !important;
+    align-items: start !important;
+  }
+
+  html body #money .period-card {
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 6px !important;
+    overflow: visible !important;
+  }
+
+  html body #money .period-card .period-header,
+  html body #money .period-card.is-collapsed .period-header {
+    min-height: 42px !important;
+    margin: 0 !important;
+    padding: 5px 10px 6px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 8px !important;
+  }
+
+  html body #money .period-header > div:first-child {
+    min-width: 0 !important;
+  }
+
+  html body #money .period-header .section-title-row {
+    min-width: 0 !important;
+    align-items: center !important;
+  }
+
+  html body #money .period-header h3 {
+    margin: 0 !important;
+    color: #1F2937 !important;
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    line-height: 1.15 !important;
+  }
+
+  html body #money .period-header p {
+    margin: 2px 0 0 !important;
+    color: #64748B !important;
+    font-size: 10px !important;
+    font-weight: 400 !important;
+    line-height: 1.2 !important;
+  }
+
+  html body #money .period-header .collapse-actions {
+    flex: 0 0 auto !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 6px !important;
+    margin: 0 !important;
+  }
+
+  html body #money .period-header .period-total {
+    margin: 0 !important;
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
+    text-align: right !important;
+    white-space: nowrap !important;
+  }
+
+  html body #money .period-card .period-header .collapse-toggle {
+    box-sizing: border-box !important;
+    flex: 0 0 20px !important;
+    width: 20px !important;
+    min-width: 20px !important;
+    max-width: 20px !important;
+    height: 20px !important;
+    min-height: 20px !important;
+    max-height: 20px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 1px solid #D5DCE5 !important;
+    border-radius: 5px !important;
+    background: color-mix(in srgb, #F8FAFC 94%, transparent) !important;
+    color: #64748B !important;
+    display: inline-grid !important;
+    place-items: center !important;
+  }
+
+  html body #money .period-card .period-header .collapse-toggle:hover {
+    background: #F1F5F9 !important;
+  }
+
+  html body #money .period-card .period-header .collapse-icon {
+    width: 16px !important;
+    height: 16px !important;
+    display: block !important;
+    color: #64748B !important;
+    transform-origin: center !important;
+  }
+
+  html body #money .period-card .period-header .collapse-icon svg {
+    width: 16px !important;
+    height: 16px !important;
+    display: block !important;
+  }
+
+  html body #money .record-header {
+    display: none !important;
+  }
+
+  html body #money :is(#earlyExpenses, #lateExpenses, #otherExpenses) {
+    display: grid !important;
+    align-content: start !important;
+    gap: 5px !important;
+    padding: 0 !important;
+  }
+
+  html body #money .period-card.is-collapsed > :is(#earlyExpenses, #lateExpenses, #otherExpenses) {
+    display: none !important;
+  }
+
+  html body #money :is(#earlyExpenses, #lateExpenses, #otherExpenses) > .record-row[data-expense-row],
+  html body #money :is(#earlyExpenses, #lateExpenses, #otherExpenses) > .record-row[data-expense-row] + .record-row[data-expense-row] {
+    position: relative !important;
+    min-height: 0 !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 8px 10px 7px !important;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    gap: 3px 8px !important;
+    align-self: start !important;
+    align-items: center !important;
+  }
+
+  html body #money .record-row[data-expense-row] > .expense-record-title {
+    grid-column: 1 / -1 !important;
+    min-width: 0 !important;
+  }
+
+  html body #money .record-row[data-expense-row] .expense-record-title .record-title-copy > strong {
+    color: #1F2937 !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    line-height: 1.2 !important;
+  }
+
+  html body #money .record-row[data-expense-row] .expense-record-title .record-title-copy > small {
+    margin-top: 2px !important;
+    color: #64748B !important;
+    font-size: 10px !important;
+    font-weight: 400 !important;
+    line-height: 1.25 !important;
+  }
+
+  html body #money .record-row[data-expense-row] .expense-record-title .ui-tag {
+    color: #64748B !important;
+    font-size: 9px !important;
+    font-weight: 600 !important;
+    line-height: 1.2 !important;
+  }
+
+  html body #money .record-row[data-expense-row] .expense-record-title .record-statuses {
+    min-height: 0 !important;
+    margin-top: 3px !important;
+    display: flex !important;
+    align-items: center !important;
+    flex-wrap: wrap !important;
+    gap: 3px 4px !important;
+  }
+
+  html body #money .record-row[data-expense-row] .record-statuses > .status-unpaid,
+  html body #money .record-row[data-expense-row] .record-statuses > .expense-inline-due-warning {
+    min-height: 18px !important;
+    padding: 2px 6px !important;
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    line-height: 1.1 !important;
+  }
+
+  html body #money .record-row[data-expense-row] .record-statuses > .expense-inline-due-warning {
+    margin-left: 0 !important;
+  }
+
+  /* Remove the old standalone Deadline / Expense prefix. */
+  html body #money .record-row[data-expense-row] > .due-cell::before {
+    content: none !important;
+    display: none !important;
+  }
+
+  html body #money .record-row[data-expense-row] > .due-cell {
+    grid-column: 1 / -1 !important;
+    display: block !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    color: #64748B !important;
+    font-size: 10px !important;
+    font-weight: 400 !important;
+    line-height: 1.2 !important;
+  }
+
+  html body #money .record-row[data-expense-row] > .due-cell > span:first-child {
+    display: inline !important;
+  }
+
+  html body #money .record-row[data-expense-row] > .due-cell > .due-warning {
+    display: none !important;
+  }
+
+  html body #money .record-row[data-expense-row] > [data-label="Planned account"] {
+    grid-column: 1 !important;
+    min-width: 0 !important;
+    color: #64748B !important;
+    font-size: 10px !important;
+    font-weight: 600 !important;
+    line-height: 1.2 !important;
+  }
+
+  html body #money .record-row[data-expense-row] > [data-label="Planned account"]::before {
+    content: "Account · " !important;
+    color: #64748B !important;
+    font-weight: 600 !important;
+  }
+
+  html body #money .record-row[data-expense-row] > .amount {
+    grid-column: 2 !important;
+    justify-self: end !important;
+    color: #172033 !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    line-height: 1.2 !important;
+    font-variant-numeric: tabular-nums !important;
+  }
+
+  html body #money .record-row[data-expense-row] > .desktop-record-actions {
+    grid-column: 1 / -1 !important;
+    width: 100% !important;
+    min-height: 30px !important;
+    margin-top: 2px !important;
+    padding: 5px 0 0 27px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 5px !important;
+    border-top: 1px solid var(--line) !important;
+  }
+
+  html body #money .record-row[data-expense-row] > .desktop-record-actions > [data-toggle-saved],
+  html body #money .record-row[data-expense-row] > .desktop-record-actions > [data-toggle-saved]:hover,
+  html body #money .record-row[data-expense-row] > .desktop-record-actions > [data-toggle-saved]:focus-visible,
+  html body #money .record-row[data-expense-row] > .desktop-record-actions > [data-toggle-saved]:active,
+  html body #money .record-row[data-expense-row] > .desktop-record-actions > [data-toggle-saved].active,
+  html body #money .record-row[data-expense-row] > .desktop-record-actions > [data-toggle-saved].active:hover {
+    box-sizing: border-box !important;
+    flex: 0 0 30px !important;
+    width: 30px !important;
+    min-width: 30px !important;
+    max-width: 30px !important;
+    height: 30px !important;
+    min-height: 30px !important;
+    max-height: 30px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+  }
+
+  html body #money .record-row[data-expense-row] > .desktop-record-actions > [data-toggle-saved] .saved-icon-container {
+    display: block !important;
+    flex: 0 0 30px !important;
+    width: 30px !important;
+    min-width: 30px !important;
+    max-width: 30px !important;
+    height: 30px !important;
+    min-height: 30px !important;
+    max-height: 30px !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background-image: url("./icons/finance-save-unsaved-r2.png") !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    background-size: 30px 30px !important;
+  }
+
+  html body #money .record-row[data-expense-row] > .desktop-record-actions > [data-toggle-saved].active .saved-icon-container {
+    background-image: url("./icons/finance-save-saved-r2.png") !important;
+  }
+
+  html body #money .record-row[data-expense-row] > .desktop-record-actions > [data-toggle-saved] .saved-icon {
+    opacity: 0 !important;
+  }
+
+  html body #money .record-row[data-expense-row] > .desktop-record-actions > [data-toggle-saved] > .monthly-repeat-label {
+    display: none !important;
+  }
+
+  html body #money .record-row[data-expense-row] > .desktop-record-actions > [data-mark-paid] {
+    box-sizing: border-box !important;
+    flex: 0 0 74px !important;
+    width: 74px !important;
+    min-width: 74px !important;
+    max-width: 74px !important;
+    height: 30px !important;
+    min-height: 30px !important;
+    max-height: 30px !important;
+    padding: 0 10px !important;
+    border: 1px solid #173A63 !important;
+    border-radius: 7px !important;
+    background: #173A63 !important;
+    color: #FFFFFF !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+  }
+
+  html body #money .record-row[data-expense-row] > .desktop-record-actions > [data-edit-expense] {
+    box-sizing: border-box !important;
+    flex: 0 0 48px !important;
+    width: 48px !important;
+    min-width: 48px !important;
+    max-width: 48px !important;
+    height: 30px !important;
+    min-height: 30px !important;
+    max-height: 30px !important;
+    padding: 0 10px !important;
+    border: 1px solid #D5DCE5 !important;
+    border-radius: 7px !important;
+    background: #FFFFFF !important;
+    color: #1F2937 !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+  }
+
+  html body #money .record-row[data-expense-row] .expense-record-title > .expense-select-footer {
+    position: absolute !important;
+    left: 7px !important;
+    bottom: 7px !important;
+    z-index: 2 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 18px !important;
+    min-width: 18px !important;
+    height: 18px !important;
+    min-height: 18px !important;
+    margin: 0 !important;
+  }
+
+  html body #money .record-row[data-expense-row] .expense-record-title > .expense-select-footer > .expense-select-checkbox {
+    width: 18px !important;
+    height: 18px !important;
+    margin: 0 !important;
+  }
+}
