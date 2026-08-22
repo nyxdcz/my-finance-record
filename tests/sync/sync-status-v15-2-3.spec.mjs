@@ -8,7 +8,7 @@ const states = [
   ["offline", "sync-issue-offline-v15-2-3.png", "rgb(255, 120, 110)"]
 ];
 
-test("V15.2.9 Cloud Sync uses supplied state icons and matching colors", async ({ page }) => {
+test("Cloud Sync uses supplied state icons and matching colors", async ({ page }) => {
   await page.goto("http://127.0.0.1:3000/index.html?page=dashboard", { waitUntil:"networkidle" });
   const button = page.locator("#cloudSyncStatusButton");
   await expect(button).toHaveCount(1);
@@ -26,8 +26,8 @@ test("V15.2.9 Cloud Sync uses supplied state icons and matching colors", async (
   }
 });
 
-test("V2.0.0 release metadata is visible", async ({ page }) => {
+test("Talaan V2.0.1 release metadata is visible", async ({ page }) => {
   await page.goto("http://127.0.0.1:3000/index.html?page=dashboard", { waitUntil:"networkidle" });
-  await expect(page).toHaveTitle(/V2\.0\.0/);
-  await expect(page.locator("#buildBadge")).toContainText("V2.0.0");
+  await expect(page).toHaveTitle(/Talaan · V2\.0\.1/);
+  await expect(page.locator("#buildBadge")).toContainText("V2.0.1");
 });
