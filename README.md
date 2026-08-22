@@ -1,11 +1,11 @@
-# My Finance Records · V2.0.0
+# Talaan · V2.0.1
 
 <div align="center">
 
 **A local-first personal and household finance PWA built for privacy, resilience, and everyday use.**
 
 [![Quality checks](https://github.com/nyxdcz/my-finance-record/actions/workflows/quality-pages.yml/badge.svg?branch=main)](https://github.com/nyxdcz/my-finance-record/actions/workflows/quality-pages.yml)
-![Version](https://img.shields.io/badge/version-V2.0.0-2563eb)
+![Version](https://img.shields.io/badge/version-V2.0.1-2563eb)
 ![PWA](https://img.shields.io/badge/PWA-offline--ready-16a34a)
 ![Node](https://img.shields.io/badge/Node.js-22%2B-339933?logo=nodedotjs&logoColor=white)
 
@@ -15,13 +15,13 @@
 
 | Release | Finance schema | Cloud schema | Sync cadence |
 | --- | ---: | ---: | ---: |
-| **V2.0.0** · Organized Complete | **12** | **V3** | **5 minutes** |
+| **V2.0.1** · Talaan | **12** | **V3** | **5 minutes** |
 
-**V2.0.0 — Organized Complete** is the current production baseline for My Finance Records. It combines the complete local-first finance workspace, Account Ledger, budgeting, reporting, projects, productivity tools, reminders, encrypted multi-profile synchronization, responsive desktop/phone interface, and offline-ready PWA delivery.
+**Talaan V2.0.1** is the current production release. The application keeps the complete local-first finance workspace, Account Ledger, budgeting, reporting, projects, productivity tools, reminders, encrypted multi-profile synchronization, responsive desktop/phone interface, and offline-ready PWA delivery under the Talaan product name.
 
 Current release notes are maintained in [`CHANGELOG.md`](CHANGELOG.md).
 
-## What it offers
+## What Talaan offers
 
 | Capability | What it means |
 | --- | --- |
@@ -31,7 +31,7 @@ Current release notes are maintained in [`CHANGELOG.md`](CHANGELOG.md).
 | Account Ledger | Transfers, reconciliations, direct spending, payment reversals, and account balances remain auditable. |
 | Budgeting and insights | Monthly planning, forecasts, savings allocation, reports, trends, and exports are integrated. |
 | Projects and productivity | Project Agenda, revisions, Kanban workflow, Quick Add, search, filters, reminders, and undo/redo are included. |
-| Offline-ready PWA | The app can be installed and used through a service-worker-backed experience. |
+| Offline-ready PWA | Talaan can be installed and used through a service-worker-backed experience. |
 | Compatibility-focused releases | Schema, cache, sync, backup, restore, and finance-data behavior are treated as protected contracts. |
 
 ## Quick start
@@ -51,16 +51,15 @@ Open `http://localhost:3000` in a browser. See [`docs/setup/`](docs/setup/) for 
 
 ```mermaid
 flowchart LR
-    UI["PWA interface"] --> Local["Local finance state"]
+    UI["Talaan PWA"] --> Local["Local finance state"]
     Local --> Backup["Encrypted backup"]
     Local <--> Sync["Optional encrypted sync"]
     Sync <--> Cloud["Supabase + RLS"]
 ```
 
-The V2.0.0 runtime keeps compatibility-sensitive URLs stable where changing them would create unnecessary PWA or installed-client risk. New work should prefer responsibility-based module ownership while preserving explicit migration paths for stored finance data and deployed clients.
+The V2.0.1 runtime keeps compatibility-sensitive URLs and stored-data identifiers stable where changing them would create unnecessary PWA or installed-client risk. The product brand is **Talaan**; compatibility identifiers do not define the visible product name.
 
-<details>
-<summary><strong>Repository layout</strong></summary>
+## Repository layout
 
 | Path | Responsibility |
 | --- | --- |
@@ -77,8 +76,6 @@ The V2.0.0 runtime keeps compatibility-sensitive URLs stable where changing them
 
 See [`docs/architecture/README.md`](docs/architecture/README.md) for module ownership and repository-organization rules.
 
-</details>
-
 ## Quality and testing
 
 ```bash
@@ -94,7 +91,7 @@ Tests are grouped by responsibility under `tests/browser`, `tests/finance`, `tes
 
 Cloud synchronization is optional. Browser-delivered configuration may contain only Supabase-compatible publishable/anonymous credentials—never a `service_role` key or another privileged secret.
 
-Changes to encryption, finance records, balances, payment state, backups, restores, or storage migrations require regression coverage and a recovery-safe migration plan. Read [`PRIVACY.md`](PRIVACY.md), [`SECURITY.md`](SECURITY.md), and the repository's [security policy](https://github.com/nyxdcz/my-finance-record/security/policy) before reporting sensitive issues.
+Changes to encryption, finance records, balances, payment state, backups, restores, or storage migrations require regression coverage and a recovery-safe migration plan. Read [`PRIVACY.md`](PRIVACY.md), [`SECURITY.md`](SECURITY.md), and the repository's security policy before reporting sensitive issues.
 
 ## Contributing
 
