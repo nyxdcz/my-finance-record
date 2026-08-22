@@ -10,7 +10,7 @@
     const link = document.createElement("link");
     link.id = "financeLiquidGlassStyles";
     link.rel = "stylesheet";
-    link.href = "./liquid-glass.css?v=2.0.1-talaan2";
+    link.href = "./liquid-glass.css?v=2.0.1-talaan3";
     document.head.appendChild(link);
   }
 
@@ -396,9 +396,9 @@
   async function start() {
     if (toolsPromise) return toolsPromise;
     toolsPromise = (async () => {
-      await loadScript("./expense-screenshot-parser.js?v=2.0.1-talaan2", "expenseScreenshotParserScript");
-      await loadScript("./expense-screenshot-detect.js?v=2.0.1-talaan2", "expenseScreenshotDetectScript");
-      await loadScript("./expense-screenshot-ai.js?v=2.0.1-talaan2", "expenseScreenshotAiScript");
+      await loadScript("./expense-screenshot-parser.js?v=2.0.1-talaan3", "expenseScreenshotParserScript");
+      await loadScript("./expense-screenshot-detect.js?v=2.0.1-talaan3", "expenseScreenshotDetectScript");
+      await loadScript("./expense-screenshot-ai.js?v=2.0.1-talaan3", "expenseScreenshotAiScript");
       window.FinanceExpenseScreenshot?.ensurePanel?.();
       window.FinanceExpenseScreenshotAI?.ensureAiControls?.();
       ensureCompactScreenshotUi();

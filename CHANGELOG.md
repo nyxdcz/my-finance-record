@@ -12,7 +12,7 @@ Talaan V2.0.1 is the active release baseline. This changelog focuses only on the
 - Updated the website title, sidebar brand, installed-app labels, manifest metadata, offline page, install messaging, and calendar export branding.
 - Updated current-facing repository documentation to use the Talaan name.
 - Unified the legacy primary-action blues on `#356FD1` across buttons, selected controls, and related blue UI states.
-- Rotated the PWA cache to `finance-v2-20260822-talaan-r2` so installed clients receive the refreshed primary color.
+- Rotated the PWA cache to `finance-v2-20260822-talaan-r3` so installed clients receive the refreshed primary color.
 - Preserved compatibility-sensitive storage keys, repository paths, calendar UID domains, and runtime filenames where changing them could affect saved data or installed clients.
 
 ### Finance

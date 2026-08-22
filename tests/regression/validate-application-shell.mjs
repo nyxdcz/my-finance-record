@@ -9,7 +9,7 @@ const help = read("assets/js/ui/application-help.js");
 const headerTools = read("assets/js/ui/header-tools-compat.js");
 const worker = read("sw.js");
 const workflow = read(".github/workflows/quality-pages.yml");
-const query = "2.0.1-talaan2";
+const query = "2.0.1-talaan3";
 
 for (const contract of [".pwa-install-guide-dialog", ".finance-privacy-lock-view", "--nav-active-bg", ".settings-search-panel", "body.sidebar-layout-pinned .main"]) {
   assert.ok(shell.includes(contract), `shell stylesheet must own ${contract}`);
