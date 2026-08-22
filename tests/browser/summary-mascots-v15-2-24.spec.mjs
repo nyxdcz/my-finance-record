@@ -10,6 +10,14 @@ async function ensureMoneyVisible(page) {
   });
 }
 
+async function ensurePeriodsExpanded(page) {
+  for (const key of ["first-half", "second-half", "other-expenses"]) {
+    const button = page.locator(`#money [data-collapse-toggle='${key}']`);
+    if (await button.getAttribute("aria-expanded") === "false") await button.click();
+    await expect(button).toHaveAttribute("aria-expanded", "true");
+  }
+}
+
 async function openMoney(page, width = 1440) {
   await page.setViewportSize({ width, height:900 });
   await page.goto("http://127.0.0.1:3000/index.html?page=money", { waitUntil:"domcontentloaded" });
@@ -18,6 +26,7 @@ async function openMoney(page, width = 1440) {
   await page.waitForFunction(() => Boolean(window.FinanceSummaryMascots?.apply));
   await page.waitForTimeout(50);
   await ensureMoneyVisible(page);
+  if (width >= 851) await ensurePeriodsExpanded(page);
 }
 
 test("desktop Budget & Expenses uses the approved supplied mascots and exact spacing", async ({ page }) => {
@@ -40,8 +49,9 @@ test("desktop Budget & Expenses uses the approved supplied mascots and exact spa
   }
 
   /* Image decoding adds an async wait long enough for startup routing to settle.
-     Re-select Finance so geometry is measured only while the page is actually visible. */
+     Re-select Finance and expand the sections so geometry is measured only while visible. */
   await ensureMoneyVisible(page);
+  await ensurePeriodsExpanded(page);
 
   const state = await page.evaluate(() => {
     for (const id of ["legendEarlyTotal", "legendLateTotal", "legendOtherTotal", "earlyTotal", "lateTotal", "otherTotal"]) {
