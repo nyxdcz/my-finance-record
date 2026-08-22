@@ -1,21 +1,22 @@
 name: One-time Talaan Primary Blue Migration
 
 on:
-  push:
+  pull_request:
     branches:
-      - style/talaan-primary-blue
+      - main
 
 permissions:
   contents: write
 
 jobs:
   migrate:
-    if: github.actor != 'github-actions[bot]'
+    if: github.head_ref == 'style/talaan-primary-blue' && github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
-      - name: Check out branch
+      - name: Check out migration branch
         uses: actions/checkout@v4
         with:
+          ref: style/talaan-primary-blue
           fetch-depth: 0
 
       - name: Use Node.js 24
