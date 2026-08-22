@@ -7,7 +7,7 @@
       --line: #e4e7ec;
       --nav: #172b28;
       --primary: #356FD1;
-      --primary-dark: #102c4d;
+      --primary-dark: #356FD1;
       --primary-contrast: #ffffff;
       --field-label: #344054;
       --green: #2f8f46;
@@ -2958,7 +2958,7 @@
 
 
     /* V12.16.1 · calendar deduplication and compact view */
-    :root { --primary:#356FD1; --primary-dark:#102c4d; --nav:#102a31; }
+    :root { --primary:#356FD1; --primary-dark:#356FD1; --nav:#102a31; }
     .sidebar-navigation { flex:1; min-height:0; display:flex; flex-direction:column; gap:10px; }
     .sidebar-settings-bottom { margin-top:auto; padding-top:12px; border-block-start:1px solid rgba(255,255,255,.13); }
     .settings-nav-button { justify-content:flex-start; }
