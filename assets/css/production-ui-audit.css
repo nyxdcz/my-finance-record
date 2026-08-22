@@ -954,3 +954,65 @@
     display:none !important;
   }
 }
+
+/* Talaan · desktop More tools viewport containment */
+@media (min-width: 851px) {
+  html body .topbar {
+    padding-inline-end: max(26px, env(safe-area-inset-right)) !important;
+  }
+
+  html body .topbar-actions {
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+
+  html body .topbar-actions .topbar-tools-menu {
+    position: relative !important;
+    flex: 0 0 34px !important;
+    width: 34px !important;
+    min-width: 34px !important;
+    max-width: 34px !important;
+    margin: 0 !important;
+  }
+
+  html body .topbar-actions #topbarToolsTrigger {
+    box-sizing: border-box !important;
+    width: 34px !important;
+    min-width: 34px !important;
+    max-width: 34px !important;
+    height: 34px !important;
+    min-height: 34px !important;
+    max-height: 34px !important;
+    display: grid !important;
+    place-items: center !important;
+    flex: 0 0 34px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 1px solid var(--line) !important;
+    border-radius: 7px !important;
+    background: var(--surface) !important;
+    color: var(--text) !important;
+    line-height: 1 !important;
+  }
+
+  html body .topbar-actions #topbarToolsTrigger:hover,
+  html body .topbar-actions #topbarToolsTrigger:focus-visible,
+  html body .topbar-actions #topbarToolsTrigger[aria-expanded="true"] {
+    border-color: var(--primary) !important;
+    color: var(--primary) !important;
+    background: color-mix(in srgb, var(--primary) 8%, var(--surface)) !important;
+  }
+
+  html body .topbar-actions #topbarToolsTrigger .toolbar-icon,
+  html body .topbar-actions #topbarToolsTrigger .toolbar-icon > svg {
+    width: 18px !important;
+    height: 18px !important;
+    margin: 0 !important;
+  }
+
+  html body .topbar-actions .topbar-tools-panel {
+    right: 0 !important;
+    width: min(248px, calc(100vw - 24px)) !important;
+    max-width: calc(100vw - 24px) !important;
+  }
+}

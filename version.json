@@ -10,7 +10,7 @@
   "profileArchitectureVersion": 1,
   "encryptionVersion": 1,
   "authSecurityVersion": 1,
-  "cacheVersion": "finance-v2-20260822-talaan-r3",
+  "cacheVersion": "finance-v2-20260822-talaan-r4",
   "released": "2026-08-22",
   "name": "Talaan",
   "notes": "Talaan V2.0.1 renames the current product experience to Talaan across the website, PWA metadata, offline experience, installation messaging, calendar export branding, and current documentation. Finance Schema 12, Cloud Schema V3, saved records, calculations, balances, recurrence, payments, storage identifiers, encryption, backups, and synchronization semantics are preserved."

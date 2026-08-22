@@ -40,12 +40,29 @@ test("desktop More Tools preserves ordering, semantics, actions, and duplicate s
   await page.goto("http://127.0.0.1:3000/index.html?page=dashboard", { waitUntil:"networkidle" });
   await unlock(page, "header-tools-desktop@example.invalid");
 
+  const triggerGeometry = await page.locator("#topbarToolsTrigger").evaluate(node => {
+    const rect = node.getBoundingClientRect();
+    return { left:rect.left, right:rect.right, width:rect.width, height:rect.height, viewport:innerWidth };
+  });
+  expect(triggerGeometry.width).toBeCloseTo(34, 0);
+  expect(triggerGeometry.height).toBeCloseTo(34, 0);
+  expect(triggerGeometry.left).toBeGreaterThanOrEqual(0);
+  expect(triggerGeometry.right).toBeLessThanOrEqual(triggerGeometry.viewport - 12);
+
+
   await expect(page.locator("#quickEntryMenuButton")).toHaveCount(1);
   await expect(page.locator("#customizeDashboardMenuButton")).toHaveCount(1);
   await openTools(page);
 
   const directButtons = await page.locator("#topbarToolsPanel > button").evaluateAll(nodes => nodes.map(node => node.id));
   expect(directButtons).toEqual(expectedOrder);
+
+  const panelGeometry = await page.locator("#topbarToolsPanel").evaluate(node => {
+    const rect = node.getBoundingClientRect();
+    return { left:rect.left, right:rect.right, viewport:innerWidth };
+  });
+  expect(panelGeometry.left).toBeGreaterThanOrEqual(12);
+  expect(panelGeometry.right).toBeLessThanOrEqual(panelGeometry.viewport - 12);
 
   const quick = page.locator("#quickEntryMenuButton");
   const customize = page.locator("#customizeDashboardMenuButton");

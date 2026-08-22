@@ -3,10 +3,10 @@
   const DESKTOP_QUERY = "(min-width: 851px)";
   const media = window.matchMedia(DESKTOP_QUERY);
   const ASSETS = Object.freeze({
-    red:"./assets/mascots/mascot-red.png?v=2.0.1-talaan3",
-    green:"./assets/mascots/mascot-green.png?v=2.0.1-talaan3",
-    blue:"./assets/mascots/mascot-blue.png?v=2.0.1-talaan3",
-    orange:"./assets/mascots/mascot-orange.png?v=2.0.1-talaan3"
+    red:"./assets/mascots/mascot-red.png?v=2.0.1-talaan4",
+    green:"./assets/mascots/mascot-green.png?v=2.0.1-talaan4",
+    blue:"./assets/mascots/mascot-blue.png?v=2.0.1-talaan4",
+    orange:"./assets/mascots/mascot-orange.png?v=2.0.1-talaan4"
   });
 
   let queued = false;
