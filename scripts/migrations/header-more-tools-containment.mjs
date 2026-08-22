@@ -38,6 +38,12 @@ if (prepare.includes('cache:"finance-v2-20260822-talaan-r3"')) {
 if (prepare.includes('assetQuery:"2.0.1-talaan3"')) {
   prepare = prepare.replace('assetQuery:"2.0.1-talaan3"', 'assetQuery:"2.0.1-talaan4"');
 }
+const queryListAnchor = '    "phone-finance-compat.js",\n    "sync-runtime-compat.js"';
+const expandedQueryList = '    "phone-finance-compat.js",\n    "sync-config.js",\n    "sync-runtime-compat.js",\n    "mascot-red.png",\n    "mascot-green.png",\n    "mascot-blue.png",\n    "mascot-orange.png"';
+if (!prepare.includes('"sync-config.js"')) {
+  if (!prepare.includes(queryListAnchor)) throw new Error("Runtime query-file anchor not found");
+  prepare = prepare.replace(queryListAnchor, expandedQueryList);
+}
 if (!prepare.includes('cache:"finance-v2-20260822-talaan-r4"') || !prepare.includes('assetQuery:"2.0.1-talaan4"')) {
   throw new Error("Unable to establish r4/talaan4 runtime generation");
 }
@@ -66,10 +72,11 @@ const refreshTestPins = directory => {
     const before = read(relative);
     const after = before
       .replaceAll("2.0.1-talaan3", "2.0.1-talaan4")
+      .replaceAll("2\\.0\\.1-talaan3", "2\\.0\\.1-talaan4")
       .replaceAll("finance-v2-20260822-talaan-r3", "finance-v2-20260822-talaan-r4");
     if (after !== before) write(relative, after);
   }
 };
 refreshTestPins("tests");
 
-console.log("Header More tools containment source, regression coverage, and aligned r4/talaan4 runtime pins are staged.");
+console.log("Header More tools containment source, regression coverage, and complete r4/talaan4 runtime pins are staged.");
