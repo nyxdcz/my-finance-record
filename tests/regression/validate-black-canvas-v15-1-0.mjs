@@ -24,11 +24,15 @@ assert.match(liquid,/html\[data-theme="light"\][\s\S]*--liquid-glass-surface:rgb
 assert.match(liquid,/html\[data-theme="light"\][\s\S]*--nav:#ffffff/);
 assert.match(liquid,/html\[data-theme="light"\] \.sidebar \.nav-button\.active[\s\S]*color:#ffffff/);
 assert.match(index,/<meta name="theme-color" content="#173e76">/);
+assert.match(index,/<title>Talaan · V2\.0\.1<\/title>/);
 assert.match(index,/black-canvas-v15-1-0\.css\?v=15\.1\.0-light1/);
+assert.equal(manifest.name,"Talaan");
+assert.equal(manifest.short_name,"Talaan");
 assert.equal(manifest.background_color,"#000000");
 assert.equal(manifest.theme_color,"#173e76");
+assert.match(offline,/<title>Talaan · Offline<\/title>/);
 assert.match(offline,/background:#000000/);
-assert.equal(version.version,"2.0.0");
-assert.equal(version.cacheVersion,"finance-v2-20260822-organized-complete-r1");
+assert.equal(version.version,"2.0.1");
+assert.equal(version.cacheVersion,"finance-v2-20260822-talaan-r1");
 assert.match(worker,/black-canvas-v15-1-0\.css\?v=15\.1\.0-light1/);
-console.log("V2.0.0 light/dark palette regression passed while preserving the legacy Black Canvas styling contract.");
+console.log("Talaan V2.0.1 light/dark palette regression passed while preserving the compatibility Black Canvas styling contract.");
