@@ -4,8 +4,8 @@ import path from 'node:path';
 const root = process.cwd();
 const skipDirs = new Set(['.git', 'node_modules', '_site', 'coverage', 'test-results']);
 const binaryExts = new Set(['.png', '.jpg', '.jpeg', '.gif', '.webp', '.ico', '.pdf', '.zip', '.woff', '.woff2', '.ttf', '.otf']);
-const oldColors = [/#173b67/gi, /#173e76/gi, /#173a63/gi, /#102c4d/gi];
-const oldColorCheck = /#(?:173b67|173e76|173a63|102c4d)/i;
+const oldColors = [/#173b67/gi, /#173e76/gi, /#173a63/gi, /#102c4d/gi, /#2e4e76/gi];
+const oldColorCheck = /#(?:173b67|173e76|173a63|102c4d|2e4e76)/i;
 const newColor = '#356FD1';
 
 let colorCount = 0;
