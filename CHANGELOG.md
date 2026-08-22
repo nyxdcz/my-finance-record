@@ -35,4 +35,3 @@ Talaan V2.0.1 is the active release baseline. This changelog focuses only on the
 ### Projects & productivity
 
 - Projects, completed projects, revision cycles, and Project Agenda.
-- Project payments, profitability, reminders, calendar export, and productivity utilities.
