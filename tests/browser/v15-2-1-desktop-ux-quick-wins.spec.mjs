@@ -3,14 +3,14 @@ import fs from "node:fs";
 
 const source = name => fs.readFileSync(new URL(`../../${name}`, import.meta.url), "utf8");
 
-test("V15.2.1 source keeps the approved desktop UX quick wins under V2.0.0", async () => {
+test("V2.0.0 source keeps the approved desktop UX quick wins", async () => {
   const index = source("index.html");
   const agenda = source("projects-calendar-v13.0.20.js");
   const budget = source("budget-planning.js");
   const sw = source("sw.js");
   const version = JSON.parse(source("version.json"));
 
-  expect(index).toContain("V15.2.9");
+  expect(index).toContain("<title>My Finance Records · V2.0.0</title>");
   expect(index).toContain("Manage available money, planned budgets, and unpaid expenses for this month.");
   expect(index).toContain('id="incomeActiveFilterChips"');
   expect(index).toContain("No income matches these filters");
@@ -50,7 +50,7 @@ test("V15.2.1 source keeps the approved desktop UX quick wins under V2.0.0", asy
 });
 
 for (const width of [1024, 1280, 1366, 1440, 1920]) {
-  test(`V15.2.1 desktop-only additions avoid horizontal overflow at ${width}px`, async ({ page }) => {
+  test(`V2.0.0 desktop additions avoid horizontal overflow at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
     await page.setContent(`<!doctype html><html><head><link rel="stylesheet" href="http://127.0.0.1:3000/app.css?v=15.1.0-desktop3"><link rel="stylesheet" href="http://127.0.0.1:3000/shell-ui-v15-2-11.css?v=15.2.11-shell1"><link rel="stylesheet" href="http://127.0.0.1:3000/desktop-ux-v15-2-0.css?v=15.2.1"></head><body><div class="income-active-filter-chips"><span class="ui-chip"><span>Category: Utilities</span><button class="ui-chip-remove" aria-label="Remove category filter">×</button></span></div><div class="empty-state"><strong>No records</strong>Nothing matches.<div class="empty-state-actions"><button class="button button-secondary button-small">Clear filters</button></div></div><div class="budget-planner-more-menu overflow-menu"><button class="button button-secondary button-small overflow-menu-trigger">More</button><div class="record-more-panel budget-planner-more-panel" hidden></div></div></body></html>`, { waitUntil:"networkidle" });
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1);
