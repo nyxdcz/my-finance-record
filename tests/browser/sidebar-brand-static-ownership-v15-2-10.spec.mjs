@@ -7,7 +7,7 @@ const root = name => fs.readFileSync(new URL(`../../${name}`, import.meta.url), 
 test("sidebar brand is static and PWA updater is DOM-free", () => {
   const index = root("index.html");
   const updater = root("pwa-update-v15-0-5.js");
-  expect(index).toContain("<strong>My Finance Records</strong>");
+  expect(index).toContain("<strong>Talaan</strong>");
   expect(index).not.toContain("<strong>Records</strong>");
   expect(updater).not.toMatch(/installSidebarBrand|querySelector|\bdocument\b/);
   expect(updater).toContain("root.FinancePwaUpdate = api");
