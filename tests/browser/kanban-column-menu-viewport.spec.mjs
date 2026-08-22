@@ -69,7 +69,7 @@ async function panelState(page) {
 }
 
 test("Kanban menu positioning is owned by Header Tools and receives a one-time PWA cache refresh", () => {
-  const updater = fs.readFileSync("assets/js/pwa-update-v15-0-5.js", "utf8");
+  const updater = fs.readFileSync("assets/js/pwa-update.js", "utf8");
   const headerTools = fs.readFileSync("assets/js/ui/header-tools-compat.js", "utf8");
   expect(updater).toContain("refreshCachedHeaderToolsOnce");
   expect(updater).toContain('/header-tools-compat.js');

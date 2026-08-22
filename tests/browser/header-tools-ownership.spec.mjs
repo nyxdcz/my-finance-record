@@ -14,7 +14,7 @@ const expectedOrder = [
 ];
 
 test("Header and More Tools compatibility is owned by the dedicated UI module", async () => {
-  const updater = fs.readFileSync("assets/js/pwa-update-v15-0-5.js", "utf8");
+  const updater = fs.readFileSync("assets/js/pwa-update.js", "utf8");
   const headerTools = fs.readFileSync("assets/js/ui/header-tools-compat.js", "utf8");
   expect(updater).not.toContain("installQuickEntryToolsMenuRelocation");
   expect(updater).not.toContain("installHeaderToolsRelocation");

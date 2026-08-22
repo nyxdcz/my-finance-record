@@ -3,15 +3,15 @@ import { test, expect } from "@playwright/test";
 const widths = [1024, 1280, 1366, 1440, 1920];
 const css = [
   "app.css?v=2.0.1-talaan1",
-  "shell-ui-v15-2-11.css?v=2.0.1-talaan1",
+  "shell-ui.css?v=2.0.1-talaan1",
   "reports-insights.css?v=2.0.1-talaan1",
   "budget-planning.css?v=2.0.1-talaan1",
   "security-profiles.css?v=2.0.1-talaan1",
-  "projects-calendar-v13.0.20.css?v=2.0.1-talaan1",
+  "projects-calendar.css?v=2.0.1-talaan1",
   "dashboard-interactions.css?v=2.0.1-talaan1",
-  "liquid-glass-v15.css?v=2.0.1-talaan1",
-  "black-canvas-v15-1-0.css?v=2.0.1-talaan1",
-  "desktop-ui-phase1-v15-1-0.css?v=2.0.1-talaan1"
+  "liquid-glass.css?v=2.0.1-talaan1",
+  "black-canvas.css?v=2.0.1-talaan1",
+  "desktop-ui-phase1.css?v=2.0.1-talaan1"
 ];
 
 const links = css.map(href => `<link rel="stylesheet" href="http://127.0.0.1:3000/${href}">`).join("");
@@ -48,7 +48,7 @@ for (const width of widths) {
 
 test("desktop Phase 1 stylesheet does not own phone layout", async ({ page }) => {
   await page.setViewportSize({ width:700, height:900 });
-  await page.setContent(`<!doctype html><html><head><link rel="stylesheet" href="http://127.0.0.1:3000/desktop-ui-phase1-v15-1-0.css?v=2.0.1-talaan1"></head><body><section id="income"><div class="page-heading" id="incomeHeading">Income</div><article class="income-kpi-card" id="incomeKpi">KPI</article><button class="context-help-button" id="helpButton">?</button></section></body></html>`, { waitUntil:"networkidle" });
+  await page.setContent(`<!doctype html><html><head><link rel="stylesheet" href="http://127.0.0.1:3000/desktop-ui-phase1.css?v=2.0.1-talaan1"></head><body><section id="income"><div class="page-heading" id="incomeHeading">Income</div><article class="income-kpi-card" id="incomeKpi">KPI</article><button class="context-help-button" id="helpButton">?</button></section></body></html>`, { waitUntil:"networkidle" });
   const metrics = await page.evaluate(() => ({
     heading:getComputedStyle(document.querySelector("#incomeHeading")).display,
     kpiMinHeight:getComputedStyle(document.querySelector("#incomeKpi")).minHeight,

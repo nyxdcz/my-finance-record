@@ -35,11 +35,11 @@ test("zero Other expenses uses the supplied heart-smile artwork", async ({ page 
   await expect(otherValue).toHaveAttribute("aria-label", "No other expenses");
   await expect(otherValue).toHaveAttribute("title", "No other expenses");
   await expect(icon).toHaveAttribute("data-theme-variant", "light");
-  await expect(icon).toHaveAttribute("src", /heart-smile-light-v15-2-4\.png$/);
+  await expect(icon).toHaveAttribute("src", /heart-smile-light\.png$/);
 
   await page.evaluate(() => { document.documentElement.dataset.theme = "dark"; });
   await expect(icon).toHaveAttribute("data-theme-variant", "dark");
-  await expect(icon).toHaveAttribute("src", /heart-smile-dark-v15-2-4\.png$/);
+  await expect(icon).toHaveAttribute("src", /heart-smile-dark\.png$/);
 });
 
 test("non-zero Other expenses keeps the money amount visible", async ({ page }) => {

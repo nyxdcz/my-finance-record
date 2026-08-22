@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 
 const fixture = `<!doctype html><html data-theme="dark"><head>
   <link rel="stylesheet" href="http://127.0.0.1:3000/app.css?v=structured-drag-test">
-  <link rel="stylesheet" href="http://127.0.0.1:3000/projects-calendar-v13.0.20.css?v=structured-drag-test">
+  <link rel="stylesheet" href="http://127.0.0.1:3000/projects-calendar.css?v=structured-drag-test">
 </head><body>
   <div class="finance-kanban-board project-kanban-board">
     <section class="finance-kanban-column" id="active" data-structured-drop-zone data-structured-drop-kind="project" data-structured-drop-destination="active" data-structured-drop-label="Active Projects">

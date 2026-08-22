@@ -19,7 +19,7 @@ for (const [label, width] of [["phone", 390], ["desktop", 1280]]) {
 test("expense dialog cleanup is structural and delivered by the network-first privacy runtime", async () => {
   const privacy = source("privacy-lock.js");
   const worker = source("sw.js");
-  const desktopUx = source("desktop-ux-v15-2-0.css");
+  const desktopUx = source("desktop-ux.css");
 
   expect(privacy).toContain("function structurallyRemoveExpenseDialogGuidance()");
   expect(privacy).toContain('dialog.querySelector(":scope > form > .modal-body > .required-note")?.remove();');

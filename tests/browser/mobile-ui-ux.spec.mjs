@@ -4,15 +4,15 @@ const widths = [320, 360, 375, 390, 393, 412, 414, 428];
 const css = [
   "budget-planning.css?v=2.0.1-talaan1",
   "productivity-tools.css?v=2.0.1-talaan1",
-  "projects-calendar-v13.0.20.css?v=2.0.1-talaan1",
-  "mobile-v14-0-23.css?v=2.0.1-talaan1",
+  "projects-calendar.css?v=2.0.1-talaan1",
+  "mobile.css?v=2.0.1-talaan1",
   "app.css?v=2.0.1-talaan1",
-  "shell-ui-v15-2-11.css?v=2.0.1-talaan1",
+  "shell-ui.css?v=2.0.1-talaan1",
   "dashboard-interactions.css?v=2.0.1-talaan1",
-  "ui-icon-alignment-v15-0-5.css?v=2.0.1-talaan1",
-  "black-canvas-v15-1-0.css?v=2.0.1-talaan1",
-  "desktop-ui-phase1-v15-1-0.css?v=2.0.1-talaan1",
-  "desktop-ux-v15-2-0.css?v=2.0.1-talaan1"
+  "ui-icon-alignment.css?v=2.0.1-talaan1",
+  "black-canvas.css?v=2.0.1-talaan1",
+  "desktop-ui-phase1.css?v=2.0.1-talaan1",
+  "desktop-ux.css?v=2.0.1-talaan1"
 ];
 
 async function fixture(page, width, height = 800) {
@@ -23,7 +23,7 @@ async function fixture(page, width, height = 800) {
 }
 
 for (const width of widths) {
-  test(`V15.2.2 phone geometry is safe at ${width}px`, async ({ page }) => {
+  test(`Talaan V2.0.1 phone geometry is safe at ${width}px`, async ({ page }) => {
     await fixture(page, width);
     const metrics = await page.evaluate(() => {
       const el = id => document.getElementById(id);
@@ -80,7 +80,7 @@ for (const width of widths) {
   });
 }
 
-test("V15.2.2 short landscape phones retain touch-safe controls", async ({ page }) => {
+test("Talaan V2.0.1 short landscape phones retain touch-safe controls", async ({ page }) => {
   await fixture(page, 844, 390);
   const metrics = await page.evaluate(() => ({
     workspaceTop:getComputedStyle(document.getElementById("workspace")).top,
@@ -98,7 +98,7 @@ test("V15.2.2 short landscape phones retain touch-safe controls", async ({ page 
   expect(metrics.dialogInside).toBe(true);
 });
 
-test("V15.2.2 short portrait keeps the dialog within the dynamic viewport", async ({ page }) => {
+test("Talaan V2.0.1 short portrait keeps the dialog within the dynamic viewport", async ({ page }) => {
   await fixture(page, 390, 480);
   const metrics = await page.evaluate(() => {
     const dialog = document.querySelector(".app-dialog").getBoundingClientRect();
@@ -109,7 +109,7 @@ test("V15.2.2 short portrait keeps the dialog within the dynamic viewport", asyn
   expect(metrics.height).toBeLessThanOrEqual(metrics.viewport - 15);
 });
 
-test("V15.2.2 mobile stylesheet does not change the 1024px desktop workspace contract", async ({ page }) => {
+test("Talaan V2.0.1 mobile stylesheet does not change the 1024px desktop workspace contract", async ({ page }) => {
   await fixture(page, 1024, 800);
   const metrics = await page.evaluate(() => ({
     workspaceTop:getComputedStyle(document.getElementById("workspace")).top,

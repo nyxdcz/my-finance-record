@@ -4,14 +4,14 @@ import { test, expect } from "@playwright/test";
 test.use({ serviceWorkers:"block" });
 
 test("More tools Appearance stays compact, left-aligned, and network-first", async ({ page }) => {
-  const alignmentCss = fs.readFileSync("ui-icon-alignment-v15-0-5.css", "utf8");
+  const alignmentCss = fs.readFileSync("ui-icon-alignment.css", "utf8");
   const serviceWorker = fs.readFileSync("sw.js", "utf8");
-  expect(alignmentCss).toContain("V15.2.4-r3 · Final network-first More tools Appearance geometry");
+  expect(alignmentCss).toContain("Final network-first More tools Appearance geometry");
   expect(alignmentCss).toContain("#themeToggleButton.topbar-tools-item.theme-toggle-button");
   expect(alignmentCss).toContain("justify-content:flex-start !important");
   expect(alignmentCss).toContain("height:38px !important");
   expect(alignmentCss).toContain("gap:6px !important");
-  expect(serviceWorker).toContain('url.pathname.endsWith("ui-icon-alignment-v15-0-5.css")');
+  expect(serviceWorker).toContain('url.pathname.endsWith("ui-icon-alignment.css")');
 
   await page.setViewportSize({ width:1440, height:900 });
   await page.route("**/cloud-sync.js*", route => route.abort());

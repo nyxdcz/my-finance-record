@@ -6,7 +6,7 @@ test("Finance completion heart uses the clean no-line light and dark artwork", a
     document.documentElement.dataset.theme = "light";
     document.body.innerHTML = `<main id="money"><img class="first-half-complete-icon" alt=""></main>`;
   });
-  await page.addStyleTag({ url:"http://127.0.0.1:3000/ui-icon-alignment-v15-0-5.css?v=heart-smile-r4-test" });
+  await page.addStyleTag({ url:"http://127.0.0.1:3000/ui-icon-alignment.css?v=heart-smile-r4-test" });
 
   const icon = page.locator(".first-half-complete-icon");
   await expect.poll(async () => icon.evaluate(node => getComputedStyle(node).content)).toContain("heart-smile-light-r4.png");

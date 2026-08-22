@@ -16,7 +16,7 @@ test("Finance completion hearts use the canonical exact clean uploaded PNGs with
   expect(await assetSha256(request, "/icons/heart-smile-light-r4.png")).toBe(EXPECTED.light);
   expect(await assetSha256(request, "/icons/heart-smile-dark-r4.png")).toBe(EXPECTED.dark);
 
-  const cssResponse = await request.get("http://127.0.0.1:3000/ui-icon-alignment-v15-0-5.css", { headers:{ "cache-control":"no-cache" } });
+  const cssResponse = await request.get("http://127.0.0.1:3000/ui-icon-alignment.css", { headers:{ "cache-control":"no-cache" } });
   expect(cssResponse.ok()).toBeTruthy();
   const css = await cssResponse.text();
   expect(css).toContain('heart-smile-light-r4.png');

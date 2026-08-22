@@ -13,10 +13,10 @@ async function unlockApp(page, width, pageName = "dashboard") {
 
 test("expanded and collapsed desktop sidebar use the static Talaan brand", async ({ page }) => {
   expect(source("index.html")).toContain("<strong>Talaan</strong>");
-  expect(source("pwa-update-v15-0-5.js")).not.toContain("installSidebarBrand");
-  expect(source("pwa-update-v15-0-5.js")).not.toContain("document");
-  expect(source("ui-icon-alignment-v15-0-5.css")).toContain("width:28px !important");
-  expect(source("ui-icon-alignment-v15-0-5.css")).toContain("white-space:nowrap !important");
+  expect(source("pwa-update.js")).not.toContain("installSidebarBrand");
+  expect(source("pwa-update.js")).not.toContain("document");
+  expect(source("ui-icon-alignment.css")).toContain("width:28px !important");
+  expect(source("ui-icon-alignment.css")).toContain("white-space:nowrap !important");
 
   await unlockApp(page, 1280);
 
@@ -83,5 +83,5 @@ test("sidebar brand shell cache is synchronized", () => {
   const expected = "finance-v2-20260822-talaan-r1";
   expect(source("version.json")).toContain(`"cacheVersion": "${expected}"`);
   expect(source("sw.js")).toContain(`const CACHE_VERSION = "${expected}"`);
-  expect(source("pwa-update-v15-0-5.js")).toContain(`const CURRENT_CACHE_VERSION = "${expected}"`);
+  expect(source("pwa-update.js")).toContain(`const CURRENT_CACHE_VERSION = "${expected}"`);
 });
