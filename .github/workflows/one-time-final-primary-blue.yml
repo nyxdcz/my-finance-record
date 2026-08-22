@@ -1,0 +1,54 @@
+name: One-time Final Primary Blue Pass
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  migrate:
+    if: github.head_ref == 'style/talaan-primary-blue' && github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out migration branch
+        uses: actions/checkout@v4
+        with:
+          ref: style/talaan-primary-blue
+          fetch-depth: 0
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Install locked project metadata
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Apply final exact blue replacements
+        run: |
+          node scripts/apply-final-primary-blue.mjs
+          node scripts/prepare-runtime.mjs
+          node scripts/apply-final-primary-blue.mjs
+
+      - name: Validate repository
+        run: npm run quality
+
+      - name: Remove one-time migration files
+        run: |
+          rm scripts/apply-final-primary-blue.mjs
+          rm .github/workflows/one-time-final-primary-blue.yml
+
+      - name: Commit migrated tree
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          if git diff --cached --quiet; then
+            echo 'No migration changes to commit.'
+            exit 0
+          fi
+          git commit -m 'style: unify Talaan primary button blue'
+          git push origin HEAD:style/talaan-primary-blue
