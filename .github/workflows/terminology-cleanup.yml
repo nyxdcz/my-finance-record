@@ -1,20 +1,23 @@
 name: One-time Talaan Terminology Cleanup
 
 on:
-  push:
+  pull_request:
+    types: [opened, synchronize, reopened]
     branches:
-      - chore/talaan-terminology-cleanup
+      - main
 
 permissions:
   contents: write
 
 jobs:
   migrate:
+    if: github.event.pull_request.head.ref == 'chore/talaan-terminology-cleanup'
     runs-on: ubuntu-latest
     steps:
       - name: Check out cleanup branch
         uses: actions/checkout@v4
         with:
+          ref: chore/talaan-terminology-cleanup
           fetch-depth: 0
 
       - name: Use Node.js 24
@@ -50,4 +53,4 @@ jobs:
             exit 0
           fi
           git commit -m "chore: modernize legacy repository terminology"
-          git push
+          git push origin HEAD:chore/talaan-terminology-cleanup
