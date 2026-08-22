@@ -13,7 +13,7 @@ const compactJs = read("assets/js/ui/expense-compact.js");
 const version = JSON.parse(read("version.json"));
 const pkg = JSON.parse(read("package.json"));
 const lock = JSON.parse(read("package-lock.json"));
-const query = "2.0.1-talaan3";
+const query = "2.0.1-talaan4";
 
 for (const [pageId, marqueeId] of [["income", "incomeFinanceWeekMarquee"], ["money", "financeWeekMarquee"], ["paid-expenses", "paidFinanceWeekMarquee"]]) {
   const start = index.indexOf(`id="${pageId}"`);

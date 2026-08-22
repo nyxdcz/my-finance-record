@@ -4,12 +4,12 @@ for (const theme of ["light", "dark"]) {
   test(`Talaan V2.0.1 appearance uses the expected ${theme} palette`, async ({ page }) => {
     await page.setViewportSize({ width:1440, height:900 });
     await page.setContent(`<!doctype html><html data-theme="${theme}"><head>
-      <link rel="stylesheet" href="http://127.0.0.1:3000/app.css?v=2.0.1-talaan3">
-      <link rel="stylesheet" href="http://127.0.0.1:3000/shell-ui.css?v=2.0.1-talaan3">
-      <link rel="stylesheet" href="http://127.0.0.1:3000/black-canvas.css?v=2.0.1-talaan3">
-      <link rel="stylesheet" href="http://127.0.0.1:3000/desktop-ui-phase1.css?v=2.0.1-talaan3">
-      <link rel="stylesheet" href="http://127.0.0.1:3000/desktop-ux.css?v=2.0.1-talaan3">
-      <link rel="stylesheet" href="http://127.0.0.1:3000/production-ui-audit.css?v=2.0.1-talaan3">
+      <link rel="stylesheet" href="http://127.0.0.1:3000/app.css?v=2.0.1-talaan4">
+      <link rel="stylesheet" href="http://127.0.0.1:3000/shell-ui.css?v=2.0.1-talaan4">
+      <link rel="stylesheet" href="http://127.0.0.1:3000/black-canvas.css?v=2.0.1-talaan4">
+      <link rel="stylesheet" href="http://127.0.0.1:3000/desktop-ui-phase1.css?v=2.0.1-talaan4">
+      <link rel="stylesheet" href="http://127.0.0.1:3000/desktop-ux.css?v=2.0.1-talaan4">
+      <link rel="stylesheet" href="http://127.0.0.1:3000/production-ui-audit.css?v=2.0.1-talaan4">
       <style>*,*::before,*::after{animation:none!important;transition:none!important}</style>
     </head><body>
       <button class="button button-paid" id="paid">Mark paid</button>
