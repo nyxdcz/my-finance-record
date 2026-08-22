@@ -4,12 +4,12 @@ for (const theme of ["light", "dark"]) {
   test(`Talaan V2.0.1 appearance uses the expected ${theme} palette`, async ({ page }) => {
     await page.setViewportSize({ width:1440, height:900 });
     await page.setContent(`<!doctype html><html data-theme="${theme}"><head>
-      <link rel="stylesheet" href="http://127.0.0.1:3000/app.css?v=2.0.1-talaan1">
-      <link rel="stylesheet" href="http://127.0.0.1:3000/shell-ui.css?v=2.0.1-talaan1">
-      <link rel="stylesheet" href="http://127.0.0.1:3000/black-canvas.css?v=2.0.1-talaan1">
-      <link rel="stylesheet" href="http://127.0.0.1:3000/desktop-ui-phase1.css?v=2.0.1-talaan1">
-      <link rel="stylesheet" href="http://127.0.0.1:3000/desktop-ux.css?v=2.0.1-talaan1">
-      <link rel="stylesheet" href="http://127.0.0.1:3000/production-ui-audit.css?v=2.0.1-talaan1">
+      <link rel="stylesheet" href="http://127.0.0.1:3000/app.css?v=2.0.1-talaan2">
+      <link rel="stylesheet" href="http://127.0.0.1:3000/shell-ui.css?v=2.0.1-talaan2">
+      <link rel="stylesheet" href="http://127.0.0.1:3000/black-canvas.css?v=2.0.1-talaan2">
+      <link rel="stylesheet" href="http://127.0.0.1:3000/desktop-ui-phase1.css?v=2.0.1-talaan2">
+      <link rel="stylesheet" href="http://127.0.0.1:3000/desktop-ux.css?v=2.0.1-talaan2">
+      <link rel="stylesheet" href="http://127.0.0.1:3000/production-ui-audit.css?v=2.0.1-talaan2">
       <style>*,*::before,*::after{animation:none!important;transition:none!important}</style>
     </head><body>
       <button class="button button-paid" id="paid">Mark paid</button>
@@ -48,7 +48,7 @@ for (const theme of ["light", "dark"]) {
 
     if (theme === "light") {
       expect(result.bg).toBe("#efefef");
-      expect(result.primary).toBe("#173b67");
+      expect(result.primary).toBe("#356FD1");
       expect(result.bodyBg).toBe("rgb(239, 239, 239)");
       expect(result.paidBg).toBe("rgb(23, 59, 103)");
       expect(result.paidBorder).toBe("rgb(23, 59, 103)");
@@ -57,7 +57,7 @@ for (const theme of ["light", "dark"]) {
       expect(result.accountTypeColor).toBe("rgb(102, 112, 133)");
     } else {
       expect(result.bg).toBe("#000000");
-      expect(result.primary).toBe("#173e76");
+      expect(result.primary).toBe("#356FD1");
       expect(result.bodyBg).toBe("rgb(0, 0, 0)");
       expect(result.paidBg).toBe("rgb(23, 62, 118)");
       expect(result.paidBorder).toBe("rgb(23, 62, 118)");

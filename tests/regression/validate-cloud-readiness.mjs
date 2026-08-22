@@ -6,7 +6,7 @@ const source = read("assets/js/cloud-sync.js");
 const index = read("index.html");
 const worker = read("sw.js");
 const version = JSON.parse(read("version.json"));
-const query = "2.0.1-talaan1";
+const query = "2.0.1-talaan2";
 
 assert.match(source, /let clientPromise = null;/);
 assert.match(source, /if \(clientPromise\) return clientPromise;/);

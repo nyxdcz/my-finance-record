@@ -6,7 +6,7 @@
       --muted: #667085;
       --line: #e4e7ec;
       --nav: #172b28;
-      --primary: #173b67;
+      --primary: #356FD1;
       --primary-dark: #102c4d;
       --primary-contrast: #ffffff;
       --field-label: #344054;
@@ -16,7 +16,7 @@
       --red-soft: #fff0ee;
       --orange: #e68a1f;
       --orange-soft: #fff5e8;
-      --blue: #356fd1;
+      --blue: #356FD1;
       --blue-soft: #edf3ff;
       --danger: #b42318;
       --shadow: 0 10px 30px rgba(16, 24, 40, 0.07);
@@ -269,7 +269,7 @@
     .month-status-chip.current { background: #eaf7ed; color: #28723b; }
     .month-status-chip.upcoming { background: #eef4ff; color: #2454a6; }
     .month-status-chip.ended { background: #fff4e5; color: #8a4b00; }
-    .month-status-chip.complete { background: #e8f7f2; color: #173b67; }
+    .month-status-chip.complete { background: #e8f7f2; color: #356FD1; }
 
     .month-insights-card { margin-top: 10px; padding: 10px 12px !important; }
     .month-insights-header {
@@ -621,9 +621,9 @@
     }
     .button-saved:hover { background: #e3e7ed; }
     .button-saved.active {
-      background: #173b67;
+      background: #356FD1;
       color: #ffffff;
-      border-color: #173b67;
+      border-color: #356FD1;
     }
     .button-saved.active:hover { background: #102f55; border-color: #102f55; }
     .saved-icon-container {
@@ -690,7 +690,7 @@
     .status-unpaid, .status-hold { background: #fff0ee; color: #b42318; border-color: #f3c0bb; }
     .status-due-soon { color: #805b00; background: #fff1a8; border-color: #f1cf54; }
     .status-overdue { color: #9f1c12; background: #ffd8d3; border-color: #f3a49b; }
-    .status-saved { color: #fff; background: #173b67; border-color: #173b67; }
+    .status-saved { color: #fff; background: #356FD1; border-color: #356FD1; }
     .status-one-time { color: #475467; background: #eef1f5; border-color: #c9ced6; }
     .status-excluded { color: #7a4b00; background: #fff4d6; border-color: #e7c66b; }
 
@@ -969,8 +969,8 @@
     .toast-message { min-width: 0; line-height: 1.35; }
     .toast-dismiss { width:28px; min-width:28px; height:28px; min-height:28px; display:grid; place-items:center; margin-left:auto; padding:0; border:0; border-radius:50%; background:transparent; color:inherit; font:inherit; font-size:1rem; line-height:1; cursor:pointer; }
     .toast-dismiss:hover { background:rgba(255,255,255,.16); }
-    .toast.toast-success { background: #173b67; }
-    .toast.toast-info { background: #173b67; }
+    .toast.toast-success { background: #356FD1; }
+    .toast.toast-info { background: #356FD1; }
     .toast.toast-warning { background: #8a4b00; }
     .toast.toast-error { background: #9f1c12; }
     .overlay { display: none; }
@@ -2958,7 +2958,7 @@
 
 
     /* V12.16.1 · calendar deduplication and compact view */
-    :root { --primary:#173b67; --primary-dark:#102c4d; --nav:#102a31; }
+    :root { --primary:#356FD1; --primary-dark:#102c4d; --nav:#102a31; }
     .sidebar-navigation { flex:1; min-height:0; display:flex; flex-direction:column; gap:10px; }
     .sidebar-settings-bottom { margin-top:auto; padding-top:12px; border-block-start:1px solid rgba(255,255,255,.13); }
     .settings-nav-button { justify-content:flex-start; }

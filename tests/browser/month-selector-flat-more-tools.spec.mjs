@@ -9,7 +9,7 @@ test("desktop month selector uses compact standalone controls and a centered 4x3
     document.documentElement.style.setProperty("--line", "#243247");
     document.documentElement.style.setProperty("--text", "#f8fafc");
     document.documentElement.style.setProperty("--muted", "#94a3b8");
-    document.documentElement.style.setProperty("--primary", "#173e76");
+    document.documentElement.style.setProperty("--primary", "#356FD1");
     document.documentElement.style.setProperty("--primary-contrast", "#ffffff");
     document.body.innerHTML = `
       <div class="topbar-actions">

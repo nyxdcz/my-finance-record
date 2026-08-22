@@ -8,7 +8,7 @@ const interaction = read("assets/js/interaction-patterns.js");
 const css = read("assets/css/projects-calendar.css");
 const worker = read("sw.js");
 const version = JSON.parse(read("version.json"));
-const query = "2.0.1-talaan1";
+const query = "2.0.1-talaan2";
 
 assert.equal(version.version, "2.0.1");
 assert.equal(version.schemaVersion, 12);

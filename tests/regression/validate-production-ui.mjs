@@ -11,7 +11,7 @@ const index = read("index.html");
 const worker = read("sw.js");
 const desktopUx = read("assets/css/desktop-ux.css");
 const version = JSON.parse(read("version.json"));
-const query = "2.0.1-talaan1";
+const query = "2.0.1-talaan2";
 
 assert.equal(version.version, "2.0.1");
 assert.equal(version.schemaVersion, 12);
