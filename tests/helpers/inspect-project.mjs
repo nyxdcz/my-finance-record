@@ -31,8 +31,6 @@ const rootJsFiles = [
 ];
 const featureJsFiles = ["cash-flow-summary.js"];
 const uiJsFiles = ["application-help.js", "header-tools-compat.js", "phone-finance-compat.js", "summary-mascots.js", "sync-runtime-compat.js"];
-const runtimeJsFiles = [...rootJsFiles, ...featureJsFiles, ...uiJsFiles];
-const runtimeNames = new Set([...runtimeCssFiles, ...runtimeJsFiles]);
 const sourcePathForRuntime = value => {
   const normalized = String(value || "").replace(/^\.\//, "");
   if (runtimeCssFiles.includes(normalized)) return `assets/css/${normalized}`;
