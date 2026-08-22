@@ -13,6 +13,10 @@ const exists = file => fs.existsSync(path.join(root, file));
 const rel = file => path.relative(root, file).replaceAll(path.sep, "/");
 const fail = message => errors.push(message);
 const warn = message => warnings.push(message);
+const CURRENT_VERSION = "2.0.1";
+const DISPLAY_VERSION = "V2.0.1";
+const BRAND = "Talaan";
+const PREVIOUS_BRAND = ["My", "Finance", "Records"].join(" ");
 
 const runtimeCssFiles = [
   "account-ledger.css", "app.css", "shell-ui-v15-2-11.css", "black-canvas-v15-1-0.css", "budget-planning.css", "dashboard-interactions-core-v14-0-23.css", "dashboard-interactions.css", "desktop-ui-phase1-v15-1-0.css", "desktop-ux-v15-2-0.css", "liquid-glass-v15.css", "mobile-v14-0-23.css", "productivity-tools.css", "production-ui-audit-v15-2-13.css", "projects-calendar-v13.0.20.css", "reminders-alerts.css", "reports-insights.css", "security-profiles.css", "ui-icon-alignment-v15-0-5.css"
@@ -36,7 +40,7 @@ const requiredFiles = [
   ...runtimeCssFiles.map(file => `assets/css/${file}`),
   ...runtimeJsFiles.map(sourcePathForRuntime),
   "assets/css/expense-compact-v15-2-24.css", "assets/js/ui/expense-compact-v15-2-24.js",
-  "package.json", "package-lock.json", "README.md", "CHANGELOG.md", ".gitignore",
+  "package.json", "package-lock.json", "README.md", "CHANGELOG.md", "PRIVACY.md", ".gitignore",
   ".github/workflows/quality-pages.yml", "vendor/supabase.min.js",
   "sync-config.js", "sync-config.example.js",
   "supabase/functions/detect-payment/index.ts", "docs/setup/AI_SCREENSHOT_DETECTOR_SETUP.md",
@@ -66,6 +70,7 @@ for (const icon of manifest.icons || []) if (!exists(icon.src || "")) fail(`Miss
 for (const shortcut of manifest.shortcuts || []) {
   for (const icon of shortcut.icons || []) if (!exists(icon.src || "")) fail(`Missing shortcut icon: ${icon.src || "(empty)"}`);
 }
+if (manifest.name !== BRAND || manifest.short_name !== BRAND) fail(`PWA manifest brand must be ${BRAND}`);
 
 const worker = read("sw.js");
 for (const match of worker.matchAll(/asset\("([^"]+)"\)/g)) {
@@ -136,15 +141,20 @@ const testTargets = [...String(pkg.scripts?.test || "").matchAll(/\bnode\s+(\S+)
 if (!testTargets.length) fail(`Test script target is missing: ${pkg.scripts?.test || "(not configured)"}`);
 for (const target of testTargets) if (!exists(target)) fail(`Test script target is missing: ${target}`);
 if (!String(pkg.engines?.node || "").includes("22")) warn(`Node engine is ${pkg.engines?.node || "not set"}; project validation expects Node 22+`);
-if (pkg.version !== "2.0.0") fail(`Expected current package version 2.0.0, found ${pkg.version || "(missing)"}`);
-if (!read("README.md").startsWith("# My Finance Records · V2.0.0")) fail("README release heading is not V2.0.0");
-if (!read("CHANGELOG.md").startsWith("# Changelog\n\n## V2.0.0 · Organized Complete")) fail("CHANGELOG current release heading is not V2.0.0");
-if (!read("version.md").startsWith("# V2.0.0 — Organized Complete")) fail("version.md current release heading is not V2.0.0");
-for (const file of ["README.md", "CHANGELOG.md", "CONTRIBUTING.md", "SECURITY.md", "version.md"]) {
-  if (read(file).includes("V1.")) fail(`${file} contains a previous product version reference`);
+if (pkg.version !== CURRENT_VERSION) fail(`Expected current package version ${CURRENT_VERSION}, found ${pkg.version || "(missing)"}`);
+if (!read("README.md").startsWith(`# ${BRAND} · ${DISPLAY_VERSION}`)) fail(`README release heading is not ${BRAND} ${DISPLAY_VERSION}`);
+if (!read("CHANGELOG.md").startsWith(`# Changelog\n\n## ${DISPLAY_VERSION} · ${BRAND}`)) fail(`CHANGELOG current release heading is not ${DISPLAY_VERSION}`);
+if (!read("version.md").startsWith(`# ${BRAND} ${DISPLAY_VERSION}`)) fail(`version.md current release heading is not ${BRAND} ${DISPLAY_VERSION}`);
+for (const file of ["README.md", "CHANGELOG.md", "CONTRIBUTING.md", "SECURITY.md", "PRIVACY.md", "version.md"]) {
+  const text = read(file);
+  if (text.includes("V1.") || text.includes("V2.0.0")) fail(`${file} contains a previous product version reference`);
+  if (text.includes(PREVIOUS_BRAND)) fail(`${file} contains the superseded display brand`);
 }
-if (!html.includes('const APP_VERSION = "2.0.0";')) fail("Prepared index runtime is not V2.0.0");
-if (!worker.includes('const APP_VERSION = "2.0.0";')) fail("Prepared service worker is not V2.0.0");
+if (!html.includes(`const APP_VERSION = "${CURRENT_VERSION}";`)) fail(`Prepared index runtime is not ${DISPLAY_VERSION}`);
+if (!html.includes(`<title>${BRAND} · ${DISPLAY_VERSION}</title>`)) fail(`Prepared page title is not ${BRAND} ${DISPLAY_VERSION}`);
+if (!html.includes(`content="${BRAND}"`) || html.includes(PREVIOUS_BRAND)) fail(`Prepared website brand is not ${BRAND}`);
+if (!read("offline.html").includes(`<title>${BRAND} · Offline</title>`)) fail(`Offline page brand is not ${BRAND}`);
+if (!worker.includes(`const APP_VERSION = "${CURRENT_VERSION}"`)) fail(`Prepared service worker is not ${DISPLAY_VERSION}`);
 
 const syncConfig = read("sync-config.js");
 const syncConfigCode = syncConfig.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|\s)\/\/.*$/gm, "$1");
@@ -176,4 +186,4 @@ console.log(`Repository inspection: ${errors.length} error(s), ${warnings.length
 for (const message of errors) console.error(`ERROR: ${message}`);
 for (const message of warnings) console.warn(`WARN: ${message}`);
 if (errors.length) process.exit(1);
-console.log("Repository inspection passed: V2.0.0 release sources, current documentation, local paths, deploy paths, package metadata, permissions, and public sync configuration are consistent.");
+console.log(`Repository inspection passed: ${BRAND} ${DISPLAY_VERSION} release sources, current documentation, local paths, deploy paths, package metadata, permissions, and public sync configuration are consistent.`);
