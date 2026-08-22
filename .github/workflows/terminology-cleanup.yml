@@ -32,6 +32,9 @@ jobs:
       - name: Modernize legacy terminology
         run: node scripts/cleanup-legacy-terminology.mjs
 
+      - name: Refine compatibility-aware runtime validation
+        run: node scripts/refine-legacy-runtime-check.mjs
+
       - name: Regenerate Talaan runtime copies
         run: npm run prepare:runtime
 
@@ -41,6 +44,7 @@ jobs:
       - name: Remove one-time migration machinery
         run: |
           rm -f scripts/cleanup-legacy-terminology.mjs
+          rm -f scripts/refine-legacy-runtime-check.mjs
           rm -f .github/workflows/terminology-cleanup.yml
 
       - name: Commit terminology cleanup
