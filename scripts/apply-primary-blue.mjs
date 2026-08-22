@@ -4,12 +4,13 @@ import path from 'node:path';
 const root = process.cwd();
 const skipDirs = new Set(['.git', 'node_modules', '_site', 'coverage', 'test-results']);
 const binaryExts = new Set(['.png', '.jpg', '.jpeg', '.gif', '.webp', '.ico', '.pdf', '.zip', '.woff', '.woff2', '.ttf', '.otf']);
-const oldColors = [/#173b67/gi, /#173e76/gi];
-const oldColorCheck = /#173(?:b67|e76)/i;
+const oldColors = [/#173b67/gi, /#173e76/gi, /#173a63/gi];
+const oldColorCheck = /#173(?:b67|e76|a63)/i;
 const newColor = '#356FD1';
 const replacements = [
   [/finance-v2-20260822-talaan-r1/g, 'finance-v2-20260822-talaan-r2'],
-  [/2\.0\.1-talaan1/g, '2.0.1-talaan2']
+  [/2\.0\.1-talaan1/g, '2.0.1-talaan2'],
+  [/2\\\.0\\\.1-talaan1/g, '2\\.0\\.1-talaan2']
 ];
 
 let colorCount = 0;
