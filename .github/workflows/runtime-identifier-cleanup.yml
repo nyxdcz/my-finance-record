@@ -1,0 +1,56 @@
+name: One-time Recovery Terminology Cleanup
+
+on:
+  pull_request:
+    types: [synchronize]
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  migrate:
+    if: github.event.pull_request.head.ref == 'chore/talaan-terminology-cleanup'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out cleanup branch
+        uses: actions/checkout@v4
+        with:
+          ref: chore/talaan-terminology-cleanup
+          fetch-depth: 0
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install locked project metadata
+        run: npm ci
+
+      - name: Modernize recovery identifiers
+        run: node scripts/cleanup-runtime-identifiers.mjs
+
+      - name: Regenerate Talaan runtime copies
+        run: npm run prepare:runtime
+
+      - name: Validate repository quality
+        run: npm run quality
+
+      - name: Remove one-time migration machinery
+        run: |
+          rm -f scripts/cleanup-runtime-identifiers.mjs
+          rm -f .github/workflows/runtime-identifier-cleanup.yml
+
+      - name: Commit recovery terminology cleanup
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No recovery terminology changes were required."
+            exit 0
+          fi
+          git commit -m "refactor: modernize recovery terminology"
+          git push origin HEAD:chore/talaan-terminology-cleanup
