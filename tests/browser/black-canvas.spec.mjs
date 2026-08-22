@@ -50,8 +50,8 @@ for (const theme of ["light", "dark"]) {
       expect(result.bg).toBe("#efefef");
       expect(result.primary).toBe("#356FD1");
       expect(result.bodyBg).toBe("rgb(239, 239, 239)");
-      expect(result.paidBg).toBe("rgb(23, 59, 103)");
-      expect(result.paidBorder).toBe("rgb(23, 59, 103)");
+      expect(result.paidBg).toBe("rgb(53, 111, 209)");
+      expect(result.paidBorder).toBe("rgb(53, 111, 209)");
       expect(result.accountBorder).not.toBe("rgba(207, 231, 213, 0.24)");
       expect(result.accountNameColor).toBe(result.accountAmountColor);
       expect(result.accountTypeColor).toBe("rgb(102, 112, 133)");
@@ -59,8 +59,8 @@ for (const theme of ["light", "dark"]) {
       expect(result.bg).toBe("#000000");
       expect(result.primary).toBe("#356FD1");
       expect(result.bodyBg).toBe("rgb(0, 0, 0)");
-      expect(result.paidBg).toBe("rgb(23, 62, 118)");
-      expect(result.paidBorder).toBe("rgb(23, 62, 118)");
+      expect(result.paidBg).toBe("rgb(53, 111, 209)");
+      expect(result.paidBorder).toBe("rgb(53, 111, 209)");
       expect(result.accountBorder).toBe("rgba(207, 231, 213, 0.24)");
     }
     expect(result.paidColor).toBe("rgb(255, 255, 255)");

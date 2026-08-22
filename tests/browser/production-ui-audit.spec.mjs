@@ -216,7 +216,7 @@ test("desktop expense cards match the approved compact type, status, and footer 
   expect(metrics.markPaidSize[1]).toBeCloseTo(30, 0);
   expect(metrics.markPaidFont.size).toBeCloseTo(11, 0);
   expect(metrics.markPaidFont.weight).toBe(600);
-  expect(metrics.markPaidBackground).toBe("rgb(23, 58, 99)");
+  expect(metrics.markPaidBackground).toBe("rgb(53, 111, 209)");
   expect(metrics.markPaidRadius).toBeCloseTo(7, 0);
   expect(metrics.editSize[0]).toBeCloseTo(48, 0);
   expect(metrics.editSize[1]).toBeCloseTo(30, 0);
