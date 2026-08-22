@@ -9,9 +9,10 @@ assert.match(css,/html\[data-theme="light"\] #availableMoneySection \.account-sp
 assert.match(css,/html\[data-theme="light"\] #availableMoneySection \.account-spend-button span\s*\{[\s\S]*color:var\(--text\) !important;/);
 assert.match(css,/html\[data-theme="dark"\] #availableMoneySection \.account-spend-button span\s*\{[\s\S]*color:#ffffff !important;/);
 assert.match(index,/black-canvas-v15-1-0\.css\?v=15\.1\.0-light1/);
+assert.match(index,/Talaan · V2\.0\.1/);
 assert.match(sw,/black-canvas-v15-1-0\.css\?v=15\.1\.0-light1/);
-assert.equal(version.version,"2.0.0");
+assert.equal(version.version,"2.0.1");
 assert.equal(version.schemaVersion,12);
 assert.equal(version.cloudSchemaVersion,3);
-assert.equal(version.cacheVersion,"finance-v2-20260822-organized-complete-r1");
-console.log("Spend theme contrast regression passed under V2.0.0 while preserving the legacy Black Canvas asset pin.");
+assert.equal(version.cacheVersion,"finance-v2-20260822-talaan-r1");
+console.log("Spend theme contrast regression passed under Talaan V2.0.1 while preserving the compatibility Black Canvas asset pin.");
