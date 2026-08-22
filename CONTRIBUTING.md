@@ -7,9 +7,9 @@ This repository contains a personal finance application. Changes must prioritize
 ## Workflow
 
 1. Start from the latest `main` branch.
-2. Create a focused branch such as `fix/installer-permissions`, `feat/budget-export`, or `docs/repository-organization`.
+2. Create a focused branch named for the actual work, such as `feat/budget-export`, `refactor/recovery-terminology`, `style/finance-card-alignment`, `test/cloud-sync-safety`, `docs/repository-organization`, `ci/pages-validation`, or `chore/dependency-maintenance`. Use `fix/...` only when repairing a confirmed defect.
 3. Change only the approved scope.
-4. Use a Conventional Commit subject such as `fix: restore installer permissions`; avoid subjects such as `fix`, `update`, or `f`.
+4. Choose the Conventional Commit type that matches the work and write a specific, descriptive subject. Use `feat:` for features, `refactor:` for structural cleanup without a behavior change, `style:` for visual-only changes, `test:` for test coverage, `docs:` for documentation, `ci:` for workflow changes, and `chore:` for maintenance. Reserve `fix:` for a confirmed defect with a clear description of what was repaired. Avoid vague subjects such as `fix`, `update`, `changes`, or `f`.
 5. When behavior or runtime output changes, update the release number, cache key, `version.json`, README/release documentation, changelog, and validation metadata required by the current release process.
 6. Run:
 
