@@ -1,6 +1,7 @@
 "use strict";
 (function exposeFinancePwaUpdate(root) {
   const FINANCE_CACHE_PATTERN = /^finance-v\d+-/;
+  // Compatibility-only cache identity used to upgrade clients installed before Talaan V2.
   const LEGACY_INDEX_CACHE = "finance-v15-20260816-mobile-ui-ux-r32";
   const CURRENT_CACHE_VERSION = "finance-v2-20260822-talaan-r1";
   const UI_HOTFIX_REFRESH_KEY = "finance-ui-hotfix-v2-0-1-talaan1";
@@ -8,7 +9,7 @@
 
   async function installBrowserBrandIcons() {
     try {
-      await import("./brand-icons-v15-2-18.js?v=15.2.19-brand1");
+      await import("./brand-icons.js?v=2.0.1-talaan1");
       return true;
     } catch (error) {
       return false;
@@ -27,9 +28,9 @@
           try {
             const pathname = new URL(request.url).pathname;
             return pathname.endsWith("/header-tools-compat.js")
-              || pathname.endsWith("/desktop-ui-phase1-v15-1-0.css")
-              || pathname.endsWith("/black-canvas-v15-1-0.css")
-              || pathname.endsWith("/production-ui-audit-v15-2-13.css")
+              || pathname.endsWith("/desktop-ui-phase1.css")
+              || pathname.endsWith("/black-canvas.css")
+              || pathname.endsWith("/production-ui-audit.css")
               || pathname.endsWith("/phone-finance-compat.js");
           }
           catch (error) { return false; }

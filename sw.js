@@ -1,29 +1,10 @@
 "use strict";
-const APP_VERSION = "15.2.23";
+const APP_VERSION = "2.0.1";
 self.__FINANCE_APP_VERSION = APP_VERSION;
-// V15.2.9 refreshes sidebar icon delivery and disclosure/icon presentation without changing Finance or sync behavior.
-// V15.2.8 consolidates Cash Flow presentation ownership in static CSS without changing Finance or sync behavior.
-// V15.2.7 extracted Application Help UI into a dedicated precached runtime module without changing Finance or sync behavior.
-// V15.2.6 extracts calculator/form-input behavior into a dedicated precached runtime module without changing Finance calculations or schemas.
-// V15.2.3 sync status artwork: supplied green/orange/red Cloud Sync icons and matching toolbar text colors.
-// V15.2.3 hotfix: keep the More tools icon-alignment stylesheet network-first so installed apps receive refreshed artwork.
-// V15.2.4 consolidated UI refinement: exact Finance/More-tools artwork, compact Appearance, flat month selector, and retry-safe live delivery.
-// V15.2.2 mobile UI/UX delivery · phone layout, touch targets, menu safety, and responsive regression coverage; finance data and sync semantics unchanged.
-// V15.2.2 hotfix: Finance workspace sticky row now follows the mobile topbar offset.
-// V15.2.2 hotfix: force refreshed shell assets for the Income versus Expenses dashboard arrangement.
-// V15.2.2 hotfix: recovery import actions are force-refreshed and the privacy lock is network-first with offline fallback.
-// V15.2.2 hotfix: large pre-import recovery snapshots are stored in IndexedDB instead of localStorage metadata.
-// V15.2.2 hotfix: re-precache the expense dialog after removing the redundant required-fields and mode-note strip.
-// V15.2.2 hotfix: refresh the compact My Finance Records sidebar brand and pin geometry.
-// V15.2.2 hotfix: compact phone Finance records and icon-only Add account / Schedule event actions.
-// V15.2.2 hotfix: refresh phone toolbar grid, Finance tabs, and expense action geometry after overlap repair.
-// V15.2.2 hotfix: require explicit Cloud Profile selection when an account has multiple finance profiles.
-// V15.2.2 hotfix: refresh the first-half completion heart-smile artwork from the validated app shell.
-// V15.2.2 hotfix: keep interaction-patterns network-first so completion-state presentation refreshes without rotating finance caches.
-// V15.2.2 hotfix: keep the PWA update layer network-first so the Quick add topbar relocation reaches installed apps.
-const CACHE_VERSION = "finance-v15-20260821-monthly-repeat-icon-r59";
+const CACHE_VERSION = "finance-v2-20260822-talaan-r1";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
+// Persistent IndexedDB name is intentionally retained so existing saved data remains available after the product rename.
 const DB_NAME = "simple-finance-project-records-v12-db";
 const DB_VERSION = 2;
 let financeAuthState = "signed-out";
@@ -35,49 +16,51 @@ const APP_SHELL = [
   asset("./offline.html"),
   asset("./manifest.webmanifest"),
   asset("./version.json"),
-  asset("./app.css?v=15.1.0-desktop3"),
-  asset("./shell-ui-v15-2-11.css?v=15.2.11-shell1"),
-  asset("./dashboard-interactions.css?v=15.2.10-icons1"),
-  asset("./ui-icon-alignment-v15-0-5.css?v=15.2.9-ui2"),
-  asset("./black-canvas-v15-1-0.css?v=15.1.0-light1"),
-  asset("./desktop-ui-phase1-v15-1-0.css?v=15.1.0-phase1"),
-  asset("./desktop-ux-v15-2-0.css?v=15.2.5-disclosure1"),
-  asset("./production-ui-audit-v15-2-13.css?v=15.2.23-repeat3"),
-  asset("./form-inputs.js?v=15.2.6-phase5a1"),
-  asset("./application-help.js?v=15.2.9-phase5b1"),
-  asset("./pwa-update-v15-0-5.js?v=15.2.23-release5"),
-  asset("./brand-icons-v15-2-18.js?v=15.2.19-brand1"),
-  asset("./phone-finance-compat.js?v=15.2.10-phone1"),
-  asset("./cash-flow-summary.js?v=15.2.10-cashflow1"),
-  asset("./header-tools-compat.js?v=15.2.10-header1"),
-  asset("./dashboard-interactions-core-v14-0-23.css"),
-  asset("./liquid-glass-v15.css?v=15.2.2-light1"),
-  asset("./mobile-v14-0-23.css?v=15.2.10-mobile2"),
-  asset("./interaction-patterns.js?v=15.2.18-kanban1"),
-  asset("./privacy-lock.js?v=15.1.0-ui1"),
-  asset("./security-profiles.js?v=14.0.23"),
-  asset("./security-profiles.css?v=15.1.0-desktop2"),
-  asset("./cloud-conflict-review.js?v=14.0.23"),
-  asset("./cloud-conflict-resolution.js?v=14.0.23"),
-  asset("./cloud-sync-lifecycle.js?v=14.0.23"),
-  asset("./cloud-sync.js?v=15.2.12-sync2"),
-  asset("./account-ledger.js?v=15.0.4"),
-  asset("./account-ledger.css?v=14.0.23"),
-  asset("./budget-planning.js?v=15.2.1-ux1"),
-  asset("./budget-planning.css?v=15.2.9-ui1"),
-  asset("./reports-insights.js?v=14.0.23"),
-  asset("./reports-insights.css?v=15.1.0-desktop1"),
-  asset("./productivity-tools.js?v=15.2.1-ux2"),
-  asset("./productivity-tools.css?v=14.0.23"),
-  asset("./reminders-alerts.js?v=14.0.23"),
-  asset("./reminders-alerts.css?v=14.0.23"),
-  asset("./projects-calendar-v13.0.20.js?v=15.2.18-kanban1"),
-  asset("./projects-calendar-v13.0.20.css?v=15.2.18-kanban1"),
-  asset("./sync-config.js?v=15.2.10-release1"),
-  asset("./sync-runtime-compat.js?v=15.2.23-release13"),
-  asset("./expense-screenshot-parser.js?v=15.0.3"),
-  asset("./expense-screenshot-detect.js?v=15.0.3"),
-  asset("./expense-screenshot-ai.js?v=15.0.3"),
+  asset("./app.css?v=2.0.1-talaan1"),
+  asset("./shell-ui.css?v=2.0.1-talaan1"),
+  asset("./dashboard-interactions.css?v=2.0.1-talaan1"),
+  asset("./ui-icon-alignment.css?v=2.0.1-talaan1"),
+  asset("./black-canvas.css?v=2.0.1-talaan1"),
+  asset("./desktop-ui-phase1.css?v=2.0.1-talaan1"),
+  asset("./desktop-ux.css?v=2.0.1-talaan1"),
+  asset("./production-ui-audit.css?v=2.0.1-talaan1"),
+  asset("./summary-mascots.css?v=2.0.1-talaan1"),
+  asset("./form-inputs.js?v=2.0.1-talaan1"),
+  asset("./application-help.js?v=2.0.1-talaan1"),
+  asset("./pwa-update.js?v=2.0.1-talaan1"),
+  asset("./brand-icons.js?v=2.0.1-talaan1"),
+  asset("./phone-finance-compat.js?v=2.0.1-talaan1"),
+  asset("./summary-mascots.js?v=2.0.1-talaan1"),
+  asset("./cash-flow-summary.js?v=2.0.1-talaan1"),
+  asset("./header-tools-compat.js?v=2.0.1-talaan1"),
+  asset("./dashboard-interactions-core.css?v=2.0.1-talaan1"),
+  asset("./liquid-glass.css?v=2.0.1-talaan1"),
+  asset("./mobile.css?v=2.0.1-talaan1"),
+  asset("./interaction-patterns.js?v=2.0.1-talaan1"),
+  asset("./privacy-lock.js?v=2.0.1-talaan1"),
+  asset("./security-profiles.js?v=2.0.1-talaan1"),
+  asset("./security-profiles.css?v=2.0.1-talaan1"),
+  asset("./cloud-conflict-review.js?v=2.0.1-talaan1"),
+  asset("./cloud-conflict-resolution.js?v=2.0.1-talaan1"),
+  asset("./cloud-sync-lifecycle.js?v=2.0.1-talaan1"),
+  asset("./cloud-sync.js?v=2.0.1-talaan1"),
+  asset("./account-ledger.js?v=2.0.1-talaan1"),
+  asset("./account-ledger.css?v=2.0.1-talaan1"),
+  asset("./budget-planning.js?v=2.0.1-talaan1"),
+  asset("./budget-planning.css?v=2.0.1-talaan1"),
+  asset("./reports-insights.js?v=2.0.1-talaan1"),
+  asset("./reports-insights.css?v=2.0.1-talaan1"),
+  asset("./productivity-tools.js?v=2.0.1-talaan1"),
+  asset("./productivity-tools.css?v=2.0.1-talaan1"),
+  asset("./reminders-alerts.js?v=2.0.1-talaan1"),
+  asset("./reminders-alerts.css?v=2.0.1-talaan1"),
+  asset("./projects-calendar.js?v=2.0.1-talaan1"),
+  asset("./projects-calendar.css?v=2.0.1-talaan1"),
+  asset("./sync-config.js?v=2.0.1-talaan1"),
+  asset("./sync-runtime-compat.js?v=2.0.1-talaan1"),
+  asset("./expense-screenshot-parser.js?v=2.0.1-talaan1"),
+  asset("./expense-screenshot-detect.js?v=2.0.1-talaan1"),
+  asset("./expense-screenshot-ai.js?v=2.0.1-talaan1"),
   asset("./vendor/supabase.min.js"),
   asset("./icons/icon-192-logo2.png"),
   asset("./icons/icon-512-logo2.png"),
@@ -105,7 +88,11 @@ const APP_SHELL = [
   asset("./icons/sync-synced-v15-2-3.png"),
   asset("./icons/theme-night-v14-0-23.png"),
   asset("./icons/theme-day-v14-0-23.png"),
-  asset("./icons/theme-auto-v14-0-23.png")
+  asset("./icons/theme-auto-v14-0-23.png"),
+  asset("./assets/mascots/mascot-red.png?v=2.0.1-talaan1"),
+  asset("./assets/mascots/mascot-green.png?v=2.0.1-talaan1"),
+  asset("./assets/mascots/mascot-blue.png?v=2.0.1-talaan1"),
+  asset("./assets/mascots/mascot-orange.png?v=2.0.1-talaan1")
 ];
 
 async function precache() {
@@ -121,6 +108,7 @@ self.addEventListener("install", event => {
 self.addEventListener("activate", event => {
   event.waitUntil((async () => {
     const keys = await caches.keys();
+    // Compatibility cleanup only: remove caches created by pre-Talaan V12-V15 releases.
     await Promise.all(keys.filter(key => /^finance-v(?:12|13|14|15)-/.test(key) && ![SHELL_CACHE, RUNTIME_CACHE].includes(key)).map(key => caches.delete(key)));
     await self.clients.claim();
   })());
@@ -178,7 +166,7 @@ self.addEventListener("fetch", event => {
     return;
   }
   if (url.origin !== self.location.origin) return;
-  if (url.pathname.endsWith("privacy-lock.js") || url.pathname.endsWith("cloud-sync-lifecycle.js") || url.pathname.endsWith("interaction-patterns.js") || url.pathname.endsWith("pwa-update-v15-0-5.js") || url.pathname.endsWith("ui-icon-alignment-v15-0-5.css") || url.pathname.endsWith("mobile-v14-0-23.css") || url.pathname.endsWith("production-ui-audit-v15-2-13.css") || url.pathname.endsWith("budget-planning.css") || url.pathname.endsWith("black-canvas-v15-1-0.css")) {
+  if (url.pathname.endsWith("privacy-lock.js") || url.pathname.endsWith("cloud-sync-lifecycle.js") || url.pathname.endsWith("interaction-patterns.js") || url.pathname.endsWith("pwa-update.js") || url.pathname.endsWith("ui-icon-alignment.css") || url.pathname.endsWith("mobile.css") || url.pathname.endsWith("production-ui-audit.css") || url.pathname.endsWith("budget-planning.css") || url.pathname.endsWith("black-canvas.css")) {
     event.respondWith(networkFirstCriticalAsset(request));
     return;
   }
@@ -267,7 +255,7 @@ async function showFinanceNotification(payload = {}, { force = false } = {}) {
   if (typeof Notification !== "undefined" && Notification.permission !== "granted") return false;
   const title = String(payload.title || "Finance reminder");
   const options = {
-    body:String(payload.body || "Open My Finance Records to review your alerts."),
+    body:String(payload.body || "Open Talaan to review your alerts."),
     icon:asset("./icons/icon-192-logo2.png"),
     badge:asset("./icons/icon-192-logo2.png"),
     tag:String(payload.tag || (force ? "finance-alert-manual" : `finance-alert-${localDateKey()}`)),
@@ -288,7 +276,7 @@ async function showScheduledFinanceAlert() {
   if (String(reminder.lastNotificationDate || "") === date) return false;
   const payload = reminder.notification || {
     title:reminder.title || "Finance alerts",
-    body:reminder.body || "Open My Finance Records to review your alerts.",
+    body:reminder.body || "Open Talaan to review your alerts.",
     tag:`finance-alert-digest-${date}`,
     url:"./index.html?page=dashboard"
   };
@@ -318,5 +306,3 @@ self.addEventListener("notificationclick", event => {
     await self.clients.openWindow(target);
   })());
 });
-
-// V15.0.2 cash-flow chart focus cache refresh.
