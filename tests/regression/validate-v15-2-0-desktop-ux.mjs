@@ -9,6 +9,8 @@ const desktopUx = read("desktop-ux-v15-2-0.css");
 const uiIcons = read("ui-icon-alignment-v15-0-5.css");
 const runtimeCompat = read("sync-runtime-compat.js");
 const changelog = read("CHANGELOG.md");
+const versionHistoryMatch = index.match(/const VERSION_HISTORY = (\[[^\n]+\]);/);
+const versionHistory = versionHistoryMatch ? JSON.parse(versionHistoryMatch[1]) : [];
 const cloudFile = fs.readdirSync(".").find(name => name.endsWith(".js") && read(name).includes("financeCloudSyncV3Bootstrap"));
 if (!cloudFile) throw new Error("Cloud Sync V3 file missing");
 const cloud = read(cloudFile);
@@ -18,6 +20,8 @@ const required = [
   [version.schemaVersion === 12 && version.cloudSchemaVersion === 3, "schemas remain 12/3"],
   [version.cacheVersion === "finance-v2-20260822-organized-complete-r1", "V2 organized cache is declared"],
   [index.includes("My Finance Records · V2.0.0"), "page title is V2.0.0"],
+  [versionHistory.length === 1 && versionHistory[0]?.version === "V2.0.0" && versionHistory[0]?.title === "Organized Complete", "website Version history contains only the current V2.0.0 release"],
+  [index.includes("<h3>Version history</h3><p>Latest release details</p>"), "website Version history is labeled as latest release details"],
   [changelog.includes("## 2.0.0 · 2026-08-22"), "CHANGELOG includes the V2.0.0 release entry"],
   [changelog.includes("## 1.0.0 · Created") && changelog.includes("## 1.14.0 · Budget & Expense Final Polish"), "CHANGELOG contains the organized V1 milestone history"],
   [changelog.includes("| **1.14.0** | V15.2.19–V15.2.24 maintenance |"), "CHANGELOG keeps the legacy V15 mapping traceable"],
@@ -35,7 +39,7 @@ const required = [
   [sw.includes('const APP_VERSION = "2.0.0"') && sw.includes(version.cacheVersion), "service worker delivery matches release"],
   [sw.includes("desktop-ux-v15-2-0.css?v=15.2.5-disclosure1"), "legacy desktop disclosure CSS pin is precached"],
   [runtimeCompat.includes('const VERSION = "2.0.0"') && runtimeCompat.includes('const RELEASE_NAME = "Organized Complete"'), "release override matches V2.0.0"],
-  [index.includes("sync-runtime-compat.js?v=2.0.0-release1") && sw.includes("sync-runtime-compat.js?v=2.0.0-release1"), "V2 release layer is cache-busted consistently"],
+  [index.includes("sync-runtime-compat.js?v=2.0.0-release2") && sw.includes("sync-runtime-compat.js?v=2.0.0-release2"), "V2 release layer is cache-busted consistently"],
   [desktopUx.includes("--budget-disclosure-reference-size:var(--ui-disclosure-size,40px)"), "Budget disclosure buttons share the First-half control size"],
   [desktopUx.includes("--budget-disclosure-reference-inset:17px"), "Budget disclosure buttons use the First-half right inset"],
   [desktopUx.includes("#money .period-card .period-header") && desktopUx.includes("padding-right:var(--budget-disclosure-reference-inset) !important"), "First, second, and other period headers pin the reference disclosure edge"],
@@ -50,4 +54,4 @@ const required = [
   [read("mobile-v14-0-23.css").length > 0, "mobile stylesheet remains present"]
 ];
 for (const [ok, message] of required) { if (!ok) throw new Error(message); }
-console.log("V2.0.0 release preserves the desktop UX source contract, organized changelog, and legacy compatibility assets");
+console.log("V2.0.0 release preserves the desktop UX source contract and shows only the current website version history");

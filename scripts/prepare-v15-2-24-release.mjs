@@ -11,7 +11,7 @@ const RELEASE = Object.freeze({
   name:"Organized Complete",
   date:"August 22, 2026",
   dateIso:"2026-08-22",
-  syncQuery:"2.0.0-release1"
+  syncQuery:"2.0.0-release2"
 });
 
 let changed = 0;

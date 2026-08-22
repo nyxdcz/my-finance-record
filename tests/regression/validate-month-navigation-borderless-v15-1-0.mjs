@@ -17,5 +17,5 @@ assert.match(runtime, /liquid-glass-v15\.css\?v=15\.2\.2-light1/);
 assert.match(runtime, /const VERSION = "2\.0\.0";/);
 assert.match(sw, new RegExp(version.cacheVersion));
 assert.match(index, new RegExp(version.cacheVersion));
-assert.match(index, /sync-runtime-compat\.js\?v=2\.0\.0-release1/);
+assert.match(index, /sync-runtime-compat\.js\?v=2\.0\.0-release2/);
 console.log("V2.0.0 borderless month-navigation regression passed while retaining the legacy Liquid Glass asset filename.");
