@@ -1,6 +1,6 @@
 {
-  "name": "My Finance Records",
-  "description": "Local-first profile-based personal and household finance app with encrypted sync support.",
+  "name": "Talaan",
+  "description": "Local-first personal and household finance PWA with multi-profile support and optional encrypted cloud sync.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
