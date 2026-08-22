@@ -20,9 +20,10 @@ const refreshAt = ledger.indexOf("refreshReconciledAccountState(account, expecte
 assert.ok(saveAt >= 0 && refreshAt > saveAt, "verified persistence must happen before final UI refresh");
 assert.match(index, /account-ledger\.js\?v=15\.0\.4/, "account-ledger asset must remain on its repaired pin");
 assert.match(index, /budget-planning\.js\?v=15\.2\.1-ux1/, "budget-planning asset must remain on its repaired pin");
-assert.ok(worker.includes(version.cacheVersion), "PWA cache must match the current organized release");
+assert.match(index, /Talaan · V2\.0\.1/);
+assert.ok(worker.includes(version.cacheVersion), "PWA cache must match the current Talaan release");
 assert.match(worker, /account-ledger\.js\?v=15\.0\.4/, "worker must precache repaired account ledger");
 assert.match(worker, /budget-planning\.js\?v=15\.2\.1-ux1/, "worker must precache repaired budget planning");
-assert.equal(pkg.version, "2.0.0");
-assert.equal(version.version, "2.0.0");
-console.log("Record spending regression validation passed under V2.0.0 with repaired legacy module pins preserved.");
+assert.equal(pkg.version, "2.0.1");
+assert.equal(version.version, "2.0.1");
+console.log("Record spending regression validation passed under Talaan V2.0.1 with repaired compatibility module pins preserved.");

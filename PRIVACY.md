@@ -1,8 +1,8 @@
-# Privacy Notes · V13.0.0
+# Privacy Notes · Talaan V2.0.1
 
-My Finance Records has no analytics or advertising code. Local finance records remain in the browser unless the user explicitly enables Supabase synchronization or exports a file.
+**Talaan** has no analytics or advertising code. Local finance records remain in the browser unless the user explicitly enables Supabase synchronization or exports a file.
 
-## Cloud Sync V3
+## Cloud Sync
 
 Cloud record payloads are encrypted in the browser before upload. Supabase stores ciphertext envelopes. Operational metadata remains visible to the configured project, including profile membership, collection and record identifiers, revisions, deletion markers, timestamps, app versions, and device information.
 
@@ -10,7 +10,7 @@ Authentication email addresses and MFA/passkey information are handled by the co
 
 ## Local browser data
 
-The active profile working copy remains plaintext in localStorage for compatibility with the existing local-first app. The optional device app lock prevents casual on-screen access but is not full storage encryption. Anyone with access to the unlocked operating-system account and browser profile may be able to inspect local data.
+The active profile working copy remains plaintext in localStorage for compatibility with Talaan's local-first model. The optional device app lock prevents casual on-screen access but is not full storage encryption. Anyone with access to the unlocked operating-system account and browser profile may be able to inspect local data.
 
 ## Household profiles
 
@@ -18,4 +18,8 @@ Owners can invite members and manage roles. Authorized members can see profile m
 
 ## Backups
 
-Normal legacy exports may be plaintext. V13 encrypted `.mfrx` exports use a user-supplied passphrase. Losing that passphrase makes the encrypted file unrecoverable.
+Encrypted `.mfrx` exports use a user-supplied passphrase. Losing that passphrase makes the encrypted file unrecoverable. Keep backup files and their passphrases in separate secure locations and test recovery before replacing a device.
+
+## Branding and compatibility
+
+The current visible product name is **Talaan**. Technical storage keys, record identifiers, repository paths, and compatibility-sensitive runtime filenames may retain stable internal names so a branding change does not reset or disconnect saved finance data.

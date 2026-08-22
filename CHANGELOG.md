@@ -1,10 +1,18 @@
 # Changelog
 
-## V2.0.0 · Organized Complete
+## V2.0.1 · Talaan
 
-**Current production release:** V2.0.0
+**Current production release:** V2.0.1
 
-V2.0.0 is the active release baseline for My Finance Records. This changelog focuses only on the current product version.
+Talaan V2.0.1 is the active release baseline. This changelog focuses only on the current product version.
+
+### Brand and PWA
+
+- Renamed the current product experience to **Talaan**.
+- Updated the website title, sidebar brand, installed-app labels, manifest metadata, offline page, install messaging, and calendar export branding.
+- Updated current-facing repository documentation to use the Talaan name.
+- Rotated the PWA cache to `finance-v2-20260822-talaan-r1` so installed clients receive the new branding.
+- Preserved compatibility-sensitive storage keys, repository paths, calendar UID domains, and runtime filenames where changing them could affect saved data or installed clients.
 
 ### Finance
 
@@ -50,6 +58,5 @@ V2.0.0 is the active release baseline for My Finance Records. This changelog foc
 
 - Protected finance calculations, balances, recurrence, payments, ledger history, projects, backups, and synchronization state.
 - Regression, browser, privacy, accessibility, and deployment validation in GitHub Actions.
-- Current PWA cache identity: `finance-v2-20260822-organized-complete-r1`.
 
-Future release notes should continue from the current V2 product line using semantic versioning.
+Future release notes continue from the current Talaan V2 product line using semantic versioning.

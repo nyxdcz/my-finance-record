@@ -8,11 +8,11 @@ async function unlockApp(page, width, pageName = "dashboard") {
   await page.goto(`http://127.0.0.1:3000/?page=${pageName}`, { waitUntil:"domcontentloaded" });
   await page.waitForFunction(() => Boolean(window.FinancePrivacyLock));
   await page.evaluate(() => window.FinancePrivacyLock.setAuthenticated(true));
-  await page.waitForFunction(() => document.querySelector(".sidebar .brand strong")?.textContent === "My Finance Records");
+  await page.waitForFunction(() => document.querySelector(".sidebar .brand strong")?.textContent === "Talaan");
 }
 
-test("expanded and collapsed desktop sidebar use the static My Finance Records brand", async ({ page }) => {
-  expect(source("index.html")).toContain("<strong>My Finance Records</strong>");
+test("expanded and collapsed desktop sidebar use the static Talaan brand", async ({ page }) => {
+  expect(source("index.html")).toContain("<strong>Talaan</strong>");
   expect(source("pwa-update-v15-0-5.js")).not.toContain("installSidebarBrand");
   expect(source("pwa-update-v15-0-5.js")).not.toContain("document");
   expect(source("ui-icon-alignment-v15-0-5.css")).toContain("width:28px !important");
@@ -46,7 +46,7 @@ test("expanded and collapsed desktop sidebar use the static My Finance Records b
     buttonTop:"15px",
     brandFontSize:"16px",
     brandWhiteSpace:"nowrap",
-    brandText:"My Finance Records",
+    brandText:"Talaan",
     navFontSizes:["11px","11px","11px","11px","11px"]
   });
 
@@ -61,18 +61,18 @@ test("expanded and collapsed desktop sidebar use the static My Finance Records b
     buttonTop:"15px",
     brandFontSize:"16px",
     brandWhiteSpace:"nowrap",
-    brandText:"My Finance Records",
+    brandText:"Talaan",
     navFontSizes:["11px","11px","11px","11px","11px"]
   });
 });
 
-test("mobile drawer keeps the static My Finance Records brand", async ({ page }) => {
+test("mobile drawer keeps the static Talaan brand", async ({ page }) => {
   await unlockApp(page, 390, "money");
   const menuButton = page.locator("#menuButton");
   await expect(menuButton).toBeVisible();
   await menuButton.click();
   await expect(page.locator("#sidebar")).toHaveAttribute("aria-hidden", "false");
-  await expect(page.locator(".sidebar .brand strong")).toHaveText("My Finance Records");
+  await expect(page.locator(".sidebar .brand strong")).toHaveText("Talaan");
   await expect(page.locator(".sidebar .brand strong")).toHaveCSS("font-size", "16px");
   for (const label of await page.locator(".sidebar .nav-label").all()) {
     await expect(label).toHaveCSS("font-size", "11px");
@@ -80,7 +80,7 @@ test("mobile drawer keeps the static My Finance Records brand", async ({ page })
 });
 
 test("sidebar brand shell cache is synchronized", () => {
-  const expected = "finance-v2-20260822-organized-complete-r1";
+  const expected = "finance-v2-20260822-talaan-r1";
   expect(source("version.json")).toContain(`"cacheVersion": "${expected}"`);
   expect(source("sw.js")).toContain(`const CACHE_VERSION = "${expected}"`);
   expect(source("pwa-update-v15-0-5.js")).toContain(`const CURRENT_CACHE_VERSION = "${expected}"`);

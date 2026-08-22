@@ -1,7 +1,7 @@
 {
-  "name": "My Finance Records",
-  "short_name": "Finance Records",
-  "description": "Local-first income, expense, budget, project, payment, calendar, Savings, and financial report records.",
+  "name": "Talaan",
+  "short_name": "Talaan",
+  "description": "Talaan is a local-first personal and household finance PWA for income, expenses, budgets, projects, payments, calendar planning, savings, and financial reports.",
   "id": "./index.html",
   "start_url": "./index.html?page=dashboard",
   "scope": "./",

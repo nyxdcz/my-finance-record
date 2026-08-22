@@ -15,14 +15,15 @@ const browserAudit = read("tests/browser/production-ui-audit-v15-2-13.spec.mjs")
 const version = JSON.parse(read("version.json"));
 const pkg = JSON.parse(read("package.json"));
 
-assert.equal(version.version, "2.0.0");
-assert.equal(pkg.version, "2.0.0");
+assert.equal(version.version, "2.0.1");
+assert.equal(pkg.version, "2.0.1");
 assert.equal(version.schemaVersion, 12);
 assert.equal(version.cloudSchemaVersion, 3);
-assert.equal(version.cacheVersion, "finance-v2-20260822-organized-complete-r1");
-assert.match(index, /production-ui-audit-v15-2-13\.css\?v=2\.0\.0-organized1/);
+assert.equal(version.cacheVersion, "finance-v2-20260822-talaan-r1");
+assert.match(index, /Talaan · V2\.0\.1/);
+assert.match(index, /production-ui-audit-v15-2-13\.css\?v=2\.0\.1-talaan1/);
 assert.ok(index.indexOf("production-ui-audit-v15-2-13.css") > index.indexOf("desktop-ux-v15-2-0.css"));
-assert.match(worker, /production-ui-audit-v15-2-13\.css\?v=2\.0\.0-organized1/);
+assert.match(worker, /production-ui-audit-v15-2-13\.css\?v=2\.0\.1-talaan1/);
 assert.match(prepare, /expense-compact-v15-2-24\.css/);
 assert.match(prepare, /expense-compact-v15-2-24\.js/);
 assert.match(runtimeCss, /V15\.2\.24 · Compact Expense Status & Collapse/);
@@ -66,4 +67,4 @@ assert.match(browserAudit, /toBeCloseTo\(20, 0\)/);
 assert.match(browserAudit, /toBeCloseTo\(74, 0\)/);
 assert.match(browserAudit, /toBeCloseTo\(48, 0\)/);
 
-console.log("V2.0.0 production UI/UX audit preserves the compact expense status and independent collapse coverage from V15.2.24.");
+console.log("Talaan V2.0.1 production UI/UX audit preserves compact expense status and independent collapse coverage.");

@@ -4,28 +4,30 @@ import { fileURLToPath } from "node:url";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, "..");
+const BRAND = "Talaan";
+const PREVIOUS_BRAND = ["My", "Finance", "Records"].join(" ");
 
 const RELEASE = Object.freeze({
-  version:"2.0.0",
-  displayVersion:"V2.0.0",
-  name:"Organized Complete",
+  version:"2.0.1",
+  displayVersion:"V2.0.1",
+  name:"Talaan",
   date:"August 22, 2026",
   dateIso:"2026-08-22",
-  cache:"finance-v2-20260822-organized-complete-r1",
-  cssQuery:"2.0.0-organized1",
-  pwaQuery:"2.0.0-release1",
-  phoneQuery:"2.0.0-organized1"
+  cache:"finance-v2-20260822-talaan-r1",
+  cssQuery:"2.0.1-talaan1",
+  pwaQuery:"2.0.1-talaan1",
+  phoneQuery:"2.0.1-talaan1"
 });
 
 const CURRENT_VERSION_HISTORY = Object.freeze([{
   version:RELEASE.displayVersion,
   title:RELEASE.name,
   changes:[
-    "Current production release for the complete My Finance Records experience.",
-    "Includes the local-first Finance workspace, Account Ledger, budgeting, reports, projects, productivity tools, reminders, and responsive desktop and phone layouts.",
+    "Current production release under the Talaan product name.",
+    "Updates the website shell, installed-app metadata, offline experience, installation messages, calendar export branding, and current documentation to Talaan.",
+    "Includes the complete local-first Finance workspace, Account Ledger, budgeting, reports, projects, productivity tools, reminders, and responsive desktop and phone layouts.",
     "Includes encrypted multi-profile Cloud Schema V3 synchronization, offline PWA support, recovery safeguards, and five-minute routine sync.",
-    "Includes the final Budget & Expenses compact-card layout, independent First half / Second half / Other expenses collapse controls, and PNG summary mascots.",
-    "Preserves Finance Schema 12, Cloud Schema V3, saved records, balances, recurrence, payments, backups, encryption, and synchronization behavior."
+    "Preserves Finance Schema 12, Cloud Schema V3, saved records, balances, recurrence, payments, backups, encryption, storage identifiers, and synchronization behavior."
   ]
 }]);
 
@@ -128,9 +130,21 @@ function patchTextFile(file, transform) {
   writeIfChanged(target, transform(current));
 }
 
+const runtimeJsTargets = [...new Set(Object.values(runtimeGroups).flat().filter(file => file.endsWith(".js")))];
+for (const file of runtimeJsTargets) {
+  patchTextFile(file, source => source
+    .replaceAll(PREVIOUS_BRAND, BRAND)
+    .replaceAll("Finance Records installed", `${BRAND} installed`));
+}
+
 patchTextFile("index.html", source => {
   let next = source
-    .replace(/<title>My Finance Records · V\d+\.\d+\.\d+<\/title>/, `<title>My Finance Records · ${RELEASE.displayVersion}</title>`)
+    .replaceAll(PREVIOUS_BRAND, BRAND)
+    .replaceAll("Finance Records installed", `${BRAND} installed`)
+    .replaceAll("My_Finance_Records_Calendar_Test.ics", "Talaan_Calendar_Test.ics")
+    .replace(/<meta name="application-name" content="[^"]+">/, `<meta name="application-name" content="${BRAND}">`)
+    .replace(/<meta name="apple-mobile-web-app-title" content="[^"]+">/, `<meta name="apple-mobile-web-app-title" content="${BRAND}">`)
+    .replace(/<title>[^<]+ · V\d+\.\d+\.\d+<\/title>/, `<title>${BRAND} · ${RELEASE.displayVersion}</title>`)
     .replace(/const APP_VERSION = "\d+\.\d+\.\d+";/, `const APP_VERSION = "${RELEASE.version}";`)
     .replace(/const APP_RELEASE_NAME = "[^"]+";/, `const APP_RELEASE_NAME = "${RELEASE.name}";`)
     .replace(/const APP_RELEASE_DATE = "[^"]+";/, `const APP_RELEASE_DATE = "${RELEASE.date}";`)
@@ -145,11 +159,26 @@ patchTextFile("index.html", source => {
     `${historySource}\n\n    function normalizeSettingsPanelKey(`
   );
   next = next.replace(
-    "<h3>Version history</h3><p>What changed in each app release</p>",
+    /<h3>Version history<\/h3><p>[^<]*<\/p>/,
     "<h3>Version history</h3><p>Latest release details</p>"
   );
+  if (next.includes(PREVIOUS_BRAND)) throw new Error("Prepared index still contains the superseded display brand.");
   return next;
 });
+
+patchTextFile("manifest.webmanifest", source => {
+  const manifest = JSON.parse(source);
+  manifest.name = BRAND;
+  manifest.short_name = BRAND;
+  manifest.description = "Talaan is a local-first personal and household finance PWA for income, expenses, budgets, projects, payments, calendar planning, savings, and financial reports.";
+  return `${JSON.stringify(manifest, null, 2)}\n`;
+});
+
+patchTextFile("offline.html", source => source
+  .replaceAll(PREVIOUS_BRAND, BRAND)
+  .replaceAll("Finance Records", BRAND)
+  .replace(/<title>[^<]+ · Offline<\/title>/, `<title>${BRAND} · Offline</title>`)
+  .replace(/Open [^<]+<\/button>/, `Open ${BRAND}</button>`));
 
 patchTextFile("sw.js", source => source
   .replace(/const APP_VERSION = "\d+\.\d+\.\d+";/, `const APP_VERSION = "${RELEASE.version}";`)
@@ -175,4 +204,4 @@ if (fs.existsSync(changelogPath)) {
   }
 }
 
-console.log(`Runtime compatibility files ready for ${RELEASE.displayVersion}${changed ? ` · refreshed ${changed}` : ""}.`);
+console.log(`Talaan runtime ready for ${RELEASE.displayVersion}${changed ? ` · refreshed ${changed}` : ""}.`);

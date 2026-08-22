@@ -1,8 +1,8 @@
 {
   "name": "my-finance-record",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "private": true,
-  "description": "Local-first profile-based personal and household finance PWA with encrypted Supabase synchronization.",
+  "description": "Talaan local-first profile-based personal and household finance PWA with encrypted Supabase synchronization.",
   "type": "module",
   "scripts": {
     "prepare:runtime": "node scripts/prepare-runtime.mjs && node scripts/prepare-v15-2-24-release.mjs && node scripts/prepare-summary-mascots-v15-2-24.mjs",

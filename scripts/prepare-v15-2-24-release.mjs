@@ -7,11 +7,11 @@ const root = path.resolve(here, "..");
 
 /* Legacy filename retained so existing automation paths remain stable. */
 const RELEASE = Object.freeze({
-  version:"2.0.0",
-  name:"Organized Complete",
+  version:"2.0.1",
+  name:"Talaan",
   date:"August 22, 2026",
   dateIso:"2026-08-22",
-  syncQuery:"2.0.0-release2"
+  syncQuery:"2.0.1-talaan1"
 });
 
 let changed = 0;
@@ -35,4 +35,4 @@ for (const file of ["index.html", "sw.js"]) {
   patch(file, source => source.replace(/sync-runtime-compat\.js\?v=[^"]+/, `sync-runtime-compat.js?v=${RELEASE.syncQuery}`));
 }
 
-console.log(`V2.0.0 release override ready${changed ? ` · refreshed ${changed}` : ""}.`);
+console.log(`Talaan ${RELEASE.version} release override ready${changed ? ` · refreshed ${changed}` : ""}.`);

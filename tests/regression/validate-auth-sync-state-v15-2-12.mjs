@@ -28,9 +28,10 @@ assert.match(source, /syncButton\.disabled=syncing \|\| !navigator\.onLine \|\| 
 assert.match(source, /overviewSync\.disabled = syncing \|\| !navigator\.onLine \|\| !ready/, "Settings sync must require cloud readiness");
 assert.match(source, /activateSettingsPanel\(cloudReadiness\(\)\.ready \? "sync" : "profiles"/, "Recovery actions must open Profile & Security when setup is incomplete");
 assert.match(index, /id="cloudConnectionChip">Connected<\/span>/, "The connected chip must be runtime-owned");
+assert.match(index, /Talaan · V2\.0\.1/);
 
-assert.equal(version.version, "2.0.0");
-assert.equal(version.cacheVersion, "finance-v2-20260822-organized-complete-r1");
+assert.equal(version.version, "2.0.1");
+assert.equal(version.cacheVersion, "finance-v2-20260822-talaan-r1");
 assert.match(worker, /cloud-sync\.js\?v=15\.2\.12-sync2/);
 
-console.log("V15.2.12 auth and sync readiness regression passed under V2.0.0.");
+console.log("Auth and sync readiness regression passed under Talaan V2.0.1.");
