@@ -4,7 +4,7 @@
 
 1. Verify V12.25.0 is synchronized on both devices.
 2. Export a recovery backup from the authoritative MacBook.
-3. Run `supabase/cloud-profiles-v13.sql`.
+3. Run `supabase/cloud-profiles-v3.sql`.
 4. Deploy the complete V13 PWA through HTTPS.
 
 ## MacBook first

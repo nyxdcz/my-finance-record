@@ -22,7 +22,7 @@ const CURRENT_VERSION_HISTORY = Object.freeze([{
   title:RELEASE.name,
   changes:[
     "Current production release under the Talaan product name.",
-    "Uses responsibility-based runtime filenames instead of old V13-V15 product-era filenames.",
+    "Uses responsibility-based runtime filenames instead of legacy product-era filenames.",
     "Includes the complete local-first Finance workspace, Account Ledger, budgeting, reports, projects, productivity tools, reminders, and responsive desktop and phone layouts.",
     "Includes encrypted multi-profile Cloud Schema V3 synchronization, offline PWA support, recovery safeguards, and five-minute routine sync.",
     "Preserves Finance Schema 12, Cloud Schema V3, saved records, balances, recurrence, payments, backups, encryption, persistent storage identifiers, and synchronization behavior."
@@ -82,23 +82,6 @@ const runtimeGroups = {
   ]
 };
 
-const LEGACY_RUNTIME_RENAMES = new Map([
-  ["shell-ui-v15-2-11.css", "shell-ui.css"],
-  ["black-canvas-v15-1-0.css", "black-canvas.css"],
-  ["dashboard-interactions-core-v14-0-23.css", "dashboard-interactions-core.css"],
-  ["desktop-ui-phase1-v15-1-0.css", "desktop-ui-phase1.css"],
-  ["desktop-ux-v15-2-0.css", "desktop-ux.css"],
-  ["liquid-glass-v15.css", "liquid-glass.css"],
-  ["mobile-v14-0-23.css", "mobile.css"],
-  ["production-ui-audit-v15-2-13.css", "production-ui-audit.css"],
-  ["projects-calendar-v13.0.20.css", "projects-calendar.css"],
-  ["projects-calendar-v13.0.20.js", "projects-calendar.js"],
-  ["ui-icon-alignment-v15-0-5.css", "ui-icon-alignment.css"],
-  ["brand-icons-v15-2-18.js", "brand-icons.js"],
-  ["pwa-update-v15-0-5.js", "pwa-update.js"],
-  ["summary-mascots-v15-2-25.css", "summary-mascots.css"],
-  ["summary-mascots-v15-2-25.js", "summary-mascots.js"]
-]);
 
 let changed = 0;
 const writeIfChanged = (target, content) => {
@@ -163,7 +146,6 @@ patchTextFile("sync-runtime-compat.js", source => source
 const escapeRegExp = value => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const normalizeRuntimeReferences = source => {
   let next = source;
-  for (const [legacy, current] of LEGACY_RUNTIME_RENAMES) next = next.replaceAll(legacy, current);
   const queryFiles = new Set([
     ...Object.values(runtimeGroups).flat(),
     "phone-finance-compat.js",

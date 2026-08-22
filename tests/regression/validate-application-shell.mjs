@@ -21,7 +21,7 @@ for (const marker of ["const HELP_CONTENT =", "function helpButtonFor", "functio
 for (const topic of ["dashboard-overview", "budget-page", "paid-page", "projects-page", "income-page", "settings-salary-work"]) {
   assert.ok(help.includes(`"${topic}"`) || help.includes(`${topic}:`), `Application Help must retain ${topic}`);
 }
-for (const forbidden of ["function clearAccountDropTargets", "function runV12Migration", "saveData(", "const SCHEMA_VERSION"]) {
+for (const forbidden of ["function clearAccountDropTargets", "function runLegacyDataMigration", "saveData(", "const SCHEMA_VERSION"]) {
   assert.ok(!help.includes(forbidden), `Application Help crossed a finance-data boundary: ${forbidden}`);
 }
 assert.ok(!index.includes("const HELP_CONTENT ="));

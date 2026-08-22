@@ -5,7 +5,7 @@
 
 - [ ] Clean V12.25.0 repository passes `npm run quality` before applying V13.
 - [ ] A fresh V12 recovery backup exists before running the V3 SQL migration.
-- [ ] `supabase/cloud-profiles-v13.sql` succeeds before V13 Cloud Sync is enabled.
+- [ ] `supabase/cloud-profiles-v3.sql` succeeds before V13 Cloud Sync is enabled.
 - [ ] V2 tables and rollback SQL remain unchanged.
 - [ ] Cloud payloads are AES-256-GCM envelopes before RPC submission.
 - [ ] Incoming cloud payloads are decrypted only after profile membership and passphrase unlock.

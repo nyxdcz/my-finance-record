@@ -99,7 +99,7 @@
           <div>
             <h1 id="topTitle">Budget &amp; Expenses</h1>
             <p id="todayLabel">Tuesday, July 21, 2026</p>
-            <small id="buildBadge" title="V15.2.19 · Compact Expense Cards · August 21, 2026">V15.2.19</small>
+            <small id="buildBadge" title="V2.0.1 · Talaan · August 22, 2026">V2.0.1</small>
           </div>
         </div>
         <div class="topbar-actions">
@@ -870,7 +870,7 @@
             <section class="settings-panel profile-security-panel" id="settings-panel-profiles" role="tabpanel" aria-labelledby="settings-tab-profiles" data-settings-panel="profiles" hidden></section>
             <section class="settings-panel cloud-sync-panel" id="settings-panel-cloud" role="tabpanel" aria-labelledby="settings-tab-sync" data-settings-panel="sync" hidden>
               <article class="card cloud-sync-overview-card">
-                <div class="card-header"><div><h3>Sync across devices</h3><p>Keep the same finance records available on your devices</p></div><span class="v12-chip info" id="cloudStatusChip">Checking</span></div>
+                <div class="card-header"><div><h3>Sync across devices</h3><p>Keep the same finance records available on your devices</p></div><span class="status-chip info" id="cloudStatusChip">Checking</span></div>
                 <div class="cloud-sync-status-grid">
                   <div><span>Status</span><strong id="cloudStatusDetail">Checking configuration</strong></div>
                   <div><span>Signed-in account</span><strong id="cloudUserEmail">—</strong></div>
@@ -879,15 +879,15 @@
                   <div><span>Current device</span><strong id="cloudCurrentDevice">This device</strong></div>
                   <div><span>Sync protocol</span><strong>Profile-scoped V3 · encrypted</strong></div>
                 </div>
-                <div class="v12-actions" id="cloudOverviewActions" style="margin-top:12px;">
+                <div class="system-actions" id="cloudOverviewActions" style="margin-top:12px;">
                   <button class="button button-primary" id="cloudOverviewFixButton" type="button" style="background:var(--red); border-color:var(--red); color:#fff;" hidden>Review &amp; fix issue</button>
                   <button class="button button-secondary" id="cloudOverviewSyncNow" type="button">Sync now</button>
                 </div>
-                <p class="v12-help">Local saves complete immediately. Sync across devices exchanges only changed records and keeps external backups necessary.</p>
+                <p class="system-help">Local saves complete immediately. Sync across devices exchanges only changed records and keeps external backups necessary.</p>
               </article>
 
               <article class="card cloud-config-card" id="cloudConfigCard">
-                <div class="card-header"><div><h3>Advanced cloud connection</h3><p>Technical setup for your private cloud project</p></div><span class="v12-chip warning" id="cloudConfigStatusChip">Setup required</span></div>
+                <div class="card-header"><div><h3>Advanced cloud connection</h3><p>Technical setup for your private cloud project</p></div><span class="status-chip warning" id="cloudConfigStatusChip">Setup required</span></div>
                 <details class="advanced-settings-disclosure">
                   <summary><span>Connection details</span><small>Supabase URL and publishable key</small></summary>
                   <div class="advanced-settings-content">
@@ -895,71 +895,71 @@
                   <div class="field"><label for="cloudConfigUrl">Supabase project URL</label><input class="input" id="cloudConfigUrl" inputmode="url" autocomplete="off" placeholder="https://project-ref.supabase.co"></div>
                   <div class="field"><label for="cloudConfigKey">Publishable key</label><input class="input" id="cloudConfigKey" type="password" autocomplete="off" placeholder="sb_publishable_..."></div>
                 </div>
-                <div class="v12-actions"><button class="button button-primary" id="saveCloudConfig" type="button">Save on this device</button><button class="button button-secondary" id="clearCloudConfig" type="button">Clear device configuration</button></div>
-                <p class="v12-help">A hosted `sync-config.js` can configure both devices automatically. Secret and service-role keys are rejected and must never be placed in this PWA.</p>
+                <div class="system-actions"><button class="button button-primary" id="saveCloudConfig" type="button">Save on this device</button><button class="button button-secondary" id="clearCloudConfig" type="button">Clear device configuration</button></div>
+                <p class="system-help">A hosted `sync-config.js` can configure both devices automatically. Secret and service-role keys are rejected and must never be placed in this PWA.</p>
                   </div>
                 </details>
               </article>
 
               <article class="card" id="cloudDisconnectedSection" hidden>
-                <div class="card-header"><div><h3>Sign in</h3><p>Use the same account on the MacBook and iPhone</p></div><span class="v12-chip info">Private account</span></div>
+                <div class="card-header"><div><h3>Sign in</h3><p>Use the same account on the MacBook and iPhone</p></div><span class="status-chip info">Private account</span></div>
                 <div class="cloud-auth-grid">
                   <div class="field"><label for="cloudAuthEmail">Email</label><input class="input" id="cloudAuthEmail" type="email" autocomplete="username" placeholder="you@example.com"></div>
                   <div class="field"><label for="cloudAuthPassword">Password</label><div class="cloud-password-wrap"><input class="input" id="cloudAuthPassword" type="password" autocomplete="current-password" minlength="6" placeholder="At least 6 characters"><button class="cloud-password-toggle" id="cloudPasswordToggle" type="button" aria-pressed="false" aria-label="Show password">Show</button></div></div>
                 </div>
-                <div class="v12-actions"><button class="button button-primary" id="cloudSignIn" type="button">Sign in</button><button class="button button-secondary" id="cloudCreateAccount" type="button">Create account</button></div>
+                <div class="system-actions"><button class="button button-primary" id="cloudSignIn" type="button">Sign in</button><button class="button button-secondary" id="cloudCreateAccount" type="button">Create account</button></div>
                 <div class="cloud-auth-secondary-actions"><button class="cloud-auth-link-button" id="cloudForgotPassword" type="button">Forgot password?</button><button class="button button-secondary button-small" id="cloudTestConnection" type="button">Test cloud connection</button></div>
                 <div class="cloud-auth-feedback" id="cloudAuthMessage" role="status" aria-live="polite">Sign in to view finance records. Local records remain stored on this device and stay hidden if sign-in fails.</div>
                 <div class="cloud-connection-line"><span>Cloud connection</span><strong id="cloudConnectionStatus">Not tested</strong></div>
               </article>
 
               <article class="card" id="cloudRecoveryHelpCard" hidden>
-                <div class="card-header"><div><h3>Password reset needs attention</h3><p>Request a fresh reset or use a recovery code</p></div><span class="v12-chip warning">Recovery</span></div>
+                <div class="card-header"><div><h3>Password reset needs attention</h3><p>Request a fresh reset or use a recovery code</p></div><span class="status-chip warning">Recovery</span></div>
                 <div class="cloud-auth-feedback" id="cloudRecoveryHelpMessage" role="alert" aria-live="assertive">This reset link is invalid, expired, or already used.</div>
                 <div class="cloud-auth-grid cloud-recovery-code-grid">
                   <div class="field"><label for="cloudRecoveryEmail">Email</label><input class="input" id="cloudRecoveryEmail" type="email" autocomplete="email" placeholder="you@example.com"></div>
                   <div class="field"><label for="cloudRecoveryCode">Recovery code</label><input class="input" id="cloudRecoveryCode" inputmode="numeric" autocomplete="one-time-code" placeholder="Code from your reset email"></div>
                 </div>
-                <div class="v12-actions"><button class="button button-primary" id="cloudRecoveryResend" type="button">Send new reset email</button><button class="button button-secondary" id="cloudVerifyRecoveryCode" type="button">Verify recovery code</button><button class="button button-secondary" id="cloudRecoveryBackToSignIn" type="button">Back to sign in</button></div>
-                <p class="v12-help">Use only the newest reset email. Recovery codes require the Supabase Recovery email template to include <code>{{ .Token }}</code>; the normal reset-link flow still works when its single-use link has not expired or been pre-opened.</p>
+                <div class="system-actions"><button class="button button-primary" id="cloudRecoveryResend" type="button">Send new reset email</button><button class="button button-secondary" id="cloudVerifyRecoveryCode" type="button">Verify recovery code</button><button class="button button-secondary" id="cloudRecoveryBackToSignIn" type="button">Back to sign in</button></div>
+                <p class="system-help">Use only the newest reset email. Recovery codes require the Supabase Recovery email template to include <code>{{ .Token }}</code>; the normal reset-link flow still works when its single-use link has not expired or been pre-opened.</p>
               </article>
 
               <article class="card" id="cloudPasswordRecoveryCard" hidden>
-                <div class="card-header"><div><h3>Choose a new password</h3><p>Finish the password reset for this cloud account</p></div><span class="v12-chip warning">Password recovery</span></div>
+                <div class="card-header"><div><h3>Choose a new password</h3><p>Finish the password reset for this cloud account</p></div><span class="status-chip warning">Password recovery</span></div>
                 <div class="cloud-auth-grid">
                   <div class="field"><label for="cloudNewPassword">New password</label><div class="cloud-password-wrap"><input class="input" id="cloudNewPassword" type="password" autocomplete="new-password" minlength="6" placeholder="At least 6 characters"><button class="cloud-password-toggle" type="button" data-cloud-password-target="cloudNewPassword" aria-pressed="false">Show</button></div></div>
                   <div class="field"><label for="cloudConfirmPassword">Confirm new password</label><div class="cloud-password-wrap"><input class="input" id="cloudConfirmPassword" type="password" autocomplete="new-password" minlength="6" placeholder="Repeat the new password"><button class="cloud-password-toggle" type="button" data-cloud-password-target="cloudConfirmPassword" aria-pressed="false">Show</button></div></div>
                 </div>
-                <div class="v12-actions"><button class="button button-primary" id="cloudCompletePasswordReset" type="button">Save new password</button><button class="button button-secondary" id="cloudCancelPasswordReset" type="button">Cancel reset</button></div>
+                <div class="system-actions"><button class="button button-primary" id="cloudCompletePasswordReset" type="button">Save new password</button><button class="button button-secondary" id="cloudCancelPasswordReset" type="button">Cancel reset</button></div>
                 <div class="cloud-auth-feedback" id="cloudPasswordRecoveryMessage" role="status" aria-live="polite">Use a password with at least 6 characters.</div>
               </article>
 
               <article class="card cloud-first-sync-card" id="cloudFirstSyncCard" hidden>
-                <div class="card-header"><div><h3>Initialize Sync across devices</h3><p id="cloudFirstSyncMessage">Choose how this device and the cloud should start.</p></div><span class="v12-chip warning">Approval required</span></div>
+                <div class="card-header"><div><h3>Initialize Sync across devices</h3><p id="cloudFirstSyncMessage">Choose how this device and the cloud should start.</p></div><span class="status-chip warning">Approval required</span></div>
                 <div class="cloud-first-sync-options">
                   <label><input type="radio" name="cloudInitialMode" id="cloudInitialUpload" value="upload" checked><span><strong>Upload this device’s records</strong><small>Recommended when the MacBook contains the authoritative records.</small></span></label>
                   <label><input type="radio" name="cloudInitialMode" id="cloudInitialDownload" value="download"><span><strong>Download existing cloud records</strong><small>Recommended for a new empty iPhone installation.</small></span></label>
                   <label><input type="radio" name="cloudInitialMode" id="cloudInitialMerge" value="merge"><span><strong>Review and merge both</strong><small>Keep different records and preserve per-record conflicts for overlaps.</small></span></label>
                 </div>
-                <div class="v12-actions"><button class="button button-secondary" id="cloudExportBeforeFirst" type="button">Export recovery copy</button><button class="button button-primary" id="cloudInitialConfirm" type="button">Confirm first sync</button></div>
+                <div class="system-actions"><button class="button button-secondary" id="cloudExportBeforeFirst" type="button">Export recovery copy</button><button class="button button-primary" id="cloudInitialConfirm" type="button">Confirm first sync</button></div>
               </article>
 
               <div id="cloudConnectedSection" class="cloud-connected-stack" hidden>
                 <article class="card">
-                  <div class="card-header"><div><h3>Sync controls</h3><p>Send and receive recent changes</p></div><span class="v12-chip success" id="cloudConnectionChip">Connected</span></div>
+                  <div class="card-header"><div><h3>Sync controls</h3><p>Send and receive recent changes</p></div><span class="status-chip success" id="cloudConnectionChip">Connected</span></div>
                   <label class="savings-setting-check cloud-auto-sync-check"><input id="cloudAutoSync" type="checkbox" checked> Synchronize automatically while the app is open and online</label>
-                  <div class="v12-actions"><button class="button button-primary" id="cloudSyncNow" type="button">Sync now</button><button class="button button-secondary" id="cloudSignOut" type="button">Sign out this device</button></div>
+                  <div class="system-actions"><button class="button button-primary" id="cloudSyncNow" type="button">Sync now</button><button class="button button-secondary" id="cloudSignOut" type="button">Sign out this device</button></div>
                 </article>
 
                 <article class="card">
-                  <div class="card-header"><div><h3>Connected devices</h3><p>Review versions, rename this installation, or sign out an old device remotely</p></div><span class="v12-chip info">Cloud devices</span></div>
-                  <div class="v12-inline-form"><div class="field"><label for="cloudDeviceName">This device name</label><input class="input" id="cloudDeviceName" maxlength="60" placeholder="Nyco’s MacBook"></div><button class="button button-primary" id="cloudSaveDeviceName" type="button">Save device name</button></div>
-                  <div class="table-scroll"><table class="responsive-table cloud-device-table"><thead><tr><th>Device</th><th>Status</th><th>Last seen</th><th>Action</th></tr></thead><tbody id="cloudDevicesBody"><tr><td colspan="4"><div class="v12-empty">Sign in to load cloud devices.</div></td></tr></tbody></table></div>
+                  <div class="card-header"><div><h3>Connected devices</h3><p>Review versions, rename this installation, or sign out an old device remotely</p></div><span class="status-chip info">Cloud devices</span></div>
+                  <div class="system-inline-form"><div class="field"><label for="cloudDeviceName">This device name</label><input class="input" id="cloudDeviceName" maxlength="60" placeholder="Nyco’s MacBook"></div><button class="button button-primary" id="cloudSaveDeviceName" type="button">Save device name</button></div>
+                  <div class="table-scroll"><table class="responsive-table cloud-device-table"><thead><tr><th>Device</th><th>Status</th><th>Last seen</th><th>Action</th></tr></thead><tbody id="cloudDevicesBody"><tr><td colspan="4"><div class="system-empty">Sign in to load cloud devices.</div></td></tr></tbody></table></div>
                 </article>
 
                 <article class="card">
-                  <div class="card-header"><div><h3>Resolve sync differences</h3><p>Review differences only when two devices changed the same item</p></div><span class="v12-chip success" id="cloudConflictCount">No conflicts</span></div>
-                  <div class="cloud-conflict-list" id="cloudConflictList"><div class="v12-empty">No unresolved cloud conflicts.</div></div>
+                  <div class="card-header"><div><h3>Resolve sync differences</h3><p>Review differences only when two devices changed the same item</p></div><span class="status-chip success" id="cloudConflictCount">No conflicts</span></div>
+                  <div class="cloud-conflict-list" id="cloudConflictList"><div class="system-empty">No unresolved cloud conflicts.</div></div>
                 </article>
               </div>
             </section>
@@ -998,129 +998,129 @@
             </form>
           </article>
 
-          <div class="v12-section-heading">
+          <div class="system-section-heading">
             <div><h3>V12 App, Offline &amp; Recovery</h3><p>Install controls, device records, local sync history, offline packs, reminders, and migration safety.</p></div>
-            <span class="v12-chip info">Schema V12</span>
+            <span class="status-chip info">Finance Schema 12</span>
           </div>
 
-          <div class="grid equal-column v12-grid">
-            <article class="card v12-card" id="pwaControlsCard">
-              <div class="card-header"><div><h3>Installable app</h3><p>Install, update, and repair the offline app shell</p></div><span class="v12-chip" id="pwaModeChip">Checking</span></div>
-              <div class="v12-status-row"><span>App version</span><span class="v12-status-value" id="pwaAppVersion">12.14.0</span></div>
-              <div class="v12-status-row"><span>Install status</span><span class="v12-status-value" id="pwaInstallStatus">Checking</span></div>
-              <div class="v12-status-row"><span>Offline app shell</span><span class="v12-status-value" id="pwaCacheStatus">Checking</span></div>
-              <div class="v12-status-row"><span>Update status</span><span class="v12-status-value" id="pwaUpdateStatus">Current</span></div>
-              <div class="v12-actions">
+          <div class="grid equal-column system-grid">
+            <article class="card system-card" id="pwaControlsCard">
+              <div class="card-header"><div><h3>Installable app</h3><p>Install, update, and repair the offline app shell</p></div><span class="status-chip" id="pwaModeChip">Checking</span></div>
+              <div class="system-status-row"><span>App version</span><span class="system-status-value" id="pwaAppVersion">12.14.0</span></div>
+              <div class="system-status-row"><span>Install status</span><span class="system-status-value" id="pwaInstallStatus">Checking</span></div>
+              <div class="system-status-row"><span>Offline app shell</span><span class="system-status-value" id="pwaCacheStatus">Checking</span></div>
+              <div class="system-status-row"><span>Update status</span><span class="system-status-value" id="pwaUpdateStatus">Current</span></div>
+              <div class="system-actions">
                 <button class="button button-primary" id="installPwaButton" type="button">Install app</button>
                 <button class="button button-secondary" id="checkUpdateButton" type="button">Check update</button>
                 <button class="button button-secondary" id="clearAppCacheButton" type="button">Clear app cache</button>
                 <button class="button button-secondary" id="repairPwaButton" type="button">Repair offline app</button>
               </div>
-              <p class="v12-help" id="pwaHelpText">Full PWA controls require HTTPS or localhost. A file opened directly from Downloads remains usable but cannot install a service worker.</p>
+              <p class="system-help" id="pwaHelpText">Full PWA controls require HTTPS or localhost. A file opened directly from Downloads remains usable but cannot install a service worker.</p>
             </article>
 
-            <article class="card v12-card" id="storageProtectionCard">
-              <div class="card-header"><div><h3>Storage protection</h3><p>Review quota and request persistent browser storage</p></div><span class="v12-chip" id="storagePersistChip">Checking</span></div>
-              <div class="v12-status-row"><span>Storage used</span><span class="v12-status-value" id="storageUsed">—</span></div>
-              <div class="v12-status-row"><span>Estimated quota</span><span class="v12-status-value" id="storageQuota">—</span></div>
-              <div class="v12-status-row"><span>Last backup</span><span class="v12-status-value" id="lastBackupStatus">Never</span></div>
-              <div class="v12-actions">
+            <article class="card system-card" id="storageProtectionCard">
+              <div class="card-header"><div><h3>Storage protection</h3><p>Review quota and request persistent browser storage</p></div><span class="status-chip" id="storagePersistChip">Checking</span></div>
+              <div class="system-status-row"><span>Storage used</span><span class="system-status-value" id="storageUsed">—</span></div>
+              <div class="system-status-row"><span>Estimated quota</span><span class="system-status-value" id="storageQuota">—</span></div>
+              <div class="system-status-row"><span>Last backup</span><span class="system-status-value" id="lastBackupStatus">Never</span></div>
+              <div class="system-actions">
                 <button class="button button-primary" id="requestPersistenceButton" type="button">Request persistent storage</button>
                 <button class="button button-secondary" id="exportRecoveryButton" type="button">Export recovery bundle</button>
                 <button class="button button-secondary" id="clearOfflinePacksButton" type="button">Clear optional PDF packs</button>
               </div>
-              <p class="v12-help">Persistent storage reduces automatic browser eviction. It does not replace an external backup.</p>
+              <p class="system-help">Persistent storage reduces automatic browser eviction. It does not replace an external backup.</p>
             </article>
           </div>
 
-          <div class="grid equal-column v12-grid">
-            <article class="card v12-card" data-finance-private-settings>
-              <div class="card-header"><div><h3>Known devices</h3><p>App installations recognized through this device or imported bundles</p></div><span class="v12-chip info" id="knownDeviceCount">0 devices</span></div>
-              <div class="v12-inline-form">
+          <div class="grid equal-column system-grid">
+            <article class="card system-card" data-finance-private-settings>
+              <div class="card-header"><div><h3>Known devices</h3><p>App installations recognized through this device or imported bundles</p></div><span class="status-chip info" id="knownDeviceCount">0 devices</span></div>
+              <div class="system-inline-form">
                 <div class="field"><label for="currentDeviceName">This device name</label><input class="input" id="currentDeviceName" maxlength="60" placeholder="Example: Nyco MacBook"></div>
                 <button class="button button-primary" id="saveDeviceNameButton" type="button">Save name</button>
               </div>
-              <div class="v12-table-wrap"><table class="v12-table"><thead><tr><th>Device</th><th>Status</th><th>Last seen</th><th>Last sync</th></tr></thead><tbody id="knownDevicesBody"></tbody></table></div>
-              <p class="v12-help">IDs are random app-installation IDs. No hardware fingerprinting or bank login information is used.</p>
+              <div class="system-table-wrap"><table class="system-table"><thead><tr><th>Device</th><th>Status</th><th>Last seen</th><th>Last sync</th></tr></thead><tbody id="knownDevicesBody"></tbody></table></div>
+              <p class="system-help">IDs are random app-installation IDs. No hardware fingerprinting or bank login information is used.</p>
             </article>
 
-            <article class="card v12-card" data-finance-private-settings>
-              <div class="card-header"><div><h3>Local sync history</h3><p>Manual imports, exports, restores, merges, and same-device tab refreshes</p></div><span class="v12-chip" id="syncConflictChip">No conflicts</span></div>
-              <div class="v12-actions">
+            <article class="card system-card" data-finance-private-settings>
+              <div class="card-header"><div><h3>Local sync history</h3><p>Manual imports, exports, restores, merges, and same-device tab refreshes</p></div><span class="status-chip" id="syncConflictChip">No conflicts</span></div>
+              <div class="system-actions">
                 <button class="button button-primary" id="exportSyncBundleButton" type="button">Export sync bundle</button>
-                <label class="button button-secondary v12-file-label" for="importSyncBundleInput">Import &amp; review</label>
+                <label class="button button-secondary file-label" for="importSyncBundleInput">Import &amp; review</label>
                 <input type="file" id="importSyncBundleInput" accept="application/json" hidden>
                 <button class="button button-secondary" id="clearSyncHistoryButton" type="button">Clear history</button>
               </div>
-              <div class="v12-table-wrap"><table class="v12-table"><thead><tr><th>Time</th><th>Device</th><th>Action</th><th>Status</th></tr></thead><tbody id="syncHistoryBody"></tbody></table></div>
+              <div class="system-table-wrap"><table class="system-table"><thead><tr><th>Time</th><th>Device</th><th>Action</th><th>Status</th></tr></thead><tbody id="syncHistoryBody"></tbody></table></div>
             </article>
           </div>
 
-          <div class="grid equal-column v12-grid">
-            <article class="card v12-card">
-              <div class="card-header"><div><h3>Verified account snapshots</h3><p>Offline account-balance snapshots validated by this app</p></div><span class="v12-chip success" id="snapshotCountChip">0 snapshots</span></div>
-              <div class="v12-warning-box"><strong>Not bank-connected.</strong> “Verified” means the account totals and checksum passed internal validation. Bank passwords, OTPs, card codes, and banking sessions are never stored.</div>
-              <div class="v12-actions">
+          <div class="grid equal-column system-grid">
+            <article class="card system-card">
+              <div class="card-header"><div><h3>Verified account snapshots</h3><p>Offline account-balance snapshots validated by this app</p></div><span class="status-chip success" id="snapshotCountChip">0 snapshots</span></div>
+              <div class="warning-box"><strong>Not bank-connected.</strong> “Verified” means the account totals and checksum passed internal validation. Bank passwords, OTPs, card codes, and banking sessions are never stored.</div>
+              <div class="system-actions">
                 <button class="button button-primary" id="createAccountSnapshotButton" type="button">Create verified snapshot</button>
                 <button class="button button-secondary" id="downloadLatestSnapshotButton" type="button">Download latest</button>
               </div>
-              <div class="v12-table-wrap"><table class="v12-table"><thead><tr><th>Created</th><th>Total</th><th>Device</th><th>Action</th></tr></thead><tbody id="accountSnapshotsBody"></tbody></table></div>
+              <div class="system-table-wrap"><table class="system-table"><thead><tr><th>Created</th><th>Total</th><th>Device</th><th>Action</th></tr></thead><tbody id="accountSnapshotsBody"></tbody></table></div>
             </article>
 
-            <article class="card v12-card" data-finance-private-settings>
-              <div class="card-header"><div><h3>Optional PDF packs</h3><p>Store monthly reports, project files, or recovery guidance offline</p></div><span class="v12-chip info" id="pdfPackCountChip">0 packs</span></div>
-              <div class="v12-pack-form">
+            <article class="card system-card" data-finance-private-settings>
+              <div class="card-header"><div><h3>Optional PDF packs</h3><p>Store monthly reports, project files, or recovery guidance offline</p></div><span class="status-chip info" id="pdfPackCountChip">0 packs</span></div>
+              <div class="recovery-pack-form">
                 <div class="field"><label for="pdfPackTitle">Pack title</label><input class="input" id="pdfPackTitle" maxlength="100" placeholder="Example: August 2026 report"></div>
                 <div class="field"><label for="pdfPackSubject">Subject</label><select class="select" id="pdfPackSubject"><option value="monthly">Monthly report</option><option value="project">Project</option><option value="annual">Annual finance</option><option value="recovery">Recovery guide</option></select></div>
                 <div class="field field-full"><label for="pdfPackFile">PDF file</label><input class="input" id="pdfPackFile" type="file" accept="application/pdf"></div>
               </div>
-              <div class="v12-actions"><button class="button button-primary" id="addPdfPackButton" type="button">Save PDF offline</button></div>
-              <div class="v12-table-wrap"><table class="v12-table"><thead><tr><th>Pack</th><th>Subject</th><th>Size</th><th>Action</th></tr></thead><tbody id="pdfPacksBody"></tbody></table></div>
+              <div class="system-actions"><button class="button button-primary" id="addPdfPackButton" type="button">Save PDF offline</button></div>
+              <div class="system-table-wrap"><table class="system-table"><thead><tr><th>Pack</th><th>Subject</th><th>Size</th><th>Action</th></tr></thead><tbody id="pdfPacksBody"></tbody></table></div>
             </article>
           </div>
 
-          <div class="grid equal-column v12-grid">
-            <article class="card v12-card" data-finance-private-settings>
-              <div class="card-header"><div><h3>Review reminders</h3><p>Foreground checks and best-effort periodic background review</p></div><span class="v12-chip" id="reminderStatusChip">Off</span></div>
-              <div class="v12-status-row"><span>Foreground review</span><span class="v12-status-value" id="foregroundReminderStatus">Ready</span></div>
-              <div class="v12-status-row"><span>Periodic Background Sync</span><span class="v12-status-value" id="periodicSyncStatus">Checking</span></div>
-              <div class="v12-status-row"><span>Last review</span><span class="v12-status-value" id="lastReviewStatus">Never</span></div>
-              <div class="v12-actions">
+          <div class="grid equal-column system-grid">
+            <article class="card system-card" data-finance-private-settings>
+              <div class="card-header"><div><h3>Review reminders</h3><p>Foreground checks and best-effort periodic background review</p></div><span class="status-chip" id="reminderStatusChip">Off</span></div>
+              <div class="system-status-row"><span>Foreground review</span><span class="system-status-value" id="foregroundReminderStatus">Ready</span></div>
+              <div class="system-status-row"><span>Periodic Background Sync</span><span class="system-status-value" id="periodicSyncStatus">Checking</span></div>
+              <div class="system-status-row"><span>Last review</span><span class="system-status-value" id="lastReviewStatus">Never</span></div>
+              <div class="system-actions">
                 <button class="button button-primary" id="enableRemindersButton" type="button">Enable review reminders</button>
                 <button class="button button-secondary" id="runReviewButton" type="button">Review now</button>
                 <button class="button button-secondary" id="disableRemindersButton" type="button">Turn off</button>
               </div>
-              <div class="v12-check-list" id="reviewIssueList"></div>
-              <p class="v12-help">Background delivery is controlled by the browser and is not guaranteed at an exact time. Foreground checks run when the app opens, becomes visible, reconnects, saves, or remains open.</p>
+              <div class="system-check-list" id="reviewIssueList"></div>
+              <p class="system-help">Background delivery is controlled by the browser and is not guaranteed at an exact time. Foreground checks run when the app opens, becomes visible, reconnects, saves, or remains open.</p>
             </article>
 
-            <article class="card v12-card">
-              <div class="card-header"><div><h3>V11 → V12 migration</h3><p>Non-destructive progress, validation, recovery copy, and rollback</p></div><span class="v12-chip" id="migrationStatusChip">Checking</span></div>
+            <article class="card system-card">
+              <div class="card-header"><div><h3>Legacy data migration</h3><p>Non-destructive progress, validation, recovery copy, and rollback</p></div><span class="status-chip" id="migrationStatusChip">Checking</span></div>
               <div class="migration-progress-shell is-indeterminate" id="migrationProgressShell" aria-live="polite">
                 <span class="indeterminate-spinner" id="migrationSpinner" role="status"><span class="sr-only">Checking migration progress</span></span>
-                <progress class="v12-progress" id="migrationProgressBar" max="100" aria-label="Migration progress"></progress>
+                <progress class="migration-progress" id="migrationProgressBar" max="100" aria-label="Migration progress"></progress>
               </div>
-              <div class="v12-status-row"><span>Progress</span><span class="v12-status-value" id="migrationProgressText">Checking</span></div>
-              <div class="v12-status-row"><span>V11 recovery copy</span><span class="v12-status-value" id="v11BackupStatus">Checking</span></div>
-              <div class="v12-status-row"><span>Validation</span><span class="v12-status-value" id="migrationValidationStatus">Checking</span></div>
-              <div class="v12-actions">
+              <div class="system-status-row"><span>Progress</span><span class="system-status-value" id="migrationProgressText">Checking</span></div>
+              <div class="system-status-row"><span>V11 recovery copy</span><span class="system-status-value" id="v11BackupStatus">Checking</span></div>
+              <div class="system-status-row"><span>Validation</span><span class="system-status-value" id="migrationValidationStatus">Checking</span></div>
+              <div class="system-actions">
                 <button class="button button-secondary" id="downloadV11BackupButton" type="button">Download V11 copy</button>
                 <button class="button button-secondary" id="restoreV11BackupButton" type="button">Restore V11 copy</button>
               </div>
-              <div class="v12-table-wrap"><table class="v12-table"><thead><tr><th>Time</th><th>Migration</th><th>Status</th></tr></thead><tbody id="migrationHistoryBody"></tbody></table></div>
+              <div class="system-table-wrap"><table class="system-table"><thead><tr><th>Time</th><th>Migration</th><th>Status</th></tr></thead><tbody id="migrationHistoryBody"></tbody></table></div>
             </article>
           </div>
 
-          <article class="card v12-card" style="margin-top:10px">
+          <article class="card system-card" style="margin-top:10px">
             <div class="card-header"><div><h3>Device recovery guidance</h3><p>Use an external recovery bundle before replacing a device or clearing browser data</p></div></div>
             <div class="grid equal-column">
-              <div><strong>Replacing a device</strong><ol class="v12-guidance"><li>Export a recovery bundle from the old device.</li><li>Install V12 from the same HTTPS site on the new device.</li><li>Import and review the bundle.</li><li>Confirm record counts and totals before merging or replacing.</li><li>Rename the new device and mark the old one as replaced.</li></ol></div>
-              <div><strong>Lost device or cleared browser data</strong><ol class="v12-guidance"><li>Open the newest external recovery bundle.</li><li>Review its source device and backup date.</li><li>Import it; V12 creates a pre-import recovery snapshot first.</li><li>PDF packs must be restored separately because they remain optional local files.</li><li>Persistent storage reduces eviction risk but is not a backup.</li></ol></div>
+              <div><strong>Replacing a device</strong><ol class="recovery-guidance"><li>Export a recovery bundle from the old device.</li><li>Install Talaan from the same HTTPS site on the new device.</li><li>Import and review the bundle.</li><li>Confirm record counts and totals before merging or replacing.</li><li>Rename the new device and mark the old one as replaced.</li></ol></div>
+              <div><strong>Lost device or cleared browser data</strong><ol class="recovery-guidance"><li>Open the newest external recovery bundle.</li><li>Review its source device and backup date.</li><li>Import it; Talaan creates a pre-import recovery snapshot first.</li><li>PDF packs must be restored separately because they remain optional local files.</li><li>Persistent storage reduces eviction risk but is not a backup.</li></ol></div>
             </div>
           </article>
 
           <article class="card" style="margin-top:16px">
-            <div class="card-header"><div><h3>Salary Work Settings</h3><p>Hybrid schedule and monthly included-project allowance</p></div><span class="v12-chip info">Fixed salary</span></div>
+            <div class="card-header"><div><h3>Salary Work Settings</h3><p>Hybrid schedule and monthly included-project allowance</p></div><span class="status-chip info">Fixed salary</span></div>
             <form id="salaryWorkSettingsForm" class="salary-work-settings-grid">
               <div class="field"><label for="salaryIncludedProjectsSetting">Included projects per month</label><input class="input" id="salaryIncludedProjectsSetting" type="number" min="1" max="99" step="1"></div>
               <div class="field"><label for="salaryCompensationModelSetting">Compensation model</label><select class="select" id="salaryCompensationModelSetting"><option value="fixed-monthly-salary">Fixed monthly salary</option></select></div>
@@ -1391,7 +1391,7 @@
     <div class="modal-body">
       <div class="pwa-install-guide-browser">
         <div><strong id="pwaInstallGuideBrowser">Browser install</strong><br><span id="pwaInstallGuideStatus">Follow the browser installation steps.</span></div>
-        <span class="v12-chip info" id="pwaInstallGuideChip">Install</span>
+        <span class="status-chip info" id="pwaInstallGuideChip">Install</span>
       </div>
       <ol class="pwa-install-steps" id="pwaInstallGuideSteps"></ol>
       <p class="pwa-install-guide-note" id="pwaInstallGuideNote">The browser controls the final installation prompt. Your finance records remain stored in the app data and are not changed by installation.</p>
@@ -1567,13 +1567,13 @@
     <div class="modal-header"><h3 id="syncReviewDialogTitle">Review imported sync bundle</h3><button type="button" class="button button-secondary button-small" id="closeSyncReviewButton">Close</button></div>
     <div class="modal-body">
       <p id="syncReviewSource" class="dialog-context-note"></p>
-      <div class="v12-sync-summary">
+      <div class="sync-summary">
         <div><span>Accounts</span><strong id="syncReviewAccounts">0</strong></div>
         <div><span>Expenses</span><strong id="syncReviewExpenses">0</strong></div>
         <div><span>Projects</span><strong id="syncReviewProjects">0</strong></div>
         <div><span>Conflicts</span><strong id="syncReviewConflicts">0</strong></div>
       </div>
-      <div class="v12-warning-box" style="margin-top:10px">V12 creates a pre-import recovery snapshot before any merge or replacement. Conflicting records are never overwritten silently.</div>
+      <div class="warning-box" style="margin-top:10px">Talaan creates a pre-import recovery snapshot before any merge or replacement. Conflicting records are never overwritten silently.</div>
     </div>
     <div class="modal-footer sync-review-footer">
       <button type="button" class="button button-secondary" id="cancelSyncImportButton">Cancel</button>
@@ -4154,7 +4154,7 @@
       }).join("") : emptyHtml("No savings goals yet", "Add a goal for travel, a gadget, shoes, an emergency fund, or anything else.");
     }
 
-    /* V13.0.5 · Dashboard calendar source scoping and idempotent event projection */
+    /* Dashboard calendar source scoping and idempotent event projection */
     function expenseCalendarEventDate(item) {
       const itemDate = /^\d{4}-\d{2}-\d{2}$/.test(String(item?.date || "")) ? String(item.date) : "";
       if (item?.paid) {
@@ -4239,7 +4239,7 @@
       manualIncomeForMonth(month).filter(item => item.date === date).forEach(item => events.push({ type:"income", title:item.name, status:item.category, amount:Number(item.amount || 0), page:"income", id:item.id, date, state:"received", sourceKey:`income|${item.id}|${date}|received`, icon:item.icon || null }));
       data.expenses.forEach(item => {
         const paid = Boolean(item.paid);
-        // V13.0.8: the Dashboard calendar represents upcoming/due expenses only.
+        // The Dashboard calendar represents upcoming/due expenses only.
         // Paid records remain available in Paid Expenses, reports, ledger, and calculations.
         if (paid) return;
         if (isGymExpense(item)) {
@@ -5612,7 +5612,7 @@
     const SETTINGS_PANEL_LABELS = { overview:"Overview", accounts:"Accounts", calendar:"Work & Calendar", profiles:"Profile & Security", sync:"Sync & Backup", app:"App & About" };
     const SETTINGS_PANEL_ALIASES = { cloud:"sync", backup:"sync", offline:"app", advanced:"app" };
 
-    const VERSION_HISTORY = [{"version":"V2.0.1","title":"Talaan","changes":["Current production release under the Talaan product name.","Uses responsibility-based runtime filenames instead of old V13-V15 product-era filenames.","Includes the complete local-first Finance workspace, Account Ledger, budgeting, reports, projects, productivity tools, reminders, and responsive desktop and phone layouts.","Includes encrypted multi-profile Cloud Schema V3 synchronization, offline PWA support, recovery safeguards, and five-minute routine sync.","Preserves Finance Schema 12, Cloud Schema V3, saved records, balances, recurrence, payments, backups, encryption, persistent storage identifiers, and synchronization behavior."]}];
+    const VERSION_HISTORY = [{"version":"V2.0.1","title":"Talaan","changes":["Current production release under the Talaan product name.","Uses responsibility-based runtime filenames instead of legacy product-era filenames.","Includes the complete local-first Finance workspace, Account Ledger, budgeting, reports, projects, productivity tools, reminders, and responsive desktop and phone layouts.","Includes encrypted multi-profile Cloud Schema V3 synchronization, offline PWA support, recovery safeguards, and five-minute routine sync.","Preserves Finance Schema 12, Cloud Schema V3, saved records, balances, recurrence, payments, backups, encryption, persistent storage identifiers, and synchronization behavior."]}];
 
     function normalizeSettingsPanelKey(key) {
       const normalized = SETTINGS_PANEL_ALIASES[key] || key;
@@ -5625,7 +5625,7 @@
           <summary><span><strong>${escapeHtml(release.version)} · ${escapeHtml(release.title)}</strong><small>${release.changes.length} change${release.changes.length === 1 ? "" : "s"}</small></span><span class="version-history-chevron" aria-hidden="true">▾</span></summary>
           <ul>${release.changes.map(change => `<li>${escapeHtml(change)}</li>`).join("")}</ul>
         </details>`).join("");
-      return `<article class="card settings-version-history-card"><div class="card-header"><div><h3>Version history</h3><p>Latest release details</p></div><span class="v12-chip info">Offline</span></div><div class="version-history-list">${entries}</div></article>`;
+      return `<article class="card settings-version-history-card"><div class="card-header"><div><h3>Version history</h3><p>Latest release details</p></div><span class="status-chip info">Offline</span></div><div class="version-history-list">${entries}</div></article>`;
     }
 
     function settingsCardByTitle(title) {
@@ -5679,7 +5679,7 @@
       details.innerHTML = `<summary>View sync details</summary><div class="settings-inline-details-body cloud-sync-status-grid"></div>`;
       detailRows.forEach(row => details.querySelector("div").appendChild(row));
       grid.replaceWith(quick, details);
-      const help = card.querySelector(".v12-help");
+      const help = card.querySelector(".system-help");
       if (help) help.textContent = "Changes save on this device first. Cloud sync is optional, and a downloaded backup is still recommended.";
       card.dataset.simplified = "true";
     }
@@ -5771,7 +5771,7 @@
       const knownCard = settingsCardByTitle("Known devices");
       const historyCard = settingsCardByTitle("Local sync history");
       const snapshotsCard = settingsCardByTitle("Verified account snapshots");
-      const migrationCard = settingsCardByTitle("V11 → V12 migration");
+      const migrationCard = settingsCardByTitle("Legacy data migration");
       const recoveryCard = settingsCardByTitle("Device recovery guidance");
       renameSettingsCard(storageCard, "Protect local data", "Storage status and browser protection");
       renameSettingsCard(knownCard, "Known devices", "Device names and recent activity");
@@ -5793,7 +5793,7 @@
       if (pwaCard) appPanel.appendChild(pwaCard);
       [remindersCard, pdfCard].filter(Boolean).forEach(card => card.dataset.financePrivateSettings = "true");
       const aboutHolder = document.createElement("div");
-      aboutHolder.innerHTML = `<article class="card settings-about-card"><div class="card-header"><div><h3>About this app</h3><p>Version, storage, and privacy basics</p></div><span class="v12-chip info">${APP_VERSION}</span></div><div class="settings-about-grid"><div><span>App version</span><strong>${APP_VERSION}</strong></div><div><span>Storage</span><strong>On this device first</strong></div><div><span>Cloud sync</span><strong>Optional and encrypted</strong></div><div><span>Bank access</span><strong>No bank credentials</strong></div></div><p class="v12-help">The app works locally. Cloud sync uses your configured project, and a downloaded backup is recommended before clearing browser data or replacing a device.</p></article>`;
+      aboutHolder.innerHTML = `<article class="card settings-about-card"><div class="card-header"><div><h3>About this app</h3><p>Version, storage, and privacy basics</p></div><span class="status-chip info">${APP_VERSION}</span></div><div class="settings-about-grid"><div><span>App version</span><strong>${APP_VERSION}</strong></div><div><span>Storage</span><strong>On this device first</strong></div><div><span>Cloud sync</span><strong>Optional and encrypted</strong></div><div><span>Bank access</span><strong>No bank credentials</strong></div></div><p class="system-help">The app works locally. Cloud sync uses your configured project, and a downloaded backup is recommended before clearing browser data or replacing a device.</p></article>`;
       const aboutCard = aboutHolder.firstElementChild;
       const versionCardHolder = document.createElement("div");
       versionCardHolder.innerHTML = versionHistoryCardHtml();
@@ -5808,7 +5808,7 @@
       buildDangerZone(appPanel, resetButton, cacheButton, packsButton, clearConfigButton);
 
       [legacyBackupPanel, legacyOfflinePanel].filter(Boolean).forEach(node => node.remove());
-      settings.querySelectorAll(":scope > .grid, :scope > .v12-section-heading").forEach(node => { if (!node.querySelector("article.card")) node.remove(); });
+      settings.querySelectorAll(":scope > .grid, :scope > .system-section-heading").forEach(node => { if (!node.querySelector("article.card")) node.remove(); });
       addSettingsWalkthroughActions();
       settings.dataset.organized = "true";
       setupSettingsFormDirtyState();
@@ -6415,7 +6415,7 @@
       document.getElementById("expenseFormModeNote").textContent=isBudget?"Daily budgets use a per-day amount and calculate the remaining period.":isGym?"Gym totals use visit price and selected gym days.":isUtility?"Utility bills keep Electric and Water separate while totals use both.":"Normal expenses use an amount, category, date, and optional monthly repeat.";
       if(isBudget) document.getElementById("expenseCategory").value="Bills"; if(isGym){const month=gymFormMonth();document.getElementById("expenseBudgetPeriod").value="other";document.getElementById("expenseDueDay").value="";document.getElementById("expenseCategory").value="Health & Fitness";document.getElementById("expenseDate").value=dateForMonth(month,1);}
       if(!isBudget&&!isGym&&period!=="other"){const due=document.getElementById("expenseDueDay"),min=period==="second"?16:1,max=period==="second"?31:15;due.min=String(min);due.max=String(max);due.placeholder=`Day ${min}–${max}`;document.getElementById("expenseDueDayLabel").textContent=`Due day (${min}–${max})`;const current=Number(due.value||0);if(current&&(current<min||current>max))due.value="";}
-      toggleCustomCategoryField(); if(isBudget)updateBudgetPreview(); if(isGym)updateGymPreview(); if(isUtility)updateUtilityPreview(); setFieldError(document.getElementById("gymAutoPayAccount"), ""); syncExpenseSeriesScopeUi(); syncV1303ExpenseSections();
+      toggleCustomCategoryField(); if(isBudget)updateBudgetPreview(); if(isGym)updateGymPreview(); if(isUtility)updateUtilityPreview(); setFieldError(document.getElementById("gymAutoPayAccount"), ""); syncExpenseSeriesScopeUi(); syncCompactExpenseSections();
     }
 
     function handleExpenseTypeChange() {
@@ -7820,7 +7820,7 @@
       showToast("Test Apple Calendar file prepared", "success");
     });
 
-    // ---------------- V12.10.0 PWA, Phase 11 interface refinement, Phase 10 calculator number inputs, projects, savings goals, and number inputs, Phase 7 secure reset, Phase 6 savings + dashboard insights, Phase 5 reports + dark mode, Phase 4 dashboard + Apple Calendar, Phase 3 monthly navigation, Phase 2 expense workflow, device registry, sync history, offline packs, reminders, and migration ----------------
+    // ---------------- Talaan application runtime: PWA, finance workflows, recovery, projects, savings, reports, and responsive interface ----------------
     const APP_VERSION = "2.0.1";
     const APP_RELEASE_NAME = "Talaan";
     const APP_RELEASE_DATE = "August 22, 2026";
@@ -7835,12 +7835,12 @@
     }
     synchronizeVersionDisplay();
     const SCHEMA_VERSION = 12;
-    const V12_META_KEY = "simple-finance-project-records-v12-meta";
-    const V11_BACKUP_KEY = "simple-finance-project-records-v11-backup";
+    const FINANCE_META_KEY = "simple-finance-project-records-v12-meta";
+    const LEGACY_BACKUP_KEY = "simple-finance-project-records-v11-backup";
     const DEVICE_ID_KEY = "simple-finance-project-records-v12-device-id";
-    const V12_DB_NAME = "simple-finance-project-records-v12-db";
-    const V12_DB_VERSION = 1;
-    const V12_CHANNEL_NAME = "simple-finance-project-records-v12-channel";
+    const FINANCE_DB_NAME = "simple-finance-project-records-v12-db";
+    const FINANCE_DB_VERSION = 1;
+    const FINANCE_CHANNEL_NAME = "simple-finance-project-records-v12-channel";
     let deferredInstallPrompt = null;
     let braveDetectionPromise = null;
     let braveBrowserDetected = false;
@@ -7969,7 +7969,7 @@
 
     function readMeta() {
       try {
-        return normalizeMeta(JSON.parse(localStorage.getItem(V12_META_KEY) || "null"));
+        return normalizeMeta(JSON.parse(localStorage.getItem(FINANCE_META_KEY) || "null"));
       } catch (error) {
         return normalizeMeta(null);
       }
@@ -7979,7 +7979,7 @@
 
     function writeMeta() {
       appMeta.updatedAt = new Date().toISOString();
-      localStorage.setItem(V12_META_KEY, JSON.stringify(appMeta));
+      localStorage.setItem(FINANCE_META_KEY, JSON.stringify(appMeta));
     }
 
     function ensureCurrentDevice() {
@@ -8055,16 +8055,16 @@
       collect("projects", previousData.projects || [], nextData.projects || []);
     }
 
-    function runV12Migration() {
+    function runLegacyDataMigration() {
       const existingRaw = localStorage.getItem(STORAGE_KEY);
-      const existingMetaRaw = localStorage.getItem(V12_META_KEY);
+      const existingMetaRaw = localStorage.getItem(FINANCE_META_KEY);
       const migrationTime = new Date().toISOString();
       try {
         if (existingMetaRaw) {
           appMeta = normalizeMeta(JSON.parse(existingMetaRaw));
           ensureCurrentDevice();
           if (appMeta.migration?.status !== "complete") {
-            appMeta.migration = { status: "complete", progress: 100, validation: "Existing V12 metadata loaded", v11Backup: Boolean(localStorage.getItem(V11_BACKUP_KEY)) };
+            appMeta.migration = { status: "complete", progress: 100, validation: "Existing finance metadata loaded", v11Backup: Boolean(localStorage.getItem(LEGACY_BACKUP_KEY)) };
           }
           writeMeta();
           return;
@@ -8080,8 +8080,8 @@
         appMeta.migration.validation = "Validating record counts and financial totals";
         writeMeta();
 
-        if (!localStorage.getItem(V11_BACKUP_KEY)) {
-          localStorage.setItem(V11_BACKUP_KEY, JSON.stringify({
+        if (!localStorage.getItem(LEGACY_BACKUP_KEY)) {
+          localStorage.setItem(LEGACY_BACKUP_KEY, JSON.stringify({
             format: "my-finance-v11-recovery",
             createdAt: migrationTime,
             sourceKey: STORAGE_KEY,
@@ -8095,25 +8095,25 @@
         appMeta.migration.v11Backup = true;
         writeMeta();
 
-        if (!summaryMatches(before, after)) throw new Error("V11 and V12 totals did not match");
+        if (!summaryMatches(before, after)) throw new Error("Legacy and migrated totals did not match");
         data = normalized;
         persistFinanceDataRaw();
         appMeta.migration = { status: "complete", progress: 100, validation: "Passed: counts and totals match", v11Backup: true, completedAt: migrationTime };
-        appMeta.migrationHistory.unshift({ id: uid(), timestamp: migrationTime, from: "V11", to: "V12", status: "success", message: "Non-destructive migration completed", before, after });
+        appMeta.migrationHistory.unshift({ id: uid(), timestamp: migrationTime, from: "Legacy", to: "Finance Schema 12", status: "success", message: "Non-destructive migration completed", before, after });
         ensureCurrentDevice();
-        addSyncHistory(existingRaw ? "V11 → V12 migration" : "Fresh V12 initialization", "success", { before, after });
+        addSyncHistory(existingRaw ? "Legacy data migration" : "Fresh finance initialization", "success", { before, after });
         writeMeta();
       } catch (error) {
-        appMeta.migration = { status: "failed", progress: Math.max(20, Number(appMeta.migration?.progress || 0)), validation: error.message || "Migration failed", v11Backup: Boolean(localStorage.getItem(V11_BACKUP_KEY)) };
-        appMeta.migrationHistory.unshift({ id: uid(), timestamp: migrationTime, from: "V11", to: "V12", status: "failed", message: error.message || "Migration failed" });
+        appMeta.migration = { status: "failed", progress: Math.max(20, Number(appMeta.migration?.progress || 0)), validation: error.message || "Migration failed", v11Backup: Boolean(localStorage.getItem(LEGACY_BACKUP_KEY)) };
+        appMeta.migrationHistory.unshift({ id: uid(), timestamp: migrationTime, from: "Legacy", to: "Finance Schema 12", status: "failed", message: error.message || "Migration failed" });
         writeMeta();
       }
     }
 
-    function openV12Db() {
+    function openFinanceDatabase() {
       return new Promise((resolve, reject) => {
         if (!("indexedDB" in window)) return reject(new Error("IndexedDB is unavailable"));
-        const request = indexedDB.open(V12_DB_NAME, V12_DB_VERSION);
+        const request = indexedDB.open(FINANCE_DB_NAME, FINANCE_DB_VERSION);
         request.onupgradeneeded = () => {
           const db = request.result;
           if (!db.objectStoreNames.contains("accountSnapshots")) db.createObjectStore("accountSnapshots", { keyPath: "id" });
@@ -8126,7 +8126,7 @@
     }
 
     async function idbPut(storeName, value) {
-      const db = await openV12Db();
+      const db = await openFinanceDatabase();
       return new Promise((resolve, reject) => {
         const tx = db.transaction(storeName, "readwrite");
         tx.objectStore(storeName).put(value);
@@ -8136,7 +8136,7 @@
     }
 
     async function idbGetAll(storeName) {
-      const db = await openV12Db();
+      const db = await openFinanceDatabase();
       return new Promise((resolve, reject) => {
         const tx = db.transaction(storeName, "readonly");
         const request = tx.objectStore(storeName).getAll();
@@ -8147,7 +8147,7 @@
     }
 
     async function idbDelete(storeName, id) {
-      const db = await openV12Db();
+      const db = await openFinanceDatabase();
       return new Promise((resolve, reject) => {
         const tx = db.transaction(storeName, "readwrite");
         tx.objectStore(storeName).delete(id);
@@ -8157,7 +8157,7 @@
     }
 
     async function idbClear(storeName) {
-      const db = await openV12Db();
+      const db = await openFinanceDatabase();
       return new Promise((resolve, reject) => {
         const tx = db.transaction(storeName, "readwrite");
         tx.objectStore(storeName).clear();
@@ -8368,9 +8368,9 @@
       try {
         const snapshots = (await idbGetAll("accountSnapshots")).sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
         document.getElementById("snapshotCountChip").textContent = `${snapshots.length} snapshot${snapshots.length === 1 ? "" : "s"}`;
-        body.innerHTML = snapshots.length ? snapshots.map(snapshot => `<tr><td>${escapeHtml(formatDateTime(snapshot.createdAt))}</td><td>${escapeHtml(money(snapshot.total))}</td><td>${escapeHtml(snapshot.deviceName || "Device")}</td><td><button class="button button-secondary button-small" type="button" data-download-snapshot="${snapshot.id}">Download</button> <button class="button button-danger button-small" type="button" data-delete-snapshot="${snapshot.id}">Delete</button></td></tr>`).join("") : `<tr><td colspan="4"><div class="v12-empty">No verified snapshots yet.</div></td></tr>`;
+        body.innerHTML = snapshots.length ? snapshots.map(snapshot => `<tr><td>${escapeHtml(formatDateTime(snapshot.createdAt))}</td><td>${escapeHtml(money(snapshot.total))}</td><td>${escapeHtml(snapshot.deviceName || "Device")}</td><td><button class="button button-secondary button-small" type="button" data-download-snapshot="${snapshot.id}">Download</button> <button class="button button-danger button-small" type="button" data-delete-snapshot="${snapshot.id}">Delete</button></td></tr>`).join("") : `<tr><td colspan="4"><div class="system-empty">No verified snapshots yet.</div></td></tr>`;
       } catch (error) {
-        body.innerHTML = `<tr><td colspan="4"><div class="v12-empty">Offline snapshot storage is unavailable.</div></td></tr>`;
+        body.innerHTML = `<tr><td colspan="4"><div class="system-empty">Offline snapshot storage is unavailable.</div></td></tr>`;
       }
     }
 
@@ -8404,9 +8404,9 @@
       try {
         const packs = (await idbGetAll("pdfPacks")).sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
         document.getElementById("pdfPackCountChip").textContent = `${packs.length} pack${packs.length === 1 ? "" : "s"}`;
-        body.innerHTML = packs.length ? packs.map(pack => { const fullName = pack.fileName || "PDF"; return `<tr><td><strong>${escapeHtml(pack.title)}</strong><br><span class="filename-middle-truncated" title="${escapeAttribute(fullName)}" aria-label="${escapeAttribute(fullName)}">${escapeHtml(middleTruncateFilename(fullName))}</span></td><td>${escapeHtml(pack.subject || "PDF")}</td><td>${escapeHtml(formatBytes(pack.size))}</td><td><button class="button button-secondary button-small" type="button" data-open-pdf-pack="${pack.id}">Open</button> <button class="button button-danger button-small" type="button" data-delete-pdf-pack="${pack.id}">Remove</button></td></tr>`; }).join("") : `<tr><td colspan="4"><div class="v12-empty">No optional PDF packs stored.</div></td></tr>`;
+        body.innerHTML = packs.length ? packs.map(pack => { const fullName = pack.fileName || "PDF"; return `<tr><td><strong>${escapeHtml(pack.title)}</strong><br><span class="filename-middle-truncated" title="${escapeAttribute(fullName)}" aria-label="${escapeAttribute(fullName)}">${escapeHtml(middleTruncateFilename(fullName))}</span></td><td>${escapeHtml(pack.subject || "PDF")}</td><td>${escapeHtml(formatBytes(pack.size))}</td><td><button class="button button-secondary button-small" type="button" data-open-pdf-pack="${pack.id}">Open</button> <button class="button button-danger button-small" type="button" data-delete-pdf-pack="${pack.id}">Remove</button></td></tr>`; }).join("") : `<tr><td colspan="4"><div class="system-empty">No optional PDF packs stored.</div></td></tr>`;
       } catch (error) {
-        body.innerHTML = `<tr><td colspan="4"><div class="v12-empty">Offline PDF storage is unavailable.</div></td></tr>`;
+        body.innerHTML = `<tr><td colspan="4"><div class="system-empty">Offline PDF storage is unavailable.</div></td></tr>`;
       }
     }
 
@@ -8472,10 +8472,10 @@
       const chip = document.getElementById("reminderStatusChip");
       if (!chip) return;
       chip.textContent = appMeta.reminders.enabled ? "On" : "Off";
-      chip.className = `v12-chip ${appMeta.reminders.enabled ? "success" : ""}`;
+      chip.className = `status-chip ${appMeta.reminders.enabled ? "success" : ""}`;
       document.getElementById("foregroundReminderStatus").textContent = `${issues.length} review item${issues.length === 1 ? "" : "s"}`;
       document.getElementById("lastReviewStatus").textContent = formatDateTime(appMeta.reminders.lastReviewAt);
-      document.getElementById("reviewIssueList").innerHTML = issues.length ? issues.map(issue => `<div class="v12-check-item"><span class="v12-chip ${issue.type === "Past due" ? "danger" : issue.type === "Due soon" ? "warning" : "info"}">${escapeHtml(issue.type)}</span><span>${escapeHtml(issue.text)}</span></div>`).join("") : `<div class="v12-success-box">No urgent review items.</div>`;
+      document.getElementById("reviewIssueList").innerHTML = issues.length ? issues.map(issue => `<div class="system-check-item"><span class="status-chip ${issue.type === "Past due" ? "danger" : issue.type === "Due soon" ? "warning" : "info"}">${escapeHtml(issue.type)}</span><span>${escapeHtml(issue.text)}</span></div>`).join("") : `<div class="success-box">No urgent review items.</div>`;
     }
 
     async function enableReminders() {
@@ -8528,7 +8528,7 @@
         document.getElementById("storageQuota").textContent = formatBytes(estimate.quota);
         const chip = document.getElementById("storagePersistChip");
         chip.textContent = persisted ? "Persistent" : "Best effort";
-        chip.className = `v12-chip ${persisted ? "success" : "warning"}`;
+        chip.className = `status-chip ${persisted ? "success" : "warning"}`;
       } catch (error) {
         used.textContent = "Unavailable";
       }
@@ -8560,7 +8560,7 @@
       const devices = Object.values(appMeta.devices).sort((a, b) => String(b.lastSeen || "").localeCompare(String(a.lastSeen || "")));
       document.getElementById("knownDeviceCount").textContent = `${devices.length} device${devices.length === 1 ? "" : "s"}`;
       document.getElementById("currentDeviceName").value = appMeta.devices[appMeta.currentDeviceId]?.name || "This device";
-      body.innerHTML = devices.length ? devices.map(device => `<tr><td data-label="Device"><strong>${escapeHtml(device.name || "Device")}</strong><details class="device-platform-details"><summary>Browser details</summary><small>${escapeHtml(device.platform || "Unknown")} · ${escapeHtml(String(device.id || "").slice(0, 12))}…</small></details></td><td data-label="Status"><span class="v12-chip ${device.id === appMeta.currentDeviceId ? "success" : "info"}">${device.id === appMeta.currentDeviceId ? "Current" : escapeHtml(device.status || "Known")}</span></td><td data-label="Last seen">${escapeHtml(formatDateTime(device.lastSeen))}</td><td data-label="Last sync">${escapeHtml(formatDateTime(device.lastSync))}</td></tr>`).join("") : `<tr><td colspan="4"><div class="v12-empty">No device records.</div></td></tr>`;
+      body.innerHTML = devices.length ? devices.map(device => `<tr><td data-label="Device"><strong>${escapeHtml(device.name || "Device")}</strong><details class="device-platform-details"><summary>Browser details</summary><small>${escapeHtml(device.platform || "Unknown")} · ${escapeHtml(String(device.id || "").slice(0, 12))}…</small></details></td><td data-label="Status"><span class="status-chip ${device.id === appMeta.currentDeviceId ? "success" : "info"}">${device.id === appMeta.currentDeviceId ? "Current" : escapeHtml(device.status || "Known")}</span></td><td data-label="Last seen">${escapeHtml(formatDateTime(device.lastSeen))}</td><td data-label="Last sync">${escapeHtml(formatDateTime(device.lastSync))}</td></tr>`).join("") : `<tr><td colspan="4"><div class="system-empty">No device records.</div></td></tr>`;
     }
 
     function renderSyncHistory() {
@@ -8570,8 +8570,8 @@
       const conflicts = history.filter(item => item.status === "conflict").length;
       const chip = document.getElementById("syncConflictChip");
       chip.textContent = conflicts ? `${conflicts} conflict${conflicts === 1 ? "" : "s"}` : "No conflicts";
-      chip.className = `v12-chip ${conflicts ? "warning" : "success"}`;
-      body.innerHTML = history.length ? history.map(item => `<tr><td>${escapeHtml(formatDateTime(item.timestamp))}</td><td>${escapeHtml(item.deviceName || "Device")}</td><td>${escapeHtml(item.action || "Sync")}</td><td><span class="v12-chip ${item.status === "success" ? "success" : item.status === "conflict" ? "warning" : item.status === "failed" ? "danger" : "info"}">${escapeHtml(item.status || "info")}</span></td></tr>`).join("") : `<tr><td colspan="4"><div class="v12-empty">No local sync events yet.</div></td></tr>`;
+      chip.className = `status-chip ${conflicts ? "warning" : "success"}`;
+      body.innerHTML = history.length ? history.map(item => `<tr><td>${escapeHtml(formatDateTime(item.timestamp))}</td><td>${escapeHtml(item.deviceName || "Device")}</td><td>${escapeHtml(item.action || "Sync")}</td><td><span class="status-chip ${item.status === "success" ? "success" : item.status === "conflict" ? "warning" : item.status === "failed" ? "danger" : "info"}">${escapeHtml(item.status || "info")}</span></td></tr>`).join("") : `<tr><td colspan="4"><div class="system-empty">No local sync events yet.</div></td></tr>`;
     }
 
     function renderMigrationStatus() {
@@ -8579,7 +8579,7 @@
       const chip = document.getElementById("migrationStatusChip");
       const status = migration.status || "pending";
       chip.textContent = status === "complete" ? "Complete" : status === "failed" ? "Needs review" : "In progress";
-      chip.className = `v12-chip ${status === "complete" ? "success" : status === "failed" ? "danger" : "warning"}`;
+      chip.className = `status-chip ${status === "complete" ? "success" : status === "failed" ? "danger" : "warning"}`;
       const hasKnownProgress = Number.isFinite(Number(migration.progress)) && status !== "pending";
       const progress = Math.max(0, Math.min(100, Number(migration.progress || 0)));
       const progressShell = document.getElementById("migrationProgressShell");
@@ -8591,10 +8591,10 @@
         progressBar.setAttribute("aria-label", `Migration progress: ${progress}%`);
       } else progressBar.removeAttribute("value");
       document.getElementById("migrationProgressText").textContent = hasKnownProgress ? `${progress}% · ${status}` : "Checking migration status";
-      document.getElementById("v11BackupStatus").textContent = localStorage.getItem(V11_BACKUP_KEY) ? "Stored locally" : "Not available";
+      document.getElementById("v11BackupStatus").textContent = localStorage.getItem(LEGACY_BACKUP_KEY) ? "Stored locally" : "Not available";
       document.getElementById("migrationValidationStatus").textContent = migration.validation || "Not run";
       const history = appMeta.migrationHistory || [];
-      document.getElementById("migrationHistoryBody").innerHTML = history.length ? history.map(item => `<tr><td>${escapeHtml(formatDateTime(item.timestamp))}</td><td>${escapeHtml(`${item.from || "V11"} → ${item.to || "V12"}`)}</td><td><span class="v12-chip ${item.status === "success" ? "success" : "danger"}">${escapeHtml(item.status || "info")}</span><br><span style="color:var(--muted)">${escapeHtml(item.message || "")}</span></td></tr>`).join("") : `<tr><td colspan="3"><div class="v12-empty">No migration history.</div></td></tr>`;
+      document.getElementById("migrationHistoryBody").innerHTML = history.length ? history.map(item => `<tr><td>${escapeHtml(formatDateTime(item.timestamp))}</td><td>${escapeHtml(`${item.from || "V11"} → ${item.to || "V12"}`)}</td><td><span class="status-chip ${item.status === "success" ? "success" : "danger"}">${escapeHtml(item.status || "info")}</span><br><span style="color:var(--muted)">${escapeHtml(item.message || "")}</span></td></tr>`).join("") : `<tr><td colspan="3"><div class="system-empty">No migration history.</div></td></tr>`;
     }
 
     async function detectBraveBrowser() {
@@ -8629,25 +8629,25 @@
         browser.textContent = "Installed app";
         status.textContent = "This browser is already running Talaan as an installed app.";
         chip.textContent = "Installed";
-        chip.className = "v12-chip success";
+        chip.className = "status-chip success";
         items = ["Open the installed app from your Applications folder, Dock, or browser app list."];
       } else if (!secure) {
         browser.textContent = "Installation unavailable";
         status.textContent = "A local file cannot install the PWA service worker.";
         chip.textContent = "HTTPS needed";
-        chip.className = "v12-chip warning";
+        chip.className = "status-chip warning";
         items = ["Open the GitHub Pages version of Talaan.", "Or serve the project through localhost for development.", "Then use the browser installation control again."];
       } else if (brave) {
         browser.textContent = "Brave";
         status.textContent = "Brave did not provide the native install prompt to this page.";
         chip.textContent = "Brave menu";
-        chip.className = "v12-chip info";
+        chip.className = "status-chip info";
         items = ["Open the Brave menu (⋮).", "Choose Save and Share.", "Choose Install page as app…", "Confirm the installation in Brave."];
       } else {
         browser.textContent = "Browser install";
         status.textContent = "Use your browser's app installation command.";
         chip.textContent = "Browser menu";
-        chip.className = "v12-chip info";
+        chip.className = "status-chip info";
         items = ["Open the browser menu.", "Choose Install app, Install page as app, or Add to Home Screen.", "Confirm the installation when prompted."];
       }
       steps.innerHTML = items.map(item => `<li>${escapeHtml(item)}</li>`).join("");
@@ -8662,7 +8662,7 @@
       const chip = document.getElementById("pwaModeChip");
       if (!chip) return;
       chip.textContent = installed ? "Installed" : brave ? "Brave" : secure ? "Web app" : "Local file";
-      chip.className = `v12-chip ${installed ? "success" : secure ? "info" : "warning"}`;
+      chip.className = `status-chip ${installed ? "success" : secure ? "info" : "warning"}`;
       document.getElementById("pwaAppVersion").textContent = APP_VERSION;
       const installStatus = document.getElementById("pwaInstallStatus");
       const installButton = document.getElementById("installPwaButton");
@@ -8866,14 +8866,14 @@
     }
 
     function downloadV11Backup() {
-      const raw = localStorage.getItem(V11_BACKUP_KEY);
+      const raw = localStorage.getItem(LEGACY_BACKUP_KEY);
       if (!raw) return showToast("No V11 recovery copy is available", "warning");
       downloadFile(`finance-v11-recovery-${new Date().toISOString().slice(0, 10)}.json`, raw, "application/json");
       showToast("V11 recovery copy downloaded", "success");
     }
 
     function restoreV11Backup() {
-      const raw = localStorage.getItem(V11_BACKUP_KEY);
+      const raw = localStorage.getItem(LEGACY_BACKUP_KEY);
       if (!raw) return showToast("No V11 recovery copy is available", "warning");
       if (!confirm("Restore the stored V11 data? V12 will create a recovery snapshot of the current records first.")) return;
       try {
@@ -8890,7 +8890,7 @@
 
     function setupCrossTabSync() {
       if ("BroadcastChannel" in window) {
-        syncChannel = new BroadcastChannel(V12_CHANNEL_NAME);
+        syncChannel = new BroadcastChannel(FINANCE_CHANNEL_NAME);
         syncChannel.addEventListener("message", event => {
           if (event.data?.deviceId === appMeta.currentDeviceId && event.data?.tabId === window.name) return;
           if (event.data?.type !== "data-updated") return;
@@ -9021,7 +9021,7 @@
       window.addEventListener("online", () => { runReviewCheck(false); checkForUpdate(); });
     }
 
-    function syncV1303ExpenseSections() {
+    function syncCompactExpenseSections() {
       const recurringSection=document.getElementById("expenseRecurringSection");
       const autoSection=document.getElementById("expenseAutoPaymentSection");
       if(!recurringSection||!autoSection) return;
@@ -9037,7 +9037,7 @@
       if(autoStatus) autoStatus.textContent=autoOn?"On":"Off";
     }
 
-    function setupV1303CompactExpenseSections() {
+    function setupCompactExpenseSections() {
       const grid=document.querySelector("#expenseDialog .form-grid");
       if(!grid||document.getElementById("expenseRecurringSection")) return;
       const makeSection=(id,title,statusId)=>{
@@ -9058,13 +9058,13 @@
       grid.insertBefore(auto,autoField);
       const autoBody=auto.querySelector(".expense-compact-section-body");
       ["gymAutoPayField","gymAutoPayAccountField"].forEach(id=>{const node=document.getElementById(id);if(node) autoBody.appendChild(node);});
-      document.getElementById("expenseRecurring")?.addEventListener("change",()=>setTimeout(syncV1303ExpenseSections,0));
-      document.getElementById("gymAutoPay")?.addEventListener("change",()=>setTimeout(syncV1303ExpenseSections,0));
+      document.getElementById("expenseRecurring")?.addEventListener("change",()=>setTimeout(syncCompactExpenseSections,0));
+      document.getElementById("gymAutoPay")?.addEventListener("change",()=>setTimeout(syncCompactExpenseSections,0));
       document.getElementById("expenseDialog")?.addEventListener("close",()=>{recurring.open=false;auto.open=false;});
-      syncV1303ExpenseSections();
+      syncCompactExpenseSections();
     }
 
-    setupV1303CompactExpenseSections();
+    setupCompactExpenseSections();
     setupResponsiveMonthPicker();
     setupCompactReportGroups();
     organizeSettingsPanels();
@@ -9078,7 +9078,7 @@
     document.addEventListener("change", updateMobileFilterBadges);
     new MutationObserver(updateMobileFilterBadges).observe(document.body, { subtree:true, childList:true, characterData:true });
     syncThemeControls();
-    runV12Migration();
+    runLegacyDataMigration();
     installV12Wrappers();
     setupCrossTabSync();
     setupV12EventHandlers();
