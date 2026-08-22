@@ -1016,3 +1016,24 @@
     max-width: calc(100vw - 24px) !important;
   }
 }
+
+/* Talaan · More tools touch-tablet target restoration */
+@media (min-width: 851px) and (max-width: 1024px) and (pointer: coarse),
+       (min-width: 851px) and (max-width: 1024px) and (hover: none) {
+  html body .topbar-actions .topbar-tools-menu {
+    flex: 0 0 44px !important;
+    width: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+  }
+
+  html body .topbar-actions #topbarToolsTrigger {
+    width: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    max-height: 44px !important;
+    flex-basis: 44px !important;
+  }
+}
