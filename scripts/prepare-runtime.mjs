@@ -171,6 +171,12 @@ patchTextFile("index.html", source => {
     .replace(/const APP_RELEASE_DATE = "[^"]+";/, `const APP_RELEASE_DATE = "${RELEASE.date}";`)
     .replace(/const APP_CACHE_VERSION = "finance-v[^"]+";/, `const APP_CACHE_VERSION = "${RELEASE.cache}";`);
 
+  const brandMarkup = `<div class="brand">\n        <img class="talaan-brand-logo" src="./icons/talaan-brand-logo.png?v=${RELEASE.assetQuery}" alt="" aria-hidden="true">\n        <strong>${BRAND}</strong>\n      </div>`;
+  next = next.replace(
+    /<div class="brand">\s*(?:<img[^>]*class="talaan-brand-logo"[^>]*>\s*)?<strong>Talaan<\/strong>\s*<\/div>/,
+    brandMarkup
+  );
+
   const sidebarCssTag = `<link rel="stylesheet" href="./sidebar-compact-brand.css?v=${RELEASE.assetQuery}">`;
   if (!next.includes("sidebar-compact-brand.css")) {
     next = next.replace(
