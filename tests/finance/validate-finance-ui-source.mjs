@@ -42,6 +42,13 @@ assert.match(compactJs, /statuses\.insertBefore\(warning/);
 assert.match(compactJs, /ensureCollapseChanged/);
 assert.match(compactJs, /toggleCollapsibleSection/);
 
+for (const icon of ["repeat-monthly-off.png", "repeat-monthly-on.png"]) {
+  assert.ok(fs.existsSync(`icons/${icon}`), `${icon} must exist`);
+  assert.ok(compactCss.includes(`./icons/${icon}?v=${query}`), `compact expense styles must use ${icon}`);
+  assert.ok(worker.includes(`./icons/${icon}?v=${query}`), `service worker must precache ${icon}`);
+}
+assert.match(compactCss, /\[data-toggle-saved\] \.saved-icon\s*\{[\s\S]*opacity:\s*0 !important;/, "text star must remain visually hidden behind PNG artwork");
+
 for (const file of ["interaction-patterns.js", "account-ledger.js", "budget-planning.js", "form-inputs.js"]) {
   assert.ok(index.includes(`./${file}?v=${query}`), `index must load ${file} with the Talaan query`);
   assert.ok(worker.includes(`./${file}?v=${query}`), `service worker must precache ${file}`);
@@ -53,4 +60,4 @@ assert.equal(pkg.version, version.version);
 assert.equal(lock.version, version.version);
 assert.equal(lock.packages[""].version, version.version);
 
-console.log("Finance UI, spending persistence, form inputs, compact expenses, and Talaan runtime pins validated.");
+console.log("Finance UI, spending persistence, form inputs, compact expenses, replaceable repeat icons, and Talaan runtime pins validated.");
