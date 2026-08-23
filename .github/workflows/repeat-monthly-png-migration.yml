@@ -1,5 +1,6 @@
 name: Repeat monthly PNG migration
 
+# One-time branch migration; removed after a successful run.
 on:
   push:
     branches:
