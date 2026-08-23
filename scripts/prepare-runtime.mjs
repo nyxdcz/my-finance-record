@@ -34,6 +34,7 @@ const runtimeGroups = {
     "account-ledger.css",
     "app.css",
     "shell-ui.css",
+    "sidebar-compact-brand.css",
     "black-canvas.css",
     "budget-planning.css",
     "dashboard-interactions-core.css",
@@ -169,6 +170,14 @@ patchTextFile("index.html", source => {
     .replace(/const APP_RELEASE_NAME = "[^"]+";/, `const APP_RELEASE_NAME = "${RELEASE.name}";`)
     .replace(/const APP_RELEASE_DATE = "[^"]+";/, `const APP_RELEASE_DATE = "${RELEASE.date}";`)
     .replace(/const APP_CACHE_VERSION = "finance-v[^"]+";/, `const APP_CACHE_VERSION = "${RELEASE.cache}";`);
+
+  const sidebarCssTag = `<link rel="stylesheet" href="./sidebar-compact-brand.css?v=${RELEASE.assetQuery}">`;
+  if (!next.includes("sidebar-compact-brand.css")) {
+    next = next.replace(
+      /(<link rel="stylesheet" href="\.\/shell-ui\.css\?v=[^"]+">)/,
+      `$1\n  ${sidebarCssTag}`
+    );
+  }
 
   const cssTag = `<link rel="stylesheet" href="./summary-mascots.css?v=${RELEASE.assetQuery}">`;
   if (!next.includes("summary-mascots.css")) {
