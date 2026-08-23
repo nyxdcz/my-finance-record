@@ -1,0 +1,47 @@
+name: Repeat monthly PNG migration
+
+on:
+  push:
+    branches:
+      - style/repeat-monthly-png-icons
+
+permissions:
+  contents: write
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v4
+        with:
+          ref: style/repeat-monthly-png-icons
+          fetch-depth: 0
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Apply PNG icon migration
+        run: node scripts/migrate-repeat-monthly-png.mjs
+
+      - name: Regenerate runtime copies
+        run: npm run prepare:runtime
+
+      - name: Run repository quality suite
+        run: npm run quality
+
+      - name: Remove one-time migration files
+        run: git rm .github/workflows/repeat-monthly-png-migration.yml scripts/migrate-repeat-monthly-png.mjs
+
+      - name: Commit migrated tree
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet || git commit -m "style: use PNG repeat monthly icons"
+          git push origin HEAD:style/repeat-monthly-png-icons
