@@ -1,0 +1,33 @@
+import { test, expect } from "@playwright/test";
+
+test.use({ serviceWorkers:"block" });
+
+test("paid expenses desktop repeat control hides redundant text and keeps accessible labels", async ({ page }) => {
+  await page.setViewportSize({ width:1280, height:800 });
+  await page.goto("http://127.0.0.1:3000/offline.html", { waitUntil:"networkidle" });
+
+  await page.evaluate(() => {
+    document.body.innerHTML = `
+      <div id="paidExpenseList">
+        <div class="record-actions desktop-record-actions">
+          <button class="button button-saved button-small" data-toggle-saved="paid-example" title="Does not repeat monthly" aria-label="Repeat this expense monthly">
+            <span class="saved-icon-container" aria-hidden="true"><span class="saved-icon">☆</span></span>
+            <span class="monthly-repeat-label">Repeat monthly</span>
+          </button>
+          <button class="button button-secondary button-small" data-undo-paid="paid-example">Move to unpaid</button>
+          <button class="button button-secondary button-small" data-edit-expense="paid-example">Edit</button>
+        </div>
+        <div class="mobile-record-actions">
+          <button class="button button-secondary" role="menuitem" data-toggle-saved="paid-example-mobile">Repeat monthly</button>
+        </div>
+      </div>`;
+  });
+
+  await page.addStyleTag({ url:"http://127.0.0.1:3000/production-ui-audit.css?v=2.0.1-talaan5" });
+
+  const desktopButton = page.locator("#paidExpenseList .desktop-record-actions [data-toggle-saved]");
+  await expect(desktopButton.locator(".monthly-repeat-label")).toHaveCSS("display", "none");
+  await expect(desktopButton).toHaveAttribute("aria-label", "Repeat this expense monthly");
+  await expect(desktopButton).toHaveAttribute("title", "Does not repeat monthly");
+  await expect(page.locator("#paidExpenseList .mobile-record-actions [data-toggle-saved]")).toHaveText("Repeat monthly");
+});
