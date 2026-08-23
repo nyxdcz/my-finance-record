@@ -27,7 +27,7 @@ async function installSidebarFixture(page, extraSidebarClass = "") {
   await page.addStyleTag({ url:"http://127.0.0.1:3000/sidebar-compact-brand.css?v=2.0.1-talaan5" });
 }
 
-test("desktop sidebar collapses to 64px and expands compactly to 190px with Talaan branding", async ({ page }) => {
+test("desktop sidebar collapses to 64px and expands compactly to 190px with readable Talaan tooltips", async ({ page }) => {
   await page.setViewportSize({ width:1280, height:800 });
   await page.goto("http://127.0.0.1:3000/offline.html", { waitUntil:"networkidle" });
   await installSidebarFixture(page);
@@ -47,7 +47,35 @@ test("desktop sidebar collapses to 64px and expands compactly to 190px with Tala
   await expect(page.locator(".insights-nav-button")).toBeVisible();
   await expect(active).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
   await expect(activeIcon).toHaveCSS("background-color", "rgb(53, 111, 209)");
-  expect(await active.evaluate(node => getComputedStyle(node, "::after").content)).toBe('"Finance"');
+
+  const collapsedTooltip = await active.evaluate(node => {
+    const style = getComputedStyle(node, "::after");
+    return {
+      content:style.content,
+      fontSize:style.fontSize,
+      fontWeight:style.fontWeight,
+      backgroundColor:style.backgroundColor,
+      color:style.color,
+      paddingTop:style.paddingTop,
+      paddingRight:style.paddingRight,
+      borderRadius:style.borderRadius
+    };
+  });
+  expect(collapsedTooltip).toEqual({
+    content:'"Finance"',
+    fontSize:"13px",
+    fontWeight:"700",
+    backgroundColor:"rgb(31, 41, 55)",
+    color:"rgb(255, 255, 255)",
+    paddingTop:"7px",
+    paddingRight:"10px",
+    borderRadius:"7px"
+  });
+
+  await active.hover();
+  await expect.poll(() => active.evaluate(node => getComputedStyle(node, "::after").opacity)).toBe("1");
+  await active.focus();
+  await expect.poll(() => active.evaluate(node => getComputedStyle(node, "::after").opacity)).toBe("1");
 
   await page.evaluate(() => document.getElementById("sidebar").classList.add("desktop-open"));
   await expect(sidebar).toHaveCSS("width", "190px");
@@ -115,6 +143,6 @@ test("runtime preparation owns the compact sidebar stylesheet and refreshes cach
   expect(prepare).toContain('const sidebarCssTag = `<link rel="stylesheet" href="./sidebar-compact-brand.css?v=${RELEASE.assetQuery}">`;');
   expect(updater).not.toContain("document");
   expect(updater).toContain('const CURRENT_CACHE_VERSION = "finance-v2-20260822-talaan-r5"');
-  expect(updater).toContain('const UI_HOTFIX_REFRESH_KEY = "finance-ui-hotfix-v2-0-1-talaan4"');
+  expect(updater).toContain('const UI_HOTFIX_REFRESH_KEY = "finance-ui-hotfix-v2-0-1-talaan5"');
   expect(updater).toContain('pathname.endsWith("/sidebar-compact-brand.css")');
 });
