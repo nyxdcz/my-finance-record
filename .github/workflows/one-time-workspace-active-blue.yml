@@ -1,0 +1,54 @@
+name: One-time Workspace Active Blue
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  migrate:
+    if: github.head_ref == 'style/workspace-tabs-active-blue'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out style branch
+        uses: actions/checkout@v7
+        with:
+          ref: style/workspace-tabs-active-blue
+          fetch-depth: 0
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          package-manager-cache: false
+
+      - name: Install locked project metadata
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Apply workspace active tab styling
+        run: node scripts/migrations/workspace-active-blue.mjs
+
+      - name: Regenerate runtime copies
+        run: npm run prepare:runtime
+
+      - name: Validate repository
+        run: npm run quality
+
+      - name: Remove one-time migration files
+        run: |
+          rm -f scripts/migrations/workspace-active-blue.mjs
+          rm -f .github/workflows/one-time-workspace-active-blue.yml
+
+      - name: Commit final style tree
+        run: |
+          git config user.name "nyco"
+          git config user.email "nyxdcz@gmail.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No migration changes to commit."
+            exit 0
+          fi
+          git commit -m "style: highlight active workspace tabs"
+          git push origin HEAD:style/workspace-tabs-active-blue
