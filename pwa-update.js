@@ -4,8 +4,23 @@
   // Compatibility-only cache identity used to upgrade clients installed before Talaan V2.
   const LEGACY_INDEX_CACHE = "finance-v15-20260816-mobile-ui-ux-r32";
   const CURRENT_CACHE_VERSION = "finance-v2-20260822-talaan-r5";
-  const UI_HOTFIX_REFRESH_KEY = "finance-ui-hotfix-v2-0-1-talaan1";
+  const UI_HOTFIX_REFRESH_KEY = "finance-ui-hotfix-v2-0-1-talaan4";
   const normalizeCacheVersion = cacheVersion => cacheVersion === LEGACY_INDEX_CACHE ? CURRENT_CACHE_VERSION : cacheVersion;
+
+  function installCompactSidebarBrandStyles() {
+    try {
+      if (!root.document?.head) return false;
+      if (root.document.getElementById("talaan-compact-sidebar-brand-styles")) return true;
+      const link = root.document.createElement("link");
+      link.id = "talaan-compact-sidebar-brand-styles";
+      link.rel = "stylesheet";
+      link.href = "./sidebar-compact-brand.css?v=2.0.1-talaan5";
+      root.document.head.appendChild(link);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
 
   async function installBrowserBrandIcons() {
     try {
@@ -31,7 +46,8 @@
               || pathname.endsWith("/desktop-ui-phase1.css")
               || pathname.endsWith("/black-canvas.css")
               || pathname.endsWith("/production-ui-audit.css")
-              || pathname.endsWith("/phone-finance-compat.js");
+              || pathname.endsWith("/phone-finance-compat.js")
+              || pathname.endsWith("/sidebar-compact-brand.css");
           }
           catch (error) { return false; }
         });
@@ -68,6 +84,7 @@
     }
   };
   root.FinancePwaUpdate = api;
+  installCompactSidebarBrandStyles();
   void installBrowserBrandIcons();
   void refreshCachedHeaderToolsOnce();
 })(typeof window !== "undefined" ? window : globalThis);
