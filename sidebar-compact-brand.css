@@ -20,11 +20,10 @@
 @media (min-width:851px) {
   :root {
     --sidebar-rail-width:64px;
+    --sidebar-compact-expanded-width:190px;
   }
 
-  html body .sidebar,
-  html body .sidebar.desktop-open,
-  html body .sidebar.sidebar-pinned {
+  html body .sidebar {
     width:var(--sidebar-rail-width) !important;
     min-width:var(--sidebar-rail-width) !important;
     max-width:var(--sidebar-rail-width) !important;
@@ -32,18 +31,60 @@
     transform:none !important;
     overflow:visible !important;
     box-shadow:7px 0 20px rgba(16,24,40,.11) !important;
+    transition:width .22s ease,max-width .22s ease,box-shadow .22s ease !important;
   }
 
-  html body .main,
-  html body.sidebar-layout-pinned .main {
+  html body .sidebar.desktop-open,
+  html body .sidebar.sidebar-pinned {
+    width:var(--sidebar-compact-expanded-width) !important;
+    min-width:var(--sidebar-compact-expanded-width) !important;
+    max-width:var(--sidebar-compact-expanded-width) !important;
+    box-shadow:14px 0 32px rgba(16,24,40,.16) !important;
+  }
+
+  html body .main {
     margin-left:var(--sidebar-rail-width) !important;
+    transition:margin-left .22s ease !important;
   }
 
-  /* Desktop stays visually identical to the collapsed rail in every state. */
-  html body .sidebar .brand,
+  html body.sidebar-layout-pinned .main {
+    margin-left:var(--sidebar-compact-expanded-width) !important;
+  }
+
+  /* Collapsed desktop rail stays icon-only. */
+  html body .sidebar .brand {
+    display:none !important;
+  }
+
+  /* Open or pinned desktop rail shows the compact Talaan brand. */
   html body .sidebar.desktop-open .brand,
   html body .sidebar.sidebar-pinned .brand {
-    display:none !important;
+    position:absolute !important;
+    top:10px !important;
+    left:60px !important;
+    right:8px !important;
+    height:44px !important;
+    display:flex !important;
+    align-items:center !important;
+    gap:6px !important;
+    padding:0 !important;
+    overflow:hidden !important;
+    white-space:nowrap !important;
+  }
+
+  html body .sidebar.desktop-open .brand::before,
+  html body .sidebar.sidebar-pinned .brand::before {
+    flex-basis:15px !important;
+    width:15px !important;
+    height:15px !important;
+  }
+
+  html body .sidebar.desktop-open .brand > strong,
+  html body .sidebar.sidebar-pinned .brand > strong {
+    display:block !important;
+    min-width:0 !important;
+    overflow:hidden !important;
+    text-overflow:ellipsis !important;
   }
 
   html body .sidebar .sidebar-navigation,
@@ -53,9 +94,7 @@
     gap:4px !important;
   }
 
-  html body .sidebar .nav-button,
-  html body .sidebar.desktop-open .nav-button,
-  html body .sidebar.sidebar-pinned .nav-button {
+  html body .sidebar .nav-button {
     position:relative !important;
     box-sizing:border-box !important;
     width:48px !important;
@@ -63,23 +102,40 @@
     max-width:48px !important;
     min-height:44px !important;
     padding:8px 10px !important;
-    gap:0 !important;
+    gap:9px !important;
     overflow:visible !important;
   }
 
-  html body .sidebar .nav-label,
-  html body .sidebar.desktop-open .nav-label,
-  html body .sidebar.sidebar-pinned .nav-label {
+  html body .sidebar.desktop-open .nav-button,
+  html body .sidebar.sidebar-pinned .nav-button {
+    width:100% !important;
+    min-width:0 !important;
+    max-width:none !important;
+    padding:8px 10px !important;
+  }
+
+  html body .sidebar .nav-label {
     width:0 !important;
     max-width:0 !important;
     opacity:0 !important;
     overflow:hidden !important;
     pointer-events:none !important;
     transform:none !important;
-    transition:none !important;
   }
 
-  /* Keep all four primary destinations available on the compact rail. */
+  html body .sidebar.desktop-open .nav-label,
+  html body .sidebar.sidebar-pinned .nav-label {
+    width:auto !important;
+    max-width:120px !important;
+    opacity:1 !important;
+    overflow:hidden !important;
+    text-overflow:ellipsis !important;
+    white-space:nowrap !important;
+    pointer-events:auto !important;
+    transition:opacity .16s ease .04s !important;
+  }
+
+  /* Keep Insights available in both collapsed and expanded states. */
   html body .sidebar .insights-nav-button,
   html body .sidebar.desktop-open .insights-nav-button,
   html body .sidebar.sidebar-pinned .insights-nav-button {
@@ -116,8 +172,8 @@
     opacity:1 !important;
   }
 
-  /* Labels remain discoverable by mouse and keyboard while the rail stays compact. */
-  html body .sidebar .nav-button::after {
+  /* Tooltips are only needed while the desktop rail is collapsed. */
+  html body .sidebar:not(.desktop-open):not(.sidebar-pinned) .nav-button::after {
     content:attr(data-nav-label) !important;
     position:absolute !important;
     left:calc(100% + 9px) !important;
@@ -139,11 +195,16 @@
     transition:opacity .14s ease,transform .14s ease,visibility .14s !important;
   }
 
-  html body .sidebar .nav-button:hover::after,
-  html body .sidebar .nav-button:focus-visible::after {
+  html body .sidebar:not(.desktop-open):not(.sidebar-pinned) .nav-button:hover::after,
+  html body .sidebar:not(.desktop-open):not(.sidebar-pinned) .nav-button:focus-visible::after {
     opacity:1 !important;
     visibility:visible !important;
     transform:translate(0,-50%) !important;
+  }
+
+  html body .sidebar.desktop-open .nav-button::after,
+  html body .sidebar.sidebar-pinned .nav-button::after {
+    content:none !important;
   }
 }
 
@@ -156,6 +217,9 @@
 }
 
 @media (prefers-reduced-motion:reduce) {
+  .sidebar,
+  .main,
+  .sidebar .nav-label,
   .sidebar .nav-button::after {
     transition:none !important;
   }
