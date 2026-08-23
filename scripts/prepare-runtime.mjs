@@ -16,6 +16,7 @@ const RELEASE = Object.freeze({
   cache:"finance-v2-20260822-talaan-r5",
   assetQuery:"2.0.1-talaan5"
 });
+const SIDEBAR_BRAND_ASSET_QUERY = "2.0.1-talaan6";
 
 const CURRENT_VERSION_HISTORY = Object.freeze([{
   version:RELEASE.displayVersion,
@@ -171,12 +172,20 @@ patchTextFile("index.html", source => {
     .replace(/const APP_RELEASE_DATE = "[^"]+";/, `const APP_RELEASE_DATE = "${RELEASE.date}";`)
     .replace(/const APP_CACHE_VERSION = "finance-v[^"]+";/, `const APP_CACHE_VERSION = "${RELEASE.cache}";`);
 
-  const sidebarCssTag = `<link rel="stylesheet" href="./sidebar-compact-brand.css?v=${RELEASE.assetQuery}">`;
+  const brandMarkup = `<div class="brand">\n        <img class="talaan-brand-logo" src="./icons/talaan-brand-logo.png?v=${SIDEBAR_BRAND_ASSET_QUERY}" alt="" aria-hidden="true">\n        <strong>${BRAND}</strong>\n      </div>`;
+  next = next.replace(
+    /<div class="brand">\s*(?:<img[^>]*class="talaan-brand-logo"[^>]*>\s*)?<strong>Talaan<\/strong>\s*<\/div>/,
+    brandMarkup
+  );
+
+  const sidebarCssTag = `<link rel="stylesheet" href="./sidebar-compact-brand.css?v=${SIDEBAR_BRAND_ASSET_QUERY}">`;
   if (!next.includes("sidebar-compact-brand.css")) {
     next = next.replace(
       /(<link rel="stylesheet" href="\.\/shell-ui\.css\?v=[^"]+">)/,
       `$1\n  ${sidebarCssTag}`
     );
+  } else {
+    next = next.replace(/sidebar-compact-brand\.css\?v=[^"']+/, `sidebar-compact-brand.css?v=${SIDEBAR_BRAND_ASSET_QUERY}`);
   }
 
   const cssTag = `<link rel="stylesheet" href="./summary-mascots.css?v=${RELEASE.assetQuery}">`;
