@@ -4,11 +4,11 @@ for (const theme of ["light","dark"]) {
   test(`Talaan V2.0.1 ${theme} final chrome is readable`, async ({ page }) => {
     await page.setViewportSize({width:1440,height:900});
     await page.setContent(`<!doctype html><html data-theme="${theme}"><head>
-      <link rel="stylesheet" href="http://127.0.0.1:3000/app.css?v=2.0.1-talaan4">
-      <link rel="stylesheet" href="http://127.0.0.1:3000/shell-ui.css?v=2.0.1-talaan4">
-      <link rel="stylesheet" href="http://127.0.0.1:3000/dashboard-interactions.css?v=2.0.1-talaan4">
-      <link rel="stylesheet" href="http://127.0.0.1:3000/black-canvas.css?v=2.0.1-talaan4">
-      <link rel="stylesheet" href="http://127.0.0.1:3000/liquid-glass.css?v=2.0.1-talaan4">
+      <link rel="stylesheet" href="http://127.0.0.1:3000/app.css?v=2.0.1-talaan5">
+      <link rel="stylesheet" href="http://127.0.0.1:3000/shell-ui.css?v=2.0.1-talaan5">
+      <link rel="stylesheet" href="http://127.0.0.1:3000/dashboard-interactions.css?v=2.0.1-talaan5">
+      <link rel="stylesheet" href="http://127.0.0.1:3000/black-canvas.css?v=2.0.1-talaan5">
+      <link rel="stylesheet" href="http://127.0.0.1:3000/liquid-glass.css?v=2.0.1-talaan5">
       <style>*,*::before,*::after{animation:none!important;transition:none!important}</style>
     </head><body>
       <aside class="sidebar desktop-open" id="sidebar">

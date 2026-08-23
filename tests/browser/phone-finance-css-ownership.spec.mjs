@@ -4,16 +4,16 @@ test.use({ serviceWorkers:"block" });
 
 const widths = [320, 360, 375, 390, 430];
 const css = [
-  "budget-planning.css?v=2.0.1-talaan4",
-  "projects-calendar.css?v=2.0.1-talaan4",
-  "mobile.css?v=2.0.1-talaan4",
-  "app.css?v=2.0.1-talaan4",
-  "shell-ui.css?v=2.0.1-talaan4",
-  "dashboard-interactions.css?v=2.0.1-talaan4",
-  "ui-icon-alignment.css?v=2.0.1-talaan4",
-  "black-canvas.css?v=2.0.1-talaan4",
-  "desktop-ui-phase1.css?v=2.0.1-talaan4",
-  "desktop-ux.css?v=2.0.1-talaan4"
+  "budget-planning.css?v=2.0.1-talaan5",
+  "projects-calendar.css?v=2.0.1-talaan5",
+  "mobile.css?v=2.0.1-talaan5",
+  "app.css?v=2.0.1-talaan5",
+  "shell-ui.css?v=2.0.1-talaan5",
+  "dashboard-interactions.css?v=2.0.1-talaan5",
+  "ui-icon-alignment.css?v=2.0.1-talaan5",
+  "black-canvas.css?v=2.0.1-talaan5",
+  "desktop-ui-phase1.css?v=2.0.1-talaan5",
+  "desktop-ux.css?v=2.0.1-talaan5"
 ];
 
 async function financeFixture(page, width) {
@@ -92,6 +92,6 @@ test("live Talaan V2.0.1 shell owns Phone Finance compact styles statically", as
     styles:[...document.querySelectorAll('link[rel="stylesheet"]')].map(link => link.getAttribute("href") || ""),
     scripts:[...document.scripts].map(script => script.getAttribute("src") || "").filter(Boolean)
   }));
-  expect(delivery.styles.some(href => href.includes("mobile.css?v=2.0.1-talaan4"))).toBe(true);
-  expect(delivery.scripts.some(src => src.includes("pwa-update.js?v=2.0.1-talaan4"))).toBe(true);
+  expect(delivery.styles.some(href => href.includes("mobile.css?v=2.0.1-talaan5"))).toBe(true);
+  expect(delivery.scripts.some(src => src.includes("pwa-update.js?v=2.0.1-talaan5"))).toBe(true);
 });
