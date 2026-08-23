@@ -3,7 +3,7 @@
 (function installCompactExpenseCardEnhancements(root) {
   const PERIOD_SELECTOR = "#money .period-card[data-collapse-key]";
   const ROW_SELECTOR = "#money .record-row[data-expense-row]";
-  const REPEAT_SELECTOR = "#money [data-toggle-saved]";
+  const REPEAT_SELECTOR = "#money [data-toggle-saved], #paidExpenseList .desktop-record-actions [data-toggle-saved]";
   let refreshQueued = false;
 
   function moveDueWarningInline(row) {
