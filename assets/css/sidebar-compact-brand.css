@@ -7,9 +7,9 @@
 .sidebar .brand::before {
   content:"";
   display:block;
-  flex:0 0 17px;
-  width:17px;
-  height:17px;
+  flex:0 0 15px;
+  width:15px;
+  height:15px;
   background:url("./icons/talaan-brand-logo.png?v=2.0.1-talaan5") center / contain no-repeat;
 }
 
@@ -149,9 +149,9 @@
 
 @media (max-width:850px) {
   .sidebar .brand::before {
-    flex-basis:17px;
-    width:17px;
-    height:17px;
+    flex-basis:15px;
+    width:15px;
+    height:15px;
   }
 }
 
