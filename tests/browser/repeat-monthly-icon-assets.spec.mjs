@@ -1,0 +1,40 @@
+import { test, expect } from "@playwright/test";
+
+test.use({ serviceWorkers:"block" });
+
+test("repeat monthly control uses replaceable off and on PNG artwork", async ({ page, request }) => {
+  await page.setViewportSize({ width:1280, height:800 });
+  await page.goto("http://127.0.0.1:3000/offline.html", { waitUntil:"networkidle" });
+
+  for (const name of ["off", "on"]) {
+    const response = await request.get(`http://127.0.0.1:3000/icons/repeat-monthly-${name}.png?v=2.0.1-talaan5`);
+    expect(response.ok()).toBeTruthy();
+    expect(response.headers()["content-type"] || "").toContain("image/png");
+    expect((await response.body()).byteLength).toBeGreaterThan(100);
+  }
+
+  await page.evaluate(() => {
+    document.body.innerHTML = `
+      <main id="money">
+        <div class="record-row" data-expense-row>
+          <div class="desktop-record-actions">
+            <button class="button button-saved button-small" data-toggle-saved="example" aria-label="Repeat this expense monthly">
+              <span class="saved-icon-container" aria-hidden="true"><span class="saved-icon">☆</span></span>
+              <span class="monthly-repeat-label">Repeat monthly</span>
+            </button>
+          </div>
+        </div>
+      </main>`;
+  });
+  await page.addStyleTag({ url:"http://127.0.0.1:3000/production-ui-audit.css?v=2.0.1-talaan5" });
+
+  const button = page.locator("[data-toggle-saved]");
+  const container = button.locator(".saved-icon-container");
+  const star = button.locator(".saved-icon");
+
+  await expect(container).toHaveCSS("background-image", /repeat-monthly-off\.png/);
+  await expect(star).toHaveCSS("opacity", "0");
+
+  await button.evaluate(element => element.classList.add("active"));
+  await expect(container).toHaveCSS("background-image", /repeat-monthly-on\.png/);
+});
