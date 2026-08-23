@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 
 test.use({ serviceWorkers:"block" });
 
-test("paid expenses desktop repeat control hides redundant text and keeps accessible labels", async ({ page }) => {
+test("paid expenses desktop repeat control uses PNG artwork, hides redundant text, and keeps accessible labels", async ({ page }) => {
   await page.setViewportSize({ width:1280, height:800 });
   await page.goto("http://127.0.0.1:3000/offline.html", { waitUntil:"networkidle" });
 
@@ -24,10 +24,29 @@ test("paid expenses desktop repeat control hides redundant text and keeps access
   });
 
   await page.addStyleTag({ url:"http://127.0.0.1:3000/production-ui-audit.css?v=2.0.1-talaan5" });
+  await page.addScriptTag({ url:"http://127.0.0.1:3000/assets/js/ui/expense-compact.js" });
 
   const desktopButton = page.locator("#paidExpenseList .desktop-record-actions [data-toggle-saved]");
+  const icon = desktopButton.locator(".saved-icon-container");
+  const star = desktopButton.locator(".saved-icon");
+
+  await expect(desktopButton).toHaveCSS("width", "30px");
+  await expect(desktopButton).toHaveCSS("height", "30px");
+  await expect(icon).toHaveCSS("background-image", /repeat-monthly-off\.png/);
+  await expect(star).toHaveCSS("opacity", "0");
   await expect(desktopButton.locator(".monthly-repeat-label")).toHaveCSS("display", "none");
   await expect(desktopButton).toHaveAttribute("aria-label", "Repeat this expense monthly");
   await expect(desktopButton).toHaveAttribute("title", "Does not repeat monthly");
+
+  await desktopButton.evaluate(element => element.classList.add("active"));
+  await expect(icon).toHaveCSS("background-image", /repeat-monthly-on\.png/);
+
+  await page.emulateMedia({ reducedMotion:"no-preference" });
+  await desktopButton.click();
+  await page.waitForTimeout(32);
+  expect(await icon.evaluate(node => node.getAnimations().some(animation => animation.playState === "running"))).toBe(true);
+
   await expect(page.locator("#paidExpenseList .mobile-record-actions [data-toggle-saved]")).toHaveText("Repeat monthly");
+  await expect(page.locator("#paidExpenseList [data-undo-paid]")).toHaveText("Move to unpaid");
+  await expect(page.locator("#paidExpenseList [data-edit-expense]")).toHaveText("Edit");
 });

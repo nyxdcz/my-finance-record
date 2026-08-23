@@ -3,8 +3,70 @@
 (function installCompactExpenseCardEnhancements(root) {
   const PERIOD_SELECTOR = "#money .period-card[data-collapse-key]";
   const ROW_SELECTOR = "#money .record-row[data-expense-row]";
-  const REPEAT_SELECTOR = "#money [data-toggle-saved]";
+  const REPEAT_SELECTOR = "#money [data-toggle-saved], #paidExpenseList .desktop-record-actions [data-toggle-saved]";
+  const PAID_REPEAT_STYLE_ID = "talaan-paid-repeat-png-control";
   let refreshQueued = false;
+
+  function installPaidRepeatPngStyles() {
+    if (document.getElementById(PAID_REPEAT_STYLE_ID)) return false;
+    const style = document.createElement("style");
+    style.id = PAID_REPEAT_STYLE_ID;
+    style.textContent = `
+@media (min-width: 851px) and (hover: hover) and (pointer: fine) {
+  html body #paidExpenseList .desktop-record-actions > [data-toggle-saved],
+  html body #paidExpenseList .desktop-record-actions > [data-toggle-saved]:hover,
+  html body #paidExpenseList .desktop-record-actions > [data-toggle-saved]:focus-visible,
+  html body #paidExpenseList .desktop-record-actions > [data-toggle-saved]:active,
+  html body #paidExpenseList .desktop-record-actions > [data-toggle-saved].active,
+  html body #paidExpenseList .desktop-record-actions > [data-toggle-saved].active:hover {
+    box-sizing: border-box !important;
+    flex: 0 0 30px !important;
+    width: 30px !important;
+    min-width: 30px !important;
+    max-width: 30px !important;
+    height: 30px !important;
+    min-height: 30px !important;
+    max-height: 30px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+  }
+
+  html body #paidExpenseList .desktop-record-actions > [data-toggle-saved] .saved-icon-container {
+    display: block !important;
+    flex: 0 0 30px !important;
+    width: 30px !important;
+    min-width: 30px !important;
+    max-width: 30px !important;
+    height: 30px !important;
+    min-height: 30px !important;
+    max-height: 30px !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background-image: url("./icons/repeat-monthly-off.png?v=2.0.1-talaan5") !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    background-size: 30px 30px !important;
+  }
+
+  html body #paidExpenseList .desktop-record-actions > [data-toggle-saved].active .saved-icon-container {
+    background-image: url("./icons/repeat-monthly-on.png?v=2.0.1-talaan5") !important;
+  }
+
+  html body #paidExpenseList .desktop-record-actions > [data-toggle-saved] .saved-icon {
+    opacity: 0 !important;
+  }
+
+  html body #paidExpenseList .desktop-record-actions > [data-toggle-saved] > .monthly-repeat-label {
+    display: none !important;
+  }
+}`;
+    document.head.appendChild(style);
+    return true;
+  }
 
   function moveDueWarningInline(row) {
     if (!row) return false;
@@ -113,6 +175,7 @@
   });
 
   function start() {
+    installPaidRepeatPngStyles();
     refresh(document);
     observer.observe(document.documentElement, { childList:true, subtree:true });
   }
@@ -120,5 +183,5 @@
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start, { once:true });
   else start();
 
-  root.FinanceExpenseCompact = Object.freeze({ refresh, moveDueWarningInline, animateRepeatMonthly });
+  root.FinanceExpenseCompact = Object.freeze({ refresh, moveDueWarningInline, animateRepeatMonthly, installPaidRepeatPngStyles });
 })(typeof window !== "undefined" ? window : globalThis);
