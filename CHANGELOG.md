@@ -32,6 +32,7 @@ Talaan V2.0.1 is the active release baseline. This changelog focuses only on the
 - First half, Second half, and Other expenses sections with independent collapse controls.
 - Repeat monthly, Mark paid, Edit, and expense-selection controls.
 - Added `icons/repeat-monthly-off.png` and `icons/repeat-monthly-on.png` as the replaceable artwork for the saved-for-future-months control while preserving the existing recurrence behavior and accessibility labels.
+- Added a short spring-style bounce when the Repeat monthly control is clicked or tapped, with the animation disabled when Reduce Motion is enabled.
 - Compact Monthly budget plan and summary layouts.
 - PNG mascot summaries with phone numeric fallbacks and accessible numeric labels.
 
