@@ -4,13 +4,12 @@
   gap:6px !important;
 }
 
-.sidebar .brand::before {
-  content:"";
+.sidebar .talaan-brand-logo {
   display:block;
-  flex:0 0 15px;
-  width:15px;
-  height:15px;
-  background:url("./icons/talaan-brand-logo.png?v=2.0.1-talaan5") center / contain no-repeat;
+  flex:0 0 16px;
+  width:16px;
+  height:16px;
+  object-fit:contain;
 }
 
 .sidebar .brand > strong {
@@ -72,11 +71,12 @@
     white-space:nowrap !important;
   }
 
-  html body .sidebar.desktop-open .brand::before,
-  html body .sidebar.sidebar-pinned .brand::before {
-    flex-basis:15px !important;
-    width:15px !important;
-    height:15px !important;
+  html body .sidebar.desktop-open .talaan-brand-logo,
+  html body .sidebar.sidebar-pinned .talaan-brand-logo {
+    display:block !important;
+    flex:0 0 16px !important;
+    width:16px !important;
+    height:16px !important;
   }
 
   html body .sidebar.desktop-open .brand > strong,
@@ -211,10 +211,10 @@
 }
 
 @media (max-width:850px) {
-  .sidebar .brand::before {
-    flex-basis:15px;
-    width:15px;
-    height:15px;
+  .sidebar .talaan-brand-logo {
+    flex-basis:16px;
+    width:16px;
+    height:16px;
   }
 }
 
