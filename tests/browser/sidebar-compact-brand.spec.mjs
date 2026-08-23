@@ -10,7 +10,7 @@ async function installSidebarFixture(page, extraSidebarClass = "") {
       <div class="app">
         <aside class="sidebar ${sidebarClass}" id="sidebar">
           <button class="sidebar-close-button" type="button" aria-label="Pin navigation open"></button>
-          <div class="brand"><strong>Talaan</strong></div>
+          <div class="brand"><img class="talaan-brand-logo" src="./icons/talaan-brand-logo.png?v=2.0.1-talaan5" alt="" aria-hidden="true"><strong>Talaan</strong></div>
           <nav class="sidebar-navigation">
             <button class="nav-button" data-nav-label="Overview"><span class="nav-icon"><span class="nav-icon-image"></span></span><span class="nav-label">Overview</span></button>
             <button class="nav-button active" data-nav-label="Finance"><span class="nav-icon"><span class="nav-icon-image"></span></span><span class="nav-label">Finance</span></button>
@@ -35,6 +35,7 @@ test("desktop sidebar collapses to 64px and expands compactly to 190px with read
   const sidebar = page.locator("#sidebar");
   const main = page.locator(".main");
   const brand = page.locator(".brand");
+  const brandLogo = brand.locator(".talaan-brand-logo");
   const active = page.locator(".nav-button.active");
   const activeIcon = active.locator(".nav-icon");
   const firstLabel = page.locator(".nav-label").first();
@@ -82,18 +83,14 @@ test("desktop sidebar collapses to 64px and expands compactly to 190px with read
   await expect(main).toHaveCSS("margin-left", "64px");
   await expect(brand).toBeVisible();
   await expect(brand.locator("strong")).toHaveText("Talaan");
+  await expect(brandLogo).toBeVisible();
+  await expect(brandLogo).toHaveCSS("width", "16px");
+  await expect(brandLogo).toHaveCSS("height", "16px");
+  await expect.poll(() => brandLogo.evaluate(node => node.complete && node.naturalWidth > 0)).toBe(true);
   await expect(firstLabel).toHaveCSS("opacity", "1");
   await expect(active).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
   await expect(activeIcon).toHaveCSS("background-color", "rgb(53, 111, 209)");
   expect(await active.evaluate(node => getComputedStyle(node, "::after").content)).toBe("none");
-
-  const brandMark = await brand.evaluate(node => {
-    const style = getComputedStyle(node, "::before");
-    return { width:style.width, height:style.height, image:style.backgroundImage };
-  });
-  expect(brandMark.width).toBe("15px");
-  expect(brandMark.height).toBe("15px");
-  expect(brandMark.image).toContain("talaan-brand-logo.png");
 
   await page.evaluate(() => {
     const rail = document.getElementById("sidebar");
@@ -114,7 +111,7 @@ test("desktop sidebar collapses to 64px and expands compactly to 190px with read
   await expect(firstLabel).toHaveCSS("opacity", "0");
 });
 
-test("mobile brand keeps Talaan text with the uploaded logo at a smaller 15px size", async ({ page, request }) => {
+test("mobile brand keeps Talaan text with the real uploaded logo at 16px", async ({ page, request }) => {
   await page.setViewportSize({ width:390, height:844 });
   const logoResponse = await request.get("http://127.0.0.1:3000/icons/talaan-brand-logo.png");
   expect(logoResponse.ok()).toBeTruthy();
@@ -124,25 +121,24 @@ test("mobile brand keeps Talaan text with the uploaded logo at a smaller 15px si
   await installSidebarFixture(page, "open");
 
   const brand = page.locator(".brand");
+  const mark = brand.locator(".talaan-brand-logo");
   await expect(brand).toBeVisible();
   await expect(brand.locator("strong")).toHaveText("Talaan");
-
-  const mark = await brand.evaluate(node => {
-    const style = getComputedStyle(node, "::before");
-    return { width:style.width, height:style.height, image:style.backgroundImage };
-  });
-  expect(mark.width).toBe("15px");
-  expect(mark.height).toBe("15px");
-  expect(mark.image).toContain("talaan-brand-logo.png");
+  await expect(mark).toBeVisible();
+  await expect(mark).toHaveCSS("width", "16px");
+  await expect(mark).toHaveCSS("height", "16px");
+  await expect.poll(() => mark.evaluate(node => node.complete && node.naturalWidth > 0)).toBe(true);
 });
 
-test("runtime preparation owns the compact sidebar stylesheet and refreshes cached copies without changing release identity", () => {
+test("runtime preparation renders the real brand image and refreshes cached copies without changing release identity", () => {
   const prepare = fs.readFileSync("scripts/prepare-runtime.mjs", "utf8");
   const updater = fs.readFileSync("assets/js/pwa-update.js", "utf8");
   expect(prepare).toContain('"sidebar-compact-brand.css"');
   expect(prepare).toContain('const sidebarCssTag = `<link rel="stylesheet" href="./sidebar-compact-brand.css?v=${RELEASE.assetQuery}">`;');
+  expect(prepare).toContain('class="talaan-brand-logo"');
+  expect(prepare).toContain('src="./icons/talaan-brand-logo.png?v=${RELEASE.assetQuery}"');
   expect(updater).not.toContain("document");
   expect(updater).toContain('const CURRENT_CACHE_VERSION = "finance-v2-20260822-talaan-r5"');
-  expect(updater).toContain('const UI_HOTFIX_REFRESH_KEY = "finance-ui-hotfix-v2-0-1-talaan5"');
+  expect(updater).toContain('const UI_HOTFIX_REFRESH_KEY = "finance-ui-hotfix-v2-0-1-talaan6"');
   expect(updater).toContain('pathname.endsWith("/sidebar-compact-brand.css")');
 });
