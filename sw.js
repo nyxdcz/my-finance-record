@@ -71,6 +71,8 @@ const APP_SHELL = [
   asset("./icons/action-add-widget.png"),
   asset("./icons/customize-dashboard.png"),
   asset("./icons/action-add-sparkle.png"),
+  asset("./icons/repeat-monthly-off.png?v=2.0.1-talaan5"),
+  asset("./icons/repeat-monthly-on.png?v=2.0.1-talaan5"),
   asset("./icons/theme-moon.png"),
   asset("./icons/theme-sun.png"),
   asset("./icons/utility-badge.png"),
@@ -166,7 +168,7 @@ self.addEventListener("fetch", event => {
     return;
   }
   if (url.origin !== self.location.origin) return;
-  if (url.pathname.endsWith("privacy-lock.js") || url.pathname.endsWith("cloud-sync-lifecycle.js") || url.pathname.endsWith("interaction-patterns.js") || url.pathname.endsWith("pwa-update.js") || url.pathname.endsWith("ui-icon-alignment.css") || url.pathname.endsWith("mobile.css") || url.pathname.endsWith("production-ui-audit.css") || url.pathname.endsWith("budget-planning.css") || url.pathname.endsWith("black-canvas.css")) {
+  if (url.pathname.endsWith("privacy-lock.js") || url.pathname.endsWith("cloud-sync-lifecycle.js") || url.pathname.endsWith("interaction-patterns.js") || url.pathname.endsWith("pwa-update.js") || url.pathname.endsWith("ui-icon-alignment.css") || url.pathname.endsWith("mobile.css") || url.pathname.endsWith("production-ui-audit.css") || url.pathname.endsWith("budget-planning.css") || url.pathname.endsWith("black-canvas.css") || url.pathname.endsWith("repeat-monthly-off.png") || url.pathname.endsWith("repeat-monthly-on.png")) {
     event.respondWith(networkFirstCriticalAsset(request));
     return;
   }
