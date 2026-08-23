@@ -13,8 +13,9 @@ Talaan V2.0.1 is the active release baseline. This changelog focuses only on the
 - Updated current-facing repository documentation to use the Talaan name.
 - Unified the legacy primary-action blues on `#356FD1` across buttons, selected controls, and related blue UI states.
 - Replaced the remaining exact `#244770` and `#325279` shades with `#356FD1` across tracked source and runtime styles.
+- Styled the active Finance and Projects workspace tabs with Talaan blue `#356FD1` and persistent white text across hover, focus, and dark mode.
 - Kept the **More tools** control at 34px on fine-pointer desktops, restored the 44px touch-tablet target, and contained both the trigger and popup within the viewport.
-- Rotated the PWA cache to `finance-v2-20260822-talaan-r4` so installed clients receive the refreshed primary color and corrected header layout.
+- Rotated the PWA cache to `finance-v2-20260822-talaan-r5` so installed clients receive the refreshed primary color and corrected header layout.
 - Preserved compatibility-sensitive storage keys, repository paths, calendar UID domains, and runtime filenames where changing them could affect saved data or installed clients.
 
 ### Finance

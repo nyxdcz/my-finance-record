@@ -5298,3 +5298,21 @@
       #quickAddMenuDialog .productivity-quick-action { min-height:56px; grid-template-columns:20px minmax(0,1fr); padding:7px; }
       .cloud-sync-toolbar-popover { width:min(286px,calc(100vw - 20px)); }
     }
+
+/* Talaan · active workspace tabs */
+:is(.money-workspace-switcher, .project-workspace-switcher) .workspace-switcher-button:is(.active, [aria-selected="true"]),
+:is(.money-workspace-switcher, .project-workspace-switcher) .workspace-switcher-button:is(.active, [aria-selected="true"]):hover,
+:is(.money-workspace-switcher, .project-workspace-switcher) .workspace-switcher-button:is(.active, [aria-selected="true"]):focus-visible {
+  background:#356FD1 !important;
+  border-color:#356FD1 !important;
+  color:#FFFFFF !important;
+}
+
+html[data-theme="dark"] :is(.money-workspace-switcher, .project-workspace-switcher) .workspace-switcher-button:is(.active, [aria-selected="true"]),
+html[data-theme="dark"] :is(.money-workspace-switcher, .project-workspace-switcher) .workspace-switcher-button:is(.active, [aria-selected="true"]):hover,
+html[data-theme="dark"] :is(.money-workspace-switcher, .project-workspace-switcher) .workspace-switcher-button:is(.active, [aria-selected="true"]):focus-visible {
+  background:#356FD1 !important;
+  border-color:#356FD1 !important;
+  color:#FFFFFF !important;
+}
+

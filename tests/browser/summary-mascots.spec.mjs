@@ -43,7 +43,7 @@ test("desktop Budget & Expenses uses the approved supplied mascots and exact spa
 
   for (const image of imageLoads) {
     expect(image.ok).toBe(true);
-    expect(image.src).toContain("?v=2.0.1-talaan4");
+    expect(image.src).toContain("?v=2.0.1-talaan5");
     expect(image.width).toBe(256);
     expect(image.height).toBe(256);
   }
@@ -123,12 +123,12 @@ test("desktop Budget & Expenses uses the approved supplied mascots and exact spa
   });
 
   const expected = {
-    legendEarlyTotal:["red", "mascot-red.png?v=2.0.1-talaan4"],
-    legendLateTotal:["orange", "mascot-orange.png?v=2.0.1-talaan4"],
-    legendOtherTotal:["blue", "mascot-blue.png?v=2.0.1-talaan4"],
-    earlyTotal:["red", "mascot-red.png?v=2.0.1-talaan4"],
-    lateTotal:["orange", "mascot-orange.png?v=2.0.1-talaan4"],
-    otherTotal:["blue", "mascot-blue.png?v=2.0.1-talaan4"]
+    legendEarlyTotal:["red", "mascot-red.png?v=2.0.1-talaan5"],
+    legendLateTotal:["orange", "mascot-orange.png?v=2.0.1-talaan5"],
+    legendOtherTotal:["blue", "mascot-blue.png?v=2.0.1-talaan5"],
+    earlyTotal:["red", "mascot-red.png?v=2.0.1-talaan5"],
+    lateTotal:["orange", "mascot-orange.png?v=2.0.1-talaan5"],
+    otherTotal:["blue", "mascot-blue.png?v=2.0.1-talaan5"]
   };
 
   for (const [id, [color, asset]] of Object.entries(expected)) {
@@ -182,13 +182,13 @@ test("difference cards follow green and red state while phone disables mascot ov
   expect(positive.mascot).toBe("green");
   expect(positive.aria).toContain("₱100.00");
   expect(positive.text).toBe("₱100.00");
-  expect(positive.background).toContain("mascot-green.png?v=2.0.1-talaan4");
+  expect(positive.background).toContain("mascot-green.png?v=2.0.1-talaan5");
 
   const negative = await setDifference(true);
   expect(negative.mascot).toBe("red");
   expect(negative.aria).toContain("-₱100.00");
   expect(negative.text).toBe("-₱100.00");
-  expect(negative.background).toContain("mascot-red.png?v=2.0.1-talaan4");
+  expect(negative.background).toContain("mascot-red.png?v=2.0.1-talaan5");
 
   await page.setViewportSize({ width:390, height:844 });
 
