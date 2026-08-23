@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 
 test.use({ serviceWorkers:"block" });
 
-test("repeat monthly control uses replaceable off and on PNG artwork", async ({ page, request }) => {
+test("repeat monthly control uses replaceable PNG artwork and click bounce", async ({ page, request }) => {
   await page.setViewportSize({ width:1280, height:800 });
   await page.goto("http://127.0.0.1:3000/offline.html", { waitUntil:"networkidle" });
 
@@ -27,6 +27,7 @@ test("repeat monthly control uses replaceable off and on PNG artwork", async ({ 
       </main>`;
   });
   await page.addStyleTag({ url:"http://127.0.0.1:3000/production-ui-audit.css?v=2.0.1-talaan5" });
+  await page.addScriptTag({ url:"http://127.0.0.1:3000/assets/js/ui/expense-compact.js" });
 
   const button = page.locator("[data-toggle-saved]");
   const container = button.locator(".saved-icon-container");
@@ -37,4 +38,15 @@ test("repeat monthly control uses replaceable off and on PNG artwork", async ({ 
 
   await button.evaluate(element => element.classList.add("active"));
   await expect(container).toHaveCSS("background-image", /repeat-monthly-on\.png/);
+
+  await page.emulateMedia({ reducedMotion:"no-preference" });
+  await button.click();
+  await page.waitForTimeout(32);
+  expect(await container.evaluate(node => node.getAnimations().some(animation => animation.playState === "running"))).toBe(true);
+
+  await container.evaluate(node => node.getAnimations().forEach(animation => animation.cancel()));
+  await page.emulateMedia({ reducedMotion:"reduce" });
+  await button.click();
+  await page.waitForTimeout(32);
+  expect(await container.evaluate(node => node.getAnimations().length)).toBe(0);
 });
