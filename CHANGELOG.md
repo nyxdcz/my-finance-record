@@ -34,6 +34,7 @@ Talaan V2.0.1 is the active release baseline. This changelog focuses only on the
 - Added `icons/repeat-monthly-off.png` and `icons/repeat-monthly-on.png` as the replaceable artwork for the saved-for-future-months control while preserving the existing recurrence behavior and accessibility labels.
 - Added a short spring-style bounce when the Repeat monthly control is clicked or tapped, with the animation disabled when Reduce Motion is enabled.
 - Removed the redundant visible Repeat monthly / Repeats monthly text beside the recurrence icon in Paid Expenses desktop rows while keeping the icon control, tooltip, accessibility label, and phone More-actions wording.
+- Unified the Paid Expenses desktop recurrence control with the same 30px replaceable OFF/ON PNG artwork and spring bounce used by Budget & Expenses.
 - Compact Monthly budget plan and summary layouts.
 - PNG mascot summaries with phone numeric fallbacks and accessible numeric labels.
 
