@@ -42,6 +42,8 @@ assert.match(worker, /url\.pathname\.endsWith\("pwa-update\.js"\)/);
 assert.match(worker, /url\.pathname\.endsWith\("production-ui-audit\.css"\)/);
 assert.match(worker, /url\.pathname\.endsWith\("mobile\.css"\)/);
 assert.match(worker, /url\.pathname\.endsWith\("black-canvas\.css"\)/);
+assert.match(worker, /url\.pathname\.endsWith\("repeat-monthly-off\.png"\)/);
+assert.match(worker, /url\.pathname\.endsWith\("repeat-monthly-on\.png"\)/);
 assert.ok(worker.includes(version.cacheVersion));
 
-console.log("Talaan PWA update, service-worker delivery, and dedicated runtime ownership validated.");
+console.log("Talaan PWA update, service-worker delivery, replaceable repeat icons, and dedicated runtime ownership validated.");
