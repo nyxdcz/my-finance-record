@@ -81,11 +81,12 @@ test("mobile brand keeps Talaan text with the uploaded logo at a smaller 15px si
   expect(mark.image).toContain("talaan-brand-logo.png");
 });
 
-test("PWA runtime loads the compact sidebar style layer without changing the release cache identity", () => {
-  const source = fs.readFileSync("assets/js/pwa-update.js", "utf8");
-  const runtime = fs.readFileSync("pwa-update.js", "utf8");
-  expect(source).toContain('link.href = "./sidebar-compact-brand.css?v=2.0.1-talaan5"');
-  expect(source).toContain('const CURRENT_CACHE_VERSION = "finance-v2-20260822-talaan-r5"');
-  expect(source).toContain('const UI_HOTFIX_REFRESH_KEY = "finance-ui-hotfix-v2-0-1-talaan3"');
-  expect(runtime).toBe(source);
+test("runtime preparation owns the compact sidebar stylesheet without changing the release identity", () => {
+  const prepare = fs.readFileSync("scripts/prepare-runtime.mjs", "utf8");
+  const updater = fs.readFileSync("assets/js/pwa-update.js", "utf8");
+  expect(prepare).toContain('"sidebar-compact-brand.css"');
+  expect(prepare).toContain('const sidebarCssTag = `<link rel="stylesheet" href="./sidebar-compact-brand.css?v=${RELEASE.assetQuery}">`;');
+  expect(updater).not.toContain("document");
+  expect(updater).toContain('const CURRENT_CACHE_VERSION = "finance-v2-20260822-talaan-r5"');
+  expect(updater).toContain('const UI_HOTFIX_REFRESH_KEY = "finance-ui-hotfix-v2-0-1-talaan3"');
 });
