@@ -18,6 +18,7 @@ Talaan V2.0.1 is the active release baseline. This changelog focuses only on the
 - Kept the collapsed desktop sidebar at a 64px icon rail, restored a compact 190px open/pinned state with the uploaded logo, Talaan title, and navigation labels, and kept `#356FD1` limited to the selected icon square rather than the full row.
 - Increased collapsed sidebar tooltip readability with 13px semibold white text on a solid `#1F2937` popup, larger padding, and a stronger shadow while preserving hover and keyboard focus behavior.
 - Replaced the sidebar brand pseudo-image with a real 16px `talaan-brand-logo.png` image beside the Talaan title and cache-busted the brand stylesheet/image as `talaan6` so the uploaded logo renders reliably.
+- Replaced the sidebar brand PNG with the exact uploaded artwork and advanced the one-time UI refresh to clear any previously cached `talaan-brand-logo.png` before reloading.
 - Rotated the PWA cache to `finance-v2-20260822-talaan-r5` so installed clients receive the refreshed primary color and corrected header layout.
 - Preserved compatibility-sensitive storage keys, repository paths, calendar UID domains, and runtime filenames where changing them could affect saved data or installed clients.
 
