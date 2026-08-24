@@ -12,9 +12,16 @@ Talaan V2.0.1 is the active product baseline. This document describes only the c
 - **Product version:** `2.0.1`
 - **Display version:** `V2.0.1`
 - **Release name:** `Talaan`
-- **PWA cache:** `finance-v2-20260822-talaan-r5`
+- **PWA cache:** `finance-v2-20260824-transaction-views-r6`
 - **Finance Schema:** 12
 - **Cloud Schema:** V3
+
+## Phase 1 workspace update
+
+- Profile-scoped saved transaction views keep presentation preferences separate from finance records, backups, and encrypted sync payloads.
+- Desktop transaction tables support optional column visibility and reordering; essential identity, amount, and action columns remain visible.
+- Income, unpaid expenses, and paid expenses support list/calendar mode, density and sorting controls, selection totals, and a visible-record footer.
+- Hide values masks monetary displays and accessible monetary labels in-session without changing stored data.
 
 The visible application, PWA metadata, offline experience, installation messaging, calendar export branding, and current documentation use the **Talaan** name.
 

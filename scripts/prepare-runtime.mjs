@@ -13,7 +13,7 @@ const RELEASE = Object.freeze({
   name:"Talaan",
   date:"August 22, 2026",
   dateIso:"2026-08-22",
-  cache:"finance-v2-20260822-talaan-r5",
+  cache:"finance-v2-20260824-transaction-views-r6",
   assetQuery:"2.0.1-talaan5"
 });
 const SIDEBAR_BRAND_ASSET_QUERY = "2.0.1-talaan6";
@@ -23,6 +23,7 @@ const CURRENT_VERSION_HISTORY = Object.freeze([{
   title:RELEASE.name,
   changes:[
     "Current production release under the Talaan product name.",
+    "Adds profile-scoped transaction views, configurable desktop columns, list/calendar mode, visible and selected totals, and an in-session monetary display mask.",
     "Uses responsibility-based runtime filenames instead of legacy product-era filenames.",
     "Includes the complete local-first Finance workspace, Account Ledger, budgeting, reports, projects, productivity tools, reminders, and responsive desktop and phone layouts.",
     "Includes encrypted multi-profile Cloud Schema V3 synchronization, offline PWA support, recovery safeguards, and five-minute routine sync.",
@@ -45,6 +46,8 @@ const runtimeGroups = {
     "liquid-glass.css",
     "mobile.css",
     "productivity-tools.css",
+    "transaction-views.css",
+    "privacy-display.css",
     "production-ui-audit.css",
     "projects-calendar.css",
     "reminders-alerts.css",
@@ -68,6 +71,8 @@ const runtimeGroups = {
     "interaction-patterns.js",
     "privacy-lock.js",
     "productivity-tools.js",
+    "transaction-views.js",
+    "privacy-display.js",
     "projects-calendar.js",
     "pwa-update.js",
     "reminders-alerts.js",

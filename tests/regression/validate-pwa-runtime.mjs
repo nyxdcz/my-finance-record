@@ -12,14 +12,14 @@ const version = JSON.parse(read("version.json"));
 const query = "2.0.1-talaan5";
 
 assert.equal(version.version, "2.0.1");
-assert.equal(version.cacheVersion, "finance-v2-20260822-talaan-r5");
+assert.equal(version.cacheVersion, "finance-v2-20260824-transaction-views-r6");
 assert.match(index, /FinancePwaUpdate\.shellCacheName\(APP_CACHE_VERSION\)/);
 assert.match(index, /FinancePwaUpdate\.clearFinanceCaches\(\)/);
 assert.match(index, /FinancePwaUpdate\.serviceWorkerUrl\(APP_VERSION, APP_CACHE_VERSION\)/);
 assert.match(index, /FinancePwaUpdate\.updateState\(remote, APP_VERSION, APP_CACHE_VERSION\)/);
 assert.match(updater, /const FINANCE_CACHE_PATTERN = \/\^finance-v\\d\+-\//);
 assert.match(updater, /const LEGACY_INDEX_CACHE = "finance-v15-20260816-mobile-ui-ux-r32";/, "pre-Talaan cache alias stays compatibility-only");
-assert.match(updater, /const CURRENT_CACHE_VERSION = "finance-v2-20260822-talaan-r5";/);
+assert.match(updater, /const CURRENT_CACHE_VERSION = "finance-v2-20260824-transaction-views-r6";/);
 assert.match(updater, /desktop-ui-phase1\.css/);
 assert.match(updater, /black-canvas\.css/);
 assert.match(updater, /production-ui-audit\.css/);

@@ -6,6 +6,15 @@
 
 Talaan V2.0.1 is the active release baseline. This changelog focuses only on the current product version.
 
+### Transaction workspace and display privacy
+
+- Added profile-scoped named transaction views for Income, Budget & Expenses, and Paid Expenses without widening Finance Schema 12 or Cloud Schema V3.
+- Added desktop column visibility and keyboard-operable reordering while keeping record identity, amount, and actions protected.
+- Added list/calendar display modes, row density, sorting, visible/selected totals, and Income selection alongside the existing expense selection flows.
+- Added a persistent Hide values control that masks monetary text, chart surfaces, accessible monetary labels, and newly rendered content without changing stored values.
+- Added transaction-view and Hide/Show values actions to the existing global search instead of introducing a second command system.
+- Rotated only the PWA delivery cache to `finance-v2-20260824-transaction-views-r6`; product version and protected finance/cloud schemas remain unchanged.
+
 ### Brand and PWA
 
 - Renamed the current product experience to **Talaan**.
@@ -19,7 +28,7 @@ Talaan V2.0.1 is the active release baseline. This changelog focuses only on the
 - Increased collapsed sidebar tooltip readability with 13px semibold white text on a solid `#1F2937` popup, larger padding, and a stronger shadow while preserving hover and keyboard focus behavior.
 - Replaced the sidebar brand pseudo-image with a real 16px `talaan-brand-logo.png` image beside the Talaan title and cache-busted the brand stylesheet/image as `talaan6` so the uploaded logo renders reliably.
 - Replaced the sidebar brand PNG with the exact uploaded artwork and advanced the one-time UI refresh to clear any previously cached `talaan-brand-logo.png` before reloading.
-- Rotated the PWA cache to `finance-v2-20260822-talaan-r5` so installed clients receive the refreshed primary color and corrected header layout.
+- Rotated the PWA cache to `finance-v2-20260824-transaction-views-r6` so installed clients receive the refreshed primary color and corrected header layout.
 - Preserved compatibility-sensitive storage keys, repository paths, calendar UID domains, and runtime filenames where changing them could affect saved data or installed clients.
 
 ### Finance

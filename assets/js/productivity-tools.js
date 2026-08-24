@@ -643,6 +643,8 @@
       terms.forEach(term => { if (String(label).toLowerCase().includes(term)) score += 12; if (String(detail).toLowerCase().includes(term)) score += 4; });
       rows.push({type,id,label,detail,value,score,open});
     };
+    add("Action","transaction-views","Customize transaction view","Open columns, saved views, list/calendar mode, sorting, and density","Open","workspace columns calendar saved views",() => window.FinanceTransactionViews?.openForActivePage?.());
+    add("Action","privacy-display",window.FinancePrivacyDisplay?.hidden ? "Show monetary values" : "Hide monetary values","Mask or restore amounts on this device","Run","privacy hide show values screen share",() => window.FinancePrivacyDisplay?.toggle?.());
     (data.expenses || []).forEach(item => add("Expense",item.id,item.name,`${item.category} · ${item.paid ? "Paid" : "Unpaid"} · ${item.paidFromAccount || item.account || "No account"} · ${item.paidDate || item.date || "No date"}`,money(effectiveExpenseAmount(item)),`${item.notes || ""} ${item.recurring || ""} ${item.expenseType || ""}`,() => openExpenseDialog(item)));
     (data.incomeRecords || []).forEach(item => add("Income",item.id,item.name,`${item.category} · ${item.account || "No account"} · ${item.date || "No date"}`,money(item.amount),`${item.notes || ""} ${item.recurring || ""}`,() => openIncomeDialog(item)));
     (data.projects || []).forEach(item => add("Project",item.id,item.name,`${item.type} · ${item.status} · ${item.deadline || item.workMonth || "No date"}`,projectIsFinancial(item) ? money(item.value) : "Salary work",`${item.notes || ""} ${projectWorkSource(item)}`,() => openProjectDialog(item)));
@@ -1065,6 +1067,15 @@
     normalizeTemplate,
     openSearch:openGlobalSearch,
     openQuickAdd:openQuickMenu,
+    getFilters(mode) { return clone(filters[mode] || {}); },
+    setFilters(mode, value, shouldRender = true) {
+      if (!Object.prototype.hasOwnProperty.call(filters, mode)) return false;
+      filters[mode] = {...filters[mode], ...(value || {})};
+      writeJson(FILTER_KEY, filters);
+      updateAdvancedFilterButtons();
+      if (shouldRender) mode === "paid" ? productivityRenderPaidExpenses() : renderMoneyPage();
+      return true;
+    },
     get activity() { return clone(activity); },
     get undoHistory() { return clone(undoHistory.map(item=>({...item,data:undefined}))); },
     get templates() { return clone(data.expenseTemplates || []); }

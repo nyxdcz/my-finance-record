@@ -1,7 +1,7 @@
 "use strict";
 const APP_VERSION = "2.0.1";
 self.__FINANCE_APP_VERSION = APP_VERSION;
-const CACHE_VERSION = "finance-v2-20260822-talaan-r5";
+const CACHE_VERSION = "finance-v2-20260824-transaction-views-r6";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 // Persistent IndexedDB name is intentionally retained so existing saved data remains available after the product rename.
@@ -52,6 +52,10 @@ const APP_SHELL = [
   asset("./reports-insights.css?v=2.0.1-talaan5"),
   asset("./productivity-tools.js?v=2.0.1-talaan5"),
   asset("./productivity-tools.css?v=2.0.1-talaan5"),
+  asset("./transaction-views.js?v=2.0.1-talaan5"),
+  asset("./transaction-views.css?v=2.0.1-talaan5"),
+  asset("./privacy-display.js?v=2.0.1-talaan5"),
+  asset("./privacy-display.css?v=2.0.1-talaan5"),
   asset("./reminders-alerts.js?v=2.0.1-talaan5"),
   asset("./reminders-alerts.css?v=2.0.1-talaan5"),
   asset("./projects-calendar.js?v=2.0.1-talaan5"),
@@ -168,7 +172,7 @@ self.addEventListener("fetch", event => {
     return;
   }
   if (url.origin !== self.location.origin) return;
-  if (url.pathname.endsWith("privacy-lock.js") || url.pathname.endsWith("cloud-sync-lifecycle.js") || url.pathname.endsWith("interaction-patterns.js") || url.pathname.endsWith("pwa-update.js") || url.pathname.endsWith("ui-icon-alignment.css") || url.pathname.endsWith("mobile.css") || url.pathname.endsWith("production-ui-audit.css") || url.pathname.endsWith("budget-planning.css") || url.pathname.endsWith("black-canvas.css") || url.pathname.endsWith("repeat-monthly-off.png") || url.pathname.endsWith("repeat-monthly-on.png")) {
+  if (url.pathname.endsWith("privacy-lock.js") || url.pathname.endsWith("privacy-display.js") || url.pathname.endsWith("transaction-views.js") || url.pathname.endsWith("cloud-sync-lifecycle.js") || url.pathname.endsWith("interaction-patterns.js") || url.pathname.endsWith("pwa-update.js") || url.pathname.endsWith("ui-icon-alignment.css") || url.pathname.endsWith("mobile.css") || url.pathname.endsWith("production-ui-audit.css") || url.pathname.endsWith("budget-planning.css") || url.pathname.endsWith("black-canvas.css") || url.pathname.endsWith("transaction-views.css") || url.pathname.endsWith("privacy-display.css") || url.pathname.endsWith("repeat-monthly-off.png") || url.pathname.endsWith("repeat-monthly-on.png")) {
     event.respondWith(networkFirstCriticalAsset(request));
     return;
   }

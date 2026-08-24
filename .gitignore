@@ -30,6 +30,8 @@ __pycache__/
 /liquid-glass.css
 /mobile.css
 /productivity-tools.css
+/transaction-views.css
+/privacy-display.css
 /production-ui-audit.css
 /projects-calendar.css
 /reminders-alerts.css
@@ -55,6 +57,8 @@ __pycache__/
 /interaction-patterns.js
 /privacy-lock.js
 /productivity-tools.js
+/transaction-views.js
+/privacy-display.js
 /projects-calendar.js
 /pwa-update.js
 /reminders-alerts.js

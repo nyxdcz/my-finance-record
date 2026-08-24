@@ -3,7 +3,7 @@
   const FINANCE_CACHE_PATTERN = /^finance-v\d+-/;
   // Compatibility-only cache identity used to upgrade clients installed before Talaan V2.
   const LEGACY_INDEX_CACHE = "finance-v15-20260816-mobile-ui-ux-r32";
-  const CURRENT_CACHE_VERSION = "finance-v2-20260822-talaan-r5";
+  const CURRENT_CACHE_VERSION = "finance-v2-20260824-transaction-views-r6";
   const UI_HOTFIX_REFRESH_KEY = "finance-ui-hotfix-v2-0-1-talaan6";
   const normalizeCacheVersion = cacheVersion => cacheVersion === LEGACY_INDEX_CACHE ? CURRENT_CACHE_VERSION : cacheVersion;
 
@@ -14,6 +14,34 @@
     } catch (error) {
       return false;
     }
+  }
+
+  function installWorkspaceStylesheet(file) {
+    if (!root.document || root.document.querySelector(`link[data-workspace-asset="${file}"]`)) return;
+    const link = root.document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = `./${file}?v=2.0.1-talaan5`;
+    link.dataset.workspaceAsset = file;
+    root.document.head.append(link);
+  }
+
+  function installWorkspaceScript(file) {
+    return new Promise(resolve => {
+      if (!root.document || root.document.querySelector(`script[data-workspace-asset="${file}"]`)) { resolve(true); return; }
+      const script = root.document.createElement("script");
+      script.src = `./${file}?v=2.0.1-talaan5`;
+      script.dataset.workspaceAsset = file;
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      root.document.body.append(script);
+    });
+  }
+
+  async function installTransactionWorkspace() {
+    installWorkspaceStylesheet("transaction-views.css");
+    installWorkspaceStylesheet("privacy-display.css");
+    if (!await installWorkspaceScript("transaction-views.js")) return false;
+    return installWorkspaceScript("privacy-display.js");
   }
 
   async function refreshCachedHeaderToolsOnce() {
@@ -71,5 +99,7 @@
   };
   root.FinancePwaUpdate = api;
   void installBrowserBrandIcons();
+  if (root.document?.readyState === "complete") void installTransactionWorkspace();
+  else root.addEventListener?.("load", () => { void installTransactionWorkspace(); }, { once:true });
   void refreshCachedHeaderToolsOnce();
 })(typeof window !== "undefined" ? window : globalThis);

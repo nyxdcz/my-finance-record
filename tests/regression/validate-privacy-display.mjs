@@ -1,0 +1,16 @@
+import assert from "node:assert/strict";
+import fs from "node:fs";
+
+const source=fs.readFileSync("assets/js/privacy-display.js","utf8");
+const css=fs.readFileSync("assets/css/privacy-display.css","utf8");
+assert.match(source,/simple-finance-privacy-display-v1/);
+assert.match(source,/activeProfileId/);
+assert.match(source,/originalMoney/);
+assert.match(source,/MutationObserver/);
+assert.match(source,/aria-label/);
+assert.match(source,/aria-valuetext/);
+assert.match(source,/finance:privacy-display-changed/);
+assert.doesNotMatch(source,/saveData\s*\(/);
+assert.doesNotMatch(source,/localStorage\.setItem\(STORAGE_KEY/);
+assert.match(css,/finance-values-hidden canvas/);
+console.log("Privacy display source contract passed.");
