@@ -1,13 +1,12 @@
 import { expect, test } from "@playwright/test";
-/* global data, normalizeData */
+/* global data */
 
 test("payees and rules round-trip through backup and encrypted Cloud V3 settings", async ({ page }) => {
   await page.goto("http://127.0.0.1:3000/index.html?page=settings&settings=finance-tools", { waitUntil:"networkidle" });
   await page.waitForFunction(() => Boolean(window.FinancePayeeRules && window.FinanceCloudSyncInternals && window.FinancePrivacyLock));
   await page.evaluate(() => window.FinancePrivacyLock.setAuthenticated(true));
   const result = await page.evaluate(() => {
-    // eslint-disable-next-line no-global-assign -- browser fixture replaces the app's lexical data snapshot.
-    data = normalizeData({ ...data, ledgerSettings:{ ...data.ledgerSettings, financeTools:{ version:1, payees:[{id:"payee-backup",name:"Backup Payee",aliases:["Backup Alias"]}], transactionRules:[{id:"rule-backup",name:"Backup Rule",enabled:true,priority:10,match:{mode:"all",conditions:[{field:"description",operator:"contains",value:"backup"}]},actions:{category:"Backups"},continue:false}] } } });
+    data.ledgerSettings.financeTools = window.FinancePayeeRules.normalizeTools({ version:1, payees:[{id:"payee-backup",name:"Backup Payee",aliases:["Backup Alias"]}], transactionRules:[{id:"rule-backup",name:"Backup Rule",enabled:true,priority:10,match:{mode:"all",conditions:[{field:"description",operator:"contains",value:"backup"}]},actions:{category:"Backups"},continue:false}] });
     const bundle = window.buildBundle("my-finance-v12-recovery");
     const records = window.FinanceCloudSyncInternals.toRecordMap(bundle.data);
     const settings = records["settings\u001fpreferences"];

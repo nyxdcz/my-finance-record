@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-/* global data, normalizeData */
+/* global data */
 
 const app = "http://127.0.0.1:3000/index.html?page=settings&settings=finance-tools";
 
@@ -16,8 +16,7 @@ test("payee normalization and deterministic rules are safe and explainable", asy
         { id:"rule-c", name:"Add reviewed tag", enabled:true, priority:20, match:{mode:"all",conditions:[{field:"category",operator:"equals",value:"Groceries"}]}, actions:{tags:["Reviewed"]}, continue:false, createdAt:"2026-01-02T00:00:00.000Z" }
       ]
     };
-    // eslint-disable-next-line no-global-assign -- browser fixture replaces the app's lexical data snapshot.
-    data = normalizeData({ ...data, ledgerSettings:{ ...data.ledgerSettings, financeTools } });
+    data.ledgerSettings.financeTools = window.FinancePayeeRules.normalizeTools(financeTools);
     const record = { id:"expense-safe", name:"MERCHANT SHOP order", notes:"Weekly", category:"Other", account:"Maya", amount:420, paid:true, paidDate:"2026-08-24", accountDeducted:true, paymentTransactionId:"payment-safe", includeInTotals:true };
     const preview = window.FinancePayeeRules.previewRecord(record, "expenses");
     const bad = window.FinancePayeeRules.normalizeRule({ id:"bad", name:"Bad regex", enabled:true, priority:1, match:{mode:"all",conditions:[{field:"description",operator:"regex",value:"["}]}, actions:{category:"Unsafe"} });

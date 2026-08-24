@@ -8,13 +8,15 @@ async function openTools(page, viewport = { width:1366, height:900 }) {
   await page.goto(app, { waitUntil:"networkidle" });
   await page.waitForFunction(() => Boolean(window.FinancePayeeRules && window.FinancePrivacyLock));
   await page.evaluate(() => window.FinancePrivacyLock.setAuthenticated(true));
-  await page.locator('[data-settings-tab="finance-tools"]').click();
+  await page.evaluate(() => window.FinancePayeeRules.open());
+  await expect(page.locator("#settings-panel-finance-tools")).toBeVisible();
 }
 
 test("Finance tools creates a payee and previews a recoverable rule apply", async ({ page }) => {
   await openTools(page);
   const balances = await page.evaluate(() => JSON.stringify(data.accounts));
   await page.locator("[data-add-payee]").click();
+  await expect(page.locator("#payeeDialog")).toBeVisible();
   await page.locator("#payeeName").fill("Home Rent");
   await page.locator("#payeeAliases").fill("Rent, Landlord");
   await page.locator("#payeeDefaultCategory").fill("Housing");
@@ -58,4 +60,3 @@ test("Finance tools remains touch-safe without phone overflow", async ({ page })
   await page.locator("[data-add-rule]").focus();
   await expect(page.locator("[data-add-rule]")).toBeFocused();
 });
-

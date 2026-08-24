@@ -134,7 +134,7 @@ test("runtime preparation renders fresh real brand assets without changing relea
   const prepare = fs.readFileSync("scripts/prepare-runtime.mjs", "utf8");
   const updater = fs.readFileSync("assets/js/pwa-update.js", "utf8");
   expect(prepare).toContain('"sidebar-compact-brand.css"');
-  expect(prepare).toContain('const SIDEBAR_BRAND_ASSET_QUERY = "2.1.0-talaan6";');
+  expect(prepare).toContain("const SIDEBAR_BRAND_ASSET_QUERY = RELEASE.assetQuery;");
   expect(prepare).toContain('class="talaan-brand-logo"');
   expect(prepare).toContain('src="./icons/talaan-brand-logo.png?v=${SIDEBAR_BRAND_ASSET_QUERY}"');
   expect(prepare).toContain('sidebar-compact-brand.css?v=${SIDEBAR_BRAND_ASSET_QUERY}');
