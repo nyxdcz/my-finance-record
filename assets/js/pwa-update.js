@@ -16,33 +16,6 @@
     }
   }
 
-  function installWorkspaceStylesheet(file) {
-    if (!root.document || root.document.querySelector(`link[data-workspace-asset="${file}"]`)) return;
-    const link = root.document.createElement("link");
-    link.rel = "stylesheet";
-    link.href = `./${file}?v=2.0.1-talaan5`;
-    link.dataset.workspaceAsset = file;
-    root.document.head.append(link);
-  }
-
-  function installWorkspaceScript(file) {
-    return new Promise(resolve => {
-      if (!root.document || root.document.querySelector(`script[data-workspace-asset="${file}"]`)) { resolve(true); return; }
-      const script = root.document.createElement("script");
-      script.src = `./${file}?v=2.0.1-talaan5`;
-      script.dataset.workspaceAsset = file;
-      script.onload = () => resolve(true);
-      script.onerror = () => resolve(false);
-      root.document.body.append(script);
-    });
-  }
-
-  async function installTransactionWorkspace() {
-    installWorkspaceStylesheet("transaction-views.css");
-    installWorkspaceStylesheet("privacy-display.css");
-    if (!await installWorkspaceScript("transaction-views.js")) return false;
-    return installWorkspaceScript("privacy-display.js");
-  }
 
   async function refreshCachedHeaderToolsOnce() {
     if (!root.navigator?.serviceWorker?.controller || !("caches" in root)) return false;
@@ -99,7 +72,5 @@
   };
   root.FinancePwaUpdate = api;
   void installBrowserBrandIcons();
-  if (root.document?.readyState === "complete") void installTransactionWorkspace();
-  else root.addEventListener?.("load", () => { void installTransactionWorkspace(); }, { once:true });
   void refreshCachedHeaderToolsOnce();
 })(typeof window !== "undefined" ? window : globalThis);

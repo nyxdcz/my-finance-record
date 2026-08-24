@@ -28,7 +28,7 @@
   function injectButton(){
     if(document.getElementById("privacyDisplayToggle"))return;
     const panel=document.getElementById("topbarToolsPanel");if(!panel)return;
-    const button=document.createElement("button");button.id="privacyDisplayToggle";button.type="button";button.className="topbar-tool-button privacy-display-toggle";button.innerHTML='<span class="topbar-tool-icon" aria-hidden="true">◉</span><span data-privacy-label>Hide values</span>';
+    const button=document.createElement("button");button.id="privacyDisplayToggle";button.type="button";button.className="topbar-tools-item privacy-display-toggle";button.setAttribute("role","menuitem");button.innerHTML='<span class="toolbar-icon" aria-hidden="true">◉</span><span><strong data-privacy-label>Hide values</strong><small>Mask money on this screen</small></span>';
     const search=panel.querySelector("[data-open-global-search],#topbarSearchButton");search?search.before(button):panel.append(button);updateButton();
   }
   function refresh({render=true}={}){

@@ -14,9 +14,9 @@ test("transaction preferences are profile-scoped presentation only",async({page}
   await page.locator("#transactionToolbar-expense [data-open-transaction-columns]").click();
   const account=page.locator('#transactionColumnsDialog [data-column-id="account"] input');
   await account.uncheck();
-  await expect(page.locator('#money [data-transaction-column="account"]').first()).toBeHidden();
-  await expect(page.locator('#money [data-transaction-column="amount"]').first()).toBeVisible();
-  await expect(page.locator('#money [data-transaction-column="actions"]').first()).toBeVisible();
+  await expect(page.locator('#money [data-transaction-column="account"]').first()).toHaveClass(/transaction-column-hidden/);
+  await expect(page.locator('#money [data-transaction-column="amount"]').first()).not.toHaveClass(/transaction-column-hidden/);
+  await expect(page.locator('#money [data-transaction-column="actions"]').first()).not.toHaveClass(/transaction-column-hidden/);
   await page.locator('#transactionColumnsDialog button[value="default"]').click();
   await page.locator('#transactionToolbar-expense [data-transaction-mode="calendar"]').click();
   await expect(page.locator("#transactionCalendar-expense")).toBeVisible();
@@ -40,6 +40,7 @@ test("Hide values masks visual and accessible money without changing balances",a
   const leakedLabel=await page.evaluate(()=>[...document.querySelectorAll("[aria-label],[title],[aria-valuetext]")].map(node=>`${node.getAttribute("aria-label")||""} ${node.getAttribute("title")||""} ${node.getAttribute("aria-valuetext")||""}`).find(value=>/₱\s*[-+]?\d/.test(value))||"");
   expect(leakedLabel).toBe("");
   expect(await page.evaluate(()=>JSON.stringify(data.accounts))).toBe(balances);
+  await page.locator("#topbarToolsTrigger").click();
   await page.locator("#privacyDisplayToggle").click();
   await expect(page.locator("html")).not.toHaveClass(/finance-values-hidden/);
   expect(await page.locator("body").innerText()).toMatch(/₱\s*[-+]?\d/);

@@ -3,7 +3,7 @@ import fs from "node:fs";
 
 const source=fs.readFileSync("assets/js/transaction-views.js","utf8");
 const css=fs.readFileSync("assets/css/transaction-views.css","utf8");
-const loader=fs.readFileSync("assets/js/pwa-update.js","utf8");
+const loader=fs.readFileSync("assets/js/productivity-tools.js","utf8");
 assert.match(source,/simple-finance-transaction-views-v1/);
 assert.match(source,/activeProfileId/);
 assert.match(source,/identity','Income',true/);
@@ -17,6 +17,6 @@ assert.doesNotMatch(source,/persistFinanceDataRaw\s*\(/);
 assert.match(css,/@media\(max-width:760px\)/);
 assert.match(css,/min-height:44px/);
 assert.match(css,/transaction-column-hidden\{display:revert!important\}/);
-assert.match(loader,/installWorkspaceStylesheet\("transaction-views\.css"\)/);
-assert.match(loader,/installWorkspaceScript\("transaction-views\.js"\)/);
+assert.match(loader,/installPhaseOneStylesheet\("transaction-views\.css"\)/);
+assert.match(loader,/installPhaseOneScript\("transaction-views\.js"\)/);
 console.log("Transaction workspace source contract passed.");

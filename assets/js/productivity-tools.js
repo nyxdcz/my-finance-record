@@ -1080,4 +1080,18 @@
     get undoHistory() { return clone(undoHistory.map(item=>({...item,data:undefined}))); },
     get templates() { return clone(data.expenseTemplates || []); }
   };
+
+  function installPhaseOneStylesheet(file) {
+    if (document.querySelector(`link[data-phase-one-asset="${file}"]`)) return;
+    const link=document.createElement("link"); link.rel="stylesheet"; link.href=`./${file}?v=2.0.1-talaan5`; link.dataset.phaseOneAsset=file; document.head.append(link);
+  }
+  function installPhaseOneScript(file) {
+    return new Promise(resolve=>{if(document.querySelector(`script[data-phase-one-asset="${file}"]`)){resolve(true);return;}const script=document.createElement("script");script.src=`./${file}?v=2.0.1-talaan5`;script.dataset.phaseOneAsset=file;script.onload=()=>resolve(true);script.onerror=()=>resolve(false);document.body.append(script);});
+  }
+  async function installPhaseOneWorkspace() {
+    installPhaseOneStylesheet("transaction-views.css"); installPhaseOneStylesheet("privacy-display.css");
+    if(!await installPhaseOneScript("transaction-views.js"))return false;
+    return installPhaseOneScript("privacy-display.js");
+  }
+  void installPhaseOneWorkspace();
 })();
