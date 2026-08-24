@@ -27,7 +27,7 @@ test("transaction preferences are profile-scoped presentation only",async({page}
   await expect(page.locator("#transactionCalendar-expense")).toBeVisible();
   await page.setViewportSize({width:390,height:844});
   await page.locator('#transactionToolbar-expense [data-transaction-mode="list"]').click();
-  await expect(page.locator('#money [data-transaction-column="account"]').first()).toBeVisible();
+  await expect(page.locator('#money .record-row [data-transaction-column="account"]').first()).toBeVisible();
   const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>document.documentElement.clientWidth+1); expect(overflow).toBe(false);
 });
 
