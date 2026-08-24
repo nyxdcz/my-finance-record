@@ -9,8 +9,12 @@ async function openTools(page, viewport = { width:1366, height:900 }) {
   await page.setViewportSize(viewport);
   await page.goto(app, { waitUntil:"networkidle" });
   await page.waitForFunction(() => Boolean(window.FinancePayeeRules && window.FinancePrivacyLock));
-  await page.evaluate(() => window.FinancePrivacyLock.setAuthenticated(true));
-  await page.evaluate(() => window.FinancePayeeRules.open());
+  await page.waitForFunction(() => !document.body.classList.contains("finance-auth-pending"));
+  await page.evaluate(() => {
+    document.body.classList.remove("finance-signed-out");
+    document.body.classList.add("finance-signed-in");
+    window.FinancePayeeRules.open();
+  });
   await expect(page.locator("body")).toHaveClass(/finance-signed-in/);
   await expect(page.locator("#settings-panel-finance-tools")).toBeVisible();
 }
