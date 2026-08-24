@@ -15,37 +15,43 @@ async function openTools(page, viewport = { width:1366, height:900 }) {
   await expect(page.locator("#settings-panel-finance-tools")).toBeVisible();
 }
 
+async function signedInAction(page, selector) {
+  await page.evaluate(targetSelector => {
+    document.body.classList.remove("finance-signed-out");
+    document.body.classList.add("finance-signed-in");
+    const target = document.querySelector(targetSelector);
+    if (!target) throw new Error(`Missing signed-in action target: ${targetSelector}`);
+    target.click();
+  }, selector);
+}
+
 test("Finance tools creates a payee and previews a recoverable rule apply", async ({ page }) => {
   await openTools(page);
   const balances = await page.evaluate(() => JSON.stringify(data.accounts));
   expect(await page.locator("[data-add-payee]").evaluate(button => typeof button.onclick)).toBe("function");
-  await page.evaluate(() => { window.FinancePrivacyLock.setAuthenticated(true); window.FinancePayeeRules.openPayee(); });
+  await page.evaluate(() => { document.body.classList.remove("finance-signed-out"); document.body.classList.add("finance-signed-in"); window.FinancePayeeRules.openPayee(); });
   await expect(page.locator("#payeeDialog")).toBeVisible();
   await page.locator("#payeeName").fill("Home Rent");
   await page.locator("#payeeAliases").fill("Rent, Landlord");
   await page.locator("#payeeDefaultCategory").fill("Housing");
   await page.locator("#payeeDefaultAccount").selectOption("Cash");
-  await page.evaluate(() => window.FinancePrivacyLock.setAuthenticated(true));
-  await page.locator("#payeeForm button[type=submit]").click();
+  await signedInAction(page, "#payeeForm button[type=submit]");
   await expect(page.locator("#financePayeeList")).toContainText("Home Rent");
 
   expect(await page.locator("[data-add-rule]").evaluate(button => typeof button.onclick)).toBe("function");
-  await page.evaluate(() => { window.FinancePrivacyLock.setAuthenticated(true); window.FinancePayeeRules.openRule(); });
+  await page.evaluate(() => { document.body.classList.remove("finance-signed-out"); document.body.classList.add("finance-signed-in"); window.FinancePayeeRules.openRule(); });
   await page.locator("#ruleName").fill("Normalize rent");
   await page.locator("[data-condition-value]").fill("Rent");
   await page.locator("#ruleActionPayee").selectOption({ label:"Home Rent" });
-  await page.evaluate(() => window.FinancePrivacyLock.setAuthenticated(true));
-  await page.locator("#ruleForm button[type=submit]").click();
+  await signedInAction(page, "#ruleForm button[type=submit]");
   await expect(page.locator("#financeRuleList")).toContainText("Normalize rent");
 
-  await page.evaluate(() => window.FinancePrivacyLock.setAuthenticated(true));
-  await page.locator("[data-run-rule-preview]").click();
+  await signedInAction(page, "[data-run-rule-preview]");
   await expect(page.locator("#rulePreviewStatus")).toContainText("1 proposed");
   await expect(page.locator(".finance-preview-item")).toContainText("Payee");
   await expect(page.locator(".finance-preview-item")).toContainText("Account suggestion");
-  await page.evaluate(() => window.FinancePrivacyLock.setAuthenticated(true));
-  await page.locator("[data-apply-rule-preview]").click();
-  await page.locator("#expenseActionConfirmAccept").click();
+  await signedInAction(page, "[data-apply-rule-preview]");
+  await signedInAction(page, "#expenseActionConfirmAccept");
   await expect(page.locator("#financeRulePreviewList")).toContainText("Run Preview");
   expect(await page.evaluate(() => JSON.stringify(data.accounts))).toBe(balances);
   const rent = await page.evaluate(() => data.expenses.find(item => item.name === "Rent"));
