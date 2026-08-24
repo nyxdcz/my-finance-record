@@ -1,6 +1,8 @@
 import { expect, test } from "@playwright/test";
 /* global data */
 
+test.use({ serviceWorkers:"block" });
+
 const app = "http://127.0.0.1:3000/index.html?page=settings&settings=finance-tools";
 
 async function openTools(page, viewport = { width:1366, height:900 }) {
@@ -16,26 +18,32 @@ async function openTools(page, viewport = { width:1366, height:900 }) {
 test("Finance tools creates a payee and previews a recoverable rule apply", async ({ page }) => {
   await openTools(page);
   const balances = await page.evaluate(() => JSON.stringify(data.accounts));
-  await page.locator("[data-add-payee]").click();
+  expect(await page.locator("[data-add-payee]").evaluate(button => typeof button.onclick)).toBe("function");
+  await page.evaluate(() => { window.FinancePrivacyLock.setAuthenticated(true); window.FinancePayeeRules.openPayee(); });
   await expect(page.locator("#payeeDialog")).toBeVisible();
   await page.locator("#payeeName").fill("Home Rent");
   await page.locator("#payeeAliases").fill("Rent, Landlord");
   await page.locator("#payeeDefaultCategory").fill("Housing");
   await page.locator("#payeeDefaultAccount").selectOption("Cash");
+  await page.evaluate(() => window.FinancePrivacyLock.setAuthenticated(true));
   await page.locator("#payeeForm button[type=submit]").click();
   await expect(page.locator("#financePayeeList")).toContainText("Home Rent");
 
-  await page.locator("[data-add-rule]").click();
+  expect(await page.locator("[data-add-rule]").evaluate(button => typeof button.onclick)).toBe("function");
+  await page.evaluate(() => { window.FinancePrivacyLock.setAuthenticated(true); window.FinancePayeeRules.openRule(); });
   await page.locator("#ruleName").fill("Normalize rent");
   await page.locator("[data-condition-value]").fill("Rent");
   await page.locator("#ruleActionPayee").selectOption({ label:"Home Rent" });
+  await page.evaluate(() => window.FinancePrivacyLock.setAuthenticated(true));
   await page.locator("#ruleForm button[type=submit]").click();
   await expect(page.locator("#financeRuleList")).toContainText("Normalize rent");
 
+  await page.evaluate(() => window.FinancePrivacyLock.setAuthenticated(true));
   await page.locator("[data-run-rule-preview]").click();
   await expect(page.locator("#rulePreviewStatus")).toContainText("1 proposed");
   await expect(page.locator(".finance-preview-item")).toContainText("Payee");
   await expect(page.locator(".finance-preview-item")).toContainText("Account suggestion");
+  await page.evaluate(() => window.FinancePrivacyLock.setAuthenticated(true));
   await page.locator("[data-apply-rule-preview]").click();
   await page.locator("#expenseActionConfirmAccept").click();
   await expect(page.locator("#financeRulePreviewList")).toContainText("Run Preview");
