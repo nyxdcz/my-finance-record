@@ -12,8 +12,8 @@ const read = file => fs.readFileSync(path.join(root, file), "utf8");
 const exists = file => fs.existsSync(path.join(root, file));
 const fail = message => errors.push(message);
 const warn = message => warnings.push(message);
-const CURRENT_VERSION = "2.0.1";
-const DISPLAY_VERSION = "V2.0.1";
+const CURRENT_VERSION = "2.1.0";
+const DISPLAY_VERSION = "V2.1.0";
 const BRAND = "Talaan";
 const PREVIOUS_BRAND = ["My", "Finance", "Records"].join(" ");
 
@@ -21,12 +21,14 @@ const runtimeCssFiles = [
   "account-ledger.css", "app.css", "shell-ui.css", "black-canvas.css", "budget-planning.css",
   "dashboard-interactions-core.css", "dashboard-interactions.css", "desktop-ui-phase1.css", "desktop-ux.css",
   "liquid-glass.css", "mobile.css", "productivity-tools.css", "production-ui-audit.css", "projects-calendar.css",
+  "payees-rules.css",
   "reminders-alerts.css", "reports-insights.css", "security-profiles.css", "summary-mascots.css", "ui-icon-alignment.css"
 ];
 const rootJsFiles = [
   "account-ledger.js", "brand-icons.js", "budget-planning.js", "cloud-conflict-resolution.js", "cloud-conflict-review.js",
   "cloud-sync-lifecycle.js", "cloud-sync.js", "expense-screenshot-ai.js", "expense-screenshot-detect.js",
   "expense-screenshot-parser.js", "form-inputs.js", "interaction-patterns.js", "privacy-lock.js", "productivity-tools.js",
+  "payees-rules.js",
   "projects-calendar.js", "pwa-update.js", "reminders-alerts.js", "reports-insights.js", "security-profiles.js"
 ];
 const featureJsFiles = ["cash-flow-summary.js"];

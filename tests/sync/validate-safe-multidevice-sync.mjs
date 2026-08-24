@@ -20,7 +20,7 @@ for (const file of ["cloud-sync.js","cloud-conflict-resolution.js","cloud-confli
   assert(result.status === 0, `${file} syntax check failed: ${result.stderr || result.stdout}`);
 }
 
-assert(version.version === "2.0.1", "Talaan release version is not V2.0.1");
+assert(version.version === "2.1.0", "Talaan release version is not V2.1.0");
 assert(cloud.includes("function reconcilePendingWithRemote"), "multi-device reconciliation helper is missing");
 assert(cloud.includes("threeWayMerge(basePayload, local.payload, row.payload"), "non-overlapping device/cloud changes are not three-way merged");
 assert(cloud.includes('local.status = "conflict"'), "overlapping changes are not preserved as explicit conflicts");
@@ -42,7 +42,7 @@ const pushLoop = cloud.indexOf("while (Object.values(pending)", syncStart);
 assert(syncStart >= 0 && firstPull > syncStart && pushLoop > firstPull, "sync must pull current cloud revisions before queued device uploads");
 assert(cloud.includes("5*60*1000"), "five-minute routine sync cadence changed");
 assert(worker.includes(version.cacheVersion), "PWA cache does not match the current Talaan release");
-assert(worker.includes('asset("./cloud-sync.js?v=2.0.1-talaan5")'), "PWA shell does not precache the stabilized cloud sync client on the Talaan query");
+assert(worker.includes('asset("./cloud-sync.js?v=2.1.0-talaan1")'), "PWA shell does not precache the stabilized cloud sync client on the Talaan query");
 assert(worker.includes('new Request(url, { cache:"reload" })'), "PWA precache no longer bypasses stale HTTP cache");
 
 if (failures.length) {
@@ -50,4 +50,4 @@ if (failures.length) {
   failures.forEach(item => console.error(`- ${item}`));
   process.exit(1);
 }
-console.log("Safe multi-device sync validation passed under Talaan V2.0.1.");
+console.log("Safe multi-device sync validation passed under Talaan V2.1.0.");

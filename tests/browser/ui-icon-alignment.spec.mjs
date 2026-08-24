@@ -1,16 +1,16 @@
 import { test, expect } from "@playwright/test";
 
-test("production Talaan V2.0.1 UI alignment uses the delivered final stylesheet", async ({ browser }) => {
+test("production Talaan V2.1.0 UI alignment uses the delivered final stylesheet", async ({ browser }) => {
   const context = await browser.newContext({ javaScriptEnabled:false });
   const page = await context.newPage();
   await page.goto("http://127.0.0.1:3000/index.html?page=dashboard", { waitUntil:"networkidle" });
 
   const styles = await page.locator('link[rel="stylesheet"]').evaluateAll(nodes => nodes.map(node => node.getAttribute("href") || ""));
-  const dashboardCss = styles.findIndex(href => href.includes("dashboard-interactions.css?v=2.0.1-talaan5"));
-  const uiCss = styles.findIndex(href => href.includes("ui-icon-alignment.css?v=2.0.1-talaan5"));
+  const dashboardCss = styles.findIndex(href => href.includes("dashboard-interactions.css?v=2.1.0-talaan1"));
+  const uiCss = styles.findIndex(href => href.includes("ui-icon-alignment.css?v=2.1.0-talaan1"));
   expect(dashboardCss).toBeGreaterThanOrEqual(0);
   expect(uiCss).toBeGreaterThan(dashboardCss);
-  expect(styles.filter(href => href.includes("ui-icon-alignment.css?v=2.0.1-talaan5"))).toHaveLength(1);
+  expect(styles.filter(href => href.includes("ui-icon-alignment.css?v=2.1.0-talaan1"))).toHaveLength(1);
 
   const badge = await page.locator("#buildBadge").evaluate(element => {
     const before = getComputedStyle(element, "::before");
@@ -28,7 +28,7 @@ test("production Talaan V2.0.1 UI alignment uses the delivered final stylesheet"
 });
 
 
-test("Talaan V2.0.1 header moves Dashboard customization into More tools", async ({ page }) => {
+test("Talaan V2.1.0 header moves Dashboard customization into More tools", async ({ page }) => {
   await page.goto("http://127.0.0.1:3000/index.html?page=dashboard", { waitUntil:"networkidle" });
 
   await expect(page.locator("#privacySignInButton")).toHaveCount(0);

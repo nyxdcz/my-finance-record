@@ -13,7 +13,7 @@ const compactJs = read("assets/js/ui/expense-compact.js");
 const version = JSON.parse(read("version.json"));
 const pkg = JSON.parse(read("package.json"));
 const lock = JSON.parse(read("package-lock.json"));
-const query = "2.0.1-talaan5";
+const query = "2.1.0-talaan1";
 
 for (const [pageId, marqueeId] of [["income", "incomeFinanceWeekMarquee"], ["money", "financeWeekMarquee"], ["paid-expenses", "paidFinanceWeekMarquee"]]) {
   const start = index.indexOf(`id="${pageId}"`);
@@ -53,7 +53,7 @@ for (const file of ["interaction-patterns.js", "account-ledger.js", "budget-plan
   assert.ok(index.includes(`./${file}?v=${query}`), `index must load ${file} with the Talaan query`);
   assert.ok(worker.includes(`./${file}?v=${query}`), `service worker must precache ${file}`);
 }
-assert.equal(version.version, "2.0.1");
+assert.equal(version.version, "2.1.0");
 assert.equal(version.schemaVersion, 12);
 assert.equal(version.cloudSchemaVersion, 3);
 assert.equal(pkg.version, version.version);

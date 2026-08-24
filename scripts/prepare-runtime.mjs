@@ -8,26 +8,26 @@ const BRAND = "Talaan";
 const PREVIOUS_BRAND = ["My", "Finance", "Records"].join(" ");
 
 const RELEASE = Object.freeze({
-  version:"2.0.1",
-  displayVersion:"V2.0.1",
+  version:"2.1.0",
+  displayVersion:"V2.1.0",
   name:"Talaan",
-  date:"August 22, 2026",
-  dateIso:"2026-08-22",
-  cache:"finance-v2-20260824-transaction-views-r6",
-  assetQuery:"2.0.1-talaan5"
+  date:"August 25, 2026",
+  dateIso:"2026-08-25",
+  cache:"finance-v2-20260825-payees-rules-r7",
+  assetQuery:"2.1.0-talaan1"
 });
-const SIDEBAR_BRAND_ASSET_QUERY = "2.0.1-talaan6";
+const SIDEBAR_BRAND_ASSET_QUERY = RELEASE.assetQuery;
 
 const CURRENT_VERSION_HISTORY = Object.freeze([{
   version:RELEASE.displayVersion,
   title:RELEASE.name,
   changes:[
     "Current production release under the Talaan product name.",
-    "Adds profile-scoped transaction views, configurable desktop columns, list/calendar mode, visible and selected totals, and an in-session monetary display mask.",
+    "Adds normalized payees with aliases, ordered transaction rules, validated matching, explainable preview, recovery snapshots, and Undo-safe bulk apply.",
     "Uses responsibility-based runtime filenames instead of legacy product-era filenames.",
     "Includes the complete local-first Finance workspace, Account Ledger, budgeting, reports, projects, productivity tools, reminders, and responsive desktop and phone layouts.",
     "Includes encrypted multi-profile Cloud Schema V3 synchronization, offline PWA support, recovery safeguards, and five-minute routine sync.",
-    "Preserves Finance Schema 12, Cloud Schema V3, saved records, balances, recurrence, payments, backups, encryption, persistent storage identifiers, and synchronization behavior."
+    "Preserves Finance Schema 12, Cloud Schema V3, account balances, paid state, recurrence, project payments, backups, encryption, persistent storage identifiers, and synchronization behavior."
   ]
 }]);
 
@@ -46,6 +46,7 @@ const runtimeGroups = {
     "liquid-glass.css",
     "mobile.css",
     "productivity-tools.css",
+    "payees-rules.css",
     "transaction-views.css",
     "privacy-display.css",
     "production-ui-audit.css",
@@ -71,6 +72,7 @@ const runtimeGroups = {
     "interaction-patterns.js",
     "privacy-lock.js",
     "productivity-tools.js",
+    "payees-rules.js",
     "transaction-views.js",
     "privacy-display.js",
     "projects-calendar.js",
@@ -150,6 +152,9 @@ patchTextFile("sync-runtime-compat.js", source => source
   .replace(/released:"\d{4}-\d{2}-\d{2}"/, `released:"${RELEASE.dateIso}"`)
   .replace(/link\.href\s*=\s*(?:`|\")[^`\"]*liquid-glass[^`\"]*(?:`|\");/g, `link.href = "./liquid-glass.css?v=${RELEASE.assetQuery}";`));
 
+patchTextFile("pwa-update.js", source => source
+  .replace(/const CURRENT_CACHE_VERSION = "finance-v[^"]+";/, `const CURRENT_CACHE_VERSION = "${RELEASE.cache}";`));
+
 const escapeRegExp = value => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const normalizeRuntimeReferences = source => {
   let next = source;
@@ -163,15 +168,20 @@ const normalizeRuntimeReferences = source => {
   }
   return next;
 };
+const normalizeReleaseAssetQuery = source => source.replace(
+  /\?v=\d+\.\d+\.\d+-talaan\d+/g,
+  `?v=${RELEASE.assetQuery}`
+);
 
 patchTextFile("index.html", source => {
-  let next = normalizeRuntimeReferences(source)
+  let next = normalizeReleaseAssetQuery(normalizeRuntimeReferences(source))
     .replaceAll(PREVIOUS_BRAND, BRAND)
     .replaceAll("Finance Records installed", `${BRAND} installed`)
     .replaceAll("My_Finance_Records_Calendar_Test.ics", "Talaan_Calendar_Test.ics")
     .replace(/<meta name="application-name" content="[^"]+">/, `<meta name="application-name" content="${BRAND}">`)
     .replace(/<meta name="apple-mobile-web-app-title" content="[^"]+">/, `<meta name="apple-mobile-web-app-title" content="${BRAND}">`)
     .replace(/<title>[^<]+ · V\d+\.\d+\.\d+<\/title>/, `<title>${BRAND} · ${RELEASE.displayVersion}</title>`)
+    .replace(/<small id="buildBadge" title="[^"]+">V\d+\.\d+\.\d+<\/small>/, `<small id="buildBadge" title="${RELEASE.displayVersion} · ${RELEASE.name} · ${RELEASE.date}">${RELEASE.displayVersion}</small>`)
     .replace(/const APP_VERSION = "\d+\.\d+\.\d+";/, `const APP_VERSION = "${RELEASE.version}";`)
     .replace(/const APP_RELEASE_NAME = "[^"]+";/, `const APP_RELEASE_NAME = "${RELEASE.name}";`)
     .replace(/const APP_RELEASE_DATE = "[^"]+";/, `const APP_RELEASE_DATE = "${RELEASE.date}";`)
@@ -235,7 +245,7 @@ patchTextFile("offline.html", source => source
   .replace(/<title>[^<]+ · Offline<\/title>/, `<title>${BRAND} · Offline</title>`)
   .replace(/Open [^<]+<\/button>/, `Open ${BRAND}</button>`));
 
-patchTextFile("sw.js", source => normalizeRuntimeReferences(source)
+patchTextFile("sw.js", source => normalizeReleaseAssetQuery(normalizeRuntimeReferences(source))
   .replace(/const APP_VERSION = "\d+\.\d+\.\d+";/, `const APP_VERSION = "${RELEASE.version}";`)
   .replace(/const CACHE_VERSION = "finance-v[^"]+";/, `const CACHE_VERSION = "${RELEASE.cache}";`)
   .replaceAll("Open My Finance Records", `Open ${BRAND}`));

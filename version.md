@@ -1,27 +1,28 @@
-# Talaan V2.0.1
+# Talaan V2.1.0
 
-**Current production version:** V2.0.1  
-**Release date:** 2026-08-22  
+**Current production version:** V2.1.0
+**Release date:** 2026-08-25
 **Release name:** Talaan
 
-Talaan V2.0.1 is the active product baseline. This document describes only the current release.
+Talaan V2.1.0 is the active product baseline. This document describes only the current release.
 
 ## Product identity
 
 - **Product name:** Talaan
-- **Product version:** `2.0.1`
-- **Display version:** `V2.0.1`
+- **Product version:** `2.1.0`
+- **Display version:** `V2.1.0`
 - **Release name:** `Talaan`
-- **PWA cache:** `finance-v2-20260824-transaction-views-r6`
+- **PWA cache:** `finance-v2-20260825-payees-rules-r7`
 - **Finance Schema:** 12
 - **Cloud Schema:** V3
 
-## Phase 1 workspace update
+## Payees and transaction rules
 
-- Profile-scoped saved transaction views keep presentation preferences separate from finance records, backups, and encrypted sync payloads.
-- Desktop transaction tables support optional column visibility and reordering; essential identity, amount, and action columns remain visible.
-- Income, unpaid expenses, and paid expenses support list/calendar mode, density and sorting controls, selection totals, and a visible-record footer.
-- Hide values masks monetary displays and accessible monetary labels in-session without changing stored data.
+- Payees normalize aliases using Unicode-aware, case-insensitive matching.
+- Ordered rules use stable priority, creation-time, and ID tie-breaking.
+- Rules support equals, contains, starts-with, and validated regex conditions.
+- Preview explains every matched rule and proposed change before applying anything.
+- Bulk apply creates a recovery snapshot and Undo point and never changes balances, paid state, or payment identifiers.
 
 The visible application, PWA metadata, offline experience, installation messaging, calendar export branding, and current documentation use the **Talaan** name.
 

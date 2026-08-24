@@ -1,11 +1,11 @@
-# Talaan · V2.0.1
+# Talaan · V2.1.0
 
 <div align="center">
 
 **A local-first personal and household finance PWA built for privacy, resilience, and everyday use.**
 
 [![Quality checks](https://github.com/nyxdcz/my-finance-record/actions/workflows/quality-pages.yml/badge.svg?branch=main)](https://github.com/nyxdcz/my-finance-record/actions/workflows/quality-pages.yml)
-![Version](https://img.shields.io/badge/version-V2.0.1-2563eb)
+![Version](https://img.shields.io/badge/version-V2.1.0-2563eb)
 ![PWA](https://img.shields.io/badge/PWA-offline--ready-16a34a)
 ![Node](https://img.shields.io/badge/Node.js-22%2B-339933?logo=nodedotjs&logoColor=white)
 
@@ -15,11 +15,11 @@
 
 | Release | Finance schema | Cloud schema | Sync cadence |
 | --- | ---: | ---: | ---: |
-| **V2.0.1** · Talaan | **12** | **V3** | **5 minutes** |
+| **V2.1.0** · Talaan | **12** | **V3** | **5 minutes** |
 
-**Talaan V2.0.1** is the current production release. The application keeps the complete local-first finance workspace, Account Ledger, budgeting, reporting, projects, productivity tools, reminders, encrypted multi-profile synchronization, responsive desktop/phone interface, and offline-ready PWA delivery under the Talaan product name.
+**Talaan V2.1.0** is the current production release. The application keeps the complete local-first finance workspace, Account Ledger, budgeting, reporting, projects, productivity tools, reminders, encrypted multi-profile synchronization, responsive desktop/phone interface, and offline-ready PWA delivery under the Talaan product name.
 
-The current workspace update adds profile-scoped transaction views, configurable desktop columns, list/calendar mode, sorting and density controls, visible/selected totals, and a complete in-session Hide values mode. These preferences remain outside Finance Schema 12 and Cloud Schema V3.
+The current update adds normalized payees, aliases, deterministic transaction rules, validated matching, explainable preview, rule export/import, recovery snapshots, and Undo-safe bulk apply. Account actions remain suggestions and cannot change balances or paid state.
 
 Current release notes are maintained in [`CHANGELOG.md`](CHANGELOG.md).
 
@@ -33,6 +33,7 @@ Current release notes are maintained in [`CHANGELOG.md`](CHANGELOG.md).
 | Account Ledger | Transfers, reconciliations, direct spending, payment reversals, and account balances remain auditable. |
 | Budgeting and insights | Monthly planning, forecasts, savings allocation, reports, trends, and exports are integrated. |
 | Projects and productivity | Project Agenda, revisions, Kanban workflow, Quick Add, search, filters, reminders, and undo/redo are included. |
+| Payees and rules | Normalize aliases, preview deterministic categorization, and apply only reviewed, recoverable changes. |
 | Offline-ready PWA | Talaan can be installed and used through a service-worker-backed experience. |
 | Compatibility-focused releases | Schema, cache, sync, backup, restore, and finance-data behavior are treated as protected contracts. |
 
@@ -59,7 +60,7 @@ flowchart LR
     Sync <--> Cloud["Supabase + RLS"]
 ```
 
-The V2.0.1 runtime keeps compatibility-sensitive URLs and stored-data identifiers stable where changing them would create unnecessary PWA or installed-client risk. The product brand is **Talaan**; compatibility identifiers do not define the visible product name.
+The V2.1.0 runtime keeps compatibility-sensitive URLs and stored-data identifiers stable where changing them would create unnecessary PWA or installed-client risk. The product brand is **Talaan**; compatibility identifiers do not define the visible product name.
 
 ## Repository layout
 
