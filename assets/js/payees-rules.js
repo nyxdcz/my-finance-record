@@ -257,6 +257,8 @@
     if (status) status.textContent = `${activePayees} active payee${activePayees === 1 ? "" : "s"} · ${enabledRules} enabled rule${enabledRules === 1 ? "" : "s"}`;
     if (text) text.textContent = "Rules require preview and confirmation before bulk changes.";
     if (chip) { chip.textContent = enabledRules ? "Configured" : "Ready"; chip.className = `settings-state-chip ${enabledRules ? "success" : "neutral"}`; }
+    panel.querySelector("[data-add-payee]").onclick = event => { event.stopPropagation(); openPayee(); };
+    panel.querySelector("[data-add-rule]").onclick = event => { event.stopPropagation(); openRule(); };
     panel.onclick = event => { event.stopPropagation(); void handlePanelClick(event); };
     panel.onchange = event => { event.stopPropagation(); handlePanelChange(event); };
   }
@@ -266,7 +268,9 @@
     document.getElementById("payeeDialogTitle").textContent = payee ? "Edit payee" : "Add payee";
     document.getElementById("payeeName").value = payee?.name || ""; document.getElementById("payeeAliases").value = payee?.aliases?.join(", ") || "";
     document.getElementById("payeeDefaultCategory").value = payee?.defaultCategory || ""; document.getElementById("payeeDefaultAccount").innerHTML = accountOptions(payee?.defaultAccount || ""); document.getElementById("payeeArchived").checked = Boolean(payee?.archived);
-    document.getElementById("payeeFormError").hidden = true; document.getElementById("payeeDialog").showModal(); setTimeout(() => document.getElementById("payeeName")?.focus(), 0);
+    document.getElementById("payeeFormError").hidden = true;
+    if (typeof showAppDialog === "function") showAppDialog("payeeDialog", "#payeeName");
+    else { const dialog = document.getElementById("payeeDialog"); if (!dialog.open) dialog.showModal(); setTimeout(() => document.getElementById("payeeName")?.focus(), 0); }
   }
 
   function collectRuleForm() {
@@ -280,7 +284,9 @@
     document.getElementById("ruleDialogTitle").textContent = rule ? "Edit transaction rule" : "Add transaction rule"; document.getElementById("ruleName").value = rule?.name || ""; document.getElementById("rulePriority").value = String(rule?.priority ?? 100); document.getElementById("ruleMatchMode").value = rule?.match?.mode || "all"; document.getElementById("ruleEnabled").checked = rule?.enabled !== false; document.getElementById("ruleContinue").checked = Boolean(rule?.continue);
     document.getElementById("ruleConditions").innerHTML = (rule?.match?.conditions?.length ? rule.match.conditions : [{field:"description",operator:"contains",value:""}]).map(conditionRow).join("");
     document.getElementById("ruleActionPayee").innerHTML = payeeOptions(rule?.actions?.payeeId || ""); document.getElementById("ruleActionCategory").value = rule?.actions?.category || ""; document.getElementById("ruleActionAccount").innerHTML = accountOptions(rule?.actions?.suggestedAccount || ""); document.getElementById("ruleActionTags").value = rule?.actions?.tags?.join(", ") || ""; document.getElementById("ruleActionTotals").value = typeof rule?.actions?.includeInTotals === "boolean" ? (rule.actions.includeInTotals ? "include" : "exclude") : "";
-    document.getElementById("ruleFormError").hidden = true; document.getElementById("ruleDialog").showModal(); setTimeout(() => document.getElementById("ruleName")?.focus(), 0);
+    document.getElementById("ruleFormError").hidden = true;
+    if (typeof showAppDialog === "function") showAppDialog("ruleDialog", "#ruleName");
+    else { const dialog = document.getElementById("ruleDialog"); if (!dialog.open) dialog.showModal(); setTimeout(() => document.getElementById("ruleName")?.focus(), 0); }
   }
 
   function closeDialog(id) { const dialog = document.getElementById(id); if (dialog?.open) dialog.close(); }
@@ -331,8 +337,8 @@
 
   async function handlePanelClick(event) {
     const target = event.target;
-    if (target.closest("[data-add-payee]")) return openPayee(); const editPayee = target.closest("[data-edit-payee]"); if (editPayee) return openPayee(editPayee.dataset.editPayee);
-    if (target.closest("[data-add-rule]")) return openRule(); const editRule = target.closest("[data-edit-rule]"); if (editRule) return openRule(editRule.dataset.editRule);
+    const editPayee = target.closest("[data-edit-payee]"); if (editPayee) return openPayee(editPayee.dataset.editPayee);
+    const editRule = target.closest("[data-edit-rule]"); if (editRule) return openRule(editRule.dataset.editRule);
     const toggle = target.closest("[data-toggle-rule]"); if (toggle && canWrite()) { const rule = tools().transactionRules.find(item => item.id === toggle.dataset.toggleRule); if (rule) { pushUndo?.(`${rule.enabled ? "Disable" : "Enable"} transaction rule`); rule.enabled = !rule.enabled; rule.updatedAt = nowIso(); persist(`Transaction rule ${rule.enabled ? "enabled" : "disabled"}`); renderPanel(); } return; }
     const removeRule = target.closest("[data-delete-rule]"); if (removeRule && canWrite()) { const rule = tools().transactionRules.find(item => item.id === removeRule.dataset.deleteRule); if (rule && await confirmAction({ title:"Delete transaction rule?", message:`Delete “${rule.name}”?`, details:"Existing transactions are not changed.", confirmLabel:"Delete rule", danger:true })) { pushUndo?.("Delete transaction rule"); tools().transactionRules = tools().transactionRules.filter(item => item.id !== rule.id); persist("Transaction rule deleted"); renderPanel(); } return; }
     if (target.closest("[data-run-rule-preview]")) return runPreview(); if (target.closest("[data-apply-rule-preview]")) { try { await applyPreview(); } catch (error) { toast(error.message || "Rule changes could not be applied", "warning"); } return; }

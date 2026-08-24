@@ -9,6 +9,7 @@ async function openTools(page, viewport = { width:1366, height:900 }) {
   await page.waitForFunction(() => Boolean(window.FinancePayeeRules && window.FinancePrivacyLock));
   await page.evaluate(() => window.FinancePrivacyLock.setAuthenticated(true));
   await page.evaluate(() => window.FinancePayeeRules.open());
+  await expect(page.locator("body")).toHaveClass(/finance-signed-in/);
   await expect(page.locator("#settings-panel-finance-tools")).toBeVisible();
 }
 
