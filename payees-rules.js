@@ -257,6 +257,8 @@
     if (status) status.textContent = `${activePayees} active payee${activePayees === 1 ? "" : "s"} · ${enabledRules} enabled rule${enabledRules === 1 ? "" : "s"}`;
     if (text) text.textContent = "Rules require preview and confirmation before bulk changes.";
     if (chip) { chip.textContent = enabledRules ? "Configured" : "Ready"; chip.className = `settings-state-chip ${enabledRules ? "success" : "neutral"}`; }
+    panel.onclick = event => { event.stopPropagation(); void handlePanelClick(event); };
+    panel.onchange = event => { event.stopPropagation(); handlePanelChange(event); };
   }
 
   function openPayee(id = "") {
@@ -327,20 +329,28 @@
     await recovery("Before transaction rule import"); if (typeof pushUndo === "function") pushUndo("Import transaction rules"); const map = new Map(tools().transactionRules.map(rule => [rule.id, rule])); normalized.forEach(rule => map.set(rule.id, rule)); tools().transactionRules = [...map.values()]; persist("Transaction rules imported"); renderPanel();
   }
 
+  async function handlePanelClick(event) {
+    const target = event.target;
+    if (target.closest("[data-add-payee]")) return openPayee(); const editPayee = target.closest("[data-edit-payee]"); if (editPayee) return openPayee(editPayee.dataset.editPayee);
+    if (target.closest("[data-add-rule]")) return openRule(); const editRule = target.closest("[data-edit-rule]"); if (editRule) return openRule(editRule.dataset.editRule);
+    const toggle = target.closest("[data-toggle-rule]"); if (toggle && canWrite()) { const rule = tools().transactionRules.find(item => item.id === toggle.dataset.toggleRule); if (rule) { pushUndo?.(`${rule.enabled ? "Disable" : "Enable"} transaction rule`); rule.enabled = !rule.enabled; rule.updatedAt = nowIso(); persist(`Transaction rule ${rule.enabled ? "enabled" : "disabled"}`); renderPanel(); } return; }
+    const removeRule = target.closest("[data-delete-rule]"); if (removeRule && canWrite()) { const rule = tools().transactionRules.find(item => item.id === removeRule.dataset.deleteRule); if (rule && await confirmAction({ title:"Delete transaction rule?", message:`Delete “${rule.name}”?`, details:"Existing transactions are not changed.", confirmLabel:"Delete rule", danger:true })) { pushUndo?.("Delete transaction rule"); tools().transactionRules = tools().transactionRules.filter(item => item.id !== rule.id); persist("Transaction rule deleted"); renderPanel(); } return; }
+    if (target.closest("[data-run-rule-preview]")) return runPreview(); if (target.closest("[data-apply-rule-preview]")) { try { await applyPreview(); } catch (error) { toast(error.message || "Rule changes could not be applied", "warning"); } return; }
+    if (target.closest("[data-export-rules]")) return exportRules();
+  }
+
+  function handlePanelChange(event) {
+    if (event.target.matches("[data-preview-record]")) updatePreviewSelection();
+    if (event.target.matches("[data-import-rules]")) importRules(event.target.files?.[0]).finally(() => { event.target.value = ""; });
+  }
+
   function bindEvents() {
     document.addEventListener("click", async event => {
       const target = event.target;
-      if (target.closest("[data-add-payee]")) return openPayee(); const editPayee = target.closest("[data-edit-payee]"); if (editPayee) return openPayee(editPayee.dataset.editPayee);
-      if (target.closest("[data-add-rule]")) return openRule(); const editRule = target.closest("[data-edit-rule]"); if (editRule) return openRule(editRule.dataset.editRule);
       const close = target.closest("[data-close-finance-dialog]"); if (close) return closeDialog(close.dataset.closeFinanceDialog);
       if (target.closest("#addRuleCondition")) { document.getElementById("ruleConditions").insertAdjacentHTML("beforeend", conditionRow()); return; }
       const remove = target.closest("[data-remove-rule-condition]"); if (remove) { const rows = document.querySelectorAll("[data-rule-condition]"); if (rows.length > 1) remove.closest("[data-rule-condition]").remove(); else toast("A rule needs at least one condition", "warning"); return; }
-      const toggle = target.closest("[data-toggle-rule]"); if (toggle && canWrite()) { const rule = tools().transactionRules.find(item => item.id === toggle.dataset.toggleRule); if (rule) { pushUndo?.(`${rule.enabled ? "Disable" : "Enable"} transaction rule`); rule.enabled = !rule.enabled; rule.updatedAt = nowIso(); persist(`Transaction rule ${rule.enabled ? "enabled" : "disabled"}`); renderPanel(); } return; }
-      const removeRule = target.closest("[data-delete-rule]"); if (removeRule && canWrite()) { const rule = tools().transactionRules.find(item => item.id === removeRule.dataset.deleteRule); if (rule && await confirmAction({ title:"Delete transaction rule?", message:`Delete “${rule.name}”?`, details:"Existing transactions are not changed.", confirmLabel:"Delete rule", danger:true })) { pushUndo?.("Delete transaction rule"); tools().transactionRules = tools().transactionRules.filter(item => item.id !== rule.id); persist("Transaction rule deleted"); renderPanel(); } return; }
-      if (target.closest("[data-run-rule-preview]")) return runPreview(); if (target.closest("[data-apply-rule-preview]")) { try { await applyPreview(); } catch (error) { toast(error.message || "Rule changes could not be applied", "warning"); } return; }
-      if (target.closest("[data-export-rules]")) return exportRules();
     });
-    document.addEventListener("change", event => { if (event.target.matches("[data-preview-record]")) updatePreviewSelection(); if (event.target.matches("[data-import-rules]")) { importRules(event.target.files?.[0]).finally(() => { event.target.value = ""; }); } });
     document.getElementById("payeeForm")?.addEventListener("submit", event => { event.preventDefault(); if (!canWrite()) return; const item = normalizePayee({ id:currentPayeeId || makeId("payee"), name:document.getElementById("payeeName").value, aliases:document.getElementById("payeeAliases").value, defaultCategory:document.getElementById("payeeDefaultCategory").value, defaultAccount:document.getElementById("payeeDefaultAccount").value, archived:document.getElementById("payeeArchived").checked, createdAt:payeeById(currentPayeeId)?.createdAt || nowIso(), updatedAt:nowIso() }); const error = document.getElementById("payeeFormError"); if (!item) { error.textContent = "Enter a payee name."; error.hidden = false; return; } const duplicate = tools().payees.find(payee => payee.id !== item.id && [payee.name,...payee.aliases].some(value => [item.name,...item.aliases].some(next => canonical(value) === canonical(next)))); if (duplicate) { error.textContent = `That name or alias already belongs to ${duplicate.name}.`; error.hidden = false; return; } pushUndo?.(currentPayeeId ? "Edit payee" : "Add payee"); const index = tools().payees.findIndex(payee => payee.id === item.id); if (index >= 0) tools().payees[index] = item; else tools().payees.push(item); persist(currentPayeeId ? "Payee updated" : "Payee added"); closeDialog("payeeDialog"); renderPanel(); });
     document.getElementById("ruleForm")?.addEventListener("submit", event => { event.preventDefault(); if (!canWrite()) return; const rule = collectRuleForm(); const errors = rule ? validateRule(rule) : ["Complete the rule name and conditions."]; const error = document.getElementById("ruleFormError"); if (errors.length) { error.innerHTML = errors.map(message => esc(message)).join("<br>"); error.hidden = false; return; } pushUndo?.(currentRuleId ? "Edit transaction rule" : "Add transaction rule"); const index = tools().transactionRules.findIndex(item => item.id === rule.id); if (index >= 0) tools().transactionRules[index] = rule; else tools().transactionRules.push(rule); persist(currentRuleId ? "Transaction rule updated" : "Transaction rule added"); closeDialog("ruleDialog"); renderPanel(); });
   }
