@@ -18,6 +18,23 @@ async function ensurePeriodsExpanded(page) {
   }
 }
 
+async function waitForMascotGeometry(page) {
+  await page.waitForFunction(() => {
+    const firstSection = document.getElementById("firstHalfSection");
+    const mascot = document.getElementById("earlyTotal");
+    const collapse = firstSection?.querySelector(".collapse-toggle");
+    if (!firstSection || !mascot || !collapse) return false;
+
+    const mascotBox = mascot.getBoundingClientRect();
+    const collapseBox = collapse.getBoundingClientRect();
+    return mascot.classList.contains("summary-mascot-slot")
+      && mascotBox.width > 0
+      && mascotBox.height > 0
+      && collapseBox.width > 0
+      && collapseBox.height > 0;
+  });
+}
+
 async function openMoney(page, width = 1440) {
   await page.setViewportSize({ width, height:900 });
   await page.goto("http://127.0.0.1:3000/index.html?page=money", { waitUntil:"domcontentloaded" });
@@ -53,7 +70,7 @@ test("desktop Budget & Expenses uses the approved supplied mascots and exact spa
   await ensureMoneyVisible(page);
   await ensurePeriodsExpanded(page);
 
-  const state = await page.evaluate(() => {
+  await page.evaluate(() => {
     for (const id of ["legendEarlyTotal", "legendLateTotal", "legendOtherTotal", "earlyTotal", "lateTotal", "otherTotal"]) {
       const element = document.getElementById(id);
       element.textContent = "₱0.00";
@@ -73,7 +90,11 @@ test("desktop Budget & Expenses uses the approved supplied mascots and exact spa
     legacyFirst.appendChild(legacySmile);
 
     window.FinanceSummaryMascots.apply();
+  });
 
+  await waitForMascotGeometry(page);
+
+  const state = await page.evaluate(() => {
     const readSlot = id => {
       const element = document.getElementById(id);
       const box = element.getBoundingClientRect();
@@ -97,6 +118,7 @@ test("desktop Budget & Expenses uses the approved supplied mascots and exact spa
     const collapse = firstSection.querySelector(".collapse-toggle").getBoundingClientRect();
     const mascotCenter = (lowerMascot.top + lowerMascot.bottom) / 2;
     const collapseCenter = (collapse.top + collapse.bottom) / 2;
+    const legacySmile = top.querySelector("img[data-first-half-complete-icon]");
 
     return {
       slots:{
