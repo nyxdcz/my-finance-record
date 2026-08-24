@@ -8,6 +8,8 @@ test("payee normalization and deterministic rules are safe and explainable", asy
   await page.waitForFunction(() => Boolean(window.FinancePayeeRules && window.FinancePrivacyLock));
   await page.evaluate(() => window.FinancePrivacyLock.setAuthenticated(true));
   const result = await page.evaluate(() => {
+    data.ledgerSettings = { version:1 };
+    const emptyAfterLateLoad = window.FinancePayeeRules.data;
     const financeTools = {
       version:1,
       payees:[{ id:"payee-shop", name:"Mérchant Shop", aliases:["ＭＥＲＣＨＡＮＴ　ＳＨＯＰ"], defaultCategory:"Groceries", defaultAccount:"Cash", archived:false }],
@@ -24,9 +26,10 @@ test("payee normalization and deterministic rules are safe and explainable", asy
     return {
       alias:window.FinancePayeeRules.resolvePayee("ＭＥＲＣＨＡＮＴ　ＳＨＯＰ")?.id,
       matches:preview.matches.map(item => item.id), changes:preview.changes.map(item => item.field), after:preview.after,
-      regexErrors:window.FinancePayeeRules.validateRule(bad), unsafeErrors:window.FinancePayeeRules.validateRule(unsafe), accounts:{...data.accounts}
+      regexErrors:window.FinancePayeeRules.validateRule(bad), unsafeErrors:window.FinancePayeeRules.validateRule(unsafe), accounts:{...data.accounts}, emptyAfterLateLoad
     };
   });
+  expect(result.emptyAfterLateLoad).toEqual({ version:1, payees:[], transactionRules:[] });
   expect(result.alias).toBe("payee-shop");
   expect(result.matches).toEqual(["rule-b", "rule-c"]);
   expect(result.changes).toEqual(expect.arrayContaining(["payeeId", "category", "suggestedAccount", "tags"]));

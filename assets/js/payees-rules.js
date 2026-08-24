@@ -118,7 +118,11 @@
   const baseNormalizeData = normalizeData;
   normalizeData = value => ensureShape(baseNormalizeData(value));
   data = ensureShape(data);
-  const tools = () => data.ledgerSettings.financeTools;
+  function tools() {
+    const current = data?.ledgerSettings?.financeTools;
+    if (!current || typeof current !== "object" || !Array.isArray(current.payees) || !Array.isArray(current.transactionRules)) data = ensureShape(data);
+    return data.ledgerSettings.financeTools;
+  }
   const orderedRules = () => [...tools().transactionRules].filter(rule => rule.enabled && !validateRule(rule).length)
     .sort((a, b) => a.priority - b.priority || String(a.createdAt).localeCompare(String(b.createdAt)) || a.id.localeCompare(b.id));
   const payeeById = id => tools().payees.find(payee => payee.id === id) || null;
