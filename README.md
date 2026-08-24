@@ -19,6 +19,8 @@
 
 **Talaan V2.0.1** is the current production release. The application keeps the complete local-first finance workspace, Account Ledger, budgeting, reporting, projects, productivity tools, reminders, encrypted multi-profile synchronization, responsive desktop/phone interface, and offline-ready PWA delivery under the Talaan product name.
 
+The current workspace update adds profile-scoped transaction views, configurable desktop columns, list/calendar mode, sorting and density controls, visible/selected totals, and a complete in-session Hide values mode. These preferences remain outside Finance Schema 12 and Cloud Schema V3.
+
 Current release notes are maintained in [`CHANGELOG.md`](CHANGELOG.md).
 
 ## What Talaan offers

@@ -643,6 +643,8 @@
       terms.forEach(term => { if (String(label).toLowerCase().includes(term)) score += 12; if (String(detail).toLowerCase().includes(term)) score += 4; });
       rows.push({type,id,label,detail,value,score,open});
     };
+    add("Action","transaction-views","Customize transaction view","Open columns, saved views, list/calendar mode, sorting, and density","Open","workspace columns calendar saved views",() => window.FinanceTransactionViews?.openForActivePage?.());
+    add("Action","privacy-display",window.FinancePrivacyDisplay?.hidden ? "Show monetary values" : "Hide monetary values","Mask or restore amounts on this device","Run","privacy hide show values screen share",() => window.FinancePrivacyDisplay?.toggle?.());
     (data.expenses || []).forEach(item => add("Expense",item.id,item.name,`${item.category} · ${item.paid ? "Paid" : "Unpaid"} · ${item.paidFromAccount || item.account || "No account"} · ${item.paidDate || item.date || "No date"}`,money(effectiveExpenseAmount(item)),`${item.notes || ""} ${item.recurring || ""} ${item.expenseType || ""}`,() => openExpenseDialog(item)));
     (data.incomeRecords || []).forEach(item => add("Income",item.id,item.name,`${item.category} · ${item.account || "No account"} · ${item.date || "No date"}`,money(item.amount),`${item.notes || ""} ${item.recurring || ""}`,() => openIncomeDialog(item)));
     (data.projects || []).forEach(item => add("Project",item.id,item.name,`${item.type} · ${item.status} · ${item.deadline || item.workMonth || "No date"}`,projectIsFinancial(item) ? money(item.value) : "Salary work",`${item.notes || ""} ${projectWorkSource(item)}`,() => openProjectDialog(item)));
@@ -1065,8 +1067,31 @@
     normalizeTemplate,
     openSearch:openGlobalSearch,
     openQuickAdd:openQuickMenu,
+    getFilters(mode) { return clone(filters[mode] || {}); },
+    setFilters(mode, value, shouldRender = true) {
+      if (!Object.prototype.hasOwnProperty.call(filters, mode)) return false;
+      filters[mode] = {...filters[mode], ...(value || {})};
+      writeJson(FILTER_KEY, filters);
+      updateAdvancedFilterButtons();
+      if (shouldRender) mode === "paid" ? productivityRenderPaidExpenses() : renderMoneyPage();
+      return true;
+    },
     get activity() { return clone(activity); },
     get undoHistory() { return clone(undoHistory.map(item=>({...item,data:undefined}))); },
     get templates() { return clone(data.expenseTemplates || []); }
   };
+
+  function installPhaseOneStylesheet(file) {
+    if (document.querySelector(`link[data-phase-one-asset="${file}"]`)) return;
+    const link=document.createElement("link"); link.rel="stylesheet"; link.href=`./${file}?v=2.0.1-talaan5`; link.dataset.phaseOneAsset=file; document.head.append(link);
+  }
+  function installPhaseOneScript(file) {
+    return new Promise(resolve=>{if(document.querySelector(`script[data-phase-one-asset="${file}"]`)){resolve(true);return;}const script=document.createElement("script");script.src=`./${file}?v=2.0.1-talaan5`;script.dataset.phaseOneAsset=file;script.onload=()=>resolve(true);script.onerror=()=>resolve(false);document.body.append(script);});
+  }
+  async function installPhaseOneWorkspace() {
+    installPhaseOneStylesheet("transaction-views.css"); installPhaseOneStylesheet("privacy-display.css");
+    if(!await installPhaseOneScript("transaction-views.js"))return false;
+    return installPhaseOneScript("privacy-display.js");
+  }
+  void installPhaseOneWorkspace();
 })();

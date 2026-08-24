@@ -10,7 +10,8 @@ const expectedOrder = [
   "undoMoneyMenuButton",
   "redoMoneyMenuButton",
   "globalSearchButton",
-  "productivityCenterButton"
+  "productivityCenterButton",
+  "privacyDisplayToggle"
 ];
 
 test("Header and More Tools compatibility is owned by the dedicated UI module", async () => {
@@ -70,6 +71,8 @@ test("desktop More Tools preserves ordering, semantics, actions, and duplicate s
   await expect(quick).toHaveAttribute("aria-label", "Quick add");
   await expect(customize).toHaveAttribute("role", "menuitem");
   await expect(customize).toHaveAttribute("aria-label", "Customize dashboard");
+  await expect(page.locator("#privacyDisplayToggle")).toHaveAttribute("role", "menuitem");
+  await expect(page.locator("#privacyDisplayToggle")).toHaveAttribute("aria-label", "Hide monetary values");
   await expect(page.locator("#topbarToolsPanel > .menu-command-separator")).toHaveCount(0);
   await expect(page.locator(".topbar-history-actions")).toBeHidden();
   await expect(page.locator("#customizeDashboardButton")).toBeHidden();

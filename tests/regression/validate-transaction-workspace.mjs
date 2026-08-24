@@ -1,0 +1,22 @@
+import assert from "node:assert/strict";
+import fs from "node:fs";
+
+const source=fs.readFileSync("assets/js/transaction-views.js","utf8");
+const css=fs.readFileSync("assets/css/transaction-views.css","utf8");
+const loader=fs.readFileSync("assets/js/productivity-tools.js","utf8");
+assert.match(source,/simple-finance-transaction-views-v1/);
+assert.match(source,/activeProfileId/);
+assert.match(source,/identity','Income',true/);
+assert.match(source,/amount','Amount',true/);
+assert.match(source,/actions','Actions',true/);
+assert.match(source,/mode:"list"/);
+assert.match(source,/calendar/);
+assert.match(source,/views:\[\]/);
+assert.doesNotMatch(source,/saveData\s*\(/);
+assert.doesNotMatch(source,/persistFinanceDataRaw\s*\(/);
+assert.match(css,/@media\(max-width:760px\)/);
+assert.match(css,/min-height:44px/);
+assert.match(css,/transaction-column-hidden\{display:revert!important\}/);
+assert.match(loader,/installPhaseOneStylesheet\("transaction-views\.css"\)/);
+assert.match(loader,/installPhaseOneScript\("transaction-views\.js"\)/);
+console.log("Transaction workspace source contract passed.");

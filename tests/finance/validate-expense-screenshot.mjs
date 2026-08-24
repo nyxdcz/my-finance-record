@@ -112,7 +112,7 @@ assert.match(edgeFunction, /store:false/, "AI screenshot response should disable
 const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
 const version = JSON.parse(fs.readFileSync(path.join(root, "version.json"), "utf8"));
 assert.equal(version.version, "2.0.1");
-assert.equal(version.cacheVersion, "finance-v2-20260822-talaan-r5");
+assert.equal(version.cacheVersion, "finance-v2-20260824-transaction-views-r6");
 assert.ok(worker.includes(version.cacheVersion), "service worker cache generation must match Talaan V2.0.1 while preserving screenshot detection");
 assert.match(worker, /expense-screenshot-parser\.js\?v=2\.0\.1-talaan5/, "service worker should precache the screenshot parser on the current query");
 assert.match(worker, /expense-screenshot-detect\.js\?v=2\.0\.1-talaan5/, "service worker should precache the local screenshot detector on the current query");
