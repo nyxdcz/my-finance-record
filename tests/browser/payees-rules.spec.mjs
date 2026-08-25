@@ -23,8 +23,6 @@ async function signedInAction(page, selector) {
 }
 
 test("Finance tools creates a payee and previews a recoverable rule apply", async ({ page }) => {
-  const pageErrors = [];
-  page.on("pageerror", error => pageErrors.push(error.message));
   await openTools(page);
   const balances = await page.evaluate(() => JSON.stringify(data.accounts));
   await signedInAction(page, "[data-add-payee]");
@@ -34,18 +32,6 @@ test("Finance tools creates a payee and previews a recoverable rule apply", asyn
   await page.locator("#payeeDefaultCategory").fill("Housing");
   await page.locator("#payeeDefaultAccount").selectOption("Cash");
   await signedInAction(page, "#payeeForm button[type=submit]");
-  const diagnostics = await page.evaluate(() => ({
-    authenticated:window.FinancePrivacyLock.isAuthenticated?.(),
-    bodyClass:document.body.className,
-    canWrite:window.FinanceProfileArchitecture?.canWrite?.(),
-    role:window.FinanceProfileArchitecture?.activeRole?.(),
-    formValid:document.getElementById("payeeForm")?.checkValidity(),
-    formError:document.getElementById("payeeFormError")?.textContent || "",
-    dialogOpen:document.getElementById("payeeDialog")?.open,
-    exposedPayees:window.FinancePayeeRules.data.payees,
-    storedPayees:data.ledgerSettings?.financeTools?.payees || []
-  }));
-  console.log("PAYEE_DIAGNOSTICS", JSON.stringify({ diagnostics, pageErrors }));
   await expect(page.locator("#financePayeeList")).toContainText("Home Rent");
 
   await signedInAction(page, "[data-add-rule]");

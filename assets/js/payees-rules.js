@@ -212,7 +212,10 @@
     return typeof createRecoverySnapshot === "function" ? createRecoverySnapshot(label, clone(data)) : null;
   }
   function persist(label) {
+    const financeTools = normalizeTools(tools());
     data = normalizeData(data);
+    data.ledgerSettings = data.ledgerSettings && typeof data.ledgerSettings === "object" && !Array.isArray(data.ledgerSettings) ? data.ledgerSettings : {};
+    data.ledgerSettings.financeTools = financeTools;
     return typeof saveData === "function" ? saveData(label) : false;
   }
   function openSettingsTools() {
