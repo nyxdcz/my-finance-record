@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 
 const source = fs.readFileSync("assets/js/payees-rules.js", "utf8");
+const ledgerSource = fs.readFileSync("assets/js/account-ledger.js", "utf8");
 const css = fs.readFileSync("assets/css/payees-rules.css", "utf8");
 const index = fs.readFileSync("index.html", "utf8");
 const worker = fs.readFileSync("sw.js", "utf8");
@@ -18,6 +19,7 @@ assert.doesNotMatch(source, /actions\.account\s*=/);
 assert.match(source, /recoveryStorage\?\.save/);
 assert.match(source, /pushUndo/);
 assert.match(source, /JSON\.stringify\(data\.accounts/);
+assert.match(ledgerSource, /normalized\.ledgerSettings = \{\s*\.\.\.settingsSource,/);
 assert.match(index, /data-settings-tab="finance-tools"/);
 assert.match(index, /payees-rules\.js\?v=2\.1\.0-talaan1/);
 assert.match(css, /min-height:44px/);
