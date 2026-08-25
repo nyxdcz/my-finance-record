@@ -19,18 +19,13 @@ async function openTools(page, viewport = { width:1366, height:900 }) {
 }
 
 async function signedInAction(page, selector) {
-  await page.evaluate(targetSelector => {
-    const target = document.querySelector(targetSelector);
-    if (!target) throw new Error(`Missing signed-in action target: ${targetSelector}`);
-    target.click();
-  }, selector);
+  await page.locator(selector).click();
 }
 
 test("Finance tools creates a payee and previews a recoverable rule apply", async ({ page }) => {
   await openTools(page);
   const balances = await page.evaluate(() => JSON.stringify(data.accounts));
-  expect(await page.locator("[data-add-payee]").evaluate(button => typeof button.onclick)).toBe("function");
-  await page.evaluate(() => window.FinancePayeeRules.openPayee());
+  await signedInAction(page, "[data-add-payee]");
   await expect(page.locator("#payeeDialog")).toBeVisible();
   await page.locator("#payeeName").fill("Home Rent");
   await page.locator("#payeeAliases").fill("Rent, Landlord");
@@ -39,8 +34,7 @@ test("Finance tools creates a payee and previews a recoverable rule apply", asyn
   await signedInAction(page, "#payeeForm button[type=submit]");
   await expect(page.locator("#financePayeeList")).toContainText("Home Rent");
 
-  expect(await page.locator("[data-add-rule]").evaluate(button => typeof button.onclick)).toBe("function");
-  await page.evaluate(() => window.FinancePayeeRules.openRule());
+  await signedInAction(page, "[data-add-rule]");
   await page.locator("#ruleName").fill("Normalize rent");
   await page.locator("[data-condition-value]").fill("Rent");
   await page.locator("#ruleActionPayee").selectOption({ label:"Home Rent" });
