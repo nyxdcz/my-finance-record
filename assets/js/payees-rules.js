@@ -361,10 +361,13 @@
       if (target.closest("#addRuleCondition")) { document.getElementById("ruleConditions").insertAdjacentHTML("beforeend", conditionRow()); return; }
       const remove = target.closest("[data-remove-rule-condition]"); if (remove) { const rows = document.querySelectorAll("[data-rule-condition]"); if (rows.length > 1) remove.closest("[data-rule-condition]").remove(); else toast("A rule needs at least one condition", "warning"); return; }
     });
-    document.addEventListener("submit", event => {
+    const submitFinanceToolForm = event => {
+      event.stopPropagation();
       if (event.target.matches("#payeeForm")) { event.preventDefault(); if (!canWrite()) return; const item = normalizePayee({ id:currentPayeeId || makeId("payee"), name:document.getElementById("payeeName").value, aliases:document.getElementById("payeeAliases").value, defaultCategory:document.getElementById("payeeDefaultCategory").value, defaultAccount:document.getElementById("payeeDefaultAccount").value, archived:document.getElementById("payeeArchived").checked, createdAt:payeeById(currentPayeeId)?.createdAt || nowIso(), updatedAt:nowIso() }); const error = document.getElementById("payeeFormError"); if (!item) { error.textContent = "Enter a payee name."; error.hidden = false; return; } const duplicate = tools().payees.find(payee => payee.id !== item.id && [payee.name,...payee.aliases].some(value => [item.name,...item.aliases].some(next => canonical(value) === canonical(next)))); if (duplicate) { error.textContent = `That name or alias already belongs to ${duplicate.name}.`; error.hidden = false; return; } pushUndo?.(currentPayeeId ? "Edit payee" : "Add payee"); const index = tools().payees.findIndex(payee => payee.id === item.id); if (index >= 0) tools().payees[index] = item; else tools().payees.push(item); persist(currentPayeeId ? "Payee updated" : "Payee added"); closeDialog("payeeDialog"); renderPanel(); return; }
       if (event.target.matches("#ruleForm")) { event.preventDefault(); if (!canWrite()) return; const rule = collectRuleForm(); const errors = rule ? validateRule(rule) : ["Complete the rule name and conditions."]; const error = document.getElementById("ruleFormError"); if (errors.length) { error.innerHTML = errors.map(message => esc(message)).join("<br>"); error.hidden = false; return; } pushUndo?.(currentRuleId ? "Edit transaction rule" : "Add transaction rule"); const index = tools().transactionRules.findIndex(item => item.id === rule.id); if (index >= 0) tools().transactionRules[index] = rule; else tools().transactionRules.push(rule); persist(currentRuleId ? "Transaction rule updated" : "Transaction rule added"); closeDialog("ruleDialog"); renderPanel(); }
-    });
+    };
+    document.getElementById("payeeForm")?.addEventListener("submit", submitFinanceToolForm);
+    document.getElementById("ruleForm")?.addEventListener("submit", submitFinanceToolForm);
   }
 
   ensureDialogs(); renderPanel(); bindEvents();
