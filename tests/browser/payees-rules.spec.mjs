@@ -11,8 +11,7 @@ async function openTools(page, viewport = { width:1366, height:900 }) {
   await page.waitForFunction(() => Boolean(window.FinancePayeeRules && window.FinancePrivacyLock));
   await page.waitForFunction(() => !document.body.classList.contains("finance-auth-pending"));
   await page.evaluate(() => {
-    document.body.classList.remove("finance-signed-out");
-    document.body.classList.add("finance-signed-in");
+    window.FinancePrivacyLock.setAuthenticated(true);
     window.FinancePayeeRules.open();
   });
   await expect(page.locator("body")).toHaveClass(/finance-signed-in/);
@@ -21,8 +20,6 @@ async function openTools(page, viewport = { width:1366, height:900 }) {
 
 async function signedInAction(page, selector) {
   await page.evaluate(targetSelector => {
-    document.body.classList.remove("finance-signed-out");
-    document.body.classList.add("finance-signed-in");
     const target = document.querySelector(targetSelector);
     if (!target) throw new Error(`Missing signed-in action target: ${targetSelector}`);
     target.click();
@@ -33,7 +30,7 @@ test("Finance tools creates a payee and previews a recoverable rule apply", asyn
   await openTools(page);
   const balances = await page.evaluate(() => JSON.stringify(data.accounts));
   expect(await page.locator("[data-add-payee]").evaluate(button => typeof button.onclick)).toBe("function");
-  await page.evaluate(() => { document.body.classList.remove("finance-signed-out"); document.body.classList.add("finance-signed-in"); window.FinancePayeeRules.openPayee(); });
+  await page.evaluate(() => window.FinancePayeeRules.openPayee());
   await expect(page.locator("#payeeDialog")).toBeVisible();
   await page.locator("#payeeName").fill("Home Rent");
   await page.locator("#payeeAliases").fill("Rent, Landlord");
@@ -43,7 +40,7 @@ test("Finance tools creates a payee and previews a recoverable rule apply", asyn
   await expect(page.locator("#financePayeeList")).toContainText("Home Rent");
 
   expect(await page.locator("[data-add-rule]").evaluate(button => typeof button.onclick)).toBe("function");
-  await page.evaluate(() => { document.body.classList.remove("finance-signed-out"); document.body.classList.add("finance-signed-in"); window.FinancePayeeRules.openRule(); });
+  await page.evaluate(() => window.FinancePayeeRules.openRule());
   await page.locator("#ruleName").fill("Normalize rent");
   await page.locator("[data-condition-value]").fill("Rent");
   await page.locator("#ruleActionPayee").selectOption({ label:"Home Rent" });
