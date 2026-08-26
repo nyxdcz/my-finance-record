@@ -128,3 +128,32 @@
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start, { once:true });
   else start();
 })();
+
+/* Collapsed desktop navigation changes pages without opening the rail. */
+(() => {
+  const desktop = window.matchMedia("(min-width: 851px)");
+  document.addEventListener("click", event => {
+    const navButton = event.target.closest?.("#sidebar .nav-button");
+    if (!navButton || !desktop.matches) return;
+
+    const sidebar = document.getElementById("sidebar");
+    if (!sidebar || sidebar.classList.contains("sidebar-pinned")) return;
+
+    sidebar.classList.remove("desktop-open");
+    document.body?.classList.remove("sidebar-layout-pinned");
+    sidebar.setAttribute("aria-hidden", "false");
+
+    const menuButton = document.getElementById("menuButton");
+    if (menuButton) {
+      menuButton.setAttribute("aria-expanded", "false");
+      menuButton.setAttribute("aria-label", "Pin navigation open");
+      menuButton.title = "Pin navigation open";
+    }
+
+    const expandButton = document.getElementById("sidebarCloseButton");
+    if (expandButton) {
+      expandButton.setAttribute("aria-label", "Pin navigation open");
+      expandButton.title = "Pin navigation open";
+    }
+  });
+})();
