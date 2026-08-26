@@ -8,9 +8,9 @@ const interaction = read("assets/js/interaction-patterns.js");
 const css = read("assets/css/projects-calendar.css");
 const worker = read("sw.js");
 const version = JSON.parse(read("version.json"));
-const query = "2.1.0-talaan1";
+const query = "2.2.0-talaan1";
 
-assert.equal(version.version, "2.1.0");
+assert.equal(version.version, "2.2.0");
 assert.equal(version.schemaVersion, 12);
 assert.equal(version.cloudSchemaVersion, 3);
 assert.match(index, /id="projectKanbanBoard"/);

@@ -1,4 +1,4 @@
-# Privacy Notes · Talaan V2.1.0
+# Privacy Notes · Talaan V2.2.0
 
 **Talaan** has no analytics or advertising code. Local finance records remain in the browser unless the user explicitly enables Supabase synchronization or exports a file.
 
@@ -7,6 +7,8 @@
 Cloud record payloads are encrypted in the browser before upload. Supabase stores ciphertext envelopes. Operational metadata remains visible to the configured project, including profile membership, collection and record identifiers, revisions, deletion markers, timestamps, app versions, and device information.
 
 Normalized payees, aliases, and transaction-rule configuration are part of the profile finance settings. They remain local unless encrypted synchronization is enabled or the user exports a backup or rule file. Rule matching and preview run in the browser.
+
+CSV files are parsed locally and remain only in the active browser session. Talaan does not upload, cache, log, or retain the selected file or its filename. Saved mapping profiles, compact import-batch metadata, and the records the user explicitly commits are part of the profile finance settings and may enter encrypted synchronization or backups.
 
 Authentication email addresses and MFA/passkey information are handled by the configured Supabase Auth project under its policies.
 

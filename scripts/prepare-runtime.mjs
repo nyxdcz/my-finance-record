@@ -8,13 +8,13 @@ const BRAND = "Talaan";
 const PREVIOUS_BRAND = ["My", "Finance", "Records"].join(" ");
 
 const RELEASE = Object.freeze({
-  version:"2.1.0",
-  displayVersion:"V2.1.0",
+  version:"2.2.0",
+  displayVersion:"V2.2.0",
   name:"Talaan",
-  date:"August 25, 2026",
-  dateIso:"2026-08-25",
-  cache:"finance-v2-20260825-payees-rules-r7",
-  assetQuery:"2.1.0-talaan1"
+  date:"August 26, 2026",
+  dateIso:"2026-08-26",
+  cache:"finance-v2-20260826-import-center-r8",
+  assetQuery:"2.2.0-talaan1"
 });
 const SIDEBAR_BRAND_ASSET_QUERY = RELEASE.assetQuery;
 
@@ -23,7 +23,7 @@ const CURRENT_VERSION_HISTORY = Object.freeze([{
   title:RELEASE.name,
   changes:[
     "Current production release under the Talaan product name.",
-    "Adds normalized payees with aliases, ordered transaction rules, validated matching, explainable preview, recovery snapshots, and Undo-safe bulk apply.",
+    "Adds a local CSV import center with reusable mappings, Philippine date and currency parsing, preview, duplicate detection, recovery snapshots, and single-import rollback.",
     "Uses responsibility-based runtime filenames instead of legacy product-era filenames.",
     "Includes the complete local-first Finance workspace, Account Ledger, budgeting, reports, projects, productivity tools, reminders, and responsive desktop and phone layouts.",
     "Includes encrypted multi-profile Cloud Schema V3 synchronization, offline PWA support, recovery safeguards, and five-minute routine sync.",
@@ -47,6 +47,7 @@ const runtimeGroups = {
     "mobile.css",
     "productivity-tools.css",
     "payees-rules.css",
+    "import-center.css",
     "transaction-views.css",
     "privacy-display.css",
     "production-ui-audit.css",
@@ -73,6 +74,7 @@ const runtimeGroups = {
     "privacy-lock.js",
     "productivity-tools.js",
     "payees-rules.js",
+    "import-center.js",
     "transaction-views.js",
     "privacy-display.js",
     "projects-calendar.js",

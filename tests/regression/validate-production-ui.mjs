@@ -11,9 +11,9 @@ const index = read("index.html");
 const worker = read("sw.js");
 const desktopUx = read("assets/css/desktop-ux.css");
 const version = JSON.parse(read("version.json"));
-const query = "2.1.0-talaan1";
+const query = "2.2.0-talaan1";
 
-assert.equal(version.version, "2.1.0");
+assert.equal(version.version, "2.2.0");
 assert.equal(version.schemaVersion, 12);
 assert.equal(version.cloudSchemaVersion, 3);
 assert.ok(index.includes(`./production-ui-audit.css?v=${query}`));

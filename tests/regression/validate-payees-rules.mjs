@@ -21,12 +21,12 @@ assert.match(source, /pushUndo/);
 assert.match(source, /JSON\.stringify\(data\.accounts/);
 assert.match(ledgerSource, /normalized\.ledgerSettings = \{\s*\.\.\.settingsSource,/);
 assert.match(index, /data-settings-tab="finance-tools"/);
-assert.match(index, /payees-rules\.js\?v=2\.1\.0-talaan1/);
+assert.match(index, /payees-rules\.js\?v=2\.2\.0-talaan1/);
 assert.match(css, /min-height:44px/);
 assert.match(css, /@media\(max-width:620px\)/);
 assert.match(css, /prefers-reduced-motion/);
 assert.match(css, /forced-colors/);
-assert.match(worker, /payees-rules\.js\?v=2\.1\.0-talaan1/);
-assert.match(worker, /payees-rules\.css\?v=2\.1\.0-talaan1/);
+assert.match(worker, /payees-rules\.js\?v=2\.2\.0-talaan1/);
+assert.match(worker, /payees-rules\.css\?v=2\.2\.0-talaan1/);
 
 console.log("Payees and transaction rules source contract passed.");
