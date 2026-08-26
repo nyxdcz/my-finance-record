@@ -6,13 +6,15 @@
 
 .sidebar .talaan-brand-logo {
   display:block;
-  flex:0 0 20px;
-  width:20px;
-  height:20px;
+  flex:0 0 25px;
+  width:25px;
+  height:25px;
   object-fit:contain;
 }
 
 .sidebar .brand > strong {
+  font-size:20px;
+  font-weight:700;
   line-height:1;
 }
 
@@ -74,9 +76,9 @@
   html body .sidebar.desktop-open .talaan-brand-logo,
   html body .sidebar.sidebar-pinned .talaan-brand-logo {
     display:block !important;
-    flex:0 0 20px !important;
-    width:20px !important;
-    height:20px !important;
+    flex:0 0 25px !important;
+    width:25px !important;
+    height:25px !important;
   }
 
   html body .sidebar.desktop-open .brand > strong,
@@ -212,9 +214,9 @@
 
 @media (max-width:850px) {
   .sidebar .talaan-brand-logo {
-    flex-basis:20px;
-    width:20px;
-    height:20px;
+    flex-basis:25px;
+    width:25px;
+    height:25px;
   }
 }
 
