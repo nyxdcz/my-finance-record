@@ -16,7 +16,7 @@ const RELEASE = Object.freeze({
   cache:"finance-v2-20260826-import-center-r8",
   assetQuery:"2.2.0-talaan1"
 });
-const SIDEBAR_BRAND_ASSET_QUERY = RELEASE.assetQuery;
+const SIDEBAR_BRAND_ASSET_QUERY = "2.2.0-talaan2";
 
 const CURRENT_VERSION_HISTORY = Object.freeze([{
   version:RELEASE.displayVersion,
@@ -248,6 +248,11 @@ patchTextFile("offline.html", source => source
   .replace(/Open [^<]+<\/button>/, `Open ${BRAND}</button>`));
 
 patchTextFile("sw.js", source => normalizeReleaseAssetQuery(normalizeRuntimeReferences(source))
+  .replace(/sidebar-compact-brand\.css\?v=[^"')]+/g, `sidebar-compact-brand.css?v=${SIDEBAR_BRAND_ASSET_QUERY}`)
+  .replace(
+    'url.pathname.endsWith("ui-icon-alignment.css") ||',
+    'url.pathname.endsWith("sidebar-compact-brand.css") || url.pathname.endsWith("ui-icon-alignment.css") ||'
+  )
   .replace(/const APP_VERSION = "\d+\.\d+\.\d+";/, `const APP_VERSION = "${RELEASE.version}";`)
   .replace(/const CACHE_VERSION = "finance-v[^"]+";/, `const CACHE_VERSION = "${RELEASE.cache}";`)
   .replaceAll("Open My Finance Records", `Open ${BRAND}`));
