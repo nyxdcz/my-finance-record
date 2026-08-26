@@ -13,7 +13,7 @@
 }
 
 .sidebar .brand > strong {
-  font-size:30px;
+  font-size:25px;
   font-weight:700;
   line-height:1;
   color:#FFFFFF;
@@ -21,7 +21,7 @@
 
 /* Keep the requested brand typography authoritative over legacy visual layers. */
 html body #sidebar.sidebar .brand > strong {
-  font-size:30px !important;
+  font-size:25px !important;
   font-weight:700 !important;
   line-height:1 !important;
   letter-spacing:0 !important;
@@ -149,7 +149,7 @@ html body #sidebar.sidebar .brand > strong {
     overflow:hidden !important;
     text-overflow:ellipsis !important;
     white-space:nowrap !important;
-    font-size:30px !important;
+    font-size:25px !important;
     font-weight:700 !important;
     line-height:1 !important;
     letter-spacing:0 !important;
@@ -327,7 +327,7 @@ html body #sidebar.sidebar .brand > strong {
   }
 
   html body #sidebar.sidebar .brand > strong {
-    font-size:30px !important;
+    font-size:25px !important;
     font-weight:700 !important;
     line-height:1 !important;
     letter-spacing:0 !important;
