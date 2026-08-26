@@ -398,3 +398,128 @@ html body #sidebar.sidebar .nav-button.active .nav-icon-image {
     transition:none !important;
   }
 }
+
+/* Approved flat theme-aware sidebar specification. Liquid Glass remains available elsewhere. */
+html[data-theme="light"] body #sidebar.sidebar,
+html[data-theme="dark"] body #sidebar.sidebar {
+  background-image:none !important;
+  border-right:0 !important;
+  box-shadow:none !important;
+  -webkit-backdrop-filter:none !important;
+  backdrop-filter:none !important;
+}
+
+html[data-theme="light"] body #sidebar.sidebar {
+  background:#FFFFFF !important;
+  color:#080B10 !important;
+}
+
+html[data-theme="dark"] body #sidebar.sidebar {
+  background:#080B10 !important;
+  color:#FFFFFF !important;
+}
+
+html[data-theme="light"] body #sidebar.sidebar .brand > strong,
+html[data-theme="dark"] body #sidebar.sidebar .brand > strong,
+html[data-theme="light"] body #sidebar.sidebar.desktop-open .brand > strong,
+html[data-theme="light"] body #sidebar.sidebar.sidebar-pinned .brand > strong,
+html[data-theme="dark"] body #sidebar.sidebar.desktop-open .brand > strong,
+html[data-theme="dark"] body #sidebar.sidebar.sidebar-pinned .brand > strong {
+  font-size:20px !important;
+  font-weight:700 !important;
+  line-height:1 !important;
+  letter-spacing:0 !important;
+}
+
+html[data-theme="light"] body #sidebar.sidebar .brand > strong,
+html[data-theme="light"] body #sidebar.sidebar .sidebar-close-button {
+  color:#080B10 !important;
+}
+
+html[data-theme="dark"] body #sidebar.sidebar .brand > strong,
+html[data-theme="dark"] body #sidebar.sidebar .sidebar-close-button {
+  color:#FFFFFF !important;
+}
+
+html[data-theme="light"] body #sidebar.sidebar :is(.sidebar-close-button,.nav-button),
+html[data-theme="dark"] body #sidebar.sidebar :is(.sidebar-close-button,.nav-button) {
+  background:transparent !important;
+  background-image:none !important;
+  border-color:transparent !important;
+  box-shadow:none !important;
+  -webkit-backdrop-filter:none !important;
+  backdrop-filter:none !important;
+}
+
+html[data-theme="light"] body #sidebar.sidebar .nav-button,
+html[data-theme="light"] body #sidebar.sidebar .nav-label {
+  color:#080B10 !important;
+}
+
+html[data-theme="dark"] body #sidebar.sidebar .nav-button,
+html[data-theme="dark"] body #sidebar.sidebar .nav-label {
+  color:#FFFFFF !important;
+}
+
+html[data-theme="light"] body #sidebar.sidebar .nav-label,
+html[data-theme="dark"] body #sidebar.sidebar .nav-label {
+  font-size:10px !important;
+  font-weight:500 !important;
+}
+
+html[data-theme="light"] body #sidebar.sidebar .nav-icon,
+html[data-theme="dark"] body #sidebar.sidebar .nav-icon {
+  background:transparent !important;
+  box-shadow:none !important;
+}
+
+html[data-theme="light"] body #sidebar.sidebar .nav-icon {
+  color:#080B10 !important;
+}
+
+html[data-theme="dark"] body #sidebar.sidebar .nav-icon {
+  color:#FFFFFF !important;
+}
+
+html[data-theme="light"] body #sidebar.sidebar .nav-icon-image {
+  filter:brightness(0) saturate(100%) !important;
+  opacity:.9 !important;
+}
+
+html[data-theme="dark"] body #sidebar.sidebar .nav-icon-image {
+  filter:brightness(0) invert(1) !important;
+  opacity:1 !important;
+}
+
+html[data-theme="light"] body #sidebar.sidebar .nav-button:hover,
+html[data-theme="light"] body #sidebar.sidebar .nav-button:focus-visible,
+html[data-theme="light"] body #sidebar.sidebar .nav-button.active,
+html[data-theme="light"] body #sidebar.sidebar .nav-button:hover .nav-label,
+html[data-theme="light"] body #sidebar.sidebar .nav-button:focus-visible .nav-label,
+html[data-theme="light"] body #sidebar.sidebar .nav-button.active .nav-label {
+  color:#080B10 !important;
+}
+
+html[data-theme="dark"] body #sidebar.sidebar .nav-button:hover,
+html[data-theme="dark"] body #sidebar.sidebar .nav-button:focus-visible,
+html[data-theme="dark"] body #sidebar.sidebar .nav-button.active,
+html[data-theme="dark"] body #sidebar.sidebar .nav-button:hover .nav-label,
+html[data-theme="dark"] body #sidebar.sidebar .nav-button:focus-visible .nav-label,
+html[data-theme="dark"] body #sidebar.sidebar .nav-button.active .nav-label {
+  color:#FFFFFF !important;
+}
+
+html[data-theme="light"] body #sidebar.sidebar .nav-button.active .nav-icon,
+html[data-theme="dark"] body #sidebar.sidebar .nav-button.active .nav-icon {
+  display:grid !important;
+  place-items:center !important;
+  background:#356FD1 !important;
+  color:#FFFFFF !important;
+  border-radius:7px !important;
+}
+
+html[data-theme="light"] body #sidebar.sidebar .nav-button.active .nav-icon-image,
+html[data-theme="dark"] body #sidebar.sidebar .nav-button.active .nav-icon-image {
+  filter:brightness(0) invert(1) !important;
+  opacity:1 !important;
+}
