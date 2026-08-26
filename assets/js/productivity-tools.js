@@ -645,6 +645,7 @@
     };
     add("Action","transaction-views","Customize transaction view","Open columns, saved views, list/calendar mode, sorting, and density","Open","workspace columns calendar saved views",() => window.FinanceTransactionViews?.openForActivePage?.());
     add("Action","privacy-display",window.FinancePrivacyDisplay?.hidden ? "Show monetary values" : "Hide monetary values","Mask or restore amounts on this device","Run","privacy hide show values screen share",() => window.FinancePrivacyDisplay?.toggle?.());
+    add("Action","finance-tools","Manage payees and rules","Open normalized payees, aliases, ordered rules, and preview","Open","payee merchant alias categorization automation rule preview",() => window.FinancePayeeRules?.open?.());
     (data.expenses || []).forEach(item => add("Expense",item.id,item.name,`${item.category} · ${item.paid ? "Paid" : "Unpaid"} · ${item.paidFromAccount || item.account || "No account"} · ${item.paidDate || item.date || "No date"}`,money(effectiveExpenseAmount(item)),`${item.notes || ""} ${item.recurring || ""} ${item.expenseType || ""}`,() => openExpenseDialog(item)));
     (data.incomeRecords || []).forEach(item => add("Income",item.id,item.name,`${item.category} · ${item.account || "No account"} · ${item.date || "No date"}`,money(item.amount),`${item.notes || ""} ${item.recurring || ""}`,() => openIncomeDialog(item)));
     (data.projects || []).forEach(item => add("Project",item.id,item.name,`${item.type} · ${item.status} · ${item.deadline || item.workMonth || "No date"}`,projectIsFinancial(item) ? money(item.value) : "Salary work",`${item.notes || ""} ${projectWorkSource(item)}`,() => openProjectDialog(item)));
@@ -653,6 +654,9 @@
     (data.accountLedger || []).forEach(item => add("Ledger",item.id,item.description || item.account,`${item.account} · ${item.type} · ${item.date}`,money(item.amount),`${item.notes || ""} ${item.counterpartAccount || ""}`,() => { goToPage("settings",{smooth:false}); setTimeout(() => { document.querySelector('[data-settings-tab="accounts"]')?.click(); const search=document.getElementById("ledgerSearch"); if(search){search.value=item.description || item.account; search.dispatchEvent(new Event("input",{bubbles:true})); search.focus();} },0); }));
     Object.entries(data.monthlyBudgets || {}).forEach(([month,item]) => add("Budget",month,monthName(month),`${(item.items || []).length} categories · monthly plan`,money((item.items || []).reduce((total,row)=>total+Number(row.plannedAmount||0),0)),(item.items || []).map(row=>`${row.category} ${row.notes||""}`).join(" "),() => { applySelectedMonth(month,false); goToPage("money",{smooth:false}); setTimeout(()=>document.getElementById("monthlyBudgetPlannerCard")?.scrollIntoView({behavior:"smooth",block:"start"}),0); }));
     (data.expenseTemplates || []).forEach(item => add("Template",item.id,item.name,`${templateTypeLabel(item)} · ${item.category}${item.account ? ` · ${item.account}` : ""}`,item.amount ? money(item.amount) : "",item.expenseName,() => applyTemplateToExpenseForm(item)));
+    const financeTools = data.ledgerSettings?.financeTools || {};
+    (financeTools.payees || []).forEach(item => add("Payee",item.id,item.name,item.archived ? "Archived payee" : `${item.aliases?.length || 0} aliases`,"Open",`${(item.aliases || []).join(" ")} ${item.defaultCategory || ""} ${item.defaultAccount || ""}`,() => window.FinancePayeeRules?.openPayee?.(item.id)));
+    (financeTools.transactionRules || []).forEach(item => add("Rule",item.id,item.name,`Priority ${item.priority} · ${item.enabled ? "Enabled" : "Disabled"}`,"Open",`${item.match?.mode || "all"} ${(item.match?.conditions || []).map(condition => `${condition.field} ${condition.operator} ${condition.value}`).join(" ")}`,() => window.FinancePayeeRules?.openRule?.(item.id)));
     return rows.sort((a,b) => b.score-a.score || a.type.localeCompare(b.type) || a.label.localeCompare(b.label)).slice(0,80);
   }
 
@@ -1083,10 +1087,10 @@
 
   function installPhaseOneStylesheet(file) {
     if (document.querySelector(`link[data-phase-one-asset="${file}"]`)) return;
-    const link=document.createElement("link"); link.rel="stylesheet"; link.href=`./${file}?v=2.0.1-talaan5`; link.dataset.phaseOneAsset=file; document.head.append(link);
+    const link=document.createElement("link"); link.rel="stylesheet"; link.href=`./${file}?v=2.1.0-talaan1`; link.dataset.phaseOneAsset=file; document.head.append(link);
   }
   function installPhaseOneScript(file) {
-    return new Promise(resolve=>{if(document.querySelector(`script[data-phase-one-asset="${file}"]`)){resolve(true);return;}const script=document.createElement("script");script.src=`./${file}?v=2.0.1-talaan5`;script.dataset.phaseOneAsset=file;script.onload=()=>resolve(true);script.onerror=()=>resolve(false);document.body.append(script);});
+    return new Promise(resolve=>{if(document.querySelector(`script[data-phase-one-asset="${file}"]`)){resolve(true);return;}const script=document.createElement("script");script.src=`./${file}?v=2.1.0-talaan1`;script.dataset.phaseOneAsset=file;script.onload=()=>resolve(true);script.onerror=()=>resolve(false);document.body.append(script);});
   }
   async function installPhaseOneWorkspace() {
     installPhaseOneStylesheet("transaction-views.css"); installPhaseOneStylesheet("privacy-display.css");

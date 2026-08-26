@@ -136,6 +136,7 @@
     normalized.accountLedger = ledger;
     normalized.accountReconciliations = (Array.isArray(normalized.accountReconciliations) ? normalized.accountReconciliations : []).map(normalizeReconciliation).filter(Boolean);
     normalized.ledgerSettings = {
+      ...settingsSource,
       version:LEDGER_VERSION,
       initializedAt,
       migratedFrom:settingsSource.migratedFrom || (settingsSource.version ? "" : "12.19.1"),

@@ -10,7 +10,7 @@ const icons = read("assets/css/ui-icon-alignment.css");
 const blackCanvas = read("assets/css/black-canvas.css");
 const workflow = read(".github/workflows/quality-pages.yml");
 const version = JSON.parse(read("version.json"));
-const query = "2.0.1-talaan5";
+const query = "2.1.0-talaan1";
 
 for (const token of [
   '#income > .page-heading', '#money > .page-heading', '#projects > .page-heading',
@@ -38,7 +38,7 @@ for (const file of ["desktop-ui-phase1.css", "desktop-ux.css", "ui-icon-alignmen
   assert.ok(worker.includes(`./${file}?v=${query}`), `service worker must precache ${file}`);
   assert.ok(workflow.includes(`_site/${file}`) || workflow.includes("cp assets/css/*.css _site/"), `Pages workflow must package ${file}`);
 }
-assert.equal(version.version, "2.0.1");
+assert.equal(version.version, "2.1.0");
 assert.ok(worker.includes(version.cacheVersion));
 
 console.log("Desktop UI hierarchy, budget disclosure geometry, account icons, and neutral Talaan assets validated.");

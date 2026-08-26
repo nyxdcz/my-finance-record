@@ -1,10 +1,20 @@
 # Changelog
 
-## V2.0.1 · Talaan
+## V2.1.0 · Talaan
 
-**Current production release:** V2.0.1
+**Current production release:** V2.1.0
 
-Talaan V2.0.1 is the active release baseline. This changelog focuses only on the current product version.
+Talaan V2.1.0 is the active release baseline. This changelog focuses only on the current product version.
+
+### Payees and transaction rules
+
+- Added normalized payees with Unicode-aware aliases, optional default categories, and non-mutating account suggestions.
+- Added deterministic ordered rules with equals, contains, starts-with, and validated regular-expression matching.
+- Added explainable preview showing every matched rule and proposed field change before records can be selected for bulk apply.
+- Added recovery snapshots, confirmation, stale-preview protection, and Undo for rule import and bulk application.
+- Added rule export/import and Finance tools actions to the existing global search without adding a sidebar destination.
+- Kept rules from changing account balances, paid state, payment identifiers, recurring-series identity, or project payments.
+- Rotated the PWA cache to `finance-v2-20260825-payees-rules-r7` while preserving Finance Schema 12 and Cloud Schema V3.
 
 ### Transaction workspace and display privacy
 
