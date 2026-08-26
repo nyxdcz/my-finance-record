@@ -85,7 +85,7 @@ test("desktop sidebar collapses to 64px and expands compactly to 190px with read
   await expect(brand).toBeVisible();
   await expect(brand).toHaveCSS("gap", "6px");
   await expect(brandText).toHaveText("Talaan");
-  await expect(brandText).toHaveCSS("font-size", "25px");
+  await expect(brandText).toHaveCSS("font-size", "30px");
   await expect(brandText).toHaveCSS("font-weight", "700");
   await expect(brandLogo).toBeVisible();
   await expect(brandLogo).toHaveCSS("width", "25px");
@@ -130,7 +130,7 @@ test("mobile brand keeps Talaan text with the real uploaded logo at 25px", async
   await expect(brand).toBeVisible();
   await expect(brand).toHaveCSS("gap", "6px");
   await expect(brandText).toHaveText("Talaan");
-  await expect(brandText).toHaveCSS("font-size", "25px");
+  await expect(brandText).toHaveCSS("font-size", "30px");
   await expect(brandText).toHaveCSS("font-weight", "700");
   await expect(mark).toBeVisible();
   await expect(mark).toHaveCSS("width", "25px");
