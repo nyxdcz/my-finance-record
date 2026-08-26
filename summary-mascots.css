@@ -137,6 +137,10 @@
 /* Collapsed desktop rail: the logo area reveals the expand/pin control on demand. */
 @media (min-width: 851px) {
   html body #sidebar.sidebar:not(.desktop-open):not(.sidebar-pinned) .sidebar-close-button {
+    display: grid !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
     cursor: pointer !important;
   }
 
