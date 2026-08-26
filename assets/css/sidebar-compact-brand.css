@@ -523,3 +523,30 @@ html[data-theme="dark"] body #sidebar.sidebar .nav-button.active .nav-icon-image
   filter:brightness(0) invert(1) !important;
   opacity:1 !important;
 }
+
+/* Collapsed desktop rail: the Talaan logo owns the expand/pin affordance. */
+@media (min-width:851px) {
+  html body #sidebar.sidebar:not(.desktop-open):not(.sidebar-pinned) .sidebar-close-button {
+    display:grid !important;
+    visibility:visible !important;
+    opacity:1 !important;
+    pointer-events:auto !important;
+    cursor:pointer !important;
+  }
+
+  html body #sidebar.sidebar:not(.desktop-open):not(.sidebar-pinned) .sidebar-close-button:is(:hover,:focus-visible) .sidebar-pin-icon {
+    opacity:1 !important;
+  }
+
+  html body #sidebar.sidebar:not(.desktop-open):not(.sidebar-pinned) .sidebar-close-button:is(:hover,:focus-visible) :is(.sidebar-unpin-icon,.sidebar-mobile-close-icon) {
+    opacity:0 !important;
+  }
+
+  html body #sidebar.sidebar:not(.desktop-open):not(.sidebar-pinned) .sidebar-close-button:is(:hover,:focus-visible) + .brand .talaan-brand-logo {
+    opacity:0 !important;
+  }
+
+  html body #sidebar.sidebar:not(.desktop-open):not(.sidebar-pinned) :is(.talaan-brand-logo,.sidebar-pin-icon) {
+    transition:opacity .14s ease !important;
+  }
+}
