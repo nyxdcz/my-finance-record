@@ -44,7 +44,7 @@ test("expanded and collapsed desktop sidebar use the static Talaan brand", async
     buttonWidth:"28px",
     buttonHeight:"28px",
     buttonTop:"15px",
-    brandFontSize:"30px",
+    brandFontSize:"25px",
     brandWhiteSpace:"nowrap",
     brandText:"Talaan",
     navFontSizes:["11px","11px","11px","11px","11px"]
@@ -59,7 +59,7 @@ test("expanded and collapsed desktop sidebar use the static Talaan brand", async
     buttonWidth:"28px",
     buttonHeight:"28px",
     buttonTop:"15px",
-    brandFontSize:"30px",
+    brandFontSize:"25px",
     brandWhiteSpace:"nowrap",
     brandText:"Talaan",
     navFontSizes:["11px","11px","11px","11px","11px"]
@@ -73,7 +73,7 @@ test("mobile drawer keeps the static Talaan brand", async ({ page }) => {
   await menuButton.click();
   await expect(page.locator("#sidebar")).toHaveAttribute("aria-hidden", "false");
   await expect(page.locator(".sidebar .brand strong")).toHaveText("Talaan");
-  await expect(page.locator(".sidebar .brand strong")).toHaveCSS("font-size", "30px");
+  await expect(page.locator(".sidebar .brand strong")).toHaveCSS("font-size", "25px");
   for (const label of await page.locator(".sidebar .nav-label").all()) {
     await expect(label).toHaveCSS("font-size", "11px");
   }
