@@ -133,3 +133,26 @@
     padding-right: 10px !important;
   }
 }
+
+/* Collapsed desktop rail: the logo area reveals the expand/pin control on demand. */
+@media (min-width: 851px) {
+  html body #sidebar.sidebar:not(.desktop-open):not(.sidebar-pinned) .sidebar-close-button {
+    cursor: pointer !important;
+  }
+
+  html body #sidebar.sidebar:not(.desktop-open):not(.sidebar-pinned) .sidebar-close-button:is(:hover,:focus-visible) .sidebar-pin-icon {
+    opacity: 1 !important;
+  }
+
+  html body #sidebar.sidebar:not(.desktop-open):not(.sidebar-pinned) .sidebar-close-button:is(:hover,:focus-visible) :is(.sidebar-unpin-icon,.sidebar-mobile-close-icon) {
+    opacity: 0 !important;
+  }
+
+  html body #sidebar.sidebar:not(.desktop-open):not(.sidebar-pinned) .sidebar-close-button:is(:hover,:focus-visible) + .brand .talaan-brand-logo {
+    opacity: 0 !important;
+  }
+
+  html body #sidebar.sidebar:not(.desktop-open):not(.sidebar-pinned) :is(.talaan-brand-logo,.sidebar-pin-icon) {
+    transition: opacity .14s ease !important;
+  }
+}
