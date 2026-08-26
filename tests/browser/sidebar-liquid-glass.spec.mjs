@@ -66,7 +66,7 @@ test("desktop sidebar stays flat white in light mode and flat #080B10 in dark mo
   await expect(normalButton).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
   await expect(normalButton).toHaveCSS("color", "rgb(8, 11, 16)");
   await expect(normalIcon).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
-  await expect(normalIconImage).toHaveCSS("filter", "brightness(0) saturate(100%)");
+  await expect(normalIconImage).toHaveCSS("filter", "brightness(0) saturate(1)");
   await expect(normalLabel).toHaveCSS("font-size", "10px");
   await expect(normalLabel).toHaveCSS("font-weight", "500");
   await expect(normalLabel).toHaveCSS("color", "rgb(8, 11, 16)");
@@ -120,6 +120,6 @@ test("mobile light sidebar stays flat white with 20px Talaan and 10px labels", a
   await expect(normalLabel).toHaveCSS("font-size", "10px");
   await expect(normalLabel).toHaveCSS("font-weight", "500");
   await expect(normalLabel).toHaveCSS("color", "rgb(8, 11, 16)");
-  await expect(normalIconImage).toHaveCSS("filter", "brightness(0) saturate(100%)");
+  await expect(normalIconImage).toHaveCSS("filter", "brightness(0) saturate(1)");
   await expect(activeIcon).toHaveCSS("background-color", "rgb(53, 111, 209)");
 });
