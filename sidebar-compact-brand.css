@@ -16,19 +16,31 @@
   font-size:30px;
   font-weight:700;
   line-height:1;
+  color:#FFFFFF;
+}
+
+/* Keep the requested brand typography authoritative over legacy visual layers. */
+html body #sidebar.sidebar .brand > strong {
+  font-size:30px !important;
+  font-weight:700 !important;
+  line-height:1 !important;
+  letter-spacing:0 !important;
+  color:#FFFFFF !important;
 }
 
 @media (min-width:851px) {
   :root {
-    --sidebar-rail-width:64px;
-    --sidebar-compact-expanded-width:190px;
+    --sidebar-rail-width:60px;
+    --sidebar-compact-expanded-width:185px;
   }
 
   html body .sidebar {
     width:var(--sidebar-rail-width) !important;
     min-width:var(--sidebar-rail-width) !important;
     max-width:var(--sidebar-rail-width) !important;
-    padding:10px 8px !important;
+    padding:10px 6px !important;
+    background:#172B28 !important;
+    color:#FFFFFF !important;
     transform:none !important;
     overflow:visible !important;
     box-shadow:7px 0 20px rgba(16,24,40,.11) !important;
@@ -40,6 +52,7 @@
     width:var(--sidebar-compact-expanded-width) !important;
     min-width:var(--sidebar-compact-expanded-width) !important;
     max-width:var(--sidebar-compact-expanded-width) !important;
+    padding:10px 8px !important;
     box-shadow:14px 0 32px rgba(16,24,40,.16) !important;
   }
 
@@ -52,41 +65,95 @@
     margin-left:var(--sidebar-compact-expanded-width) !important;
   }
 
-  /* Collapsed desktop rail stays icon-only. */
-  html body .sidebar .brand {
-    display:none !important;
-  }
-
-  /* Open or pinned desktop rail shows the compact Talaan brand. */
-  html body .sidebar.desktop-open .brand,
-  html body .sidebar.sidebar-pinned .brand {
+  /* Collapsed desktop rail shows the 25px Talaan logo only. */
+  html body #sidebar.sidebar:not(.desktop-open):not(.sidebar-pinned) .brand {
     position:absolute !important;
     top:10px !important;
-    left:60px !important;
-    right:8px !important;
+    left:6px !important;
+    width:48px !important;
+    min-width:48px !important;
+    max-width:48px !important;
     height:44px !important;
     display:flex !important;
     align-items:center !important;
-    gap:6px !important;
+    justify-content:center !important;
+    gap:0 !important;
     padding:0 !important;
     overflow:hidden !important;
-    white-space:nowrap !important;
+    pointer-events:none !important;
   }
 
-  html body .sidebar.desktop-open .talaan-brand-logo,
-  html body .sidebar.sidebar-pinned .talaan-brand-logo {
+  html body #sidebar.sidebar:not(.desktop-open):not(.sidebar-pinned) .brand > strong {
+    display:none !important;
+  }
+
+  html body #sidebar.sidebar:not(.desktop-open):not(.sidebar-pinned) .talaan-brand-logo {
     display:block !important;
     flex:0 0 25px !important;
     width:25px !important;
     height:25px !important;
   }
 
-  html body .sidebar.desktop-open .brand > strong,
-  html body .sidebar.sidebar-pinned .brand > strong {
+  /* Keep the existing click target in the same top slot while the logo is visible. */
+  html body #sidebar.sidebar:not(.desktop-open):not(.sidebar-pinned) .sidebar-close-button {
+    left:6px !important;
+    right:auto !important;
+    top:10px !important;
+    width:48px !important;
+    min-width:48px !important;
+    max-width:48px !important;
+    height:44px !important;
+    min-height:44px !important;
+    max-height:44px !important;
+    z-index:2 !important;
+    border-color:transparent !important;
+    background:transparent !important;
+  }
+
+  html body #sidebar.sidebar:not(.desktop-open):not(.sidebar-pinned) .sidebar-close-button
+  :is(.sidebar-pin-icon,.sidebar-unpin-icon,.sidebar-mobile-close-icon) {
+    opacity:0 !important;
+  }
+
+  /* Open or pinned desktop rail shows the compact Talaan brand. */
+  html body #sidebar.sidebar.desktop-open .brand,
+  html body #sidebar.sidebar.sidebar-pinned .brand {
+    position:absolute !important;
+    top:10px !important;
+    left:52px !important;
+    right:8px !important;
+    height:42px !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:flex-start !important;
+    gap:6px !important;
+    padding:0 !important;
+    overflow:hidden !important;
+    white-space:nowrap !important;
+    pointer-events:auto !important;
+  }
+
+  html body #sidebar.sidebar.desktop-open .talaan-brand-logo,
+  html body #sidebar.sidebar.sidebar-pinned .talaan-brand-logo {
+    display:block !important;
+    flex:0 0 25px !important;
+    width:25px !important;
+    height:25px !important;
+  }
+
+  html body #sidebar.sidebar.desktop-open .brand > strong,
+  html body #sidebar.sidebar.sidebar-pinned .brand > strong {
     display:block !important;
     min-width:0 !important;
+    max-width:100% !important;
     overflow:hidden !important;
     text-overflow:ellipsis !important;
+    white-space:nowrap !important;
+    font-size:30px !important;
+    font-weight:700 !important;
+    line-height:1 !important;
+    letter-spacing:0 !important;
+    color:#FFFFFF !important;
   }
 
   html body .sidebar .sidebar-navigation,
@@ -106,6 +173,7 @@
     padding:8px 10px !important;
     gap:9px !important;
     overflow:visible !important;
+    color:#D9E5E2 !important;
   }
 
   html body .sidebar.desktop-open .nav-button,
@@ -116,6 +184,27 @@
     padding:8px 10px !important;
   }
 
+  html body .sidebar .nav-icon {
+    flex:0 0 28px !important;
+    width:28px !important;
+    min-width:28px !important;
+    max-width:28px !important;
+    height:28px !important;
+    min-height:28px !important;
+    max-height:28px !important;
+  }
+
+  html body .sidebar .nav-icon-image {
+    display:block !important;
+    width:16px !important;
+    min-width:16px !important;
+    max-width:16px !important;
+    height:16px !important;
+    min-height:16px !important;
+    max-height:16px !important;
+    object-fit:contain !important;
+  }
+
   html body .sidebar .nav-label {
     width:0 !important;
     max-width:0 !important;
@@ -123,6 +212,9 @@
     overflow:hidden !important;
     pointer-events:none !important;
     transform:none !important;
+    font-size:11px !important;
+    font-weight:400 !important;
+    color:#D9E5E2 !important;
   }
 
   html body .sidebar.desktop-open .nav-label,
@@ -135,6 +227,22 @@
     white-space:nowrap !important;
     pointer-events:auto !important;
     transition:opacity .16s ease .04s !important;
+  }
+
+  html body .sidebar .nav-button:hover,
+  html body .sidebar .nav-button:focus-visible,
+  html body .sidebar .nav-button.active,
+  html[data-theme="dark"] body .sidebar .nav-button.active,
+  html body .sidebar.desktop-open .nav-button.active,
+  html body .sidebar.sidebar-pinned .nav-button.active {
+    color:#FFFFFF !important;
+  }
+
+  html body .sidebar .nav-button:hover .nav-label,
+  html body .sidebar .nav-button:focus-visible .nav-label,
+  html body .sidebar .nav-button.active .nav-label,
+  html[data-theme="dark"] body .sidebar .nav-button.active .nav-label {
+    color:#FFFFFF !important;
   }
 
   /* Keep Insights available in both collapsed and expanded states. */
@@ -151,7 +259,6 @@
   html body .sidebar.desktop-open .nav-button.active,
   html body .sidebar.sidebar-pinned .nav-button.active {
     background:transparent !important;
-    color:inherit !important;
     box-shadow:none !important;
   }
 
@@ -217,6 +324,14 @@
     flex-basis:25px;
     width:25px;
     height:25px;
+  }
+
+  html body #sidebar.sidebar .brand > strong {
+    font-size:30px !important;
+    font-weight:700 !important;
+    line-height:1 !important;
+    letter-spacing:0 !important;
+    color:#FFFFFF !important;
   }
 }
 
