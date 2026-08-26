@@ -1,0 +1,84 @@
+/* Talaan V2.2.0 · canonical rectangular UI radius
+   Normal rectangular surfaces use 7px corners. Structural joins may remain 0,
+   while pills, chips, badges, avatars, dots, swatches, and other circular shapes
+   keep their intentional geometry. */
+:root {
+  --talaan-ui-radius: 7px;
+  --radius: 7px;
+  --desktop-panel-radius: 7px;
+  --desktop-inner-radius: 7px;
+  --liquid-glass-radius: 7px;
+}
+
+html body :where(
+  .card,
+  [class$="-card"],
+  [class*="-card "],
+  .button,
+  button[class$="-button"],
+  button[class*="-button "],
+  .input,
+  .select,
+  .textarea,
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
+  select,
+  textarea,
+  dialog,
+  [role="dialog"],
+  .modal,
+  [class$="-dialog"],
+  [class*="-dialog "],
+  .popover,
+  [class$="-popover"],
+  [class*="-popover "],
+  .panel,
+  [class$="-panel"],
+  [class*="-panel "],
+  .overflow-menu,
+  .context-menu,
+  .menu-popover,
+  [class$="-menu-panel"],
+  [class*="-menu-panel "],
+  .table-wrap,
+  [class$="-table-wrap"],
+  [class*="-table-wrap "],
+  [class$="-control"],
+  [class*="-control "],
+  .workspace-switcher,
+  .workspace-switcher button,
+  .dashboard-week-marquee,
+  .finance-week-marquee,
+  .work-week-marquee,
+  .dashboard-week-day,
+  .nav-icon,
+  .legend-item,
+  .summary-item,
+  .month-comparison-item,
+  .monthly-check-item,
+  .ledger-summary-grid > div,
+  .ledger-transfer-preview,
+  .budget-preview,
+  .account-setting-row,
+  .cloud-pending-item,
+  .cloud-conflict-item,
+  .productivity-search-result,
+  .settings-disclosure,
+  .settings-mobile-back,
+  .toast,
+  .snackbar,
+  .toast-message
+):not([class*="status-chip"]):not([class*="badge"]):not([class*="pill"]):not([class*="avatar"]):not([class*="dot"]):not([class*="swatch"]):not([class*="mascot"]) {
+  border-radius: var(--talaan-ui-radius) !important;
+}
+
+/* Composite Finance period headers keep their structural join, but their visible
+   outer corners follow the same 7px system. */
+@media (max-width: 700px) {
+  html body #money .period-header {
+    border-radius: 7px 7px 0 0 !important;
+  }
+
+  html body #money .period-card.is-collapsed .period-header {
+    border-radius: 7px !important;
+  }
+}
