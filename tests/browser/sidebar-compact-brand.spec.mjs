@@ -36,6 +36,7 @@ test("desktop sidebar collapses to 64px and expands compactly to 190px with read
   const main = page.locator(".main");
   const brand = page.locator(".brand");
   const brandLogo = brand.locator(".talaan-brand-logo");
+  const brandText = brand.locator("strong");
   const active = page.locator(".nav-button.active");
   const activeIcon = active.locator(".nav-icon");
   const firstLabel = page.locator(".nav-label").first();
@@ -82,10 +83,13 @@ test("desktop sidebar collapses to 64px and expands compactly to 190px with read
   await expect(sidebar).toHaveCSS("width", "190px");
   await expect(main).toHaveCSS("margin-left", "64px");
   await expect(brand).toBeVisible();
-  await expect(brand.locator("strong")).toHaveText("Talaan");
+  await expect(brand).toHaveCSS("gap", "6px");
+  await expect(brandText).toHaveText("Talaan");
+  await expect(brandText).toHaveCSS("font-size", "20px");
+  await expect(brandText).toHaveCSS("font-weight", "700");
   await expect(brandLogo).toBeVisible();
-  await expect(brandLogo).toHaveCSS("width", "20px");
-  await expect(brandLogo).toHaveCSS("height", "20px");
+  await expect(brandLogo).toHaveCSS("width", "25px");
+  await expect(brandLogo).toHaveCSS("height", "25px");
   await expect.poll(() => brandLogo.evaluate(node => node.complete && node.naturalWidth > 0)).toBe(true);
   await expect(firstLabel).toHaveCSS("opacity", "1");
   await expect(active).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
@@ -111,7 +115,7 @@ test("desktop sidebar collapses to 64px and expands compactly to 190px with read
   await expect(firstLabel).toHaveCSS("opacity", "0");
 });
 
-test("mobile brand keeps Talaan text with the real uploaded logo at 20px", async ({ page, request }) => {
+test("mobile brand keeps Talaan text with the real uploaded logo at 25px", async ({ page, request }) => {
   await page.setViewportSize({ width:390, height:844 });
   const logoResponse = await request.get("http://127.0.0.1:3000/icons/talaan-brand-logo.png?v=2.2.0-talaan1");
   expect(logoResponse.ok()).toBeTruthy();
@@ -122,11 +126,15 @@ test("mobile brand keeps Talaan text with the real uploaded logo at 20px", async
 
   const brand = page.locator(".brand");
   const mark = brand.locator(".talaan-brand-logo");
+  const brandText = brand.locator("strong");
   await expect(brand).toBeVisible();
-  await expect(brand.locator("strong")).toHaveText("Talaan");
+  await expect(brand).toHaveCSS("gap", "6px");
+  await expect(brandText).toHaveText("Talaan");
+  await expect(brandText).toHaveCSS("font-size", "20px");
+  await expect(brandText).toHaveCSS("font-weight", "700");
   await expect(mark).toBeVisible();
-  await expect(mark).toHaveCSS("width", "20px");
-  await expect(mark).toHaveCSS("height", "20px");
+  await expect(mark).toHaveCSS("width", "25px");
+  await expect(mark).toHaveCSS("height", "25px");
   await expect.poll(() => mark.evaluate(node => node.complete && node.naturalWidth > 0)).toBe(true);
 });
 
