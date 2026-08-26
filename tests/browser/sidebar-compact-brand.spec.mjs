@@ -25,9 +25,10 @@ async function installSidebarFixture(page, extraSidebarClass = "") {
   await page.addStyleTag({ url:"http://127.0.0.1:3000/app.css?v=2.2.0-talaan1" });
   await page.addStyleTag({ url:"http://127.0.0.1:3000/shell-ui.css?v=2.2.0-talaan1" });
   await page.addStyleTag({ url:"http://127.0.0.1:3000/sidebar-compact-brand.css?v=2.2.0-talaan1" });
+  await page.addStyleTag({ url:"http://127.0.0.1:3000/assets/css/ui-icon-alignment.css?v=2.2.0-talaan1" });
 }
 
-test("desktop sidebar collapses to 64px and expands compactly to 190px with readable Talaan tooltips", async ({ page }) => {
+test("desktop sidebar collapses to 60px and expands to 185px with the approved Talaan specification", async ({ page }) => {
   await page.setViewportSize({ width:1280, height:800 });
   await page.goto("http://127.0.0.1:3000/offline.html", { waitUntil:"networkidle" });
   await installSidebarFixture(page);
@@ -37,17 +38,36 @@ test("desktop sidebar collapses to 64px and expands compactly to 190px with read
   const brand = page.locator(".brand");
   const brandLogo = brand.locator(".talaan-brand-logo");
   const brandText = brand.locator("strong");
-  const active = page.locator(".nav-button.active");
-  const activeIcon = active.locator(".nav-icon");
+  const firstButton = page.locator(".nav-button").first();
   const firstLabel = page.locator(".nav-label").first();
+  const active = page.locator(".nav-button.active");
+  const activeLabel = active.locator(".nav-label");
+  const activeIcon = active.locator(".nav-icon");
+  const activeIconImage = active.locator(".nav-icon-image");
 
-  await expect(sidebar).toHaveCSS("width", "64px");
-  await expect(main).toHaveCSS("margin-left", "64px");
-  await expect(brand).toBeHidden();
+  await expect(sidebar).toHaveCSS("width", "60px");
+  await expect(sidebar).toHaveCSS("padding-left", "6px");
+  await expect(sidebar).toHaveCSS("padding-right", "6px");
+  await expect(sidebar).toHaveCSS("background-color", "rgb(23, 43, 40)");
+  await expect(main).toHaveCSS("margin-left", "60px");
+
+  await expect(brand).toBeVisible();
+  await expect(brandLogo).toBeVisible();
+  await expect(brandLogo).toHaveCSS("width", "25px");
+  await expect(brandLogo).toHaveCSS("height", "25px");
+  await expect(brandText).toBeHidden();
+
+  await expect(firstButton).toHaveCSS("width", "48px");
+  await expect(firstButton).toHaveCSS("min-height", "44px");
   await expect(firstLabel).toHaveCSS("max-width", "0px");
   await expect(firstLabel).toHaveCSS("opacity", "0");
   await expect(page.locator(".insights-nav-button")).toBeVisible();
+  await expect(activeIcon).toHaveCSS("width", "28px");
+  await expect(activeIcon).toHaveCSS("height", "28px");
+  await expect(activeIconImage).toHaveCSS("width", "16px");
+  await expect(activeIconImage).toHaveCSS("height", "16px");
   await expect(active).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+  await expect(active).toHaveCSS("color", "rgb(255, 255, 255)");
   await expect(activeIcon).toHaveCSS("background-color", "rgb(53, 111, 209)");
 
   const collapsedTooltip = await active.evaluate(node => {
@@ -80,18 +100,29 @@ test("desktop sidebar collapses to 64px and expands compactly to 190px with read
   await expect.poll(() => active.evaluate(node => getComputedStyle(node, "::after").opacity)).toBe("1");
 
   await page.evaluate(() => document.getElementById("sidebar").classList.add("desktop-open"));
-  await expect(sidebar).toHaveCSS("width", "190px");
-  await expect(main).toHaveCSS("margin-left", "64px");
+  await expect(sidebar).toHaveCSS("width", "185px");
+  await expect(sidebar).toHaveCSS("padding-left", "8px");
+  await expect(sidebar).toHaveCSS("padding-right", "8px");
+  await expect(sidebar).toHaveCSS("background-color", "rgb(23, 43, 40)");
+  await expect(main).toHaveCSS("margin-left", "60px");
+
   await expect(brand).toBeVisible();
   await expect(brand).toHaveCSS("gap", "6px");
+  await expect(brandText).toBeVisible();
   await expect(brandText).toHaveText("Talaan");
   await expect(brandText).toHaveCSS("font-size", "30px");
   await expect(brandText).toHaveCSS("font-weight", "700");
+  await expect(brandText).toHaveCSS("color", "rgb(255, 255, 255)");
   await expect(brandLogo).toBeVisible();
   await expect(brandLogo).toHaveCSS("width", "25px");
   await expect(brandLogo).toHaveCSS("height", "25px");
   await expect.poll(() => brandLogo.evaluate(node => node.complete && node.naturalWidth > 0)).toBe(true);
+
   await expect(firstLabel).toHaveCSS("opacity", "1");
+  await expect(firstLabel).toHaveCSS("font-size", "11px");
+  await expect(firstLabel).toHaveCSS("font-weight", "400");
+  await expect(firstLabel).toHaveCSS("color", "rgb(217, 229, 226)");
+  await expect(activeLabel).toHaveCSS("color", "rgb(255, 255, 255)");
   await expect(active).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
   await expect(activeIcon).toHaveCSS("background-color", "rgb(53, 111, 209)");
   expect(await active.evaluate(node => getComputedStyle(node, "::after").content)).toBe("none");
@@ -101,21 +132,23 @@ test("desktop sidebar collapses to 64px and expands compactly to 190px with read
     rail.classList.add("sidebar-pinned");
     document.body.classList.add("sidebar-layout-pinned");
   });
-  await expect(sidebar).toHaveCSS("width", "190px");
-  await expect(main).toHaveCSS("margin-left", "190px");
+  await expect(sidebar).toHaveCSS("width", "185px");
+  await expect(main).toHaveCSS("margin-left", "185px");
 
   await page.evaluate(() => {
     const rail = document.getElementById("sidebar");
     rail.classList.remove("desktop-open", "sidebar-pinned");
     document.body.classList.remove("sidebar-layout-pinned");
   });
-  await expect(sidebar).toHaveCSS("width", "64px");
-  await expect(main).toHaveCSS("margin-left", "64px");
-  await expect(brand).toBeHidden();
+  await expect(sidebar).toHaveCSS("width", "60px");
+  await expect(main).toHaveCSS("margin-left", "60px");
+  await expect(brand).toBeVisible();
+  await expect(brandLogo).toBeVisible();
+  await expect(brandText).toBeHidden();
   await expect(firstLabel).toHaveCSS("opacity", "0");
 });
 
-test("mobile brand keeps Talaan text with the real uploaded logo at 25px", async ({ page, request }) => {
+test("mobile brand keeps 30px Talaan text with the real uploaded logo at 25px", async ({ page, request }) => {
   await page.setViewportSize({ width:390, height:844 });
   const logoResponse = await request.get("http://127.0.0.1:3000/icons/talaan-brand-logo.png?v=2.2.0-talaan1");
   expect(logoResponse.ok()).toBeTruthy();
@@ -132,6 +165,7 @@ test("mobile brand keeps Talaan text with the real uploaded logo at 25px", async
   await expect(brandText).toHaveText("Talaan");
   await expect(brandText).toHaveCSS("font-size", "30px");
   await expect(brandText).toHaveCSS("font-weight", "700");
+  await expect(brandText).toHaveCSS("color", "rgb(255, 255, 255)");
   await expect(mark).toBeVisible();
   await expect(mark).toHaveCSS("width", "25px");
   await expect(mark).toHaveCSS("height", "25px");
