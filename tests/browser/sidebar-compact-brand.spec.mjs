@@ -110,7 +110,7 @@ test("desktop sidebar collapses to 60px and expands to 185px with the approved T
   await expect(brand).toHaveCSS("gap", "6px");
   await expect(brandText).toBeVisible();
   await expect(brandText).toHaveText("Talaan");
-  await expect(brandText).toHaveCSS("font-size", "30px");
+  await expect(brandText).toHaveCSS("font-size", "25px");
   await expect(brandText).toHaveCSS("font-weight", "700");
   await expect(brandText).toHaveCSS("color", "rgb(255, 255, 255)");
   await expect(brandLogo).toBeVisible();
@@ -148,7 +148,7 @@ test("desktop sidebar collapses to 60px and expands to 185px with the approved T
   await expect(firstLabel).toHaveCSS("opacity", "0");
 });
 
-test("mobile brand keeps 30px Talaan text with the real uploaded logo at 25px", async ({ page, request }) => {
+test("mobile brand keeps 25px Talaan text with the real uploaded logo at 25px", async ({ page, request }) => {
   await page.setViewportSize({ width:390, height:844 });
   const logoResponse = await request.get("http://127.0.0.1:3000/icons/talaan-brand-logo.png?v=2.2.0-talaan2");
   expect(logoResponse.ok()).toBeTruthy();
@@ -163,7 +163,7 @@ test("mobile brand keeps 30px Talaan text with the real uploaded logo at 25px", 
   await expect(brand).toBeVisible();
   await expect(brand).toHaveCSS("gap", "6px");
   await expect(brandText).toHaveText("Talaan");
-  await expect(brandText).toHaveCSS("font-size", "30px");
+  await expect(brandText).toHaveCSS("font-size", "25px");
   await expect(brandText).toHaveCSS("font-weight", "700");
   await expect(brandText).toHaveCSS("color", "rgb(255, 255, 255)");
   await expect(mark).toBeVisible();
