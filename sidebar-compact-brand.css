@@ -28,6 +28,61 @@ html body #sidebar.sidebar .brand > strong {
   color:#FFFFFF !important;
 }
 
+/* Keep the approved dark sidebar authoritative over the later Liquid Glass light-mode layer. */
+html body #sidebar.sidebar {
+  background:#172B28 !important;
+  background-image:none !important;
+  color:#FFFFFF !important;
+  border-right:0 !important;
+  -webkit-backdrop-filter:none !important;
+  backdrop-filter:none !important;
+}
+
+html body #sidebar.sidebar .sidebar-close-button {
+  color:#FFFFFF !important;
+}
+
+html body #sidebar.sidebar .nav-button {
+  background:transparent !important;
+  border-color:transparent !important;
+  box-shadow:none !important;
+  color:#D9E5E2 !important;
+}
+
+html body #sidebar.sidebar .nav-icon {
+  background:transparent !important;
+  color:#D9E5E2 !important;
+}
+
+html body #sidebar.sidebar .nav-icon-image {
+  filter:brightness(0) invert(1) !important;
+  opacity:.9 !important;
+}
+
+html body #sidebar.sidebar .nav-label {
+  color:#D9E5E2 !important;
+}
+
+html body #sidebar.sidebar .nav-button:hover,
+html body #sidebar.sidebar .nav-button:focus-visible,
+html body #sidebar.sidebar .nav-button.active,
+html body #sidebar.sidebar .nav-button:hover .nav-label,
+html body #sidebar.sidebar .nav-button:focus-visible .nav-label,
+html body #sidebar.sidebar .nav-button.active .nav-label {
+  color:#FFFFFF !important;
+}
+
+html body #sidebar.sidebar .nav-button.active .nav-icon {
+  background:#356FD1 !important;
+  color:#FFFFFF !important;
+  border-radius:7px !important;
+}
+
+html body #sidebar.sidebar .nav-button.active .nav-icon-image {
+  filter:brightness(0) invert(1) !important;
+  opacity:1 !important;
+}
+
 @media (min-width:851px) {
   :root {
     --sidebar-rail-width:60px;
