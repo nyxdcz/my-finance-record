@@ -103,7 +103,7 @@ test("browser-delivered configuration contains no privileged secret", async () =
   const formInputs = read("form-inputs.js");
   expect(syncConfig).not.toMatch(/sb_secret_|service_role/i);
   expect(syncConfig).not.toMatch(/OPENAI_API_KEY\s*[:=]\s*["'][^"']+/i);
-  expect(html).toContain("Talaan · V2.1.0");
+  expect(html).toContain("Talaan · V2.2.0");
   expect(formInputs).toMatch(/function validateMoneyInput/);
   expect(formInputs).toMatch(/function evaluateArithmeticExpression/);
 });

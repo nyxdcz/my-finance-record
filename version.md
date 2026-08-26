@@ -1,28 +1,28 @@
-# Talaan V2.1.0
+# Talaan V2.2.0
 
-**Current production version:** V2.1.0
-**Release date:** 2026-08-25
+**Current production version:** V2.2.0
+**Release date:** 2026-08-26
 **Release name:** Talaan
 
-Talaan V2.1.0 is the active product baseline. This document describes only the current release.
+Talaan V2.2.0 is the active product baseline. This document describes only the current release.
 
 ## Product identity
 
 - **Product name:** Talaan
-- **Product version:** `2.1.0`
-- **Display version:** `V2.1.0`
+- **Product version:** `2.2.0`
+- **Display version:** `V2.2.0`
 - **Release name:** `Talaan`
-- **PWA cache:** `finance-v2-20260825-payees-rules-r7`
+- **PWA cache:** `finance-v2-20260826-import-center-r8`
 - **Finance Schema:** 12
 - **Cloud Schema:** V3
 
-## Payees and transaction rules
+## Local CSV import center
 
-- Payees normalize aliases using Unicode-aware, case-insensitive matching.
-- Ordered rules use stable priority, creation-time, and ID tie-breaking.
-- Rules support equals, contains, starts-with, and validated regex conditions.
-- Preview explains every matched rule and proposed change before applying anything.
-- Bulk apply creates a recovery snapshot and Undo point and never changes balances, paid state, or payment identifiers.
+- CSV files are parsed entirely inside the current browser session.
+- Reusable profiles map dates, signed amounts or debit/credit columns, descriptions, references, categories, payees, and transaction types.
+- Preview identifies invalid, ignored, transfer, and duplicate rows before commit and shows reviewed transaction-rule suggestions.
+- Commit creates a recovery snapshot and Undo point, then writes all selected records through one finance save.
+- A completed batch can be rolled back without changing account balances or Account Ledger entries.
 
 The visible application, PWA metadata, offline experience, installation messaging, calendar export branding, and current documentation use the **Talaan** name.
 

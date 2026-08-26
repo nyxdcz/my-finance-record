@@ -1,10 +1,20 @@
 # Changelog
 
-## V2.1.0 · Talaan
+## V2.2.0 · Talaan
 
-**Current production release:** V2.1.0
+**Current production release:** V2.2.0
 
-Talaan V2.1.0 is the active release baseline. This changelog focuses only on the current product version.
+Talaan V2.2.0 is the active release baseline. This changelog focuses only on the current product version.
+
+### Local CSV import center
+
+- Added an original local-only CSV pipeline for parsing, column mapping, preview, duplicate detection, commit, and rollback.
+- Added reusable mapping profiles, Philippine D/M/Y dates, signed amount and debit/credit support, delimiter detection, and quoted multiline values.
+- Added preview totals, invalid and duplicate reasons, date range, destination-account context, and reviewed payee/rule suggestions.
+- Added recovery snapshots, Undo, one-save commits, import batches, and single-import rollback.
+- Imported records never deduct account balances or create Account Ledger entries; transfers remain excluded from personal totals.
+- Uploaded file contents and filenames remain session-only and are never synchronized, cached, logged, or stored.
+- Rotated the PWA cache to `finance-v2-20260826-import-center-r8` while preserving Finance Schema 12 and Cloud Schema V3.
 
 ### Payees and transaction rules
 

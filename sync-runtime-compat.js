@@ -1,16 +1,16 @@
 (function applyTalaanReleaseLayer() {
-  const VERSION = "2.1.0";
+  const VERSION = "2.2.0";
   const RELEASE_NAME = "Talaan";
-  const RELEASE_DATE = "August 25, 2026";
+  const RELEASE_DATE = "August 26, 2026";
   window.FINANCE_APP_VERSION_OVERRIDE = VERSION;
-  window.FINANCE_RELEASE_OVERRIDE = { version:VERSION, name:RELEASE_NAME, released:"2026-08-25" };
+  window.FINANCE_RELEASE_OVERRIDE = { version:VERSION, name:RELEASE_NAME, released:"2026-08-26" };
 
   function ensureLiquidGlassStyles() {
     if (document.getElementById("financeLiquidGlassStyles")) return;
     const link = document.createElement("link");
     link.id = "financeLiquidGlassStyles";
     link.rel = "stylesheet";
-    link.href = "./liquid-glass.css?v=2.1.0-talaan1";
+    link.href = "./liquid-glass.css?v=2.2.0-talaan1";
     document.head.appendChild(link);
   }
 
@@ -396,9 +396,9 @@
   async function start() {
     if (toolsPromise) return toolsPromise;
     toolsPromise = (async () => {
-      await loadScript("./expense-screenshot-parser.js?v=2.1.0-talaan1", "expenseScreenshotParserScript");
-      await loadScript("./expense-screenshot-detect.js?v=2.1.0-talaan1", "expenseScreenshotDetectScript");
-      await loadScript("./expense-screenshot-ai.js?v=2.1.0-talaan1", "expenseScreenshotAiScript");
+      await loadScript("./expense-screenshot-parser.js?v=2.2.0-talaan1", "expenseScreenshotParserScript");
+      await loadScript("./expense-screenshot-detect.js?v=2.2.0-talaan1", "expenseScreenshotDetectScript");
+      await loadScript("./expense-screenshot-ai.js?v=2.2.0-talaan1", "expenseScreenshotAiScript");
       window.FinanceExpenseScreenshot?.ensurePanel?.();
       window.FinanceExpenseScreenshotAI?.ensureAiControls?.();
       ensureCompactScreenshotUi();

@@ -10,7 +10,7 @@ async function installSidebarFixture(page, extraSidebarClass = "") {
       <div class="app">
         <aside class="sidebar ${sidebarClass}" id="sidebar">
           <button class="sidebar-close-button" type="button" aria-label="Pin navigation open"></button>
-          <div class="brand"><img class="talaan-brand-logo" src="./icons/talaan-brand-logo.png?v=2.1.0-talaan6" alt="" aria-hidden="true"><strong>Talaan</strong></div>
+          <div class="brand"><img class="talaan-brand-logo" src="./icons/talaan-brand-logo.png?v=2.2.0-talaan1" alt="" aria-hidden="true"><strong>Talaan</strong></div>
           <nav class="sidebar-navigation">
             <button class="nav-button" data-nav-label="Overview"><span class="nav-icon"><span class="nav-icon-image"></span></span><span class="nav-label">Overview</span></button>
             <button class="nav-button active" data-nav-label="Finance"><span class="nav-icon"><span class="nav-icon-image"></span></span><span class="nav-label">Finance</span></button>
@@ -22,9 +22,9 @@ async function installSidebarFixture(page, extraSidebarClass = "") {
         <main class="main">Workspace</main>
       </div>`;
   }, extraSidebarClass);
-  await page.addStyleTag({ url:"http://127.0.0.1:3000/app.css?v=2.1.0-talaan1" });
-  await page.addStyleTag({ url:"http://127.0.0.1:3000/shell-ui.css?v=2.1.0-talaan1" });
-  await page.addStyleTag({ url:"http://127.0.0.1:3000/sidebar-compact-brand.css?v=2.1.0-talaan6" });
+  await page.addStyleTag({ url:"http://127.0.0.1:3000/app.css?v=2.2.0-talaan1" });
+  await page.addStyleTag({ url:"http://127.0.0.1:3000/shell-ui.css?v=2.2.0-talaan1" });
+  await page.addStyleTag({ url:"http://127.0.0.1:3000/sidebar-compact-brand.css?v=2.2.0-talaan1" });
 }
 
 test("desktop sidebar collapses to 64px and expands compactly to 190px with readable Talaan tooltips", async ({ page }) => {
@@ -113,7 +113,7 @@ test("desktop sidebar collapses to 64px and expands compactly to 190px with read
 
 test("mobile brand keeps Talaan text with the real uploaded logo at 20px", async ({ page, request }) => {
   await page.setViewportSize({ width:390, height:844 });
-  const logoResponse = await request.get("http://127.0.0.1:3000/icons/talaan-brand-logo.png?v=2.1.0-talaan6");
+  const logoResponse = await request.get("http://127.0.0.1:3000/icons/talaan-brand-logo.png?v=2.2.0-talaan1");
   expect(logoResponse.ok()).toBeTruthy();
   expect(logoResponse.headers()["content-type"] || "").toContain("image/png");
 
@@ -139,7 +139,7 @@ test("runtime preparation renders fresh real brand assets without changing relea
   expect(prepare).toContain('src="./icons/talaan-brand-logo.png?v=${SIDEBAR_BRAND_ASSET_QUERY}"');
   expect(prepare).toContain('sidebar-compact-brand.css?v=${SIDEBAR_BRAND_ASSET_QUERY}');
   expect(updater).not.toContain("document");
-  expect(updater).toContain('const CURRENT_CACHE_VERSION = "finance-v2-20260825-payees-rules-r7"');
+  expect(updater).toContain('const CURRENT_CACHE_VERSION = "finance-v2-20260826-import-center-r8"');
   expect(updater).toContain('const UI_HOTFIX_REFRESH_KEY = "finance-ui-hotfix-v2-0-1-talaan6"');
   expect(updater).toContain('pathname.endsWith("/sidebar-compact-brand.css")');
   expect(updater).toContain('pathname.endsWith("/talaan-brand-logo.png")');

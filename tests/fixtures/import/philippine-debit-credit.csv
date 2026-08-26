@@ -1,0 +1,4 @@
+Date,Description,Reference,Debit,Credit,Type,Category,Payee
+25/08/2026,SM Supermarket,REF-001,1250.50,,Expense,Groceries,SM
+26/08/2026,August salary,REF-002,,50000.00,Income,Wages,Employer
+27/08/2026,Transfer to Maya,REF-003,2000.00,,Transfer,Transfer,Maya
