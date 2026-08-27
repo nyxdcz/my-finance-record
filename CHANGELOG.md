@@ -1,10 +1,20 @@
 # Changelog
 
-## V2.2.0 · Talaan
+## V2.3.0 · Talaan
 
-**Current production release:** V2.2.0
+**Current production release:** V2.3.0
 
-Talaan V2.2.0 is the active release baseline. This changelog focuses only on the current product version.
+Talaan V2.3.0 is the active release baseline. This changelog focuses only on the current product version.
+
+### Local OFX and QIF statement import
+
+- Added original local parsers for OFX 1.x SGML and OFX 2.x XML bank and credit-card statements.
+- Added QIF Bank, Cash, CCard, Oth A, and Oth L parsing with opening-balance exclusion and bracketed-category transfer handling.
+- Kept all formats inside the existing map, preview, rule-suggestion, deduplication, recovery, Undo, commit, and single-import rollback pipeline.
+- Required OFX FITID values, blocked non-PHP or undeclared OFX currencies, and required explicit PHP confirmation for QIF.
+- Rejected unsupported investment OFX and QIF split transactions before they can be selected.
+- Added format-aware mapping profiles and compact batch metadata without widening Finance Schema 12 or Cloud Schema V3.
+- Rotated the PWA cache to `finance-v2-20260826-import-formats-r9` so installed clients receive the parser before the import UI.
 
 ### Local CSV import center
 

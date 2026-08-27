@@ -2,16 +2,16 @@ import { test, expect } from "@playwright/test";
 
 const widths = [1024, 1280, 1366, 1440, 1920];
 const css = [
-  "app.css?v=2.2.0-talaan1",
-  "shell-ui.css?v=2.2.0-talaan1",
-  "reports-insights.css?v=2.2.0-talaan1",
-  "budget-planning.css?v=2.2.0-talaan1",
-  "security-profiles.css?v=2.2.0-talaan1",
-  "projects-calendar.css?v=2.2.0-talaan1",
-  "dashboard-interactions.css?v=2.2.0-talaan1",
-  "liquid-glass.css?v=2.2.0-talaan1",
-  "black-canvas.css?v=2.2.0-talaan1",
-  "desktop-ui-phase1.css?v=2.2.0-talaan1"
+  "app.css?v=2.3.0-talaan1",
+  "shell-ui.css?v=2.3.0-talaan1",
+  "reports-insights.css?v=2.3.0-talaan1",
+  "budget-planning.css?v=2.3.0-talaan1",
+  "security-profiles.css?v=2.3.0-talaan1",
+  "projects-calendar.css?v=2.3.0-talaan1",
+  "dashboard-interactions.css?v=2.3.0-talaan1",
+  "liquid-glass.css?v=2.3.0-talaan1",
+  "black-canvas.css?v=2.3.0-talaan1",
+  "desktop-ui-phase1.css?v=2.3.0-talaan1"
 ];
 
 async function fixture(page, width, theme) {

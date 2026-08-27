@@ -22,10 +22,10 @@ async function installSidebarFixture(page, extraSidebarClass = "") {
         <main class="main">Workspace</main>
       </div>`;
   }, extraSidebarClass);
-  await page.addStyleTag({ url:"http://127.0.0.1:3000/app.css?v=2.2.0-talaan1" });
-  await page.addStyleTag({ url:"http://127.0.0.1:3000/shell-ui.css?v=2.2.0-talaan1" });
+  await page.addStyleTag({ url:"http://127.0.0.1:3000/app.css?v=2.3.0-talaan1" });
+  await page.addStyleTag({ url:"http://127.0.0.1:3000/shell-ui.css?v=2.3.0-talaan1" });
   await page.addStyleTag({ url:"http://127.0.0.1:3000/sidebar-compact-brand.css?v=2.2.0-talaan2" });
-  await page.addStyleTag({ url:"http://127.0.0.1:3000/assets/css/ui-icon-alignment.css?v=2.2.0-talaan1" });
+  await page.addStyleTag({ url:"http://127.0.0.1:3000/assets/css/ui-icon-alignment.css?v=2.3.0-talaan1" });
 }
 
 test("desktop sidebar collapses to 60px and expands to 185px with the approved Talaan specification", async ({ page }) => {
@@ -186,7 +186,7 @@ test("runtime preparation renders fresh real brand assets without changing relea
   expect(index).toContain('talaan-brand-logo.png?v=2.2.0-talaan2');
   expect(serviceWorker).toContain('url.pathname.endsWith("sidebar-compact-brand.css") ||');
   expect(updater).not.toContain("document");
-  expect(updater).toContain('const CURRENT_CACHE_VERSION = "finance-v2-20260826-import-center-r8"');
+  expect(updater).toContain('const CURRENT_CACHE_VERSION = "finance-v2-20260826-import-formats-r9"');
   expect(updater).toContain('const UI_HOTFIX_REFRESH_KEY = "finance-ui-hotfix-v2-0-1-talaan6"');
   expect(updater).toContain('pathname.endsWith("/sidebar-compact-brand.css")');
   expect(updater).toContain('pathname.endsWith("/talaan-brand-logo.png")');

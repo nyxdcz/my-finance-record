@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import { test } from "@playwright/test";
 
-test("CSV files stay session-only and commit requires recovery without ledger mutation", () => {
+test("statement files stay session-only and commit requires recovery without ledger mutation", () => {
 const source = fs.readFileSync("assets/js/import-center.js", "utf8");
 const worker = fs.readFileSync("sw.js", "utf8");
 const html = fs.readFileSync("index.html", "utf8");
@@ -19,9 +19,9 @@ assert.match(source, /replace\(\/\[&<>'"\]\/g/);
 assert.match(source, /accountDeducted:false/);
 assert.match(source, /postToLedger:false/);
 assert.match(source, /includeInTotals:type !== "transfer"/);
-assert.match(source, /await saveRecovery\("Before local CSV import"\)/);
-assert.match(source, /pushUndo\("Import local CSV"\)/);
-assert.match(source, /persist\(`Imported \$\{selected\.length\} CSV record/);
+assert.match(source, /await saveRecovery\(`Before local \$\{label\} import`\)/);
+assert.match(source, /pushUndo\(`Import local \$\{label\}`\)/);
+assert.match(source, /persist\(`Imported \$\{selected\.length\} \$\{label\} record/);
 
 const batchStart = source.indexOf("function buildBatch");
 const batchEnd = source.indexOf("async function commitImport", batchStart);
@@ -29,13 +29,15 @@ const batchSource = source.slice(batchStart, batchEnd);
 assert.ok(batchStart >= 0 && batchEnd > batchStart);
 assert.doesNotMatch(batchSource, /fileName|description|rawRows|fileHash/);
 
-assert.match(source, /accept="\.csv,text\/csv,text\/plain" data-import-csv/);
-assert.match(html, /import-center\.js\?v=2\.2\.0-talaan1/);
-assert.match(worker, /import-center\.js\?v=2\.2\.0-talaan1/);
-assert.match(worker, /import-center\.css\?v=2\.2\.0-talaan1/);
+assert.match(source, /accept="\.csv,\.ofx,\.qif,text\/csv,text\/plain,application\/x-ofx,application\/vnd\.intu\.qif" data-import-csv/);
+assert.match(html, /import-formats\.js\?v=2\.3\.0-talaan1/);
+assert.match(html, /import-center\.js\?v=2\.3\.0-talaan1/);
+assert.match(worker, /import-formats\.js\?v=2\.3\.0-talaan1/);
+assert.match(worker, /import-center\.js\?v=2\.3\.0-talaan1/);
+assert.match(worker, /import-center\.css\?v=2\.3\.0-talaan1/);
 assert.match(worker, /endsWith\("import-center\.js"\)/);
 
-console.log("CSV import files remain session-only and the commit boundary requires recovery, Undo, and non-ledger records.");
+console.log("Statement import files remain session-only and the commit boundary requires recovery, Undo, and non-ledger records.");
 });
 
 test("mapping profiles and batch metadata round-trip through backup and encrypted Cloud V3 settings", async ({ page }) => {

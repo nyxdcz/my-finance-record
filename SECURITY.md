@@ -1,11 +1,11 @@
-# Security Policy · Talaan V2.2.0
+# Security Policy · Talaan V2.3.0
 
-**Talaan V2.2.0** is the current production release. Security changes must preserve the local-first finance model, Finance Schema 12, Cloud Schema V3, encrypted synchronization, recovery paths, and installed-PWA compatibility unless a reviewed migration explicitly changes one of those contracts.
+**Talaan V2.3.0** is the current production release. Security changes must preserve the local-first finance model, Finance Schema 12, Cloud Schema V3, encrypted synchronization, recovery paths, and installed-PWA compatibility unless a reviewed migration explicitly changes one of those contracts.
 
 ## Current security baseline
 
 - **Product:** Talaan.
-- **Current product release:** V2.2.0.
+- **Current product release:** V2.3.0.
 - **Finance Schema:** 12.
 - **Cloud Schema:** V3.
 - **Encryption:** client-side AES-256-GCM for encrypted cloud payloads and encrypted backup/restore files.
@@ -13,7 +13,7 @@
 - **Cloud access:** authenticated profile membership plus Row Level Security and approved RPC paths.
 - **Browser credentials:** publishable/anonymous Supabase credentials only; privileged secrets are prohibited from client files.
 
-All security fixes and releases continue forward from the current Talaan V2.2.0 baseline using semantic versioning.
+All security fixes and releases continue forward from the current Talaan V2.3.0 baseline using semantic versioning.
 
 ## Protected architecture
 
@@ -38,7 +38,7 @@ Changes to encryption format, key derivation, encrypted backups, restore behavio
 
 - Never silently rewrite paid status, ledger deductions, account balances, recurring-series identity, or payment-operation identity.
 - Transaction rules may only apply previewed safe fields. Account changes remain suggestions, invalid regex is rejected, and bulk apply requires confirmation plus recovery and Undo.
-- CSV imports must remain local, validate size and row limits, escape preview content, reject invalid mappings, deduplicate before commit, and create recovery plus Undo points. The V2.2.0 import path must not mutate account balances or Account Ledger entries.
+- CSV, OFX, and QIF imports must remain local, validate size and row limits, escape preview content, reject invalid or unsupported statement structures, enforce the PHP currency gates, deduplicate before commit, and create recovery plus Undo points. The V2.3.0 import path must not mutate account balances or Account Ledger entries.
 - Preserve unknown fields when reading or migrating records unless an explicit migration documents their removal.
 - Keep offline/local records usable when cloud services are unavailable.
 - Preserve backup and restore paths when tightening access controls.
@@ -60,7 +60,7 @@ Changes to encryption format, key derivation, encrypted backups, restore behavio
 
 Do not include real finance records, passwords, keys, passphrases, backup files, authentication tokens, or screenshots containing sensitive values in a public issue.
 
-When reporting a security problem, provide only the minimum reproducible information needed, using sample data where possible. Include the affected Talaan app version (currently **V2.2.0**), the affected area, reproduction steps, expected behavior, actual behavior, and whether the issue involves local storage, cloud sync, authentication, encryption, backups, payments, imports, or the service worker.
+When reporting a security problem, provide only the minimum reproducible information needed, using sample data where possible. Include the affected Talaan app version (currently **V2.3.0**), the affected area, reproduction steps, expected behavior, actual behavior, and whether the issue involves local storage, cloud sync, authentication, encryption, backups, payments, imports, or the service worker.
 
 If sensitive information is required to demonstrate the issue, use the repository's private security-reporting mechanism rather than posting the secret or private record publicly.
 
@@ -68,4 +68,4 @@ If sensitive information is required to demonstrate the issue, use the repositor
 
 Security-sensitive pull requests should include focused regression coverage and must pass the repository's **Regression quality** and **Browser privacy and accessibility** checks before merge. Changes affecting Finance Schema 12, Cloud Schema V3, encryption, authentication, RLS/RPC behavior, payments, recovery, or stored finance data also require an explicit migration/recovery review.
 
-See [`CONTRIBUTING.md`](CONTRIBUTING.md) for the contribution and release process, [`PRIVACY.md`](PRIVACY.md) for privacy boundaries, and [`CHANGELOG.md`](CHANGELOG.md) for the current Talaan V2.2.0 release notes.
+See [`CONTRIBUTING.md`](CONTRIBUTING.md) for the contribution and release process, [`PRIVACY.md`](PRIVACY.md) for privacy boundaries, and [`CHANGELOG.md`](CHANGELOG.md) for the current Talaan V2.3.0 release notes.

@@ -1088,10 +1088,10 @@
 
   function installPhaseOneStylesheet(file) {
     if (document.querySelector(`link[data-phase-one-asset="${file}"]`)) return;
-    const link=document.createElement("link"); link.rel="stylesheet"; link.href=`./${file}?v=2.2.0-talaan1`; link.dataset.phaseOneAsset=file; document.head.append(link);
+    const link=document.createElement("link"); link.rel="stylesheet"; link.href=`./${file}?v=2.3.0-talaan1`; link.dataset.phaseOneAsset=file; document.head.append(link);
   }
   function installPhaseOneScript(file) {
-    return new Promise(resolve=>{if(document.querySelector(`script[data-phase-one-asset="${file}"]`)){resolve(true);return;}const script=document.createElement("script");script.src=`./${file}?v=2.2.0-talaan1`;script.dataset.phaseOneAsset=file;script.onload=()=>resolve(true);script.onerror=()=>resolve(false);document.body.append(script);});
+    return new Promise(resolve=>{if(document.querySelector(`script[data-phase-one-asset="${file}"]`)){resolve(true);return;}const script=document.createElement("script");script.src=`./${file}?v=2.3.0-talaan1`;script.dataset.phaseOneAsset=file;script.onload=()=>resolve(true);script.onerror=()=>resolve(false);document.body.append(script);});
   }
   async function installPhaseOneWorkspace() {
     installPhaseOneStylesheet("transaction-views.css"); installPhaseOneStylesheet("privacy-display.css");

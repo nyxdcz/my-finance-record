@@ -6,7 +6,7 @@ const source = read("assets/js/cloud-sync.js");
 const index = read("index.html");
 const worker = read("sw.js");
 const version = JSON.parse(read("version.json"));
-const query = "2.2.0-talaan1";
+const query = "2.3.0-talaan1";
 
 assert.match(source, /let clientPromise = null;/);
 assert.match(source, /if \(clientPromise\) return clientPromise;/);
@@ -27,7 +27,7 @@ assert.match(source, /activateSettingsPanel\(cloudReadiness\(\)\.ready \? "sync"
 assert.match(index, /id="cloudConnectionChip">Connected<\/span>/);
 assert.ok(index.includes(`./cloud-sync.js?v=${query}`));
 assert.ok(worker.includes(`./cloud-sync.js?v=${query}`));
-assert.equal(version.version, "2.2.0");
+assert.equal(version.version, "2.3.0");
 assert.equal(version.cloudSchemaVersion, 3);
 
 console.log("Cloud client deduplication, profile readiness, sync gating, and Talaan runtime delivery validated.");

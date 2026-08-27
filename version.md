@@ -1,24 +1,27 @@
-# Talaan V2.2.0
+# Talaan V2.3.0
 
-**Current production version:** V2.2.0
+**Current production version:** V2.3.0
 **Release date:** 2026-08-26
 **Release name:** Talaan
 
-Talaan V2.2.0 is the active product baseline. This document describes only the current release.
+Talaan V2.3.0 is the active product baseline. This document describes only the current release.
 
 ## Product identity
 
 - **Product name:** Talaan
-- **Product version:** `2.2.0`
-- **Display version:** `V2.2.0`
+- **Product version:** `2.3.0`
+- **Display version:** `V2.3.0`
 - **Release name:** `Talaan`
-- **PWA cache:** `finance-v2-20260826-import-center-r8`
+- **PWA cache:** `finance-v2-20260826-import-formats-r9`
 - **Finance Schema:** 12
 - **Cloud Schema:** V3
 
-## Local CSV import center
+## Local statement import center
 
-- CSV files are parsed entirely inside the current browser session.
+- CSV, OFX bank/credit-card, and QIF bank/cash/credit-card/asset/liability statements are parsed entirely inside the current browser session.
+- OFX 1.x SGML and OFX 2.x XML banking records share one normalized mapping and preview path. FITID is required for a valid OFX transaction.
+- QIF opening balances are ignored, bracketed categories become internal transfers, and unsupported investment or split records are rejected or isolated before commit.
+- Non-PHP OFX statements are blocked. QIF users must explicitly confirm that the file uses Philippine pesos because QIF has no reliable currency declaration.
 - Reusable profiles map dates, signed amounts or debit/credit columns, descriptions, references, categories, payees, and transaction types.
 - Preview identifies invalid, ignored, transfer, and duplicate rows before commit and shows reviewed transaction-rule suggestions.
 - Commit creates a recovery snapshot and Undo point, then writes all selected records through one finance save.
