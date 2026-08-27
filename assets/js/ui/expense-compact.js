@@ -46,14 +46,14 @@
     max-height: 30px !important;
     border: 0 !important;
     border-radius: 0 !important;
-    background-image: url("./icons/repeat-monthly-off.png?v=2.2.0-talaan1") !important;
+    background-image: url("./icons/repeat-monthly-off.png?v=2.3.0-talaan1") !important;
     background-repeat: no-repeat !important;
     background-position: center !important;
     background-size: 30px 30px !important;
   }
 
   html body #paidExpenseList .desktop-record-actions > [data-toggle-saved].active .saved-icon-container {
-    background-image: url("./icons/repeat-monthly-on.png?v=2.2.0-talaan1") !important;
+    background-image: url("./icons/repeat-monthly-on.png?v=2.3.0-talaan1") !important;
   }
 
   html body #paidExpenseList .desktop-record-actions > [data-toggle-saved] .saved-icon {

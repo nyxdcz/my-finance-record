@@ -1,12 +1,13 @@
 "use strict";
 
-/* Talaan local CSV import center.
+/* Talaan local statement import center.
    Files are parsed in memory and are never uploaded, cached, or persisted. */
 (function importCenterBootstrap() {
   const VERSION = 1;
   const MAX_FILE_SIZE = 10 * 1024 * 1024;
   const MAX_ROWS = 20000;
   const MAX_BATCHES = 100;
+  const SUPPORTED_FORMATS = new Set(["csv", "ofx", "qif"]);
   const FIELD_KEYS = ["date", "amount", "debit", "credit", "description", "reference", "type", "category", "payee"];
   const HEADER_ALIASES = Object.freeze({
     date:["date", "transaction date", "posting date", "posted date", "petsa"],
@@ -29,6 +30,8 @@
   const makeId = prefix => `${prefix}-${globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`}`;
   const nowIso = () => new Date().toISOString();
   const localMoney = value => new Intl.NumberFormat("en-PH", { style:"currency", currency:"PHP" }).format(Number(value || 0));
+  const formatLabel = format => ({ csv:"CSV", ofx:"OFX", qif:"QIF" }[format] || "Statement");
+  const emptyAnalysis = errors => ({ rows:[], errors, totals:{income:0, expenses:0, net:0, ready:0, duplicates:0, invalid:0, ignored:0}, dateRange:{from:"",to:""} });
 
   function detectDelimiter(text) {
     const candidates = [",", ";", "\t"];
@@ -152,7 +155,7 @@
     if (!name) return null;
     const mapping = Object.fromEntries(FIELD_KEYS.map(field => [field, /^\d+$/.test(String(item.mapping?.[field] ?? "")) ? String(item.mapping[field]) : ""]));
     return {
-      id:compact(item.id || makeId("import-profile"), 120), name, format:"csv", mapping,
+      id:compact(item.id || makeId("import-profile"), 120), name, format:SUPPORTED_FORMATS.has(item.format) ? item.format : "csv", mapping,
       delimiter:[",", ";", "\t", "auto"].includes(item.delimiter) ? item.delimiter : "auto",
       dateFormat:["dmy", "mdy", "auto"].includes(item.dateFormat) ? item.dateFormat : "dmy",
       decimalSeparator:item.decimalSeparator === "," ? "," : ".",
@@ -164,7 +167,7 @@
   function normalizeBatch(item) {
     if (!item || typeof item !== "object" || !item.id) return null;
     return {
-      id:compact(item.id, 120), format:"csv", importedAt:Number.isFinite(Date.parse(String(item.importedAt || ""))) ? String(item.importedAt) : nowIso(),
+      id:compact(item.id, 120), format:SUPPORTED_FORMATS.has(item.format) ? item.format : "csv", importedAt:Number.isFinite(Date.parse(String(item.importedAt || ""))) ? String(item.importedAt) : nowIso(),
       account:compact(item.account, 100), profileId:compact(item.profileId, 120), rowCount:Math.max(0, Math.round(Number(item.rowCount || 0))),
       expenseIds:(Array.isArray(item.expenseIds) ? item.expenseIds : []).map(value => compact(value, 120)).filter(Boolean).slice(0, MAX_ROWS),
       incomeIds:(Array.isArray(item.incomeIds) ? item.incomeIds : []).map(value => compact(value, 120)).filter(Boolean).slice(0, MAX_ROWS),
@@ -248,26 +251,31 @@
         signedAmount = amount.value;
         if (!type) type = signedAmount < 0 ? "expense" : (options.positiveMeans === "expense" ? "expense" : "income");
       }
-      if (type === "ignore") return { rowNumber, status:"ignored", type, description, reference, date:date.value, amount:Math.abs(signedAmount), errors:[], selected:false };
+      const sourceErrors = Array.isArray(parsed.rowErrors?.[index]) ? parsed.rowErrors[index] : [];
+      if (type === "ignore") return { rowNumber, status:"ignored", type, description, reference, date:date.value, amount:Math.abs(signedAmount), errors:sourceErrors, selected:false };
       if (type === "transfer" && !signedAmount) amountError ||= "Transfer amount is missing";
-      const rowErrors = [date.error, amountError, description ? "" : "Missing description", type ? "" : "Choose a transaction type"].filter(Boolean);
+      const rowErrors = [...sourceErrors, date.error, amountError, description ? "" : "Missing description", type ? "" : "Choose a transaction type"].filter(Boolean);
       const direction = type === "transfer" ? (signedAmount < 0 ? "expense" : "income") : type;
-      const fingerprint = rowErrors.length ? "" : `csv-${hashText([account,date.value,Math.abs(signedAmount).toFixed(2),direction,canonical(description),canonical(reference)].join("\u001f"))}`;
-      const duplicate = Boolean(fingerprint && (existing.has(fingerprint) || seen.has(fingerprint)));
+      const identity = options.format === "ofx" && reference
+        ? ["ofx", account, canonical(reference)]
+        : [account, date.value, Math.abs(signedAmount).toFixed(2), direction, canonical(description), canonical(reference)];
+      const fingerprint = rowErrors.length ? "" : `csv-${hashText(identity.join("\u001f"))}`;
+      const duplicateReason = fingerprint && existing.has(fingerprint) ? "Already imported" : fingerprint && seen.has(fingerprint) ? "Repeated in this file" : "";
+      const duplicate = Boolean(duplicateReason);
       if (fingerprint) seen.add(fingerprint);
       const id = makeId(direction === "income" ? "income" : "expense");
       let record = null;
       if (!rowErrors.length) {
-        const common = { id, name:description.slice(0, 80), amount:Math.abs(signedAmount), date:date.value, account, notes:description.slice(0, 240), payee:payee || description.slice(0, 80), importFingerprint:fingerprint, importSource:"csv", importReference:reference, importedAt:nowIso(), recurring:"No", seriesId:"", includeInTotals:type !== "transfer" };
+        const common = { id, name:description.slice(0, 80), amount:Math.abs(signedAmount), date:date.value, account, notes:description.slice(0, 240), payee:payee || description.slice(0, 80), importFingerprint:fingerprint, importSource:SUPPORTED_FORMATS.has(options.format) ? options.format : "csv", importReference:reference, importedAt:nowIso(), recurring:"No", seriesId:"", includeInTotals:type !== "transfer" };
         if (direction === "income") record = { ...common, category:type === "transfer" ? "Transfer from savings" : (category || "Other income"), categoryGroup:type === "transfer" ? "Internal transfer" : "Other income", postToLedger:false, ledgerTransactionId:"" };
         else record = { ...common, expenseType:"normal", category:type === "transfer" ? "Internal transfer" : (category || "Other"), expensePeriod:"other", budgetPeriod:"", dueDay:null, paid:true, paidDate:date.value, paidFromAccount:"", paidAmount:0, accountDeducted:false, paymentTransactionId:"", autoPaidAtMonthEnd:false, gymAutoPay:false, gymAutoPayAccount:"", gymAutoPaySuppressed:false };
       }
       if (record && globalThis.FinancePayeeRules?.previewRecord) {
         const rulePreview = globalThis.FinancePayeeRules.previewRecord(record, direction === "income" ? "incomeRecords" : "expenses");
         record = rulePreview.after;
-        return { rowNumber, status:duplicate ? "duplicate" : "ready", type, direction, description, reference, date:date.value, amount:Math.abs(signedAmount), errors:rowErrors, fingerprint, duplicate, selected:!duplicate, record, rulePreview };
+        return { rowNumber, status:duplicate ? "duplicate" : "ready", type, direction, description, reference, date:date.value, amount:Math.abs(signedAmount), errors:rowErrors, fingerprint, duplicate, duplicateReason, selected:!duplicate, record, rulePreview };
       }
-      return { rowNumber, status:rowErrors.length ? "invalid" : (duplicate ? "duplicate" : "ready"), type, direction, description, reference, date:date.value, amount:Math.abs(signedAmount), errors:rowErrors, fingerprint, duplicate, selected:!rowErrors.length && !duplicate, record, rulePreview:null };
+      return { rowNumber, status:rowErrors.length ? "invalid" : (duplicate ? "duplicate" : "ready"), type, direction, description, reference, date:date.value, amount:Math.abs(signedAmount), errors:rowErrors, fingerprint, duplicate, duplicateReason, selected:!rowErrors.length && !duplicate, record, rulePreview:null };
     });
     const readyRows = analyzed.filter(item => item.status === "ready");
     const totals = {
@@ -328,7 +336,7 @@
 
   function ensureDialog() {
     if (document.getElementById("importCenterDialog")) return;
-    document.body.insertAdjacentHTML("beforeend", `<dialog class="app-dialog import-center-dialog" id="importCenterDialog" aria-labelledby="importCenterDialogTitle"><div class="modal-header"><div><h3 id="importCenterDialogTitle">Import local CSV</h3><p id="importCenterFileSummary">Choose a CSV file</p></div><button class="button button-secondary button-small" type="button" data-close-import-center>Close</button></div><div class="modal-body import-center-body"><p class="info-box">Parsing happens only in this browser. The uploaded file is not stored, synchronized, or cached.</p><section id="importMappingSection"></section><section id="importPreviewSection"></section><p class="field-error" id="importCenterError" role="alert" hidden></p></div><div class="modal-footer"><button class="button button-secondary" type="button" data-close-import-center>Cancel</button><span class="footer-spacer"></span><button class="button button-primary" id="commitCsvImport" type="button" disabled>Import selected records</button></div></dialog>`);
+    document.body.insertAdjacentHTML("beforeend", `<dialog class="app-dialog import-center-dialog" id="importCenterDialog" aria-labelledby="importCenterDialogTitle"><div class="modal-header"><div><h3 id="importCenterDialogTitle">Import local statement</h3><p id="importCenterFileSummary">Choose a CSV, OFX, or QIF file</p></div><button class="button button-secondary button-small" type="button" data-close-import-center>Close</button></div><div class="modal-body import-center-body"><p class="info-box">Parsing happens only in this browser. The uploaded file is not stored, synchronized, or cached.</p><section id="importMappingSection"></section><section id="importPreviewSection"></section><p class="field-error" id="importCenterError" role="alert" hidden></p></div><div class="modal-footer"><button class="button button-secondary" type="button" data-close-import-center>Cancel</button><span class="footer-spacer"></span><button class="button button-primary" id="commitCsvImport" type="button" disabled>Import selected records</button></div></dialog>`);
   }
 
   function renderMapping() {
@@ -336,7 +344,10 @@
     const mapping = session.options.mapping;
     const section = document.getElementById("importMappingSection");
     const field = (key, label, required = false) => `<label class="field"><span>${label}${required ? " *" : ""}</span><select class="select" data-import-map="${key}">${optionMarkup(session.parsed.headers, mapping[key])}</select></label>`;
-    section.innerHTML = `<div class="import-step-heading"><div><strong>1. Map columns</strong><small>Choose how this file should become Talaan records.</small></div><span class="status-chip info">CSV</span></div><div class="import-mapping-grid">${field("date", "Date", true)}${field("amount", "Signed amount")}${field("debit", "Debit")}${field("credit", "Credit")}${field("description", "Description", true)}${field("reference", "Reference")}${field("type", "Type")}${field("category", "Category")}${field("payee", "Payee")}</div><div class="import-settings-grid"><label class="field"><span>Destination account</span><select class="select" id="importDestinationAccount">${Object.keys(data.accounts || {}).map(name => `<option value="${esc(name)}" ${name === session.options.account ? "selected" : ""}>${esc(name)}</option>`).join("")}</select></label><label class="field"><span>Date format</span><select class="select" id="importDateFormat"><option value="dmy" ${session.options.dateFormat === "dmy" ? "selected" : ""}>D/M/Y · Philippines</option><option value="mdy" ${session.options.dateFormat === "mdy" ? "selected" : ""}>M/D/Y</option><option value="auto" ${session.options.dateFormat === "auto" ? "selected" : ""}>Auto · flag ambiguity</option></select></label><label class="field"><span>Decimal separator</span><select class="select" id="importDecimalSeparator"><option value="." ${session.options.decimalSeparator === "." ? "selected" : ""}>Period · 1,234.56</option><option value="," ${session.options.decimalSeparator === "," ? "selected" : ""}>Comma · 1.234,56</option></select></label><label class="field"><span>Positive signed amounts</span><select class="select" id="importPositiveMeans"><option value="income" ${session.options.positiveMeans === "income" ? "selected" : ""}>Income</option><option value="expense" ${session.options.positiveMeans === "expense" ? "selected" : ""}>Expense</option></select></label></div><div class="import-profile-row"><label class="field"><span>Mapping profile name</span><input class="input" id="importProfileName" maxlength="80" placeholder="Example: BDO statement"></label><button class="button button-secondary" type="button" data-save-import-profile>Save profile</button><button class="button button-primary" type="button" data-preview-import>Preview records</button></div>`;
+    const metadata = session.metadata || {};
+    const details = [metadata.statementType, metadata.currency ? `Currency: ${metadata.currency}` : "", metadata.accountHint ? `Account: ${metadata.accountHint}` : ""].filter(Boolean);
+    const notes = [...(session.warnings || [])];
+    section.innerHTML = `<div class="import-step-heading"><div><strong>1. Map columns</strong><small>Choose how this file should become Talaan records.</small></div><span class="status-chip info">${esc(session.label)}</span></div>${details.length || notes.length ? `<div class="import-source-notes">${details.length ? `<p>${details.map(esc).join(" · ")}</p>` : ""}${notes.length ? `<ul>${notes.map(note => `<li>${esc(note)}</li>`).join("")}</ul>` : ""}</div>` : ""}<div class="import-mapping-grid">${field("date", "Date", true)}${field("amount", "Signed amount")}${field("debit", "Debit")}${field("credit", "Credit")}${field("description", "Description", true)}${field("reference", "Reference")}${field("type", "Type")}${field("category", "Category")}${field("payee", "Payee")}</div><div class="import-settings-grid"><label class="field"><span>Destination account</span><select class="select" id="importDestinationAccount">${Object.keys(data.accounts || {}).map(name => `<option value="${esc(name)}" ${name === session.options.account ? "selected" : ""}>${esc(name)}</option>`).join("")}</select></label><label class="field"><span>Date format</span><select class="select" id="importDateFormat"><option value="dmy" ${session.options.dateFormat === "dmy" ? "selected" : ""}>D/M/Y · Philippines</option><option value="mdy" ${session.options.dateFormat === "mdy" ? "selected" : ""}>M/D/Y</option><option value="auto" ${session.options.dateFormat === "auto" ? "selected" : ""}>Auto · flag ambiguity</option></select></label><label class="field"><span>Decimal separator</span><select class="select" id="importDecimalSeparator"><option value="." ${session.options.decimalSeparator === "." ? "selected" : ""}>Period · 1,234.56</option><option value="," ${session.options.decimalSeparator === "," ? "selected" : ""}>Comma · 1.234,56</option></select></label><label class="field"><span>Positive signed amounts</span><select class="select" id="importPositiveMeans"><option value="income" ${session.options.positiveMeans === "income" ? "selected" : ""}>Income</option><option value="expense" ${session.options.positiveMeans === "expense" ? "selected" : ""}>Expense</option></select></label></div>${session.format === "qif" ? `<label class="import-currency-confirmation"><input type="checkbox" id="confirmQifCurrency" ${session.options.currencyConfirmed ? "checked" : ""}><span>I confirm this QIF statement uses Philippine pesos (PHP).</span></label>` : ""}<div class="import-profile-row"><label class="field"><span>Mapping profile name</span><input class="input" id="importProfileName" maxlength="80" placeholder="Example: BDO statement"></label><button class="button button-secondary" type="button" data-save-import-profile>Save profile</button><button class="button button-primary" type="button" data-preview-import>Preview records</button></div>`;
   }
 
   function formatRuleChange(change) {
@@ -355,7 +366,7 @@
       section.innerHTML = ""; document.getElementById("commitCsvImport").disabled = true; return;
     }
     error.hidden = true;
-    section.innerHTML = `<div class="import-step-heading"><div><strong>2. Review rows</strong><small>${esc(analysis.dateRange.from || "No valid date")} to ${esc(analysis.dateRange.to || "—")}</small></div><span class="status-chip ${summary.invalid ? "warning" : "success"}">${summary.ready} ready</span></div><div class="import-summary-grid"><div><span>Income</span><strong>${esc(localMoney(summary.income))}</strong></div><div><span>Expenses</span><strong>${esc(localMoney(summary.expenses))}</strong></div><div><span>Net</span><strong>${esc(localMoney(summary.net))}</strong></div><div><span>Duplicates</span><strong>${summary.duplicates}</strong></div><div><span>Invalid</span><strong>${summary.invalid}</strong></div><div><span>Ignored</span><strong>${summary.ignored}</strong></div></div><div class="import-preview-list">${analysis.rows.map((item, index) => `<article class="import-preview-row is-${item.status}" data-import-preview-row="${index}"><label class="import-row-select"><input type="checkbox" data-import-select="${index}" ${item.selected ? "checked" : ""} ${item.status !== "ready" ? "disabled" : ""}><span><strong>Row ${item.rowNumber} · ${esc(item.description || "No description")}</strong><small>${esc(item.date || "No date")} · ${esc(localMoney(item.amount))} · ${esc(item.type || "Unknown")}${item.rulePreview?.matches?.length ? ` · ${item.rulePreview.matches.length} reviewed rule suggestion${item.rulePreview.matches.length === 1 ? "" : "s"}` : ""}</small></span></label><span class="status-chip ${item.status === "ready" ? "success" : item.status === "duplicate" ? "info" : item.status === "ignored" ? "neutral" : "warning"}">${esc(item.status)}</span>${item.rulePreview?.changes?.length ? `<div class="import-rule-suggestions"><small>These rule suggestions will be included if this row stays selected.</small><ul>${item.rulePreview.changes.map(change => `<li>${esc(formatRuleChange(change))}</li>`).join("")}</ul></div>` : ""}${item.errors?.length ? `<ul>${item.errors.map(message => `<li>${esc(message)}</li>`).join("")}</ul>` : ""}</article>`).join("")}</div>`;
+    section.innerHTML = `<div class="import-step-heading"><div><strong>2. Review rows</strong><small>${esc(analysis.dateRange.from || "No valid date")} to ${esc(analysis.dateRange.to || "—")}</small></div><span class="status-chip ${summary.invalid ? "warning" : "success"}">${summary.ready} ready</span></div><div class="import-summary-grid"><div><span>Income</span><strong>${esc(localMoney(summary.income))}</strong></div><div><span>Expenses</span><strong>${esc(localMoney(summary.expenses))}</strong></div><div><span>Net</span><strong>${esc(localMoney(summary.net))}</strong></div><div><span>Duplicates</span><strong>${summary.duplicates}</strong></div><div><span>Invalid</span><strong>${summary.invalid}</strong></div><div><span>Ignored</span><strong>${summary.ignored}</strong></div></div><div class="import-preview-list">${analysis.rows.map((item, index) => `<article class="import-preview-row is-${item.status}" data-import-preview-row="${index}"><label class="import-row-select"><input type="checkbox" data-import-select="${index}" ${item.selected ? "checked" : ""} ${item.status !== "ready" ? "disabled" : ""}><span><strong>Row ${item.rowNumber} · ${esc(item.description || "No description")}</strong><small>${esc(item.date || "No date")} · ${esc(localMoney(item.amount))} · ${esc(item.type || "Unknown")}${item.rulePreview?.matches?.length ? ` · ${item.rulePreview.matches.length} reviewed rule suggestion${item.rulePreview.matches.length === 1 ? "" : "s"}` : ""}${item.duplicateReason ? ` · ${esc(item.duplicateReason)}` : ""}</small></span></label><span class="status-chip ${item.status === "ready" ? "success" : item.status === "duplicate" ? "info" : item.status === "ignored" ? "neutral" : "warning"}">${esc(item.status)}</span>${item.rulePreview?.changes?.length ? `<div class="import-rule-suggestions"><small>These rule suggestions will be included if this row stays selected.</small><ul>${item.rulePreview.changes.map(change => `<li>${esc(formatRuleChange(change))}</li>`).join("")}</ul></div>` : ""}${item.errors?.length ? `<ul>${item.errors.map(message => `<li>${esc(message)}</li>`).join("")}</ul>` : ""}</article>`).join("")}</div>`;
     updateSelection();
   }
 
@@ -374,11 +385,15 @@
     session.options.dateFormat = document.getElementById("importDateFormat")?.value || "dmy";
     session.options.decimalSeparator = document.getElementById("importDecimalSeparator")?.value || ".";
     session.options.positiveMeans = document.getElementById("importPositiveMeans")?.value || "income";
+    session.options.currencyConfirmed = session.format !== "qif" || Boolean(document.getElementById("confirmQifCurrency")?.checked);
   }
 
   function previewCurrent() {
     collectOptions();
-    session.analysis = analyzeRows(session.parsed, session.options, data);
+    const blockers = [];
+    if (session.format === "ofx" && session.metadata?.currency !== "PHP") blockers.push(session.metadata?.currency ? `This OFX statement uses ${session.metadata.currency}. Talaan does not convert currencies during import.` : "The OFX statement does not declare PHP as its currency.");
+    if (session.format === "qif" && !session.options.currencyConfirmed) blockers.push("Confirm that this QIF statement uses Philippine pesos before previewing.");
+    session.analysis = blockers.length ? emptyAnalysis(blockers) : analyzeRows(session.parsed, session.options, data);
     renderPreview();
   }
 
@@ -386,28 +401,33 @@
     collectOptions();
     const name = compact(document.getElementById("importProfileName")?.value, 80);
     if (!name) return toast("Enter a profile name", "warning");
-    const profile = normalizeProfile({ id:makeId("import-profile"), name, mapping:session.options.mapping, delimiter:session.parsed.delimiter, dateFormat:session.options.dateFormat, decimalSeparator:session.options.decimalSeparator, positiveMeans:session.options.positiveMeans, updatedAt:nowIso() });
-    const current = state(); current.profiles = [...current.profiles.filter(item => canonical(item.name) !== canonical(name)), profile];
+    const profile = normalizeProfile({ id:makeId("import-profile"), name, format:session.format, mapping:session.options.mapping, delimiter:session.parsed.delimiter, dateFormat:session.options.dateFormat, decimalSeparator:session.options.decimalSeparator, positiveMeans:session.options.positiveMeans, updatedAt:nowIso() });
+    const current = state(); current.profiles = [...current.profiles.filter(item => item.format !== session.format || canonical(item.name) !== canonical(name)), profile];
     if (!persist("Import profile saved")) return toast("The import profile could not be saved", "warning");
     session.profileId = profile.id; renderCard(); toast("Import profile saved", "success");
   }
 
   async function readFile(file) {
     if (!file) return;
-    if (file.size > MAX_FILE_SIZE) return toast("CSV files are limited to 10 MB", "warning");
-    if (!/\.csv$/i.test(file.name) && !/^(text\/csv|text\/plain|application\/vnd\.ms-excel)$/i.test(file.type || "")) return toast("Choose a CSV file", "warning");
+    if (file.size > MAX_FILE_SIZE) return toast("Statement files are limited to 10 MB", "warning");
+    if (!/\.(csv|ofx|qif)$/i.test(file.name)) return toast("Choose a CSV, OFX, or QIF file", "warning");
     try {
       const text = await file.text();
-      const parsed = parseCsv(text);
-      const preferredProfile = state().profiles.find(item => item.id === preferredProfileId) || null;
-      const mapping = preferredProfile ? clone(preferredProfile.mapping) : guessMapping(parsed.headers);
-      session = { fileName:compact(file.name, 140), fileSize:file.size, parsed, profileId:preferredProfile?.id || "", options:{ mapping, account:Object.keys(data.accounts || {})[0] || "", dateFormat:preferredProfile?.dateFormat || "dmy", decimalSeparator:preferredProfile?.decimalSeparator || ".", positiveMeans:preferredProfile?.positiveMeans || "income" }, analysis:null };
+      const parser = globalThis.FinanceImportFormats;
+      const format = parser?.detectFormat?.(file.name, text) || "csv";
+      const parsed = format === "csv"
+        ? { ...parseCsv(text), format:"csv", label:"CSV", mapping:null, rowErrors:{}, metadata:{ currency:"PHP", accountHint:"", statementType:"CSV" }, warnings:[] }
+        : parser?.parseStatement?.(text, { format, fileName:file.name });
+      if (!parsed || !SUPPORTED_FORMATS.has(parsed.format)) throw new Error("The statement format could not be recognized.");
+      const preferredProfile = state().profiles.find(item => item.id === preferredProfileId && item.format === parsed.format) || null;
+      const mapping = preferredProfile ? clone(preferredProfile.mapping) : clone(parsed.mapping || guessMapping(parsed.headers));
+      session = { fileName:compact(file.name, 140), fileSize:file.size, format:parsed.format, label:parsed.label || formatLabel(parsed.format), metadata:parsed.metadata || {}, warnings:Array.isArray(parsed.warnings) ? parsed.warnings : [], parsed, profileId:preferredProfile?.id || "", options:{ format:parsed.format, mapping, account:Object.keys(data.accounts || {})[0] || "", dateFormat:preferredProfile?.dateFormat || (parsed.format === "qif" ? "auto" : "dmy"), decimalSeparator:preferredProfile?.decimalSeparator || ".", positiveMeans:preferredProfile?.positiveMeans || "income", currencyConfirmed:false }, analysis:null };
       preferredProfileId = "";
-      ensureDialog(); document.getElementById("importCenterFileSummary").textContent = `${session.fileName} · ${parsed.rows.length.toLocaleString()} data rows · parsed locally`;
+      ensureDialog(); document.getElementById("importCenterFileSummary").textContent = `${session.fileName} · ${parsed.rows.length.toLocaleString()} transaction${parsed.rows.length === 1 ? "" : "s"} · parsed locally`;
       renderMapping(); renderPreview();
       if (typeof showAppDialog === "function") showAppDialog("importCenterDialog", "[data-import-map='date']");
       else document.getElementById("importCenterDialog").showModal();
-    } catch (error) { toast(error?.message || "The CSV could not be parsed", "warning"); }
+    } catch (error) { toast(error?.message || "The statement could not be parsed", "warning"); }
   }
 
   function buildBatch(rows) {
@@ -419,7 +439,7 @@
       if (item.direction === "income") incomeIds.push(record.id); else expenseIds.push(record.id);
       return { direction:item.direction, record };
     });
-    return { batchId, records, batch:normalizeBatch({ id:batchId, importedAt:nowIso(), account:session.options.account, profileId:session.profileId, rowCount:records.length, expenseIds, incomeIds, fingerprints, rolledBackAt:"" }) };
+    return { batchId, records, batch:normalizeBatch({ id:batchId, format:session.format, importedAt:nowIso(), account:session.options.account, profileId:session.profileId, rowCount:records.length, expenseIds, incomeIds, fingerprints, rolledBackAt:"" }) };
   }
 
   async function commitImport() {
@@ -433,26 +453,27 @@
     const selected = refreshed.rows.filter(item => item.status === "ready" && item.selected && item.record);
     if (!selected.length) return toast("Select at least one ready row", "warning");
     if (selected.length !== selectedFingerprints.size) toast("The preview changed after current records were rechecked", "warning");
-    const confirmed = await confirmAction({ title:"Import reviewed CSV records?", message:`Add ${selected.length} reviewed record${selected.length === 1 ? "" : "s"} without changing account balances?`, details:"A recovery snapshot and Undo point will be created. Duplicate and invalid rows remain excluded.", confirmLabel:"Import records" });
+    const label = formatLabel(session.format);
+    const confirmed = await confirmAction({ title:`Import reviewed ${label} records?`, message:`Add ${selected.length} reviewed record${selected.length === 1 ? "" : "s"} without changing account balances?`, details:"A recovery snapshot and Undo point will be created. Duplicate and invalid rows remain excluded.", confirmLabel:"Import records" });
     if (!confirmed) return;
     const before = clone(data);
     const button = document.getElementById("commitCsvImport");
     button.disabled = true; button.textContent = "Creating recovery copy…";
     try {
-      await saveRecovery("Before local CSV import");
-      if (typeof pushUndo === "function") pushUndo("Import local CSV");
+      await saveRecovery(`Before local ${label} import`);
+      if (typeof pushUndo === "function") pushUndo(`Import local ${label}`);
       const built = buildBatch(selected);
       built.records.forEach(item => {
         if (item.direction === "income") data.incomeRecords.push(item.record);
         else data.expenses.push(item.record);
       });
       const current = state(); current.batches = [built.batch, ...current.batches].slice(0, MAX_BATCHES);
-      if (persist(`Imported ${selected.length} CSV record${selected.length === 1 ? "" : "s"}`) !== true) throw new Error("The imported records could not be saved.");
-      if (typeof addSyncHistory === "function") addSyncHistory("Import · local CSV", "success", { batchId:built.batchId, records:selected.length, account:session.options.account });
-      document.getElementById("importCenterDialog")?.close(); session = null; renderCard(); toast("CSV records imported without changing account balances", "success");
+      if (persist(`Imported ${selected.length} ${label} record${selected.length === 1 ? "" : "s"}`) !== true) throw new Error("The imported records could not be saved.");
+      if (typeof addSyncHistory === "function") addSyncHistory(`Import · local ${label}`, "success", { batchId:built.batchId, records:selected.length, account:session.options.account });
+      document.getElementById("importCenterDialog")?.close(); session = null; renderCard(); toast(`${label} records imported without changing account balances`, "success");
     } catch (error) {
       data = normalizeData(before);
-      try { if (typeof persistFinanceDataRaw === "function") persistFinanceDataRaw("CSV import rolled back"); } catch (persistError) {}
+      try { if (typeof persistFinanceDataRaw === "function") persistFinanceDataRaw(`${label} import rolled back`); } catch (persistError) {}
       toast(`Import failed: ${error?.message || "unknown error"}`, "warning");
       button.disabled = false; button.textContent = "Import selected records";
     }
@@ -462,21 +483,22 @@
     if (!canWrite()) return;
     const batch = state().batches.find(item => item.id === id);
     if (!batch || batch.rolledBackAt) return;
-    const confirmed = await confirmAction({ title:"Roll back this CSV import?", message:`Remove the ${batch.rowCount} record${batch.rowCount === 1 ? "" : "s"} created by this import?`, details:"A recovery snapshot and Undo point will be created first. Account balances remain unchanged.", confirmLabel:"Roll back import", danger:true });
+    const label = formatLabel(batch.format);
+    const confirmed = await confirmAction({ title:`Roll back this ${label} import?`, message:`Remove the ${batch.rowCount} record${batch.rowCount === 1 ? "" : "s"} created by this import?`, details:"A recovery snapshot and Undo point will be created first. Account balances remain unchanged.", confirmLabel:"Roll back import", danger:true });
     if (!confirmed) return;
     const before = clone(data);
     try {
-      await saveRecovery("Before CSV import rollback");
-      if (typeof pushUndo === "function") pushUndo("Roll back CSV import");
+      await saveRecovery(`Before ${label} import rollback`);
+      if (typeof pushUndo === "function") pushUndo(`Roll back ${label} import`);
       data.expenses = (data.expenses || []).filter(item => item.importBatchId !== id);
       data.incomeRecords = (data.incomeRecords || []).filter(item => item.importBatchId !== id);
       const current = state(); const currentBatch = current.batches.find(item => item.id === id); if (currentBatch) currentBatch.rolledBackAt = nowIso();
-      if (persist("CSV import rolled back") !== true) throw new Error("The rollback could not be saved.");
+      if (persist(`${label} import rolled back`) !== true) throw new Error("The rollback could not be saved.");
       if (typeof addSyncHistory === "function") addSyncHistory("Import · rollback", "success", { batchId:id, records:batch.rowCount });
-      renderCard(); toast("CSV import rolled back", "success");
+      renderCard(); toast(`${label} import rolled back`, "success");
     } catch (error) {
       data = normalizeData(before);
-      try { if (typeof persistFinanceDataRaw === "function") persistFinanceDataRaw("CSV rollback restored"); } catch (persistError) {}
+      try { if (typeof persistFinanceDataRaw === "function") persistFinanceDataRaw(`${label} rollback restored`); } catch (persistError) {}
       toast(`Rollback failed: ${error?.message || "unknown error"}`, "warning");
     }
   }
@@ -489,7 +511,7 @@
       card = document.createElement("article"); card.className = "card import-center-card"; card.id = "financeImportCenter"; panel.appendChild(card);
     }
     const current = state();
-    card.innerHTML = `<div class="card-header finance-tool-card-header"><div><h3>Import center</h3><p>Map, preview, deduplicate, and recover local CSV imports</p></div><label class="button button-primary import-file-button">Choose CSV<input type="file" accept=".csv,text/csv,text/plain" data-import-csv hidden></label></div><p class="system-help">Files stay in this browser session. Imports create records only and never change account balances.</p>${current.profiles.length ? `<div class="import-saved-profiles"><strong>Saved profiles</strong><div>${current.profiles.map(profile => `<button class="status-chip" type="button" data-use-import-profile="${esc(profile.id)}">${esc(profile.name)}</button>`).join("")}</div></div>` : ""}<div class="import-batch-list"><strong>Recent imports</strong>${current.batches.length ? current.batches.slice(0, 8).map(batch => `<div class="import-batch-row"><span><strong>${batch.rowCount} CSV record${batch.rowCount === 1 ? "" : "s"}</strong><small>${esc(batch.importedAt.slice(0, 10))} · ${esc(batch.account || "No account")}${batch.rolledBackAt ? " · Rolled back" : ""}</small></span>${batch.rolledBackAt ? `<span class="status-chip neutral">Rolled back</span>` : `<button class="button button-secondary button-small" type="button" data-rollback-import="${esc(batch.id)}">Rollback</button>`}</div>`).join("") : `<div class="system-empty">No CSV imports yet.</div>`}</div>`;
+    card.innerHTML = `<div class="card-header finance-tool-card-header"><div><h3>Import center</h3><p>Map, preview, deduplicate, and recover local CSV, OFX, and QIF imports</p></div><label class="button button-primary import-file-button">Choose file<input type="file" accept=".csv,.ofx,.qif,text/csv,text/plain,application/x-ofx,application/vnd.intu.qif" data-import-csv hidden></label></div><p class="system-help">Files stay in this browser session. Imports create records only and never change account balances.</p>${current.profiles.length ? `<div class="import-saved-profiles"><strong>Saved profiles</strong><div>${current.profiles.map(profile => `<button class="status-chip" type="button" data-use-import-profile="${esc(profile.id)}"><span>${esc(formatLabel(profile.format))}</span> ${esc(profile.name)}</button>`).join("")}</div></div>` : ""}<div class="import-batch-list"><strong>Recent imports</strong>${current.batches.length ? current.batches.slice(0, 8).map(batch => `<div class="import-batch-row"><span><strong>${batch.rowCount} ${esc(formatLabel(batch.format))} record${batch.rowCount === 1 ? "" : "s"}</strong><small>${esc(batch.importedAt.slice(0, 10))} · ${esc(batch.account || "No account")}${batch.rolledBackAt ? " · Rolled back" : ""}</small></span>${batch.rolledBackAt ? `<span class="status-chip neutral">Rolled back</span>` : `<button class="button button-secondary button-small" type="button" data-rollback-import="${esc(batch.id)}">Rollback</button>`}</div>`).join("") : `<div class="system-empty">No statement imports yet.</div>`}</div>`;
     const fileInput = card.querySelector("[data-import-csv]");
     fileInput?.addEventListener("change", () => {
       const selectedFile = fileInput.files?.[0];

@@ -1,0 +1,29 @@
+!Account
+NBDO Savings
+TBank
+^
+!Type:Bank
+D8/23/2026
+T-500.00
+PManila Water
+MUtility bill
+LUtilities
+NQIF-001
+^
+D8/24/2026
+T2500.00
+PClient deposit
+LIncome
+NQIF-002
+^
+D8/25/2026
+T-1000.00
+PTransfer to cash
+L[Cash]
+NQIF-003
+^
+D8/26/2026
+T10000.00
+POpening Balance
+LOpening Bal
+^

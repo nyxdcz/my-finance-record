@@ -23,7 +23,7 @@ test("paid expenses desktop repeat control uses PNG artwork, hides redundant tex
       </div>`;
   });
 
-  await page.addStyleTag({ url:"http://127.0.0.1:3000/production-ui-audit.css?v=2.2.0-talaan1" });
+  await page.addStyleTag({ url:"http://127.0.0.1:3000/production-ui-audit.css?v=2.3.0-talaan1" });
   await page.addScriptTag({ url:"http://127.0.0.1:3000/assets/js/ui/expense-compact.js" });
 
   const desktopButton = page.locator("#paidExpenseList .desktop-record-actions [data-toggle-saved]");

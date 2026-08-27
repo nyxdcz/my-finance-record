@@ -33,8 +33,8 @@ for (const width of widths) {
     const delivery = await page.evaluate(() => ({
       scripts:[...document.scripts].map(script => script.getAttribute("src") || "").filter(Boolean)
     }));
-    expect(delivery.scripts.some(src => src.includes("cash-flow-summary.js?v=2.2.0-talaan1"))).toBe(true);
-    expect(delivery.scripts.some(src => src.includes("pwa-update.js?v=2.2.0-talaan1"))).toBe(true);
+    expect(delivery.scripts.some(src => src.includes("cash-flow-summary.js?v=2.3.0-talaan1"))).toBe(true);
+    expect(delivery.scripts.some(src => src.includes("pwa-update.js?v=2.3.0-talaan1"))).toBe(true);
 
     await seedCashFlow(page);
 

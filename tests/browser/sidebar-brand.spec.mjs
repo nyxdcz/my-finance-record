@@ -80,7 +80,7 @@ test("mobile drawer keeps the static Talaan brand", async ({ page }) => {
 });
 
 test("sidebar brand shell cache is synchronized", () => {
-  const expected = "finance-v2-20260826-import-center-r8";
+  const expected = "finance-v2-20260826-import-formats-r9";
   expect(source("version.json")).toContain(`"cacheVersion": "${expected}"`);
   expect(source("sw.js")).toContain(`const CACHE_VERSION = "${expected}"`);
   expect(source("pwa-update.js")).toContain(`const CURRENT_CACHE_VERSION = "${expected}"`);
