@@ -647,6 +647,7 @@
     add("Action","privacy-display",window.FinancePrivacyDisplay?.hidden ? "Show monetary values" : "Hide monetary values","Mask or restore amounts on this device","Run","privacy hide show values screen share",() => window.FinancePrivacyDisplay?.toggle?.());
     add("Action","finance-tools","Manage payees and rules","Open normalized payees, aliases, ordered rules, and preview","Open","payee merchant alias categorization automation rule preview",() => window.FinancePayeeRules?.open?.());
     add("Action","import-center","Import local CSV","Map, preview, deduplicate, and recover a financial CSV import","Open","csv statement import mapping duplicate rollback",() => window.FinanceImportCenter?.open?.());
+    add("Action","net-worth","Open net worth","Manage manual assets, liabilities, and valuation history","Open","net worth asset liability valuation wealth",() => window.FinanceNetWorth?.open?.());
     (data.expenses || []).forEach(item => add("Expense",item.id,item.name,`${item.category} · ${item.paid ? "Paid" : "Unpaid"} · ${item.paidFromAccount || item.account || "No account"} · ${item.paidDate || item.date || "No date"}`,money(effectiveExpenseAmount(item)),`${item.notes || ""} ${item.recurring || ""} ${item.expenseType || ""}`,() => openExpenseDialog(item)));
     (data.incomeRecords || []).forEach(item => add("Income",item.id,item.name,`${item.category} · ${item.account || "No account"} · ${item.date || "No date"}`,money(item.amount),`${item.notes || ""} ${item.recurring || ""}`,() => openIncomeDialog(item)));
     (data.projects || []).forEach(item => add("Project",item.id,item.name,`${item.type} · ${item.status} · ${item.deadline || item.workMonth || "No date"}`,projectIsFinancial(item) ? money(item.value) : "Salary work",`${item.notes || ""} ${projectWorkSource(item)}`,() => openProjectDialog(item)));
@@ -658,6 +659,10 @@
     const financeTools = data.ledgerSettings?.financeTools || {};
     (financeTools.payees || []).forEach(item => add("Payee",item.id,item.name,item.archived ? "Archived payee" : `${item.aliases?.length || 0} aliases`,"Open",`${(item.aliases || []).join(" ")} ${item.defaultCategory || ""} ${item.defaultAccount || ""}`,() => window.FinancePayeeRules?.openPayee?.(item.id)));
     (financeTools.transactionRules || []).forEach(item => add("Rule",item.id,item.name,`Priority ${item.priority} · ${item.enabled ? "Enabled" : "Disabled"}`,"Open",`${item.match?.mode || "all"} ${(item.match?.conditions || []).map(condition => `${condition.field} ${condition.operator} ${condition.value}`).join(" ")}`,() => window.FinancePayeeRules?.openRule?.(item.id)));
+    (data.ledgerSettings?.netWorth?.items || []).forEach(item => {
+      const latest = window.FinanceNetWorth?.latestValuation?.(item);
+      add(item.type === "liability" ? "Liability" : "Asset",item.id,item.name,`${item.category || "Uncategorized"} · ${item.archived ? "Archived" : "Active"}`,latest ? money(latest.amountPhp) : "No value",`${item.currency || "PHP"} valuation net worth`,() => window.FinanceNetWorth?.openItem?.(item.id));
+    });
     return rows.sort((a,b) => b.score-a.score || a.type.localeCompare(b.type) || a.label.localeCompare(b.label)).slice(0,80);
   }
 
@@ -1088,10 +1093,10 @@
 
   function installPhaseOneStylesheet(file) {
     if (document.querySelector(`link[data-phase-one-asset="${file}"]`)) return;
-    const link=document.createElement("link"); link.rel="stylesheet"; link.href=`./${file}?v=2.3.0-talaan1`; link.dataset.phaseOneAsset=file; document.head.append(link);
+    const link=document.createElement("link"); link.rel="stylesheet"; link.href=`./${file}?v=2.4.0-talaan1`; link.dataset.phaseOneAsset=file; document.head.append(link);
   }
   function installPhaseOneScript(file) {
-    return new Promise(resolve=>{if(document.querySelector(`script[data-phase-one-asset="${file}"]`)){resolve(true);return;}const script=document.createElement("script");script.src=`./${file}?v=2.3.0-talaan1`;script.dataset.phaseOneAsset=file;script.onload=()=>resolve(true);script.onerror=()=>resolve(false);document.body.append(script);});
+    return new Promise(resolve=>{if(document.querySelector(`script[data-phase-one-asset="${file}"]`)){resolve(true);return;}const script=document.createElement("script");script.src=`./${file}?v=2.4.0-talaan1`;script.dataset.phaseOneAsset=file;script.onload=()=>resolve(true);script.onerror=()=>resolve(false);document.body.append(script);});
   }
   async function installPhaseOneWorkspace() {
     installPhaseOneStylesheet("transaction-views.css"); installPhaseOneStylesheet("privacy-display.css");

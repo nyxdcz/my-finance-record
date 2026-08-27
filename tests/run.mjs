@@ -9,6 +9,7 @@ const testPlan = [
   { suite: "sync", file: "tests/sync/validate-payees-rules-sync.mjs" },
   { suite: "sync", file: "tests/sync/validate-import-center-sync.mjs" },
   { suite: "sync", file: "tests/sync/validate-import-formats-sync.mjs" },
+  { suite: "sync", file: "tests/sync/validate-net-worth-sync.mjs" },
   { suite: "regression", file: "tests/regression/validate-desktop-ui.mjs" },
   { suite: "regression", file: "tests/regression/validate-pwa-runtime.mjs" },
   { suite: "regression", file: "tests/regression/validate-mobile-ui.mjs" },
@@ -22,6 +23,7 @@ const testPlan = [
   { suite: "regression", file: "tests/regression/validate-payees-rules.mjs" },
   { suite: "regression", file: "tests/regression/validate-import-center.mjs" },
   { suite: "regression", file: "tests/regression/validate-import-formats.mjs" },
+  { suite: "regression", file: "tests/regression/validate-net-worth.mjs" },
 ];
 
 const supportedSuites = new Set(["all", ...testPlan.map(({ suite }) => suite)]);

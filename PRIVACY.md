@@ -1,4 +1,4 @@
-# Privacy Notes · Talaan V2.3.0
+# Privacy Notes · Talaan V2.4.0
 
 **Talaan** has no analytics or advertising code. Local finance records remain in the browser unless the user explicitly enables Supabase synchronization or exports a file.
 
@@ -9,6 +9,8 @@ Cloud record payloads are encrypted in the browser before upload. Supabase store
 Normalized payees, aliases, and transaction-rule configuration are part of the profile finance settings. They remain local unless encrypted synchronization is enabled or the user exports a backup or rule file. Rule matching and preview run in the browser.
 
 CSV, OFX, and QIF files are parsed locally and remain only in the active browser session. Talaan does not upload, cache, log, or retain the selected file or its filename. QIF requires explicit confirmation that amounts use Philippine pesos; OFX statements that do not declare PHP are blocked because Talaan does not convert currencies during import. Saved mapping profiles, compact format-aware import-batch metadata, and the records the user explicitly commits are part of the profile finance settings and may enter encrypted synchronization or backups.
+
+Manual net worth items and valuation histories are stored inside the active profile's finance settings. They remain local unless encrypted synchronization is enabled or the user exports a backup. Foreign-currency values use only a conversion rate entered by the user; Talaan does not contact a market-price, brokerage, or currency-rate service.
 
 Authentication email addresses and MFA/passkey information are handled by the configured Supabase Auth project under its policies.
 

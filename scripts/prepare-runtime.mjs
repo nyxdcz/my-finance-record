@@ -8,13 +8,13 @@ const BRAND = "Talaan";
 const PREVIOUS_BRAND = ["My", "Finance", "Records"].join(" ");
 
 const RELEASE = Object.freeze({
-  version:"2.3.0",
-  displayVersion:"V2.3.0",
+  version:"2.4.0",
+  displayVersion:"V2.4.0",
   name:"Talaan",
-  date:"August 26, 2026",
-  dateIso:"2026-08-26",
-  cache:"finance-v2-20260826-import-formats-r9",
-  assetQuery:"2.3.0-talaan1"
+  date:"August 27, 2026",
+  dateIso:"2026-08-27",
+  cache:"finance-v2-20260827-net-worth-r10",
+  assetQuery:"2.4.0-talaan1"
 });
 const SIDEBAR_BRAND_ASSET_QUERY = "2.2.0-talaan2";
 
@@ -23,8 +23,9 @@ const CURRENT_VERSION_HISTORY = Object.freeze([{
   title:RELEASE.name,
   changes:[
     "Current production release under the Talaan product name.",
-    "Adds local OFX bank and credit-card plus QIF bank, cash, credit-card, asset, and liability statement parsing to the existing safe import center.",
-    "Keeps CSV, OFX, and QIF files session-only with currency gates, format-aware preview, duplicate reasons, recovery snapshots, Undo, and single-import rollback.",
+    "Adds a manual net worth ledger with assets, liabilities, dated valuation history, category composition, and value evolution.",
+    "Keeps net worth separate from Available Money, Cash Flow, and Account Ledger balances, with explicit manual, stale, and converted-value labels.",
+    "Supports archived items, manually entered PHP conversion rates, recovery snapshots, and Undo for destructive changes.",
     "Uses responsibility-based runtime filenames instead of legacy product-era filenames.",
     "Includes the complete local-first Finance workspace, Account Ledger, budgeting, reports, projects, productivity tools, reminders, and responsive desktop and phone layouts.",
     "Includes encrypted multi-profile Cloud Schema V3 synchronization, offline PWA support, recovery safeguards, and five-minute routine sync.",
@@ -55,6 +56,7 @@ const runtimeGroups = {
     "projects-calendar.css",
     "reminders-alerts.css",
     "reports-insights.css",
+    "net-worth.css",
     "security-profiles.css",
     "summary-mascots.css",
     "ui-icon-alignment.css"
@@ -83,6 +85,7 @@ const runtimeGroups = {
     "pwa-update.js",
     "reminders-alerts.js",
     "reports-insights.js",
+    "net-worth.js",
     "security-profiles.js"
   ],
   "assets/js/features": ["cash-flow-summary.js"],

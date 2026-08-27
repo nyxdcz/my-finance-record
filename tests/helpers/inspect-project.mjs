@@ -12,8 +12,8 @@ const read = file => fs.readFileSync(path.join(root, file), "utf8");
 const exists = file => fs.existsSync(path.join(root, file));
 const fail = message => errors.push(message);
 const warn = message => warnings.push(message);
-const CURRENT_VERSION = "2.3.0";
-const DISPLAY_VERSION = "V2.3.0";
+const CURRENT_VERSION = "2.4.0";
+const DISPLAY_VERSION = "V2.4.0";
 const BRAND = "Talaan";
 const PREVIOUS_BRAND = ["My", "Finance", "Records"].join(" ");
 

@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-test("Talaan V2.3.0 registers the cache-qualified worker and clears stale Finance caches", async ({ page }) => {
+test("Talaan V2.4.0 registers the cache-qualified worker and clears stale Finance caches", async ({ page }) => {
   await page.goto("http://127.0.0.1:3000/index.html?page=settings", { waitUntil:"networkidle" });
   await page.evaluate(async () => {
     await navigator.serviceWorker.ready;
@@ -9,9 +9,9 @@ test("Talaan V2.3.0 registers the cache-qualified worker and clears stale Financ
     await caches.open("unrelated-test-cache");
   });
 
-  await expect.poll(async () => page.evaluate(() => navigator.serviceWorker.controller?.scriptURL || ""), { timeout:15000 }).toContain("v=2.3.0");
+  await expect.poll(async () => page.evaluate(() => navigator.serviceWorker.controller?.scriptURL || ""), { timeout:15000 }).toContain("v=2.4.0");
   const workerUrl = await page.evaluate(() => navigator.serviceWorker.controller?.scriptURL || "");
-  expect(workerUrl).toContain("cache=finance-v2-20260826-import-formats-r9");
+  expect(workerUrl).toContain("cache=finance-v2-20260827-net-worth-r10");
 
   await page.evaluate(async () => { await window.clearAppCaches(); });
   const names = await page.evaluate(async () => caches.keys());

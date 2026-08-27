@@ -30,11 +30,11 @@ assert.ok(batchStart >= 0 && batchEnd > batchStart);
 assert.doesNotMatch(batchSource, /fileName|description|rawRows|fileHash/);
 
 assert.match(source, /accept="\.csv,\.ofx,\.qif,text\/csv,text\/plain,application\/x-ofx,application\/vnd\.intu\.qif" data-import-csv/);
-assert.match(html, /import-formats\.js\?v=2\.3\.0-talaan1/);
-assert.match(html, /import-center\.js\?v=2\.3\.0-talaan1/);
-assert.match(worker, /import-formats\.js\?v=2\.3\.0-talaan1/);
-assert.match(worker, /import-center\.js\?v=2\.3\.0-talaan1/);
-assert.match(worker, /import-center\.css\?v=2\.3\.0-talaan1/);
+assert.match(html, /import-formats\.js\?v=2\.4\.0-talaan1/);
+assert.match(html, /import-center\.js\?v=2\.4\.0-talaan1/);
+assert.match(worker, /import-formats\.js\?v=2\.4\.0-talaan1/);
+assert.match(worker, /import-center\.js\?v=2\.4\.0-talaan1/);
+assert.match(worker, /import-center\.css\?v=2\.4\.0-talaan1/);
 assert.match(worker, /endsWith\("import-center\.js"\)/);
 
 console.log("Statement import files remain session-only and the commit boundary requires recovery, Undo, and non-ledger records.");

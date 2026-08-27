@@ -109,6 +109,8 @@ jobs:
           test -f _site/summary-mascots.css
           test -f _site/import-center.css
           test -f _site/import-center.js
+          test -f _site/net-worth.css
+          test -f _site/net-worth.js
           test -f _site/pwa-update.js
           test -f _site/brand-icons.js
           test -f _site/projects-calendar.js

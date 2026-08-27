@@ -1,20 +1,29 @@
-# Talaan V2.3.0
+# Talaan V2.4.0
 
-**Current production version:** V2.3.0
-**Release date:** 2026-08-26
+**Current production version:** V2.4.0
+**Release date:** 2026-08-27
 **Release name:** Talaan
 
-Talaan V2.3.0 is the active product baseline. This document describes only the current release.
+Talaan V2.4.0 is the active product baseline. This document describes only the current release.
 
 ## Product identity
 
 - **Product name:** Talaan
-- **Product version:** `2.3.0`
-- **Display version:** `V2.3.0`
+- **Product version:** `2.4.0`
+- **Display version:** `V2.4.0`
 - **Release name:** `Talaan`
-- **PWA cache:** `finance-v2-20260826-import-formats-r9`
+- **PWA cache:** `finance-v2-20260827-net-worth-r10`
 - **Finance Schema:** 12
 - **Cloud Schema:** V3
+
+## Manual net worth ledger
+
+- Assets and liabilities are entered manually with dated valuation history.
+- Insights shows current assets, liabilities, net worth, stale values, category composition, and value evolution.
+- Net worth does not change Available Money, Cash Flow, Accounts, Account Ledger entries, paid state, or project payments.
+- Foreign values require a manually entered PHP conversion rate and remain labeled as converted.
+- Archive/restore and destructive deletion use recovery snapshots and Undo.
+- Data remains under `ledgerSettings.netWorth`, preserving Finance Schema 12 and Cloud Schema V3.
 
 ## Local statement import center
 
