@@ -1,5 +1,5 @@
 {
-  "version": "2.3.0",
+  "version": "2.4.0",
   "schemaVersion": 12,
   "cloudSchemaVersion": 3,
   "ledgerVersion": 1,
@@ -10,8 +10,8 @@
   "profileArchitectureVersion": 1,
   "encryptionVersion": 1,
   "authSecurityVersion": 1,
-  "cacheVersion": "finance-v2-20260826-import-formats-r9",
-  "released": "2026-08-26",
+  "cacheVersion": "finance-v2-20260827-net-worth-r10",
+  "released": "2026-08-27",
   "name": "Talaan",
-  "notes": "Talaan V2.3.0 adds local OFX bank and credit-card plus QIF bank, cash, credit-card, asset, and liability statement parsing to the existing CSV import center. Format-aware preview, PHP currency gates, duplicate reasons, rule suggestions, recovery snapshots, Undo, and single-import rollback remain local-first. Finance Schema 12, Cloud Schema V3, account balances, Account Ledger entries, paid-state calculations, recurrence, project payments, encryption, backups, and synchronization semantics are preserved."
+  "notes": "Talaan V2.4.0 adds a manual net worth ledger with assets, liabilities, dated valuations, category composition, and value evolution. Values remain separate from Available Money, Cash Flow, and Account Ledger balances. Foreign values require a manually entered PHP rate and are labeled as converted; stale and manual values remain explicit. Finance Schema 12 and Cloud Schema V3 are preserved."
 }

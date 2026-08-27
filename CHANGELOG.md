@@ -1,10 +1,20 @@
 # Changelog
 
-## V2.3.0 · Talaan
+## V2.4.0 · Talaan
 
-**Current production release:** V2.3.0
+**Current production release:** V2.4.0
 
-Talaan V2.3.0 is the active release baseline. This changelog focuses only on the current product version.
+Talaan V2.4.0 is the active release baseline. This changelog focuses only on the current product version.
+
+### Manual net worth ledger
+
+- Added manually maintained assets and liabilities with dated valuation histories.
+- Added net worth totals, category composition, stale-value awareness, and historical value evolution under Insights without adding a sidebar destination.
+- Kept every valuation separate from Available Money, Cash Flow, Account Ledger balances, paid state, and project payments.
+- Added optional foreign-currency values using an explicitly entered PHP conversion rate, with manual, stale, and converted-value labels.
+- Added archive/restore, recovery snapshots, Undo, backup merge conflict handling, encrypted synchronization, and net-worth-only privacy-lock detection.
+- Stored the versioned configuration under `ledgerSettings.netWorth`, preserving Finance Schema 12 and Cloud Schema V3.
+- Rotated the PWA cache to `finance-v2-20260827-net-worth-r10` so installed clients receive the new Insights module and styles together.
 
 ### Local OFX and QIF statement import
 
