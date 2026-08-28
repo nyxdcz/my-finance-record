@@ -35,7 +35,7 @@ async function visibleSettingsContract(page) {
       });
     return {
       interactive,
-      undersized:interactive.filter(item => item.height < 43.5),
+      undersized:interactive.filter(item => item.height < 43.5 || item.width < 43.5),
       outside:interactive.filter(item => item.left < -1 || item.right > innerWidth + 1),
       pageOverflow:document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
       viewport:{ width:innerWidth, height:innerHeight }
