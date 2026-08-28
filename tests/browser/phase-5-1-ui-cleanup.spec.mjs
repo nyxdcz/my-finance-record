@@ -27,7 +27,7 @@ test("Dashboard drag and resize controls appear only while Customize is active",
     drag:getComputedStyle(document.querySelector(".dashboard-drag-handle")).display,
     resize:getComputedStyle(document.querySelector(".dashboard-resize-handle")).display
   }));
-  expect(customizing).toEqual({ drag:"grid", resize:"inline-flex" });
+  expect(customizing).toEqual({ drag:"grid", resize:"flex" });
 
   await page.evaluate(() => document.getElementById("dashboard").classList.remove("dashboard-customizing"));
   await expect(page.locator(".dashboard-drag-handle")).toHaveCSS("display", "none");
