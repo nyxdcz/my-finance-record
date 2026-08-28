@@ -54,6 +54,53 @@ test("iPhone account modes keep their title, scroll origin, and fields contained
   expect(geometry.pageOverflow).toBe(false);
 });
 
+test("iPhone account balance correction updates the card and persisted finance data", async ({ page }) => {
+  await openAuthenticated(page, "money");
+  await page.waitForFunction(() => Boolean(window.FinanceAccountLedger && document.querySelector("#moneyAccounts [data-account-card]")));
+
+  const setup = await page.evaluate(() => {
+    const card = document.querySelector("#moneyAccounts [data-account-card]");
+    const account = card?.dataset.accountCard || "";
+    const original = Number(data.accounts?.[account] || 0);
+    const target = Math.round(((original >= 123.45 ? original - 123.45 : original + 123.45) + Number.EPSILON) * 100) / 100;
+    return { account, original, target };
+  });
+  expect(setup.account).not.toBe("");
+
+  const firstCard = page.locator("#moneyAccounts [data-account-card]").first();
+  await firstCard.locator("[data-edit-account]").click();
+  await expect(page.locator("#accountDialog")).toBeVisible();
+  await expect(page.locator("#accountDialogTitle")).toHaveText("Edit account");
+  await expect(page.locator("#originalAccountName")).toHaveValue(setup.account);
+
+  await page.locator("#accountBalance").fill(String(setup.target));
+  await page.locator("#accountPrimaryAction").click();
+  await expect(page.locator("#accountDialog")).not.toBeVisible();
+
+  const result = await page.evaluate(({ account, target, original }) => {
+    const card = [...document.querySelectorAll("#moneyAccounts [data-account-card]")]
+      .find(node => node.dataset.accountCard === account);
+    const cardAmount = Number(String(card?.querySelector(".account-card-main strong")?.textContent || "")
+      .replace(/[^0-9.-]/g, ""));
+    const persisted = JSON.parse(localStorage.getItem("simple-finance-project-records-v2") || "{}");
+    const reconciliation = [...(data.accountReconciliations || [])]
+      .reverse()
+      .find(item => item.account === account && Number(item.statementBalance) === target);
+    return {
+      runtimeBalance:Number(data.accounts?.[account]),
+      cardAmount,
+      persistedBalance:Number(persisted.accounts?.[account]),
+      reconciliationDifference:Number(reconciliation?.difference),
+      expectedDifference:Math.round(((target - original) + Number.EPSILON) * 100) / 100
+    };
+  }, setup);
+
+  expect(result.runtimeBalance).toBe(setup.target);
+  expect(result.cardAmount).toBe(setup.target);
+  expect(result.persistedBalance).toBe(setup.target);
+  expect(result.reconciliationDifference).toBe(result.expectedDifference);
+});
+
 test("iPhone transaction totals remain in flow and shared workspace tabs stay compact", async ({ page }) => {
   await openAuthenticated(page, "money");
   await page.waitForFunction(() => Boolean(document.getElementById("monthlyBudgetPlannerCard") && document.getElementById("transactionTotals-expense")));
