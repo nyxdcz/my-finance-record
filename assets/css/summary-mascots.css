@@ -1,5 +1,41 @@
 /* Talaan · V2.0.1 · Budget summary mascots */
+/* Phase 5.1 compatibility repair: load the canonical Dashboard interaction core.
+   dashboard-interactions.css still points at a retired versioned filename. */
+@import url("./dashboard-interactions-core.css");
 @import url("./ui-radius.css?v=2.2.0-talaan1");
+
+/* Phase 5.1 · customization controls must never leak into normal Dashboard view. */
+.dashboard-drag-handle,
+.dashboard-resize-handle {
+  display: none !important;
+}
+#dashboard.dashboard-customizing .dashboard-drag-handle {
+  display: grid !important;
+}
+#dashboard.dashboard-customizing .dashboard-resize-handle {
+  display: inline-flex !important;
+}
+@media (max-width: 700px) {
+  #dashboard.dashboard-customizing .dashboard-resize-handle {
+    display: none !important;
+  }
+}
+
+/* Prevent a page-level horizontal scrollbar/separator from appearing when a
+   wide child temporarily exceeds the viewport. Purpose-built inner scrollers remain unaffected. */
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+  overflow-x: clip;
+}
+.app,
+.main,
+.content,
+.page {
+  min-width: 0;
+  max-width: 100%;
+}
 
 /* The older completion layer still keeps its amount in data-* attributes.
    Never show its heart-smile artwork in Budget & Expenses; this layer owns the visual. */
