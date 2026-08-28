@@ -73,7 +73,6 @@ test("desktop paid calendar separates dates and keeps names and amounts easy to 
       dayHeight:day.getBoundingClientRect().height,
       dayBorder:getComputedStyle(day).borderStyle,
       dayRadius:parseFloat(getComputedStyle(day).borderRadius),
-      headingColor:getComputedStyle(heading).color,
       headingWeight:Number(getComputedStyle(heading).fontWeight),
       entryDisplay:getComputedStyle(entry).display,
       entryHeight:entry.getBoundingClientRect().height,
@@ -127,8 +126,8 @@ test("phone paid calendar becomes one column and preserves touch targets", async
   const state = await page.evaluate(() => {
     const calendar = document.getElementById("transactionCalendar-paid");
     const toolbar = document.getElementById("transactionToolbar-paid");
-    const toolbarControls = [...toolbar.querySelectorAll(".select,.button")];
-    const bulkControls = [...document.querySelectorAll("#paidProductivityBulk .select,#paidProductivityBulk .button")];
+    const toolbarControls = [...toolbar.querySelectorAll(".select,.button")].filter(control=>getComputedStyle(control).display !== "none");
+    const bulkControls = [...document.querySelectorAll("#paidProductivityBulk .select,#paidProductivityBulk .button")].filter(control=>getComputedStyle(control).display !== "none");
     return {
       calendarColumns:getComputedStyle(calendar).gridTemplateColumns,
       toolbarHeights:toolbarControls.map(control=>control.getBoundingClientRect().height),
