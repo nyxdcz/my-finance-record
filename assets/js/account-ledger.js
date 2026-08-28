@@ -511,6 +511,8 @@
     const editing = Boolean(document.getElementById("originalAccountName")?.value);
     const next = editing && mode === "spend" ? "spend" : "correct";
     dialog.dataset.accountMode = next;
+    const title = document.getElementById("accountDialogTitle");
+    if (title) title.textContent = next === "spend" ? "Record spending" : (editing ? "Edit account" : "Add account");
     const switcher = document.getElementById("accountModeSwitch");
     if (switcher) switcher.hidden = !editing;
     const maintenance = document.getElementById("accountMaintenanceFields");
@@ -534,7 +536,20 @@
     if (next === "spend") updateAccountSpendPreview(); else setAccountSpendStatus();
     accountSpendSubmitPending = false;
     setTrackedFormBaseline?.("accountDialog");
-    if (focus) setTimeout(() => document.getElementById(next === "spend" ? "accountSpendAmount" : "accountName")?.focus(), 0);
+    const body = dialog.querySelector(".modal-body");
+    if (body) {
+      body.scrollTop = 0;
+      body.scrollLeft = 0;
+    }
+    if (focus) setTimeout(() => {
+      const target = document.getElementById(next === "spend" ? "accountSpendAmount" : "accountName");
+      const phone = matchMedia("(max-width: 700px)").matches;
+      target?.focus(phone ? { preventScroll:true } : undefined);
+      if (phone && body) {
+        body.scrollTop = 0;
+        body.scrollLeft = 0;
+      }
+    }, 0);
   }
 
   function updateAccountSpendPreview() {
