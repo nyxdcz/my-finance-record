@@ -20,7 +20,7 @@ assert.match(css,/min-height:44px/);
 assert.match(css,/transaction-column-hidden\{display:revert!important\}/);
 assert.match(css,/@media\(min-width:1181px\)/);
 assert.match(css,/#money #transactionToolbar-expense/);
-assert.match(css,/#money #bulkExpenseBar\[hidden\]/);
+assert.match(css,/#money #expenseFiltersPanel #bulkExpenseBar\[hidden\]/);
 assert.match(compactToolbar,/Budget & Expenses uses one compact desktop toolbar/);
 assert.match(compactToolbar,/window\.matchMedia\("\(min-width: 1181px\)"\)/);
 assert.match(compactToolbar,/hideGroup\(document\.getElementById\("bulkExpenseBar"\)\)/);
