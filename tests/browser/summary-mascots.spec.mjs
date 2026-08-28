@@ -279,7 +279,7 @@ test("period mascots do not replace live amounts before their date boundary", as
     early:"red",
     late:"orange",
     firstDifference:"green",
-    secondDifference:"green",
+    secondDifference:"red",
     firstText:"₱1,234.00",
     secondText:"₱1,234.00"
   });
