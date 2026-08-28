@@ -1,17 +1,40 @@
 .transaction-workspace-toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:10px 0}.transaction-workspace-toolbar .button,.transaction-workspace-toolbar .select{min-height:44px}.transaction-view-group{display:flex;gap:4px}.transaction-view-group [aria-pressed="true"]{border-color:var(--accent,#2563eb);box-shadow:0 0 0 2px color-mix(in srgb,var(--accent,#2563eb) 22%,transparent)}.transaction-column-hidden{display:none!important}.transaction-totals-footer{display:flex;justify-content:space-between;gap:12px;margin-top:8px;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:var(--surface,#fff);font-variant-numeric:tabular-nums}.transaction-calendar{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;margin:10px 0}.transaction-calendar[hidden]{display:none}.transaction-calendar-day{min-width:0;padding:10px;border:1px solid var(--border);border-radius:12px;background:var(--surface,#fff)}.transaction-calendar-day h4{margin:0 0 8px;font-size:.82rem}.transaction-calendar-entry{display:flex;width:100%;min-height:44px;align-items:center;justify-content:space-between;gap:6px;margin-top:6px;padding:8px;border:0;border-radius:9px;background:var(--surface-muted,#f3f4f6);color:inherit;text-align:left}.transaction-calendar-entry span{overflow:hidden;text-overflow:ellipsis}.transaction-calendar-mode .income-record-header,.transaction-calendar-mode #incomeList,.transaction-calendar-mode #paidExpensesSection>.record-header,.transaction-calendar-mode #paidExpenseList,.transaction-calendar-mode #money>.section-stack{display:none!important}.transaction-density-compact .record-row{padding-top:7px!important;padding-bottom:7px!important}.transaction-select{display:inline-flex;min-width:44px;min-height:44px;align-items:center;justify-content:center}.transaction-columns-dialog [data-transaction-column-list]{display:grid;gap:6px;margin:0;padding:0;list-style:none}.transaction-columns-dialog [data-column-id]{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px;border:1px solid var(--border);border-radius:10px}.transaction-columns-dialog [data-column-id] label{display:flex;align-items:center;gap:8px;min-height:44px}.transaction-columns-dialog [data-column-id] small{color:var(--muted);font-size:.75rem}.transaction-columns-dialog [data-column-id]>span{display:flex;gap:4px}
 #money #expenseFiltersPanel #bulkExpenseBar[hidden],#money #expenseFiltersPanel>.expense-toolbar-single-line>.field[hidden]{display:none!important}
 @media(min-width:1181px){
-  #money #expenseFiltersPanel{border-bottom:1px solid var(--border)!important;border-radius:12px!important;overflow:visible!important}
-  #money #expenseFiltersPanel>.expense-toolbar-single-line{display:flex!important;grid-template-columns:none!important;align-items:center!important;flex-wrap:nowrap!important;gap:6px!important;min-width:0!important;padding:8px 10px!important}
-  #money #expenseFiltersPanel>.expense-toolbar-single-line>.expense-search-field{flex:1 1 150px!important;min-width:120px!important;max-width:190px!important}
-  #money #expenseFiltersPanel>.expense-toolbar-single-line>.field:not([hidden]){flex:0 1 138px!important;min-width:112px!important;max-width:150px!important}
-  #money #expenseFiltersPanel>.expense-toolbar-single-line>.button{flex:0 0 auto!important}
-  #money #transactionToolbar-expense{display:flex!important;align-items:center!important;justify-content:flex-end!important;flex:1 1 auto!important;flex-wrap:nowrap!important;gap:5px!important;width:auto!important;min-width:0!important;min-height:0!important;margin:0 0 0 auto!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
-  #money #transactionToolbar-expense>*{flex:0 0 auto!important;min-width:0!important}
-  #money #transactionToolbar-expense .button,#money #transactionToolbar-expense .select{height:29px!important;min-height:29px!important;padding-top:4px!important;padding-bottom:4px!important;font-size:.75rem!important}
-  #money #transactionToolbar-expense .transaction-view-group{gap:3px!important}
-  #money #transactionToolbar-expense [data-transaction-saved-view]{width:150px!important}
-  #money #transactionToolbar-expense [data-transaction-sort]{width:158px!important}
+  html body #money #expenseFiltersPanel{box-sizing:border-box!important;margin:8px 0 8px!important;padding:0!important;border:1px solid var(--line)!important;border-radius:10px!important;background:var(--surface-soft)!important;overflow:visible!important}
+  html body #money #expenseFiltersPanel>summary{display:none!important}
+  html body #money #expenseFiltersPanel>.expense-toolbar-single-line{box-sizing:border-box!important;display:flex!important;grid-template-columns:none!important;align-items:center!important;flex-wrap:nowrap!important;gap:6px!important;width:100%!important;min-width:0!important;min-height:50px!important;padding:7px 8px!important}
+  html body #money #expenseFiltersPanel>.expense-toolbar-single-line>.expense-search-field{flex:1 1 150px!important;min-width:130px!important;max-width:210px!important;margin:0!important}
+  html body #money #expenseFiltersPanel>.expense-toolbar-single-line>.field:not([hidden]):not(.expense-search-field){flex:0 0 132px!important;min-width:132px!important;max-width:132px!important;margin:0!important}
+  html body #money #expenseFiltersPanel>.expense-toolbar-single-line>.button{flex:0 0 auto!important;margin:0!important}
+  html body #money #expenseFiltersPanel>.expense-toolbar-single-line :is(.input,.select,.button),html body #money #transactionToolbar-expense :is(.select,.button){box-sizing:border-box!important;height:34px!important;min-height:34px!important;border-radius:7px!important;font-size:.78rem!important;line-height:1.1!important}
+  html body #money #expenseFiltersPanel>.expense-toolbar-single-line :is(.input,.select){padding-block:0!important}
+  html body #money #expenseFiltersPanel>.expense-toolbar-single-line .button,html body #money #transactionToolbar-expense .button{padding:0 10px!important;white-space:nowrap!important}
+  html body #money #transactionToolbar-expense{display:flex!important;align-items:center!important;justify-content:flex-start!important;flex:0 0 auto!important;flex-wrap:nowrap!important;gap:6px!important;width:auto!important;min-width:0!important;min-height:34px!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
+  html body #money #transactionToolbar-expense>*{box-sizing:border-box!important;flex:0 0 auto!important;min-width:0!important;margin:0!important}
+  html body #money #transactionToolbar-expense .transaction-view-group{box-sizing:border-box!important;display:inline-flex!important;align-items:center!important;gap:2px!important;height:34px!important;padding:2px!important;border:1px solid var(--line)!important;border-radius:8px!important;background:var(--surface)!important}
+  html body #money #transactionToolbar-expense .transaction-view-group .button{height:28px!important;min-height:28px!important;padding:0 10px!important;border-color:transparent!important;border-radius:6px!important;background:transparent!important;box-shadow:none!important}
+  html body #money #transactionToolbar-expense .transaction-view-group .button[aria-pressed="true"]{border-color:color-mix(in srgb,var(--primary) 22%,var(--line))!important;background:var(--surface)!important;color:var(--primary)!important;box-shadow:0 0 0 1px color-mix(in srgb,var(--primary) 18%,transparent)!important}
+  html body #money #transactionToolbar-expense>label{display:block!important;flex:0 0 auto!important;margin:0!important}
+  html body #money #transactionToolbar-expense [data-transaction-saved-view]{width:142px!important}
+  html body #money #transactionToolbar-expense [data-transaction-sort]{width:146px!important}
+  html body #money #transactionToolbar-expense [data-open-transaction-columns]{margin-right:0!important}
+  html body #money .section-stack{gap:8px!important}
+  html body #money .section-stack>.period-card{border-radius:10px!important;overflow:hidden!important}
+  html body #money .section-stack>.period-card>.period-header{box-sizing:border-box!important;min-height:54px!important;padding:9px 11px!important;align-items:center!important}
+  html body #money .section-stack>.period-card>.period-header h3{font-size:.98rem!important;line-height:1.15!important;margin:0!important}
+  html body #money .section-stack>.period-card>.period-header p{margin:3px 0 0!important;font-size:.72rem!important;line-height:1.2!important}
+  html body #money .section-stack>.period-card>.period-header .collapse-actions{gap:7px!important;align-items:center!important}
+}
+@media(min-width:1181px) and (max-width:1350px){
+  html body #money #expenseFiltersPanel>.expense-toolbar-single-line{gap:4px!important;padding-inline:6px!important}
+  html body #money #expenseFiltersPanel>.expense-toolbar-single-line>.expense-search-field{min-width:118px!important;max-width:158px!important}
+  html body #money #expenseFiltersPanel>.expense-toolbar-single-line>.field:not([hidden]):not(.expense-search-field){flex-basis:112px!important;min-width:112px!important;max-width:112px!important}
+  html body #money #expenseFiltersPanel>.expense-toolbar-single-line .button,html body #money #transactionToolbar-expense .button{padding-inline:8px!important}
+  html body #money #transactionToolbar-expense{gap:4px!important}
+  html body #money #transactionToolbar-expense .transaction-view-group .button{padding-inline:8px!important}
+  html body #money #transactionToolbar-expense [data-transaction-saved-view]{width:126px!important}
+  html body #money #transactionToolbar-expense [data-transaction-sort]{width:132px!important}
 }
 @media(max-width:1180px){#money #transactionToolbar-expense{position:static!important}}
 @media(max-width:900px){.transaction-calendar{grid-template-columns:repeat(3,minmax(0,1fr))}}
