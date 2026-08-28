@@ -209,3 +209,81 @@
     }
   });
 })();
+
+/* Budget & Expenses uses one compact desktop toolbar while preserving tablet/phone filter collapse. */
+(() => {
+  const desktop = window.matchMedia("(min-width: 1181px)");
+  let queued = false;
+
+  function hideGroup(element) {
+    if (!element) return;
+    element.hidden = true;
+    element.setAttribute("aria-hidden", "true");
+    element.querySelectorAll?.("input, select, button").forEach(control => { control.tabIndex = -1; });
+  }
+
+  function enforceMonthScope(rerender = false) {
+    const dateControl = document.getElementById("expenseDateFilter");
+    if (!dateControl) return false;
+    const changed = dateControl.value !== "month";
+    dateControl.value = "month";
+    dateControl.tabIndex = -1;
+    dateControl.setAttribute("aria-hidden", "true");
+    hideGroup(dateControl.closest(".field"));
+    if (changed && rerender) {
+      if (typeof renderMoneyPage === "function") renderMoneyPage();
+      else if (typeof renderPage === "function") renderPage("money");
+    }
+    return changed;
+  }
+
+  function placeToolbar() {
+    const panel = document.getElementById("expenseFiltersPanel");
+    const toolbar = document.getElementById("transactionToolbar-expense");
+    if (!panel || !toolbar) return;
+
+    toolbar.querySelector("[data-transaction-density]")?.closest("label")?.remove();
+    document.getElementById("money")?.classList.add("transaction-density-compact");
+
+    const row = panel.querySelector(":scope > .expense-toolbar-single-line");
+    if (desktop.matches && row) {
+      if (toolbar.parentElement !== row) row.append(toolbar);
+      return;
+    }
+    if (panel.nextElementSibling !== toolbar) panel.after(toolbar);
+  }
+
+  function apply() {
+    queued = false;
+    hideGroup(document.getElementById("bulkExpenseBar"));
+    enforceMonthScope(false);
+    placeToolbar();
+  }
+
+  function schedule() {
+    if (queued) return;
+    queued = true;
+    queueMicrotask(apply);
+  }
+
+  function start() {
+    apply();
+    const money = document.getElementById("money") || document.body;
+    new MutationObserver(schedule).observe(money, { childList:true, subtree:true });
+    desktop.addEventListener?.("change", schedule);
+    window.addEventListener("pageshow", schedule);
+    window.addEventListener("finance:page-changed", schedule);
+    window.addEventListener("finance:profile-changed", schedule);
+    document.addEventListener("change", event => {
+      if (event.target?.matches?.("#transactionToolbar-expense [data-transaction-saved-view]")) {
+        queueMicrotask(() => enforceMonthScope(true));
+      } else if (event.target?.id === "expenseDateFilter") {
+        queueMicrotask(() => enforceMonthScope(true));
+      }
+    });
+  }
+
+  window.FinanceCompactExpenseToolbar = Object.freeze({ apply, enforceMonthScope, placeToolbar });
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start, { once:true });
+  else start();
+})();
