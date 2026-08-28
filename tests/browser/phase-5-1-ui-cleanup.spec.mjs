@@ -23,6 +23,13 @@ async function loadFinanceRailFixture(page, width = 1024) {
   await page.setContent(`<!doctype html><html data-theme="light"><head>${links}</head><body><div class="app"><main class="main"><div class="content"><section class="page active" id="money"><div class="section-stack"><article style="flex:0 0 520px;height:180px">First half</article><article style="flex:0 0 520px;height:180px">Second half</article><article style="flex:0 0 520px;height:180px">Other expenses</article></div><div class="transaction-totals-footer"><span>5 visible</span><strong>₱77,890.00</strong></div></section></div></main></div></body></html>`, { waitUntil:"networkidle" });
 }
 
+async function loadFinanceToolbarFixture(page, width = 1440) {
+  await page.setViewportSize({ width, height:900 });
+  const links = ["app.css?v=2.5.0-talaan1", "summary-mascots.css?v=2.5.0-talaan1"]
+    .map(href => `<link rel="stylesheet" href="http://127.0.0.1:3000/${href}">`).join("");
+  await page.setContent(`<!doctype html><html data-theme="light"><head>${links}</head><body><div class="app"><main class="main"><div class="content"><section class="page active" id="money"><details class="expense-filters-panel" id="expenseFiltersPanel" open><summary>Filters</summary><div class="toolbar expense-toolbar-compact expense-toolbar-single-line"><div class="bulk-expense-inline"><label><input type="checkbox"> Select visible</label><span class="bulk-selected-count">0 selected</span></div><div class="field"><input class="input" placeholder="Name or note"></div><div class="field"><select class="select"><option>Selected month</option></select></div><div class="field"><select class="select"><option>All categories</option></select></div><button class="button button-secondary">More filters</button><button class="button button-secondary expense-clear-filters">Clear</button></div></details><div class="transaction-workspace-toolbar" id="transactionToolbar-expense"><div class="transaction-view-group"><button class="button button-secondary" aria-pressed="true">List</button><button class="button button-secondary" aria-pressed="false">Calendar</button></div><label><select class="select"><option>Saved views</option></select></label><button class="button button-secondary">Save view</button><button class="button button-secondary" data-open-transaction-columns>Columns</button><label><select class="select"><option>Newest first</option></select></label><label><select class="select"><option>Comfortable</option></select></label></div><div class="section-stack"></div></section></div></main></div></body></html>`, { waitUntil:"networkidle" });
+}
+
 test("Dashboard drag and resize controls appear only while Customize is active", async ({ page }) => {
   await loadDashboardFixture(page, 1440);
 
@@ -108,4 +115,43 @@ test("medium desktop Finance keeps horizontal card swipe without a visible botto
   expect(state.mainOverflowX).toBe("clip");
   expect(state.contentOverflowX).toBe("clip");
   expect(state.pageOverflowX).toBe("clip");
+});
+
+test("desktop Finance filters and view controls read as one organized toolbar", async ({ page }) => {
+  await loadFinanceToolbarFixture(page, 1440);
+
+  const state = await page.evaluate(() => {
+    const filters = document.getElementById("expenseFiltersPanel");
+    const toolbar = document.getElementById("transactionToolbar-expense");
+    const columns = toolbar.querySelector("[data-open-transaction-columns]");
+    const labels = toolbar.querySelectorAll(":scope > label");
+    const active = toolbar.querySelector('.transaction-view-group [aria-pressed="true"]');
+    const filtersRect = filters.getBoundingClientRect();
+    const toolbarRect = toolbar.getBoundingClientRect();
+    return {
+      joinedGap:Math.abs(filtersRect.bottom - toolbarRect.top),
+      filtersBackground:getComputedStyle(filters).backgroundColor,
+      toolbarBackground:getComputedStyle(toolbar).backgroundColor,
+      toolbarDisplay:getComputedStyle(toolbar).display,
+      toolbarWrap:getComputedStyle(toolbar).flexWrap,
+      columnsMarginRight:getComputedStyle(columns).marginRight,
+      activeColor:getComputedStyle(active).color,
+      activeHeight:active.getBoundingClientRect().height,
+      savedWidth:labels[0].querySelector("select").getBoundingClientRect().width,
+      sortWidth:labels[1].querySelector("select").getBoundingClientRect().width,
+      densityWidth:labels[2].querySelector("select").getBoundingClientRect().width,
+      sortStartsAfterColumns:labels[1].getBoundingClientRect().left > columns.getBoundingClientRect().right
+    };
+  });
+
+  expect(state.joinedGap).toBeLessThanOrEqual(1);
+  expect(state.filtersBackground).toBe(state.toolbarBackground);
+  expect(state.toolbarDisplay).toBe("flex");
+  expect(state.toolbarWrap).toBe("nowrap");
+  expect(state.columnsMarginRight).toBe("auto");
+  expect(state.activeHeight).toBeCloseTo(29, 0);
+  expect(state.savedWidth).toBeCloseTo(150, 0);
+  expect(state.sortWidth).toBeCloseTo(158, 0);
+  expect(state.densityWidth).toBeCloseTo(126, 0);
+  expect(state.sortStartsAfterColumns).toBe(true);
 });
