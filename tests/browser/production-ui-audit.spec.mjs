@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 const APP_URL = "http://127.0.0.1:3000/index.html?page=money";
-const APP_CACHE = "finance-v2-20260827-net-worth-r10";
+const APP_CACHE = "finance-v2-20260828-household-splits-r11";
 
 async function openFinance(page, viewport) {
   await page.setViewportSize(viewport);

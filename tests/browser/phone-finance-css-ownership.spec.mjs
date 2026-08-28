@@ -4,16 +4,16 @@ test.use({ serviceWorkers:"block" });
 
 const widths = [320, 360, 375, 390, 430];
 const css = [
-  "budget-planning.css?v=2.4.0-talaan1",
-  "projects-calendar.css?v=2.4.0-talaan1",
-  "mobile.css?v=2.4.0-talaan1",
-  "app.css?v=2.4.0-talaan1",
-  "shell-ui.css?v=2.4.0-talaan1",
-  "dashboard-interactions.css?v=2.4.0-talaan1",
-  "ui-icon-alignment.css?v=2.4.0-talaan1",
-  "black-canvas.css?v=2.4.0-talaan1",
-  "desktop-ui-phase1.css?v=2.4.0-talaan1",
-  "desktop-ux.css?v=2.4.0-talaan1"
+  "budget-planning.css?v=2.5.0-talaan1",
+  "projects-calendar.css?v=2.5.0-talaan1",
+  "mobile.css?v=2.5.0-talaan1",
+  "app.css?v=2.5.0-talaan1",
+  "shell-ui.css?v=2.5.0-talaan1",
+  "dashboard-interactions.css?v=2.5.0-talaan1",
+  "ui-icon-alignment.css?v=2.5.0-talaan1",
+  "black-canvas.css?v=2.5.0-talaan1",
+  "desktop-ui-phase1.css?v=2.5.0-talaan1",
+  "desktop-ux.css?v=2.5.0-talaan1"
 ];
 
 async function financeFixture(page, width) {
@@ -84,7 +84,7 @@ for (const width of widths) {
   });
 }
 
-test("live Talaan V2.4.0 shell owns Phone Finance compact styles statically", async ({ page }) => {
+test("live Talaan V2.5.0 shell owns Phone Finance compact styles statically", async ({ page }) => {
   await page.setViewportSize({ width:390, height:844 });
   await page.goto("http://127.0.0.1:3000/index.html?page=money", { waitUntil:"networkidle" });
   await expect(page.locator("#phoneFinanceCompactV1522")).toHaveCount(0);
@@ -92,6 +92,6 @@ test("live Talaan V2.4.0 shell owns Phone Finance compact styles statically", as
     styles:[...document.querySelectorAll('link[rel="stylesheet"]')].map(link => link.getAttribute("href") || ""),
     scripts:[...document.scripts].map(script => script.getAttribute("src") || "").filter(Boolean)
   }));
-  expect(delivery.styles.some(href => href.includes("mobile.css?v=2.4.0-talaan1"))).toBe(true);
-  expect(delivery.scripts.some(src => src.includes("pwa-update.js?v=2.4.0-talaan1"))).toBe(true);
+  expect(delivery.styles.some(href => href.includes("mobile.css?v=2.5.0-talaan1"))).toBe(true);
+  expect(delivery.scripts.some(src => src.includes("pwa-update.js?v=2.5.0-talaan1"))).toBe(true);
 });

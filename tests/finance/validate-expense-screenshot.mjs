@@ -88,9 +88,9 @@ assert.match(runtimeCompat, /expenseScreenshotMenuButton/, "loaded screenshot to
 assert.match(runtimeCompat, /button\.textContent = "Upload"/, "screenshot launcher should use the compact Upload label");
 assert.match(runtimeCompat, /"Analyzing…" : "AI"/, "optional AI screenshot action should use the compact AI label");
 assert.match(runtimeCompat, /header\.insertBefore\(shell, close\)/, "screenshot actions should be positioned immediately before the expense dialog Close button");
-assert.match(runtimeCompat, /expense-screenshot-parser\.js\?v=2\.4\.0-talaan1/, "screenshot parser should use the current Talaan runtime query");
-assert.match(runtimeCompat, /expense-screenshot-detect\.js\?v=2\.4\.0-talaan1/, "local screenshot detector should use the current Talaan runtime query");
-assert.match(runtimeCompat, /expense-screenshot-ai\.js\?v=2\.4\.0-talaan1/, "optional AI screenshot detector should use the current Talaan runtime query");
+assert.match(runtimeCompat, /expense-screenshot-parser\.js\?v=2\.5\.0-talaan1/, "screenshot parser should use the current Talaan runtime query");
+assert.match(runtimeCompat, /expense-screenshot-detect\.js\?v=2\.5\.0-talaan1/, "local screenshot detector should use the current Talaan runtime query");
+assert.match(runtimeCompat, /expense-screenshot-ai\.js\?v=2\.5\.0-talaan1/, "optional AI screenshot detector should use the current Talaan runtime query");
 assert.doesNotMatch(syncConfig, /OPENAI_API_KEY/, "browser sync config must not contain an OpenAI API key");
 
 const aiClient = fs.readFileSync(path.join(root, "expense-screenshot-ai.js"), "utf8");
@@ -111,11 +111,11 @@ assert.match(edgeFunction, /store:false/, "AI screenshot response should disable
 
 const worker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
 const version = JSON.parse(fs.readFileSync(path.join(root, "version.json"), "utf8"));
-assert.equal(version.version, "2.4.0");
-assert.equal(version.cacheVersion, "finance-v2-20260827-net-worth-r10");
-assert.ok(worker.includes(version.cacheVersion), "service worker cache generation must match Talaan V2.4.0 while preserving screenshot detection");
-assert.match(worker, /expense-screenshot-parser\.js\?v=2\.4\.0-talaan1/, "service worker should precache the screenshot parser on the current query");
-assert.match(worker, /expense-screenshot-detect\.js\?v=2\.4\.0-talaan1/, "service worker should precache the local screenshot detector on the current query");
-assert.match(worker, /expense-screenshot-ai\.js\?v=2\.4\.0-talaan1/, "service worker should precache the optional AI client on the current query");
+assert.equal(version.version, "2.5.0");
+assert.equal(version.cacheVersion, "finance-v2-20260828-household-splits-r11");
+assert.ok(worker.includes(version.cacheVersion), "service worker cache generation must match Talaan V2.5.0 while preserving screenshot detection");
+assert.match(worker, /expense-screenshot-parser\.js\?v=2\.5\.0-talaan1/, "service worker should precache the screenshot parser on the current query");
+assert.match(worker, /expense-screenshot-detect\.js\?v=2\.5\.0-talaan1/, "service worker should precache the local screenshot detector on the current query");
+assert.match(worker, /expense-screenshot-ai\.js\?v=2\.5\.0-talaan1/, "service worker should precache the optional AI client on the current query");
 
-console.log("Expense screenshot local and optional AI detector validation passed under Talaan V2.4.0.");
+console.log("Expense screenshot local and optional AI detector validation passed under Talaan V2.5.0.");

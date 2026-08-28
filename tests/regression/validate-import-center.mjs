@@ -6,10 +6,10 @@ const css = fs.readFileSync("assets/css/import-center.css", "utf8");
 const html = fs.readFileSync("index.html", "utf8");
 const version = JSON.parse(fs.readFileSync("version.json", "utf8"));
 
-assert.equal(version.version, "2.4.0");
+assert.equal(version.version, "2.5.0");
 assert.equal(version.schemaVersion, 12);
 assert.equal(version.cloudSchemaVersion, 3);
-assert.equal(version.cacheVersion, "finance-v2-20260827-net-worth-r10");
+assert.equal(version.cacheVersion, "finance-v2-20260828-household-splits-r11");
 assert.match(source, /function parseCsv/);
 assert.match(source, /function analyzeRows/);
 assert.match(source, /function existingFingerprintSet/);

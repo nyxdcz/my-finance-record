@@ -7,7 +7,7 @@ test("repeat monthly control uses replaceable PNG artwork and click bounce", asy
   await page.goto("http://127.0.0.1:3000/offline.html", { waitUntil:"networkidle" });
 
   for (const name of ["off", "on"]) {
-    const response = await request.get(`http://127.0.0.1:3000/icons/repeat-monthly-${name}.png?v=2.4.0-talaan1`);
+    const response = await request.get(`http://127.0.0.1:3000/icons/repeat-monthly-${name}.png?v=2.5.0-talaan1`);
     expect(response.ok()).toBeTruthy();
     expect(response.headers()["content-type"] || "").toContain("image/png");
     expect((await response.body()).byteLength).toBeGreaterThan(100);
@@ -26,7 +26,7 @@ test("repeat monthly control uses replaceable PNG artwork and click bounce", asy
         </div>
       </main>`;
   });
-  await page.addStyleTag({ url:"http://127.0.0.1:3000/production-ui-audit.css?v=2.4.0-talaan1" });
+  await page.addStyleTag({ url:"http://127.0.0.1:3000/production-ui-audit.css?v=2.5.0-talaan1" });
   await page.addScriptTag({ url:"http://127.0.0.1:3000/assets/js/ui/expense-compact.js" });
 
   const button = page.locator("[data-toggle-saved]");

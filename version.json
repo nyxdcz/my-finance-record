@@ -1,5 +1,5 @@
 {
-  "version": "2.4.0",
+  "version": "2.5.0",
   "schemaVersion": 12,
   "cloudSchemaVersion": 3,
   "ledgerVersion": 1,
@@ -10,8 +10,8 @@
   "profileArchitectureVersion": 1,
   "encryptionVersion": 1,
   "authSecurityVersion": 1,
-  "cacheVersion": "finance-v2-20260827-net-worth-r10",
-  "released": "2026-08-27",
+  "cacheVersion": "finance-v2-20260828-household-splits-r11",
+  "released": "2026-08-28",
   "name": "Talaan",
-  "notes": "Talaan V2.4.0 adds a manual net worth ledger with assets, liabilities, dated valuations, category composition, and value evolution. Values remain separate from Available Money, Cash Flow, and Account Ledger balances. Foreign values require a manually entered PHP rate and are labeled as converted; stale and manual values remain explicit. Finance Schema 12 and Cloud Schema V3 are preserved."
+  "notes": "Talaan V2.5.0 adds household groups, equal, percentage, and exact expense shares, payer tracking, member balances, and explicit settlements. Personal reports count only the owner's share while Account Ledger payments retain the complete amount actually paid. Settlements never create income, expenses, paid state, or automatic account movements. Finance Schema 12 and Cloud Schema V3 are preserved."
 }

@@ -12,8 +12,8 @@ const read = file => fs.readFileSync(path.join(root, file), "utf8");
 const exists = file => fs.existsSync(path.join(root, file));
 const fail = message => errors.push(message);
 const warn = message => warnings.push(message);
-const CURRENT_VERSION = "2.4.0";
-const DISPLAY_VERSION = "V2.4.0";
+const CURRENT_VERSION = "2.5.0";
+const DISPLAY_VERSION = "V2.5.0";
 const BRAND = "Talaan";
 const PREVIOUS_BRAND = ["My", "Finance", "Records"].join(" ");
 
@@ -21,14 +21,14 @@ const runtimeCssFiles = [
   "account-ledger.css", "app.css", "shell-ui.css", "black-canvas.css", "budget-planning.css",
   "dashboard-interactions-core.css", "dashboard-interactions.css", "desktop-ui-phase1.css", "desktop-ux.css",
   "liquid-glass.css", "mobile.css", "productivity-tools.css", "production-ui-audit.css", "projects-calendar.css",
-  "payees-rules.css", "import-center.css",
+  "payees-rules.css", "import-center.css", "net-worth.css", "household-splits.css",
   "reminders-alerts.css", "reports-insights.css", "security-profiles.css", "summary-mascots.css", "ui-icon-alignment.css"
 ];
 const rootJsFiles = [
   "account-ledger.js", "brand-icons.js", "budget-planning.js", "cloud-conflict-resolution.js", "cloud-conflict-review.js",
   "cloud-sync-lifecycle.js", "cloud-sync.js", "expense-screenshot-ai.js", "expense-screenshot-detect.js",
   "expense-screenshot-parser.js", "form-inputs.js", "interaction-patterns.js", "privacy-lock.js", "productivity-tools.js",
-  "payees-rules.js", "import-formats.js", "import-center.js",
+  "payees-rules.js", "import-formats.js", "import-center.js", "net-worth.js", "household-splits.js",
   "projects-calendar.js", "pwa-update.js", "reminders-alerts.js", "reports-insights.js", "security-profiles.js"
 ];
 const featureJsFiles = ["cash-flow-summary.js"];
@@ -95,7 +95,7 @@ for (const match of worker.matchAll(/asset\("([^"]+)"\)/g)) {
 }
 
 const workflow = read(".github/workflows/quality-pages.yml");
-for (const file of ["dashboard-interactions-core.css", "liquid-glass.css", "ui-icon-alignment.css", "black-canvas.css", "desktop-ui-phase1.css", "desktop-ux.css", "shell-ui.css", "production-ui-audit.css", "summary-mascots.css", "import-center.css", "import-formats.js", "import-center.js", "pwa-update.js", "brand-icons.js", "projects-calendar.js", "projects-calendar.css", "mobile.css"]) {
+for (const file of ["dashboard-interactions-core.css", "liquid-glass.css", "ui-icon-alignment.css", "black-canvas.css", "desktop-ui-phase1.css", "desktop-ux.css", "shell-ui.css", "production-ui-audit.css", "summary-mascots.css", "import-center.css", "import-formats.js", "import-center.js", "net-worth.css", "net-worth.js", "household-splits.css", "household-splits.js", "pwa-update.js", "brand-icons.js", "projects-calendar.js", "projects-calendar.css", "mobile.css"]) {
   if (!workflow.includes(`_site/${file}`) && !workflow.includes(`cp assets/css/*.css _site/`) && !workflow.includes(`cp assets/js/*.js _site/`)) fail(`Pages workflow does not validate/package ${file}`);
 }
 

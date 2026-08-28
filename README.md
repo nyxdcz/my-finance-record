@@ -1,11 +1,11 @@
-# Talaan · V2.4.0
+# Talaan · V2.5.0
 
 <div align="center">
 
 **A local-first personal and household finance PWA built for privacy, resilience, and everyday use.**
 
 [![Quality checks](https://github.com/nyxdcz/my-finance-record/actions/workflows/quality-pages.yml/badge.svg?branch=main)](https://github.com/nyxdcz/my-finance-record/actions/workflows/quality-pages.yml)
-![Version](https://img.shields.io/badge/version-V2.4.0-2563eb)
+![Version](https://img.shields.io/badge/version-V2.5.0-2563eb)
 ![PWA](https://img.shields.io/badge/PWA-offline--ready-16a34a)
 ![Node](https://img.shields.io/badge/Node.js-22%2B-339933?logo=nodedotjs&logoColor=white)
 
@@ -15,11 +15,11 @@
 
 | Release | Finance schema | Cloud schema | Sync cadence |
 | --- | ---: | ---: | ---: |
-| **V2.4.0** · Talaan | **12** | **V3** | **5 minutes** |
+| **V2.5.0** · Talaan | **12** | **V3** | **5 minutes** |
 
-**Talaan V2.4.0** is the current production release. The application keeps the complete local-first finance workspace, Account Ledger, budgeting, reporting, projects, productivity tools, reminders, encrypted multi-profile synchronization, responsive desktop/phone interface, and offline-ready PWA delivery under the Talaan product name.
+**Talaan V2.5.0** is the current production release. The application keeps the complete local-first finance workspace, Account Ledger, budgeting, reporting, projects, productivity tools, reminders, encrypted multi-profile synchronization, responsive desktop/phone interface, and offline-ready PWA delivery under the Talaan product name.
 
-The current update adds a manual net worth ledger under Insights, with assets, liabilities, dated valuation history, category composition, and value evolution. Net worth values do not change Available Money, Cash Flow, Account Ledger balances, paid records, or project payments.
+The current update adds household expense splits with groups, equal/percentage/exact shares, payer tracking, member balances, and explicit settlements. Personal reports count only your assigned share, while Account Ledger payments retain the full amount you actually paid. Settlements never create a second expense, income record, or automatic account movement.
 
 Current release notes are maintained in [`CHANGELOG.md`](CHANGELOG.md).
 
@@ -36,6 +36,7 @@ Current release notes are maintained in [`CHANGELOG.md`](CHANGELOG.md).
 | Payees and rules | Normalize aliases, preview deterministic categorization, and apply only reviewed, recoverable changes. |
 | Local statement import | Parse, map, preview, deduplicate, and roll back CSV, OFX, and QIF records without uploading files or changing balances. |
 | Manual net worth | Track assets, liabilities, dated values, composition, and evolution separately from cash-flow and account balances. |
+| Household splits | Share expenses, track who paid and who owes whom, and record settlements without double-counting personal totals or moving account balances automatically. |
 | Offline-ready PWA | Talaan can be installed and used through a service-worker-backed experience. |
 | Compatibility-focused releases | Schema, cache, sync, backup, restore, and finance-data behavior are treated as protected contracts. |
 
@@ -62,7 +63,7 @@ flowchart LR
     Sync <--> Cloud["Supabase + RLS"]
 ```
 
-The V2.4.0 runtime keeps compatibility-sensitive URLs and stored-data identifiers stable where changing them would create unnecessary PWA or installed-client risk. The product brand is **Talaan**; compatibility identifiers do not define the visible product name.
+The V2.5.0 runtime keeps compatibility-sensitive URLs and stored-data identifiers stable where changing them would create unnecessary PWA or installed-client risk. The product brand is **Talaan**; compatibility identifiers do not define the visible product name.
 
 ## Repository layout
 
