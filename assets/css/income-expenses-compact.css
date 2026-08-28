@@ -1,0 +1,217 @@
+/* Talaan Income vs Expenses compact presentation override.
+   Presentation-only: preserves finance calculations, range logic, and touch targets. */
+
+@media (min-width: 901px) {
+  .income-expenses-analytics {
+    gap: 8px !important;
+  }
+
+  .income-expenses-analytics-head {
+    gap: 12px !important;
+    padding-inline: 1px !important;
+  }
+
+  .income-expenses-eyebrow {
+    margin-bottom: 1px !important;
+    font-size: .56rem !important;
+  }
+
+  .income-expenses-title {
+    font-size: 1.06rem !important;
+    line-height: 1.08 !important;
+  }
+
+  .income-expenses-subtitle {
+    margin-top: 2px !important;
+    font-size: .61rem !important;
+  }
+
+  .income-expenses-range button {
+    min-height: 34px !important;
+    padding: 5px 9px !important;
+    font-size: .64rem !important;
+  }
+
+  .income-expenses-summary {
+    grid-template-columns: minmax(210px, .72fr) minmax(390px, 1.28fr) !important;
+    min-height: 82px !important;
+    padding: 10px 14px !important;
+    gap: 14px !important;
+  }
+
+  .income-expenses-primary {
+    gap: 2px !important;
+    padding-inline-end: 14px !important;
+  }
+
+  .income-expenses-primary-label {
+    font-size: .59rem !important;
+  }
+
+  .income-expenses-primary-value {
+    font-size: 1.34rem !important;
+  }
+
+  .income-expenses-period-copy {
+    font-size: .60rem !important;
+  }
+
+  .income-expenses-kpis {
+    gap: 6px !important;
+  }
+
+  .income-expenses-kpi {
+    gap: 2px !important;
+    padding: 2px 4px !important;
+  }
+
+  .income-expenses-kpi span,
+  .income-expenses-composition-list span {
+    font-size: .59rem !important;
+  }
+
+  .income-expenses-kpi strong {
+    font-size: .80rem !important;
+  }
+
+  .income-expenses-chart-card {
+    padding: 9px 11px 5px !important;
+  }
+
+  .income-expenses-chart-head {
+    margin-bottom: 1px !important;
+  }
+
+  .income-expenses-chart-title {
+    font-size: .72rem !important;
+  }
+
+  .income-expenses-legend {
+    gap: 9px !important;
+  }
+
+  .income-expenses-legend-item {
+    font-size: .56rem !important;
+  }
+
+  .income-expenses-svg {
+    height: 198px !important;
+    min-height: 198px !important;
+  }
+
+  .income-expenses-lower-grid {
+    gap: 8px !important;
+  }
+
+  .income-expenses-lower-card {
+    padding: 8px 10px !important;
+  }
+
+  .income-expenses-lower-head {
+    margin-bottom: 6px !important;
+  }
+
+  .income-expenses-lower-head h4 {
+    font-size: .69rem !important;
+  }
+
+  .income-expenses-lower-head p {
+    display: none !important;
+  }
+
+  .income-expenses-composition-body {
+    grid-template-columns: 68px minmax(0, 1fr) !important;
+    gap: 9px !important;
+  }
+
+  .income-expenses-donut {
+    width: 60px !important;
+    height: 60px !important;
+  }
+
+  .income-expenses-donut span {
+    width: 36px !important;
+    height: 36px !important;
+  }
+
+  .income-expenses-composition-list,
+  .income-expenses-category-list {
+    gap: 5px !important;
+  }
+
+  .income-expenses-category-row {
+    gap: 7px !important;
+  }
+
+  .income-expenses-category-row > span {
+    font-size: .58rem !important;
+  }
+
+  .income-expenses-category-row > strong {
+    font-size: .62rem !important;
+  }
+
+  .income-expenses-category-track {
+    height: 5px !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .income-expenses-analytics {
+    gap: 9px !important;
+  }
+
+  .income-expenses-summary {
+    padding: 12px !important;
+    gap: 10px !important;
+  }
+
+  .income-expenses-chart-card {
+    padding: 11px 8px 7px !important;
+  }
+
+  .income-expenses-svg {
+    min-height: 190px !important;
+  }
+
+  .income-expenses-lower-card {
+    padding: 11px !important;
+  }
+}
+
+@media (max-width: 700px) {
+  .income-expenses-subtitle {
+    display: none !important;
+  }
+
+  .income-expenses-range button {
+    min-width: 44px !important;
+    min-height: 44px !important;
+  }
+
+  .income-expenses-summary {
+    padding: 11px !important;
+  }
+
+  .income-expenses-primary-value {
+    font-size: 1.30rem !important;
+  }
+
+  .income-expenses-svg {
+    min-height: 176px !important;
+  }
+
+  .income-expenses-lower-head {
+    margin-bottom: 8px !important;
+  }
+
+  .income-expenses-donut {
+    width: 68px !important;
+    height: 68px !important;
+  }
+
+  .income-expenses-donut span {
+    width: 42px !important;
+    height: 42px !important;
+  }
+}
