@@ -35,12 +35,17 @@ async function waitForMascotGeometry(page) {
   });
 }
 
-async function openMoney(page, width = 1440) {
+async function openMoney(page, width = 1440, { today = "2026-09-01", month = "2026-08" } = {}) {
   await page.setViewportSize({ width, height:900 });
   await page.goto("http://127.0.0.1:3000/index.html?page=money", { waitUntil:"domcontentloaded" });
   await page.waitForFunction(() => Boolean(window.FinancePrivacyLock));
   await page.evaluate(() => window.FinancePrivacyLock.setAuthenticated(true));
   await page.waitForFunction(() => Boolean(window.FinanceSummaryMascots?.apply));
+  await page.evaluate(({ today, month }) => {
+    window.FINANCE_SUMMARY_TODAY_OVERRIDE = today;
+    window.selectedMonth = () => month;
+    window.FinanceSummaryMascots.apply();
+  }, { today, month });
   await page.waitForTimeout(50);
   await ensureMoneyVisible(page);
   if (width >= 851) await ensurePeriodsExpanded(page);
@@ -219,4 +224,63 @@ test("difference cards follow green and red state while phone disables mascot ov
     data:document.querySelectorAll("#money [data-summary-mascot]").length,
     desktopMedia:window.matchMedia("(min-width: 851px)").matches
   }))).toEqual({ slots:0, data:0, desktopMedia:false });
+});
+
+test("period mascots do not replace live amounts before their date boundary", async ({ page }) => {
+  await openMoney(page, 1440, { today:"2026-08-10", month:"2026-08" });
+
+  const snapshot = async today => page.evaluate(today => {
+    window.FINANCE_SUMMARY_TODAY_OVERRIDE = today;
+    for (const id of ["legendEarlyTotal", "legendLateTotal", "earlyTotal", "lateTotal"]) {
+      const element = document.getElementById(id);
+      element.textContent = "₱0.00";
+      delete element.dataset.firstHalfOriginalText;
+      delete element.dataset.otherExpensesOriginalText;
+    }
+    const cards = [...document.querySelectorAll("#moneySummary .summary-card")];
+    const readDifference = label => {
+      const card = cards.find(item => (item.querySelector(".summary-label-desktop")?.textContent?.trim() || item.querySelector(".summary-card-label")?.textContent?.trim()) === label);
+      const value = card.querySelector(".summary-card-value");
+      value.textContent = "₱1,234.00";
+      return value;
+    };
+    const firstDifference = readDifference("First-half difference");
+    const secondDifference = readDifference("Second-half difference");
+    window.FinanceSummaryMascots.apply();
+    return {
+      early:document.getElementById("legendEarlyTotal").dataset.summaryMascot || "",
+      late:document.getElementById("legendLateTotal").dataset.summaryMascot || "",
+      firstDifference:firstDifference.dataset.summaryMascot || "",
+      secondDifference:secondDifference.dataset.summaryMascot || "",
+      firstText:firstDifference.textContent,
+      secondText:secondDifference.textContent
+    };
+  }, today);
+
+  expect(await snapshot("2026-08-10")).toEqual({
+    early:"",
+    late:"",
+    firstDifference:"",
+    secondDifference:"",
+    firstText:"₱1,234.00",
+    secondText:"₱1,234.00"
+  });
+
+  expect(await snapshot("2026-08-28")).toEqual({
+    early:"red",
+    late:"",
+    firstDifference:"green",
+    secondDifference:"",
+    firstText:"₱1,234.00",
+    secondText:"₱1,234.00"
+  });
+
+  expect(await snapshot("2026-09-01")).toEqual({
+    early:"red",
+    late:"orange",
+    firstDifference:"green",
+    secondDifference:"red",
+    firstText:"₱1,234.00",
+    secondText:"₱1,234.00"
+  });
 });

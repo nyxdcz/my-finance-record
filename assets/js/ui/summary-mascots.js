@@ -28,6 +28,42 @@
     return negative ? -number : number;
   }
 
+  function selectedFinanceMonth() {
+    try {
+      const value = typeof root.selectedMonth === "function" ? root.selectedMonth() : "";
+      if (/^\d{4}-\d{2}$/.test(String(value || ""))) return String(value);
+    } catch (error) {}
+    const picker = document.getElementById("monthPicker")?.value;
+    if (/^\d{4}-\d{2}$/.test(String(picker || ""))) return String(picker);
+    const shortValue = document.getElementById("monthDisplayShort")?.textContent?.trim();
+    return /^\d{4}-\d{2}$/.test(String(shortValue || "")) ? String(shortValue) : "";
+  }
+
+  function manilaTodayKey() {
+    const override = String(root.FINANCE_SUMMARY_TODAY_OVERRIDE || root.FINANCE_FIRST_HALF_TODAY_OVERRIDE || "");
+    if (/^\d{4}-\d{2}-\d{2}$/.test(override)) return override;
+    try {
+      const parts = new Intl.DateTimeFormat("en-CA", { timeZone:"Asia/Manila", year:"numeric", month:"2-digit", day:"2-digit" }).formatToParts(new Date());
+      const map = Object.fromEntries(parts.map(part => [part.type, part.value]));
+      return `${map.year}-${map.month}-${map.day}`;
+    } catch (error) {
+      const date = new Date();
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")}`;
+    }
+  }
+
+  function periodState(month = selectedFinanceMonth()) {
+    if (!/^\d{4}-\d{2}$/.test(month)) return { firstHalfFinished:false, monthFinished:false };
+    const today = manilaTodayKey();
+    const currentMonth = today.slice(0, 7);
+    if (month < currentMonth) return { firstHalfFinished:true, monthFinished:true };
+    if (month > currentMonth) return { firstHalfFinished:false, monthFinished:false };
+    return {
+      firstHalfFinished:Number(today.slice(8, 10)) > 15,
+      monthFinished:false
+    };
+  }
+
   function clearMascot(element) {
     if (!element) return;
     const legacyAmount = storedAmountText(element);
@@ -57,9 +93,13 @@
     if (periodClass) element.closest(".collapse-actions")?.classList.add("has-period-mascot");
   }
 
-  function zeroTotal(id, color, label, { period = false } = {}) {
+  function zeroTotal(id, color, label, { period = false, eligible = true } = {}) {
     const element = document.getElementById(id);
     if (!element) return;
+    if (!eligible) {
+      clearMascot(element);
+      return;
+    }
     const amount = numericAmount(storedAmountText(element));
     if (Number.isFinite(amount) && Math.abs(amount) < 0.005) {
       useMascot(element, { color, accessibleLabel:label, cardClass:!period, periodClass:period });
@@ -68,15 +108,22 @@
     }
   }
 
-  function differenceCards() {
+  function differenceCards({ firstHalfFinished, monthFinished }) {
     const cards = document.querySelectorAll("#moneySummary .summary-card");
     for (const card of cards) {
       const label = card.querySelector(".summary-label-desktop")?.textContent?.trim()
         || card.querySelector(".summary-card-label")?.textContent?.trim()
         || "";
-      if (label !== "First-half difference" && label !== "Second-half difference") continue;
+      const isFirstHalf = label === "First-half difference";
+      const isSecondHalf = label === "Second-half difference";
+      if (!isFirstHalf && !isSecondHalf) continue;
       const value = card.querySelector(".summary-card-value");
       if (!value) continue;
+      const eligible = isFirstHalf ? firstHalfFinished : monthFinished;
+      if (!eligible) {
+        clearMascot(value);
+        continue;
+      }
       const isRed = card.classList.contains("summary-card-danger") || value.classList.contains("text-danger") || value.classList.contains("text-red");
       useMascot(value, { color:isRed ? "red" : "green", accessibleLabel:label, cardClass:true });
     }
@@ -93,14 +140,15 @@
       return;
     }
 
-    zeroTotal("legendEarlyTotal", "red", "First half of the month");
-    zeroTotal("legendLateTotal", "orange", "Second half of the month");
+    const state = periodState();
+    zeroTotal("legendEarlyTotal", "red", "First half of the month", { eligible:state.firstHalfFinished });
+    zeroTotal("legendLateTotal", "orange", "Second half of the month", { eligible:state.monthFinished });
     zeroTotal("legendOtherTotal", "blue", "Other expenses");
 
-    differenceCards();
+    differenceCards(state);
 
-    zeroTotal("earlyTotal", "red", "First half of the month", { period:true });
-    zeroTotal("lateTotal", "orange", "Second half of the month", { period:true });
+    zeroTotal("earlyTotal", "red", "First half of the month", { period:true, eligible:state.firstHalfFinished });
+    zeroTotal("lateTotal", "orange", "Second half of the month", { period:true, eligible:state.monthFinished });
     zeroTotal("otherTotal", "blue", "Other expenses", { period:true });
   }
 
@@ -122,9 +170,13 @@
     });
     media.addEventListener?.("change", schedule);
     window.addEventListener("pageshow", schedule);
+    window.addEventListener("finance:page-changed", schedule);
+    document.addEventListener("change", event => {
+      if (event.target?.id === "monthPicker") schedule();
+    });
   }
 
-  root.FinanceSummaryMascots = Object.freeze({ refresh:schedule, apply, assets:ASSETS });
+  root.FinanceSummaryMascots = Object.freeze({ refresh:schedule, apply, assets:ASSETS, periodState });
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start, { once:true });
   else start();
 })();
