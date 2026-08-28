@@ -33,7 +33,7 @@
     catch (error) { return false; }
   }
 
-  function essentialChoicePersisted({ key, choice, nextBase, nextPending, nextConflicts }) {
+  function essentialChoicePersisted({ key, choice, nextBase, nextPending }) {
     const profileId=String(window.FinanceProfileArchitecture?.activeProfileId?.() || "profile-personal");
     const baseStore=readStoredJson(`simple-finance-cloud-record-base-v3:${profileId}`);
     const queueStore=readStoredJson(`simple-finance-cloud-record-queue-v3:${profileId}`);
@@ -79,7 +79,7 @@
     const nextConflicts=conflicts.filter(entry=>entry.key!==key);
     setConflicts(nextConflicts);
     const persisted=persist();
-    const essentialPersisted=persisted || essentialChoicePersisted({key,choice,nextBase,nextPending:pending[key],nextConflicts});
+    const essentialPersisted=persisted || essentialChoicePersisted({key,choice,nextBase,nextPending:pending[key]});
     if (!essentialPersisted) {
       if (hadBase) baseRecords[key]=previousBase; else delete baseRecords[key];
       if (previousPending) pending[key]=previousPending; else delete pending[key];
