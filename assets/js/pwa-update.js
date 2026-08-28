@@ -3,7 +3,7 @@
   const FINANCE_CACHE_PATTERN = /^finance-v\d+-/;
   // Compatibility-only cache identity used to upgrade clients installed before Talaan V2.
   const LEGACY_INDEX_CACHE = "finance-v15-20260816-mobile-ui-ux-r32";
-  const CURRENT_CACHE_VERSION = "finance-v2-20260828-household-splits-r11";
+  const CURRENT_CACHE_VERSION = "finance-v2-20260828-household-splits-r12";
   const UI_HOTFIX_REFRESH_KEY = "finance-ui-hotfix-v2-0-1-talaan6";
   const normalizeCacheVersion = cacheVersion => cacheVersion === LEGACY_INDEX_CACHE ? CURRENT_CACHE_VERSION : cacheVersion;
 

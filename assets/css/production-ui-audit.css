@@ -115,7 +115,7 @@
 
 /* Phone: compact the containers, not the touch targets. */
 @media (max-width: 700px) {
-  :root { --mobile-topbar-offset: calc(env(safe-area-inset-top) + 106px); }
+  :root { --mobile-topbar-offset: calc(max(7px, env(safe-area-inset-top)) + 101px); }
 
   html body .topbar {
     gap: 6px 5px !important;
@@ -207,6 +207,57 @@
   html body #money .record-row[data-expense-row] .overflow-menu-trigger {
     min-height: 44px !important;
     height: 44px !important;
+  }
+
+  /* Keep every compact phone popover and secondary action finger-safe. */
+  html body :is(
+    .cloud-sync-popover-close,
+    .compact-help-close,
+    .month-picker-year-button,
+    .emoji-option,
+    .gym-override-chip button,
+    .kanban-column-menu .overflow-menu-trigger,
+    .structured-drag-toast-dismiss
+  ) {
+    box-sizing: border-box !important;
+    width: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    max-height: 44px !important;
+  }
+
+  html body :is(
+    .month-picker-option,
+    .emoji-custom-button,
+    .settings-search-field button,
+    .pc-event-actions .button,
+    #projects .project-kanban-board .project-calendar-button,
+    #projects .project-kanban-board .project-row-actions .button,
+    .structured-drag-toast-undo
+  ) {
+    min-width: 44px !important;
+    min-height: 44px !important;
+  }
+
+  html body .emoji-picker-panel,
+  html body .record-icon-picker-controls.compact-icon-popover .emoji-picker-panel {
+    position: fixed !important;
+    inset: auto 12px max(12px, env(safe-area-inset-bottom)) !important;
+    width: auto !important;
+    max-height: min(58dvh, 430px) !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain;
+  }
+
+  html body .emoji-grid {
+    grid-template-columns: repeat(5, minmax(44px, 1fr)) !important;
+    gap: 6px !important;
+  }
+
+  html body .emoji-option {
+    justify-self: center;
   }
 }
 

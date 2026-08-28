@@ -28,7 +28,7 @@ if (configPosition < 0 || runtimePosition < 0 || runtimePosition <= configPositi
   throw new Error("index.html must load sync-config.js before the Talaan sync-runtime compatibility layer.");
 }
 
-const expectedCache = "finance-v2-20260828-household-splits-r11";
+const expectedCache = "finance-v2-20260828-household-splits-r12";
 if (version.version !== "2.5.0") throw new Error(`Unexpected Talaan app version: ${version.version}`);
 if (version.schemaVersion !== 12 || version.cloudSchemaVersion !== 3) throw new Error("Talaan versioning must not change finance/cloud schema versions.");
 if (version.cacheVersion !== expectedCache) throw new Error(`Unexpected cache version: ${version.cacheVersion}`);
