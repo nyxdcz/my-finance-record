@@ -37,6 +37,28 @@ body {
   max-width: 100%;
 }
 
+/* Phase 5.2 · the medium-desktop Finance card rail intentionally remains
+   horizontally swipeable, but it must not reserve or paint a bottom scrollbar
+   gutter. That gutter is the empty strip visible below the transaction totals
+   on Retina/zoomed desktop layouts. */
+.app,
+.main,
+.content,
+.page {
+  overflow-x: clip !important;
+}
+@media (min-width: 851px) and (max-width: 1099px) {
+  html body #money .section-stack {
+    scrollbar-gutter: auto !important;
+    scrollbar-width: none !important;
+  }
+  html body #money .section-stack::-webkit-scrollbar {
+    width: 0 !important;
+    height: 0 !important;
+    display: none !important;
+  }
+}
+
 /* The older completion layer still keeps its amount in data-* attributes.
    Never show its heart-smile artwork in Budget & Expenses; this layer owns the visual. */
 #money img[data-first-half-complete-icon],
