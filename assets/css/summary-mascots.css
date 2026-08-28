@@ -59,6 +59,131 @@ body {
   }
 }
 
+/* Phase 5.3 · present Budget & Expenses filters and view controls as one
+   deliberate workspace toolbar instead of two unrelated rows. */
+@media (min-width: 851px) {
+  html body #money #expenseFiltersPanel {
+    margin: 10px 0 0 !important;
+    padding: 10px 10px 8px !important;
+    border: 1px solid var(--line) !important;
+    border-bottom: 0 !important;
+    border-radius: 9px 9px 0 0 !important;
+    background: var(--surface-soft) !important;
+  }
+
+  html body #money #expenseFiltersPanel > .expense-toolbar-single-line {
+    grid-template-columns: minmax(170px,.62fr) minmax(240px,1.4fr) minmax(160px,.7fr) minmax(180px,.9fr) auto minmax(0,auto) !important;
+    gap: 6px !important;
+    align-items: center !important;
+  }
+
+  html body #money #expenseFiltersPanel .bulk-expense-inline {
+    box-sizing: border-box !important;
+    min-height: 35px !important;
+    height: 35px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 8px !important;
+    padding: 0 10px !important;
+    border: 1px solid var(--line) !important;
+    border-radius: 7px !important;
+    background: var(--surface) !important;
+  }
+
+  html body #money #expenseFiltersPanel :is(.input,.select,.button),
+  html body #money #transactionToolbar-expense :is(.select,.button) {
+    box-sizing: border-box !important;
+    min-height: 35px !important;
+    height: 35px !important;
+    border-radius: 7px !important;
+  }
+
+  html body #money #transactionToolbar-expense {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    min-height: 54px !important;
+    display: flex !important;
+    align-items: center !important;
+    flex-wrap: nowrap !important;
+    gap: 6px !important;
+    margin: 0 0 10px !important;
+    padding: 8px 10px 10px !important;
+    border: 1px solid var(--line) !important;
+    border-top-color: color-mix(in srgb,var(--line) 72%,transparent) !important;
+    border-radius: 0 0 9px 9px !important;
+    background: var(--surface-soft) !important;
+  }
+
+  html body #money #transactionToolbar-expense .transaction-view-group {
+    box-sizing: border-box !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    flex: 0 0 auto !important;
+    gap: 2px !important;
+    padding: 2px !important;
+    border: 1px solid var(--line) !important;
+    border-radius: 8px !important;
+    background: var(--surface) !important;
+  }
+
+  html body #money #transactionToolbar-expense .transaction-view-group .button {
+    min-height: 29px !important;
+    height: 29px !important;
+    padding-inline: 12px !important;
+    border-color: transparent !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  html body #money #transactionToolbar-expense .transaction-view-group .button[aria-pressed="true"] {
+    border-color: color-mix(in srgb,var(--primary) 20%,var(--line)) !important;
+    background: var(--surface) !important;
+    color: var(--primary) !important;
+    box-shadow: 0 0 0 1px color-mix(in srgb,var(--primary) 24%,transparent) !important;
+  }
+
+  html body #money #transactionToolbar-expense > label {
+    display: block !important;
+    flex: 0 0 auto !important;
+    margin: 0 !important;
+  }
+
+  html body #money #transactionToolbar-expense > label:first-of-type .select {
+    width: 150px !important;
+  }
+
+  html body #money #transactionToolbar-expense > label:nth-of-type(2) .select {
+    width: 158px !important;
+  }
+
+  html body #money #transactionToolbar-expense > label:nth-of-type(3) .select {
+    width: 126px !important;
+  }
+
+  html body #money #transactionToolbar-expense [data-open-transaction-columns] {
+    margin-right: auto !important;
+  }
+}
+
+@media (min-width: 851px) and (max-width: 1180px) {
+  html body #money #expenseFiltersPanel > .expense-toolbar-single-line {
+    grid-template-columns: minmax(170px,.72fr) minmax(230px,1.35fr) minmax(150px,.72fr) minmax(170px,.9fr) auto auto !important;
+  }
+
+  html body #money #transactionToolbar-expense {
+    flex-wrap: wrap !important;
+  }
+
+  html body #money #transactionToolbar-expense [data-open-transaction-columns] {
+    margin-right: 0 !important;
+  }
+
+  html body #money #transactionToolbar-expense > label:nth-of-type(2) {
+    margin-left: auto !important;
+  }
+}
+
 /* The older completion layer still keeps its amount in data-* attributes.
    Never show its heart-smile artwork in Budget & Expenses; this layer owns the visual. */
 #money img[data-first-half-complete-icon],
