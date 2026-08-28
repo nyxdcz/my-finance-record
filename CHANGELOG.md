@@ -15,7 +15,8 @@
 - Stored versioned groups and settlements under `ledgerSettings.householdSplits` and optional snapshots on expenses, preserving Finance Schema 12 and Cloud Schema V3.
 - Hardened iPhone safe-area geometry, dynamic viewport sizing, and compact phone controls without changing desktop layouts or finance behavior.
 - Corrected phone account-dialog mode headings and scroll containment, transaction-total overlap, workspace-tab chrome, and Project Agenda action wrapping.
-- Rotated the PWA cache to `finance-v2-20260828-household-splits-r13` so installed clients receive the household baseline and complete iPhone layout refinements together.
+- Organized the Dashboard into Calendar, Cash Flow, and Overview views with Calendar first, a consistent 7px card radius, a 12px spacing rhythm, and explicit default bento spans.
+- Rotated the PWA cache to `finance-v2-20260828-household-splits-r14` so installed clients receive the household baseline, iPhone refinements, and consistent Dashboard views together.
 
 ## V2.4.0 · Talaan
 
