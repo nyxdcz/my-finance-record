@@ -21,5 +21,5 @@
   ensureLink({ rel:"icon", sizes:"32x32", type:"image/png", href:"./icons/favicon-32-logo2.png" });
   ensureLink({ rel:"icon", sizes:"192x192", type:"image/png", href:"./icons/icon-192-logo2.png" });
   ensureLink({ rel:"apple-touch-icon", href:"./icons/apple-touch-icon-logo2.png" });
-  ensureLink({ rel:"stylesheet", id:"incomeExpensesCompactStylesheet", href:"./income-expenses-compact.css?v=2.5.0-income-expenses-compact1" });
+  ensureLink({ rel:"stylesheet", id:"incomeExpensesCompactStylesheet", href:"./income-expenses-compact.css?v=2.5.0-income-expenses-compact2" });
 })(typeof window !== "undefined" ? window : globalThis);
