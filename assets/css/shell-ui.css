@@ -46,7 +46,7 @@
     body.finance-signed-out #globalSearchButton,
     body.finance-signed-out #productivityCenterButton { display:none !important; }
     body.finance-signed-out .page:not(#settings) > :not(.finance-privacy-lock-view) { display:none !important; }
-    body.finance-signed-out .page:not(#settings) > .finance-privacy-lock-view { display:grid !important; min-height:min(620px,calc(100vh - 170px)); place-items:center; padding:22px 0; }
+    body.finance-signed-out .page:not(#settings) > .finance-privacy-lock-view { display:grid !important; min-height:min(620px,calc(100vh - 170px)); min-height:min(620px,calc(100dvh - 170px)); place-items:center; padding:22px 0; }
     .finance-privacy-lock-card { width:min(760px,100%); display:grid; gap:16px; padding:22px; border:1px solid var(--line); border-radius:12px; background:var(--surface); box-shadow:var(--shadow); }
     .finance-privacy-lock-icon { width:44px; height:44px; display:grid; place-items:center; border:1px solid var(--line); border-radius:10px; background:var(--surface-soft); color:var(--primary); }
     .finance-privacy-lock-icon svg { width:24px; height:24px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
@@ -82,7 +82,7 @@
       body.finance-signed-out .privacy-signin-topbar { grid-area:sync !important; width:44px; min-width:44px; height:44px; min-height:44px; max-height:44px; padding:0; justify-content:center; }
       body.finance-signed-out .privacy-signin-topbar .privacy-signin-label { position:absolute; width:1px; height:1px; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; }
       body.finance-signed-out .topbar-actions { grid-template-areas:"add sync tools" "month month month"; }
-      body.finance-signed-out .page:not(#settings) > .finance-privacy-lock-view { min-height:calc(100vh - 190px); padding:12px 0; }
+      body.finance-signed-out .page:not(#settings) > .finance-privacy-lock-view { min-height:calc(100vh - 190px); min-height:calc(100dvh - 190px); padding:12px 0; }
       .finance-privacy-lock-card { padding:16px; gap:13px; }
       .finance-privacy-zero-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
       .finance-privacy-lock-card .button { min-height:44px; }

@@ -10,7 +10,7 @@ const version = JSON.parse(fs.readFileSync("version.json", "utf8"));
 assert.equal(version.version, "2.5.0");
 assert.equal(version.schemaVersion, 12);
 assert.equal(version.cloudSchemaVersion, 3);
-assert.equal(version.cacheVersion, "finance-v2-20260828-household-splits-r11");
+assert.equal(version.cacheVersion, "finance-v2-20260828-household-splits-r12");
 assert.match(source, /Manual net-worth ledger/);
 assert.match(source, /Separate from Available Money, Savings, Cash Flow, and Account Ledger/);
 assert.match(source, /source:"manual"/);
