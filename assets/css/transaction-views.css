@@ -21,9 +21,9 @@
   html body #money #transactionToolbar-expense [data-open-transaction-columns]{margin-right:0!important}
   html body #money .section-stack{gap:8px!important}
   html body #money .section-stack>.period-card{border-radius:10px!important;overflow:hidden!important}
-  html body #money .section-stack>.period-card>.period-header{box-sizing:border-box!important;min-height:54px!important;padding:9px 11px!important;align-items:center!important}
+  html body #money .section-stack>.period-card>.period-header{box-sizing:border-box!important;min-height:54px!important;padding:9px 10px!important;align-items:center!important}
   html body #money .section-stack>.period-card>.period-header h3{font-size:15px!important;line-height:1.15!important;margin:0!important}
-  html body #money .section-stack>.period-card>.period-header p{margin:3px 0 0!important;font-size:.72rem!important;line-height:1.2!important}
+  html body #money .section-stack>.period-card>.period-header p{margin:3px 0 0!important;font-size:10px!important;line-height:1.2!important}
   html body #money .section-stack>.period-card>.period-header .collapse-actions{gap:10px!important;align-items:center!important}
 }
 @media(min-width:1181px) and (max-width:1350px){
