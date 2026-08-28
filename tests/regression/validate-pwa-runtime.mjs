@@ -12,14 +12,14 @@ const version = JSON.parse(read("version.json"));
 const query = "2.5.0-talaan1";
 
 assert.equal(version.version, "2.5.0");
-assert.equal(version.cacheVersion, "finance-v2-20260828-household-splits-r14");
+assert.equal(version.cacheVersion, "finance-v2-20260828-household-splits-r15");
 assert.match(index, /FinancePwaUpdate\.shellCacheName\(APP_CACHE_VERSION\)/);
 assert.match(index, /FinancePwaUpdate\.clearFinanceCaches\(\)/);
 assert.match(index, /FinancePwaUpdate\.serviceWorkerUrl\(APP_VERSION, APP_CACHE_VERSION\)/);
 assert.match(index, /FinancePwaUpdate\.updateState\(remote, APP_VERSION, APP_CACHE_VERSION\)/);
 assert.match(updater, /const FINANCE_CACHE_PATTERN = \/\^finance-v\\d\+-\//);
 assert.match(updater, /const LEGACY_INDEX_CACHE = "finance-v15-20260816-mobile-ui-ux-r32";/, "pre-Talaan cache alias stays compatibility-only");
-assert.match(updater, /const CURRENT_CACHE_VERSION = "finance-v2-20260828-household-splits-r14";/);
+assert.match(updater, /const CURRENT_CACHE_VERSION = "finance-v2-20260828-household-splits-r15";/);
 assert.match(updater, /const UI_HOTFIX_REFRESH_KEY = "finance-ui-hotfix-v2-0-1-talaan7";/);
 assert.match(updater, /"\/cash-flow-summary\.js"/, "dashboard analytics runtime must be included in the generic stale-cache purge list");
 assert.match(updater, /const DASHBOARD_PRESENTATION_REFRESH_KEY = "finance-dashboard-presentation-v2-5-0-talaan8";/);

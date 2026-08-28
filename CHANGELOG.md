@@ -16,7 +16,8 @@
 - Hardened iPhone safe-area geometry, dynamic viewport sizing, and compact phone controls without changing desktop layouts or finance behavior.
 - Corrected phone account-dialog mode headings and scroll containment, transaction-total overlap, workspace-tab chrome, and Project Agenda action wrapping.
 - Organized the Dashboard into Calendar, Cash Flow, and Overview views with Calendar first, a consistent 7px card radius, a 12px spacing rhythm, and explicit default bento spans.
-- Rotated the PWA cache to `finance-v2-20260828-household-splits-r14` so installed clients receive the household baseline, iPhone refinements, and consistent Dashboard views together.
+- Matched the Dashboard view switcher to the compact Finance segmented-control treatment and enlarged the monthly calendar grid across desktop and phone layouts.
+- Rotated the PWA cache to `finance-v2-20260828-household-splits-r15` so installed clients receive the household baseline, iPhone refinements, and final Dashboard presentation together.
 
 ## V2.4.0 · Talaan
 

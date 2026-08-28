@@ -1,7 +1,7 @@
 "use strict";
 const APP_VERSION = "2.5.0";
 self.__FINANCE_APP_VERSION = APP_VERSION;
-const CACHE_VERSION = "finance-v2-20260828-household-splits-r14";
+const CACHE_VERSION = "finance-v2-20260828-household-splits-r15";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 // Persistent IndexedDB name is intentionally retained so existing saved data remains available after the product rename.

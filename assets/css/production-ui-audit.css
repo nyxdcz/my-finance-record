@@ -1258,13 +1258,14 @@
   box-sizing: border-box;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0;
-  width: 100%;
+  gap: 4px;
+  width: min(100%, 480px);
   min-width: 0;
-  height: 44px;
-  min-height: 44px;
-  max-height: 44px;
-  padding: 0;
+  height: 52px;
+  min-height: 52px;
+  max-height: 52px;
+  margin-right: auto;
+  padding: 4px;
   border: 0;
   border-radius: var(--dashboard-card-radius);
   background: var(--surface-soft);
@@ -1279,8 +1280,7 @@
   min-height: 44px;
   padding: 7px 12px;
   border: 0;
-  border-right: 1px solid var(--line);
-  border-radius: 0;
+  border-radius: 5px;
   background: transparent;
   color: var(--muted);
   font: inherit;
@@ -1291,13 +1291,16 @@
   cursor: pointer;
 }
 
-#dashboard .dashboard-view-tab:last-child { border-right: 0; }
+#dashboard .dashboard-view-tab:hover:not([aria-selected="true"]) {
+  background: color-mix(in srgb, var(--primary) 7%, transparent);
+  color: var(--text);
+}
 
 #dashboard .dashboard-view-tab[aria-selected="true"] {
-  border-color: transparent;
   border-radius: 5px;
   background: var(--primary);
   color: var(--primary-contrast);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--text) 14%, transparent);
 }
 
 #dashboard .dashboard-view-tab:focus-visible {
@@ -1355,6 +1358,20 @@
 
 #dashboard .month-insights-card {
   margin-top: var(--dashboard-card-gap) !important;
+}
+
+#dashboard .dashboard-calendar-layout {
+  grid-template-columns: minmax(0, 18fr) minmax(260px, 7fr) !important;
+  gap: var(--dashboard-card-gap) !important;
+}
+
+#dashboard .dashboard-calendar-grid {
+  gap: 4px !important;
+}
+
+#dashboard .calendar-day {
+  min-height: clamp(68px, 6vw, 88px) !important;
+  padding: 6px !important;
 }
 
 #dashboard.dashboard-default-layout [data-dashboard-card="calendar"],
@@ -1438,6 +1455,16 @@
   }
 }
 
+@media (max-width: 850px) {
+  #dashboard .dashboard-calendar-layout {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  #dashboard .calendar-day {
+    min-height: 64px !important;
+  }
+}
+
 @media (max-width: 700px) {
   #dashboard {
     --dashboard-card-gap: 12px;
@@ -1445,10 +1472,11 @@
   }
 
   #dashboard .dashboard-view-tabs {
-    height: 44px;
-    min-height: 44px;
-    max-height: 44px;
-    padding: 0;
+    width: 100%;
+    height: 52px;
+    min-height: 52px;
+    max-height: 52px;
+    padding: 4px;
   }
 
   #dashboard .dashboard-view-tab {
@@ -1483,5 +1511,10 @@
 
   #dashboard .calendar-card-controls {
     min-width: 0;
+  }
+
+  #dashboard .calendar-day {
+    min-height: 56px !important;
+    padding: 5px !important;
   }
 }
