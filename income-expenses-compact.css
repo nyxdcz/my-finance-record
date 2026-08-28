@@ -221,3 +221,40 @@
     height: 42px !important;
   }
 }
+
+/* The primary over-time chart is intentionally excluded from the compact pass.
+   Keep its original card spacing and responsive chart scale for readability. */
+.income-expenses-chart-card {
+  padding: 16px 16px 10px !important;
+}
+
+.income-expenses-chart-head {
+  margin-bottom: 8px !important;
+}
+
+.income-expenses-chart-title {
+  font-size: .78rem !important;
+}
+
+.income-expenses-legend {
+  gap: 13px !important;
+}
+
+.income-expenses-legend-item {
+  font-size: .61rem !important;
+}
+
+.income-expenses-svg {
+  height: auto !important;
+  min-height: 260px !important;
+}
+
+@media (max-width: 700px) {
+  .income-expenses-chart-card {
+    padding: 13px 9px 8px !important;
+  }
+
+  .income-expenses-svg {
+    min-height: 210px !important;
+  }
+}
