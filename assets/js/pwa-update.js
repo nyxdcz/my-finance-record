@@ -16,6 +16,15 @@
     }
   }
 
+  async function installAccountSubmitCompat() {
+    try {
+      await import("./account-submit-compat.js?v=2.5.0-account-submit1");
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
 
   async function refreshCachedHeaderToolsOnce() {
     if (!root.navigator?.serviceWorker?.controller || !("caches" in root)) return false;
@@ -72,5 +81,6 @@
   };
   root.FinancePwaUpdate = api;
   void installBrowserBrandIcons();
+  void installAccountSubmitCompat();
   void refreshCachedHeaderToolsOnce();
 })(typeof window !== "undefined" ? window : globalThis);
