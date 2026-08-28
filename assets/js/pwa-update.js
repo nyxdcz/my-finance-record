@@ -25,17 +25,6 @@
     }
   }
 
-  function installIncomeExpensesCompactStyles() {
-    const doc = root.document;
-    if (!doc) return false;
-    if (doc.getElementById("incomeExpensesCompactStylesheet")) return true;
-    const link = doc.createElement("link");
-    link.id = "incomeExpensesCompactStylesheet";
-    link.rel = "stylesheet";
-    link.href = "./income-expenses-compact.css?v=2.5.0-income-expenses-compact1";
-    doc.head.appendChild(link);
-    return true;
-  }
 
   async function refreshCachedHeaderToolsOnce() {
     if (!root.navigator?.serviceWorker?.controller || !("caches" in root)) return false;
@@ -94,6 +83,5 @@
   root.FinancePwaUpdate = api;
   void installBrowserBrandIcons();
   void installAccountSubmitCompat();
-  installIncomeExpensesCompactStyles();
   void refreshCachedHeaderToolsOnce();
 })(typeof window !== "undefined" ? window : globalThis);
