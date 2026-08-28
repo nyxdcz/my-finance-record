@@ -1,4 +1,5 @@
 "use strict";
+/* global data */
 (function installIncomeExpensesDashboard(root) {
   const STYLE_ID = "incomeExpensesDashboardStyles";
   const RANGE_OPTIONS = [
@@ -16,6 +17,11 @@
   const escapeHtml = value => String(value ?? "").replace(/[&<>"']/g, character => ({
     "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
   }[character]));
+
+  function financeData() {
+    try { if (typeof data !== "undefined" && data && typeof data === "object") return data; } catch (error) {}
+    return root.data && typeof root.data === "object" ? root.data : {};
+  }
 
   function formatMoney(value) {
     try { if (typeof root.money === "function") return root.money(Number(value || 0)); } catch (error) {}
@@ -42,6 +48,12 @@
     try { if (typeof root.monthLabel === "function") return root.monthLabel(month); } catch (error) {}
     const [year, monthNumber] = String(month).split("-").map(Number);
     return new Intl.DateTimeFormat("en-PH", { month:"short", year:"numeric" }).format(new Date(year, monthNumber - 1, 1));
+  }
+
+  function shortMonthLabel(month) {
+    const [year, monthNumber] = String(month).split("-").map(Number);
+    const shortMonth = new Intl.DateTimeFormat("en-PH", { month:"short" }).format(new Date(year, monthNumber - 1, 1));
+    return `${shortMonth} '${String(year).slice(-2)}`;
   }
 
   function rangeMonths(rangeValue = activeRange, month = anchorMonth()) {
@@ -83,7 +95,7 @@
 
   function projectIncomeForMonth(month) {
     let total = 0;
-    (root.data?.projects || []).filter(projectIncluded).forEach(project => {
+    (financeData().projects || []).filter(projectIncluded).forEach(project => {
       const history = Array.isArray(project.paymentHistory) ? project.paymentHistory : [];
       if (history.length) {
         history.forEach(payment => {
@@ -97,10 +109,11 @@
   }
 
   function monthMetrics(month) {
-    const manualIncome = (root.data?.incomeRecords || [])
+    const source = financeData();
+    const manualIncome = (source.incomeRecords || [])
       .filter(item => incomeIncluded(item) && String(item?.date || "").slice(0, 7) === month)
       .reduce((sum, item) => sum + Number(item?.amount || 0), 0);
-    const paidExpenses = (root.data?.expenses || [])
+    const paidExpenses = (source.expenses || [])
       .filter(item => item?.paid && expenseIncluded(item) && String(item?.paidDate || item?.date || "").slice(0, 7) === month);
     const expenses = paidExpenses.reduce((sum, item) => sum + expenseAmount(item), 0);
     const income = roundMoney(manualIncome + projectIncomeForMonth(month));
@@ -179,7 +192,7 @@
       return `<g class="income-expenses-month-group">
         <rect class="income-expenses-bar income" x="${(center - barWidth - 2).toFixed(2)}" y="${incomeY.toFixed(2)}" width="${barWidth.toFixed(2)}" height="${incomeHeight.toFixed(2)}" rx="4"><title>${escapeHtml(label)} income</title></rect>
         <rect class="income-expenses-bar expense" x="${(center + 2).toFixed(2)}" y="${expenseY.toFixed(2)}" width="${barWidth.toFixed(2)}" height="${expenseHeight.toFixed(2)}" rx="4"><title>${escapeHtml(label)} expenses</title></rect>
-        ${index % labelEvery === 0 || index === rows.length - 1 ? `<text class="income-expenses-axis-label" x="${center.toFixed(2)}" y="${height - 19}" text-anchor="middle">${escapeHtml(label.replace(/\s(\d{4})$/, " '$1".slice(0, 4)))}</text>` : ""}
+        ${index % labelEvery === 0 || index === rows.length - 1 ? `<text class="income-expenses-axis-label" x="${center.toFixed(2)}" y="${height - 19}" text-anchor="middle">${escapeHtml(shortMonthLabel(row.month))}</text>` : ""}
       </g>`;
     }).join("");
     const points = rows.map((row, index) => {
