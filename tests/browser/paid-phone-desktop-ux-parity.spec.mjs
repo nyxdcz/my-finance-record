@@ -20,6 +20,15 @@ async function resetPaidViewPreferences(page) {
   });
 }
 
+async function cleanupPaidUxFixtures(page) {
+  await page.evaluate(() => {
+    ["uxParityPaidSelection", "uxParityEditTarget", "uxParityCalendarEntry"].forEach(id => document.getElementById(id)?.remove());
+    const dialog = document.getElementById("expenseDialog");
+    if (dialog?.open) dialog.close();
+    delete window.__paidUxEditOpened;
+  });
+}
+
 async function controlContract(page) {
   return page.evaluate(() => {
     const toolbar = document.getElementById("transactionToolbar-paid");
@@ -44,6 +53,7 @@ async function controlContract(page) {
 }
 
 async function exercisePaidUx(page) {
+  await cleanupPaidUxFixtures(page);
   const beforeData = await page.evaluate(() => JSON.stringify(data));
 
   await page.locator('#transactionToolbar-paid [data-transaction-mode="calendar"]').click();
@@ -76,6 +86,7 @@ async function exercisePaidUx(page) {
   }));
 
   await page.evaluate(() => {
+    document.getElementById("uxParityPaidSelection")?.remove();
     const host = document.getElementById("paidProductivityBulk");
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
@@ -89,6 +100,8 @@ async function exercisePaidUx(page) {
   await expect(page.locator("#paidProductivitySelectedCount")).toContainText("0 selected");
 
   await page.evaluate(() => {
+    document.getElementById("uxParityEditTarget")?.remove();
+    document.getElementById("uxParityCalendarEntry")?.remove();
     window.__paidUxEditOpened = false;
     const edit = document.createElement("button");
     edit.id = "uxParityEditTarget";
@@ -114,6 +127,7 @@ async function exercisePaidUx(page) {
   const listState = await page.evaluate(() => window.FinanceTransactionViews.getState().paid.mode);
 
   const dataUnchanged = await page.evaluate(before => JSON.stringify(data) === before, beforeData);
+  await cleanupPaidUxFixtures(page);
 
   return {
     calendarState,
@@ -157,6 +171,7 @@ test("iPhone 14 Pro Paid Expenses interactions produce the same state transition
   const desktop = await exercisePaidUx(page);
 
   await resetPaidViewPreferences(page);
+  await cleanupPaidUxFixtures(page);
   await page.setViewportSize(IPHONE_14_PRO);
   const phone = await exercisePaidUx(page);
 
