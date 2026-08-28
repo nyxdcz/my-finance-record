@@ -20,6 +20,7 @@ test("desktop Income vs Expenses uses the compact presentation", async ({ page }
 
   const stylesheet = page.locator("#incomeExpensesCompactStylesheet");
   await expect(stylesheet).toHaveAttribute("href", /income-expenses-compact\.css\?v=2\.5\.0-income-expenses-compact1$/);
+  await expect(page.locator("#dashboardWeekMarquee")).toBeHidden();
 
   const measurements = await page.evaluate(() => {
     const analytics = document.querySelector(".income-expenses-analytics");
