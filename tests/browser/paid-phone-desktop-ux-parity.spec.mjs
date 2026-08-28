@@ -103,6 +103,11 @@ async function exercisePaidUx(page) {
   });
   await page.locator("#uxParityCalendarEntry").click();
   const calendarOpenWorked = await page.evaluate(() => window.__paidUxEditOpened === true);
+  const editDialog = page.locator("#expenseDialog");
+  await expect(editDialog).toBeVisible();
+  const editDialogOpened = await editDialog.evaluate(dialog => dialog.open === true);
+  await editDialog.evaluate(dialog => dialog.close());
+  await expect(editDialog).toBeHidden();
 
   await page.locator('#transactionToolbar-paid [data-transaction-mode="list"]').click();
   await expect(page.locator("#transactionCalendar-paid")).toBeHidden();
@@ -117,6 +122,7 @@ async function exercisePaidUx(page) {
     savedView,
     bulkValueState,
     calendarOpenWorked,
+    editDialogOpened,
     listState,
     dataUnchanged
   };
@@ -162,6 +168,7 @@ test("iPhone 14 Pro Paid Expenses interactions produce the same state transition
   expect(phone.bulkValueState.disabled).toBe(false);
   expect(phone.bulkValueState.optionCount).toBeGreaterThan(1);
   expect(phone.calendarOpenWorked).toBe(true);
+  expect(phone.editDialogOpened).toBe(true);
   expect(phone.listState).toBe("list");
   expect(phone.dataUnchanged).toBe(true);
 });
