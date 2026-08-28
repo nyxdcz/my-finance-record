@@ -18,7 +18,7 @@ async function loadFixture(page, width) {
           <div class="field expense-search-field"><input class="input" id="expenseSearch" placeholder="Name or note"></div>
           <div class="field"><select class="select" id="expenseDateFilter"><option value="month">Selected month</option><option value="all">All dates</option></select></div>
           <div class="field"><select class="select" id="expenseCategoryFilter"><option value="">All categories</option><option>Bills</option></select></div>
-          <button class="button button-secondary" type="button">More filters</button>
+          <button class="button button-secondary productivity-advanced-filter-button" type="button">More filters</button>
           <button class="button button-secondary expense-clear-filters" type="button">Clear</button>
         </div>
       </details>
@@ -30,7 +30,11 @@ async function loadFixture(page, width) {
         <label><select class="select" data-transaction-sort><option>Newest first</option></select></label>
         <label><select class="select" data-transaction-density><option>Comfortable</option><option>Compact</option></select></label>
       </div>
-      <div class="section-stack"></div>
+      <div class="section-stack">
+        <article class="card period-card period-early"><div class="period-header"><div><h3>First half of the month</h3><p>Unpaid expenses due on days 1–15</p></div><div class="collapse-actions"><strong>₱0.00</strong></div></div></article>
+        <article class="card period-card period-late"><div class="period-header"><div><h3>Second half of the month</h3><p>Unpaid expenses due on days 16–end</p></div><div class="collapse-actions"><strong>₱2,250.00</strong></div></div></article>
+        <article class="card period-card period-other"><div class="period-header"><div><h3>Other expenses</h3><p>Unpaid one-time expenses</p></div><div class="collapse-actions"><strong>₱640.00</strong></div></div></article>
+      </div>
     </section>
   </div></main></div>
   <script>window.renderCount=0;window.renderMoneyPage=()=>{window.renderCount+=1;};</script>
@@ -39,7 +43,7 @@ async function loadFixture(page, width) {
   await expect.poll(() => page.evaluate(() => Boolean(window.FinanceCompactExpenseToolbar))).toBe(true);
 }
 
-test("desktop Budget & Expenses combines visible controls into one compact line", async ({ page }) => {
+test("desktop Budget & Expenses uses one compact aligned control system", async ({ page }) => {
   await loadFixture(page, 1440);
 
   const state = await page.evaluate(() => {
@@ -51,6 +55,8 @@ test("desktop Budget & Expenses combines visible controls into one compact line"
     const sort = toolbar.querySelector("[data-transaction-sort]");
     const bulk = document.getElementById("bulkExpenseBar");
     const date = document.getElementById("expenseDateFilter");
+    const visibleControls = [...row.querySelectorAll(".input,.select,.button")].filter(control => getComputedStyle(control).display !== "none" && control.getBoundingClientRect().width > 0);
+    const periodHeaders = [...document.querySelectorAll("#money .period-card>.period-header")];
     return {
       toolbarInsideRow:toolbar.parentElement === row,
       rowWrap:getComputedStyle(row).flexWrap,
@@ -62,9 +68,13 @@ test("desktop Budget & Expenses combines visible controls into one compact line"
       densityExists:Boolean(toolbar.querySelector("[data-transaction-density]")),
       compact:document.getElementById("money").classList.contains("transaction-density-compact"),
       activeHeight:active.getBoundingClientRect().height,
+      savedHeight:saved.getBoundingClientRect().height,
       savedWidth:saved.getBoundingClientRect().width,
       sortWidth:sort.getBoundingClientRect().width,
-      rowOverflows:row.scrollWidth > row.clientWidth + 1
+      rowHeight:row.getBoundingClientRect().height,
+      controlHeights:visibleControls.map(control => control.getBoundingClientRect().height),
+      rowOverflows:row.scrollWidth > row.clientWidth + 1,
+      periodHeaderHeights:periodHeaders.map(header => header.getBoundingClientRect().height)
     };
   });
 
@@ -77,10 +87,14 @@ test("desktop Budget & Expenses combines visible controls into one compact line"
   expect(state.monthValue).toBe("month");
   expect(state.densityExists).toBe(false);
   expect(state.compact).toBe(true);
-  expect(state.activeHeight).toBeCloseTo(29, 0);
-  expect(state.savedWidth).toBeCloseTo(150, 0);
-  expect(state.sortWidth).toBeCloseTo(158, 0);
+  expect(state.activeHeight).toBeCloseTo(28, 0);
+  expect(state.savedHeight).toBeCloseTo(34, 0);
+  expect(state.savedWidth).toBeCloseTo(142, 0);
+  expect(state.sortWidth).toBeCloseTo(146, 0);
+  expect(state.rowHeight).toBeLessThanOrEqual(50);
+  state.controlHeights.filter(height => height > 30).forEach(height => expect(height).toBeCloseTo(34, 0));
   expect(state.rowOverflows).toBe(false);
+  state.periodHeaderHeights.forEach(height => expect(height).toBeCloseTo(54, 0));
 });
 
 test("tablet keeps transaction controls outside the collapsible filter panel", async ({ page }) => {
