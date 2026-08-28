@@ -128,19 +128,21 @@ test("desktop Finance filters and view controls read as one organized toolbar", 
     const active = toolbar.querySelector('.transaction-view-group [aria-pressed="true"]');
     const filtersRect = filters.getBoundingClientRect();
     const toolbarRect = toolbar.getBoundingClientRect();
+    const columnsRect = columns.getBoundingClientRect();
+    const sortRect = labels[1].getBoundingClientRect();
     return {
       joinedGap:Math.abs(filtersRect.bottom - toolbarRect.top),
       filtersBackground:getComputedStyle(filters).backgroundColor,
       toolbarBackground:getComputedStyle(toolbar).backgroundColor,
       toolbarDisplay:getComputedStyle(toolbar).display,
       toolbarWrap:getComputedStyle(toolbar).flexWrap,
-      columnsMarginRight:getComputedStyle(columns).marginRight,
+      preferenceGap:sortRect.left - columnsRect.right,
       activeColor:getComputedStyle(active).color,
       activeHeight:active.getBoundingClientRect().height,
       savedWidth:labels[0].querySelector("select").getBoundingClientRect().width,
       sortWidth:labels[1].querySelector("select").getBoundingClientRect().width,
       densityWidth:labels[2].querySelector("select").getBoundingClientRect().width,
-      sortStartsAfterColumns:labels[1].getBoundingClientRect().left > columns.getBoundingClientRect().right
+      sortStartsAfterColumns:sortRect.left > columnsRect.right
     };
   });
 
@@ -148,7 +150,7 @@ test("desktop Finance filters and view controls read as one organized toolbar", 
   expect(state.filtersBackground).toBe(state.toolbarBackground);
   expect(state.toolbarDisplay).toBe("flex");
   expect(state.toolbarWrap).toBe("nowrap");
-  expect(state.columnsMarginRight).toBe("auto");
+  expect(state.preferenceGap).toBeGreaterThan(24);
   expect(state.activeHeight).toBeCloseTo(29, 0);
   expect(state.savedWidth).toBeCloseTo(150, 0);
   expect(state.sortWidth).toBeCloseTo(158, 0);
