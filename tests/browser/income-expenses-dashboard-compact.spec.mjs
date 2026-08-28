@@ -9,6 +9,7 @@ async function openDashboard(page, viewport) {
   await page.waitForFunction(() => Boolean(window.FinancePrivacyLock));
   await page.evaluate(() => window.FinancePrivacyLock.setAuthenticated(true));
   await page.waitForFunction(() => document.querySelector("#dashCashFlowChart .income-expenses-analytics"));
+  await page.locator('[data-dashboard-view-tab="cash-flow"]').click();
   await page.waitForFunction(() => {
     const link = document.getElementById("incomeExpensesCompactStylesheet");
     return Boolean(link && link.sheet);
