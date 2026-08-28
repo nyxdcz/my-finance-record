@@ -27,10 +27,10 @@
   }
 
   async function deleteCachedPaths(pathnames) {
-    if (!("caches" in root)) return false;
+    if (!("caches" in root)) return 0;
     try {
       const cacheNames = (await root.caches.keys()).filter(name => FINANCE_CACHE_PATTERN.test(name));
-      await Promise.all(cacheNames.map(async cacheName => {
+      const deletedCounts = await Promise.all(cacheNames.map(async cacheName => {
         const cache = await root.caches.open(cacheName);
         const requests = await cache.keys();
         const targets = requests.filter(request => {
@@ -41,11 +41,12 @@
             return false;
           }
         });
-        await Promise.all(targets.map(request => cache.delete(request)));
+        const deleted = await Promise.all(targets.map(request => cache.delete(request)));
+        return deleted.filter(Boolean).length;
       }));
-      return true;
+      return deletedCounts.reduce((sum, count) => sum + count, 0);
     } catch (error) {
-      return false;
+      return 0;
     }
   }
 
