@@ -30,8 +30,11 @@ assert.match(phoneFinance, /function enhancePhoneCompactButtons\(\)/);
 assert.match(phoneFinance, /function installPhoneFinanceCompactUi\(\)/);
 assert.match(headerTools, /function installQuickEntryToolsMenuRelocation\(\)/);
 assert.match(headerTools, /function installHeaderToolsRelocation\(\)/);
-assert.match(cashFlow, /function upgradeCashFlowLayout\(\)/);
-assert.match(cashFlow, /function comparisonMarkup\(current, previous\)/);
+assert.match(cashFlow, /function renderAnalytics\(force = false\)/);
+assert.match(cashFlow, /function comparisonCopy\(current, previous\)/);
+assert.match(cashFlow, /function rangeMonths\(rangeValue = activeRange, month = anchorMonth\(\)\)/);
+assert.match(cashFlow, /FinanceIncomeExpensesDashboard/);
+assert.match(cashFlow, /income-expenses-chart-card/);
 
 for (const file of ["pwa-update.js", "phone-finance-compat.js", "header-tools-compat.js", "cash-flow-summary.js", "import-formats.js", "import-center.js", "import-center.css"]) {
   assert.ok(index.includes(`./${file}?v=${query}`), `index must load ${file}`);
@@ -49,4 +52,4 @@ assert.match(worker, /url\.pathname\.endsWith\("repeat-monthly-off\.png"\)/);
 assert.match(worker, /url\.pathname\.endsWith\("repeat-monthly-on\.png"\)/);
 assert.ok(worker.includes(version.cacheVersion));
 
-console.log("Talaan PWA update, service-worker delivery, replaceable repeat icons, and dedicated runtime ownership validated.");
+console.log("Talaan PWA update, service-worker delivery, Income vs Expenses analytics ownership, replaceable repeat icons, and dedicated runtime ownership validated.");
