@@ -187,7 +187,7 @@ test("runtime preparation renders fresh real brand assets without changing relea
   expect(serviceWorker).toContain('url.pathname.endsWith("sidebar-compact-brand.css") ||');
   expect(updater).not.toContain("document");
   expect(updater).toContain('const CURRENT_CACHE_VERSION = "finance-v2-20260828-household-splits-r13"');
-  expect(updater).toContain('const UI_HOTFIX_REFRESH_KEY = "finance-ui-hotfix-v2-0-1-talaan6"');
+  expect(updater).toContain('const UI_HOTFIX_REFRESH_KEY = "finance-ui-hotfix-v2-0-1-talaan7"');
   expect(updater).toContain('pathname.endsWith("/sidebar-compact-brand.css")');
   expect(updater).toContain('pathname.endsWith("/talaan-brand-logo.png")');
 });

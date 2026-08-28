@@ -20,6 +20,8 @@ assert.match(index, /FinancePwaUpdate\.updateState\(remote, APP_VERSION, APP_CAC
 assert.match(updater, /const FINANCE_CACHE_PATTERN = \/\^finance-v\\d\+-\//);
 assert.match(updater, /const LEGACY_INDEX_CACHE = "finance-v15-20260816-mobile-ui-ux-r32";/, "pre-Talaan cache alias stays compatibility-only");
 assert.match(updater, /const CURRENT_CACHE_VERSION = "finance-v2-20260828-household-splits-r13";/);
+assert.match(updater, /const UI_HOTFIX_REFRESH_KEY = "finance-ui-hotfix-v2-0-1-talaan7";/);
+assert.match(updater, /pathname\.endsWith\("\/cash-flow-summary\.js"\)/, "dashboard analytics runtime must be purged from stale PWA caches once");
 assert.match(updater, /desktop-ui-phase1\.css/);
 assert.match(updater, /black-canvas\.css/);
 assert.match(updater, /production-ui-audit\.css/);
@@ -52,4 +54,4 @@ assert.match(worker, /url\.pathname\.endsWith\("repeat-monthly-off\.png"\)/);
 assert.match(worker, /url\.pathname\.endsWith\("repeat-monthly-on\.png"\)/);
 assert.ok(worker.includes(version.cacheVersion));
 
-console.log("Talaan PWA update, service-worker delivery, Income vs Expenses analytics ownership, replaceable repeat icons, and dedicated runtime ownership validated.");
+console.log("Talaan PWA update, service-worker delivery, Income vs Expenses analytics ownership and cache refresh, replaceable repeat icons, and dedicated runtime ownership validated.");
