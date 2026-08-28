@@ -24,6 +24,9 @@ assert.match(updater, /const UI_HOTFIX_REFRESH_KEY = "finance-ui-hotfix-v2-0-1-t
 assert.match(updater, /"\/cash-flow-summary\.js"/, "dashboard analytics runtime must be included in the generic stale-cache purge list");
 assert.match(updater, /const DASHBOARD_PRESENTATION_REFRESH_KEY = "finance-dashboard-presentation-v2-5-0-talaan8";/);
 assert.match(updater, /"\/income-expenses-compact\.css"/, "dashboard presentation stylesheet must be included in the dedicated stale-cache purge list");
+assert.match(updater, /const deletedCounts = await Promise\.all/, "targeted cache refresh must count actual deletions");
+assert.match(updater, /return deletedCounts\.reduce\(\(sum, count\) => sum \+ count, 0\);/, "an empty cache scan must report zero deleted assets");
+assert.match(updater, /if \(!removed\) return false;/, "one-time refresh must not reload when no stale target was removed");
 assert.match(updater, /desktop-ui-phase1\.css/);
 assert.match(updater, /black-canvas\.css/);
 assert.match(updater, /production-ui-audit\.css/);
