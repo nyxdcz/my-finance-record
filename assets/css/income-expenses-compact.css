@@ -1,6 +1,12 @@
 /* Talaan Income vs Expenses compact presentation override.
    Presentation-only: preserves finance calculations, range logic, and touch targets. */
 
+/* Dashboard overview refinement: remove the overview-only seven-day marquee.
+   Finance workspace marquees remain unchanged. */
+#dashboard > #dashboardWeekMarquee {
+  display: none !important;
+}
+
 @media (min-width: 901px) {
   .income-expenses-analytics {
     gap: 8px !important;
