@@ -259,6 +259,164 @@
   html body .emoji-option {
     justify-self: center;
   }
+
+  /* Phone workspaces stay compact without turning their visual chrome into a
+     second card. The 44px buttons retain the full accessible hit area. */
+  html body :is(
+    .finance-workspace-marquee-row > .money-workspace-switcher,
+    .project-workspace-switcher
+  ) {
+    position: static !important;
+    top: auto !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    max-height: 44px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    gap: 0 !important;
+    border: 1px solid var(--line) !important;
+    border-radius: 10px !important;
+    background: var(--surface) !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    overflow: hidden !important;
+  }
+
+  html body :is(
+    .finance-workspace-marquee-row > .money-workspace-switcher,
+    .project-workspace-switcher
+  ) > .workspace-switcher-button {
+    box-sizing: border-box !important;
+    min-width: 0 !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    max-height: 44px !important;
+    padding: 6px 8px !important;
+    border-radius: 8px !important;
+    box-shadow: none !important;
+  }
+
+  html body .project-workspace-switcher {
+    margin-bottom: 9px !important;
+  }
+
+  /* A page-level sticky total was covering cards that follow the transaction
+     list. Keep phone totals in normal document flow inside their workspace. */
+  html body :is(
+    #income #transactionTotals-income,
+    #money #transactionTotals-expense,
+    #paid-expenses #transactionTotals-paid
+  ) {
+    position: static !important;
+    inset: auto !important;
+    z-index: auto !important;
+  }
+
+  /* Account modes share one contained scrolling surface on iPhone. */
+  html body #accountDialog,
+  html body #accountDialog > form {
+    box-sizing: border-box !important;
+    width: calc(100vw - 16px) !important;
+    max-width: calc(100vw - 16px) !important;
+    max-height: calc(100dvh - 16px) !important;
+    overflow: hidden !important;
+  }
+
+  html body #accountDialog .modal-body {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    padding: 10px 12px !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain;
+  }
+
+  html body #accountDialog :is(
+    .account-mode-switch,
+    #accountMaintenanceFields,
+    .account-spend-panel,
+    .account-spend-summary,
+    .account-spend-grid,
+    .account-spend-total-choice,
+    .account-spend-preview,
+    .field,
+    .input,
+    .select
+  ) {
+    box-sizing: border-box !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+
+  html body #accountDialog .account-spend-panel,
+  html body #accountDialog .account-spend-grid,
+  html body #accountDialog .account-spend-summary,
+  html body #accountDialog .account-spend-total-choice,
+  html body #accountDialog .account-spend-preview {
+    width: 100% !important;
+  }
+
+  /* Agenda actions use explicit rows so Add column cannot collapse into a
+     narrow multi-line sliver beside the count. */
+  html body .project-calendar-v13020 .pc-header-actions {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 44px !important;
+    gap: 7px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    margin-top: 8px !important;
+    justify-content: stretch !important;
+    align-items: stretch !important;
+  }
+
+  html body .project-calendar-v13020 .pc-count {
+    grid-column: 1 / -1;
+    width: max-content;
+    max-width: 100%;
+  }
+
+  html body .project-calendar-v13020 :is([data-pc-view], [data-kanban-add-column="agenda"]) {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 44px !important;
+    padding-inline: 8px !important;
+    white-space: nowrap !important;
+  }
+
+  html body .project-calendar-v13020 [data-pc-add] {
+    grid-column: 3;
+    width: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+  }
+
+  html body .project-calendar-v13020 .pc-agenda {
+    width: 100% !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+  }
+
+  html body .project-calendar-v13020 .finance-kanban-board {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    scroll-padding-inline: 7px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  html body .project-calendar-v13020 .finance-kanban-column {
+    min-width: min(82vw, 310px) !important;
+    max-width: min(82vw, 310px) !important;
+    flex: 0 0 min(82vw, 310px) !important;
+    scroll-snap-align: start;
+  }
 }
 
 @media (max-width: 380px) {

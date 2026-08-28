@@ -14,7 +14,8 @@
 - Added expense allocation snapshots, recurring equal/percentage allocation support, paid-record edit protection, recovery snapshots, Undo, backup merge conflicts, and encrypted synchronization.
 - Stored versioned groups and settlements under `ledgerSettings.householdSplits` and optional snapshots on expenses, preserving Finance Schema 12 and Cloud Schema V3.
 - Hardened iPhone safe-area geometry, dynamic viewport sizing, and compact phone controls without changing desktop layouts or finance behavior.
-- Rotated the PWA cache to `finance-v2-20260828-household-splits-r12` so installed clients receive the household baseline and iPhone layout refinements together.
+- Corrected phone account-dialog mode headings and scroll containment, transaction-total overlap, workspace-tab chrome, and Project Agenda action wrapping.
+- Rotated the PWA cache to `finance-v2-20260828-household-splits-r13` so installed clients receive the household baseline and complete iPhone layout refinements together.
 
 ## V2.4.0 · Talaan
 
