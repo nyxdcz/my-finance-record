@@ -10,7 +10,7 @@ const version = JSON.parse(fs.readFileSync("version.json", "utf8"));
 assert.equal(version.version, "2.5.0");
 assert.equal(version.schemaVersion, 12);
 assert.equal(version.cloudSchemaVersion, 3);
-assert.equal(version.cacheVersion, "finance-v2-20260828-household-splits-r13");
+assert.equal(version.cacheVersion, "finance-v2-20260828-household-splits-r14");
 assert.match(source, /function allocateShares/);
 assert.match(source, /function positions/);
 assert.match(source, /payerMemberId/);

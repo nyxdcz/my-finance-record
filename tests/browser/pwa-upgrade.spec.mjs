@@ -11,7 +11,7 @@ test("Talaan V2.5.0 registers the cache-qualified worker and clears stale Financ
 
   await expect.poll(async () => page.evaluate(() => navigator.serviceWorker.controller?.scriptURL || ""), { timeout:15000 }).toContain("v=2.5.0");
   const workerUrl = await page.evaluate(() => navigator.serviceWorker.controller?.scriptURL || "");
-  expect(workerUrl).toContain("cache=finance-v2-20260828-household-splits-r13");
+  expect(workerUrl).toContain("cache=finance-v2-20260828-household-splits-r14");
 
   await page.evaluate(async () => { await window.clearAppCaches(); });
   const names = await page.evaluate(async () => caches.keys());

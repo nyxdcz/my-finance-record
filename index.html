@@ -171,13 +171,19 @@
           <div class="page-heading">
             <div>
               <h2 id="dashboard-title">Monthly overview</h2>
-              <p>See the month’s budget, payments, deadlines, and recent changes.</p>
+              <p>Switch between your calendar, cash flow, and monthly overview.</p>
             </div>
             <div class="dashboard-heading-actions">
               <button class="button button-secondary button-small related-page-link" type="button" data-go="reports">View monthly report</button>
               <button class="button button-secondary button-small" id="dashboardPrivacyButton" type="button">Hide amounts</button>
               <button class="button button-secondary button-small" id="customizeDashboardButton" type="button">Customize dashboard</button>
             </div>
+          </div>
+
+          <div class="dashboard-view-tabs no-print" role="tablist" aria-label="Dashboard views">
+            <button class="dashboard-view-tab" id="dashboardViewTabCalendar" type="button" role="tab" aria-selected="true" aria-controls="dashboardViewPanel" tabindex="0" data-dashboard-view-tab="calendar">Calendar</button>
+            <button class="dashboard-view-tab" id="dashboardViewTabCashFlow" type="button" role="tab" aria-selected="false" aria-controls="dashboardViewPanel" tabindex="-1" data-dashboard-view-tab="cash-flow">Cash Flow</button>
+            <button class="dashboard-view-tab" id="dashboardViewTabOverview" type="button" role="tab" aria-selected="false" aria-controls="dashboardViewPanel" tabindex="-1" data-dashboard-view-tab="overview">Overview</button>
           </div>
 
           <div class="dashboard-customize-toolbar no-print" id="dashboardCustomizeToolbar" hidden aria-label="Dashboard customization controls">
@@ -189,7 +195,8 @@
             </div>
           </div>
 
-          <div class="grid kpi-grid">
+          <div class="dashboard-view-panel" id="dashboardViewPanel" role="tabpanel" aria-labelledby="dashboardViewTabCalendar">
+          <div class="grid kpi-grid" data-dashboard-view="overview" hidden>
             <article class="card kpi-card bento-tone-green text-green">
               <div class="kpi-label" id="dashAvailableLabel">Available money</div>
               <div class="kpi-value" id="dashAvailable">₱0.00</div>
@@ -217,7 +224,7 @@
             </article>
           </div>
 
-          <article class="card month-insights-card month-comparison-only" aria-labelledby="month-insights-title">
+          <article class="card month-insights-card month-comparison-only" aria-labelledby="month-insights-title" data-dashboard-view="overview" hidden>
             <div class="month-insights-header">
               <div><strong id="month-insights-title">Monthly comparison</strong><small id="monthComparisonSubtitle">Compared with the previous month</small></div>
             </div>
@@ -225,7 +232,7 @@
           </article>
 
           <div class="dashboard-card-grid" id="dashboardCardGrid">
-            <article class="card dashboard-detail-card dashboard-chart-card" data-dashboard-card="savings-trend">
+            <article class="card dashboard-detail-card dashboard-chart-card" data-dashboard-card="savings-trend" data-dashboard-view="cash-flow" hidden>
               <div class="card-header">
                 <div><h3>Savings trend</h3><p>Balances from accounts marked as Savings</p></div>
                 <span class="chart-period-chip" id="dashSavingsTrendPeriod">6 months</span>
@@ -240,7 +247,7 @@
               </div>
             </article>
 
-            <article class="card dashboard-detail-card savings-goals-card" data-dashboard-card="savings-goals">
+            <article class="card dashboard-detail-card savings-goals-card" data-dashboard-card="savings-goals" data-dashboard-view="cash-flow" hidden>
               <div class="card-header">
                 <div><h3>Savings goals</h3><p>Plan what you are saving for without double-counting money</p></div>
                 <button class="button button-primary button-small" id="addSavingsGoalButton" type="button">+ Add goal</button>
@@ -248,7 +255,7 @@
               <div class="savings-goal-list chart-sensitive" id="dashSavingsGoals"></div>
             </article>
 
-            <article class="card dashboard-detail-card dashboard-chart-card" data-dashboard-card="cash-flow">
+            <article class="card dashboard-detail-card dashboard-chart-card" data-dashboard-card="cash-flow" data-dashboard-view="cash-flow" hidden>
               <div class="card-header">
                 <div><h3>Income versus expenses</h3><p>Income, expenses, and monthly balance</p></div>
                 <span class="chart-period-chip" id="dashCashFlowPeriod">6 months</span>
@@ -256,7 +263,7 @@
               <div class="chart-shell chart-sensitive" id="dashCashFlowChart" role="group" aria-label="Income, expenses, and balance charts"></div>
             </article>
 
-            <article class="card dashboard-detail-card dashboard-calendar-card" data-dashboard-card="calendar">
+            <article class="card dashboard-detail-card dashboard-calendar-card" data-dashboard-card="calendar" data-dashboard-view="calendar">
               <div class="card-header">
                 <div><h3>Monthly calendar</h3><p>Income, expenses, projects, and payments</p></div>
                 <div class="calendar-card-controls"><button class="button button-secondary button-small" id="dashboardCalendarPrevious" type="button" aria-label="Previous calendar month">‹</button><strong id="dashboardCalendarLabel">Month</strong><button class="button button-secondary button-small" id="dashboardCalendarNext" type="button" aria-label="Next calendar month">›</button></div>
@@ -268,7 +275,7 @@
               <div class="calendar-legend"><span><i class="calendar-dot income"></i>Income</span><span><i class="calendar-dot expense"></i>Expense</span><span><i class="calendar-dot project"></i>Project</span><span><i class="calendar-dot payment"></i>Payment</span></div>
             </article>
 
-            <article class="card dashboard-detail-card" data-dashboard-card="payment-progress">
+            <article class="card dashboard-detail-card" data-dashboard-card="payment-progress" data-dashboard-view="overview" hidden>
               <div class="card-header">
                 <div><h3>Payment progress</h3><p>Project fees collected</p></div>
                 <button class="button button-secondary button-small" data-go="payments">View all</button>
@@ -280,7 +287,7 @@
               <p class="kpi-meta" id="dashPaymentProgressLabel">0% collected</p>
             </article>
 
-            <article class="card dashboard-detail-card" data-dashboard-card="expense-schedule">
+            <article class="card dashboard-detail-card" data-dashboard-card="expense-schedule" data-dashboard-view="overview" hidden>
               <div class="card-header">
                 <div><h3>Expense schedule</h3><p>Current unpaid expenses</p></div>
                 <button class="button button-secondary button-small" data-go="money">View all</button>
@@ -288,7 +295,7 @@
               <ul class="simple-list" id="dashExpenseGroups"></ul>
             </article>
 
-            <article class="card dashboard-detail-card" data-dashboard-card="due-soon">
+            <article class="card dashboard-detail-card" data-dashboard-card="due-soon" data-dashboard-view="overview" hidden>
               <div class="card-header">
                 <div><h3>Due-soon warnings</h3><p>Three most urgent expenses</p></div>
                 <button class="button button-secondary button-small" data-go="money">View all</button>
@@ -296,7 +303,7 @@
               <ul class="simple-list" id="dashDueSoon"></ul>
             </article>
 
-            <article class="card dashboard-detail-card" data-dashboard-card="accounts">
+            <article class="card dashboard-detail-card" data-dashboard-card="accounts" data-dashboard-view="overview" hidden>
               <div class="card-header">
                 <div><h3>Account balances</h3><p>Your money sources</p></div>
                 <button class="button button-secondary button-small" data-go="settings" data-settings-target="accounts">Edit</button>
@@ -304,7 +311,7 @@
               <div class="account-grid" id="dashAccounts"></div>
             </article>
 
-            <article class="card dashboard-detail-card" data-dashboard-card="projects">
+            <article class="card dashboard-detail-card" data-dashboard-card="projects" data-dashboard-view="overview" hidden>
               <div class="card-header">
                 <div><h3>Project balances</h3><p>Three largest unpaid balances</p></div>
                 <button class="button button-secondary button-small" data-go="payments">View all</button>
@@ -312,13 +319,14 @@
               <ul class="simple-list" id="dashProjects"></ul>
             </article>
 
-            <article class="card dashboard-detail-card" data-dashboard-card="activity">
+            <article class="card dashboard-detail-card" data-dashboard-card="activity" data-dashboard-view="overview" hidden>
               <div class="card-header">
                 <div><h3>Recent activity</h3><p>Latest saved changes</p></div>
                 <button class="button button-secondary button-small" data-go="settings" data-settings-target="backup">View history</button>
               </div>
               <ul class="simple-list" id="dashRecentActivity"></ul>
             </article>
+          </div>
           </div>
         </section>
 
@@ -3629,7 +3637,7 @@
       "projects": "Project balances",
       "activity": "Recent activity"
     };
-    const DEFAULT_DASHBOARD_ORDER = ["cash-flow", "calendar", "due-soon", "expense-schedule", "savings-goals", "savings-trend", "payment-progress", "accounts", "projects", "activity"];
+    const DEFAULT_DASHBOARD_ORDER = ["calendar", "cash-flow", "savings-trend", "savings-goals", "due-soon", "expense-schedule", "payment-progress", "accounts", "projects", "activity"];
     const DEFAULT_DASHBOARD_SIZES = {
       "cash-flow": "wide",
       "calendar": "wide",
@@ -3647,6 +3655,55 @@
       large: "Large · 3 per row",
       wide: "Wide · 2 per row"
     };
+    const DASHBOARD_VIEWS = ["calendar", "cash-flow", "overview"];
+    let dashboardActiveView = "calendar";
+
+    function applyDashboardView() {
+      const dashboard = document.getElementById("dashboard");
+      if (!dashboard) return;
+      const customizing = dashboard.classList.contains("dashboard-customizing");
+      dashboard.dataset.dashboardActiveView = dashboardActiveView;
+      dashboard.querySelectorAll("[data-dashboard-view]").forEach(section => {
+        section.hidden = !customizing && section.dataset.dashboardView !== dashboardActiveView;
+      });
+      dashboard.querySelectorAll("[data-dashboard-view-tab]").forEach(tab => {
+        const active = tab.dataset.dashboardViewTab === dashboardActiveView;
+        tab.setAttribute("aria-selected", String(active));
+        tab.tabIndex = active ? 0 : -1;
+      });
+      const activeTab = dashboard.querySelector(`[data-dashboard-view-tab="${dashboardActiveView}"]`);
+      document.getElementById("dashboardViewPanel")?.setAttribute("aria-labelledby", activeTab?.id || "dashboardViewTabCalendar");
+    }
+
+    function setDashboardView(view, options = {}) {
+      if (!DASHBOARD_VIEWS.includes(view)) return;
+      dashboardActiveView = view;
+      applyDashboardView();
+      if (options.focus) document.querySelector(`[data-dashboard-view-tab="${view}"]`)?.focus({ preventScroll:true });
+    }
+
+    function setupDashboardViewTabs() {
+      const tablist = document.querySelector("#dashboard .dashboard-view-tabs");
+      if (!tablist || tablist.dataset.dashboardTabsBound === "true") return;
+      tablist.dataset.dashboardTabsBound = "true";
+      tablist.addEventListener("click", event => {
+        const tab = event.target.closest("[data-dashboard-view-tab]");
+        if (tab) setDashboardView(tab.dataset.dashboardViewTab);
+      });
+      tablist.addEventListener("keydown", event => {
+        const current = event.target.closest("[data-dashboard-view-tab]");
+        if (!current || !["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+        event.preventDefault();
+        const currentIndex = Math.max(0, DASHBOARD_VIEWS.indexOf(current.dataset.dashboardViewTab));
+        const targetIndex = event.key === "Home"
+          ? 0
+          : event.key === "End"
+            ? DASHBOARD_VIEWS.length - 1
+            : (currentIndex + (event.key === "ArrowRight" ? 1 : -1) + DASHBOARD_VIEWS.length) % DASHBOARD_VIEWS.length;
+        setDashboardView(DASHBOARD_VIEWS[targetIndex], { focus:true });
+      });
+      applyDashboardView();
+    }
 
     function dashboardAllowedSizes(key) {
       if (["savings-trend", "cash-flow", "calendar"].includes(key)) return ["large", "wide"];
@@ -3779,6 +3836,7 @@
       const toolbar = document.getElementById("dashboardCustomizeToolbar");
       dashboard?.classList.toggle("dashboard-customizing", enabled);
       if (toolbar) toolbar.hidden = !enabled;
+      applyDashboardView();
       if (!enabled) {
         document.querySelectorAll(".dashboard-detail-card.is-dashboard-resizing").forEach(card => card.classList.remove("is-dashboard-resizing"));
         document.body.classList.remove("dashboard-pointer-resizing");
@@ -3839,6 +3897,7 @@
       dashboard?.classList.toggle("dashboard-default-layout", !dashboardPreferences.customized);
       const privacyButton = document.getElementById("dashboardPrivacyButton");
       if (privacyButton) privacyButton.textContent = dashboardPreferences.privacy ? "Show amounts" : "Hide amounts";
+      applyDashboardView();
     }
 
     function renderDashboardCustomizer() {
@@ -7840,7 +7899,7 @@
     const APP_VERSION = "2.5.0";
     const APP_RELEASE_NAME = "Talaan";
     const APP_RELEASE_DATE = "August 28, 2026";
-    const APP_CACHE_VERSION = "finance-v2-20260828-household-splits-r13";
+    const APP_CACHE_VERSION = "finance-v2-20260828-household-splits-r14";
 
     function synchronizeVersionDisplay() {
       document.title = `Talaan · V${APP_VERSION}`;
@@ -9127,7 +9186,7 @@
       dashboard:document.getElementById("dashboard"), grid:document.getElementById("dashboardCardGrid"), labels:DASHBOARD_CARD_LABELS,
       getOrder:() => dashboardPreferences.order, commitMove:commitDashboardCardMove, announcer:document.getElementById("dashboardDragAnnouncer")
     });
-    setupDashboardResizeHandles(); setupCompactIconPickers(); setupNumericInputs(document);
+    setupDashboardViewTabs(); setupDashboardResizeHandles(); setupCompactIconPickers(); setupNumericInputs(document);
     setupFilterControlStates(); syncSavingsGoalFields();
     setupCollapsibleSections(); renderDashboardCustomizer();
     renderAll(true);
