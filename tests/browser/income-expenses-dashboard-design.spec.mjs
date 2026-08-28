@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+/* global data */
 
 const BASE = "http://127.0.0.1:3000";
 
