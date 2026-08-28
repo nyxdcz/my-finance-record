@@ -632,6 +632,8 @@
     if(Object.keys(accounts).length>1) return true;
     if(Object.values(accounts).some(value=>Math.abs(Number(value||0))>0.005)) return true;
     if(Array.isArray(source.ledgerSettings?.netWorth?.items) && source.ledgerSettings.netWorth.items.length) return true;
+    if(Array.isArray(source.ledgerSettings?.householdSplits?.groups) && source.ledgerSettings.householdSplits.groups.length) return true;
+    if(Array.isArray(source.ledgerSettings?.householdSplits?.settlements) && source.ledgerSettings.householdSplits.settlements.length) return true;
     return false;
   }
 

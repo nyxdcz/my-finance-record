@@ -8,13 +8,13 @@ const BRAND = "Talaan";
 const PREVIOUS_BRAND = ["My", "Finance", "Records"].join(" ");
 
 const RELEASE = Object.freeze({
-  version:"2.4.0",
-  displayVersion:"V2.4.0",
+  version:"2.5.0",
+  displayVersion:"V2.5.0",
   name:"Talaan",
-  date:"August 27, 2026",
-  dateIso:"2026-08-27",
-  cache:"finance-v2-20260827-net-worth-r10",
-  assetQuery:"2.4.0-talaan1"
+  date:"August 28, 2026",
+  dateIso:"2026-08-28",
+  cache:"finance-v2-20260828-household-splits-r11",
+  assetQuery:"2.5.0-talaan1"
 });
 const SIDEBAR_BRAND_ASSET_QUERY = "2.2.0-talaan2";
 
@@ -23,9 +23,9 @@ const CURRENT_VERSION_HISTORY = Object.freeze([{
   title:RELEASE.name,
   changes:[
     "Current production release under the Talaan product name.",
-    "Adds a manual net worth ledger with assets, liabilities, dated valuation history, category composition, and value evolution.",
-    "Keeps net worth separate from Available Money, Cash Flow, and Account Ledger balances, with explicit manual, stale, and converted-value labels.",
-    "Supports archived items, manually entered PHP conversion rates, recovery snapshots, and Undo for destructive changes.",
+    "Adds household groups, expense-level equal, percentage, and exact shares, payer tracking, member balances, and explicit settlement history.",
+    "Counts only the owner's allocated share in personal expense totals while preserving the full amount actually paid in Account Ledger cash movements.",
+    "Keeps settlements separate from income, expenses, paid state, and automatic account mutations, with recovery snapshots and Undo for material changes.",
     "Uses responsibility-based runtime filenames instead of legacy product-era filenames.",
     "Includes the complete local-first Finance workspace, Account Ledger, budgeting, reports, projects, productivity tools, reminders, and responsive desktop and phone layouts.",
     "Includes encrypted multi-profile Cloud Schema V3 synchronization, offline PWA support, recovery safeguards, and five-minute routine sync.",
@@ -57,6 +57,7 @@ const runtimeGroups = {
     "reminders-alerts.css",
     "reports-insights.css",
     "net-worth.css",
+    "household-splits.css",
     "security-profiles.css",
     "summary-mascots.css",
     "ui-icon-alignment.css"
@@ -86,6 +87,7 @@ const runtimeGroups = {
     "reminders-alerts.js",
     "reports-insights.js",
     "net-worth.js",
+    "household-splits.js",
     "security-profiles.js"
   ],
   "assets/js/features": ["cash-flow-summary.js"],

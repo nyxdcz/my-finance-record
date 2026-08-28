@@ -1,14 +1,14 @@
 import { test, expect } from "@playwright/test";
 
 for (const theme of ["light","dark"]) {
-  test(`Talaan V2.4.0 ${theme} final chrome is readable`, async ({ page }) => {
+  test(`Talaan V2.5.0 ${theme} final chrome is readable`, async ({ page }) => {
     await page.setViewportSize({width:1440,height:900});
     await page.setContent(`<!doctype html><html data-theme="${theme}"><head>
-      <link rel="stylesheet" href="http://127.0.0.1:3000/app.css?v=2.4.0-talaan1">
-      <link rel="stylesheet" href="http://127.0.0.1:3000/shell-ui.css?v=2.4.0-talaan1">
-      <link rel="stylesheet" href="http://127.0.0.1:3000/dashboard-interactions.css?v=2.4.0-talaan1">
-      <link rel="stylesheet" href="http://127.0.0.1:3000/black-canvas.css?v=2.4.0-talaan1">
-      <link rel="stylesheet" href="http://127.0.0.1:3000/liquid-glass.css?v=2.4.0-talaan1">
+      <link rel="stylesheet" href="http://127.0.0.1:3000/app.css?v=2.5.0-talaan1">
+      <link rel="stylesheet" href="http://127.0.0.1:3000/shell-ui.css?v=2.5.0-talaan1">
+      <link rel="stylesheet" href="http://127.0.0.1:3000/dashboard-interactions.css?v=2.5.0-talaan1">
+      <link rel="stylesheet" href="http://127.0.0.1:3000/black-canvas.css?v=2.5.0-talaan1">
+      <link rel="stylesheet" href="http://127.0.0.1:3000/liquid-glass.css?v=2.5.0-talaan1">
       <style>*,*::before,*::after{animation:none!important;transition:none!important}</style>
     </head><body>
       <aside class="sidebar desktop-open" id="sidebar">

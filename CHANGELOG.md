@@ -1,5 +1,20 @@
 # Changelog
 
+## V2.5.0 · Talaan
+
+**Current production release:** V2.5.0
+
+### Household expense splits
+
+- Added household groups and expense-level equal, percentage, and exact PHP shares with deterministic cent rounding.
+- Added payer tracking, member net positions, and explicit settlement history under Settings → Finance tools without adding a sidebar destination.
+- Personal expense totals and reports count only the owner's assigned share while owner-paid Account Ledger transactions keep the complete cash amount actually paid.
+- Another member can pay a split bill without deducting a Talaan account; moving the expense back to unpaid clears its payer claim.
+- Settlements adjust household balances only and never create income, expenses, paid state, or automatic Account Ledger entries.
+- Added expense allocation snapshots, recurring equal/percentage allocation support, paid-record edit protection, recovery snapshots, Undo, backup merge conflicts, and encrypted synchronization.
+- Stored versioned groups and settlements under `ledgerSettings.householdSplits` and optional snapshots on expenses, preserving Finance Schema 12 and Cloud Schema V3.
+- Rotated the PWA cache to `finance-v2-20260828-household-splits-r11` so installed clients receive the household engine and styles together.
+
 ## V2.4.0 · Talaan
 
 **Current production release:** V2.4.0

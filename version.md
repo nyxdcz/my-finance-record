@@ -1,18 +1,18 @@
-# Talaan V2.4.0
+# Talaan V2.5.0
 
-**Current production version:** V2.4.0
-**Release date:** 2026-08-27
+**Current production version:** V2.5.0
+**Release date:** 2026-08-28
 **Release name:** Talaan
 
-Talaan V2.4.0 is the active product baseline. This document describes only the current release.
+Talaan V2.5.0 is the active product baseline. This document describes only the current release.
 
 ## Product identity
 
 - **Product name:** Talaan
-- **Product version:** `2.4.0`
-- **Display version:** `V2.4.0`
+- **Product version:** `2.5.0`
+- **Display version:** `V2.5.0`
 - **Release name:** `Talaan`
-- **PWA cache:** `finance-v2-20260827-net-worth-r10`
+- **PWA cache:** `finance-v2-20260828-household-splits-r11`
 - **Finance Schema:** 12
 - **Cloud Schema:** V3
 
@@ -24,6 +24,16 @@ Talaan V2.4.0 is the active product baseline. This document describes only the c
 - Foreign values require a manually entered PHP conversion rate and remain labeled as converted.
 - Archive/restore and destructive deletion use recovery snapshots and Undo.
 - Data remains under `ledgerSettings.netWorth`, preserving Finance Schema 12 and Cloud Schema V3.
+
+## Household expense splits
+
+- Household groups contain manually named members with one owner representing the active user.
+- Expenses can use equal, percentage, or exact PHP shares with deterministic cent rounding.
+- Personal expense totals use only the owner's share; Account Ledger payments retain the complete amount actually paid by the owner.
+- If another member paid, the expense can be completed without deducting a Talaan account.
+- Explicit settlements adjust member balances only and never create income, expenses, paid records, or Account Ledger entries.
+- Groups and settlements live under `ledgerSettings.householdSplits`; expense allocation snapshots preserve historical member names and shares.
+- Backup conflict handling, encrypted synchronization, recovery snapshots, and Undo preserve Finance Schema 12 and Cloud Schema V3.
 
 ## Local statement import center
 

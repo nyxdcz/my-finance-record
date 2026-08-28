@@ -33,6 +33,7 @@
   const incomeIncluded = item => typeof incomeIncludedInTotals === "function" ? incomeIncludedInTotals(item) : item?.includeInTotals !== false && item?.category !== "Transfer from savings";
   const expensePlannedAmount = item => roundMoney(typeof monthlyExpenseAmount === "function" ? monthlyExpenseAmount(item) : Number(item?.amount || 0));
   const expensePaidAmount = item => roundMoney(typeof settledExpenseAmount === "function" ? settledExpenseAmount(item) : Number(item?.paidAmount || item?.amount || 0));
+  const expenseComponentAmount = (item, amount) => roundMoney(globalThis.FinanceHouseholdSplits?.personalAmount?.(item, Number(amount || 0)) ?? Number(amount || 0));
   const projectIsIncluded = project => typeof projectIsFinancial === "function" ? projectIsFinancial(project) : project?.workSource !== "salary" || project?.compensationType === "extra-paid";
   const isUtility = item => typeof isUtilityExpense === "function" ? isUtilityExpense(item) : item?.expenseType === "utility" || item?.electricBillAmount != null || item?.waterBillAmount != null;
   const isGym = item => typeof isGymExpense === "function" ? isGymExpense(item) : item?.expenseType === "gym";
@@ -190,8 +191,8 @@
     const actualExpenses = roundMoney(paid.reduce((sum,item) => sum + expensePaidAmount(item),0));
     const plannedExpensesTotal = roundMoney(planned.reduce((sum,item) => sum + expensePlannedAmount(item),0));
     const budgetPlanned = plannedBudgetForMonth(month, category);
-    const electric = roundMoney(planned.filter(isUtility).reduce((sum,item) => sum + Number(item.electricBillAmount || 0),0));
-    const water = roundMoney(planned.filter(isUtility).reduce((sum,item) => sum + Number(item.waterBillAmount || 0),0));
+    const electric = roundMoney(planned.filter(isUtility).reduce((sum,item) => sum + expenseComponentAmount(item, item.electricBillAmount),0));
+    const water = roundMoney(planned.filter(isUtility).reduce((sum,item) => sum + expenseComponentAmount(item, item.waterBillAmount),0));
     const gymItems = planned.filter(isGym);
     const gymVisits = gymItems.reduce((sum,item) => {
       if (Number.isFinite(Number(item.gymVisitCount)) && Number(item.gymVisitCount) > 0) return sum + Number(item.gymVisitCount);

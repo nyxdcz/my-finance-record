@@ -111,6 +111,8 @@ jobs:
           test -f _site/import-center.js
           test -f _site/net-worth.css
           test -f _site/net-worth.js
+          test -f _site/household-splits.css
+          test -f _site/household-splits.js
           test -f _site/pwa-update.js
           test -f _site/brand-icons.js
           test -f _site/projects-calendar.js
