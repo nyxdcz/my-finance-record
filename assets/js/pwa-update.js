@@ -6,6 +6,7 @@
   const CURRENT_CACHE_VERSION = "finance-v2-20260828-household-splits-r17";
   const UI_HOTFIX_REFRESH_KEY = "finance-ui-hotfix-v2-0-1-talaan7";
   const DASHBOARD_PRESENTATION_REFRESH_KEY = "finance-dashboard-presentation-v2-5-0-talaan9";
+  const EXPENSE_DARK_MODE_REFRESH_KEY = "finance-expense-dark-mode-v2-5-0-talaan1";
   const normalizeCacheVersion = cacheVersion => cacheVersion === LEGACY_INDEX_CACHE ? CURRENT_CACHE_VERSION : cacheVersion;
 
   async function installBrowserBrandIcons() {
@@ -91,6 +92,22 @@
     }
   }
 
+  async function refreshExpenseDarkModeOnce() {
+    if (!root.navigator?.serviceWorker?.controller || !("caches" in root)) return false;
+    try {
+      if (root.localStorage?.getItem(EXPENSE_DARK_MODE_REFRESH_KEY) === "done") return false;
+      const removed = await deleteCachedPaths([
+        "/phone-finance-compat.js"
+      ]);
+      if (!removed) return false;
+      root.localStorage?.setItem(EXPENSE_DARK_MODE_REFRESH_KEY, "done");
+      root.location.reload();
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
   const api = {
     financeCachePattern:FINANCE_CACHE_PATTERN,
     shellCacheName(cacheVersion) { return `${normalizeCacheVersion(cacheVersion)}-shell`; },
@@ -118,4 +135,5 @@
   void installAccountSubmitCompat();
   void refreshCachedHeaderToolsOnce();
   void refreshDashboardPresentationOnce();
+  void refreshExpenseDarkModeOnce();
 })(typeof window !== "undefined" ? window : globalThis);
