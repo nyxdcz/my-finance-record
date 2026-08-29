@@ -5,6 +5,7 @@ const APP_CACHE = "finance-v2-20260828-household-splits-r17";
 
 async function openFinance(page, viewport) {
   await page.setViewportSize(viewport);
+  await page.addInitScript(() => localStorage.setItem("simple-finance-theme-v1", "light"));
   await page.goto(APP_URL, { waitUntil:"networkidle" });
   await expect.poll(async () => {
     try { return await page.evaluate(() => navigator.serviceWorker?.controller?.scriptURL || ""); }
