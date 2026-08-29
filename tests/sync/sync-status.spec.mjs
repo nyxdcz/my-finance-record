@@ -26,8 +26,8 @@ test("Cloud Sync uses supplied state icons and matching colors", async ({ page }
   }
 });
 
-test("Talaan V2.5.0 release metadata is visible", async ({ page }) => {
+test("Talaan V2.5.0 release metadata remains visible outside the browser title", async ({ page }) => {
   await page.goto("http://127.0.0.1:3000/index.html?page=dashboard", { waitUntil:"networkidle" });
-  await expect(page).toHaveTitle(/Talaan · V2\.5\.0/);
+  await expect(page).toHaveTitle(/^Talaan$/);
   await expect(page.locator("#buildBadge")).toContainText("V2.5.0");
 });
