@@ -19,7 +19,7 @@
 
 **Talaan V2.5.0** is the current production release. The application keeps the complete local-first finance workspace, Account Ledger, budgeting, reporting, projects, productivity tools, reminders, encrypted multi-profile synchronization, responsive desktop/phone interface, and offline-ready PWA delivery under the Talaan product name.
 
-The current update adds household expense splits with groups, equal/percentage/exact shares, payer tracking, member balances, and explicit settlements. Personal reports count only your assigned share, while Account Ledger payments retain the full amount you actually paid. Settlements never create a second expense, income record, or automatic account movement. The Dashboard now uses compact segmented views and a larger responsive monthly calendar without changing finance behavior.
+The current update adds household expense splits with groups, equal/percentage/exact shares, payer tracking, member balances, and explicit settlements. Personal reports count only your assigned share, while Account Ledger payments retain the full amount you actually paid. Settlements never create a second expense, income record, or automatic account movement. The Dashboard now shares Finance's segmented workspace component and uses a larger responsive monthly calendar without changing finance behavior.
 
 Current release notes are maintained in [`CHANGELOG.md`](CHANGELOG.md).
 

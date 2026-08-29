@@ -12,7 +12,7 @@ Talaan V2.5.0 is the active product baseline. This document describes only the c
 - **Product version:** `2.5.0`
 - **Display version:** `V2.5.0`
 - **Release name:** `Talaan`
-- **PWA cache:** `finance-v2-20260828-household-splits-r15`
+- **PWA cache:** `finance-v2-20260828-household-splits-r16`
 - **Finance Schema:** 12
 - **Cloud Schema:** V3
 

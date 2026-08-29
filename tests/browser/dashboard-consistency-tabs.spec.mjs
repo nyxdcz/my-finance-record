@@ -10,6 +10,14 @@ async function openDashboard(page, viewport) {
   await expect(page.locator("#dashboard .dashboard-view-tabs")).toBeVisible();
 }
 
+async function openFinance(page, viewport) {
+  await page.setViewportSize(viewport);
+  await page.goto(`${APP_URL}/?page=money`, { waitUntil:"domcontentloaded" });
+  await page.waitForFunction(() => Boolean(window.FinancePrivacyLock));
+  await page.evaluate(() => window.FinancePrivacyLock.setAuthenticated(true));
+  await expect(page.locator("#money .money-workspace-switcher")).toBeVisible();
+}
+
 test("Dashboard defaults to Calendar and exposes the approved view order", async ({ page }) => {
   await openDashboard(page, { width:1440, height:1000 });
 
@@ -62,6 +70,75 @@ test("Dashboard tabs support roving keyboard focus and customization preview", a
 });
 
 for (const viewport of [{ width:1440, height:1000 }, { width:393, height:852 }]) {
+  test(`Dashboard and Finance share the exact segmented-control styles at ${viewport.width}px`, async ({ page }) => {
+    await openFinance(page, viewport);
+
+    const comparison = await page.evaluate(() => {
+      const finance = document.querySelector("#money .money-workspace-switcher");
+      const dashboard = document.querySelector("#dashboard .dashboard-view-tabs");
+      const financeActive = finance.querySelector('[aria-selected="true"]');
+      const dashboardActive = dashboard.querySelector('[aria-selected="true"]');
+      const financeInactive = finance.querySelector('[aria-selected="false"]');
+      const dashboardInactive = dashboard.querySelector('[aria-selected="false"]');
+      const outerStyle = node => {
+        const css = getComputedStyle(node);
+        return {
+          display:css.display,
+          position:css.position,
+          top:css.top,
+          height:css.height,
+          minHeight:css.minHeight,
+          maxHeight:css.maxHeight,
+          margin:css.margin,
+          padding:css.padding,
+          gap:css.gap,
+          border:css.border,
+          borderRadius:css.borderRadius,
+          backgroundColor:css.backgroundColor,
+          boxShadow:css.boxShadow,
+          overflow:css.overflow,
+          backdropFilter:css.backdropFilter,
+          webkitBackdropFilter:css.webkitBackdropFilter
+        };
+      };
+      const buttonStyle = node => {
+        const css = getComputedStyle(node);
+        return {
+          boxSizing:css.boxSizing,
+          display:css.display,
+          height:css.height,
+          minHeight:css.minHeight,
+          maxHeight:css.maxHeight,
+          padding:css.padding,
+          border:css.border,
+          borderRadius:css.borderRadius,
+          backgroundColor:css.backgroundColor,
+          color:css.color,
+          boxShadow:css.boxShadow,
+          fontSize:css.fontSize,
+          fontWeight:css.fontWeight,
+          lineHeight:css.lineHeight,
+          textAlign:css.textAlign,
+          whiteSpace:css.whiteSpace
+        };
+      };
+      return {
+        financeOuter:outerStyle(finance),
+        dashboardOuter:outerStyle(dashboard),
+        financeActive:buttonStyle(financeActive),
+        dashboardActive:buttonStyle(dashboardActive),
+        financeInactive:buttonStyle(financeInactive),
+        dashboardInactive:buttonStyle(dashboardInactive)
+      };
+    });
+
+    expect(comparison.dashboardOuter).toEqual(comparison.financeOuter);
+    expect(comparison.dashboardActive).toEqual(comparison.financeActive);
+    expect(comparison.dashboardInactive).toEqual(comparison.financeInactive);
+  });
+}
+
+for (const viewport of [{ width:1440, height:1000 }, { width:393, height:852 }]) {
   test(`Dashboard keeps its 7px cards, 12px rhythm, and contained tabs at ${viewport.width}px`, async ({ page }) => {
     await openDashboard(page, viewport);
 
@@ -83,6 +160,7 @@ for (const viewport of [{ width:1440, height:1000 }, { width:393, height:852 }])
         tabHeight:tabRect.height,
         tabWidth:tabRect.width,
         tabPadding:parseFloat(getComputedStyle(tabs).paddingTop),
+        tabGap:parseFloat(getComputedStyle(tabs).gap),
         tabButtonHeights:tabButtons.map(button => button.getBoundingClientRect().height),
         activeTabRadius:parseFloat(getComputedStyle(tabButtons[0]).borderRadius),
         cardRadius:parseFloat(getComputedStyle(calendar).borderRadius),
@@ -98,10 +176,6 @@ for (const viewport of [{ width:1440, height:1000 }, { width:393, height:852 }])
     });
 
     expect(contract.tabRadius).toBe(7);
-    expect(contract.tabHeight).toBe(52);
-    expect(contract.tabPadding).toBe(4);
-    expect(contract.tabButtonHeights).toEqual([44, 44, 44]);
-    expect(contract.activeTabRadius).toBe(5);
     expect(contract.cardRadius).toBe(7);
     expect(contract.gridGap).toBe(12);
     expect(contract.tabsContained).toBe(true);
@@ -109,11 +183,20 @@ for (const viewport of [{ width:1440, height:1000 }, { width:393, height:852 }])
     expect(contract.pageOverflow).toBe(false);
 
     if (viewport.width === 1440) {
+      expect(contract.tabHeight).toBe(43);
+      expect(contract.tabPadding).toBe(3);
+      expect(contract.tabGap).toBe(3);
+      expect(contract.activeTabRadius).toBe(7);
       expect(contract.tabWidth).toBeLessThanOrEqual(480);
       expect(contract.calendarLayoutColumns).toBe(2);
       expect(contract.calendarGridWidth / contract.calendarEventsWidth).toBeGreaterThan(2.3);
       expect(contract.calendarDayMinHeight).toBeGreaterThanOrEqual(68);
     } else {
+      expect(contract.tabHeight).toBe(44);
+      expect(contract.tabPadding).toBe(0);
+      expect(contract.tabGap).toBe(0);
+      expect(contract.tabButtonHeights).toEqual([44, 44, 44]);
+      expect(contract.activeTabRadius).toBe(8);
       expect(contract.calendarLayoutColumns).toBe(1);
       expect(contract.calendarDayMinHeight).toBeGreaterThanOrEqual(56);
     }
