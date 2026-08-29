@@ -66,7 +66,8 @@ test("desktop sidebar collapses to 60px and expands to 185px with the approved T
   await expect(activeIcon).toHaveCSS("height", "28px");
   await expect(activeIconImage).toHaveCSS("width", "16px");
   await expect(activeIconImage).toHaveCSS("height", "16px");
-  await expect(active).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+  await expect(active).toHaveCSS("background-color", "rgba(53, 111, 209, 0.18)");
+  await expect(active).toHaveCSS("border-radius", "7px");
   await expect(active).toHaveCSS("color", "rgb(255, 255, 255)");
   await expect(activeIcon).toHaveCSS("background-color", "rgb(53, 111, 209)");
 
@@ -119,11 +120,11 @@ test("desktop sidebar collapses to 60px and expands to 185px with the approved T
   await expect.poll(() => brandLogo.evaluate(node => node.complete && node.naturalWidth > 0)).toBe(true);
 
   await expect(firstLabel).toHaveCSS("opacity", "1");
-  await expect(firstLabel).toHaveCSS("font-size", "11px");
-  await expect(firstLabel).toHaveCSS("font-weight", "400");
+  await expect(firstLabel).toHaveCSS("font-size", "12px");
+  await expect(firstLabel).toHaveCSS("font-weight", "700");
   await expect(firstLabel).toHaveCSS("color", "rgb(217, 229, 226)");
   await expect(activeLabel).toHaveCSS("color", "rgb(255, 255, 255)");
-  await expect(active).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+  await expect(active).toHaveCSS("background-color", "rgba(53, 111, 209, 0.18)");
   await expect(activeIcon).toHaveCSS("background-color", "rgb(53, 111, 209)");
   expect(await active.evaluate(node => getComputedStyle(node, "::after").content)).toBe("none");
 
@@ -148,7 +149,7 @@ test("desktop sidebar collapses to 60px and expands to 185px with the approved T
   await expect(firstLabel).toHaveCSS("opacity", "0");
 });
 
-test("mobile brand keeps 25px Talaan text with the real uploaded logo at 25px", async ({ page, request }) => {
+test("mobile drawer keeps a roomy 320px shell, 48px rows, and the real Talaan brand", async ({ page, request }) => {
   await page.setViewportSize({ width:390, height:844 });
   const logoResponse = await request.get("http://127.0.0.1:3000/icons/talaan-brand-logo.png?v=2.2.0-talaan2");
   expect(logoResponse.ok()).toBeTruthy();
@@ -160,6 +161,10 @@ test("mobile brand keeps 25px Talaan text with the real uploaded logo at 25px", 
   const brand = page.locator(".brand");
   const mark = brand.locator(".talaan-brand-logo");
   const brandText = brand.locator("strong");
+  const sidebar = page.locator("#sidebar");
+  const firstButton = sidebar.locator(".nav-button").first();
+  const firstLabel = firstButton.locator(".nav-label");
+  await expect(sidebar).toHaveCSS("width", "320px");
   await expect(brand).toBeVisible();
   await expect(brand).toHaveCSS("gap", "6px");
   await expect(brandText).toHaveText("Talaan");
@@ -169,6 +174,10 @@ test("mobile brand keeps 25px Talaan text with the real uploaded logo at 25px", 
   await expect(mark).toBeVisible();
   await expect(mark).toHaveCSS("width", "25px");
   await expect(mark).toHaveCSS("height", "25px");
+  await expect(firstButton).toHaveCSS("min-height", "48px");
+  await expect(firstButton).toHaveCSS("border-radius", "7px");
+  await expect(firstLabel).toHaveCSS("font-size", "12px");
+  await expect(firstLabel).toHaveCSS("font-weight", "700");
   await expect.poll(() => mark.evaluate(node => node.complete && node.naturalWidth > 0)).toBe(true);
 });
 
@@ -186,7 +195,7 @@ test("runtime preparation renders fresh real brand assets without changing relea
   expect(index).toContain('talaan-brand-logo.png?v=2.2.0-talaan2');
   expect(serviceWorker).toContain('url.pathname.endsWith("sidebar-compact-brand.css") ||');
   expect(updater).not.toContain("document");
-  expect(updater).toContain('const CURRENT_CACHE_VERSION = "finance-v2-20260828-household-splits-r16"');
+  expect(updater).toContain('const CURRENT_CACHE_VERSION = "finance-v2-20260828-household-splits-r17"');
   expect(updater).toContain('const UI_HOTFIX_REFRESH_KEY = "finance-ui-hotfix-v2-0-1-talaan7"');
   expect(updater).toContain('"/sidebar-compact-brand.css"');
   expect(updater).toContain('"/talaan-brand-logo.png"');

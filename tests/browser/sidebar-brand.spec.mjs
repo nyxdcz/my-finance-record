@@ -29,13 +29,21 @@ test("expanded and collapsed desktop sidebar use the static Talaan brand", async
   const readMetrics = () => page.evaluate(() => {
     const button = getComputedStyle(document.getElementById("sidebarCloseButton"));
     const brand = getComputedStyle(document.querySelector(".sidebar .brand strong"));
+    const buttonRect = document.getElementById("sidebarCloseButton").getBoundingClientRect();
+    const logoRect = document.querySelector(".sidebar .talaan-brand-logo").getBoundingClientRect();
+    const titleRect = document.querySelector(".sidebar .brand strong").getBoundingClientRect();
+    const navIconRect = document.querySelector(".sidebar .nav-icon").getBoundingClientRect();
     return {
       buttonWidth:button.width,
       buttonHeight:button.height,
       buttonTop:button.top,
+      buttonRight:Math.round(buttonRect.right),
       brandFontSize:brand.fontSize,
       brandWhiteSpace:brand.whiteSpace,
       brandText:document.querySelector(".sidebar .brand strong")?.textContent,
+      logoLeft:Math.round(logoRect.left),
+      titleLeft:Math.round(titleRect.left),
+      navIconLeft:Math.round(navIconRect.left),
       navFontSizes:[...document.querySelectorAll(".sidebar .nav-label")].map(label => getComputedStyle(label).fontSize)
     };
   });
@@ -44,10 +52,14 @@ test("expanded and collapsed desktop sidebar use the static Talaan brand", async
     buttonWidth:"28px",
     buttonHeight:"28px",
     buttonTop:"15px",
+    buttonRight:177,
     brandFontSize:"20px",
     brandWhiteSpace:"nowrap",
     brandText:"Talaan",
-    navFontSizes:["10px","10px","10px","10px","10px"]
+    logoLeft:18,
+    titleLeft:49,
+    navIconLeft:18,
+    navFontSizes:["12px","12px","12px","12px","12px"]
   });
 
   await page.locator("#sidebar").evaluate(sidebar => {
@@ -59,10 +71,14 @@ test("expanded and collapsed desktop sidebar use the static Talaan brand", async
     buttonWidth:"28px",
     buttonHeight:"28px",
     buttonTop:"15px",
+    buttonRight:177,
     brandFontSize:"20px",
     brandWhiteSpace:"nowrap",
     brandText:"Talaan",
-    navFontSizes:["10px","10px","10px","10px","10px"]
+    logoLeft:18,
+    titleLeft:49,
+    navIconLeft:18,
+    navFontSizes:["12px","12px","12px","12px","12px"]
   });
 });
 
@@ -74,13 +90,14 @@ test("mobile drawer keeps the static Talaan brand", async ({ page }) => {
   await expect(page.locator("#sidebar")).toHaveAttribute("aria-hidden", "false");
   await expect(page.locator(".sidebar .brand strong")).toHaveText("Talaan");
   await expect(page.locator(".sidebar .brand strong")).toHaveCSS("font-size", "20px");
+  await expect(page.locator("#sidebar")).toHaveCSS("width", "320px");
   for (const label of await page.locator(".sidebar .nav-label").all()) {
-    await expect(label).toHaveCSS("font-size", "10px");
+    await expect(label).toHaveCSS("font-size", "12px");
   }
 });
 
 test("sidebar brand shell cache is synchronized", () => {
-  const expected = "finance-v2-20260828-household-splits-r16";
+  const expected = "finance-v2-20260828-household-splits-r17";
   expect(source("version.json")).toContain(`"cacheVersion": "${expected}"`);
   expect(source("sw.js")).toContain(`const CACHE_VERSION = "${expected}"`);
   expect(source("pwa-update.js")).toContain(`const CURRENT_CACHE_VERSION = "${expected}"`);

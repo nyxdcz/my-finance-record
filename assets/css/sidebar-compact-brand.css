@@ -45,6 +45,7 @@ html body #sidebar.sidebar .sidebar-close-button {
 html body #sidebar.sidebar .nav-button {
   background:transparent !important;
   border-color:transparent !important;
+  border-radius:7px !important;
   box-shadow:none !important;
   color:#D9E5E2 !important;
 }
@@ -61,6 +62,18 @@ html body #sidebar.sidebar .nav-icon-image {
 
 html body #sidebar.sidebar .nav-label {
   color:#D9E5E2 !important;
+  font-size:12px !important;
+  font-weight:700 !important;
+}
+
+html body #sidebar.sidebar .nav-button:is(:hover,:focus-visible) {
+  background:rgba(53,111,209,.1) !important;
+  border-color:rgba(92,145,232,.18) !important;
+}
+
+html body #sidebar.sidebar .nav-button.active {
+  background:rgba(53,111,209,.18) !important;
+  border-color:rgba(92,145,232,.3) !important;
 }
 
 html body #sidebar.sidebar .nav-button:hover,
@@ -81,6 +94,15 @@ html body #sidebar.sidebar .nav-button.active .nav-icon {
 html body #sidebar.sidebar .nav-button.active .nav-icon-image {
   filter:brightness(0) invert(1) !important;
   opacity:1 !important;
+}
+
+/* Navigation groups share one compact rhythm while remaining easy to scan. */
+html body #sidebar.sidebar .nav-group + .nav-group {
+  margin-top:8px !important;
+}
+
+html body #sidebar.sidebar .sidebar-settings-bottom {
+  padding-top:12px !important;
 }
 
 @media (min-width:851px) {
@@ -170,13 +192,13 @@ html body #sidebar.sidebar .nav-button.active .nav-icon-image {
     opacity:0 !important;
   }
 
-  /* Open or pinned desktop rail shows the compact Talaan brand. */
+  /* Open or pinned desktop rail: logo + title first, pin control at the end. */
   html body #sidebar.sidebar.desktop-open .brand,
   html body #sidebar.sidebar.sidebar-pinned .brand {
     position:absolute !important;
     top:10px !important;
-    left:52px !important;
-    right:8px !important;
+    left:18px !important;
+    right:44px !important;
     height:42px !important;
     display:flex !important;
     align-items:center !important;
@@ -186,6 +208,12 @@ html body #sidebar.sidebar .nav-button.active .nav-icon-image {
     overflow:hidden !important;
     white-space:nowrap !important;
     pointer-events:auto !important;
+  }
+
+  html body #sidebar.sidebar.desktop-open .sidebar-close-button,
+  html body #sidebar.sidebar.sidebar-pinned .sidebar-close-button {
+    left:auto !important;
+    right:8px !important;
   }
 
   html body #sidebar.sidebar.desktop-open .talaan-brand-logo,
@@ -267,8 +295,8 @@ html body #sidebar.sidebar .nav-button.active .nav-icon-image {
     overflow:hidden !important;
     pointer-events:none !important;
     transform:none !important;
-    font-size:11px !important;
-    font-weight:400 !important;
+    font-size:12px !important;
+    font-weight:700 !important;
     color:#D9E5E2 !important;
   }
 
@@ -308,12 +336,13 @@ html body #sidebar.sidebar .nav-button.active .nav-icon-image {
     padding-inline-start:10px !important;
   }
 
-  /* The active state belongs to the icon square, never the full row. */
+  /* Keep every selected destination visible across the full compact row. */
   html body .sidebar .nav-button.active,
   html[data-theme="dark"] body .sidebar .nav-button.active,
   html body .sidebar.desktop-open .nav-button.active,
   html body .sidebar.sidebar-pinned .nav-button.active {
-    background:transparent !important;
+    background:rgba(53,111,209,.18) !important;
+    border-color:rgba(92,145,232,.3) !important;
     box-shadow:none !important;
   }
 
@@ -375,6 +404,13 @@ html body #sidebar.sidebar .nav-button.active .nav-icon-image {
 }
 
 @media (max-width:850px) {
+  html body #sidebar.sidebar {
+    width:min(320px,calc(100vw - 24px)) !important;
+    min-width:0 !important;
+    max-width:calc(100vw - 24px) !important;
+    padding:max(18px,calc(env(safe-area-inset-top) + 12px)) 12px max(18px,calc(env(safe-area-inset-bottom) + 12px)) !important;
+  }
+
   .sidebar .talaan-brand-logo {
     flex-basis:25px;
     width:25px;
@@ -387,6 +423,33 @@ html body #sidebar.sidebar .nav-button.active .nav-icon-image {
     line-height:1 !important;
     letter-spacing:0 !important;
     color:#FFFFFF !important;
+  }
+
+  html body #sidebar.sidebar .sidebar-navigation {
+    gap:4px !important;
+  }
+
+  html body #sidebar.sidebar .nav-button {
+    width:100% !important;
+    min-height:48px !important;
+    padding:10px !important;
+    gap:10px !important;
+    border-radius:7px !important;
+  }
+
+  html body #sidebar.sidebar .nav-icon {
+    flex:0 0 28px !important;
+    width:28px !important;
+    height:28px !important;
+  }
+
+  html body #sidebar.sidebar .nav-label {
+    width:auto !important;
+    max-width:none !important;
+    opacity:1 !important;
+    font-size:12px !important;
+    font-weight:700 !important;
+    line-height:1.2 !important;
   }
 }
 
@@ -463,8 +526,8 @@ html[data-theme="dark"] body #sidebar.sidebar .nav-label {
 
 html[data-theme="light"] body #sidebar.sidebar .nav-label,
 html[data-theme="dark"] body #sidebar.sidebar .nav-label {
-  font-size:10px !important;
-  font-weight:500 !important;
+  font-size:12px !important;
+  font-weight:700 !important;
 }
 
 html[data-theme="light"] body #sidebar.sidebar .nav-icon,
@@ -522,6 +585,35 @@ html[data-theme="light"] body #sidebar.sidebar .nav-button.active .nav-icon-imag
 html[data-theme="dark"] body #sidebar.sidebar .nav-button.active .nav-icon-image {
   filter:brightness(0) invert(1) !important;
   opacity:1 !important;
+}
+
+/* Full-row selection is the final authoritative sidebar state in both themes. */
+html[data-theme="light"] body #sidebar.sidebar .nav-button:is(:hover,:focus-visible) {
+  background:rgba(53,111,209,.07) !important;
+  border-color:rgba(53,111,209,.12) !important;
+}
+
+html[data-theme="dark"] body #sidebar.sidebar .nav-button:is(:hover,:focus-visible) {
+  background:rgba(53,111,209,.12) !important;
+  border-color:rgba(92,145,232,.2) !important;
+}
+
+html[data-theme="light"] body #sidebar.sidebar .nav-button.active {
+  background:rgba(53,111,209,.12) !important;
+  border-color:rgba(53,111,209,.22) !important;
+}
+
+html[data-theme="dark"] body #sidebar.sidebar .nav-button.active {
+  background:rgba(53,111,209,.22) !important;
+  border-color:rgba(92,145,232,.36) !important;
+}
+
+html[data-theme="light"] body #sidebar.sidebar .sidebar-settings-bottom {
+  border-block-start-color:rgba(8,11,16,.12) !important;
+}
+
+html[data-theme="dark"] body #sidebar.sidebar .sidebar-settings-bottom {
+  border-block-start-color:rgba(255,255,255,.14) !important;
 }
 
 /* Collapsed desktop rail: the Talaan logo owns the expand/pin affordance. */

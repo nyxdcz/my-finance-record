@@ -10,8 +10,8 @@
   "profileArchitectureVersion": 1,
   "encryptionVersion": 1,
   "authSecurityVersion": 1,
-  "cacheVersion": "finance-v2-20260828-household-splits-r16",
+  "cacheVersion": "finance-v2-20260828-household-splits-r17",
   "released": "2026-08-28",
   "name": "Talaan",
-  "notes": "Talaan V2.5.0 adds household groups, equal, percentage, and exact expense shares, payer tracking, member balances, and explicit settlements. Personal reports count only the owner's share while Account Ledger payments retain the complete amount actually paid. Settlements never create income, expenses, paid state, or automatic account movements. Dashboard views now reuse the Finance segmented control and the monthly calendar has more room across desktop and phone layouts. Finance Schema 12 and Cloud Schema V3 are preserved."
+  "notes": "Talaan V2.5.0 adds household groups, equal, percentage, and exact expense shares, payer tracking, member balances, and explicit settlements. Personal reports count only the owner's share while Account Ledger payments retain the complete amount actually paid. Settlements never create income, expenses, paid state, or automatic account movements. Dashboard views now reuse the Finance segmented control and the monthly calendar has more room across desktop and phone layouts. Sidebar navigation keeps its 60px collapsed and 185px expanded desktop widths while adding consistent 7px full-row selection, 12px semibold labels, and a 320px safe-area-aware phone drawer. Finance Schema 12 and Cloud Schema V3 are preserved."
 }

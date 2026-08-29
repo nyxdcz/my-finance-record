@@ -33,6 +33,6 @@ assert.match(production, /dashboard-default-layout \[data-dashboard-card="calend
 assert.equal(version.version, "2.5.0");
 assert.equal(version.schemaVersion, 12);
 assert.equal(version.cloudSchemaVersion, 3);
-assert.equal(version.cacheVersion, "finance-v2-20260828-household-splits-r16");
+assert.equal(version.cacheVersion, "finance-v2-20260828-household-splits-r17");
 
 console.log("Dashboard Calendar, Cash Flow, and Overview view contracts validated.");
