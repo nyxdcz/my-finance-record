@@ -20,7 +20,9 @@
 - Refined the sidebar without changing its 60px collapsed or 185px expanded desktop widths: navigation now uses 12px semibold labels, 7px full-row selection states, clearer section spacing, a theme-aware Settings divider, and collapsed tooltips.
 - Reordered the expanded sidebar header to place the logo first in the navigation-icon column, the Talaan title second, and the pin/unpin control at the far-right edge.
 - Expanded the phone drawer to a capped 320px with safe-area padding and 48px navigation rows while preserving every route and the existing pinned-state preference.
-- Rotated the PWA cache to `finance-v2-20260828-household-splits-r17` so installed clients receive the household baseline, iPhone refinements, shared Dashboard presentation, and sidebar refinement together.
+- Normalized Calendar, Cash Flow, and Overview into one full-width Dashboard contract outside Customize mode, while preserving saved card order, visibility, and size preferences for editing.
+- Enlarged the desktop calendar canvas, matched its event panel height, bounded the Cash Flow chart on wide screens, and made Overview use predictable three-, two-, and full-width bento rows.
+- Kept the PWA cache at `finance-v2-20260828-household-splits-r17` and advanced the one-time Dashboard presentation refresh so installed clients receive the normalized layouts without changing the product version.
 
 ## V2.4.0 · Talaan
 

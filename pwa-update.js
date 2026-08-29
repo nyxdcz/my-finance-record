@@ -3,9 +3,9 @@
   const FINANCE_CACHE_PATTERN = /^finance-v\d+-/;
   // Compatibility-only cache identity used to upgrade clients installed before Talaan V2.
   const LEGACY_INDEX_CACHE = "finance-v15-20260816-mobile-ui-ux-r32";
-  const CURRENT_CACHE_VERSION = "finance-v2-20260828-household-splits-r13";
+  const CURRENT_CACHE_VERSION = "finance-v2-20260828-household-splits-r17";
   const UI_HOTFIX_REFRESH_KEY = "finance-ui-hotfix-v2-0-1-talaan7";
-  const DASHBOARD_PRESENTATION_REFRESH_KEY = "finance-dashboard-presentation-v2-5-0-talaan8";
+  const DASHBOARD_PRESENTATION_REFRESH_KEY = "finance-dashboard-presentation-v2-5-0-talaan9";
   const normalizeCacheVersion = cacheVersion => cacheVersion === LEGACY_INDEX_CACHE ? CURRENT_CACHE_VERSION : cacheVersion;
 
   async function installBrowserBrandIcons() {
@@ -79,7 +79,8 @@
       if (root.localStorage?.getItem(DASHBOARD_PRESENTATION_REFRESH_KEY) === "done") return false;
       const removed = await deleteCachedPaths([
         "/brand-icons.js",
-        "/income-expenses-compact.css"
+        "/income-expenses-compact.css",
+        "/production-ui-audit.css"
       ]);
       if (!removed) return false;
       root.localStorage?.setItem(DASHBOARD_PRESENTATION_REFRESH_KEY, "done");

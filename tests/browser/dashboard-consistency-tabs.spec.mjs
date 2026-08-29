@@ -164,6 +164,8 @@ for (const viewport of [{ width:1440, height:1000 }, { width:393, height:852 }])
         activeTabRadius:parseFloat(getComputedStyle(tabButtons[0]).borderRadius),
         cardRadius:parseFloat(getComputedStyle(calendar).borderRadius),
         gridGap:parseFloat(getComputedStyle(grid).gap),
+        gridWidth:grid.getBoundingClientRect().width,
+        calendarCardWidth:cardRect.width,
         calendarLayoutColumns:getComputedStyle(calendarLayout).gridTemplateColumns.trim().split(/\s+/).length,
         calendarGridWidth:calendarGridRect.width,
         calendarEventsWidth:calendarEventsRect.width,
@@ -188,6 +190,7 @@ for (const viewport of [{ width:1440, height:1000 }, { width:393, height:852 }])
       expect(contract.activeTabRadius).toBe(7);
       expect(contract.tabWidth).toBeLessThanOrEqual(480);
       expect(contract.calendarLayoutColumns).toBe(2);
+      expect(contract.calendarCardWidth).toBeGreaterThanOrEqual(contract.gridWidth - 1);
       expect(contract.calendarGridWidth / contract.calendarEventsWidth).toBeGreaterThan(2.3);
       expect(contract.calendarDayMinHeight).toBeGreaterThanOrEqual(68);
     } else {
@@ -201,3 +204,72 @@ for (const viewport of [{ width:1440, height:1000 }, { width:393, height:852 }])
     }
   });
 }
+
+test("normal Dashboard views ignore stale card spans while Customize mode preserves them", async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem("simple-finance-project-records-v2-dashboard-phase4", JSON.stringify({
+      customized:true,
+      hidden:[],
+      privacy:false,
+      order:["activity", "projects", "accounts", "payment-progress", "expense-schedule", "due-soon", "savings-goals", "savings-trend", "cash-flow", "calendar"],
+      sizes:{
+        calendar:"large",
+        "cash-flow":"large",
+        "savings-goals":"small",
+        "savings-trend":"large",
+        "due-soon":"small",
+        "expense-schedule":"wide",
+        "payment-progress":"small",
+        accounts:"small",
+        projects:"wide",
+        activity:"small"
+      }
+    }));
+  });
+  await openDashboard(page, { width:1440, height:1000 });
+
+  const dashboard = page.locator("#dashboard");
+  const grid = page.locator("#dashboardCardGrid");
+  const calendar = page.locator('[data-dashboard-card="calendar"]');
+  await expect(dashboard).not.toHaveClass(/dashboard-default-layout/);
+  await expect(calendar).toHaveAttribute("data-size", "large");
+
+  const fullWidthDifference = async locator => {
+    const [gridBox, cardBox] = await Promise.all([grid.boundingBox(), locator.boundingBox()]);
+    return Math.abs(gridBox.width - cardBox.width);
+  };
+  expect(await fullWidthDifference(calendar)).toBeLessThanOrEqual(1);
+
+  await page.locator('[data-dashboard-view-tab="cash-flow"]').click();
+  const cashFlow = page.locator('[data-dashboard-card="cash-flow"]');
+  await expect(cashFlow).toBeVisible();
+  expect(await fullWidthDifference(cashFlow)).toBeLessThanOrEqual(1);
+
+  await page.locator('[data-dashboard-view-tab="overview"]').click();
+  const overviewLayout = await page.evaluate(() => {
+    const rect = key => document.querySelector(`[data-dashboard-card="${key}"]`).getBoundingClientRect();
+    const gridRect = document.getElementById("dashboardCardGrid").getBoundingClientRect();
+    const first = [rect("due-soon"), rect("expense-schedule"), rect("payment-progress")];
+    const second = [rect("accounts"), rect("projects")];
+    const activity = rect("activity");
+    return {
+      firstTops:first.map(item => item.top),
+      firstWidths:first.map(item => item.width),
+      secondTops:second.map(item => item.top),
+      secondWidths:second.map(item => item.width),
+      activityWidth:activity.width,
+      gridWidth:gridRect.width
+    };
+  });
+  expect(Math.max(...overviewLayout.firstTops) - Math.min(...overviewLayout.firstTops)).toBeLessThanOrEqual(1);
+  expect(Math.max(...overviewLayout.firstWidths) - Math.min(...overviewLayout.firstWidths)).toBeLessThanOrEqual(1);
+  expect(Math.max(...overviewLayout.secondTops) - Math.min(...overviewLayout.secondTops)).toBeLessThanOrEqual(1);
+  expect(Math.max(...overviewLayout.secondWidths) - Math.min(...overviewLayout.secondWidths)).toBeLessThanOrEqual(1);
+  expect(Math.abs(overviewLayout.activityWidth - overviewLayout.gridWidth)).toBeLessThanOrEqual(1);
+
+  await page.evaluate(() => window.setDashboardCustomizeMode(true));
+  const customizedCalendarWidth = await calendar.evaluate(node => node.getBoundingClientRect().width);
+  const customizedGridWidth = await grid.evaluate(node => node.getBoundingClientRect().width);
+  expect(customizedCalendarWidth).toBeLessThan(customizedGridWidth * .6);
+  await expect(calendar).toHaveAttribute("data-size", "large");
+});

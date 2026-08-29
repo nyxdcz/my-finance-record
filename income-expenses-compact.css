@@ -9,7 +9,7 @@
 
 @media (min-width: 901px) {
   .income-expenses-analytics {
-    gap: 8px !important;
+    gap: 12px !important;
   }
 
   .income-expenses-analytics-head {
@@ -222,10 +222,20 @@
   }
 }
 
-/* The primary over-time chart is intentionally excluded from the compact pass.
-   Keep its original card spacing and responsive chart scale for readability. */
+/* Keep the analytics cards on the same 7px/12px Dashboard system. */
+#dashboard :is(
+  .income-expenses-summary,
+  .income-expenses-chart-card,
+  .income-expenses-lower-card,
+  .income-expenses-range
+) {
+  border-radius: 7px !important;
+}
+
+/* Bound the over-time chart so wide desktops do not turn its SVG aspect ratio
+   into an oversized empty plotting area. */
 .income-expenses-chart-card {
-  padding: 16px 16px 10px !important;
+  padding: 14px 14px 8px !important;
 }
 
 .income-expenses-chart-head {
@@ -245,8 +255,17 @@
 }
 
 .income-expenses-svg {
-  height: auto !important;
-  min-height: 260px !important;
+  height: clamp(300px, 30vw, 420px) !important;
+  min-height: 300px !important;
+  max-height: 420px !important;
+}
+
+@media (min-width: 701px) and (max-width: 900px) {
+  .income-expenses-svg {
+    height: clamp(260px, 38vw, 340px) !important;
+    min-height: 260px !important;
+    max-height: 340px !important;
+  }
 }
 
 @media (max-width: 700px) {
@@ -255,6 +274,8 @@
   }
 
   .income-expenses-svg {
-    min-height: 210px !important;
+    height: 220px !important;
+    min-height: 220px !important;
+    max-height: 220px !important;
   }
 }

@@ -16,7 +16,7 @@ async function openDashboard(page, viewport) {
   });
 }
 
-test("desktop Income vs Expenses keeps compact chrome with a full-size over-time chart", async ({ page }) => {
+test("desktop Income vs Expenses keeps compact chrome with a bounded over-time chart", async ({ page }) => {
   await openDashboard(page, { width:1440, height:900 });
 
   const stylesheet = page.locator("#incomeExpensesCompactStylesheet");
@@ -41,8 +41,9 @@ test("desktop Income vs Expenses keeps compact chrome with a full-size over-time
   });
 
   expect(measurements.summaryHeight).toBeLessThanOrEqual(96);
-  expect(measurements.chartHeight).toBeGreaterThanOrEqual(260);
-  expect(measurements.chartPaddingTop).toBeGreaterThanOrEqual(16);
+  expect(measurements.chartHeight).toBeGreaterThanOrEqual(300);
+  expect(measurements.chartHeight).toBeLessThanOrEqual(420);
+  expect(measurements.chartPaddingTop).toBeGreaterThanOrEqual(14);
   expect(measurements.lowerCardHeight).toBeLessThan(150);
   expect(measurements.pageScrollWidth).toBeLessThanOrEqual(measurements.viewportWidth + 1);
 });
@@ -66,7 +67,7 @@ test("iPhone 14 Pro keeps the chart readable without reducing range touch target
   });
 
   expect(layout.subtitleDisplay).toBe("none");
-  expect(layout.chartHeight).toBeGreaterThanOrEqual(210);
+  expect(layout.chartHeight).toBe(220);
   expect(layout.chartPaddingTop).toBeGreaterThanOrEqual(13);
   expect(layout.pageScrollWidth).toBeLessThanOrEqual(layout.viewportWidth + 1);
 
