@@ -3,6 +3,9 @@
   const doc = root.document;
   if (!doc) return;
 
+  // Browser chrome should show the product name only; version remains inside the app UI.
+  doc.title = "Talaan";
+
   const ensureLink = ({ rel, sizes, href, type }) => {
     let selector = `link[rel="${rel}"]`;
     if (sizes) selector += `[sizes="${sizes}"]`;

@@ -13,7 +13,7 @@ const RELEASE = Object.freeze({
   name:"Talaan",
   date:"August 28, 2026",
   dateIso:"2026-08-28",
-  cache:"finance-v2-20260828-household-splits-r17",
+  cache:"finance-v2-20260828-household-splits-r16",
   assetQuery:"2.5.0-talaan1"
 });
 const SIDEBAR_BRAND_ASSET_QUERY = "2.2.0-talaan2";
@@ -159,6 +159,7 @@ patchTextFile("sync-runtime-compat.js", source => source
   .replace(/const RELEASE_NAME = "[^"]+";/, `const RELEASE_NAME = "${RELEASE.name}";`)
   .replace(/const RELEASE_DATE = "[^"]+";/, `const RELEASE_DATE = "${RELEASE.date}";`)
   .replace(/released:"\d{4}-\d{2}-\d{2}"/, `released:"${RELEASE.dateIso}"`)
+  .replace(/document\.title = `Talaan · V\$\{VERSION\}`;/, `document.title = "${BRAND}";`)
   .replace(/link\.href\s*=\s*(?:`|\")[^`\"]*liquid-glass[^`\"]*(?:`|\");/g, `link.href = "./liquid-glass.css?v=${RELEASE.assetQuery}";`));
 
 patchTextFile("pwa-update.js", source => source
@@ -189,7 +190,7 @@ patchTextFile("index.html", source => {
     .replaceAll("My_Finance_Records_Calendar_Test.ics", "Talaan_Calendar_Test.ics")
     .replace(/<meta name="application-name" content="[^"]+">/, `<meta name="application-name" content="${BRAND}">`)
     .replace(/<meta name="apple-mobile-web-app-title" content="[^"]+">/, `<meta name="apple-mobile-web-app-title" content="${BRAND}">`)
-    .replace(/<title>[^<]+ · V\d+\.\d+\.\d+<\/title>/, `<title>${BRAND} · ${RELEASE.displayVersion}</title>`)
+    .replace(/<title>[^<]+<\/title>/, `<title>${BRAND}</title>`)
     .replace(/<small id="buildBadge" title="[^"]+">V\d+\.\d+\.\d+<\/small>/, `<small id="buildBadge" title="${RELEASE.displayVersion} · ${RELEASE.name} · ${RELEASE.date}">${RELEASE.displayVersion}</small>`)
     .replace(/const APP_VERSION = "\d+\.\d+\.\d+";/, `const APP_VERSION = "${RELEASE.version}";`)
     .replace(/const APP_RELEASE_NAME = "[^"]+";/, `const APP_RELEASE_NAME = "${RELEASE.name}";`)
