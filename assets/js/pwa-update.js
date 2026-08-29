@@ -27,6 +27,15 @@
     }
   }
 
+  async function installPaidCalendarSortCompat() {
+    try {
+      await import("./paid-calendar-sort-compat.js?v=2.5.0-paid-calendar-sort1");
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
   async function deleteCachedPaths(pathnames) {
     if (!("caches" in root)) return 0;
     try {
@@ -133,6 +142,7 @@
   root.FinancePwaUpdate = api;
   void installBrowserBrandIcons();
   void installAccountSubmitCompat();
+  void installPaidCalendarSortCompat();
   void refreshCachedHeaderToolsOnce();
   void refreshDashboardPresentationOnce();
   void refreshExpenseDarkModeOnce();
