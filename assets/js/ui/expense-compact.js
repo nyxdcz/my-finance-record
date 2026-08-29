@@ -63,6 +63,44 @@
   html body #paidExpenseList .desktop-record-actions > [data-toggle-saved] > .monthly-repeat-label {
     display: none !important;
   }
+}
+
+/* Compact expense CSS intentionally uses explicit light-theme colors with
+   !important. These dark-theme rules are injected after the runtime styles so
+   Budget & Expenses keeps readable headings, record names, metadata, and
+   amounts without changing light mode or finance behavior. */
+@media (min-width: 851px) and (hover: hover) and (pointer: fine) {
+  html[data-theme="dark"] body #money .period-header h3,
+  html[data-theme="dark"] body #money .record-row[data-expense-row] .expense-record-title .record-title-copy > strong {
+    color: #F8FAFC !important;
+  }
+
+  html[data-theme="dark"] body #money .period-header p,
+  html[data-theme="dark"] body #money .record-row[data-expense-row] .expense-record-title .record-title-copy > small,
+  html[data-theme="dark"] body #money .record-row[data-expense-row] .expense-record-title .ui-tag,
+  html[data-theme="dark"] body #money .record-row[data-expense-row] > .due-cell,
+  html[data-theme="dark"] body #money .record-row[data-expense-row] > [data-label="Planned account"],
+  html[data-theme="dark"] body #money .record-row[data-expense-row] > [data-label="Planned account"]::before {
+    color: #AEBBD0 !important;
+  }
+
+  html[data-theme="dark"] body #money .record-row[data-expense-row] > .amount {
+    color: #F1F5F9 !important;
+  }
+
+  html[data-theme="dark"] body #money .period-card .period-header .collapse-toggle {
+    border-color: #475569 !important;
+    background: #172033 !important;
+    color: #CBD5E1 !important;
+  }
+
+  html[data-theme="dark"] body #money .period-card .period-header .collapse-toggle:hover {
+    background: #1E293B !important;
+  }
+
+  html[data-theme="dark"] body #money .period-card .period-header .collapse-icon {
+    color: #CBD5E1 !important;
+  }
 }`;
     document.head.appendChild(style);
     return true;
