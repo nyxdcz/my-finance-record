@@ -10,7 +10,8 @@ test("Talaan V2.5.0 source keeps the approved desktop UX quick wins", async () =
   const sw = source("sw.js");
   const version = JSON.parse(source("version.json"));
 
-  expect(index).toContain("<title>Talaan · V2.5.0</title>");
+  expect(index).toContain("<title>Talaan</title>");
+  expect(index).not.toContain("<title>Talaan · V2.5.0</title>");
   expect(index).toContain("Manage available money, planned budgets, and unpaid expenses for this month.");
   expect(index).toContain('id="incomeActiveFilterChips"');
   expect(index).toContain("No income matches these filters");
