@@ -69,7 +69,8 @@ for (const icon of manifest.icons || []) if (!exists(icon.src || "")) fail(`Miss
 
 const html = read("index.html");
 const worker = read("sw.js");
-if (!html.includes(`<title>${BRAND} · ${DISPLAY_VERSION}</title>`)) fail(`Prepared title must be ${BRAND} ${DISPLAY_VERSION}`);
+if (!html.includes(`<title>${BRAND}</title>`)) fail(`Prepared browser title must be ${BRAND}`);
+if (/<title>[^<]*V\d+\.\d+\.\d+[^<]*<\/title>/.test(html)) fail("Prepared browser title must not expose the app version");
 if (!html.includes(`const APP_VERSION = "${CURRENT_VERSION}";`)) fail(`Prepared index runtime must be ${DISPLAY_VERSION}`);
 if (/\bV(?:11|12|13|14|15)(?:\.\d+)*\b/.test(html)) fail("Prepared index still contains legacy product-version terminology");
 if (html.includes(PREVIOUS_BRAND)) fail("Prepared index still contains the superseded product brand");
