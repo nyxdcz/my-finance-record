@@ -47,7 +47,7 @@ test("expanded and collapsed desktop sidebar use the static Talaan brand", async
     brandFontSize:"20px",
     brandWhiteSpace:"nowrap",
     brandText:"Talaan",
-    navFontSizes:["10px","10px","10px","10px","10px"]
+    navFontSizes:["12px","12px","12px","12px","12px"]
   });
 
   await page.locator("#sidebar").evaluate(sidebar => {
@@ -62,7 +62,7 @@ test("expanded and collapsed desktop sidebar use the static Talaan brand", async
     brandFontSize:"20px",
     brandWhiteSpace:"nowrap",
     brandText:"Talaan",
-    navFontSizes:["10px","10px","10px","10px","10px"]
+    navFontSizes:["12px","12px","12px","12px","12px"]
   });
 });
 
@@ -74,13 +74,14 @@ test("mobile drawer keeps the static Talaan brand", async ({ page }) => {
   await expect(page.locator("#sidebar")).toHaveAttribute("aria-hidden", "false");
   await expect(page.locator(".sidebar .brand strong")).toHaveText("Talaan");
   await expect(page.locator(".sidebar .brand strong")).toHaveCSS("font-size", "20px");
+  await expect(page.locator("#sidebar")).toHaveCSS("width", "320px");
   for (const label of await page.locator(".sidebar .nav-label").all()) {
-    await expect(label).toHaveCSS("font-size", "10px");
+    await expect(label).toHaveCSS("font-size", "12px");
   }
 });
 
 test("sidebar brand shell cache is synchronized", () => {
-  const expected = "finance-v2-20260828-household-splits-r16";
+  const expected = "finance-v2-20260828-household-splits-r17";
   expect(source("version.json")).toContain(`"cacheVersion": "${expected}"`);
   expect(source("sw.js")).toContain(`const CACHE_VERSION = "${expected}"`);
   expect(source("pwa-update.js")).toContain(`const CURRENT_CACHE_VERSION = "${expected}"`);

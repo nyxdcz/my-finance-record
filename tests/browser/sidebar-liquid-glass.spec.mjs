@@ -67,11 +67,12 @@ test("desktop sidebar stays flat white in light mode and flat #080B10 in dark mo
   await expect(normalButton).toHaveCSS("color", "rgb(8, 11, 16)");
   await expect(normalIcon).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
   await expect(normalIconImage).toHaveCSS("filter", "brightness(0) saturate(1)");
-  await expect(normalLabel).toHaveCSS("font-size", "10px");
-  await expect(normalLabel).toHaveCSS("font-weight", "500");
+  await expect(normalLabel).toHaveCSS("font-size", "12px");
+  await expect(normalLabel).toHaveCSS("font-weight", "700");
   await expect(normalLabel).toHaveCSS("color", "rgb(8, 11, 16)");
 
-  await expect(active).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+  await expect(active).toHaveCSS("background-color", "rgba(53, 111, 209, 0.12)");
+  await expect(active).toHaveCSS("border-radius", "7px");
   await expect(activeLabel).toHaveCSS("color", "rgb(8, 11, 16)");
   await expect(activeIcon).toHaveCSS("background-color", "rgb(53, 111, 209)");
   await expect(activeIconImage).toHaveCSS("filter", "brightness(0) invert(1)");
@@ -85,11 +86,12 @@ test("desktop sidebar stays flat white in light mode and flat #080B10 in dark mo
   await expect(brandText).toHaveCSS("font-size", "20px");
   await expect(brandText).toHaveCSS("font-weight", "700");
   await expect(brandText).toHaveCSS("color", "rgb(255, 255, 255)");
-  await expect(normalLabel).toHaveCSS("font-size", "10px");
-  await expect(normalLabel).toHaveCSS("font-weight", "500");
+  await expect(normalLabel).toHaveCSS("font-size", "12px");
+  await expect(normalLabel).toHaveCSS("font-weight", "700");
   await expect(normalLabel).toHaveCSS("color", "rgb(255, 255, 255)");
   await expect(normalIconImage).toHaveCSS("filter", "brightness(0) invert(1)");
   await expect(activeLabel).toHaveCSS("color", "rgb(255, 255, 255)");
+  await expect(active).toHaveCSS("background-color", "rgba(53, 111, 209, 0.22)");
   await expect(activeIcon).toHaveCSS("background-color", "rgb(53, 111, 209)");
 
   await page.evaluate(() => document.getElementById("sidebar").classList.remove("desktop-open"));
@@ -99,7 +101,7 @@ test("desktop sidebar stays flat white in light mode and flat #080B10 in dark mo
   await expect(brandText).toBeHidden();
 });
 
-test("mobile light sidebar stays flat white with 20px Talaan and 10px labels", async ({ page }) => {
+test("mobile light sidebar stays flat white with a 320px drawer and readable labels", async ({ page }) => {
   await page.setViewportSize({ width:390, height:844 });
   await page.goto("http://127.0.0.1:3000/offline.html", { waitUntil:"networkidle" });
   await installFixture(page, { mobile:true });
@@ -111,14 +113,15 @@ test("mobile light sidebar stays flat white with 20px Talaan and 10px labels", a
   const activeIcon = sidebar.locator(".nav-button.active .nav-icon");
 
   await expect(sidebar).toHaveCSS("background-color", "rgb(255, 255, 255)");
+  await expect(sidebar).toHaveCSS("width", "320px");
   await expect(sidebar).toHaveCSS("background-image", "none");
   await expect(sidebar).toHaveCSS("box-shadow", "none");
   await expect(sidebar).toHaveCSS("backdrop-filter", "none");
   await expect(brandText).toHaveCSS("font-size", "20px");
   await expect(brandText).toHaveCSS("font-weight", "700");
   await expect(brandText).toHaveCSS("color", "rgb(8, 11, 16)");
-  await expect(normalLabel).toHaveCSS("font-size", "10px");
-  await expect(normalLabel).toHaveCSS("font-weight", "500");
+  await expect(normalLabel).toHaveCSS("font-size", "12px");
+  await expect(normalLabel).toHaveCSS("font-weight", "700");
   await expect(normalLabel).toHaveCSS("color", "rgb(8, 11, 16)");
   await expect(normalIconImage).toHaveCSS("filter", "brightness(0) saturate(1)");
   await expect(activeIcon).toHaveCSS("background-color", "rgb(53, 111, 209)");

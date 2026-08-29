@@ -13,7 +13,7 @@ const RELEASE = Object.freeze({
   name:"Talaan",
   date:"August 28, 2026",
   dateIso:"2026-08-28",
-  cache:"finance-v2-20260828-household-splits-r16",
+  cache:"finance-v2-20260828-household-splits-r17",
   assetQuery:"2.5.0-talaan1"
 });
 const SIDEBAR_BRAND_ASSET_QUERY = "2.2.0-talaan2";

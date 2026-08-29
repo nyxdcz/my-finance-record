@@ -5,6 +5,7 @@ const read = file => fs.readFileSync(file, "utf8");
 const index = read("index.html");
 const shell = read("assets/css/shell-ui.css");
 const app = read("assets/css/app.css");
+const sidebar = read("assets/css/sidebar-compact-brand.css");
 const help = read("assets/js/ui/application-help.js");
 const headerTools = read("assets/js/ui/header-tools-compat.js");
 const worker = read("sw.js");
@@ -36,4 +37,19 @@ assert.ok(workflow.includes("cp assets/js/ui/*.js _site/"));
 assert.ok(workflow.includes("test -f _site/application-help.js"));
 assert.ok(app.split(/\r?\n/).length < 5500, "app.css must retain maintainability headroom");
 
-console.log("Application shell, Help boundaries, header tools, and CSS ownership validated.");
+for (const sidebarContract of [
+  "--sidebar-compact-expanded-width:185px",
+  ".nav-group + .nav-group",
+  "margin-top:8px !important",
+  "width:min(320px,calc(100vw - 24px)) !important",
+  "min-height:48px !important",
+  "font-size:12px !important",
+  "font-weight:700 !important",
+  "border-radius:7px !important"
+]) {
+  assert.ok(sidebar.includes(sidebarContract), `sidebar stylesheet must retain ${sidebarContract}`);
+}
+assert.match(sidebar, /html\[data-theme="light"\] body #sidebar\.sidebar \.nav-button\.active \{[\s\S]*background:rgba\(53,111,209,\.12\) !important/);
+assert.match(sidebar, /html\[data-theme="dark"\] body #sidebar\.sidebar \.nav-button\.active \{[\s\S]*background:rgba\(53,111,209,\.22\) !important/);
+
+console.log("Application shell, Help boundaries, header tools, CSS ownership, and sidebar navigation validated.");

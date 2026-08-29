@@ -17,7 +17,9 @@
 - Corrected phone account-dialog mode headings and scroll containment, transaction-total overlap, workspace-tab chrome, and Project Agenda action wrapping.
 - Organized the Dashboard into Calendar, Cash Flow, and Overview views with Calendar first, a consistent 7px card radius, a 12px spacing rhythm, and explicit default bento spans.
 - Reused the exact Finance `workspace-switcher` component for Dashboard views and enlarged the monthly calendar grid across desktop and phone layouts.
-- Rotated the PWA cache to `finance-v2-20260828-household-splits-r16` so installed clients receive the household baseline, iPhone refinements, and shared Dashboard presentation together.
+- Refined the sidebar without changing its 60px collapsed or 185px expanded desktop widths: navigation now uses 12px semibold labels, 7px full-row selection states, clearer section spacing, a theme-aware Settings divider, and collapsed tooltips.
+- Expanded the phone drawer to a capped 320px with safe-area padding and 48px navigation rows while preserving every route and the existing pinned-state preference.
+- Rotated the PWA cache to `finance-v2-20260828-household-splits-r17` so installed clients receive the household baseline, iPhone refinements, shared Dashboard presentation, and sidebar refinement together.
 
 ## V2.4.0 · Talaan
 
