@@ -196,7 +196,7 @@ for (const viewport of [{ width:1440, height:1000 }, { width:393, height:852 }])
       expect(contract.tabPadding).toBe(0);
       expect(contract.tabGap).toBe(0);
       expect(contract.tabButtonHeights).toEqual([44, 44, 44]);
-      expect(contract.activeTabRadius).toBe(8);
+      expect(contract.activeTabRadius).toBe(7);
       expect(contract.calendarLayoutColumns).toBe(1);
       expect(contract.calendarDayMinHeight).toBeGreaterThanOrEqual(56);
     }

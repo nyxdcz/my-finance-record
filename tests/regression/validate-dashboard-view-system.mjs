@@ -18,6 +18,8 @@ assert.match(index, /data-dashboard-card="activity" data-dashboard-view="overvie
 assert.match(production, /--dashboard-card-radius:\s*7px/);
 assert.match(production, /--dashboard-card-gap:\s*12px/);
 assert.match(production, /#dashboard \.dashboard-view-tabs[\s\S]*height:\s*43px[\s\S]*min-height:\s*43px[\s\S]*max-height:\s*43px/);
+assert.match(production, /@media \(min-width: 701px\)[\s\S]*#dashboard \.dashboard-view-tabs[\s\S]*display:\s*flex/);
+assert.match(production, /@media \(max-width: 700px\)[\s\S]*#dashboard \.dashboard-view-tabs[\s\S]*margin:\s*0 0 8px !important/);
 assert.match(production, /\.finance-workspace-marquee-row > \.money-workspace-switcher,[\s\S]*\.project-workspace-switcher,[\s\S]*\.dashboard-view-tabs/);
 assert.doesNotMatch(production, /#dashboard \.dashboard-view-tab\s*\{/);
 assert.doesNotMatch(production, /#dashboard \.dashboard-view-tab\[aria-selected="true"\]/);
