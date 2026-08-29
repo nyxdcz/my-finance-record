@@ -1270,6 +1270,7 @@
 @media (min-width: 701px) {
   #dashboard .dashboard-view-tabs {
     display: flex;
+    width: fit-content;
   }
 }
 
@@ -1436,6 +1437,12 @@
 
   #dashboard .dashboard-view-tabs {
     margin: 0 0 8px !important;
+  }
+
+  html body #dashboard .dashboard-view-tabs > .workspace-switcher-button {
+    padding: 6px 7px !important;
+    font-size: .7rem !important;
+    white-space: nowrap;
   }
 
   #dashboard .dashboard-card-grid {

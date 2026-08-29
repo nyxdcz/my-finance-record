@@ -18,6 +18,61 @@ async function openFinance(page, viewport) {
   await expect(page.locator("#money .money-workspace-switcher")).toBeVisible();
 }
 
+async function captureSwitcherStyles(page, selector) {
+  return page.evaluate(currentSelector => {
+    const switcher = document.querySelector(currentSelector);
+    const active = switcher.querySelector('[aria-selected="true"]');
+    const inactive = switcher.querySelector('[aria-selected="false"]');
+    const outerStyle = node => {
+      const css = getComputedStyle(node);
+      return {
+        display:css.display,
+        position:css.position,
+        top:css.top,
+        height:css.height,
+        minHeight:css.minHeight,
+        maxHeight:css.maxHeight,
+        margin:css.margin,
+        padding:css.padding,
+        gap:css.gap,
+        border:css.border,
+        borderRadius:css.borderRadius,
+        backgroundColor:css.backgroundColor,
+        boxShadow:css.boxShadow,
+        overflow:css.overflow,
+        backdropFilter:css.backdropFilter,
+        webkitBackdropFilter:css.webkitBackdropFilter
+      };
+    };
+    const buttonStyle = node => {
+      const css = getComputedStyle(node);
+      return {
+        boxSizing:css.boxSizing,
+        display:css.display,
+        height:css.height,
+        minHeight:css.minHeight,
+        maxHeight:css.maxHeight,
+        padding:css.padding,
+        border:css.border,
+        borderRadius:css.borderRadius,
+        backgroundColor:css.backgroundColor,
+        color:css.color,
+        boxShadow:css.boxShadow,
+        fontSize:css.fontSize,
+        fontWeight:css.fontWeight,
+        lineHeight:css.lineHeight,
+        textAlign:css.textAlign,
+        whiteSpace:css.whiteSpace
+      };
+    };
+    return {
+      outer:outerStyle(switcher),
+      active:buttonStyle(active),
+      inactive:buttonStyle(inactive)
+    };
+  }, selector);
+}
+
 test("Dashboard defaults to Calendar and exposes the approved view order", async ({ page }) => {
   await openDashboard(page, { width:1440, height:1000 });
 
@@ -72,69 +127,13 @@ test("Dashboard tabs support roving keyboard focus and customization preview", a
 for (const viewport of [{ width:1440, height:1000 }, { width:393, height:852 }]) {
   test(`Dashboard and Finance share the exact segmented-control styles at ${viewport.width}px`, async ({ page }) => {
     await openFinance(page, viewport);
+    const finance = await captureSwitcherStyles(page, "#money .money-workspace-switcher");
+    await openDashboard(page, viewport);
+    const dashboard = await captureSwitcherStyles(page, "#dashboard .dashboard-view-tabs");
 
-    const comparison = await page.evaluate(() => {
-      const finance = document.querySelector("#money .money-workspace-switcher");
-      const dashboard = document.querySelector("#dashboard .dashboard-view-tabs");
-      const financeActive = finance.querySelector('[aria-selected="true"]');
-      const dashboardActive = dashboard.querySelector('[aria-selected="true"]');
-      const financeInactive = finance.querySelector('[aria-selected="false"]');
-      const dashboardInactive = dashboard.querySelector('[aria-selected="false"]');
-      const outerStyle = node => {
-        const css = getComputedStyle(node);
-        return {
-          display:css.display,
-          position:css.position,
-          top:css.top,
-          height:css.height,
-          minHeight:css.minHeight,
-          maxHeight:css.maxHeight,
-          margin:css.margin,
-          padding:css.padding,
-          gap:css.gap,
-          border:css.border,
-          borderRadius:css.borderRadius,
-          backgroundColor:css.backgroundColor,
-          boxShadow:css.boxShadow,
-          overflow:css.overflow,
-          backdropFilter:css.backdropFilter,
-          webkitBackdropFilter:css.webkitBackdropFilter
-        };
-      };
-      const buttonStyle = node => {
-        const css = getComputedStyle(node);
-        return {
-          boxSizing:css.boxSizing,
-          display:css.display,
-          height:css.height,
-          minHeight:css.minHeight,
-          maxHeight:css.maxHeight,
-          padding:css.padding,
-          border:css.border,
-          borderRadius:css.borderRadius,
-          backgroundColor:css.backgroundColor,
-          color:css.color,
-          boxShadow:css.boxShadow,
-          fontSize:css.fontSize,
-          fontWeight:css.fontWeight,
-          lineHeight:css.lineHeight,
-          textAlign:css.textAlign,
-          whiteSpace:css.whiteSpace
-        };
-      };
-      return {
-        financeOuter:outerStyle(finance),
-        dashboardOuter:outerStyle(dashboard),
-        financeActive:buttonStyle(financeActive),
-        dashboardActive:buttonStyle(dashboardActive),
-        financeInactive:buttonStyle(financeInactive),
-        dashboardInactive:buttonStyle(dashboardInactive)
-      };
-    });
-
-    expect(comparison.dashboardOuter).toEqual(comparison.financeOuter);
-    expect(comparison.dashboardActive).toEqual(comparison.financeActive);
-    expect(comparison.dashboardInactive).toEqual(comparison.financeInactive);
+    expect(dashboard.outer).toEqual(finance.outer);
+    expect(dashboard.active).toEqual(finance.active);
+    expect(dashboard.inactive).toEqual(finance.inactive);
   });
 }
 
