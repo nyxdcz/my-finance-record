@@ -62,6 +62,8 @@ html body #sidebar.sidebar .nav-icon-image {
 
 html body #sidebar.sidebar .nav-label {
   color:#D9E5E2 !important;
+  font-size:12px !important;
+  font-weight:700 !important;
 }
 
 html body #sidebar.sidebar .nav-button:is(:hover,:focus-visible) {
