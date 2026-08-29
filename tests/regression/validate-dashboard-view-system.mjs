@@ -26,10 +26,12 @@ assert.match(production, /\.finance-workspace-marquee-row > \.money-workspace-sw
 assert.match(production, /#dashboard \.dashboard-view-tabs > \.workspace-switcher-button:is\(\.active, \[aria-selected="true"\]\)[\s\S]*background:\s*#356FD1 !important/);
 assert.doesNotMatch(production, /#dashboard \.dashboard-view-tab\s*\{/);
 assert.doesNotMatch(production, /#dashboard \.dashboard-view-tab\[aria-selected="true"\]/);
-assert.match(production, /\.dashboard-calendar-layout[\s\S]*grid-template-columns:\s*minmax\(0, 18fr\) minmax\(260px, 7fr\)/);
-assert.match(production, /\.calendar-day[\s\S]*min-height:\s*clamp\(68px, 6vw, 88px\)/);
+assert.match(production, /\.dashboard-calendar-layout[\s\S]*grid-template-columns:\s*minmax\(0, 1fr\) minmax\(300px, 360px\)/);
+assert.match(production, /\.calendar-day[\s\S]*min-height:\s*clamp\(72px, 7vw, 116px\)/);
 assert.match(production, /@media \(max-width: 700px\)[\s\S]*\.calendar-day[\s\S]*min-height:\s*56px/);
 assert.match(production, /dashboard-default-layout \[data-dashboard-card="calendar"\][\s\S]*grid-column:\s*1 \/ -1/);
+assert.match(production, /:not\(\.dashboard-customizing\)\[data-dashboard-active-view="calendar"\][\s\S]*\[data-dashboard-card="calendar"\][\s\S]*grid-column:\s*1 \/ -1/);
+assert.match(production, /:not\(\.dashboard-customizing\)\[data-dashboard-active-view="overview"\][\s\S]*\[data-dashboard-card="activity"\][\s\S]*grid-column:\s*1 \/ -1/);
 assert.equal(version.version, "2.5.0");
 assert.equal(version.schemaVersion, 12);
 assert.equal(version.cloudSchemaVersion, 3);

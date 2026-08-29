@@ -1256,6 +1256,20 @@
   --dashboard-card-padding: 14px;
 }
 
+html body :is(
+  #dashboard .dashboard-view-tabs,
+  #money .money-workspace-switcher
+) {
+  border-radius: 7px !important;
+}
+
+html body :is(
+  #dashboard .dashboard-view-tabs,
+  #money .money-workspace-switcher
+) > .workspace-switcher-button {
+  border-radius: 7px !important;
+}
+
 #dashboard .dashboard-view-tabs {
   position: static;
   top: auto;
@@ -1276,6 +1290,7 @@
 
 #dashboard .dashboard-view-panel {
   min-width: 0;
+  width: 100%;
   margin-top: var(--dashboard-card-gap);
 }
 
@@ -1315,7 +1330,7 @@
 
 #dashboard .dashboard-card-grid {
   grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
-  grid-auto-flow: row !important;
+  grid-auto-flow: row dense !important;
   gap: var(--dashboard-card-gap) !important;
   margin-top: 0 !important;
 }
@@ -1333,7 +1348,8 @@
 }
 
 #dashboard .dashboard-calendar-layout {
-  grid-template-columns: minmax(0, 18fr) minmax(260px, 7fr) !important;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 360px) !important;
+  align-items: stretch !important;
   gap: var(--dashboard-card-gap) !important;
 }
 
@@ -1342,8 +1358,67 @@
 }
 
 #dashboard .calendar-day {
-  min-height: clamp(68px, 6vw, 88px) !important;
+  min-height: clamp(72px, 7vw, 116px) !important;
   padding: 6px !important;
+}
+
+#dashboard .dashboard-calendar-events {
+  display: flex;
+  min-height: 100%;
+  max-height: none;
+  flex-direction: column;
+}
+
+#dashboard .dashboard-calendar-events .calendar-event-list {
+  min-height: 0;
+  max-height: none;
+  flex: 1 1 auto;
+}
+
+/* Normal tab views use one stable layout even when older saved card sizes exist.
+   Customize mode still shows and edits the persisted order, visibility, and sizes. */
+#dashboard:not(.dashboard-customizing)[data-dashboard-active-view="calendar"] [data-dashboard-card="calendar"],
+#dashboard:not(.dashboard-customizing)[data-dashboard-active-view="cash-flow"] [data-dashboard-card="cash-flow"] {
+  width: 100% !important;
+  grid-column: 1 / -1 !important;
+  order: 1 !important;
+}
+
+#dashboard:not(.dashboard-customizing)[data-dashboard-active-view="cash-flow"] [data-dashboard-card="savings-goals"] {
+  grid-column: span 5 !important;
+  order: 2 !important;
+}
+
+#dashboard:not(.dashboard-customizing)[data-dashboard-active-view="cash-flow"] [data-dashboard-card="savings-trend"] {
+  grid-column: span 7 !important;
+  order: 3 !important;
+}
+
+#dashboard:not(.dashboard-customizing)[data-dashboard-active-view="overview"] :is(
+  [data-dashboard-card="payment-progress"],
+  [data-dashboard-card="expense-schedule"],
+  [data-dashboard-card="due-soon"]
+) {
+  grid-column: span 4 !important;
+}
+
+#dashboard:not(.dashboard-customizing)[data-dashboard-active-view="overview"] [data-dashboard-card="due-soon"] { order: 1 !important; }
+#dashboard:not(.dashboard-customizing)[data-dashboard-active-view="overview"] [data-dashboard-card="expense-schedule"] { order: 2 !important; }
+#dashboard:not(.dashboard-customizing)[data-dashboard-active-view="overview"] [data-dashboard-card="payment-progress"] { order: 3 !important; }
+
+#dashboard:not(.dashboard-customizing)[data-dashboard-active-view="overview"] :is(
+  [data-dashboard-card="accounts"],
+  [data-dashboard-card="projects"]
+) {
+  grid-column: span 6 !important;
+}
+
+#dashboard:not(.dashboard-customizing)[data-dashboard-active-view="overview"] [data-dashboard-card="accounts"] { order: 4 !important; }
+#dashboard:not(.dashboard-customizing)[data-dashboard-active-view="overview"] [data-dashboard-card="projects"] { order: 5 !important; }
+
+#dashboard:not(.dashboard-customizing)[data-dashboard-active-view="overview"] [data-dashboard-card="activity"] {
+  grid-column: 1 / -1 !important;
+  order: 6 !important;
 }
 
 #dashboard.dashboard-default-layout [data-dashboard-card="calendar"],
@@ -1425,11 +1500,40 @@
   #dashboard.dashboard-default-layout [data-dashboard-card="activity"] {
     grid-column: span 3 !important;
   }
+
+  #dashboard:not(.dashboard-customizing)[data-dashboard-active-view="cash-flow"] :is(
+    [data-dashboard-card="savings-goals"],
+    [data-dashboard-card="savings-trend"]
+  ),
+  #dashboard:not(.dashboard-customizing)[data-dashboard-active-view="overview"] :is(
+    [data-dashboard-card="accounts"],
+    [data-dashboard-card="projects"]
+  ) {
+    grid-column: span 3 !important;
+  }
+
+  #dashboard:not(.dashboard-customizing)[data-dashboard-active-view="overview"] :is(
+    [data-dashboard-card="payment-progress"],
+    [data-dashboard-card="expense-schedule"],
+    [data-dashboard-card="due-soon"]
+  ) {
+    grid-column: span 2 !important;
+  }
 }
 
 @media (max-width: 850px) {
   #dashboard .dashboard-calendar-layout {
     grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  #dashboard .dashboard-calendar-events {
+    display: block;
+    min-height: 224px;
+    max-height: 320px;
+  }
+
+  #dashboard .dashboard-calendar-events .calendar-event-list {
+    max-height: 254px;
   }
 
   #dashboard .calendar-day {
@@ -1459,6 +1563,15 @@
 
   #dashboard .dashboard-detail-card,
   #dashboard.dashboard-default-layout [data-dashboard-card] {
+    grid-column: 1 !important;
+  }
+
+  #dashboard:not(.dashboard-customizing)[data-dashboard-active-view="cash-flow"] :is(
+    [data-dashboard-card="cash-flow"],
+    [data-dashboard-card="savings-goals"],
+    [data-dashboard-card="savings-trend"]
+  ),
+  #dashboard:not(.dashboard-customizing)[data-dashboard-active-view="overview"] [data-dashboard-card] {
     grid-column: 1 !important;
   }
 
