@@ -4,7 +4,7 @@ const APP_URL = "http://127.0.0.1:3000";
 
 async function openDashboard(page, viewport) {
   await page.setViewportSize(viewport);
-  await page.goto(`${APP_URL}/?page=dashboard`, { waitUntil:"domcontentloaded" });
+  await page.goto(`${APP_URL}/?page=dashboard`, { waitUntil:"networkidle" });
   await page.waitForFunction(() => Boolean(window.FinancePrivacyLock));
   await page.evaluate(() => window.FinancePrivacyLock.setAuthenticated(true));
   await expect(page.locator("#dashboard .dashboard-view-tabs")).toBeVisible();
@@ -12,7 +12,7 @@ async function openDashboard(page, viewport) {
 
 async function openFinance(page, viewport) {
   await page.setViewportSize(viewport);
-  await page.goto(`${APP_URL}/?page=money`, { waitUntil:"domcontentloaded" });
+  await page.goto(`${APP_URL}/?page=money`, { waitUntil:"networkidle" });
   await page.waitForFunction(() => Boolean(window.FinancePrivacyLock));
   await page.evaluate(() => window.FinancePrivacyLock.setAuthenticated(true));
   await expect(page.locator("#money .money-workspace-switcher")).toBeVisible();
