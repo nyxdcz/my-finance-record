@@ -18,6 +18,7 @@
 - Organized the Dashboard into Calendar, Cash Flow, and Overview views with Calendar first, a consistent 7px card radius, a 12px spacing rhythm, and explicit default bento spans.
 - Reused the exact Finance `workspace-switcher` component for Dashboard views and enlarged the monthly calendar grid across desktop and phone layouts.
 - Refined the sidebar without changing its 60px collapsed or 185px expanded desktop widths: navigation now uses 12px semibold labels, 7px full-row selection states, clearer section spacing, a theme-aware Settings divider, and collapsed tooltips.
+- Reordered the expanded sidebar header to place the logo first in the navigation-icon column, the Talaan title second, and the pin/unpin control at the far-right edge.
 - Expanded the phone drawer to a capped 320px with safe-area padding and 48px navigation rows while preserving every route and the existing pinned-state preference.
 - Rotated the PWA cache to `finance-v2-20260828-household-splits-r17` so installed clients receive the household baseline, iPhone refinements, shared Dashboard presentation, and sidebar refinement together.
 
