@@ -23,7 +23,7 @@ assert.match(production, /@media \(min-width: 701px\)[\s\S]*#dashboard \.dashboa
 assert.match(production, /@media \(max-width: 700px\)[\s\S]*#dashboard \.dashboard-view-tabs[\s\S]*margin:\s*0 0 8px !important/);
 assert.match(production, /#dashboard \.dashboard-view-tabs > \.workspace-switcher-button[\s\S]*padding:\s*6px 7px !important[\s\S]*font-size:\s*\.7rem !important[\s\S]*white-space:\s*nowrap/);
 assert.match(production, /\.finance-workspace-marquee-row > \.money-workspace-switcher,[\s\S]*\.project-workspace-switcher,[\s\S]*\.dashboard-view-tabs/);
-assert.match(fs.readFileSync("assets/css/app.css", "utf8"), /:is\(\.money-workspace-switcher, \.project-workspace-switcher, \.dashboard-view-tabs\)[\s\S]*background:#356FD1 !important/);
+assert.match(production, /#dashboard \.dashboard-view-tabs > \.workspace-switcher-button:is\(\.active, \[aria-selected="true"\]\)[\s\S]*background:\s*#356FD1 !important/);
 assert.doesNotMatch(production, /#dashboard \.dashboard-view-tab\s*\{/);
 assert.doesNotMatch(production, /#dashboard \.dashboard-view-tab\[aria-selected="true"\]/);
 assert.match(production, /\.dashboard-calendar-layout[\s\S]*grid-template-columns:\s*minmax\(0, 18fr\) minmax\(260px, 7fr\)/);

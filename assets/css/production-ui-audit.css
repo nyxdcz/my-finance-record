@@ -1279,6 +1279,14 @@
   margin-top: var(--dashboard-card-gap);
 }
 
+#dashboard .dashboard-view-tabs > .workspace-switcher-button:is(.active, [aria-selected="true"]),
+#dashboard .dashboard-view-tabs > .workspace-switcher-button:is(.active, [aria-selected="true"]):hover,
+#dashboard .dashboard-view-tabs > .workspace-switcher-button:is(.active, [aria-selected="true"]):focus-visible {
+  background: #356FD1 !important;
+  border-color: #356FD1 !important;
+  color: #FFFFFF !important;
+}
+
 #dashboard [data-dashboard-view][hidden] { display: none !important; }
 
 #dashboard .card,
