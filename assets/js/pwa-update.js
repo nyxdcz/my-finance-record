@@ -27,13 +27,66 @@
     }
   }
 
-  async function installPaidCalendarSortCompat() {
-    try {
-      await import("./paid-calendar-sort-compat.js?v=2.5.0-paid-calendar-sort1");
+  function installPaidCalendarSortCompat() {
+    if (root.FinancePaidCalendarSort) return false;
+    const CALENDAR_SELECTOR = "#transactionCalendar-paid";
+    const SORT_SELECTOR = "#transactionToolbar-paid [data-transaction-sort]";
+    let refreshQueued = false;
+
+    const dayTimestamp = day => {
+      const label = String(day?.querySelector(":scope > h4")?.textContent || "").trim();
+      if (!label || label === "Unscheduled") return null;
+      const timestamp = Date.parse(label);
+      return Number.isFinite(timestamp) ? timestamp : null;
+    };
+
+    const applySort = () => {
+      const calendar = document.querySelector(CALENDAR_SELECTOR);
+      const sortControl = document.querySelector(SORT_SELECTOR);
+      if (!calendar || !sortControl || !["oldest", "newest"].includes(sortControl.value)) return false;
+      const days = [...calendar.querySelectorAll(":scope > .transaction-calendar-day")];
+      if (days.length < 2) return false;
+      const direction = sortControl.value === "oldest" ? 1 : -1;
+      const sorted = [...days].sort((a, b) => {
+        const aTime = dayTimestamp(a);
+        const bTime = dayTimestamp(b);
+        if (aTime === null && bTime === null) return 0;
+        if (aTime === null) return 1;
+        if (bTime === null) return -1;
+        return direction * (aTime - bTime);
+      });
+      const unchanged = days.every((day, index) => day === sorted[index]);
+      if (unchanged) return false;
+      sorted.forEach(day => calendar.append(day));
       return true;
-    } catch (error) {
-      return false;
-    }
+    };
+
+    const queueApply = () => {
+      if (refreshQueued) return;
+      refreshQueued = true;
+      root.requestAnimationFrame(() => {
+        refreshQueued = false;
+        applySort();
+      });
+    };
+
+    document.addEventListener("change", event => {
+      if (event.target?.matches?.(SORT_SELECTOR)) queueApply();
+    });
+
+    const observer = new MutationObserver(records => {
+      if (records.some(record => record.target?.closest?.(CALENDAR_SELECTOR) || [...record.addedNodes].some(node => node.nodeType === Node.ELEMENT_NODE && (node.matches?.(CALENDAR_SELECTOR) || node.querySelector?.(CALENDAR_SELECTOR))))) queueApply();
+    });
+
+    const start = () => {
+      observer.observe(document.documentElement, { childList:true, subtree:true });
+      queueApply();
+    };
+
+    root.FinancePaidCalendarSort = Object.freeze({ applySort, queueApply });
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start, { once:true });
+    else start();
+    return true;
   }
 
   async function deleteCachedPaths(pathnames) {
@@ -142,7 +195,7 @@
   root.FinancePwaUpdate = api;
   void installBrowserBrandIcons();
   void installAccountSubmitCompat();
-  void installPaidCalendarSortCompat();
+  installPaidCalendarSortCompat();
   void refreshCachedHeaderToolsOnce();
   void refreshDashboardPresentationOnce();
   void refreshExpenseDarkModeOnce();
