@@ -14,23 +14,51 @@ async function openAuthenticatedPage(page, route, viewport) {
   await expect(page.locator(`#${route}`)).toHaveClass(/active/);
 }
 
-test("desktop Paid Expenses keeps every primary filter action on one row", async ({ page }) => {
-  await openAuthenticatedPage(page, "paid-expenses", { width:1440, height:1000 });
+for (const width of [1024, 1440]) {
+  test(`desktop Paid Expenses keeps every primary filter action on one row at ${width}px`, async ({ page }) => {
+    await openAuthenticatedPage(page, "paid-expenses", { width, height:1000 });
 
-  const toolbar = page.locator("#paidExpensesSection .paid-toolbar-compact");
-  const controls = toolbar.locator(":scope > .field, :scope > button");
-  await expect(controls).toHaveCount(4);
+    const toolbar = page.locator("#paidExpensesSection .paid-toolbar-compact");
+    const controls = toolbar.locator(":scope > .field, :scope > button");
+    await expect(controls).toHaveCount(4);
 
-  const geometry = await controls.evaluateAll(nodes => nodes.map(node => {
-    const rect = node.getBoundingClientRect();
-    return { top:rect.top, bottom:rect.bottom, left:rect.left, right:rect.right };
-  }));
+    const geometry = await controls.evaluateAll(nodes => nodes.map(node => {
+      const rect = node.getBoundingClientRect();
+      return { top:rect.top, bottom:rect.bottom, left:rect.left, right:rect.right };
+    }));
 
-  geometry.forEach(rect => expect(Math.abs(rect.top - geometry[0].top)).toBeLessThan(2));
-  geometry.forEach(rect => expect(Math.abs(rect.bottom - geometry[0].bottom)).toBeLessThan(2));
-  geometry.forEach((rect, index) => {
-    if (index > 0) expect(rect.left).toBeGreaterThanOrEqual(geometry[index - 1].right);
+    geometry.forEach(rect => expect(Math.abs(rect.top - geometry[0].top)).toBeLessThan(2));
+    geometry.forEach(rect => expect(Math.abs(rect.bottom - geometry[0].bottom)).toBeLessThan(2));
+    geometry.forEach((rect, index) => {
+      if (index > 0) expect(rect.left).toBeGreaterThanOrEqual(geometry[index - 1].right);
+    });
   });
+}
+
+test("app shell publishes the refreshed responsive stylesheet revision", async ({ page }) => {
+  await page.goto(APP_URL, { waitUntil:"networkidle" });
+
+  await expect(page.locator('link[rel="stylesheet"][href*="app.css?v=2.5.0-talaan2"]')).toHaveCount(1);
+  const workerSource = await page.evaluate(() => fetch("./sw.js", { cache:"no-store" }).then(response => response.text()));
+  const dashboardStyleSource = await page.evaluate(() => fetch("./dashboard-interactions.css", { cache:"no-store" }).then(response => response.text()));
+  expect(workerSource).toContain('asset("./app.css?v=2.5.0-talaan2")');
+  expect(workerSource).toContain('url.pathname.endsWith("app.css")');
+  expect(dashboardStyleSource).toContain('@import url("./dashboard-interactions-core.css")');
+});
+
+test("Escape closes the Income dialog and returns focus to its opener", async ({ page }) => {
+  await openAuthenticatedPage(page, "income", { width:393, height:852 });
+
+  const opener = page.locator("#quickAddExpense");
+  const dialog = page.locator("#incomeDialog");
+  await opener.click();
+  await expect(dialog).toBeVisible();
+  await expect(page.locator("#incomeName")).toBeFocused();
+
+  await page.keyboard.press("Escape");
+
+  await expect(dialog).toBeHidden();
+  await expect(opener).toBeFocused();
 });
 
 for (const viewport of [{ width:375, height:812 }, { width:768, height:1024 }]) {

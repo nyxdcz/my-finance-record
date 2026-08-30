@@ -16,6 +16,7 @@ const RELEASE = Object.freeze({
   cache:"finance-v2-20260828-household-splits-r17",
   assetQuery:"2.5.0-talaan1"
 });
+const APP_STYLE_ASSET_QUERY = "2.5.0-talaan2";
 const SIDEBAR_BRAND_ASSET_QUERY = "2.2.0-talaan2";
 
 const CURRENT_VERSION_HISTORY = Object.freeze([{
@@ -185,6 +186,7 @@ const normalizeReleaseAssetQuery = source => source.replace(
 
 patchTextFile("index.html", source => {
   let next = normalizeReleaseAssetQuery(normalizeRuntimeReferences(source))
+    .replace(/app\.css\?v=[^"']+/, `app.css?v=${APP_STYLE_ASSET_QUERY}`)
     .replaceAll(PREVIOUS_BRAND, BRAND)
     .replaceAll("Finance Records installed", `${BRAND} installed`)
     .replaceAll("My_Finance_Records_Calendar_Test.ics", "Talaan_Calendar_Test.ics")
@@ -256,6 +258,7 @@ patchTextFile("offline.html", source => source
   .replace(/Open [^<]+<\/button>/, `Open ${BRAND}</button>`));
 
 patchTextFile("sw.js", source => normalizeReleaseAssetQuery(normalizeRuntimeReferences(source))
+  .replace(/app\.css\?v=[^"')]+/, `app.css?v=${APP_STYLE_ASSET_QUERY}`)
   .replace(/sidebar-compact-brand\.css\?v=[^"')]+/g, `sidebar-compact-brand.css?v=${SIDEBAR_BRAND_ASSET_QUERY}`)
   .replace(
     /(?:url\.pathname\.endsWith\("sidebar-compact-brand\.css"\) \|\| )*url\.pathname\.endsWith\("ui-icon-alignment\.css"\) \|\|/,

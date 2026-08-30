@@ -3,11 +3,15 @@ import { expect, test } from "@playwright/test";
 
 const BASE = "http://127.0.0.1:3000";
 
+test.use({ serviceWorkers:"block" });
+
 async function openDashboard(page, viewport) {
   await page.setViewportSize(viewport);
-  await page.goto(`${BASE}/?page=dashboard`, { waitUntil:"domcontentloaded" });
+  await page.goto(`${BASE}/?page=dashboard`, { waitUntil:"networkidle" });
   await page.waitForFunction(() => Boolean(window.FinancePrivacyLock));
+  await page.waitForFunction(() => !document.body.classList.contains("finance-auth-pending"));
   await page.evaluate(() => window.FinancePrivacyLock.setAuthenticated(true));
+  await expect(page.locator("body")).toHaveClass(/finance-signed-in/);
   await page.waitForFunction(() => document.querySelector("#dashCashFlowChart .income-expenses-analytics"));
   await page.locator('[data-dashboard-view-tab="cash-flow"]').click();
 }

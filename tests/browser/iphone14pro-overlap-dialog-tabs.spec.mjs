@@ -4,11 +4,15 @@ import { expect, test } from "@playwright/test";
 const APP_URL = "http://127.0.0.1:3000";
 const IPHONE_14_PRO = { width:393, height:852 };
 
+test.use({ serviceWorkers:"block" });
+
 async function openAuthenticated(page, route) {
   await page.setViewportSize(IPHONE_14_PRO);
-  await page.goto(`${APP_URL}/?page=${route}`, { waitUntil:"domcontentloaded" });
+  await page.goto(`${APP_URL}/?page=${route}`, { waitUntil:"networkidle" });
   await page.waitForFunction(() => Boolean(window.FinancePrivacyLock));
+  await page.waitForFunction(() => !document.body.classList.contains("finance-auth-pending"));
   await page.evaluate(() => window.FinancePrivacyLock.setAuthenticated(true));
+  await expect(page.locator("body")).toHaveClass(/finance-signed-in/);
 }
 
 test("iPhone account modes keep their title, scroll origin, and fields contained", async ({ page }) => {

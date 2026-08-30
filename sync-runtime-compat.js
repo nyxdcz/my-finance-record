@@ -16,7 +16,7 @@
 
   function synchronizeTalaanReleaseDisplay() {
     document.documentElement.dataset.appVersion = VERSION;
-    document.title = `Talaan · V${VERSION}`;
+    document.title = "Talaan";
     const badge = document.getElementById("buildBadge");
     if (badge) {
       badge.textContent = `V${VERSION}`;

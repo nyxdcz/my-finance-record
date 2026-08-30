@@ -37,9 +37,11 @@ async function waitForMascotGeometry(page) {
 
 async function openMoney(page, width = 1440, { today = "2026-09-01", month = "2026-08" } = {}) {
   await page.setViewportSize({ width, height:900 });
-  await page.goto("http://127.0.0.1:3000/index.html?page=money", { waitUntil:"domcontentloaded" });
+  await page.goto("http://127.0.0.1:3000/index.html?page=money", { waitUntil:"networkidle" });
   await page.waitForFunction(() => Boolean(window.FinancePrivacyLock));
+  await page.waitForFunction(() => !document.body.classList.contains("finance-auth-pending"));
   await page.evaluate(() => window.FinancePrivacyLock.setAuthenticated(true));
+  await expect(page.locator("body")).toHaveClass(/finance-signed-in/);
   await page.waitForFunction(() => Boolean(window.FinanceSummaryMascots?.apply));
   await page.evaluate(({ today, month }) => {
     window.FINANCE_SUMMARY_TODAY_OVERRIDE = today;

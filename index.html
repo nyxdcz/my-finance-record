@@ -45,8 +45,8 @@
     })();
   </script>
 
-  <title>Talaan · V2.5.0</title>
-  <link rel="stylesheet" href="./app.css?v=2.5.0-talaan1">
+  <title>Talaan</title>
+  <link rel="stylesheet" href="./app.css?v=2.5.0-talaan2">
   <link rel="stylesheet" href="./shell-ui.css?v=2.5.0-talaan1">
   <link rel="stylesheet" href="./sidebar-compact-brand.css?v=2.2.0-talaan2">
   <link rel="stylesheet" href="./dashboard-interactions.css?v=2.5.0-talaan1">
@@ -6990,7 +6990,16 @@
       }
     });
 
-    document.addEventListener("keydown", event => { if (event.key === "Escape") { closeProjectNoteTooltips(); closeCompactIconPickers(); } });
+    document.addEventListener("keydown", event => {
+      if (event.key !== "Escape") return;
+      closeProjectNoteTooltips();
+      closeCompactIconPickers();
+      const openDialogs = [...document.querySelectorAll("dialog[open]")];
+      const topDialog = openDialogs.at(-1);
+      if (!topDialog || !FORM_DIALOGS[topDialog.id]) return;
+      event.preventDefault();
+      requestCloseTrackedFormDialog(topDialog.id);
+    });
 
     Object.entries(FORM_DIALOGS).forEach(([dialogId, config]) => {
       const dialog = document.getElementById(dialogId);

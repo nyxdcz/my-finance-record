@@ -3,12 +3,16 @@ import { test, expect } from "@playwright/test";
 const APP_URL = "http://127.0.0.1:3000/?page=money";
 const widths = [320, 360, 375, 390, 430, 768, 820, 1024, 1280, 1440, 1920];
 
+test.use({ serviceWorkers:"block" });
+
 async function openApp(page, width) {
   const height = width <= 430 ? 852 : width <= 1024 ? 900 : 1000;
   await page.setViewportSize({ width, height });
-  await page.goto(APP_URL, { waitUntil:"domcontentloaded" });
+  await page.goto(APP_URL, { waitUntil:"networkidle" });
   await page.waitForFunction(() => Boolean(window.FinancePrivacyLock));
+  await page.waitForFunction(() => !document.body.classList.contains("finance-auth-pending"));
   await page.evaluate(() => window.FinancePrivacyLock.setAuthenticated(true));
+  await expect(page.locator("body")).toHaveClass(/finance-signed-in/);
   await page.waitForFunction(() => Boolean(document.querySelector("#money")));
 }
 
