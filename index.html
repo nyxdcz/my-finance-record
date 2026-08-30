@@ -362,7 +362,7 @@
           <article class="card annual-income-card">
             <div class="card-header"><div><h3 id="annualIncomeHeading">Annual income table</h3><p>Monthly totals by category for the selected year.</p></div><div class="annual-income-actions"><label class="sr-only" for="incomeYearPicker">Income year</label><select class="select" id="incomeYearPicker"></select><label class="annual-show-all" for="incomeShowAllCategories" aria-label="Show all income categories"><input type="checkbox" id="incomeShowAllCategories"> Show all</label><button class="button button-secondary button-small" id="exportAnnualIncomeCsv" type="button" aria-label="Export annual income CSV">Export CSV</button></div></div>
             <div class="annual-income-summary" aria-label="Annual income summary"><div><span>Annual income</span><strong class="text-green" id="annualIncomeTotal">₱0.00</strong></div><div><span>Average per month</span><strong id="annualIncomeAverage">₱0.00</strong></div><div><span>Highest-income month</span><strong id="annualIncomeHighest">—</strong></div><div><span>Lowest-income month</span><strong id="annualIncomeLowest">—</strong></div></div>
-            <p class="annual-income-scroll-hint">Scroll horizontally to review all months. Income Category, Total, and Average remain visible.</p>
+            <p class="annual-income-scroll-hint">Review monthly totals below. Phones stack each month vertically; wider screens keep the compact table.</p>
             <div class="annual-income-table-wrap"><table class="annual-income-table" id="annualIncomeTable"></table></div>
           </article>
         </section>
@@ -4429,14 +4429,15 @@
       const years=[...new Set([new Date().getFullYear(), ...((data.incomeRecords||[]).map(item=>Number(String(item.date).slice(0,4))).filter(Boolean)), ...(data.projects||[]).flatMap(project=>(project.paymentHistory||[]).map(p=>Number(String(p.date).slice(0,4))).filter(Boolean))])].sort((a,b)=>b-a);
       const currentValue=Number(picker.value)||Number(selectedMonth().slice(0,4)); picker.innerHTML=years.map(year=>`<option value="${year}">${year}</option>`).join(""); picker.value=years.includes(currentValue)?String(currentValue):String(years[0]);
       const year=Number(picker.value), showAll=Boolean(document.getElementById("incomeShowAllCategories")?.checked), model=annualIncomeRows(year);
-      const headers=`<thead><tr><th>Income category</th>${model.months.map(month=>`<th>${new Date(`${month}-01T00:00:00`).toLocaleDateString("en-PH",{month:"short"})}</th>`).join("")}<th>Total</th><th>Average</th></tr></thead>`;
+      const monthLabels=model.months.map(month=>new Date(`${month}-01T00:00:00`).toLocaleDateString("en-PH",{month:"short"}));
+      const headers=`<thead><tr><th>Income category</th>${monthLabels.map(label=>`<th>${escapeHtml(label)}</th>`).join("")}<th>Total</th><th>Average</th></tr></thead>`;
       const body=model.groups.map(group=>{
         const allRows=model.rows.filter(row=>group.cats.includes(row.category));
         const visibleRows=showAll ? allRows : allRows.filter(row=>row.total>0);
         const totals=model.months.map((_,i)=>allRows.reduce((t,row)=>t+row.values[i],0));
         const total=totals.reduce((a,b)=>a+b,0);
         if(!showAll && !visibleRows.length && total===0) return "";
-        return `<tr class="income-group-row"><th colspan="15">${escapeHtml(group.name)}</th></tr><tr class="income-total-row"><th>Monthly totals</th>${totals.map(value=>`<td>${money(value)}</td>`).join("")}<td>${money(total)}</td><td>${money(total/12)}</td></tr>${visibleRows.map(row=>`<tr><th>${escapeHtml(row.category)}</th>${row.values.map(value=>`<td>${value?money(value):"—"}</td>`).join("")}<td>${row.total?money(row.total):"—"}</td><td>${row.total?money(row.total/12):"—"}</td></tr>`).join("")}`;
+        return `<tr class="income-group-row"><th colspan="15">${escapeHtml(group.name)}</th></tr><tr class="income-total-row"><th>Monthly totals</th>${totals.map((value,index)=>`<td data-label="${escapeHtml(monthLabels[index])}">${money(value)}</td>`).join("")}<td data-label="Total">${money(total)}</td><td data-label="Average">${money(total/12)}</td></tr>${visibleRows.map(row=>`<tr><th>${escapeHtml(row.category)}</th>${row.values.map((value,index)=>`<td data-label="${escapeHtml(monthLabels[index])}">${value?money(value):"—"}</td>`).join("")}<td data-label="Total">${row.total?money(row.total):"—"}</td><td data-label="Average">${row.total?money(row.total/12):"—"}</td></tr>`).join("")}`;
       }).join("");
       const table=document.getElementById("annualIncomeTable");
       const tableWrap=table.closest(".annual-income-table-wrap");
