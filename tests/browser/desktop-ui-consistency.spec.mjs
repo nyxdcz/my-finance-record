@@ -74,7 +74,7 @@ for (const width of widths) {
       settingsTab:"38px",
       sidebarPin:"44px",
       budgetKpi:"70px",
-      budgetToggle:"40px",
+      budgetToggle:"30px",
       profileChip:"23px",
       calendarRadius:"8px",
       calendarAction:"32px",

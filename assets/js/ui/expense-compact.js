@@ -186,7 +186,7 @@
     section.classList.toggle("is-collapsed", shouldCollapse);
     button.setAttribute("aria-expanded", shouldCollapse ? "false" : "true");
     const icon = button.querySelector(".collapse-icon");
-    if (icon) icon.style.transform = shouldCollapse ? "rotate(-90deg)" : "";
+    if (icon) icon.style.transform = shouldCollapse ? "rotate(180deg)" : "";
   }
 
   document.addEventListener("click", event => {

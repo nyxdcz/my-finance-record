@@ -377,15 +377,15 @@
   html body .topbar .month-nav-button,
   html body .topbar .topbar-history-button,
   html body .topbar #topbarToolsTrigger,
-  html body .overflow-menu-trigger,
+  html body .overflow-menu-trigger { min-height:44px !important; }
   html body .budget-planner-toggle,
-  html body .budget-panel-collapse { min-height:44px !important; }
+  html body .budget-panel-collapse { min-height:35px !important; }
   html body .topbar .month-nav-button,
   html body .topbar .topbar-history-button,
   html body .topbar #topbarToolsTrigger,
-  html body .overflow-menu-trigger,
+  html body .overflow-menu-trigger { min-width:44px !important; }
   html body .budget-planner-toggle,
-  html body .budget-panel-collapse { min-width:44px !important; }
+  html body .budget-panel-collapse { min-width:35px !important; }
 }
 
 /* V15.2.10 · static Phone Finance compact CSS ownership · moved unchanged from pwa-update-v15-0-5.js. */
@@ -399,11 +399,11 @@
   #availableMoneySection .card-header{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;gap:8px!important;align-items:start!important;margin-bottom:7px!important}
   #availableMoneySection .card-header>div:first-child{min-width:0}
   #availableMoneySection .card-header>div:first-child p{margin-top:2px!important;font-size:.62rem!important;line-height:1.25!important}
-  #availableMoneySection .collapse-actions{display:grid!important;grid-template-columns:auto 44px 44px!important;gap:6px!important;align-items:center!important;justify-content:end!important;min-width:0}
+  #availableMoneySection .collapse-actions{display:grid!important;grid-template-columns:auto 44px 35px!important;gap:6px!important;align-items:center!important;justify-content:end!important;min-width:0}
   #availableMoneySection .available-money-total-wrap{min-width:0;text-align:right}
   #availableMoneySection .available-money-total-wrap strong{font-size:.82rem!important;white-space:nowrap}
   #availableMoneySection .available-money-account-count{font-size:.58rem!important;white-space:nowrap}
-  #availableMoneySection .collapse-toggle{width:44px!important;min-width:44px!important;height:44px!important;min-height:44px!important}
+  #availableMoneySection .collapse-toggle{width:35px!important;min-width:35px!important;height:35px!important;min-height:35px!important}
   #availableMoneySection .account-grid{gap:8px!important}
 
   .project-calendar-v13020 .pc-header{display:block!important;padding-bottom:6px!important}
@@ -419,7 +419,7 @@
   #money .period-header p{margin:2px 0 0!important;font-size:.61rem!important;line-height:1.25!important}
   #money .period-header .collapse-actions{display:flex!important;align-items:center!important;gap:6px!important;min-width:0}
   #money .period-header .period-total{font-size:.8rem!important;white-space:nowrap}
-  #money .period-header .collapse-toggle{width:40px!important;min-width:40px!important;height:40px!important;min-height:40px!important}
+  #money .period-header .collapse-toggle{width:35px!important;min-width:35px!important;height:35px!important;min-height:35px!important}
   #money .record-header{display:none!important}
   #money .record-row[data-expense-row]{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;grid-template-areas:"title amount" "due account" "actions actions"!important;gap:6px 10px!important;align-items:start!important;padding:9px 10px!important;overflow:visible!important}
   #money .record-row[data-expense-row]>.record-title{grid-area:title!important;grid-column:auto!important;min-width:0!important;padding:0!important;border:0!important;align-items:flex-start!important;gap:6px!important}

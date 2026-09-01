@@ -63,12 +63,12 @@ for (const width of widths) {
     });
 
     expect(metrics.financeTab).toBeGreaterThanOrEqual(44);
-    expect(metrics.plannerToggle).toBeGreaterThanOrEqual(44);
+    expect(metrics.plannerToggle).toBe(35);
     expect(metrics.addAccountWidth).toBe(44);
     expect(metrics.addAccountHeight).toBe(44);
-    expect(metrics.availableToggleWidth).toBe(44);
-    expect(metrics.availableToggleHeight).toBe(44);
-    expect(metrics.periodToggleHeight).toBeGreaterThanOrEqual(40);
+    expect(metrics.availableToggleWidth).toBe(35);
+    expect(metrics.availableToggleHeight).toBe(35);
+    expect(metrics.periodToggleHeight).toBe(35);
     expect(metrics.expenseAreas).toContain("title amount");
     expect(metrics.expenseAreas).toContain("due account");
     expect(metrics.expenseAreas).toContain("actions actions");
