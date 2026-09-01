@@ -68,7 +68,11 @@
 .savings-suggestion { min-height:1.2em; margin:7px 0 0; color:var(--muted); font-size:.65rem; line-height:1.35; }
 .savings-confirmation { display:grid; gap:9px; margin-top:10px; padding:9px; border:1px solid var(--line); border-radius:7px; background:var(--surface-soft); }
 .savings-check-row { display:flex; align-items:flex-start; gap:8px; cursor:pointer; }
-.savings-check-row input { flex:0 0 18px; width:18px; height:18px; margin-top:1px; border-radius:7px; }
+.savings-check-row input { appearance:none !important; display:grid; place-items:center; flex:0 0 18px; width:18px; height:18px; margin-top:1px; border:1px solid var(--line); border-radius:7px; background:var(--surface); color:var(--primary-foreground); }
+.savings-check-row input::after { content:"✓"; opacity:0; font-size:.68rem; font-weight:700; line-height:1; }
+.savings-check-row input:checked { border-color:var(--primary); background:var(--primary); }
+.savings-check-row input:checked::after { opacity:1; }
+.savings-check-row input:disabled { cursor:not-allowed; opacity:.55; }
 .savings-check-row span,.savings-check-row strong,.savings-check-row small { display:block; }
 .savings-check-row strong { font-size:.72rem; }
 .savings-check-row small { margin-top:2px; color:var(--muted); font-size:.61rem; line-height:1.35; }
