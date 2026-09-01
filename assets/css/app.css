@@ -3832,16 +3832,24 @@
     .report-compact-summary-copy strong { font-size:.8rem; }
     .report-compact-summary-copy small { color:var(--muted); font-size:.62rem; line-height:1.3; }
     .report-compact-chevron {
-      width:24px;
-      height:24px;
+      box-sizing:border-box;
+      flex:0 0 30px;
+      width:30px;
+      min-width:30px;
+      height:30px;
+      min-height:30px;
       display:grid;
       place-items:center;
       border:1px solid var(--line);
-      border-radius:6px;
+      border-radius:7px;
       background:var(--surface);
       transition:transform .18s ease;
     }
-    .report-compact-group[open] .report-compact-chevron { transform:rotate(180deg); }
+    .report-compact-chevron svg { width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
+    .report-compact-group:not([open]) .report-compact-chevron { transform:rotate(180deg); }
+    @media (max-width:850px), (hover:none) and (pointer:coarse) {
+      .report-compact-chevron { flex-basis:35px; width:35px; min-width:35px; height:35px; min-height:35px; }
+    }
     .report-compact-body { display:grid; gap:8px; padding:10px; }
     .report-compact-body > .report-section-heading { margin:0; padding:0 2px 5px; }
     .report-compact-body > .report-section-heading span { width:26px; height:26px; font-size:.63rem; }

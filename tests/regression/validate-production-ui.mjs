@@ -10,6 +10,7 @@ const runtimePhone = read("phone-finance-compat.js");
 const index = read("index.html");
 const worker = read("sw.js");
 const desktopUx = read("assets/css/desktop-ux.css");
+const appCss = read("assets/css/app.css");
 const version = JSON.parse(read("version.json"));
 const query = "2.5.0-talaan1";
 
@@ -43,5 +44,13 @@ assert.match(compactJs, /ensureCollapseChanged/);
 assert.match(compactJs, /toggleCollapsibleSection/);
 assert.match(desktopUx, /--budget-disclosure-reference-size/);
 assert.match(desktopUx, /#dashCashFlowChart \.cash-flow-chart-grid/);
+assert.match(index, /createCompactReportGroup\("report-summary"/);
+assert.match(index, /createCompactReportGroup\("report-exports"/);
+assert.match(index, /details\.dataset\.reportCollapseKey = key/);
+assert.match(index, /collapsedSections\[key\] = !details\.open;[\s\S]*persistCollapsedSections\(\)/);
+assert.match(index, /class="report-compact-chevron"[\s\S]*<svg viewBox="0 0 24 24"[\s\S]*<path d="m6 15 6-6 6 6"/);
+assert.match(appCss, /\.report-compact-chevron \{[\s\S]*width:30px;[\s\S]*height:30px;[\s\S]*border-radius:7px/);
+assert.match(appCss, /\.report-compact-chevron svg \{ width:20px; height:20px/);
+assert.match(appCss, /@media \(max-width:850px\), \(hover:none\) and \(pointer:coarse\)[\s\S]*\.report-compact-chevron \{[\s\S]*width:35px;[\s\S]*height:35px/);
 
 console.log("Production UI, compact expenses, independent collapse behavior, and neutral runtime overlay validated.");

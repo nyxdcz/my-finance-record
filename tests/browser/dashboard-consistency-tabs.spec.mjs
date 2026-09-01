@@ -86,6 +86,28 @@ test("Dashboard defaults to Calendar and exposes the approved view order", async
   await expect(page.locator('#dashboard > .dashboard-view-panel > [data-dashboard-view="overview"].kpi-grid')).toBeHidden();
 });
 
+test("Dashboard calendar follows the global month without duplicate controls", async ({ page }) => {
+  await openDashboard(page, { width:1440, height:1000 });
+  await expect(page.locator("#dashboardCalendarPrevious, #dashboardCalendarNext, #dashboardCalendarLabel")).toHaveCount(0);
+
+  await page.locator("#monthPicker").evaluate(picker => {
+    picker.value = "2026-08";
+    picker.dispatchEvent(new Event("change", { bubbles:true }));
+  });
+  await expect(page.locator("#monthPicker")).toHaveValue("2026-08");
+  await expect(page.locator("#dashboardCalendarGrid .calendar-day:not(.is-outside)").first()).toHaveAttribute("data-calendar-date", "2026-08-01");
+  await expect(page.locator("#dashboardCalendarSelectedLabel")).toHaveText("August 1, 2026");
+
+  await page.locator("#nextMonthButton").click();
+  await expect(page.locator("#monthPicker")).toHaveValue("2026-09");
+  await expect(page.locator("#dashboardCalendarGrid .calendar-day:not(.is-outside)").first()).toHaveAttribute("data-calendar-date", "2026-09-01");
+  await expect(page.locator("#dashboardCalendarSelectedLabel")).toHaveText("September 1, 2026");
+
+  await page.locator('#dashboardCalendarGrid .calendar-day[data-calendar-date="2026-08-31"]').click();
+  await expect(page.locator("#monthPicker")).toHaveValue("2026-08");
+  await expect(page.locator("#dashboardCalendarSelectedLabel")).toHaveText("August 31, 2026");
+});
+
 test("Dashboard tabs filter existing cards without duplicating finance content", async ({ page }) => {
   await openDashboard(page, { width:1440, height:1000 });
 

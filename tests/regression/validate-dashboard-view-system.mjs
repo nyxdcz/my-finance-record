@@ -13,6 +13,11 @@ assert.match(index, /const DASHBOARD_VIEWS = \["calendar", "cash-flow", "overvie
 assert.match(index, /function setupDashboardViewTabs\(\)/);
 assert.match(index, /section\.hidden = !customizing && section\.dataset\.dashboardView !== dashboardActiveView/);
 assert.match(index, /data-dashboard-card="calendar" data-dashboard-view="calendar"/);
+assert.doesNotMatch(index, /dashboardCalendarPrevious|dashboardCalendarNext|dashboardCalendarLabel/);
+assert.match(index, /const dashboardCalendarMonth = selectedMonth\(\);/);
+assert.match(index, /dashboardCalendarSelectedDate\.startsWith\(`\$\{dashboardCalendarMonth\}-`\)/);
+assert.match(index, /dashboardCalendarToday[\s\S]*applySelectedMonth\(dashboardCalendarSelectedDate\.slice\(0,7\),true\)/);
+assert.match(index, /calendarMonth!==selectedMonth\(\)\)applySelectedMonth\(calendarMonth,true\)/);
 assert.match(index, /data-dashboard-card="cash-flow" data-dashboard-view="cash-flow"/);
 assert.match(index, /data-dashboard-card="activity" data-dashboard-view="overview"/);
 assert.match(production, /--dashboard-card-radius:\s*7px/);
