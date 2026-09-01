@@ -26,8 +26,7 @@ const runtimeCssFiles = [
 ];
 const rootJsFiles = [
   "account-ledger.js", "brand-icons.js", "budget-planning.js", "cloud-conflict-resolution.js", "cloud-conflict-review.js",
-  "cloud-sync-lifecycle.js", "cloud-sync.js", "expense-screenshot-ai.js", "expense-screenshot-detect.js",
-  "expense-screenshot-parser.js", "form-inputs.js", "interaction-patterns.js", "privacy-lock.js", "productivity-tools.js",
+  "cloud-sync-lifecycle.js", "cloud-sync.js", "form-inputs.js", "interaction-patterns.js", "privacy-lock.js", "productivity-tools.js",
   "payees-rules.js", "import-formats.js", "import-center.js", "net-worth.js", "household-splits.js",
   "projects-calendar.js", "pwa-update.js", "reminders-alerts.js", "reports-insights.js", "security-profiles.js"
 ];

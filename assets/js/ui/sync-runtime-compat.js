@@ -45,26 +45,9 @@
   else bootReleaseLayer();
 })();
 
-(function loadExpenseScreenshotTools() {
-  // Detector validation marker: <span>📷</span> Upload Screenshot
-  let toolsPromise = null;
-  let documentMenuBound = false;
-  let panelObserver = null;
+(function enhanceTalaanRuntimeUi() {
   let workMarqueeObserver = null;
   let dashboardActionObserver = null;
-
-  function loadScript(src, id) {
-    if (document.getElementById(id)) return Promise.resolve();
-    return new Promise((resolve, reject) => {
-      const script = document.createElement("script");
-      script.id = id;
-      script.src = src;
-      script.async = false;
-      script.onload = resolve;
-      script.onerror = () => reject(new Error(`Could not load ${src}`));
-      document.head.appendChild(script);
-    });
-  }
 
   function insertEnhancementStyles() {
     if (document.getElementById("financeUiEnhancementStyles")) return;
@@ -80,179 +63,10 @@
       #cloudSyncStatusButton .toolbar-icon[data-uploaded-sync-icon="syncing"]{background-image:url("./icons/sync-syncing.png")!important}
       #cloudSyncStatusButton .toolbar-icon[data-uploaded-sync-icon="needs-sync"]{background-image:url("./icons/sync-needs-sync.png")!important}
       #cloudSyncStatusButton .toolbar-icon[data-uploaded-sync-icon="offline"]{background-image:url("./icons/sync-issue-offline.png")!important}
-      .expense-screenshot-header-actions{position:relative;display:flex;align-items:center;gap:6px;margin-left:auto}.expense-screenshot-header-actions .button{min-width:84px;min-height:38px;white-space:nowrap}
-      .expense-screenshot-panel.expense-screenshot-panel-compact{padding:9px 10px;gap:8px;margin-top:8px}.expense-screenshot-panel-compact .expense-screenshot-head{display:none!important}.expense-screenshot-panel-compact .expense-screenshot-privacy{display:none!important}
-      .expense-screenshot-action-menu{position:absolute;top:calc(100% + 6px);right:0;z-index:190;display:grid;gap:4px;min-width:156px;padding:6px;border:1px solid var(--line);border-radius:10px;background:var(--surface);box-shadow:0 12px 30px rgba(0,0,0,.22)}.expense-screenshot-action-menu[hidden]{display:none!important}.expense-screenshot-action-menu .button{justify-content:flex-start;width:100%;min-height:38px;text-align:left}
       #cloudSyncStatusButton .toolbar-icon[data-uploaded-sync-icon]::before,#themeToggleIcon[data-uploaded-theme-icon]::before{display:none!important}#cloudSyncStatusButton .toolbar-icon[data-uploaded-sync-icon],#themeToggleIcon[data-uploaded-theme-icon]{background-repeat:no-repeat;background-position:center;background-size:contain}#cloudSyncStatusButton .toolbar-icon[data-uploaded-sync-icon="syncing"]{background-image:url("./icons/sync-syncing-alternate.png")}#cloudSyncStatusButton .toolbar-icon[data-uploaded-sync-icon="error"]{background-image:url("./icons/sync-error.png")}#cloudSyncStatusButton .toolbar-icon[data-uploaded-sync-icon="success"]{background-image:url("./icons/sync-success.png")}#themeToggleIcon[data-uploaded-theme-icon="night"]{background-image:url("./icons/theme-night.png")}#themeToggleIcon[data-uploaded-theme-icon="day"]{background-image:url("./icons/theme-day.png")}#themeToggleIcon[data-uploaded-theme-icon="auto"]{background-image:url("./icons/theme-auto.png")}
-      @media(max-width:700px){.expense-screenshot-header-actions .button{min-height:38px}.expense-screenshot-action-menu{right:0;min-width:150px}.finance-workspace-marquee-row>.project-workspace-switcher{width:100%}#dashboard>.page-heading{display:none!important}#customizeDashboardButton[data-dashboard-toolbar-action]{width:44px;min-width:44px;height:44px;padding:0;font-size:0;justify-content:center}}
+      @media(max-width:700px){.finance-workspace-marquee-row>.project-workspace-switcher{width:100%}#dashboard>.page-heading{display:none!important}#customizeDashboardButton[data-dashboard-toolbar-action]{width:44px;min-width:44px;height:44px;padding:0;font-size:0;justify-content:center}}
     `;
     document.head.appendChild(style);
-  }
-
-  function ensureExpenseHeaderShell() {
-    const header = document.querySelector("#expenseDialog .modal-header");
-    const close = header?.querySelector('[data-close="expenseDialog"]');
-    if (!header || !close) return null;
-    let shell = document.getElementById("expenseScreenshotHeaderActions");
-    if (!shell) {
-      shell = document.createElement("div");
-      shell.id = "expenseScreenshotHeaderActions";
-      shell.className = "expense-screenshot-header-actions";
-      header.insertBefore(shell, close);
-    } else if (shell.parentElement !== header || shell.nextElementSibling !== close) {
-      header.insertBefore(shell, close);
-    }
-    return shell;
-  }
-
-  function normalizeScreenshotButtons() {
-    const choose = document.getElementById("expenseScreenshotChoose");
-    const ai = document.getElementById("expenseScreenshotAiButton");
-    if (choose) {
-      const label = choose.getAttribute("aria-busy") === "true" ? "Reading…" : "Upload";
-      if (choose.textContent !== label) choose.textContent = label;
-      choose.setAttribute("role", "menuitem");
-    }
-    if (ai) {
-      const label = ai.getAttribute("aria-busy") === "true" ? "Analyzing…" : "AI";
-      if (ai.textContent !== label) ai.textContent = label;
-      ai.setAttribute("role", "menuitem");
-    }
-  }
-
-  function menuParts() {
-    return {
-      trigger:document.getElementById("expenseScreenshotMenuButton"),
-      menu:document.getElementById("expenseScreenshotActionMenu")
-    };
-  }
-
-  function closeUploadMenu(restoreFocus = false) {
-    const { trigger, menu } = menuParts();
-    if (!trigger || !menu) return;
-    menu.hidden = true;
-    trigger.setAttribute("aria-expanded", "false");
-    if (restoreFocus) trigger.focus();
-  }
-
-  function menuItems(menu) {
-    return menu ? [...menu.querySelectorAll('[role="menuitem"]')].filter(item => !item.hidden && !item.disabled) : [];
-  }
-
-  function openUploadMenu(focusFirst = true) {
-    if (!ensureCompactScreenshotUi()) return false;
-    const { trigger, menu } = menuParts();
-    if (!trigger || !menu) return false;
-    menu.hidden = false;
-    trigger.setAttribute("aria-expanded", "true");
-    if (focusFirst) menuItems(menu)[0]?.focus();
-    return true;
-  }
-
-  function bindMenu(trigger, menu) {
-    if (trigger.dataset.menuBound !== "true") {
-      trigger.dataset.menuBound = "true";
-      trigger.addEventListener("click", () => menu.hidden ? openUploadMenu() : closeUploadMenu(true));
-      trigger.addEventListener("keydown", event => {
-        if (!["ArrowDown", "ArrowUp"].includes(event.key)) return;
-        event.preventDefault();
-        openUploadMenu(false);
-        const items = menuItems(menu);
-        (event.key === "ArrowUp" ? items.at(-1) : items[0])?.focus();
-      });
-    }
-    if (menu.dataset.menuBound !== "true") {
-      menu.dataset.menuBound = "true";
-      menu.addEventListener("click", event => {
-        if (event.target instanceof Element && event.target.closest('[role="menuitem"]')) closeUploadMenu();
-      });
-      menu.addEventListener("keydown", event => {
-        const items = menuItems(menu);
-        if (!items.length) return;
-        if (event.key === "Escape") { event.preventDefault(); closeUploadMenu(true); return; }
-        if (!["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) return;
-        event.preventDefault();
-        const current = items.indexOf(document.activeElement);
-        let next = current;
-        if (event.key === "Home") next = 0;
-        else if (event.key === "End") next = items.length - 1;
-        else if (event.key === "ArrowDown") next = (current + 1 + items.length) % items.length;
-        else next = (current - 1 + items.length) % items.length;
-        items[next]?.focus();
-      });
-    }
-    if (!documentMenuBound) {
-      documentMenuBound = true;
-      document.addEventListener("pointerdown", event => {
-        const active = menuParts();
-        if (!active.menu || active.menu.hidden || !(event.target instanceof Node)) return;
-        if (!active.menu.contains(event.target) && !active.trigger?.contains(event.target)) closeUploadMenu();
-      });
-      document.addEventListener("keydown", event => { if (event.key === "Escape") closeUploadMenu(true); });
-    }
-  }
-
-  function ensureCompactScreenshotUi() {
-    insertEnhancementStyles();
-    const panel = document.getElementById("expenseScreenshotPanel");
-    const actions = panel?.querySelector(".expense-screenshot-actions");
-    const shell = ensureExpenseHeaderShell();
-    if (!panel || !actions || !shell) return false;
-    panel.classList.add("expense-screenshot-panel-compact");
-    panel.removeAttribute("aria-labelledby");
-    panel.setAttribute("aria-label", "Screenshot upload and detection results");
-    const copy = panel.querySelector(".expense-screenshot-head > div:first-child:not(.expense-screenshot-actions)");
-    if (copy) copy.hidden = true;
-    const privacy = panel.querySelector(".expense-screenshot-privacy");
-    if (privacy) privacy.hidden = true;
-
-    document.getElementById("expenseScreenshotLauncherButton")?.remove();
-    let trigger = document.getElementById("expenseScreenshotMenuButton");
-    if (!trigger) {
-      trigger = document.createElement("button");
-      trigger.className = "button button-primary button-small";
-      trigger.id = "expenseScreenshotMenuButton";
-      trigger.type = "button";
-      trigger.textContent = "Upload";
-      trigger.setAttribute("aria-haspopup", "menu");
-      trigger.setAttribute("aria-controls", "expenseScreenshotActionMenu");
-      trigger.setAttribute("aria-expanded", "false");
-      shell.appendChild(trigger);
-    } else if (trigger.parentElement !== shell) {
-      shell.appendChild(trigger);
-    }
-    let menu = document.getElementById("expenseScreenshotActionMenu");
-    if (!menu) {
-      menu = document.createElement("div");
-      menu.className = "expense-screenshot-action-menu";
-      menu.id = "expenseScreenshotActionMenu";
-      menu.setAttribute("role", "menu");
-      menu.setAttribute("aria-label", "Screenshot upload method");
-      menu.hidden = true;
-      shell.appendChild(menu);
-    } else if (menu.parentElement !== shell) {
-      shell.appendChild(menu);
-    }
-    [document.getElementById("expenseScreenshotChoose"), document.getElementById("expenseScreenshotAiButton")].forEach(button => {
-      if (button && button.parentElement !== menu) menu.appendChild(button);
-    });
-    normalizeScreenshotButtons();
-    bindMenu(trigger, menu);
-    if (panel.dataset.compactObserveBound !== "true") {
-      panel.dataset.compactObserveBound = "true";
-      new MutationObserver(() => { ensureCompactScreenshotUi(); normalizeScreenshotButtons(); }).observe(panel, { childList:true, subtree:true, characterData:true, attributes:true, attributeFilter:["aria-busy", "disabled"] });
-    }
-    return true;
-  }
-
-  function watchForScreenshotPanel() {
-    if (ensureCompactScreenshotUi() || panelObserver) return;
-    panelObserver = new MutationObserver(() => {
-      if (!ensureCompactScreenshotUi()) return;
-      panelObserver.disconnect();
-      panelObserver = null;
-    });
-    panelObserver.observe(document.documentElement, { childList:true, subtree:true });
   }
 
   function updateSyncIcon() {
@@ -356,66 +170,11 @@
     }
   }
 
-  function ensureLauncher() {
-    const shell = ensureExpenseHeaderShell();
-    if (!shell) return null;
-    if (document.getElementById("expenseScreenshotMenuButton")) return shell;
-    const existing = document.getElementById("expenseScreenshotLauncherButton");
-    if (existing) return shell;
-    insertEnhancementStyles();
-    const button = document.createElement("button");
-    button.className = "button button-primary button-small";
-    button.id = "expenseScreenshotLauncherButton";
-    button.type = "button";
-    button.textContent = "Upload";
-    button.setAttribute("aria-haspopup", "menu");
-    button.setAttribute("aria-controls", "expenseScreenshotActionMenu");
-    button.setAttribute("aria-expanded", "false");
-    shell.appendChild(button);
-    button.addEventListener("click", async () => {
-      button.disabled = true;
-      button.setAttribute("aria-busy", "true");
-      button.textContent = "Preparing…";
-      try {
-        await start();
-        window.FinanceExpenseScreenshot?.ensurePanel?.();
-        window.FinanceExpenseScreenshotAI?.ensureAiControls?.();
-        ensureCompactScreenshotUi();
-        if (!openUploadMenu()) throw new Error("Screenshot upload menu did not initialize.");
-      } catch (error) {
-        console.warn("Screenshot detection tools are unavailable.", error);
-        button.disabled = false;
-        button.setAttribute("aria-busy", "false");
-        button.textContent = "Upload";
-        if (typeof window.showToast === "function") window.showToast("Screenshot scanner could not load. Reload the app and try again.", "warning");
-      }
-    });
-    return shell;
-  }
-
-  async function start() {
-    if (toolsPromise) return toolsPromise;
-    toolsPromise = (async () => {
-      await loadScript("./expense-screenshot-parser.js?v=2.5.0-talaan1", "expenseScreenshotParserScript");
-      await loadScript("./expense-screenshot-detect.js?v=2.5.0-talaan1", "expenseScreenshotDetectScript");
-      await loadScript("./expense-screenshot-ai.js?v=2.5.0-talaan1", "expenseScreenshotAiScript");
-      window.FinanceExpenseScreenshot?.ensurePanel?.();
-      window.FinanceExpenseScreenshotAI?.ensureAiControls?.();
-      ensureCompactScreenshotUi();
-      document.getElementById("expenseScreenshotLauncherButton")?.remove();
-    })();
-    try { await toolsPromise; }
-    catch (error) { toolsPromise = null; throw error; }
-  }
-
   function boot() {
     insertEnhancementStyles();
-    ensureLauncher();
-    watchForScreenshotPanel();
     bindUploadedIcons();
     bindDashboardToolbarAction();
     ensureWorkMarquees();
-    start().catch(error => console.warn("Screenshot detection tools are unavailable.", error));
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot, { once:true });

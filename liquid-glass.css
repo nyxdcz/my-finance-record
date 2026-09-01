@@ -78,7 +78,7 @@ html[data-theme="dark"] {
 .dashboard-week-marquee,
 .finance-week-marquee,
 .work-week-marquee,
-:is(.cloud-sync-toolbar-popover,.month-picker-popover,.topbar-tools-panel,.expense-screenshot-action-menu,.overflow-menu,.context-menu,.menu-popover,.popover),
+:is(.cloud-sync-toolbar-popover,.month-picker-popover,.topbar-tools-panel,.overflow-menu,.context-menu,.menu-popover,.popover),
 :is(.toast,.snackbar,.toast-message,[role="status"].toast,[role="status"].snackbar) {
   border-radius:var(--liquid-glass-radius);
 }
@@ -175,8 +175,8 @@ html[data-theme="dark"] {
   border-inline-end-color:color-mix(in srgb,var(--liquid-glass-border) 76%,var(--line));
 }
 
-/* Floating menus, upload/AI actions, and popovers use the stronger glass material. */
-:is(.cloud-sync-toolbar-popover,.month-picker-popover,.topbar-tools-panel,.expense-screenshot-action-menu,.overflow-menu,.context-menu,.menu-popover,.popover) {
+/* Floating menus and popovers use the stronger glass material. */
+:is(.cloud-sync-toolbar-popover,.month-picker-popover,.topbar-tools-panel,.overflow-menu,.context-menu,.menu-popover,.popover) {
   background:linear-gradient(180deg,var(--liquid-glass-surface-strong),var(--liquid-glass-surface));
   border:1px solid var(--liquid-glass-border);
   box-shadow:var(--liquid-glass-shadow);
@@ -184,7 +184,7 @@ html[data-theme="dark"] {
   backdrop-filter:blur(26px) saturate(150%);
 }
 
-:is(.topbar-tools-panel,.expense-screenshot-action-menu,.overflow-menu,.context-menu,.menu-popover) :is(button,[role="menuitem"]):not(:disabled):hover {
+:is(.topbar-tools-panel,.overflow-menu,.context-menu,.menu-popover) :is(button,[role="menuitem"]):not(:disabled):hover {
   background:var(--liquid-glass-hover);
 }
 
@@ -222,8 +222,7 @@ html[data-theme="dark"] {
 .settings-card,
 .table-wrap,
 table,
-form,
-.expense-screenshot-panel {
+form {
   -webkit-backdrop-filter:none;
   backdrop-filter:none;
 }
@@ -232,7 +231,7 @@ form,
 .topbar :is(button,[role="button"]):focus-visible,
 .sidebar :is(button,[role="button"]):focus-visible,
 .workspace-switcher button:focus-visible,
-:is(.cloud-sync-toolbar-popover,.month-picker-popover,.topbar-tools-panel,.expense-screenshot-action-menu) :is(button,[role="menuitem"]):focus-visible {
+:is(.cloud-sync-toolbar-popover,.month-picker-popover,.topbar-tools-panel) :is(button,[role="menuitem"]):focus-visible {
   outline:2px solid var(--focus-ring,var(--primary));
   outline-offset:2px;
 }
@@ -244,7 +243,7 @@ form,
   .finance-week-marquee,
   .work-week-marquee,
   :is(.dashboard-week-marquee,.finance-week-marquee,.work-week-marquee) .dashboard-week-day,
-  :is(.cloud-sync-toolbar-popover,.month-picker-popover,.topbar-tools-panel,.expense-screenshot-action-menu,.overflow-menu,.context-menu,.menu-popover,.popover),
+  :is(.cloud-sync-toolbar-popover,.month-picker-popover,.topbar-tools-panel,.overflow-menu,.context-menu,.menu-popover,.popover),
   :is(dialog,.modal,.dialog) :is(.modal-header,.dialog-header,.modal-footer,.dialog-footer,.modal-actions,.dialog-actions),
   :is(.toast,.snackbar,.toast-message,[role="status"].toast,[role="status"].snackbar) {
     background:var(--surface);
@@ -262,7 +261,7 @@ form,
   .topbar,.sidebar,
   .dashboard-week-marquee,.finance-week-marquee,.work-week-marquee,
   :is(.dashboard-week-marquee,.finance-week-marquee,.work-week-marquee) .dashboard-week-day,
-  :is(.cloud-sync-toolbar-popover,.month-picker-popover,.topbar-tools-panel,.expense-screenshot-action-menu,.overflow-menu,.context-menu,.menu-popover,.popover) {
+  :is(.cloud-sync-toolbar-popover,.month-picker-popover,.topbar-tools-panel,.overflow-menu,.context-menu,.menu-popover,.popover) {
     -webkit-backdrop-filter:none;
     backdrop-filter:none;
   }
@@ -281,7 +280,7 @@ form,
   .topbar,.sidebar,
   .dashboard-week-marquee,.finance-week-marquee,.work-week-marquee,
   :is(.dashboard-week-marquee,.finance-week-marquee,.work-week-marquee) .dashboard-week-day,
-  :is(.cloud-sync-toolbar-popover,.month-picker-popover,.topbar-tools-panel,.expense-screenshot-action-menu,.overflow-menu,.context-menu,.menu-popover,.popover),
+  :is(.cloud-sync-toolbar-popover,.month-picker-popover,.topbar-tools-panel,.overflow-menu,.context-menu,.menu-popover,.popover),
   .workspace-switcher {
     background:Canvas;
     border-color:CanvasText;
@@ -298,7 +297,7 @@ form,
   .sidebar {
     background:linear-gradient(180deg,color-mix(in srgb,var(--liquid-glass-surface-strong) 96%,transparent),var(--liquid-glass-surface-strong));
   }
-  :is(.cloud-sync-toolbar-popover,.month-picker-popover,.topbar-tools-panel,.expense-screenshot-action-menu) {
+  :is(.cloud-sync-toolbar-popover,.month-picker-popover,.topbar-tools-panel) {
     background:var(--liquid-glass-surface-strong);
   }
 }
