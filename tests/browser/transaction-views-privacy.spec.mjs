@@ -34,12 +34,23 @@ test("transaction preferences are profile-scoped presentation only",async({page}
 test("Hide values masks visual and accessible money without changing balances",async({page})=>{
   await page.setViewportSize({width:1440,height:900}); await unlock(page,"dashboard");
   const balances=await page.evaluate(()=>JSON.stringify(data.accounts));
+  const available=await page.locator("#dashAvailable").innerText();
   await page.locator("#topbarToolsTrigger").click(); await page.locator("#privacyDisplayToggle").click();
   await expect(page.locator("html")).toHaveClass(/finance-values-hidden/);
   expect(await page.locator("body").innerText()).not.toMatch(/₱\s*[-+]?\d/);
   const leakedLabel=await page.evaluate(()=>[...document.querySelectorAll("[aria-label],[title],[aria-valuetext]")].map(node=>`${node.getAttribute("aria-label")||""} ${node.getAttribute("title")||""} ${node.getAttribute("aria-valuetext")||""}`).find(value=>/₱\s*[-+]?\d/.test(value))||"");
   expect(leakedLabel).toBe("");
   expect(await page.evaluate(()=>JSON.stringify(data.accounts))).toBe(balances);
+  const hiddenAvailable=page.locator("#dashAvailable .privacy-value-mask").first();
+  await expect(hiddenAvailable).toHaveText("₱•••••");
+  await hiddenAvailable.hover();
+  await expect(hiddenAvailable).toHaveText(available);
+  await page.mouse.move(0,0);
+  await expect(hiddenAvailable).toHaveText("₱•••••");
+  await hiddenAvailable.focus();
+  await expect(hiddenAvailable).toHaveText(available);
+  await page.evaluate(()=>document.activeElement?.blur());
+  await expect(hiddenAvailable).toHaveText("₱•••••");
   await page.locator("#topbarToolsTrigger").click();
   await page.locator("#privacyDisplayToggle").click();
   await expect(page.locator("html")).not.toHaveClass(/finance-values-hidden/);
