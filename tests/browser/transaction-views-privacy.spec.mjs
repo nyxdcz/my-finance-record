@@ -40,6 +40,17 @@ test("Hide values masks visual and accessible money without changing balances",a
   const leakedLabel=await page.evaluate(()=>[...document.querySelectorAll("[aria-label],[title],[aria-valuetext]")].map(node=>`${node.getAttribute("aria-label")||""} ${node.getAttribute("title")||""} ${node.getAttribute("aria-valuetext")||""}`).find(value=>/₱\s*[-+]?\d/.test(value))||"");
   expect(leakedLabel).toBe("");
   expect(await page.evaluate(()=>JSON.stringify(data.accounts))).toBe(balances);
+  const hiddenValue=page.locator(".privacy-value-mask:visible").first();
+  await expect(hiddenValue).toBeVisible();
+  await expect(hiddenValue).toHaveText("₱•••••");
+  await hiddenValue.hover();
+  await expect(hiddenValue).toHaveText(/₱\s*[-+]?\d/);
+  await page.mouse.move(0,0);
+  await expect(hiddenValue).toHaveText("₱•••••");
+  await hiddenValue.focus();
+  await expect(hiddenValue).toHaveText(/₱\s*[-+]?\d/);
+  await page.evaluate(()=>document.activeElement?.blur());
+  await expect(hiddenValue).toHaveText("₱•••••");
   await page.locator("#topbarToolsTrigger").click();
   await page.locator("#privacyDisplayToggle").click();
   await expect(page.locator("html")).not.toHaveClass(/finance-values-hidden/);
