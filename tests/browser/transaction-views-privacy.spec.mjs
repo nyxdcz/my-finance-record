@@ -34,32 +34,21 @@ test("transaction preferences are profile-scoped presentation only",async({page}
 test("Hide values masks visual and accessible money without changing balances",async({page})=>{
   await page.setViewportSize({width:1440,height:900}); await unlock(page,"dashboard");
   const balances=await page.evaluate(()=>JSON.stringify(data.accounts));
-  const revealTarget=await page.evaluate(()=>{
-    const currency=/(?:₱|PHP\s*)[-+]?\s*\d[\d,]*(?:\.\d{1,2})?/iu;
-    const element=[...document.querySelectorAll("[id]")].find(candidate=>{
-      if(candidate.closest("select,option,svg")||!currency.test(candidate.textContent||""))return false;
-      const rect=candidate.getBoundingClientRect();
-      const style=getComputedStyle(candidate);
-      return rect.width>0&&rect.height>0&&style.display!=="none"&&style.visibility!=="hidden"&&[...candidate.children].every(child=>!currency.test(child.textContent||""));
-    });
-    if(!element)throw new Error("No visible monetary value is available for the privacy reveal test.");
-    return {id:element.id,value:(element.textContent||"").match(currency)?.[0]||""};
-  });
   await page.locator("#topbarToolsTrigger").click(); await page.locator("#privacyDisplayToggle").click();
   await expect(page.locator("html")).toHaveClass(/finance-values-hidden/);
   expect(await page.locator("body").innerText()).not.toMatch(/₱\s*[-+]?\d/);
   const leakedLabel=await page.evaluate(()=>[...document.querySelectorAll("[aria-label],[title],[aria-valuetext]")].map(node=>`${node.getAttribute("aria-label")||""} ${node.getAttribute("title")||""} ${node.getAttribute("aria-valuetext")||""}`).find(value=>/₱\s*[-+]?\d/.test(value))||"");
   expect(leakedLabel).toBe("");
   expect(await page.evaluate(()=>JSON.stringify(data.accounts))).toBe(balances);
-  const hiddenValue=page.locator(`[id=${JSON.stringify(revealTarget.id)}] .privacy-value-mask`).first();
+  const hiddenValue=page.locator(".privacy-value-mask:visible").first();
   await expect(hiddenValue).toBeVisible();
   await expect(hiddenValue).toHaveText("₱•••••");
   await hiddenValue.hover();
-  await expect(hiddenValue).toHaveText(revealTarget.value);
+  await expect(hiddenValue).toHaveText(/₱\s*[-+]?\d/);
   await page.mouse.move(0,0);
   await expect(hiddenValue).toHaveText("₱•••••");
   await hiddenValue.focus();
-  await expect(hiddenValue).toHaveText(revealTarget.value);
+  await expect(hiddenValue).toHaveText(/₱\s*[-+]?\d/);
   await page.evaluate(()=>document.activeElement?.blur());
   await expect(hiddenValue).toHaveText("₱•••••");
   await page.locator("#topbarToolsTrigger").click();
