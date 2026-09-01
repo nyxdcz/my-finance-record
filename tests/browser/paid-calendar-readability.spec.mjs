@@ -42,6 +42,15 @@ async function loadPaidCalendarFixture(page, width) {
       <div class="transaction-totals-footer" id="transactionTotals-paid"><span>21 visible</span><span><strong>₱31,157.49</strong></span></div>
     </section>
   </div></main></div></body></html>`, { waitUntil:"networkidle" });
+  await page.evaluate(() => {
+    const money = document.createElement("section");
+    money.className = "page active";
+    money.id = "money";
+    const budgetCalendar = document.getElementById("transactionCalendar-paid").cloneNode(true);
+    budgetCalendar.id = "transactionCalendar-expense";
+    money.append(budgetCalendar);
+    document.querySelector(".content").append(money);
+  });
 }
 
 function columnCount(value) {
@@ -67,6 +76,9 @@ test("desktop paid calendar separates dates and keeps names and amounts easy to 
     const footer = document.getElementById("transactionTotals-paid");
     const footerLast = footer.lastElementChild;
     const total = footer.querySelector("strong");
+    const budgetCalendar = document.getElementById("transactionCalendar-expense");
+    const budgetDay = budgetCalendar.querySelector(".transaction-calendar-day");
+    const budgetEntry = budgetDay.querySelector(".transaction-calendar-entry");
     return {
       calendarColumns:getComputedStyle(calendar).gridTemplateColumns,
       calendarGap:parseFloat(getComputedStyle(calendar).gap),
@@ -88,7 +100,14 @@ test("desktop paid calendar separates dates and keeps names and amounts easy to 
       footerHeight:footer.getBoundingClientRect().height,
       footerLabel:getComputedStyle(footerLast,"::before").content,
       totalSize:parseFloat(getComputedStyle(total).fontSize),
-      totalWeight:Number(getComputedStyle(total).fontWeight)
+      totalWeight:Number(getComputedStyle(total).fontWeight),
+      budgetCalendarColumns:getComputedStyle(budgetCalendar).gridTemplateColumns,
+      budgetCalendarGap:parseFloat(getComputedStyle(budgetCalendar).gap),
+      budgetDayHeight:budgetDay.getBoundingClientRect().height,
+      budgetDayPadding:getComputedStyle(budgetDay).padding,
+      budgetEntryDisplay:getComputedStyle(budgetEntry).display,
+      budgetEntryHeight:budgetEntry.getBoundingClientRect().height,
+      budgetEntryPadding:getComputedStyle(budgetEntry).padding
     };
   });
 
@@ -112,12 +131,19 @@ test("desktop paid calendar separates dates and keeps names and amounts easy to 
   expect(state.footerLabel).toContain("Total paid");
   expect(state.totalSize).toBeGreaterThanOrEqual(16);
   expect(state.totalWeight).toBeGreaterThanOrEqual(800);
+  expect(state.budgetCalendarColumns).toBe(state.calendarColumns);
+  expect(state.budgetCalendarGap).toBe(state.calendarGap);
+  expect(state.budgetDayHeight).toBe(state.dayHeight);
+  expect(state.budgetDayPadding).toBe("9px");
+  expect(state.budgetEntryDisplay).toBe(state.entryDisplay);
+  expect(state.budgetEntryHeight).toBe(state.entryHeight);
+  expect(state.budgetEntryPadding).toBe("8px 9px");
 });
 
 test("tablet paid calendar reduces to four readable date columns", async ({ page }) => {
   await loadPaidCalendarFixture(page, 1024);
-  const columns = await page.evaluate(() => getComputedStyle(document.getElementById("transactionCalendar-paid")).gridTemplateColumns);
-  expect(columnCount(columns)).toBe(4);
+  const columns = await page.evaluate(() => ["paid","expense"].map(name=>getComputedStyle(document.getElementById(`transactionCalendar-${name}`)).gridTemplateColumns));
+  columns.forEach(value=>expect(columnCount(value)).toBe(4));
 });
 
 test("phone paid calendar becomes one column and preserves touch targets", async ({ page }) => {
@@ -128,19 +154,24 @@ test("phone paid calendar becomes one column and preserves touch targets", async
     const toolbar = document.getElementById("transactionToolbar-paid");
     const toolbarControls = [...toolbar.querySelectorAll(".select,.button")].filter(control=>getComputedStyle(control).display !== "none");
     const bulkControls = [...document.querySelectorAll("#paidProductivityBulk .select,#paidProductivityBulk .button")].filter(control=>getComputedStyle(control).display !== "none");
+    const budgetCalendar = document.getElementById("transactionCalendar-expense");
     return {
       calendarColumns:getComputedStyle(calendar).gridTemplateColumns,
+      budgetCalendarColumns:getComputedStyle(budgetCalendar).gridTemplateColumns,
       toolbarHeights:toolbarControls.map(control=>control.getBoundingClientRect().height),
       bulkHeights:bulkControls.map(control=>control.getBoundingClientRect().height),
       dayMinHeight:getComputedStyle(calendar.querySelector(".transaction-calendar-day")).minHeight,
+      budgetDayMinHeight:getComputedStyle(budgetCalendar.querySelector(".transaction-calendar-day")).minHeight,
       columnsButtonDisplay:getComputedStyle(toolbar.querySelector(".transaction-columns-button")).display
     };
   });
 
   expect(columnCount(state.calendarColumns)).toBe(1);
+  expect(columnCount(state.budgetCalendarColumns)).toBe(1);
   state.toolbarHeights.forEach(height=>expect(height).toBeGreaterThanOrEqual(40));
   state.toolbarHeights.filter(height=>height > 40).forEach(height=>expect(height).toBeGreaterThanOrEqual(44));
   state.bulkHeights.forEach(height=>expect(height).toBeGreaterThanOrEqual(44));
   expect(state.dayMinHeight).toBe("0px");
+  expect(state.budgetDayMinHeight).toBe("0px");
   expect(state.columnsButtonDisplay).toBe("none");
 });
