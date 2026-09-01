@@ -209,16 +209,20 @@
   line-height:20px !important;
 }
 
-/* V15.2.5 · Budget & Expenses disclosure controls use the First-half column exactly. */
+/* V15.2.5 · Finance disclosure controls share one desktop target size. */
 @media (min-width:851px){
   #money{
     --budget-disclosure-reference-size:var(--ui-disclosure-size,40px);
     --budget-disclosure-reference-inset:17px;
     --budget-available-card-inset:12px;
   }
+  #income{
+    --budget-disclosure-reference-size:var(--ui-disclosure-size,40px);
+    --budget-disclosure-reference-inset:17px;
+  }
   #money .period-card .collapse-toggle,
   #money #availableMoneySection [data-collapse-toggle="available-money"],
-  #money #monthlyBudgetPlannerToggle{
+  #income #monthlyBudgetPlannerToggle{
     width:var(--budget-disclosure-reference-size) !important;
     min-width:var(--budget-disclosure-reference-size) !important;
     height:var(--budget-disclosure-reference-size) !important;
@@ -235,10 +239,10 @@
   #money #availableMoneySection [data-collapse-toggle="available-money"]{
     margin-right:0 !important;
   }
-  #money #monthlyBudgetPlannerCard.is-planner-collapsed .budget-planner-actions{
+  #income #monthlyBudgetPlannerCard.is-planner-collapsed .budget-planner-actions{
     right:var(--budget-disclosure-reference-inset) !important;
   }
-  #money #monthlyBudgetPlannerCard:not(.is-planner-collapsed) #monthlyBudgetPlannerToggle{
+  #income #monthlyBudgetPlannerCard:not(.is-planner-collapsed) #monthlyBudgetPlannerToggle{
     margin-right:0 !important;
   }
 }

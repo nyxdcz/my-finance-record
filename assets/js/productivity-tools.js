@@ -21,8 +21,8 @@
     accountLedger:{label:"Ledger entry",page:"settings"},
     accountReconciliations:{label:"Reconciliation",page:"settings"},
     expenseTemplates:{label:"Expense template",page:"money"},
-    budgetTemplates:{label:"Budget template",page:"money"},
-    monthlyBudgets:{label:"Monthly budget",page:"money"},
+    budgetTemplates:{label:"Budget template",page:"income"},
+    monthlyBudgets:{label:"Monthly budget",page:"income"},
     accounts:{label:"Account",page:"settings"}
   };
 
@@ -655,7 +655,7 @@
     (data.savingsGoals || []).forEach(item => add("Savings goal",item.id,item.name,`${item.status || "active"} · ${item.linkedAccount || "Manual progress"}`,`${money(item.currentAmount)} / ${money(item.targetAmount)}`,`${item.targetDate || ""}`,() => openSavingsGoalDialog(item)));
     accountNames().forEach(name => add("Account",name,name,`${accountType(name)} account`,money(data.accounts[name]),name,() => openAccountDialog(name)));
     (data.accountLedger || []).forEach(item => add("Ledger",item.id,item.description || item.account,`${item.account} · ${item.type} · ${item.date}`,money(item.amount),`${item.notes || ""} ${item.counterpartAccount || ""}`,() => { goToPage("settings",{smooth:false}); setTimeout(() => { document.querySelector('[data-settings-tab="accounts"]')?.click(); const search=document.getElementById("ledgerSearch"); if(search){search.value=item.description || item.account; search.dispatchEvent(new Event("input",{bubbles:true})); search.focus();} },0); }));
-    Object.entries(data.monthlyBudgets || {}).forEach(([month,item]) => add("Budget",month,monthName(month),`${(item.items || []).length} categories · monthly plan`,money((item.items || []).reduce((total,row)=>total+Number(row.plannedAmount||0),0)),(item.items || []).map(row=>`${row.category} ${row.notes||""}`).join(" "),() => { applySelectedMonth(month,false); goToPage("money",{smooth:false}); setTimeout(()=>document.getElementById("monthlyBudgetPlannerCard")?.scrollIntoView({behavior:"smooth",block:"start"}),0); }));
+    Object.entries(data.monthlyBudgets || {}).forEach(([month,item]) => add("Budget",month,monthName(month),`${(item.items || []).length} categories · monthly plan`,money((item.items || []).reduce((total,row)=>total+Number(row.plannedAmount||0),0)),(item.items || []).map(row=>`${row.category} ${row.notes||""}`).join(" "),() => { applySelectedMonth(month,false); goToPage("income",{smooth:false}); setTimeout(()=>document.getElementById("monthlyBudgetPlannerCard")?.scrollIntoView({behavior:"smooth",block:"start"}),0); }));
     (data.expenseTemplates || []).forEach(item => add("Template",item.id,item.name,`${templateTypeLabel(item)} · ${item.category}${item.account ? ` · ${item.account}` : ""}`,item.amount ? money(item.amount) : "",item.expenseName,() => applyTemplateToExpenseForm(item)));
     const financeTools = data.ledgerSettings?.financeTools || {};
     (financeTools.payees || []).forEach(item => add("Payee",item.id,item.name,item.archived ? "Archived payee" : `${item.aliases?.length || 0} aliases`,"Open",`${(item.aliases || []).join(" ")} ${item.defaultCategory || ""} ${item.defaultAccount || ""}`,() => window.FinancePayeeRules?.openPayee?.(item.id)));
@@ -956,7 +956,7 @@
     else if (collection === "savingsGoals") { const item=data.savingsGoals.find(row=>row.id===id); item ? openSavingsGoalDialog(item) : goToPage("dashboard"); }
     else if (collection === "accounts") openAccountDialog(id);
     else if (collection === "expenseTemplates") { const item=data.expenseTemplates.find(row=>row.id===id); item ? applyTemplateToExpenseForm(item) : openProductivityCenter("templates"); }
-    else if (collection === "monthlyBudgets") { applySelectedMonth(id,false); goToPage("money",{smooth:false}); setTimeout(()=>document.getElementById("monthlyBudgetPlannerCard")?.scrollIntoView({behavior:"smooth",block:"start"}),0); }
+    else if (collection === "monthlyBudgets") { applySelectedMonth(id,false); goToPage("income",{smooth:false}); setTimeout(()=>document.getElementById("monthlyBudgetPlannerCard")?.scrollIntoView({behavior:"smooth",block:"start"}),0); }
     else { goToPage(entry.page || "settings",{smooth:false}); if (entry.page === "settings") setTimeout(()=>document.querySelector('[data-settings-tab="accounts"]')?.click(),0); }
   }
 

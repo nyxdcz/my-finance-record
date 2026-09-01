@@ -6,6 +6,7 @@ const index = read("index.html");
 const worker = read("sw.js");
 const interaction = read("interaction-patterns.js");
 const budget = read("budget-planning.js");
+const productivity = read("productivity-tools.js");
 const ledger = read("account-ledger.js");
 const formInputs = read("form-inputs.js");
 const compactCss = read("assets/css/expense-compact.css");
@@ -28,6 +29,13 @@ for (const [pageId, marqueeId] of [["income", "incomeFinanceWeekMarquee"], ["mon
 
 assert.equal(interaction.includes("alignFinanceWorkspaceMarquees"), false, "Finance marquee placement must be source-owned");
 assert.match(budget, /budgetRenderDashboard\(\.\.\.args\).*injectUi\(\); return result;/s, "Budget dashboard wrapper must preserve supported UI injection");
+assert.match(index, /<h2 id="income-title">Income &amp; Planning<\/h2>/, "Income page must expose its planning role");
+assert.equal((index.match(/workspace-label-desktop">Income &amp; Planning/g) || []).length, 3, "Every Finance switcher must use the renamed desktop label");
+assert.match(budget, /incomeSummary\?\.insertAdjacentHTML\("beforebegin"/, "Monthly budget plan must be inserted before the Income summary");
+assert.match(budget, /PAGE_RENDERERS\.income = renderIncomePage/, "Income renderer must own monthly budget presentation");
+assert.doesNotMatch(budget, /PAGE_RENDERERS\.money = renderMoneyPage/, "Budget & Expenses must no longer own monthly budget presentation");
+assert.match(productivity, /monthlyBudgets:\{label:"Monthly budget",page:"income"\}/, "Monthly budget navigation must target Income & Planning");
+assert.match(productivity, /budgetTemplates:\{label:"Budget template",page:"income"\}/, "Budget template navigation must follow the planner");
 assert.match(ledger, /const saved = saveData\(/s, "Record spending must persist before final UI refresh");
 assert.match(ledger, /storedLedger\.length !== 1/, "Record spending must verify one ledger debit");
 assert.match(formInputs, /function evaluateArithmeticExpression/);

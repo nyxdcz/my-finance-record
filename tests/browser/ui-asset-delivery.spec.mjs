@@ -66,7 +66,7 @@ test("V15.2.9 Quick actions uses the native sliders SVG", async ({ page }) => {
 for (const width of [1200,1280,1440]) {
   test(`V15.2.9 Monthly budget plan disclosure does not overlap Forecast at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height:900 });
-    await unlock(page, "money");
+    await unlock(page, "income");
     const card = page.locator("#monthlyBudgetPlannerCard");
     const toggle = page.locator("#monthlyBudgetPlannerToggle");
     await expect(card).toBeVisible();

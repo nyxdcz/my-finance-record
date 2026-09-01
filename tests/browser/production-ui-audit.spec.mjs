@@ -60,7 +60,7 @@ for (const width of [1024, 1280, 1366, 1440, 1920]) {
         visibleToolbarHeights:heights(".topbar-actions > .cloud-sync-toolbar-button, .topbar-actions .topbar-history-button, .topbar-actions .topbar-add-button, .topbar-actions .topbar-tools-trigger, .topbar-actions .month-navigator"),
         summaryHeights:heights("#money .legend-item, #money .summary-item"),
         periodDisclosureSizes:sizes("#money .period-card .collapse-toggle"),
-        otherDisclosureSizes:sizes("#money #availableMoneySection [data-collapse-toggle='available-money'], #money #monthlyBudgetPlannerToggle")
+        otherDisclosureSizes:sizes("#money #availableMoneySection [data-collapse-toggle='available-money']")
       };
     });
     expect(metrics.overflow).toBe(false);
