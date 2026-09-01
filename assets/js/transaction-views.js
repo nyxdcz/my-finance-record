@@ -36,13 +36,14 @@
       const order=[...(Array.isArray(source.columns)?source.columns:[])].filter(id=>valid.includes(id));
       valid.forEach(id=>{ if(!order.includes(id)) order.push(id); });
       const protectedIds=WORKSPACES[name].columns.filter(([, ,locked])=>locked).map(([id])=>id);
+      const modeOnly=name==="expense";
       output[name]={
         mode:source.mode==="calendar"?"calendar":"list",
-        density:source.density==="compact"?"compact":"comfortable",
-        sort:["default","newest","oldest","amount-high","amount-low","name"].includes(source.sort)?source.sort:"default",
-        columns:order,
-        hidden:(Array.isArray(source.hidden)?source.hidden:[]).filter(id=>valid.includes(id)&&!protectedIds.includes(id)),
-        views:(Array.isArray(source.views)?source.views:[]).slice(0,20).map(view=>({name:String(view.name||"").slice(0,60),settings:view.settings||{},filters:view.filters||{}})).filter(view=>view.name)
+        density:modeOnly?"compact":source.density==="compact"?"compact":"comfortable",
+        sort:modeOnly?"default":["default","newest","oldest","amount-high","amount-low","name"].includes(source.sort)?source.sort:"default",
+        columns:modeOnly?[...valid]:order,
+        hidden:modeOnly?[]:(Array.isArray(source.hidden)?source.hidden:[]).filter(id=>valid.includes(id)&&!protectedIds.includes(id)),
+        views:modeOnly?[]:(Array.isArray(source.views)?source.views:[]).slice(0,20).map(view=>({name:String(view.name||"").slice(0,60),settings:view.settings||{},filters:view.filters||{}})).filter(view=>view.name)
       };
     });
     return output;
@@ -101,17 +102,19 @@
     });
   }
   function sortRows(name,entries) {
-    const mode=state[name].sort; if(mode==="default")return;
+    const mode=state[name].sort; if(mode==="default")return [...entries];
     const multiplier=mode==="oldest"||mode==="amount-low"?1:-1;
     const compare=(a,b)=>{
       if(mode==="name") return String(a.item.name||"").localeCompare(String(b.item.name||""));
       if(mode.startsWith("amount")) return multiplier*(itemAmount(a.item,name)-itemAmount(b.item,name));
       return multiplier*String(itemDate(a.item,name)).localeCompare(String(itemDate(b.item,name)));
     };
+    const ordered=[...entries].sort(compare);
     WORKSPACES[name].listIds.forEach(id=>{
       const list=document.getElementById(id); if(!list)return;
-      entries.filter(entry=>entry.list===list).sort(compare).forEach(entry=>list.append(entry.row));
+      ordered.filter(entry=>entry.list===list).forEach(entry=>list.append(entry.row));
     });
+    return ordered;
   }
   function addIncomeSelection(entry) {
     const title=entry.row.querySelector(".record-title"); if(!title||title.querySelector("[data-select-income]"))return;
@@ -134,7 +137,9 @@
     const calendar=document.getElementById(`transactionCalendar-${name}`); if(!calendar)return;
     const groups=new Map();
     entries.forEach(entry=>{const key=itemDate(entry.item,name)||"Unscheduled";if(!groups.has(key))groups.set(key,[]);groups.get(key).push(entry.item);});
-    calendar.innerHTML=groups.size?[...groups.entries()].sort(([a],[b])=>a.localeCompare(b)).map(([date,items])=>`<section class="transaction-calendar-day"><h4>${date==="Unscheduled"?date:(typeof formatDate==="function"?formatDate(date):date)}</h4>${items.map(item=>`<button type="button" class="transaction-calendar-entry" data-transaction-open="${esc(item.id)}"><span>${esc(item.name||"Record")}</span><strong>${typeof money==="function"?money(itemAmount(item,name)):itemAmount(item,name)}</strong></button>`).join("")}</section>`).join(""):`<div class="empty-state"><strong>No visible records</strong>Change or clear the active filters.</div>`;
+    const calendarGroups=[...groups.entries()];
+    if(state[name].sort==="default")calendarGroups.sort(([a],[b])=>a.localeCompare(b));
+    calendar.innerHTML=calendarGroups.length?calendarGroups.map(([date,items])=>`<section class="transaction-calendar-day"><h4>${date==="Unscheduled"?date:(typeof formatDate==="function"?formatDate(date):date)}</h4>${items.map(item=>`<button type="button" class="transaction-calendar-entry" data-transaction-open="${esc(item.id)}"><span>${esc(item.name||"Record")}</span><strong>${typeof money==="function"?money(itemAmount(item,name)):itemAmount(item,name)}</strong></button>`).join("")}</section>`).join(""):`<div class="empty-state"><strong>No visible records</strong>Change or clear the active filters.</div>`;
   }
   function captureFilters(name) {
     const values={}; Object.entries(WORKSPACES[name].filters).forEach(([key,id])=>values[key]=document.getElementById(id)?.value||"");
@@ -148,8 +153,10 @@
   function renderToolbar(name) {
     const toolbar=document.getElementById(`transactionToolbar-${name}`); if(!toolbar)return;
     const prefs=state[name];
+    const modeControls=`<div class="transaction-view-group" role="group" aria-label="Display mode"><button type="button" class="button button-secondary" data-transaction-mode="list" aria-pressed="${prefs.mode==="list"}">List</button><button type="button" class="button button-secondary" data-transaction-mode="calendar" aria-pressed="${prefs.mode==="calendar"}">Calendar</button></div>`;
+    if(name==="expense"){toolbar.innerHTML=modeControls;return;}
     const views=prefs.views.map((view,index)=>`<option value="${index}">${esc(view.name)}</option>`).join("");
-    toolbar.innerHTML=`<div class="transaction-view-group" role="group" aria-label="Display mode"><button type="button" class="button button-secondary" data-transaction-mode="list" aria-pressed="${prefs.mode==="list"}">List</button><button type="button" class="button button-secondary" data-transaction-mode="calendar" aria-pressed="${prefs.mode==="calendar"}">Calendar</button></div><label><span class="sr-only">Saved view</span><select class="select" data-transaction-saved-view><option value="">Saved views</option>${views}</select></label><button class="button button-secondary" type="button" data-save-transaction-view>Save view</button><button class="button button-secondary transaction-columns-button" type="button" data-open-transaction-columns>Columns</button><label><span class="sr-only">Sort records</span><select class="select" data-transaction-sort><option value="default">Default sort</option><option value="newest">Newest first</option><option value="oldest">Oldest first</option><option value="amount-high">Amount: high to low</option><option value="amount-low">Amount: low to high</option><option value="name">Name A–Z</option></select></label><label><span class="sr-only">Row density</span><select class="select" data-transaction-density><option value="comfortable">Comfortable</option><option value="compact">Compact</option></select></label>`;
+    toolbar.innerHTML=`${modeControls}<label><span class="sr-only">Saved view</span><select class="select" data-transaction-saved-view><option value="">Saved views</option>${views}</select></label><button class="button button-secondary" type="button" data-save-transaction-view>Save view</button><button class="button button-secondary transaction-columns-button" type="button" data-open-transaction-columns>Columns</button><label><span class="sr-only">Sort records</span><select class="select" data-transaction-sort><option value="default">Default sort</option><option value="newest">Newest first</option><option value="oldest">Oldest first</option><option value="amount-high">Amount: high to low</option><option value="amount-low">Amount: low to high</option><option value="name">Name A–Z</option></select></label><label><span class="sr-only">Row density</span><select class="select" data-transaction-density><option value="comfortable">Comfortable</option><option value="compact">Compact</option></select></label>`;
     toolbar.querySelector("[data-transaction-sort]").value=prefs.sort;
     toolbar.querySelector("[data-transaction-density]").value=prefs.density;
   }
@@ -167,10 +174,10 @@
     activeWorkspace=name; ensureUi(name); renderToolbar(name);
     const entries=rowEntries(name); if(name==="income")entries.forEach(addIncomeSelection);
     document.querySelectorAll(`#${WORKSPACES[name].page} .record-header`).forEach(header=>mapColumns(header,name,true));
-    entries.forEach(entry=>mapColumns(entry.row,name)); sortRows(name,entries);
+    entries.forEach(entry=>mapColumns(entry.row,name)); const orderedEntries=sortRows(name,entries);
     const page=document.getElementById(WORKSPACES[name].page); page?.classList.toggle("transaction-density-compact",state[name].density==="compact"); page?.classList.toggle("transaction-calendar-mode",state[name].mode==="calendar");
     const calendar=document.getElementById(`transactionCalendar-${name}`); if(calendar)calendar.hidden=state[name].mode!=="calendar";
-    renderCalendar(name,entries); renderFooter(name,entries);
+    renderCalendar(name,orderedEntries); renderFooter(name,entries);
   }
   function rerender(name) {
     const page=WORKSPACES[name].page;

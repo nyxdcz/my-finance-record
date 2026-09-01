@@ -104,7 +104,7 @@ test("desktop paid calendar separates dates and keeps names and amounts easy to 
   expect(state.nameWhiteSpace).toBe("normal");
   expect(state.amountWhiteSpace).toBe("nowrap");
   expect(state.amountWeight).toBeGreaterThanOrEqual(800);
-  expect(state.toolbarSelectHeight).toBeCloseTo(38, 0);
+  expect(state.toolbarSelectHeight).toBeCloseTo(34, 0);
   expect(state.activeBorder).not.toBe(state.inactiveBorder);
   expect(columnCount(state.bulkColumns)).toBe(6);
   expect(state.bulkSelectHeight).toBeCloseTo(38, 0);
