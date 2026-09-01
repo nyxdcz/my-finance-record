@@ -87,6 +87,38 @@ html[data-theme="dark"] .sidebar .nav-button.active .nav-icon-image{
   animation:none!important;
   transform:none!important;
 }
+@media(max-width:850px){
+  #cloudSyncStatusButton[data-sync-state="syncing"] .toolbar-icon[data-uploaded-sync-icon="syncing"]{
+    animation:mobile-sync-pulse .9s ease-in-out infinite!important;
+    transform-origin:center;
+  }
+  #cloudSyncStatusButton[data-mobile-sync-feedback]::after{
+    content:attr(data-mobile-sync-feedback);
+    position:absolute;
+    top:calc(100% + 6px);
+    right:0;
+    z-index:230;
+    width:max-content;
+    max-width:min(220px,calc(100vw - 24px));
+    padding:5px 8px;
+    border:1px solid color-mix(in srgb,currentColor 42%,var(--line));
+    border-radius:7px;
+    background:var(--surface);
+    box-shadow:0 8px 24px rgba(15,23,42,.16);
+    color:var(--text);
+    font-size:.65rem;
+    font-weight:800;
+    line-height:1.25;
+    pointer-events:none;
+  }
+  #cloudSyncStatusButton[data-mobile-sync-tone="success"]::after{color:var(--green)}
+  #cloudSyncStatusButton[data-mobile-sync-tone="warning"]::after{color:var(--orange)}
+  #cloudSyncStatusButton[data-mobile-sync-tone="danger"]::after{color:var(--red)}
+}
+@keyframes mobile-sync-pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.14);opacity:.55}}
+@media(prefers-reduced-motion:reduce){
+  #cloudSyncStatusButton[data-sync-state="syncing"] .toolbar-icon[data-uploaded-sync-icon="syncing"]{animation:none!important;opacity:1!important;transform:none!important}
+}
 #quickAddExpense .toolbar-icon::before{display:none!important}
 #quickAddExpense .toolbar-icon{
   background-image:url("./icons/action-add-sparkle.png")!important;

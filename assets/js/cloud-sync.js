@@ -24,6 +24,7 @@
   const MAX_CONFLICTS = 60;
   const RETRY_BASE_MS = 2000;
   const RETRY_MAX_MS = 5 * 60 * 1000;
+  const ICON_ONLY_SYNC_QUERY = "(max-width: 850px)";
   const ARRAY_COLLECTIONS = ["expenses", "projects", "incomeRecords", "savingsGoals",
     "accountLedger", "accountReconciliations", "budgetTemplates", "expenseTemplates"
   ];
@@ -51,6 +52,8 @@
   let syncTimer = null;
   let retryTimer = null;
   let syncing = false;
+  let topSyncRequestPending = false;
+  let mobileSyncFeedbackTimer = null;
   let passwordRecoveryActive = false;
   let passwordRecoveryRouteActive = false;
   let passwordRecoveryError = null;
@@ -598,13 +601,67 @@
     return "setup";
   }
 
+  function isIconOnlyTopSyncButton() {
+    return Boolean(window.matchMedia?.(ICON_ONLY_SYNC_QUERY).matches);
+  }
+
+  function clearMobileSyncFeedback() {
+    if (mobileSyncFeedbackTimer) clearTimeout(mobileSyncFeedbackTimer);
+    mobileSyncFeedbackTimer = null;
+    const top = document.getElementById("cloudSyncStatusButton");
+    if (top) {
+      delete top.dataset.mobileSyncFeedback;
+      delete top.dataset.mobileSyncTone;
+    }
+  }
+
+  function showMobileSyncFeedback(message, tone = "info", hideAfter = 0) {
+    if (!isIconOnlyTopSyncButton()) return;
+    clearMobileSyncFeedback();
+    const top = document.getElementById("cloudSyncStatusButton");
+    const live = document.getElementById("cloudSyncMobileLive");
+    if (top) {
+      top.dataset.mobileSyncFeedback = message;
+      top.dataset.mobileSyncTone = tone;
+    }
+    if (live) {
+      live.textContent = "";
+      requestAnimationFrame(() => { live.textContent = message; });
+    }
+    if (hideAfter > 0) mobileSyncFeedbackTimer = setTimeout(clearMobileSyncFeedback, hideAfter);
+  }
+
+  function mobileSyncOutcome() {
+    const label = topStatusLabel();
+    if (label === "Synced") return { message:"Synced.", tone:"success" };
+    if (label === "Offline" || /^\d+ pending$/.test(label)) return { message:"Offline — sync paused.", tone:"danger" };
+    if (label === "Sign in") return { message:"Sign in to sync.", tone:"warning" };
+    if (label === "Sync issue") return { message:"Sync needs attention.", tone:"danger" };
+    if (label === "Needs sync") return { message:"Changes still pending.", tone:"warning" };
+    return { message:label, tone:"warning" };
+  }
+
   function updateTopSyncUi(detail = "") {
     const top=document.getElementById("cloudSyncStatusButton"), label=topStatusLabel(), readiness=cloudReadiness();
     if (top) {
-      top.dataset.syncState=topSyncStateKey(label);
+      const topLabel = topSyncRequestPending ? "Syncing…" : label;
+      top.dataset.syncState=topSyncStateKey(topLabel);
       const text=top.querySelector(".cloud-sync-label") || top.querySelector("span:last-child");
-      if (text) text.textContent=label;
-      top.setAttribute("aria-label",`Cloud sync: ${label}`); top.title=`Cloud sync: ${label}`; top.setAttribute("aria-busy", syncing ? "true" : "false");
+      if (text) text.textContent=topLabel;
+      const iconOnly = isIconOnlyTopSyncButton();
+      top.setAttribute("aria-label",iconOnly ? `Sync now. ${topLabel}` : `Cloud sync: ${topLabel}`);
+      top.title=iconOnly ? `Sync now · ${topLabel}` : `Cloud sync: ${topLabel}`;
+      top.setAttribute("aria-busy", syncing || topSyncRequestPending ? "true" : "false");
+      if (iconOnly) {
+        top.removeAttribute("aria-haspopup");
+        top.removeAttribute("aria-controls");
+        top.removeAttribute("aria-expanded");
+      } else {
+        const pop=document.getElementById("cloudSyncToolbarPopover");
+        top.setAttribute("aria-haspopup","dialog");
+        top.setAttribute("aria-controls","cloudSyncToolbarPopover");
+        top.setAttribute("aria-expanded",String(Boolean(pop && !pop.hidden)));
+      }
     }
     const stateNode=document.getElementById("cloudToolbarState"), detailNode=document.getElementById("cloudToolbarDetail"), lastNode=document.getElementById("cloudToolbarLastSync"), syncButton=document.getElementById("cloudToolbarSyncNow"), fixButton=document.getElementById("cloudToolbarFixIssue");
     if (stateNode) stateNode.textContent=label;
@@ -633,8 +690,39 @@
     }
   }
 
-  function closeTopSyncPopover() { const pop=document.getElementById("cloudSyncToolbarPopover"), button=document.getElementById("cloudSyncStatusButton"); if(pop)pop.hidden=true; if(button)button.setAttribute("aria-expanded","false"); }
+  function closeTopSyncPopover() { const pop=document.getElementById("cloudSyncToolbarPopover"), button=document.getElementById("cloudSyncStatusButton"); if(pop)pop.hidden=true; if(button&&!isIconOnlyTopSyncButton())button.setAttribute("aria-expanded","false"); }
   function toggleTopSyncPopover() { const pop=document.getElementById("cloudSyncToolbarPopover"), button=document.getElementById("cloudSyncStatusButton"); if(!pop||!button)return; const opening=pop.hidden; pop.hidden=!opening; button.setAttribute("aria-expanded",String(opening)); updateTopSyncUi(); if(opening && typeof positionCloudToolbarPopover === "function") requestAnimationFrame(positionCloudToolbarPopover); }
+  async function runTopSyncAction() {
+    if (syncing || topSyncRequestPending) {
+      showMobileSyncFeedback("Syncing…");
+      return;
+    }
+    const readiness = cloudReadiness();
+    if (!cloudUser || !readiness.ready) {
+      showMobileSyncFeedback(!cloudUser ? "Sign in to sync." : readiness.label, "warning", 2400);
+      toggleTopSyncPopover();
+      return;
+    }
+    if (!navigator.onLine) {
+      setStatus("Offline", `${pendingCount()} device change${pendingCount()===1?"":"s"} waiting for cloud.`, "info");
+      showMobileSyncFeedback("Offline — sync paused.", "danger", 2400);
+      return;
+    }
+    topSyncRequestPending = true;
+    showMobileSyncFeedback("Syncing…");
+    updateTopSyncUi();
+    try {
+      await syncNow({reason:"mobile-toolbar"});
+      const outcome = mobileSyncOutcome();
+      showMobileSyncFeedback(outcome.message, outcome.tone, 1800);
+    } catch (error) {
+      showMobileSyncFeedback("Sync failed.", "danger", 2400);
+      showToast(error.message,"warning");
+    } finally {
+      topSyncRequestPending = false;
+      updateTopSyncUi();
+    }
+  }
   function openCloudRecoveryTarget() {
     closeTopSyncPopover();
     if (typeof goToPage === "function") goToPage("settings", { smooth:false });
@@ -1191,7 +1279,7 @@
   function downloadJson(filename,value) { const blob=new Blob([JSON.stringify(value,null,2)],{type:"application/json"}); const url=URL.createObjectURL(blob), link=document.createElement("a"); link.href=url; link.download=filename; document.body.appendChild(link); link.click(); link.remove(); setTimeout(()=>URL.revokeObjectURL(url),0); }
 
   function bindEvents() {
-    document.getElementById("cloudSyncStatusButton")?.addEventListener("click",event=>{event.stopPropagation();toggleTopSyncPopover();});
+    document.getElementById("cloudSyncStatusButton")?.addEventListener("click",event=>{event.stopPropagation();if(isIconOnlyTopSyncButton())runTopSyncAction();else toggleTopSyncPopover();});
     document.getElementById("cloudToolbarClose")?.addEventListener("click",closeTopSyncPopover);
     document.getElementById("cloudToolbarSyncNow")?.addEventListener("click",()=>syncNow({reason:"toolbar"}).catch(error=>showToast(error.message,"warning")));
     document.getElementById("cloudToolbarOpenSettings")?.addEventListener("click",()=>{closeTopSyncPopover();goToPage("settings",{smooth:false});activateSettingsPanel("cloud",true);});
@@ -1200,7 +1288,7 @@
     document.getElementById("cloudOverviewFixButton")?.addEventListener("click", openCloudRecoveryTarget);
     document.getElementById("cloudReplaceFromDevice")?.addEventListener("click",async()=>{if(!confirm("Make this device the current cloud copy? A local recovery point will be saved first. Other connected devices will download this copy before uploading their own changes."))return;try{await replaceCloudWithThisDevice();}catch(error){setStatus("Cloud replacement needs attention",error.message,"danger");showToast(error.message,"warning");}});
     document.addEventListener("click",event=>{if(!event.target.closest("#cloudSyncToolbarPopover")&&!event.target.closest("#cloudSyncStatusButton"))closeTopSyncPopover();});
-    window.addEventListener("resize",()=>{if(!document.getElementById("cloudSyncToolbarPopover")?.hidden&&typeof positionCloudToolbarPopover==="function")positionCloudToolbarPopover();});
+    window.addEventListener("resize",()=>{if(!isIconOnlyTopSyncButton())clearMobileSyncFeedback();updateTopSyncUi();if(!document.getElementById("cloudSyncToolbarPopover")?.hidden&&typeof positionCloudToolbarPopover==="function")positionCloudToolbarPopover();});
     document.getElementById("saveCloudConfig")?.addEventListener("click",()=>{const config={supabaseUrl:document.getElementById("cloudConfigUrl").value.trim(),supabasePublishableKey:document.getElementById("cloudConfigKey").value.trim()};const status=configStatus(config); if(!status.ok)return showToast(status.message,"warning");saveJson(CONFIG_KEY,config); showToast("Cloud configuration saved. Reloading…","success"); setTimeout(()=>location.reload(),350);});
     document.getElementById("clearCloudConfig")?.addEventListener("click",()=>{ if(!confirm("Remove cloud configuration from this device? Local records remain."))return; localStorage.removeItem(CONFIG_KEY); setTimeout(()=>location.reload(),250); });
     document.getElementById("cloudPasswordToggle")?.addEventListener("click",event=>{const input=document.getElementById("cloudAuthPassword");setPasswordVisibility(input,event.currentTarget,input?.type === "password");});
