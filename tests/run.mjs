@@ -2,6 +2,7 @@ import { spawnSync } from "node:child_process";
 
 const testPlan = [
   { suite: "finance", file: "tests/finance/validate-finance-ui-source.mjs" },
+  { suite: "finance", file: "tests/finance/validate-savings-forecast-engine.mjs" },
   { suite: "sync", file: "tests/sync/validate-safe-multidevice-sync.mjs" },
   { suite: "sync", file: "tests/sync/validate-mobile-cloud-revert-safety.mjs" },
   { suite: "sync", file: "tests/sync/validate-view-preference-boundary.mjs" },

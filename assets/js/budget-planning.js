@@ -56,6 +56,15 @@
     };
   }
 
+  function normalizeSavingsProgress(value) {
+    return {
+      confirmed:Boolean(value?.confirmed),
+      actualAmount:Math.max(0, roundMoney(value?.actualAmount || 0)),
+      confirmedAt:safeText(value?.confirmedAt, 40),
+      updatedAt:safeText(value?.updatedAt, 40)
+    };
+  }
+
   function normalizePlan(month, value) {
     const items = (Array.isArray(value?.items) ? value.items : []).map(normalizeBudgetItem).filter(item => item.plannedAmount > 0);
     const seen = new Set();
@@ -63,6 +72,8 @@
       month,
       items:items.filter(item => { if (seen.has(item.id)) return false; seen.add(item.id); return true; }),
       savingsAllocation:normalizeAllocation(value?.savingsAllocation),
+      savingsTargetSet:Boolean(value?.savingsTargetSet ?? Number(value?.savingsAllocation?.value || 0) > 0),
+      savingsProgress:normalizeSavingsProgress(value?.savingsProgress),
       lowBalanceThreshold:Math.max(0, roundMoney(value?.lowBalanceThreshold ?? DEFAULT_THRESHOLD)),
       templateId:safeText(value?.templateId, 120),
       createdAt:value?.createdAt || new Date().toISOString(),
@@ -144,6 +155,40 @@
     return { plan, planned, actual, committed, upcoming, reservedUnassigned, totalIncome, allocation, expectedIncome, currentAvailable, forecast, remaining, variance, recurringEstimate, oneTimeUpcoming, overdue };
   }
 
+  function savingsEstimate(metrics) {
+    const estimatedExpenses = roundMoney(Math.max(metrics.planned, metrics.committed));
+    return {
+      income:metrics.totalIncome,
+      estimatedExpenses,
+      potential:roundMoney(metrics.totalIncome - estimatedExpenses)
+    };
+  }
+
+  function suggestedSavingsTarget(potential) {
+    if (potential <= 0) return 0;
+    return roundMoney(Math.ceil(potential / 500) * 500);
+  }
+
+  function savingsProjection(startMonth, previewTarget = null) {
+    const startMetrics = planMetrics(startMonth);
+    const fallbackTarget = previewTarget === null ? startMetrics.allocation : Math.max(0, roundMoney(previewTarget));
+    let cumulative = 0;
+    return Array.from({length:4}, (_, index) => {
+      const month = monthShift(startMonth,index);
+      const savedPlan = data.monthlyBudgets?.[month];
+      const metrics = planMetrics(month);
+      const target = index === 0 && previewTarget !== null
+        ? fallbackTarget
+        : savedPlan?.savingsTargetSet
+          ? metrics.allocation
+          : fallbackTarget;
+      const progress = savedPlan?.savingsProgress || normalizeSavingsProgress();
+      const contribution = progress.confirmed ? progress.actualAmount : target;
+      cumulative = roundMoney(cumulative + contribution);
+      return { month, target, confirmed:progress.confirmed, actualAmount:progress.actualAmount, contribution, cumulative };
+    });
+  }
+
   function dueDateForExpense(item, month) {
     const day = Math.max(1,Math.min(new Date(Number(month.slice(0,4)),Number(month.slice(5,7)),0).getDate(),Number(item?.dueDay || String(item?.date || "").slice(8,10) || 1)));
     return `${month}-${String(day).padStart(2,"0")}`;
@@ -173,7 +218,7 @@
         <div id="monthlyBudgetPlannerBody" class="budget-planner-body">
         <div class="budget-planner-summary" id="budgetPlannerSummary"></div>
         <div class="budget-planner-grid"><section class="budget-category-panel budget-bento-panel" data-budget-panel="category"><div class="budget-panel-heading"><div class="budget-panel-heading-copy"><h4>Category plan</h4><p>Fixed and flexible budgets for personal and project spending.</p></div><div class="budget-panel-heading-actions"><span class="status-chip info" id="budgetCategoryCount">0 categories</span><button class="budget-panel-collapse no-print" type="button" data-budget-panel-toggle="category" aria-controls="budgetCategoryPanelBody" aria-expanded="true" aria-label="Collapse Category plan" title="Collapse Category plan"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m6 15 6-6 6 6"/></svg></button></div></div><div class="budget-panel-body budget-category-body" id="budgetCategoryPanelBody"><div id="budgetCategoryTableWrap"></div><div class="budget-template-bar no-print"><div class="field"><label for="budgetTemplateSelect">Budget template</label><select class="select" id="budgetTemplateSelect"><option value="">Choose a template</option></select></div><button class="button button-secondary button-small" id="applyBudgetTemplate" type="button">Apply</button><button class="button button-secondary button-small" id="saveBudgetTemplate" type="button">Save current…</button><button class="button button-secondary button-small" id="deleteBudgetTemplate" type="button">Delete</button></div></div></section>
-        <aside class="cash-forecast-panel budget-bento-panel" data-budget-panel="forecast"><div class="budget-panel-heading"><div class="budget-panel-heading-copy"><h4>Cash-flow forecast</h4><p>Current money plus expected income minus future commitments.</p></div><div class="budget-panel-heading-actions"><span class="status-chip" id="cashForecastStatus">No plan</span><button class="budget-panel-collapse no-print" type="button" data-budget-panel-toggle="forecast" aria-controls="cashForecastPanelBody" aria-expanded="true" aria-label="Collapse Cash-flow forecast" title="Collapse Cash-flow forecast"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m6 15 6-6 6 6"/></svg></button></div></div><div class="cash-forecast-body budget-panel-body" id="cashForecastPanelBody"><div class="forecast-breakdown" id="cashForecastBreakdown"></div><div class="forecast-classification" id="cashForecastClassification"></div><div class="budget-alerts" id="budgetForecastAlerts"></div></div></aside></div>
+        <aside class="cash-forecast-panel budget-bento-panel" data-budget-panel="forecast"><div class="budget-panel-heading"><div class="budget-panel-heading-copy"><h4>Cash-flow &amp; savings forecast</h4><p>Review this month, set a savings target, and track the next four months.</p></div><div class="budget-panel-heading-actions"><span class="status-chip" id="cashForecastStatus">No plan</span><button class="budget-panel-collapse no-print" type="button" data-budget-panel-toggle="forecast" aria-controls="cashForecastPanelBody" aria-expanded="true" aria-label="Collapse Cash-flow &amp; savings forecast" title="Collapse Cash-flow &amp; savings forecast"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m6 15 6-6 6 6"/></svg></button></div></div><div class="cash-forecast-body budget-panel-body" id="cashForecastPanelBody"><div class="forecast-breakdown" id="cashForecastBreakdown"></div><div class="forecast-classification" id="cashForecastClassification"></div><div class="budget-alerts" id="budgetForecastAlerts"></div><section class="savings-outlook" aria-labelledby="savingsOutlookTitle"><div class="savings-outlook-heading"><div><h5 id="savingsOutlookTitle">Savings outlook</h5><p id="savingsProjectionCaption">Set a monthly target to preview your progress.</p></div><span class="status-chip info" id="savingsProgressStatus">Suggested</span></div><div class="savings-outlook-summary" id="savingsOutlookSummary"></div><div class="savings-target-controls no-print"><div class="field savings-target-field"><label for="monthlySavingsTarget">Monthly savings target</label><div class="savings-money-input"><span aria-hidden="true">₱</span><input class="input" id="monthlySavingsTarget" type="number" min="0" step="100" inputmode="decimal"><span>per month</span></div></div><button class="button button-primary button-small" id="setMonthlySavingsTarget" type="button">Set target</button></div><p class="savings-suggestion" id="savingsTargetSuggestion" aria-live="polite"></p><div class="savings-confirmation"><label class="savings-check-row" for="savingsMonthConfirmed"><input id="savingsMonthConfirmed" type="checkbox"><span><strong id="savingsConfirmationLabel">I saved this month</strong><small>Confirm only after you have set the money aside.</small></span></label><div class="field savings-actual-field"><label for="actualSavingsAmount">Amount actually saved</label><div class="savings-money-input"><span aria-hidden="true">₱</span><input class="input" id="actualSavingsAmount" type="number" min="0" step="100" inputmode="decimal"><span>actual</span></div></div><div class="savings-progress-copy" id="savingsActualStatus" aria-live="polite"></div></div><div class="savings-projection-list" id="savingsProjectionRows"></div><p class="savings-tracking-note"><strong>Tracking only:</strong> confirming savings does not change any account balance.</p></section></div></aside></div>
         </div>
       </article>`);
     }
@@ -271,6 +316,7 @@
       return normalizeBudgetItem({...clone(item),id:makeId("budget-item"),plannedAmount:roundMoney(item.plannedAmount+unused),createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()});
     });
     current.savingsAllocation = clone(previous.savingsAllocation);
+    current.savingsTargetSet = Boolean(previous.savingsTargetSet);
     current.lowBalanceThreshold = previous.lowBalanceThreshold;
     current.templateId = previous.templateId || "";
     saveBudgetChange(`Copied ${monthName(previousMonth)} monthly budget`);
@@ -296,6 +342,7 @@
     if (typeof pushUndo === "function") pushUndo(`Apply budget template ${template.name}`);
     plan.items = template.items.map(item=>normalizeBudgetItem({...clone(item),id:makeId("budget-item"),createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()}));
     plan.savingsAllocation = clone(template.savingsAllocation);
+    plan.savingsTargetSet = true;
     plan.lowBalanceThreshold = template.lowBalanceThreshold;
     plan.templateId = template.id;
     saveBudgetChange(`Applied budget template ${template.name}`);
@@ -315,13 +362,71 @@
   function exportCsv() {
     const month = selectedMonth();
     const metrics = planMetrics(month);
-    const rows = [["Month","Category","Group","Scope","Planned","Actual Paid","Committed","Remaining","Rollover","Notes"],...metrics.plan.items.map(item=>[month,item.category,item.group,item.scope,item.plannedAmount,itemActual(item,month),itemCommitted(item,month),roundMoney(item.plannedAmount-itemActual(item,month)),item.rollover?"Yes":"No",item.notes]),[],["Forecast Component","Amount"],["Current available",metrics.currentAvailable],["Expected unposted income",metrics.expectedIncome],["Upcoming recorded expenses",-metrics.upcoming],["Reserved unassigned budget",-metrics.reservedUnassigned],["Savings allocation",-metrics.allocation],["Forecast month-end",metrics.forecast]];
+    const rows = [["Month","Category","Group","Scope","Planned","Actual Paid","Committed","Remaining","Rollover","Notes"],...metrics.plan.items.map(item=>[month,item.category,item.group,item.scope,item.plannedAmount,itemActual(item,month),itemCommitted(item,month),roundMoney(item.plannedAmount-itemActual(item,month)),item.rollover?"Yes":"No",item.notes]),[],["Forecast Component","Amount"],["Current available",metrics.currentAvailable],["Expected unposted income",metrics.expectedIncome],["Upcoming recorded expenses",-metrics.upcoming],["Reserved unassigned budget",-metrics.reservedUnassigned],["Savings allocation",-metrics.allocation],["Savings confirmed",metrics.plan.savingsProgress.confirmed?"Yes":"No"],["Actual savings",metrics.plan.savingsProgress.confirmed?metrics.plan.savingsProgress.actualAmount:0],["Forecast month-end",metrics.forecast]];
     if (typeof downloadCsv === "function") downloadCsv(`monthly-budget-${month}.csv`,rows);
     else {
       const content=rows.map(row=>row.map(value=>`"${String(value??"").replaceAll('"','""')}"`).join(",")).join("\n");
       const url=URL.createObjectURL(new Blob([content],{type:"text/csv"})); const link=document.createElement("a"); link.href=url; link.download=`monthly-budget-${month}.csv`; link.click(); URL.revokeObjectURL(url);
     }
     showToast("Monthly budget CSV exported", "success");
+  }
+
+  function renderSavingsOutlook(metrics, previewTarget = null) {
+    const month = selectedMonth();
+    const savedPlan = data.monthlyBudgets?.[month];
+    const configured = Boolean(savedPlan?.savingsTargetSet);
+    const estimate = savingsEstimate(metrics);
+    const suggested = suggestedSavingsTarget(estimate.potential);
+    const target = Math.max(0, roundMoney(previewTarget === null ? (configured ? metrics.allocation : suggested) : previewTarget));
+    const progress = savedPlan?.savingsProgress || normalizeSavingsProgress();
+    const targetInput = document.getElementById("monthlySavingsTarget");
+    if (!targetInput) return;
+    if (previewTarget === null) targetInput.value = String(target || "");
+    targetInput.max = estimate.income > 0 ? String(estimate.income) : "";
+    const targetButton = document.getElementById("setMonthlySavingsTarget");
+    targetButton.textContent = configured ? "Update target" : "Set target";
+
+    const savingsRate = estimate.income > 0 ? Math.round(target / estimate.income * 1000) / 10 : 0;
+    document.getElementById("savingsOutlookSummary").innerHTML = [
+      ["Monthly income",money(estimate.income),""],
+      ["Estimated expenses",money(estimate.estimatedExpenses),""],
+      ["Potential monthly savings",money(estimate.potential),estimate.potential<0?"is-danger":"is-success"],
+      ["Target savings rate",`${savingsRate}%`,""]
+    ].map(([label,value,tone])=>`<div class="savings-outlook-stat ${tone}"><span>${label}</span><strong>${value}</strong></div>`).join("");
+
+    const suggestion = document.getElementById("savingsTargetSuggestion");
+    if (estimate.income <= 0) suggestion.textContent = "Add income records for this month to calculate a realistic savings target.";
+    else if (target <= 0) suggestion.textContent = estimate.potential > 0 ? `Suggested target: ${money(suggested)} per month.` : "Record or reduce expenses before setting a savings target.";
+    else if (target > estimate.potential) suggestion.textContent = `Reduce flexible spending by ${money(target-estimate.potential)} to meet this target.`;
+    else if (target < estimate.potential) suggestion.textContent = `This target leaves ${money(estimate.potential-target)} of the current saving potential unassigned.`;
+    else suggestion.textContent = "This target matches the current saving potential.";
+
+    const checkbox = document.getElementById("savingsMonthConfirmed");
+    checkbox.checked = progress.confirmed;
+    checkbox.disabled = !configured || metrics.allocation <= 0;
+    document.getElementById("savingsConfirmationLabel").textContent = `I saved in ${monthName(month)}`;
+    const actualInput = document.getElementById("actualSavingsAmount");
+    actualInput.disabled = !progress.confirmed;
+    actualInput.value = String(progress.confirmed ? progress.actualAmount : target || "");
+    const actualStatus = document.getElementById("savingsActualStatus");
+    if (!configured) actualStatus.textContent = "Set the monthly target before confirming savings.";
+    else if (!progress.confirmed) actualStatus.textContent = `Target ${money(metrics.allocation)} · Not yet confirmed.`;
+    else {
+      const difference = roundMoney(progress.actualAmount - metrics.allocation);
+      actualStatus.textContent = difference === 0
+        ? `${money(progress.actualAmount)} saved · Target reached.`
+        : difference > 0
+          ? `${money(progress.actualAmount)} saved · ${money(difference)} above target.`
+          : `${money(progress.actualAmount)} saved · ${money(Math.abs(difference))} below target.`;
+    }
+
+    const projection = savingsProjection(month,target);
+    const horizon = projection.at(-1);
+    document.getElementById("savingsProjectionCaption").textContent = `${money(horizon.cumulative)} projected by ${monthName(horizon.month)}.`;
+    document.getElementById("savingsProjectionRows").innerHTML = projection.map((row,index)=>`<div class="savings-projection-row ${row.confirmed?"is-confirmed":""} ${index===projection.length-1?"is-horizon":""}"><span><strong>${monthName(row.month)}</strong><small>${row.confirmed?"Actually saved":"Planned target"}</small></span><span class="savings-projection-amount"><strong>${money(row.contribution)}</strong><small>${money(row.cumulative)} cumulative</small></span></div>`).join("");
+    const progressStatus = document.getElementById("savingsProgressStatus");
+    progressStatus.textContent = progress.confirmed ? "Saved" : configured ? "Target ready" : "Suggested";
+    progressStatus.className = `status-chip ${progress.confirmed?"success":configured?"info":"warning"}`;
   }
 
   function renderBudgetWorkspace() {
@@ -369,6 +474,7 @@
       ["Overdue unpaid",metrics.overdue]
     ].map(([label,value])=>`<div><span>${label}</span><strong>${money(value)}</strong></div>`).join("");
     document.getElementById("budgetForecastAlerts").innerHTML=lowBalanceAlerts(metrics).map(item=>`<div class="budget-alert ${item.tone}">${escapeHtml(item.text)}</div>`).join("");
+    renderSavingsOutlook(metrics);
     renderBudgetReport(metrics);
   }
 
@@ -390,7 +496,7 @@
     const panel = document.querySelector(`[data-budget-panel="${name}"]`);
     const toggle = document.querySelector(`[data-budget-panel-toggle="${name}"]`);
     if (!panel || !toggle) return;
-    const title = name === "forecast" ? "Cash-flow forecast" : "Category plan";
+    const title = name === "forecast" ? "Cash-flow & savings forecast" : "Category plan";
     panel.classList.toggle("is-collapsed", collapsed);
     toggle.setAttribute("aria-expanded", String(!collapsed));
     toggle.setAttribute("aria-label", `${collapsed ? "Expand" : "Collapse"} ${title}`);
@@ -440,6 +546,46 @@
     });
   }
 
+  function setMonthlySavingsTarget() {
+    const input = document.getElementById("monthlySavingsTarget");
+    const value = roundMoney(input?.value);
+    const metrics = planMetrics(selectedMonth());
+    if (!Number.isFinite(value) || value < 0) return showToast("Enter a valid monthly savings target", "warning");
+    if (metrics.totalIncome > 0 && value > metrics.totalIncome) return showToast("The savings target cannot exceed this month’s income", "warning");
+    const plan = selectedPlan(true);
+    if (typeof pushUndo === "function") pushUndo(`Update ${monthName(selectedMonth())} savings target`);
+    plan.savingsAllocation = {mode:"fixed",value,account:plan.savingsAllocation.account};
+    plan.savingsTargetSet = true;
+    saveBudgetChange("Monthly savings target saved");
+  }
+
+  function setSavingsConfirmation(confirmed) {
+    const plan = selectedPlan(true);
+    const metrics = planMetrics(selectedMonth());
+    if (confirmed && (!plan.savingsTargetSet || metrics.allocation <= 0)) {
+      const checkbox = document.getElementById("savingsMonthConfirmed");
+      if (checkbox) checkbox.checked = false;
+      return showToast("Set a monthly savings target first", "warning");
+    }
+    const current = normalizeSavingsProgress(plan.savingsProgress);
+    const entered = roundMoney(document.getElementById("actualSavingsAmount")?.value);
+    const actualAmount = confirmed ? Math.max(0, entered || metrics.allocation) : current.actualAmount;
+    const now = new Date().toISOString();
+    if (typeof pushUndo === "function") pushUndo(`${confirmed?"Confirm":"Reopen"} ${monthName(selectedMonth())} savings`);
+    plan.savingsProgress = {confirmed,actualAmount,confirmedAt:confirmed?(current.confirmedAt||now):"",updatedAt:now};
+    saveBudgetChange(confirmed ? "Monthly savings confirmed" : "Monthly savings reopened");
+  }
+
+  function updateActualSavings() {
+    const plan = selectedPlan(true);
+    if (!plan.savingsProgress?.confirmed) return;
+    const actualAmount = roundMoney(document.getElementById("actualSavingsAmount")?.value);
+    if (!Number.isFinite(actualAmount) || actualAmount < 0) return showToast("Enter a valid saved amount", "warning");
+    if (typeof pushUndo === "function") pushUndo(`Update ${monthName(selectedMonth())} saved amount`);
+    plan.savingsProgress = {...normalizeSavingsProgress(plan.savingsProgress),actualAmount,updatedAt:new Date().toISOString()};
+    saveBudgetChange("Actual savings updated");
+  }
+
   function bindEvents() {
     document.addEventListener("click",event=>{
       if(event.target.closest("#addBudgetItem")) openItemDialog();
@@ -450,6 +596,7 @@
       if(event.target.closest("#saveBudgetTemplate")) saveTemplate();
       if(event.target.closest("#applyBudgetTemplate")) applyTemplate();
       if(event.target.closest("#deleteBudgetTemplate")) deleteTemplate();
+      if(event.target.closest("#setMonthlySavingsTarget")) setMonthlySavingsTarget();
       if(event.target.closest("#reportOpenBudgetPlan")){goToPage("income");setTimeout(()=>document.getElementById("monthlyBudgetPlannerCard")?.scrollIntoView({behavior:"smooth",block:"start"}),120);}
       const edit=event.target.closest("[data-edit-budget-item]"); if(edit){const item=selectedPlan(false).items.find(value=>value.id===edit.dataset.editBudgetItem);if(item)openItemDialog(item);}
       const remove=event.target.closest("[data-delete-budget-item]"); if(remove){const plan=selectedPlan(true),item=plan.items.find(value=>value.id===remove.dataset.deleteBudgetItem);if(item&&confirm(`Delete the ${item.category} budget from ${monthName(selectedMonth())}?`)){if(typeof pushUndo==="function")pushUndo(`Delete ${item.category} monthly budget`);plan.items=plan.items.filter(value=>value.id!==item.id);saveBudgetChange("Monthly budget category deleted");}}
@@ -458,6 +605,9 @@
     });
     document.getElementById("budgetItemCategory")?.addEventListener("change",event=>{const custom=event.target.value==="__custom__";document.getElementById("budgetCustomCategoryField").hidden=!custom;if(!custom){document.getElementById("budgetItemGroup").value=FIXED_CATEGORIES.has(event.target.value)?"fixed":"flexible";document.getElementById("budgetItemScope").value=event.target.value==="Project Costs"?"project":"personal";}});
     document.getElementById("budgetSavingsMode")?.addEventListener("change",syncSavingsModeLabel);
+    document.getElementById("monthlySavingsTarget")?.addEventListener("input",event=>renderSavingsOutlook(planMetrics(selectedMonth()),Math.max(0,roundMoney(event.target.value))));
+    document.getElementById("savingsMonthConfirmed")?.addEventListener("change",event=>setSavingsConfirmation(event.target.checked));
+    document.getElementById("actualSavingsAmount")?.addEventListener("change",updateActualSavings);
     document.getElementById("budgetItemForm")?.addEventListener("submit",event=>{
       event.preventDefault(); const plan=selectedPlan(true),id=document.getElementById("budgetItemId").value,rawCategory=document.getElementById("budgetItemCategory").value,category=rawCategory==="__custom__"?safeText(document.getElementById("budgetCustomCategory").value,60):rawCategory,amount=roundMoney(document.getElementById("budgetItemAmount").value);
       if(!category||amount<=0)return showToast("Enter a category and planned amount greater than zero","warning");
@@ -466,11 +616,11 @@
     });
     document.getElementById("budgetSettingsForm")?.addEventListener("submit",event=>{
       event.preventDefault(); const plan=selectedPlan(true),mode=document.getElementById("budgetSavingsMode").value,value=roundMoney(document.getElementById("budgetSavingsValue").value),threshold=roundMoney(document.getElementById("budgetLowBalanceThreshold").value); if(mode==="percentage"&&value>100)return showToast("Savings percentage cannot exceed 100%","warning");
-      if(typeof pushUndo==="function")pushUndo(`Update ${monthName(selectedMonth())} plan settings`); plan.savingsAllocation={mode,value:Math.max(0,value),account:document.getElementById("budgetSavingsAccount").value}; plan.lowBalanceThreshold=Math.max(0,threshold); closeDialog("budgetSettingsDialog");saveBudgetChange("Monthly budget settings saved");
+      if(typeof pushUndo==="function")pushUndo(`Update ${monthName(selectedMonth())} plan settings`); plan.savingsAllocation={mode,value:Math.max(0,value),account:document.getElementById("budgetSavingsAccount").value}; plan.savingsTargetSet=true; plan.lowBalanceThreshold=Math.max(0,threshold); closeDialog("budgetSettingsDialog");saveBudgetChange("Monthly budget settings saved");
     });
   }
 
-  window.FinanceBudgetPlanningInternals = {normalizeBudgetItem,normalizePlan,ensureBudgetShape,planMetrics,itemActual,itemCommitted,lowBalanceAlerts,dueDateForExpense};
+  window.FinanceBudgetPlanningInternals = {normalizeBudgetItem,normalizePlan,normalizeSavingsProgress,ensureBudgetShape,planMetrics,itemActual,itemCommitted,lowBalanceAlerts,dueDateForExpense,savingsEstimate,suggestedSavingsTarget,savingsProjection};
   if (window.__FINANCE_BUDGET_TEST__) return;
 
   renderIncomePage = function budgetRenderIncomePage(...args) { const result=originalRenderIncomePage(...args); injectUi(); renderBudgetWorkspace(); return result; };
