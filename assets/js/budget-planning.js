@@ -9,7 +9,7 @@
   const FIXED_CATEGORIES = new Set(["Bills","Rent","Loans","Utilities","Subscriptions"]);
   const DEFAULT_THRESHOLD = 1000;
   const originalRenderAll = renderAll;
-  const originalRenderMoneyPage = renderMoneyPage;
+  const originalRenderIncomePage = renderIncomePage;
   const originalRenderDashboard = renderDashboard;
   const originalRenderReports = renderReports;
   const originalNormalizeData = normalizeData;
@@ -165,9 +165,10 @@
   }
 
   function injectUi() {
+    const income = document.getElementById("income");
+    const incomeSummary = income?.querySelector(".income-kpi-grid");
     if (!document.getElementById("monthlyBudgetPlannerCard")) {
-      const summary = document.getElementById("moneySummary");
-      summary?.insertAdjacentHTML("afterend", `<article class="card budget-planner-card" id="monthlyBudgetPlannerCard" aria-labelledby="monthlyBudgetPlannerTitle">
+      incomeSummary?.insertAdjacentHTML("beforebegin", `<article class="card budget-planner-card" id="monthlyBudgetPlannerCard" aria-labelledby="monthlyBudgetPlannerTitle">
         <div class="card-header budget-planner-header"><div class="budget-planner-heading-copy"><h3 id="monthlyBudgetPlannerTitle">Monthly budget plan</h3><p id="monthlyBudgetPlannerSubtitle">Plan categories, compare actual spending, and forecast month-end cash.</p></div><div class="budget-planner-actions no-print"><button class="button button-secondary button-small" id="buildBudgetFromExpenses" type="button">Build from expenses</button><button class="button button-secondary button-small" id="copyPreviousBudget" type="button">Copy previous month</button><div class="overflow-menu budget-planner-more-menu"><button class="button button-secondary button-small overflow-menu-trigger" type="button" aria-label="More budget plan actions" title="More budget plan actions" aria-haspopup="menu" aria-controls="budgetPlannerMorePanel" aria-expanded="false">More</button><div class="record-more-panel budget-planner-more-panel" id="budgetPlannerMorePanel" role="menu" aria-label="More budget plan actions" hidden><button class="button button-secondary" id="openBudgetSettings" type="button" role="menuitem">Plan settings…</button><button class="button button-secondary" id="exportBudgetCsv" type="button" role="menuitem">Export CSV</button></div></div><button class="button button-primary button-small" id="addBudgetItem" type="button">+ Add category…</button><button class="budget-planner-toggle budget-panel-collapse" id="monthlyBudgetPlannerToggle" type="button" aria-controls="monthlyBudgetPlannerBody" aria-expanded="true" aria-label="Collapse Monthly budget plan" title="Collapse Monthly budget plan"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m6 15 6-6 6 6"/></svg></button></div></div>
         <div id="monthlyBudgetPlannerBody" class="budget-planner-body">
         <div class="budget-planner-summary" id="budgetPlannerSummary"></div>
@@ -176,6 +177,8 @@
         </div>
       </article>`);
     }
+    const planner = document.getElementById("monthlyBudgetPlannerCard");
+    if (planner && incomeSummary && planner.nextElementSibling !== incomeSummary) incomeSummary.before(planner);
     if (!document.getElementById("monthlyBudgetReportCard")) {
       const reports = document.getElementById("reports");
       const anchor = reports?.querySelector("#report-account-section") || reports?.lastElementChild;
@@ -447,7 +450,7 @@
       if(event.target.closest("#saveBudgetTemplate")) saveTemplate();
       if(event.target.closest("#applyBudgetTemplate")) applyTemplate();
       if(event.target.closest("#deleteBudgetTemplate")) deleteTemplate();
-      if(event.target.closest("#reportOpenBudgetPlan")){goToPage("money");setTimeout(()=>document.getElementById("monthlyBudgetPlannerCard")?.scrollIntoView({behavior:"smooth",block:"start"}),120);}
+      if(event.target.closest("#reportOpenBudgetPlan")){goToPage("income");setTimeout(()=>document.getElementById("monthlyBudgetPlannerCard")?.scrollIntoView({behavior:"smooth",block:"start"}),120);}
       const edit=event.target.closest("[data-edit-budget-item]"); if(edit){const item=selectedPlan(false).items.find(value=>value.id===edit.dataset.editBudgetItem);if(item)openItemDialog(item);}
       const remove=event.target.closest("[data-delete-budget-item]"); if(remove){const plan=selectedPlan(true),item=plan.items.find(value=>value.id===remove.dataset.deleteBudgetItem);if(item&&confirm(`Delete the ${item.category} budget from ${monthName(selectedMonth())}?`)){if(typeof pushUndo==="function")pushUndo(`Delete ${item.category} monthly budget`);plan.items=plan.items.filter(value=>value.id!==item.id);saveBudgetChange("Monthly budget category deleted");}}
       if(event.target.closest("[data-close-budget-dialog]"))closeDialog("budgetItemDialog");
@@ -470,10 +473,10 @@
   window.FinanceBudgetPlanningInternals = {normalizeBudgetItem,normalizePlan,ensureBudgetShape,planMetrics,itemActual,itemCommitted,lowBalanceAlerts,dueDateForExpense};
   if (window.__FINANCE_BUDGET_TEST__) return;
 
-  renderMoneyPage = function budgetRenderMoneyPage(...args) { const result=originalRenderMoneyPage(...args); renderBudgetWorkspace(); return result; };
+  renderIncomePage = function budgetRenderIncomePage(...args) { const result=originalRenderIncomePage(...args); injectUi(); renderBudgetWorkspace(); return result; };
   renderDashboard = function budgetRenderDashboard(...args) { const result=originalRenderDashboard(...args); injectUi(); return result; };
   renderReports = function budgetRenderReports(...args) { const result=originalRenderReports(...args); injectUi(); renderBudgetReport(); return result; };
-  PAGE_RENDERERS.money = renderMoneyPage;
+  PAGE_RENDERERS.income = renderIncomePage;
   PAGE_RENDERERS.dashboard = () => { renderDashboard(); renderMonthInsights(); };
   PAGE_RENDERERS.reports = renderReports;
   renderAll = function budgetRenderAll(...args) { const result=originalRenderAll(...args); injectUi(); renderBudgetWorkspace(); return result; };

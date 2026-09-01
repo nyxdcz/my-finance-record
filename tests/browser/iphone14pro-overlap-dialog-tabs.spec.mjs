@@ -105,7 +105,7 @@ test("iPhone account balance correction updates the card and persisted finance d
   expect(result.reconciliationDifference).toBe(result.expectedDifference);
 });
 
-test("iPhone transaction totals remain in flow and shared workspace tabs stay compact", async ({ page }) => {
+test("iPhone transaction totals remain in flow after the planner moves to Income & Planning", async ({ page }) => {
   await openAuthenticated(page, "money");
   await page.waitForFunction(() => Boolean(document.getElementById("monthlyBudgetPlannerCard") && document.getElementById("transactionTotals-expense")));
 
@@ -114,11 +114,11 @@ test("iPhone transaction totals remain in flow and shared workspace tabs stay co
     const planner = document.getElementById("monthlyBudgetPlannerCard");
     const tabs = document.querySelector("#money .money-workspace-switcher");
     const tab = tabs.querySelector(".workspace-switcher-button");
-    const footerRect = footer.getBoundingClientRect();
-    const plannerRect = planner.getBoundingClientRect();
     return {
       footerPosition:getComputedStyle(footer).position,
-      overlapsPlanner:!(footerRect.bottom <= plannerRect.top || footerRect.top >= plannerRect.bottom),
+      plannerParent:planner.parentElement?.id || "",
+      plannerBeforeIncomeSummary:planner.nextElementSibling?.classList.contains("income-kpi-grid") || false,
+      plannerInMoney:Boolean(document.querySelector("#money #monthlyBudgetPlannerCard")),
       tabShellHeight:tabs.getBoundingClientRect().height,
       tabHeight:tab.getBoundingClientRect().height,
       tabShellShadow:getComputedStyle(tabs).boxShadow,
@@ -127,7 +127,9 @@ test("iPhone transaction totals remain in flow and shared workspace tabs stay co
   });
 
   expect(contract.footerPosition).toBe("static");
-  expect(contract.overlapsPlanner).toBe(false);
+  expect(contract.plannerParent).toBe("income");
+  expect(contract.plannerBeforeIncomeSummary).toBe(true);
+  expect(contract.plannerInMoney).toBe(false);
   expect(contract.tabShellHeight).toBe(44);
   expect(contract.tabHeight).toBe(44);
   expect(contract.tabShellShadow).toBe("none");

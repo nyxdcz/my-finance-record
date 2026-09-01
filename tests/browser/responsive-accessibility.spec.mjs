@@ -40,8 +40,12 @@ for (const width of widths) {
 test("collapsed Monthly Budget Plan stays compact and readable at narrow phone widths", async ({ page }) => {
   for (const width of [320, 360, 390, 430]) {
     await openApp(page, width);
+    await page.locator('#money [data-workspace-page="income"]').click();
+    await expect(page.locator("#income")).toHaveClass(/active/);
     const card = page.locator("#monthlyBudgetPlannerCard");
-    await expect(card).toBeAttached();
+    await expect(card).toBeVisible();
+    await expect(page.locator("#income > #monthlyBudgetPlannerCard + .income-kpi-grid")).toHaveCount(1);
+    await expect(page.locator("#money #monthlyBudgetPlannerCard")).toHaveCount(0);
     await page.evaluate(() => {
       const planner = document.getElementById("monthlyBudgetPlannerCard");
       if (planner) planner.classList.add("is-planner-collapsed");

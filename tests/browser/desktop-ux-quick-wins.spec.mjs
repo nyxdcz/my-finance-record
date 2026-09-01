@@ -12,7 +12,7 @@ test("Talaan V2.5.0 source keeps the approved desktop UX quick wins", async () =
 
   expect(index).toContain("<title>Talaan</title>");
   expect(index).not.toContain("<title>Talaan · V2.5.0</title>");
-  expect(index).toContain("Manage available money, planned budgets, and unpaid expenses for this month.");
+  expect(index).toContain("Manage available money and unpaid expenses for this month.");
   expect(index).toContain('id="incomeActiveFilterChips"');
   expect(index).toContain("No income matches these filters");
   expect(index).toContain("No expenses match these filters");
