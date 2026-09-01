@@ -23,9 +23,15 @@ assert.match(updater, /const CURRENT_CACHE_VERSION = "finance-v2-20260828-househ
 assert.match(updater, /const UI_HOTFIX_REFRESH_KEY = "finance-ui-hotfix-v2-0-1-talaan7";/);
 assert.match(updater, /const DASHBOARD_PRESENTATION_REFRESH_KEY = "finance-dashboard-presentation-v2-5-0-talaan9";/);
 assert.match(updater, /const EXPENSE_DARK_MODE_REFRESH_KEY = "finance-expense-dark-mode-v2-5-0-talaan1";/);
+assert.match(updater, /const INCOME_PLANNING_REFRESH_KEY = "finance-income-planning-v2-5-0-talaan1";/);
 assert.match(updater, /async function refreshExpenseDarkModeOnce\(\)/);
 assert.match(updater, /void refreshExpenseDarkModeOnce\(\);/);
+assert.match(updater, /async function refreshIncomePlanningOnce\(\)/);
+assert.match(updater, /void refreshIncomePlanningOnce\(\);/);
 assert.match(updater, /"\/phone-finance-compat\.js"/, "expense dark-mode hotfix must purge the cached compact finance runtime");
+for (const file of ["budget-planning.js", "productivity-tools.js", "application-help.js", "desktop-ux.css"]) {
+  assert.ok(updater.includes(`"/${file}"`), `${file} must be included in the Income & Planning cache refresh`);
+}
 assert.match(updater, /"\/cash-flow-summary\.js"/, "dashboard analytics runtime must be included in the generic stale-cache purge list");
 assert.match(updater, /"\/income-expenses-compact\.css"/, "dashboard presentation stylesheet must be included in the dedicated stale-cache purge list");
 assert.match(updater, /"\/production-ui-audit\.css"/, "dashboard layout stylesheet must be included in the dedicated stale-cache purge list");
@@ -54,6 +60,9 @@ for (const file of ["pwa-update.js", "phone-finance-compat.js", "header-tools-co
 }
 assert.match(worker, /networkFirstCriticalAsset/);
 assert.match(worker, /url\.pathname\.endsWith\("pwa-update\.js"\)/);
+for (const file of ["budget-planning.js", "productivity-tools.js", "application-help.js", "desktop-ux.css"]) {
+  assert.ok(worker.includes(`url.pathname.endsWith("${file}")`), `${file} must use network-first delivery`);
+}
 assert.match(worker, /url\.pathname\.endsWith\("production-ui-audit\.css"\)/);
 assert.match(worker, /url\.pathname\.endsWith\("mobile\.css"\)/);
 assert.match(worker, /url\.pathname\.endsWith\("black-canvas\.css"\)/);
