@@ -23,6 +23,10 @@ assert.doesNotMatch(source, /Auto connect profile failed|Auto creation of cloud 
 for (const marker of ["Unlock profile", "Set up profile", "Profile issue", "Connecting…"]) assert.ok(source.includes(marker), `cloud readiness must expose ${marker}`);
 assert.match(source, /syncButton\.disabled=syncing \|\| !navigator\.onLine \|\| !readiness\.ready/);
 assert.match(source, /overviewSync\.disabled = syncing \|\| !navigator\.onLine \|\| !ready/);
+assert.match(source, /const ICON_ONLY_SYNC_QUERY = "\(max-width: 850px\)"/);
+assert.match(source, /if\(isIconOnlyTopSyncButton\(\)\)runTopSyncAction\(\);else toggleTopSyncPopover\(\)/);
+assert.match(source, /showMobileSyncFeedback\("Syncing…"\)/);
+assert.match(index, /id="cloudSyncMobileLive" role="status" aria-live="polite"/);
 assert.match(source, /activateSettingsPanel\(cloudReadiness\(\)\.ready \? "sync" : "profiles"/);
 assert.match(index, /id="cloudConnectionChip">Connected<\/span>/);
 assert.ok(index.includes(`./cloud-sync.js?v=${query}`));
