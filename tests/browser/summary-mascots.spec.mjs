@@ -176,8 +176,8 @@ test("desktop Budget & Expenses uses the approved supplied mascots and exact spa
   expect(state.lower.mascotHeight).toBeCloseTo(30, 0);
   expect(state.lower.mascotGap).toBeCloseTo(10, 0);
   expect(state.lower.mascotLift).toBeCloseTo(16, 0);
-  expect(state.lower.collapseWidth).toBeCloseTo(20, 0);
-  expect(state.lower.collapseHeight).toBeCloseTo(20, 0);
+  expect(state.lower.collapseWidth).toBeCloseTo(30, 0);
+  expect(state.lower.collapseHeight).toBeCloseTo(30, 0);
   expect(state.lower.collapseRightInset).toBeCloseTo(10, 0);
 });
 

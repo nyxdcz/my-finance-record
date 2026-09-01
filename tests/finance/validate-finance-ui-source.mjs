@@ -43,7 +43,7 @@ assert.match(formInputs, /function validateMoneyInput/);
 assert.match(formInputs, /function setupNumericInputs/);
 assert.match(formInputs, /Object\.assign\(root/);
 assert.match(compactCss, /\.period-header h3[\s\S]*font-size:\s*15px !important;[\s\S]*font-weight:\s*700 !important/);
-assert.match(compactCss, /\.period-card \.period-header \.collapse-toggle[\s\S]*width:\s*20px !important;[\s\S]*height:\s*20px !important/);
+assert.match(compactCss, /\.period-card \.period-header \.collapse-toggle[\s\S]*width:\s*30px !important;[\s\S]*height:\s*30px !important/);
 assert.match(compactCss, /\[data-mark-paid\][\s\S]*width:\s*74px !important;[\s\S]*height:\s*30px !important/);
 assert.match(compactCss, /\[data-edit-expense\][\s\S]*width:\s*48px !important;[\s\S]*height:\s*30px !important/);
 assert.match(compactJs, /statuses\.insertBefore\(warning/);

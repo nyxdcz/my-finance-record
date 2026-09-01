@@ -23,7 +23,7 @@ assert.doesNotMatch(desktop, /max-width\s*:\s*700px/);
 assert.match(desktop, /#availableMoneySection\s*\{[\s\S]*?border-color\s*:\s*var\(--line\)/);
 assert.doesNotMatch(desktop, /border-color\s*:\s*color-mix\(in srgb,var\(--green\) 22%,var\(--line\)\)/);
 
-assert.match(desktopUx, /--budget-disclosure-reference-size:var\(--ui-disclosure-size,40px\)/);
+assert.match(desktopUx, /--budget-disclosure-reference-size:var\(--ui-disclosure-size,30px\)/);
 assert.match(desktopUx, /--budget-disclosure-reference-inset:17px/);
 assert.match(desktopUx, /#money \.period-card \.period-header/);
 assert.match(desktopUx, /#dashCashFlowChart \.cash-flow-chart-grid/);

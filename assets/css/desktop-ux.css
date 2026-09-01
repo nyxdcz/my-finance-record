@@ -212,12 +212,12 @@
 /* V15.2.5 · Finance disclosure controls share one desktop target size. */
 @media (min-width:851px){
   #money{
-    --budget-disclosure-reference-size:var(--ui-disclosure-size,40px);
+    --budget-disclosure-reference-size:var(--ui-disclosure-size,30px);
     --budget-disclosure-reference-inset:17px;
     --budget-available-card-inset:12px;
   }
   #income{
-    --budget-disclosure-reference-size:var(--ui-disclosure-size,40px);
+    --budget-disclosure-reference-size:var(--ui-disclosure-size,30px);
     --budget-disclosure-reference-inset:17px;
   }
   #money .period-card .collapse-toggle,

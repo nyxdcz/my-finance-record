@@ -70,17 +70,17 @@
 
   html body #money .period-card .period-header .collapse-toggle {
     box-sizing: border-box !important;
-    flex: 0 0 20px !important;
-    width: 20px !important;
-    min-width: 20px !important;
-    max-width: 20px !important;
-    height: 20px !important;
-    min-height: 20px !important;
-    max-height: 20px !important;
+    flex: 0 0 30px !important;
+    width: 30px !important;
+    min-width: 30px !important;
+    max-width: 30px !important;
+    height: 30px !important;
+    min-height: 30px !important;
+    max-height: 30px !important;
     margin: 0 !important;
     padding: 0 !important;
     border: 1px solid #D5DCE5 !important;
-    border-radius: 5px !important;
+    border-radius: 7px !important;
     background: color-mix(in srgb, #F8FAFC 94%, transparent) !important;
     color: #64748B !important;
     display: inline-grid !important;
@@ -92,16 +92,16 @@
   }
 
   html body #money .period-card .period-header .collapse-icon {
-    width: 16px !important;
-    height: 16px !important;
+    width: 20px !important;
+    height: 20px !important;
     display: block !important;
     color: #64748B !important;
     transform-origin: center !important;
   }
 
   html body #money .period-card .period-header .collapse-icon svg {
-    width: 16px !important;
-    height: 16px !important;
+    width: 20px !important;
+    height: 20px !important;
     display: block !important;
   }
 

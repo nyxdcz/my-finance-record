@@ -753,9 +753,9 @@
     .collapsible-header { position: relative; }
     .collapse-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
     .collapse-toggle {
-      width: 32px;
-      height: 32px;
-      min-height: 32px;
+      width: 30px;
+      height: 30px;
+      min-height: 30px;
       padding: 0;
       border-radius: 9px;
       display: inline-grid;
@@ -767,7 +767,7 @@
     .collapse-toggle:hover { background: var(--surface-soft); }
     .collapse-icon { display: inline-block; transition: transform 0.2s ease; font-size: 0.9rem; }
     .collapsible-section.is-collapsed > :not(.collapsible-header) { display: none !important; }
-    .collapsible-section.is-collapsed .collapse-icon { transform: rotate(-90deg); }
+    .collapsible-section.is-collapsed .collapse-icon { transform: rotate(180deg); }
     .collapsible-section.is-collapsed .collapsible-header { margin-bottom: 0; border-bottom-color: transparent; }
     .period-card.is-collapsed .period-header { border-bottom: 0; }
 
@@ -4525,7 +4525,7 @@
     /* V13.0.2 · simplified toolbar and paired budget bento controls */
     .toolbar-icon,
     .month-nav-button svg,
-    .budget-panel-collapse svg { width:18px; height:18px; display:block; flex:0 0 auto; }
+    .budget-panel-collapse svg { width:20px; height:20px; display:block; flex:0 0 auto; }
     .toolbar-icon svg,
     .month-nav-button svg,
     .budget-panel-collapse svg { width:100%; height:100%; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
@@ -4584,7 +4584,7 @@
     .budget-panel-heading-copy { min-width:0; }
     .budget-panel-heading-actions { display:flex; align-items:center; justify-content:flex-end; gap:7px; flex:0 0 auto; }
     .budget-panel-collapse {
-      width:34px; min-width:34px; height:34px; min-height:34px; display:grid; place-items:center; padding:0;
+      width:30px; min-width:30px; height:30px; min-height:30px; display:grid; place-items:center; padding:0;
       border:1px solid var(--line); border-radius:7px; background:var(--surface-soft); color:var(--text);
     }
     .budget-panel-collapse:hover,
@@ -4704,7 +4704,7 @@
 
 
     /* V13.0.8 · calendar paid-state, project completion, and disclosure consistency */
-    :root { --ui-disclosure-size:40px; --ui-disclosure-icon-size:18px; }
+    :root { --ui-disclosure-size:30px; --ui-disclosure-icon-size:20px; }
     .collapse-toggle,
     .budget-panel-collapse {
       width:var(--ui-disclosure-size) !important;
@@ -4733,14 +4733,14 @@
       transition:transform .18s ease;
     }
     .collapse-icon svg { width:100%; height:100%; display:block; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
-    .collapsible-section.is-collapsed .collapse-icon { transform:rotate(-90deg); }
+    .collapsible-section.is-collapsed .collapse-icon { transform:rotate(180deg); }
     .budget-bento-panel.is-collapsed .budget-panel-collapse > svg { transform:rotate(180deg); }
     .budget-planner-card.is-planner-collapsed .budget-planner-toggle > svg { transform:rotate(180deg); }
     #projects .project-row-actions { display:flex; align-items:center; justify-content:center; flex-wrap:nowrap; gap:5px; }
     #projects .project-row-actions .project-compact-action { min-width:0; min-height:32px; height:32px; padding:4px 7px; font-size:.65rem; white-space:nowrap; }
     #projects .completed-project-record .status-completed { white-space:normal; text-align:center; line-height:1.15; }
     @media (max-width:850px) {
-      :root { --ui-disclosure-size:44px; }
+      :root { --ui-disclosure-size:35px; }
       .collapse-toggle,
       .budget-panel-collapse { border-radius:7px; }
       #projects .project-row-actions { flex-wrap:wrap; }
@@ -4969,12 +4969,12 @@
       #availableMoneySection .card-header > div:first-child { min-width:0; }
       #availableMoneySection .section-title-row h3 { font-size:.84rem !important; }
       #availableMoneySection .card-header > div:first-child > p { max-width:195px; margin-top:2px !important; font-size:.58rem !important; line-height:1.2 !important; }
-      #availableMoneySection .collapse-actions { display:grid !important; grid-template-columns:auto 44px !important; grid-template-areas:"total total" "add toggle" !important; justify-items:end !important; align-items:center !important; gap:5px 6px !important; }
+      #availableMoneySection .collapse-actions { display:grid !important; grid-template-columns:auto 35px !important; grid-template-areas:"total total" "add toggle" !important; justify-items:end !important; align-items:center !important; gap:5px 6px !important; }
       #availableMoneySection .available-money-total-wrap { grid-area:total; }
       #availableMoneySection #moneyAvailableTotal { font-size:.9rem !important; line-height:1 !important; }
       #availableMoneySection .available-money-account-count { font-size:.54rem; }
       #availableMoneySection #addAccountButton { grid-area:add; min-height:44px !important; height:44px !important; padding:7px 10px !important; font-size:.66rem !important; white-space:nowrap; }
-      #availableMoneySection [data-collapse-toggle="available-money"] { grid-area:toggle; width:44px !important; min-width:44px !important; height:44px !important; min-height:44px !important; padding:0 !important; }
+      #availableMoneySection [data-collapse-toggle="available-money"] { grid-area:toggle; width:35px !important; min-width:35px !important; height:35px !important; min-height:35px !important; padding:0 !important; }
       #availableMoneySection.is-collapsed .card-header { margin-bottom:0 !important; padding-bottom:0 !important; border-bottom-color:transparent !important; }
       #availableMoneySection.is-collapsed .card-header > div:first-child > p { display:none !important; }
       #availableMoneySection .account-grid { gap:7px !important; }

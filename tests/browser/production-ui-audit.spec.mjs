@@ -72,14 +72,54 @@ for (const width of [1024, 1280, 1366, 1440, 1920]) {
     metrics.summaryHeights.forEach(heightValue => expect(heightValue).toBeLessThanOrEqual(58));
     expect(metrics.periodDisclosureSizes).toHaveLength(3);
     metrics.periodDisclosureSizes.forEach(([widthValue, heightValue]) => {
-      expect(widthValue).toBeCloseTo(20, 0);
-      expect(heightValue).toBeCloseTo(20, 0);
+      expect(widthValue).toBeCloseTo(30, 0);
+      expect(heightValue).toBeCloseTo(30, 0);
     });
     expect(metrics.otherDisclosureSizes.length).toBeGreaterThanOrEqual(1);
     metrics.otherDisclosureSizes.forEach(([widthValue, heightValue]) => {
-      expect(widthValue).toBeCloseTo(40, 0);
-      expect(heightValue).toBeCloseTo(40, 0);
+      expect(widthValue).toBeCloseTo(30, 0);
+      expect(heightValue).toBeCloseTo(30, 0);
     });
+  });
+}
+
+for (const contract of [{ width:1440, size:30 }, { width:390, size:35 }]) {
+  test(`all eight section disclosures share the ${contract.size}px contract at ${contract.width}px`, async ({ page }) => {
+    await openFinance(page, { width:contract.width, height:1000 });
+    const groups = [
+      { pageId:"money", selector:"#availableMoneySection [data-collapse-toggle='available-money'], #money .period-card .collapse-toggle", count:4 },
+      { pageId:"income", selector:"#monthlyBudgetPlannerToggle, #income [data-budget-panel-toggle]", count:3 },
+      { pageId:"paid-expenses", selector:"#paidExpensesSection [data-collapse-toggle='paid-expenses']", count:1 }
+    ];
+    let total = 0;
+    for (const group of groups) {
+      await page.evaluate(pageId => window.goToPage(pageId, { historyMode:"none", smooth:false }), group.pageId);
+      await expect(page.locator(`#${group.pageId}`)).toHaveClass(/active/);
+      const metrics = await page.locator(group.selector).evaluateAll(buttons => buttons.map(button => {
+        const rect = button.getBoundingClientRect();
+        const icon = button.querySelector(".collapse-icon") || button.querySelector(":scope > svg");
+        const iconRect = icon?.getBoundingClientRect();
+        return {
+          width:rect.width,
+          height:rect.height,
+          radius:parseFloat(getComputedStyle(button).borderRadius),
+          iconWidth:iconRect?.width || 0,
+          iconHeight:iconRect?.height || 0,
+          path:button.querySelector("svg path")?.getAttribute("d") || ""
+        };
+      }));
+      expect(metrics).toHaveLength(group.count);
+      total += metrics.length;
+      for (const metric of metrics) {
+        expect(metric.width).toBeCloseTo(contract.size, 0);
+        expect(metric.height).toBeCloseTo(contract.size, 0);
+        expect(metric.radius).toBe(7);
+        expect(metric.iconWidth).toBeCloseTo(20, 0);
+        expect(metric.iconHeight).toBeCloseTo(20, 0);
+        expect(metric.path).toBe("m6 15 6-6 6 6");
+      }
+    }
+    expect(total).toBe(8);
   });
 }
 
@@ -180,11 +220,11 @@ test("desktop expense cards match the approved compact type, status, and footer 
   expect(metrics.sectionHelper.color).toBe("rgb(100, 116, 139)");
   expect(metrics.sectionTotal.size).toBeCloseTo(15, 0);
   expect(metrics.sectionTotal.weight).toBe(700);
-  expect(metrics.collapseSize[0]).toBeCloseTo(20, 0);
-  expect(metrics.collapseSize[1]).toBeCloseTo(20, 0);
+  expect(metrics.collapseSize[0]).toBeCloseTo(30, 0);
+  expect(metrics.collapseSize[1]).toBeCloseTo(30, 0);
   expect(metrics.collapseRightInset).toBeCloseTo(10, 0);
-  expect(metrics.collapseIconSize[0]).toBeCloseTo(16, 0);
-  expect(metrics.collapseIconSize[1]).toBeCloseTo(16, 0);
+  expect(metrics.collapseIconSize[0]).toBeCloseTo(20, 0);
+  expect(metrics.collapseIconSize[1]).toBeCloseTo(20, 0);
 
   expect(metrics.expenseTitle.size).toBeCloseTo(13, 0);
   expect(metrics.expenseTitle.weight).toBe(700);
@@ -273,7 +313,7 @@ test("First half, Second half, and Other expenses collapse independently and res
 });
 
 for (const width of [390, 430]) {
-  test(`phone Budget periods stay compact and touch safe at ${width}px`, async ({ page }) => {
+  test(`phone Budget periods use the approved compact disclosure size at ${width}px`, async ({ page }) => {
     await openFinance(page, { width, height:900 });
     await page.evaluate(() => {
       document.querySelectorAll("#money .period-card").forEach(card => card.classList.add("is-collapsed"));
@@ -305,8 +345,8 @@ for (const width of [390, 430]) {
     metrics.periodHeights.forEach(height => expect(height).toBeLessThanOrEqual(72));
     metrics.periodMargins.forEach(margin => expect(margin).toBe(0));
     metrics.toggleSizes.forEach(([widthValue, heightValue]) => {
-      expect(widthValue).toBeGreaterThanOrEqual(44);
-      expect(heightValue).toBeGreaterThanOrEqual(44);
+      expect(widthValue).toBeCloseTo(35, 0);
+      expect(heightValue).toBeCloseTo(35, 0);
     });
   });
 }
