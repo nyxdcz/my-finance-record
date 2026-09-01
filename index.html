@@ -266,7 +266,6 @@
             <article class="card dashboard-detail-card dashboard-calendar-card" data-dashboard-card="calendar" data-dashboard-view="calendar">
               <div class="card-header">
                 <div><h3>Monthly calendar</h3><p>Income, expenses, projects, and payments</p></div>
-                <div class="calendar-card-controls"><button class="button button-secondary button-small" id="dashboardCalendarPrevious" type="button" aria-label="Previous calendar month">‹</button><strong id="dashboardCalendarLabel">Month</strong><button class="button button-secondary button-small" id="dashboardCalendarNext" type="button" aria-label="Next calendar month">›</button></div>
               </div>
               <div class="dashboard-calendar-layout">
                 <div class="dashboard-calendar-grid" id="dashboardCalendarGrid" aria-label="Monthly financial calendar"></div>
@@ -2102,7 +2101,6 @@
     let expenseSavePending = false;
     let highlightExpenseId = "";
     let selectedExpenseIds = new Set();
-    let dashboardCalendarMonth = selectedMonth();
     let dashboardCalendarSelectedDate = dateForMonth(selectedMonth(), Math.min(new Date().getDate(), 28));
     let lastVisibleExpenseIds = [];
 
@@ -3252,12 +3250,16 @@
       const section = document.querySelector(`.collapsible-section[data-collapse-key="${key}"]`);
       if (!section) return;
       collapsedSections[key] = !Boolean(collapsedSections[key]);
+      persistCollapsedSections();
+      applyCollapseState(section);
+    }
+
+    function persistCollapsedSections() {
       try {
         localStorage.setItem(COLLAPSE_STATE_KEY, JSON.stringify(collapsedSections));
       } catch (error) {
         // The current session still works if browser storage is unavailable.
       }
-      applyCollapseState(section);
     }
 
     function emptyHtml(title, text, action = null) { return window.FinanceInteractionPatterns?.emptyStateHtml?.(title, text, action) || `<div class="empty-state"><strong>${escapeHtml(title)}</strong>${escapeHtml(text)}</div>`; }
@@ -4360,10 +4362,12 @@
       window.renderDashboardCalendar = renderDashboardCalendar;
       const grid = document.getElementById("dashboardCalendarGrid");
       if (!grid) return;
-      if (!/^\d{4}-\d{2}$/.test(dashboardCalendarMonth)) dashboardCalendarMonth = selectedMonth();
+      const dashboardCalendarMonth = selectedMonth();
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(dashboardCalendarSelectedDate) || !dashboardCalendarSelectedDate.startsWith(`${dashboardCalendarMonth}-`)) {
+        dashboardCalendarSelectedDate = `${dashboardCalendarMonth}-01`;
+      }
       const [year, monthNumber] = dashboardCalendarMonth.split("-").map(Number);
       const first = new Date(year, monthNumber-1, 1), start = new Date(year, monthNumber-1, 1-first.getDay());
-      document.getElementById("dashboardCalendarLabel").textContent = first.toLocaleDateString("en-PH", { month:"long", year:"numeric" });
       const weekdays = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map(day => `<div class="calendar-weekday">${day}</div>`).join("");
       const today = new Date().toISOString().slice(0,10);
       const cells = Array.from({length:42}, (_, index) => {
@@ -5556,20 +5560,25 @@
       window.dispatchEvent(new CustomEvent("finance:page-changed", { detail:{ pageId, previousPageId:previous } }));
     }
 
-    function createCompactReportGroup(label, description, nodes, open = false, beforeNode = null) {
+    function createCompactReportGroup(key, label, description, nodes, open = false, beforeNode = null) {
       const validNodes = nodes.filter(Boolean);
       const anchor = validNodes.find(node => node.isConnected) || beforeNode;
       if (!validNodes.length || !anchor) return null;
       const details = document.createElement("details");
       details.className = "report-compact-group";
-      details.open = open;
+      details.dataset.reportCollapseKey = key;
+      details.open = key in collapsedSections ? !Boolean(collapsedSections[key]) : open;
       const summary = document.createElement("summary");
-      summary.innerHTML = `<span class="report-compact-summary-copy"><strong>${label}</strong><small>${description}</small></span><span class="report-compact-chevron" aria-hidden="true">⌄</span>`;
+      summary.innerHTML = `<span class="report-compact-summary-copy"><strong>${label}</strong><small>${description}</small></span><span class="report-compact-chevron" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="m6 15 6-6 6 6"/></svg></span>`;
       const body = document.createElement("div");
       body.className = "report-compact-body";
       anchor.before(details);
       details.append(summary, body);
       validNodes.forEach(node => body.appendChild(node));
+      details.addEventListener("toggle", () => {
+        collapsedSections[key] = !details.open;
+        persistCollapsedSections();
+      });
       return details;
     }
 
@@ -5593,9 +5602,9 @@
       const goalsCard = reports.querySelector(":scope > .report-savings-goals-card");
       const exportCard = reports.querySelector(":scope > .report-export-card");
 
-      createCompactReportGroup("Summary", "Key totals and month-to-month comparison", between(summaryHeading, incomeHeading), true);
-      createCompactReportGroup("Income", "Income categories, balance, and records", between(incomeHeading, expenseHeading));
-      createCompactReportGroup("Expenses", "Schedule and category distribution", between(expenseHeading, recordHeading));
+      createCompactReportGroup("report-summary", "Summary", "Key totals and month-to-month comparison", between(summaryHeading, incomeHeading), true);
+      createCompactReportGroup("report-income", "Income", "Income categories, balance, and records", between(incomeHeading, expenseHeading));
+      createCompactReportGroup("report-expenses", "Expenses", "Schedule and category distribution", between(expenseHeading, recordHeading));
 
       if (recordHeading && detailStack) {
         const stackChildren = [...detailStack.children];
@@ -5607,13 +5616,13 @@
         projectStack.className = "report-detail-stack";
         (projectIndex >= 0 ? stackChildren.slice(0, projectIndex) : stackChildren).forEach(node => expenseRecordStack.appendChild(node));
         if (projectIndex >= 0) stackChildren.slice(projectIndex).forEach(node => projectStack.appendChild(node));
-        createCompactReportGroup("Expense records", "Budget and paid-expense records", [recordHeading, expenseRecordStack]);
-        if (projectStack.children.length) createCompactReportGroup("Projects & payments", "Project values, balances, and payment records", [projectStack], false, accountHeading);
+        createCompactReportGroup("report-expense-records", "Expense records", "Budget and paid-expense records", [recordHeading, expenseRecordStack]);
+        if (projectStack.children.length) createCompactReportGroup("report-projects-payments", "Projects & payments", "Project values, balances, and payment records", [projectStack], false, accountHeading);
         detailStack.remove();
       }
 
-      createCompactReportGroup("Accounts & savings", "Account snapshot and Savings progress", [accountHeading, savingsCard, goalsCard]);
-      createCompactReportGroup("Exports", "Print, CSV, and JSON report files", [exportCard]);
+      createCompactReportGroup("report-accounts-savings", "Accounts & savings", "Account snapshot and Savings progress", [accountHeading, savingsCard, goalsCard]);
+      createCompactReportGroup("report-exports", "Exports", "Print, CSV, and JSON report files", [exportCard]);
       reports.dataset.compactGroups = "true";
     }
 
@@ -7815,10 +7824,8 @@
       });
       exportCsv(`annual-income-${year}.csv`,rows);
     });
-    document.getElementById("dashboardCalendarPrevious").addEventListener("click",()=>{dashboardCalendarMonth=shiftMonth(dashboardCalendarMonth,-1);dashboardCalendarSelectedDate=`${dashboardCalendarMonth}-01`;renderDashboardCalendar();});
-    document.getElementById("dashboardCalendarNext").addEventListener("click",()=>{dashboardCalendarMonth=shiftMonth(dashboardCalendarMonth,1);dashboardCalendarSelectedDate=`${dashboardCalendarMonth}-01`;renderDashboardCalendar();});
-    document.getElementById("dashboardCalendarToday").addEventListener("click",()=>{dashboardCalendarMonth=monthKey(new Date());dashboardCalendarSelectedDate=new Date().toISOString().slice(0,10);renderDashboardCalendar();});
-    document.getElementById("dashboardCalendarGrid").addEventListener("click",event=>{const button=event.target.closest("[data-calendar-date]");if(button){dashboardCalendarSelectedDate=button.dataset.calendarDate;dashboardCalendarMonth=dashboardCalendarSelectedDate.slice(0,7);renderDashboardCalendar();}});
+    document.getElementById("dashboardCalendarToday").addEventListener("click",()=>{dashboardCalendarSelectedDate=new Date().toISOString().slice(0,10);applySelectedMonth(dashboardCalendarSelectedDate.slice(0,7),true);});
+    document.getElementById("dashboardCalendarGrid").addEventListener("click",event=>{const button=event.target.closest("[data-calendar-date]");if(button){dashboardCalendarSelectedDate=button.dataset.calendarDate;const calendarMonth=dashboardCalendarSelectedDate.slice(0,7);if(calendarMonth!==selectedMonth())applySelectedMonth(calendarMonth,true);else renderDashboardCalendar();}});
     document.getElementById("dashboardCalendarEvents").addEventListener("click",event=>{const button=event.target.closest("[data-calendar-go]");if(button)goToPage(button.dataset.calendarGo,{focusHeading:true});});
     window.addEventListener("finance:project-agenda-changed", () => renderDashboardCalendar());
 
