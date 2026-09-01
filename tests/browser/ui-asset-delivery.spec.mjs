@@ -80,7 +80,7 @@ for (const width of [1200,1280,1440]) {
       return { toggle:{ left:toggle.left, right:toggle.right, width:toggle.width }, forecast:{ left:forecast.left, right:forecast.right }, card:{ left:card.left, right:card.right }, visible:visible.length };
     });
     expect(metrics.visible).toBe(3);
-    expect(metrics.toggle.width).toBe(40);
+    expect(metrics.toggle.width).toBe(30);
     expect(metrics.forecast.right).toBeLessThanOrEqual(metrics.toggle.left - 4);
     expect(metrics.toggle.right).toBeLessThanOrEqual(metrics.card.right);
   });
