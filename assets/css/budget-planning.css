@@ -48,7 +48,7 @@
 .budget-alert.warning { background:var(--orange-soft); border-color:rgba(230,138,31,.3); }
 .budget-alert.danger { background:var(--red-soft); border-color:rgba(214,69,53,.28); }
 .budget-alert.success { background:var(--green-soft); border-color:rgba(47,143,70,.26); }
-.savings-outlook { margin-top:12px; padding-top:12px; border-top:1px solid var(--line); }
+.savings-outlook { margin:12px -12px 0; padding:12px 12px 0; border-top:1px solid var(--line); }
 .savings-outlook-heading { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
 .savings-outlook-heading h5 { margin:0; font-size:.8rem; }
 .savings-outlook-heading p { margin:2px 0 0; color:var(--muted); font-size:.64rem; line-height:1.35; }

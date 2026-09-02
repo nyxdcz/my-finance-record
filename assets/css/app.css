@@ -5352,6 +5352,16 @@ html[data-theme="dark"] :is(.money-workspace-switcher, .project-workspace-switch
   padding-inline:var(--row-divider-bleed, var(--workspace-card-padding, 13px));
 }
 
+#availableMoneySection {
+  --row-divider-bleed:12px;
+}
+
+#availableMoneySection:not(.is-collapsed) > .card-header {
+  box-sizing:border-box;
+  margin-inline:calc(-1 * var(--row-divider-bleed));
+  padding-inline:var(--row-divider-bleed);
+}
+
 .sidebar-settings-bottom {
   box-sizing:border-box;
   margin-inline:-8px;
@@ -5366,6 +5376,10 @@ html[data-theme="dark"] :is(.money-workspace-switcher, .project-workspace-switch
 }
 
 @media (max-width:700px) {
+  #availableMoneySection {
+    --row-divider-bleed:10px;
+  }
+
   #settings .settings-panel .system-card {
     --row-divider-bleed:10px;
   }

@@ -119,7 +119,7 @@
 .finance-kanban-card-value small { color:var(--muted); font-size:.58rem; }
 .finance-kanban-card-statuses { display:flex; align-items:center; gap:5px; flex-wrap:wrap; }
 .finance-kanban-card-statuses .project-deadline-state,.finance-kanban-card-statuses .project-revision-inline { margin:0; }
-#projects .project-kanban-board .project-row-actions { min-height:34px; padding-top:7px; display:flex; align-items:center; justify-content:flex-start; gap:5px; border-top:1px solid var(--line); }
+#projects .project-kanban-board .finance-kanban-card.project-record > .project-row-actions { box-sizing:border-box; width:calc(100% + 20px); max-width:none; min-height:34px; margin-inline:-10px; padding:7px 10px 0; display:flex; align-self:stretch; align-items:center; justify-content:flex-start; gap:5px; border-top:1px solid var(--line); }
 .project-kanban-calendar { margin-right:auto; }
 #projects .project-kanban-board .project-calendar-button { min-height:30px; height:30px; margin:0; }
 #projects .project-kanban-board .project-row-actions .button { min-height:30px; height:30px; padding:4px 8px; }
@@ -130,7 +130,7 @@
 .agenda-kanban-board .pc-event-card { display:block; padding:8px; }
 .agenda-kanban-board .pc-event-drag-handle { position:absolute; top:7px; right:8px; z-index:1; }
 .agenda-kanban-board .pc-event-main { display:block; padding-right:18px; }
-.agenda-kanban-board .pc-event-actions { margin-top:7px; padding-top:6px; border-top:1px solid var(--line); }
+.agenda-kanban-board .pc-event-actions { margin:7px -8px 0; padding:6px 8px 0; border-top:1px solid var(--line); }
 .agenda-kanban-board-full .finance-kanban-column { flex-basis:310px; }
 .pc-full-dialog { width:min(1180px,calc(100vw - 28px)) !important; }
 
