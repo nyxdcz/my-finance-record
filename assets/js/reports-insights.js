@@ -1,6 +1,6 @@
 "use strict";
 
-/* My Finance Records V12.23.0 · reports and financial insights.
+/* Talaan V12.23.0 · reports and financial insights.
    All insights are derived locally from existing finance records, ledger history,
    saved monthly reports, budget plans, and project payments. */
 (function reportsInsightsBootstrap() {
@@ -501,7 +501,7 @@
 
   function exportInsights(metrics=rangeMetrics(filterState,selectedMonth())) {
     const rows=[
-      ["My Finance Records","Reports & Financial Insights"],
+      ["Talaan","Reports & Financial Insights"],
       ["Generated",metrics.generatedAt],["Start date",metrics.range.startDate],["End date",metrics.range.endDate],["Account filter",metrics.range.account||"All accounts"],["Expense category filter",metrics.range.category||"All categories"],[],
       ["SUMMARY"],["Total income",metrics.totalIncome],["Actual spending",metrics.totalExpenses],["Net cash flow",metrics.netCashFlow],["Planned expenses",metrics.totalPlannedExpenses],["Budget plan",metrics.totalBudget],["Savings start",metrics.savingsStart],["Savings end",metrics.savingsEnd],["Savings change",metrics.savingsChange],["Project income",metrics.projectIncome],["Paid Project Costs",metrics.projectCosts],["Project margin",metrics.projectMargin],["Gym visits",metrics.gymVisits],["Gym cost",metrics.gymCost],["Gym cost per visit",metrics.gymCostPerVisit],[],
       ["MONTHLY TREND"],["Month","Income","Actual spending","Net cash flow","Budget plan","Planned expenses","Account balance","Savings","Electric","Water","Gym visits","Gym cost","Project income","Project costs","Project margin"],

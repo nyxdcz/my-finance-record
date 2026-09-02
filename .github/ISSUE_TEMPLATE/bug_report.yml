@@ -7,7 +7,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for helping improve My Finance Records. Search existing issues first and redact balances, names, emails, keys, and record details from screenshots or logs.
+        Thanks for helping improve Talaan. Search existing issues first and redact balances, names, emails, keys, and record details from screenshots or logs.
 
   - type: textarea
     id: summary
@@ -35,7 +35,7 @@ body:
     attributes:
       label: App version
       description: The version shown in the application header or About screen.
-      placeholder: V15.2.14
+      placeholder: V2.5.0
     validations:
       required: true
 
