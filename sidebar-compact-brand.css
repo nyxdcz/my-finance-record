@@ -467,9 +467,20 @@ html[data-theme="light"] body #sidebar.sidebar,
 html[data-theme="dark"] body #sidebar.sidebar {
   background-image:none !important;
   border-right:0 !important;
-  box-shadow:inset -1px 0 0 var(--line) !important;
+  box-shadow:none !important;
   -webkit-backdrop-filter:none !important;
   backdrop-filter:none !important;
+}
+
+html[data-theme="light"] body #sidebar.sidebar::after,
+html[data-theme="dark"] body #sidebar.sidebar::after {
+  content:"";
+  position:absolute;
+  inset-block:0;
+  inset-inline-end:0;
+  width:1px;
+  background:var(--line);
+  pointer-events:none;
 }
 
 html[data-theme="light"] body #sidebar.sidebar {
