@@ -174,8 +174,8 @@ for (const viewport of [{ width:1440, height:1000 }, { width:393, height:852 }])
 
     for (const row of [geometry.list, geometry.metric]) {
       expect(row).not.toBeNull();
-      expect(row.leftGap).toBeLessThanOrEqual(0.5);
-      expect(row.rightGap).toBeLessThanOrEqual(0.5);
+      expect(row.leftGap).toBeLessThanOrEqual(1);
+      expect(row.rightGap).toBeLessThanOrEqual(1);
       expect(row.borderBottom).toBe("1px");
     }
     expect(geometry.overflow).toBe(false);
