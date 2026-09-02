@@ -50,6 +50,9 @@ test("Paid Expenses sorting reorders both list and calendar views",async({page})
 
 test("Hide values masks visual and accessible money without changing balances",async({page})=>{
   await page.setViewportSize({width:1440,height:900}); await unlock(page,"dashboard");
+  await page.locator("#dashboardViewTabOverview").click();
+  await expect(page.locator("#dashAvailable")).toBeVisible();
+  await expect(page.locator("#dashAvailable")).toHaveText(/₱\s*[-+]?\d/);
   const balances=await page.evaluate(()=>JSON.stringify(data.accounts));
   await page.locator("#topbarToolsTrigger").click(); await page.locator("#privacyDisplayToggle").click();
   await expect(page.locator("html")).toHaveClass(/finance-values-hidden/);

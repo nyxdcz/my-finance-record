@@ -98,7 +98,7 @@ Passkeys are experimental. They require supported Supabase project configuration
 For **Forgot password?** to return to the hosted PWA, add the deployed HTTPS app URL to your Supabase project:
 
 1. Open **Supabase Dashboard → Authentication → URL Configuration**.
-2. Under **Redirect URLs**, add the exact hosted My Finance Records URL you use in Brave/Chrome/Safari.
+2. Under **Redirect URLs**, add the exact hosted Talaan URL you use in Brave/Chrome/Safari.
 3. Keep the app hosted over HTTPS. A local `file://` copy cannot receive the secure password-recovery redirect.
 
 The app intentionally does not reveal whether an email address is registered when a reset is requested.
@@ -107,8 +107,8 @@ The app intentionally does not reveal whether an email address is registered whe
 
 In **Supabase → Authentication → URL Configuration**:
 
-1. Set the production Site URL to `https://nyxdcz.github.io/my-finance-record/`.
-2. Add `https://nyxdcz.github.io/my-finance-record/index.html?auth=recovery` to **Redirect URLs**. You may also keep the root GitHub Pages URL as an allowed redirect.
+1. Set the production Site URL to `https://nyxdcz.github.io/talaan/`.
+2. Add `https://nyxdcz.github.io/talaan/index.html?auth=recovery` to **Redirect URLs**. You may also keep the root GitHub Pages URL as an allowed redirect.
 3. The app sends reset requests with `redirectTo` set to the `?auth=recovery` route. Failed links are returned with Supabase error details in the URL fragment and V13.0.16 shows them inside Sync & Backup.
 
 For the optional recovery-code fallback, edit **Authentication → Email Templates → Reset Password / Recovery** and include the one-time code variable `{{ .Token }}` somewhere the user can read it. The app verifies that code with recovery OTP verification before showing the new-password form. Keep the normal reset link in the template as well.

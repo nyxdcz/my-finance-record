@@ -1,6 +1,6 @@
 "use strict";
 
-/* My Finance Records V14.0.12 · Project Agenda
+/* Talaan V14.0.12 · Project Agenda
    Adds meeting, presentation, site-visit, deadline, and other project events.
    Agenda entries are stored separately from finance records so schedule changes never
    alter account balances, expenses, payments, or project financial values. */
@@ -464,7 +464,7 @@
       "END:VALARM"
     ];
     const lines = [
-      "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//My Finance Records//Projects Calendar//EN",
+      "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Talaan//Projects Calendar//EN",
       "CALSCALE:GREGORIAN", "METHOD:PUBLISH", "BEGIN:VEVENT",
       `UID:${icsEscape(event.id)}@my-finance-records.local`,
       `DTSTAMP:${new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d{3}Z$/, "Z")}`,

@@ -1,6 +1,6 @@
 # Repository Architecture
 
-This document defines the target organization for My Finance Records and the rules for reaching it without breaking installed PWA clients or finance/sync compatibility.
+This document defines the target organization for Talaan and the rules for reaching it without breaking installed PWA clients or finance/sync compatibility.
 
 ## Goals
 

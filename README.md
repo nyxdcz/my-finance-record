@@ -4,7 +4,7 @@
 
 **A local-first personal and household finance PWA built for privacy, resilience, and everyday use.**
 
-[![Quality checks](https://github.com/nyxdcz/my-finance-record/actions/workflows/quality-pages.yml/badge.svg?branch=main)](https://github.com/nyxdcz/my-finance-record/actions/workflows/quality-pages.yml)
+[![Quality checks](https://github.com/nyxdcz/talaan/actions/workflows/quality-pages.yml/badge.svg?branch=main)](https://github.com/nyxdcz/talaan/actions/workflows/quality-pages.yml)
 ![Version](https://img.shields.io/badge/version-V2.5.0-2563eb)
 ![PWA](https://img.shields.io/badge/PWA-offline--ready-16a34a)
 ![Node](https://img.shields.io/badge/Node.js-22%2B-339933?logo=nodedotjs&logoColor=white)
@@ -45,8 +45,8 @@ Current release notes are maintained in [`CHANGELOG.md`](CHANGELOG.md).
 Requirements: Node.js **22 or newer** and npm.
 
 ```bash
-git clone https://github.com/nyxdcz/my-finance-record.git
-cd my-finance-record
+git clone https://github.com/nyxdcz/talaan.git
+cd talaan
 npm ci --ignore-scripts --no-audit --no-fund
 npm run dev
 ```

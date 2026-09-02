@@ -49,7 +49,7 @@ const requiredFiles = [
   ...uiJsFiles.map(file => `assets/js/ui/${file}`),
   "assets/css/expense-compact.css", "assets/js/ui/expense-compact.js",
   "package.json", "package-lock.json", "README.md", "CHANGELOG.md", "PRIVACY.md", "SECURITY.md",
-  ".github/workflows/quality-pages.yml", "scripts/prepare-runtime.mjs", "scripts/run_audit.sh",
+  ".github/workflows/quality-pages.yml", ".github/workflows/release.yml", "scripts/prepare-runtime.mjs", "scripts/run_audit.sh",
   "vendor/supabase.min.js", "sync-config.js", "sync-config.example.js", "tests/run.mjs", "tests/helpers/check-maintainability.mjs"
 ];
 for (const file of requiredFiles) if (!exists(file)) fail(`Missing required file: ${file}`);
@@ -105,6 +105,24 @@ for (const file of ["README.md", "CHANGELOG.md", "CONTRIBUTING.md", "SECURITY.md
 }
 if (!read("README.md").startsWith(`# ${BRAND} · ${DISPLAY_VERSION}`)) fail(`README heading is not ${BRAND} ${DISPLAY_VERSION}`);
 if (!read("CHANGELOG.md").startsWith(`# Changelog\n\n## ${DISPLAY_VERSION} · ${BRAND}`)) fail(`CHANGELOG heading is not ${DISPLAY_VERSION} ${BRAND}`);
+
+const repositorySurfaceFiles = [
+  "README.md", ".github/ISSUE_TEMPLATE/bug_report.yml", ".github/ISSUE_TEMPLATE/config.yml",
+  ".github/workflows/release.yml", "docs/architecture/README.md", "docs/setup/CLOUD_SYNC_SETUP.md",
+  "docs/assets/repository-social-preview.svg"
+];
+for (const file of repositorySurfaceFiles) {
+  const text = read(file);
+  if (text.includes("nyxdcz/my-finance-record") || text.includes(PREVIOUS_BRAND)) fail(`${file} contains outdated public repository branding`);
+}
+const releaseWorkflow = read(".github/workflows/release.yml");
+if (!releaseWorkflow.includes("npm run quality:ci")) fail("Tagged releases must run the complete quality and browser suite");
+if (!releaseWorkflow.includes('title "Talaan $GITHUB_REF_NAME"')) fail("Tagged releases must use the Talaan product name");
+const socialPreview = read("docs/assets/repository-social-preview.svg");
+if (!socialPreview.includes(">TALAAN</text>") || !socialPreview.includes(`>${DISPLAY_VERSION}</text>`)) fail("Repository social preview must show the current Talaan release");
+const gitignore = read(".gitignore");
+for (const obsolete of ["expense-screenshot-ai.js", "expense-screenshot-detect.js", "expense-screenshot-parser.js"]) if (gitignore.includes(obsolete)) fail(`.gitignore still lists removed runtime output: ${obsolete}`);
+for (const generated of ["household-splits.css", "household-splits.js", "import-center.css", "import-center.js", "import-formats.js", "net-worth.css", "net-worth.js", "payees-rules.css", "payees-rules.js"]) if (!gitignore.includes(`/${generated}`)) fail(`.gitignore is missing generated runtime output: ${generated}`);
 
 const syncConfig = read("sync-config.js").replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|\s)\/\/.*$/gm, "$1");
 if (/sb_secret_|service_role/i.test(syncConfig)) fail("sync-config.js contains a privileged secret pattern");
