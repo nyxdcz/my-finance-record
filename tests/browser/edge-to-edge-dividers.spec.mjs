@@ -55,8 +55,7 @@ function dividerGeometry(page) {
       expense:measure("#expenseActions", "#earlyExpenses > [data-expense-row]"),
       expenseVisible:getComputedStyle(document.querySelector("#expenseActions")).display !== "none",
       sidebar:{
-        borderWidth:parseFloat(sidebarStyle.borderInlineEndWidth || sidebarStyle.borderRightWidth || 0),
-        borderStyle:sidebarStyle.borderInlineEndStyle || sidebarStyle.borderRightStyle,
+        edgeLine:sidebarStyle.boxShadow,
         topGap:Math.abs(sidebarRect.top),
         bottomGap:Math.abs(window.innerHeight - sidebarRect.bottom)
       },
@@ -82,12 +81,10 @@ for (const viewport of [{ width:1440, height:1000 }, { width:393, height:852 }])
       || row.dividerWidth !== 1);
 
     expect(failures, `Divider geometry:\n${JSON.stringify(geometry, null, 2)}`).toEqual([]);
-    expect(geometry.sidebar, `Sidebar divider geometry:\n${JSON.stringify(geometry, null, 2)}`).toEqual({
-      borderWidth:1,
-      borderStyle:"solid",
-      topGap:0,
-      bottomGap:0
-    });
+    expect(geometry.sidebar.edgeLine).toContain("inset");
+    expect(geometry.sidebar.edgeLine).toContain("-1px");
+    expect(geometry.sidebar.topGap).toBe(0);
+    expect(geometry.sidebar.bottomGap).toBe(0);
     expect(geometry.overflow).toBe(false);
   });
 }
