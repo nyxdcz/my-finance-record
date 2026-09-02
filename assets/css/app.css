@@ -5342,3 +5342,31 @@ html[data-theme="dark"] :is(.money-workspace-switcher, .project-workspace-switch
   border-color:#356FD1 !important;
   color:#FFFFFF !important;
 }
+
+/* Talaan · edge-to-edge row dividers */
+.card > .simple-list > li,
+.card > .dashboard-stat-line,
+.system-card > .system-status-row {
+  box-sizing:border-box;
+  margin-inline:calc(-1 * var(--row-divider-bleed, var(--workspace-card-padding, 13px)));
+  padding-inline:var(--row-divider-bleed, var(--workspace-card-padding, 13px));
+}
+
+.sidebar-settings-bottom {
+  box-sizing:border-box;
+  margin-inline:-8px;
+  padding-inline:8px;
+}
+
+@media (max-width:850px) {
+  .sidebar-settings-bottom {
+    margin-inline:-16px;
+    padding-inline:16px;
+  }
+}
+
+@media (max-width:700px) {
+  #settings .settings-panel .system-card {
+    --row-divider-bleed:10px;
+  }
+}

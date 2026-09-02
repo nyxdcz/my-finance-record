@@ -147,6 +147,42 @@ test("Dashboard tabs support roving keyboard focus and customization preview", a
 });
 
 for (const viewport of [{ width:1440, height:1000 }, { width:393, height:852 }]) {
+  test(`Dashboard row dividers reach both card edges at ${viewport.width}px`, async ({ page }) => {
+    await openDashboard(page, viewport);
+    await page.locator('[data-dashboard-view-tab="overview"]').click();
+
+    const geometry = await page.evaluate(() => {
+      const measure = selector => {
+        const row = document.querySelector(selector);
+        const card = row?.closest(".card");
+        if (!row || !card) return null;
+        const rowRect = row.getBoundingClientRect();
+        const cardRect = card.getBoundingClientRect();
+        const cardStyle = getComputedStyle(card);
+        return {
+          leftGap:Math.abs(rowRect.left - cardRect.left - parseFloat(cardStyle.borderLeftWidth)),
+          rightGap:Math.abs(cardRect.right - parseFloat(cardStyle.borderRightWidth) - rowRect.right),
+          borderBottom:getComputedStyle(row).borderBottomWidth
+        };
+      };
+      return {
+        list:measure("#dashDueSoon > li:first-child"),
+        metric:measure('[data-dashboard-card="payment-progress"] > .dashboard-stat-line'),
+        overflow:document.documentElement.scrollWidth > document.documentElement.clientWidth + 1
+      };
+    });
+
+    for (const row of [geometry.list, geometry.metric]) {
+      expect(row).not.toBeNull();
+      expect(row.leftGap).toBeLessThanOrEqual(1);
+      expect(row.rightGap).toBeLessThanOrEqual(1);
+      expect(row.borderBottom).toBe("1px");
+    }
+    expect(geometry.overflow).toBe(false);
+  });
+}
+
+for (const viewport of [{ width:1440, height:1000 }, { width:393, height:852 }]) {
   test(`Dashboard and Finance share the exact segmented-control styles at ${viewport.width}px`, async ({ page }) => {
     await openFinance(page, viewport);
     const finance = await captureSwitcherStyles(page, "#money .money-workspace-switcher");

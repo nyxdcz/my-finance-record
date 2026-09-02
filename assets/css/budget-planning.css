@@ -33,7 +33,7 @@
 .budget-template-bar .field { flex:1 1 190px; margin:0; }
 .cash-forecast-body { padding:11px 12px; }
 .forecast-breakdown { display:grid; gap:0; }
-.forecast-line { display:flex; justify-content:space-between; gap:12px; padding:7px 0; border-bottom:1px dashed var(--line); font-size:.72rem; }
+.forecast-line { display:flex; justify-content:space-between; gap:12px; margin-inline:-12px; padding:7px 12px; border-bottom:1px dashed var(--line); font-size:.72rem; }
 .forecast-line:last-child { border-bottom:0; }
 .forecast-line span { color:var(--muted); }
 .forecast-line strong { text-align:right; }
