@@ -18,6 +18,7 @@ const RELEASE = Object.freeze({
 });
 const APP_STYLE_ASSET_QUERY = "2.5.0-talaan2";
 const SIDEBAR_BRAND_ASSET_QUERY = "2.2.0-talaan2";
+const UI_RADIUS_ASSET_QUERY = "2.5.0-talaan2";
 
 const CURRENT_VERSION_HISTORY = Object.freeze([{
   version:RELEASE.displayVersion,
@@ -61,6 +62,7 @@ const runtimeGroups = {
     "household-splits.css",
     "security-profiles.css",
     "summary-mascots.css",
+    "ui-radius.css",
     "ui-icon-alignment.css"
   ],
   "assets/js": [
@@ -162,6 +164,9 @@ patchTextFile("sync-runtime-compat.js", source => source
 
 patchTextFile("pwa-update.js", source => source
   .replace(/const CURRENT_CACHE_VERSION = "finance-v[^"]+";/, `const CURRENT_CACHE_VERSION = "${RELEASE.cache}";`));
+
+patchTextFile("summary-mascots.css", source => source
+  .replace(/\.\/ui-radius\.css\?v=[^"')]+/g, `./ui-radius.css?v=${UI_RADIUS_ASSET_QUERY}`));
 
 const escapeRegExp = value => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const normalizeRuntimeReferences = source => {
