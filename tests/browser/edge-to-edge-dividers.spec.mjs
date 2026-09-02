@@ -46,7 +46,7 @@ function dividerGeometry(page) {
     };
     const sidebar = document.querySelector("#sidebar");
     const sidebarRect = sidebar.getBoundingClientRect();
-    const sidebarStyle = getComputedStyle(sidebar);
+    const sidebarEdgeStyle = getComputedStyle(sidebar, "::after");
     return {
       agenda:measure("#agendaActions", ".agenda-kanban-board .pc-event-card"),
       project:measure("#projectActions", ".project-kanban-board .project-record"),
@@ -55,7 +55,11 @@ function dividerGeometry(page) {
       expense:measure("#expenseActions", "#earlyExpenses > [data-expense-row]"),
       expenseVisible:getComputedStyle(document.querySelector("#expenseActions")).display !== "none",
       sidebar:{
-        edgeLine:sidebarStyle.boxShadow,
+        edgeContent:sidebarEdgeStyle.content,
+        edgePosition:sidebarEdgeStyle.position,
+        edgeWidth:sidebarEdgeStyle.width,
+        edgeTop:sidebarEdgeStyle.top,
+        edgeBottom:sidebarEdgeStyle.bottom,
         topGap:Math.abs(sidebarRect.top),
         bottomGap:Math.abs(window.innerHeight - sidebarRect.bottom)
       },
@@ -81,8 +85,11 @@ for (const viewport of [{ width:1440, height:1000 }, { width:393, height:852 }])
       || row.dividerWidth !== 1);
 
     expect(failures, `Divider geometry:\n${JSON.stringify(geometry, null, 2)}`).toEqual([]);
-    expect(geometry.sidebar.edgeLine).toContain("inset");
-    expect(geometry.sidebar.edgeLine).toContain("-1px");
+    expect(geometry.sidebar.edgeContent).toBe('""');
+    expect(geometry.sidebar.edgePosition).toBe("absolute");
+    expect(geometry.sidebar.edgeWidth).toBe("1px");
+    expect(geometry.sidebar.edgeTop).toBe("0px");
+    expect(geometry.sidebar.edgeBottom).toBe("0px");
     expect(geometry.sidebar.topGap).toBe(0);
     expect(geometry.sidebar.bottomGap).toBe(0);
     expect(geometry.overflow).toBe(false);
