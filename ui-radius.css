@@ -82,3 +82,212 @@ html body :where(
     border-radius: 7px !important;
   }
 }
+
+/* Talaan V2.5.0 · canonical shadow hierarchy
+   Level 0 is the default for content. Elevation is reserved for components that
+   physically float above another surface. State rings/inset status indicators
+   remain separate from this elevation system. */
+:root {
+  --shadow-level-0: none;
+  --shadow-level-1: 0 1px 3px rgba(15, 23, 42, .08);
+  --shadow-level-2: 0 8px 24px rgba(15, 23, 42, .14);
+  --shadow-level-3: 0 20px 56px rgba(15, 23, 42, .20);
+  --shadow: var(--shadow-level-2);
+  --workspace-soft-shadow: var(--shadow-level-0);
+  --workspace-raised-shadow: var(--shadow-level-0);
+  --liquid-glass-shadow-soft: var(--shadow-level-0);
+  --liquid-glass-shadow: var(--shadow-level-2);
+}
+
+html[data-theme="dark"] {
+  --shadow-level-1: 0 1px 3px rgba(0, 0, 0, .22);
+  --shadow-level-2: 0 8px 24px rgba(0, 0, 0, .34);
+  --shadow-level-3: 0 20px 56px rgba(0, 0, 0, .48);
+  --shadow: var(--shadow-level-2);
+}
+
+/* Level 0 — normal content and navigation surfaces stay flat. */
+html body :is(
+  .card,
+  .dashboard-card,
+  .dashboard-detail-card,
+  .summary-card,
+  .settings-card,
+  .finance-privacy-lock-card,
+  .settings-search-panel,
+  .workspace-switcher,
+  .workspace-switcher-button,
+  .dashboard-week-marquee,
+  .finance-week-marquee,
+  .work-week-marquee,
+  .dashboard-week-day,
+  .finance-kanban-card,
+  .report-compact-group,
+  .report-section-nav,
+  .month-insights-card
+) {
+  box-shadow: var(--shadow-level-0) !important;
+}
+
+html body :is(.card,.dashboard-card,.dashboard-detail-card):hover {
+  box-shadow: var(--shadow-level-0) !important;
+}
+
+html body #dashboard :is(.card,.dashboard-detail-card),
+html body #dashboard :is(.card,.dashboard-detail-card):hover,
+html body #reports :is(.card,.report-insights-card,.report-insight-panel),
+html body #money .record-row[data-expense-row],
+html body #projects .finance-kanban-card {
+  box-shadow: var(--shadow-level-0) !important;
+}
+
+/* Avoid using a shadow as a duplicate separator where a border already exists. */
+html body .topbar {
+  box-shadow: none !important;
+}
+
+/* Normal glass/navigation controls keep material/background treatment but no
+   decorative elevation. */
+html body .topbar :is(
+  .cloud-sync-toolbar-button,
+  .month-nav-button,
+  .month-display-button,
+  .month-current-button,
+  .topbar-history-button,
+  .topbar-add-button,
+  #customizeDashboardButton,
+  .topbar-tools-trigger
+),
+html body .topbar :is(.month-navigator,.topbar-history-actions),
+html body .sidebar :is(.sidebar-close-button,.nav-button),
+html body .workspace-switcher button,
+html body :is(.dashboard-week-marquee,.finance-week-marquee,.work-week-marquee) .dashboard-week-day {
+  box-shadow: none !important;
+}
+
+html body .sidebar .nav-button.active,
+html body .workspace-switcher button.active,
+html body .workspace-switcher button[aria-selected="true"],
+html body .workspace-switcher-button.active,
+html body .workspace-switcher-button[aria-selected="true"] {
+  box-shadow: none !important;
+}
+
+/* Level 1 — reserved for the shell edge and a single floating primary action. */
+@media (min-width: 851px) {
+  html body #sidebar.sidebar,
+  html body #sidebar.sidebar.desktop-open,
+  html body #sidebar.sidebar.sidebar-pinned {
+    box-shadow: 1px 0 0 color-mix(in srgb, var(--line) 72%, transparent) !important;
+  }
+}
+
+html body .mobile-add-expense-fab {
+  box-shadow: var(--shadow-level-1) !important;
+}
+
+/* Level 2 — menus, popovers, tooltips, toasts, transient floating UI. */
+html body :is(
+  .cloud-sync-toolbar-popover,
+  .month-picker-popover,
+  .topbar-tools-panel,
+  .overflow-menu,
+  .context-menu,
+  .menu-popover,
+  .popover,
+  .record-more-panel,
+  .project-dialog-more-panel,
+  .report-export-menu-panel,
+  .emoji-picker-panel,
+  .record-icon-picker-controls.compact-icon-popover,
+  .mobile-utility-panel,
+  .toast,
+  .snackbar,
+  .toast-message,
+  .structured-drag-toast,
+  #pwaUpdateBanner
+) {
+  box-shadow: var(--shadow-level-2) !important;
+}
+
+html body #sidebar.sidebar:not(.desktop-open):not(.sidebar-pinned) .nav-button::after,
+html body #cloudSyncStatusButton[data-mobile-sync-feedback]::after {
+  box-shadow: var(--shadow-level-2) !important;
+}
+
+/* Level 3 — dialogs and blocking overlays. */
+html body :is(dialog,.modal,.dialog,.finance-device-lock-card) {
+  box-shadow: var(--shadow-level-3) !important;
+}
+
+/* Modal chrome should not create a second elevation layer inside the dialog. */
+html body :is(dialog,.modal,.dialog) :is(
+  .modal-header,
+  .dialog-header,
+  .pc-dialog-header,
+  .modal-footer,
+  .dialog-footer,
+  .modal-actions,
+  .dialog-actions
+) {
+  box-shadow: none !important;
+}
+
+/* Functional state shadows remain intentional. These communicate selection,
+   validation, timing, or drag/drop state rather than decorative elevation. */
+html body :is(
+  .appearance-choice[aria-checked="true"],
+  #accountDialog .account-mode-button[aria-pressed="true"],
+  .calendar-day.is-selected,
+  .gym-day-grid input:checked + span,
+  .filter-control-active,
+  .record-icon-trigger:hover,
+  .record-icon-trigger:focus-visible
+) {
+  /* Existing component rules retain their inset state ring. */
+}
+
+/* The segmented transaction view already has a border/background selected state;
+   remove its additional raised ring. Higher specificity intentionally wins over
+   the later summary compatibility layer. */
+html body #money #transactionToolbar-expense .transaction-view-group .button.button[aria-pressed="true"] {
+  box-shadow: none !important;
+}
+
+/* Dragging is one of the few interaction states where temporary elevation helps
+   communicate that an item is detached from its original surface. */
+html body :is(.is-structured-dragging,.dashboard-drag-preview,.dashboard-detail-card.is-dashboard-resizing) {
+  box-shadow: var(--shadow-level-2) !important;
+}
+
+/* Drop targets use a ring, not a raised shadow. */
+html body .is-structured-drop-target {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 20%, transparent) !important;
+}
+
+/* Semantic inset edges are kept because they encode status/position. */
+html body :is(
+  .record-row.due-soon-row,
+  .record-row.overdue-row,
+  .account-card.account-drop-before,
+  .account-card.account-drop-after
+) {
+  /* Existing inset declarations remain authoritative. */
+}
+
+@media print,
+       (forced-colors: active) {
+  html body :is(
+    .card,
+    dialog,
+    .modal,
+    .dialog,
+    .popover,
+    .toast,
+    .snackbar,
+    .toast-message,
+    .sidebar
+  ) {
+    box-shadow: none !important;
+  }
+}
