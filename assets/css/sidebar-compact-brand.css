@@ -466,8 +466,8 @@ html body #sidebar.sidebar .sidebar-settings-bottom {
 html[data-theme="light"] body #sidebar.sidebar,
 html[data-theme="dark"] body #sidebar.sidebar {
   background-image:none !important;
-  border-inline-end:1px solid var(--line) !important;
-  box-shadow:none !important;
+  border-right:0 !important;
+  box-shadow:inset -1px 0 0 var(--line) !important;
   -webkit-backdrop-filter:none !important;
   backdrop-filter:none !important;
 }
