@@ -34,7 +34,7 @@ test("rectangular UI surfaces use 7px while structural and circular shapes stay 
     #avatar { width:32px; height:32px; border-radius:50%; }
     #join { border-radius:0; }
   ` });
-  await page.addStyleTag({ url:"http://127.0.0.1:3000/ui-radius.css?v=2.2.0-talaan1" });
+  await page.addStyleTag({ url:"http://127.0.0.1:3000/ui-radius.css?v=2.5.0-talaan2" });
 
   for (const selector of [
     "#card", "#summaryCard", "#button", "#monthButton", "#monthControl",
@@ -50,7 +50,7 @@ test("rectangular UI surfaces use 7px while structural and circular shapes stay 
 });
 
 test("runtime summary layer imports the canonical radius stylesheet", () => {
-  expect(source("summary-mascots.css")).toContain('@import url("./ui-radius.css?v=2.2.0-talaan1")');
+  expect(source("summary-mascots.css")).toContain('@import url("./ui-radius.css?v=2.5.0-talaan2")');
   expect(source("ui-radius.css")).toContain("--talaan-ui-radius: 7px");
   expect(source("ui-radius.css")).toContain("--radius: 7px");
   expect(source("ui-radius.css")).toContain("--desktop-panel-radius: 7px");
