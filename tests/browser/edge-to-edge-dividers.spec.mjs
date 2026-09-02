@@ -58,15 +58,19 @@ for (const viewport of [{ width:1440, height:1000 }, { width:393, height:852 }])
   test(`Specified section dividers reach both edges at ${viewport.width}px`, async ({ page }) => {
     await openDividerFixture(page, viewport);
     const geometry = await dividerGeometry(page);
-    const rows = [geometry.agenda, geometry.project, geometry.available, geometry.savings];
-    if (geometry.expenseVisible) rows.push(geometry.expense);
+    const rows = {
+      agenda:geometry.agenda,
+      project:geometry.project,
+      available:geometry.available,
+      savings:geometry.savings
+    };
+    if (geometry.expenseVisible) rows.expense = geometry.expense;
+    const failures = Object.entries(rows).filter(([, row]) => !row
+      || row.leftGap > 1
+      || row.rightGap > 1
+      || row.dividerWidth !== 1);
 
-    for (const row of rows) {
-      expect(row).not.toBeNull();
-      expect(row.leftGap).toBeLessThanOrEqual(1);
-      expect(row.rightGap).toBeLessThanOrEqual(1);
-      expect(row.dividerWidth).toBe(1);
-    }
+    expect(failures, `Divider geometry:\n${JSON.stringify(geometry, null, 2)}`).toEqual([]);
     expect(geometry.overflow).toBe(false);
   });
 }
