@@ -5,13 +5,15 @@ const APP_URL = "http://127.0.0.1:3000";
 async function openDividerFixture(page, viewport) {
   await page.setViewportSize(viewport);
   await page.goto(`${APP_URL}/`, { waitUntil:"networkidle" });
-  await page.setContent(`<!doctype html><html><head>
+  await page.setContent(`<!doctype html><html data-theme="light"><head>
     <link rel="stylesheet" href="${APP_URL}/budget-planning.css">
     <link rel="stylesheet" href="${APP_URL}/projects-calendar.css">
     <link rel="stylesheet" href="${APP_URL}/app.css">
     <link rel="stylesheet" href="${APP_URL}/desktop-ux.css">
     <link rel="stylesheet" href="${APP_URL}/production-ui-audit.css">
+    <link rel="stylesheet" href="${APP_URL}/sidebar-compact-brand.css">
   </head><body>
+    <aside class="sidebar open" id="sidebar" aria-label="Main navigation"><nav class="sidebar-navigation">Navigation</nav></aside>
     <section id="projects">
       <div class="agenda-kanban-board"><article class="pc-event-card"><div class="pc-event-main">Agenda</div><div class="pc-event-actions" id="agendaActions"><button class="button">Complete</button></div></article></div>
       <div class="project-kanban-board"><article class="finance-kanban-card project-record"><div>Project</div><div class="project-row-actions" id="projectActions"><button class="button">Edit</button></div></article></div>
@@ -42,6 +44,9 @@ function dividerGeometry(page) {
         )
       };
     };
+    const sidebar = document.querySelector("#sidebar");
+    const sidebarRect = sidebar.getBoundingClientRect();
+    const sidebarStyle = getComputedStyle(sidebar);
     return {
       agenda:measure("#agendaActions", ".agenda-kanban-board .pc-event-card"),
       project:measure("#projectActions", ".project-kanban-board .project-record"),
@@ -49,6 +54,12 @@ function dividerGeometry(page) {
       savings:measure("#savingsOutlook", "#forecastBody"),
       expense:measure("#expenseActions", "#earlyExpenses > [data-expense-row]"),
       expenseVisible:getComputedStyle(document.querySelector("#expenseActions")).display !== "none",
+      sidebar:{
+        borderWidth:parseFloat(sidebarStyle.borderInlineEndWidth || sidebarStyle.borderRightWidth || 0),
+        borderStyle:sidebarStyle.borderInlineEndStyle || sidebarStyle.borderRightStyle,
+        topGap:Math.abs(sidebarRect.top),
+        bottomGap:Math.abs(window.innerHeight - sidebarRect.bottom)
+      },
       overflow:document.documentElement.scrollWidth > document.documentElement.clientWidth + 1
     };
   });
@@ -71,6 +82,12 @@ for (const viewport of [{ width:1440, height:1000 }, { width:393, height:852 }])
       || row.dividerWidth !== 1);
 
     expect(failures, `Divider geometry:\n${JSON.stringify(geometry, null, 2)}`).toEqual([]);
+    expect(geometry.sidebar, `Sidebar divider geometry:\n${JSON.stringify(geometry, null, 2)}`).toEqual({
+      borderWidth:1,
+      borderStyle:"solid",
+      topGap:0,
+      bottomGap:0
+    });
     expect(geometry.overflow).toBe(false);
   });
 }
