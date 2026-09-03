@@ -43,7 +43,7 @@ test("financial integrity UI scans without mutating records and Viewer cannot re
     const architecture = window.FinanceProfileArchitecture;
     const runtimeActive = architecture?.activeProfile?.() || { id:"profile-personal", name:"My Finances", type:"personal", role:"owner", cloudProfileId:"", encryption:{ enabled:false } };
     let meta = null;
-    try { meta = JSON.parse(localStorage.getItem("simple-finance-profiles-v1") || "null"); } catch (error) {}
+    try { meta = JSON.parse(localStorage.getItem("simple-finance-profiles-v1") || "null"); } catch { meta = null; }
     if (!Array.isArray(meta?.profiles) || !meta.profiles.length) {
       meta = { version:1, activeProfileId:runtimeActive.id || "profile-personal", profiles:[structuredClone(runtimeActive)] };
     }
