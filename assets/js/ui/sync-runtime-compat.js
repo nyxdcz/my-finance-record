@@ -1,6 +1,11 @@
 (function enhanceTalaanRuntimeUi() {
+  const PRODUCT_TITLE = "Talaan";
   let workMarqueeObserver = null;
   let dashboardActionObserver = null;
+
+  function preserveNeutralDocumentTitle() {
+    if (document.title !== PRODUCT_TITLE) document.title = PRODUCT_TITLE;
+  }
 
   function preserveLiquidGlassCascadeOrder() {
     const link = [...document.querySelectorAll('link[rel="stylesheet"]')].find(node => {
@@ -136,6 +141,7 @@
   }
 
   function boot() {
+    preserveNeutralDocumentTitle();
     preserveLiquidGlassCascadeOrder();
     insertEnhancementStyles();
     bindUploadedIcons();
@@ -143,6 +149,7 @@
     ensureWorkMarquees();
   }
 
+  preserveNeutralDocumentTitle();
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot, { once:true });
   else boot();
 })();
