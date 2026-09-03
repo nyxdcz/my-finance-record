@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 import crypto from "node:crypto";
 import fs from "node:fs";
 
-/* global data */
+/* global data, persistFinanceDataRaw */
 
 const APP_URL = "http://127.0.0.1:3000";
 const ACCOUNT_INTEGRITY_SOURCES = ["assets/js/account-ledger.js","assets/js/account-submit-compat.js","assets/js/cloud-sync.js","assets/js/cloud-sync-lifecycle.js"];
