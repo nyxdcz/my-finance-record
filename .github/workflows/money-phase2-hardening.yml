@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - ".github/money-phase2-hardening.py"
+      - ".github/money-phase2-runner.py"
       - ".github/workflows/money-phase2-hardening.yml"
 
 permissions:
@@ -23,7 +24,7 @@ jobs:
           package-manager-cache: false
       - name: Apply Phase 2 money hardening
         run: |
-          python .github/money-phase2-hardening.py
+          python .github/money-phase2-runner.py
           node scripts/prepare-runtime.mjs
           node --check assets/js/account-ledger.js
           node --check account-ledger.js
@@ -45,7 +46,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          rm -f .github/money-phase2-hardening.py .github/workflows/money-phase2-hardening.yml
+          rm -f .github/money-phase2-hardening.py .github/money-phase2-runner.py .github/workflows/money-phase2-hardening.yml
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
