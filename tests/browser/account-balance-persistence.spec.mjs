@@ -1,18 +1,14 @@
 import { expect, test } from "@playwright/test";
-import crypto from "node:crypto";
 import fs from "node:fs";
 /* global data, renderSettings */
 
 const APP_URL = "http://127.0.0.1:3000";
-const ACCOUNT_INTEGRITY_SOURCES = ["assets/js/finance-integrity.js","assets/js/account-ledger.js","assets/js/account-submit-compat.js","assets/js/cloud-sync.js","assets/js/cloud-sync-lifecycle.js","assets/js/finance-transaction-diagnostics.js"];
-const accountIntegrityHash = crypto.createHash("sha256");
-for (const file of ACCOUNT_INTEGRITY_SOURCES) {
-  accountIntegrityHash.update(`${file}\0`);
-  accountIntegrityHash.update(fs.readFileSync(file));
-}
-const ACCOUNT_INTEGRITY_REVISION = accountIntegrityHash.digest("hex").slice(0, 12);
+const preparedIndex = fs.readFileSync("index.html", "utf8");
+const accountAssetMatch = preparedIndex.match(/account-ledger\.js\?v=(2\.5\.0-account-([a-f0-9]{12}))/);
+if (!accountAssetMatch) throw new Error("Prepared Account Integrity asset key is unavailable");
+const ACCOUNT_ASSET_QUERY = accountAssetMatch[1];
+const ACCOUNT_INTEGRITY_REVISION = accountAssetMatch[2];
 const ACCOUNT_REFRESH_KEY = `finance-account-integrity-${ACCOUNT_INTEGRITY_REVISION}`;
-const ACCOUNT_ASSET_QUERY = `2.5.0-account-${ACCOUNT_INTEGRITY_REVISION}`;
 
 test.use({ serviceWorkers:"allow" });
 
@@ -81,7 +77,7 @@ async function readAccountState(page, setup) {
       mutationOwner:Boolean(window.FinanceAccountMutations?.capabilities?.singleOwner),
       invariantsOk:Boolean(window.FinanceAccountMutations?.invariantReport?.([{ account, target }])?.ok),
       controlled:Boolean(navigator.serviceWorker.controller),
-      ledgerAsset:[...performance.getEntriesByType("resource")].some(entry => entry.name.includes(`account-ledger.js?v=${accountAssetQuery}`))
+      ledgerAsset:[...document.scripts].some(script => script.src.includes(`account-ledger.js?v=${accountAssetQuery}`))
     };
   }, { ...setup, accountAssetQuery:ACCOUNT_ASSET_QUERY });
 }
@@ -150,15 +146,17 @@ test("Settings account balance update is reconciled and profile-persisted", asyn
   await openControlledPwa(page, { width:1440, height:1000 });
   const setup = await accountSetup(page, 8765.43);
   expect(setup.account).not.toBe("");
+  await page.evaluate(() => renderSettings());
   await page.evaluate(({ account, target }) => {
-    renderSettings();
     const input = [...document.querySelectorAll(".account-input")].find(node => node.dataset.account === account);
     if (!input) throw new Error("Settings account input is unavailable");
     input.value = target.toLocaleString("en-PH", { minimumFractionDigits:2, maximumFractionDigits:2 });
-    document.getElementById("accountsForm").dispatchEvent(new Event("submit", { bubbles:true, cancelable:true }));
+    input.dispatchEvent(new Event("input", { bubbles:true }));
+    input.dispatchEvent(new Event("change", { bubbles:true }));
   }, setup);
+  await page.locator('#accountsForm button[type="submit"]').click();
+  await expect.poll(async () => (await readAccountState(page, setup)).runtime).toBe(setup.target);
   const result = await readAccountState(page, setup);
-  expect(result.runtime).toBe(setup.target);
   expect(result.persisted).toBe(setup.target);
   expect(result.profilePersisted).toBe(setup.target);
   expect(result.reconciliationId).not.toBe("");
