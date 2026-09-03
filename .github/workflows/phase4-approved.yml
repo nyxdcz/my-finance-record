@@ -33,6 +33,7 @@ jobs:
           python .github/phase4-approved.py
           python .github/phase4-followup.py
           python .github/phase4-followup2.py
+          python .github/phase4-followup3.py
 
       - name: Prepare production runtime
         run: node scripts/prepare-runtime.mjs
@@ -66,7 +67,7 @@ jobs:
           --project=chromium
 
       - name: Remove temporary Phase 4 helper
-        run: rm -f .github/phase4-approved.py .github/phase4-followup.py .github/phase4-followup2.py .github/workflows/phase4-approved.yml
+        run: rm -f .github/phase4-approved.py .github/phase4-followup.py .github/phase4-followup2.py .github/phase4-followup3.py .github/workflows/phase4-approved.yml
 
       - name: Commit validated Phase 4
         run: |
