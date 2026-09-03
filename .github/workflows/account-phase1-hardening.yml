@@ -1,0 +1,56 @@
+name: Account Phase 1 hardening
+
+on:
+  push:
+    paths:
+      - ".github/workflows/account-phase1-hardening.yml"
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  harden:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          package-manager-cache: false
+      - name: Apply single-owner account hardening
+        run: |
+          python .github/account-phase1-hardening.py
+          node scripts/prepare-runtime.mjs
+          node --check assets/js/account-ledger.js
+          node --check assets/js/pwa-update.js
+          node --check pwa-update.js
+          node tests/regression/validate-pwa-runtime.mjs
+          node tests/finance/validate-finance-ui-source.mjs
+          if grep -R "2.5.0-account-integrity2\|finance-account-integrity-v2-5-0-talaan2" assets scripts tests index.html sw.js --exclude-dir=node_modules; then
+            echo "Stale manually-versioned account integrity reference remains"
+            exit 1
+          fi
+      - name: Install locked project metadata
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Run focused source suites
+        run: |
+          npm run test:finance
+          npm run test:regression
+      - name: Install Chromium for account regressions
+        run: npx playwright install chromium --with-deps
+      - name: Run focused account PWA regressions
+        run: npx playwright test tests/browser/account-balance-persistence.spec.mjs tests/browser/account-submit-compat.spec.mjs
+      - name: Commit hardening and remove temporary runner
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          rm -f .github/account-phase1-hardening.py .github/workflows/account-phase1-hardening.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "refactor: centralize account mutations"
+          git push origin HEAD:main
+          gh workflow run quality-pages.yml --ref main
