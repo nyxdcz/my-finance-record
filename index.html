@@ -5693,7 +5693,7 @@
     const SETTINGS_PANEL_LABELS = { overview:"Overview", accounts:"Accounts", calendar:"Work & Calendar", "finance-tools":"Finance tools", profiles:"Profile & Security", sync:"Sync & Backup", app:"App & About" };
     const SETTINGS_PANEL_ALIASES = { cloud:"sync", backup:"sync", offline:"app", advanced:"app" };
 
-    const VERSION_HISTORY = [{"version":"V2.5.0","title":"Talaan","changes":["Current production release under the Talaan product name.","Adds household groups, expense-level equal, percentage, and exact shares, payer tracking, member balances, and explicit settlement history.","Counts only the owner's allocated share in personal expense totals while preserving the full amount actually paid in Account Ledger cash movements.","Keeps settlements separate from income, expenses, paid state, and automatic account mutations, with recovery snapshots and Undo for material changes.","Uses responsibility-based runtime filenames instead of legacy product-era filenames.","Includes the complete local-first Finance workspace, Account Ledger, budgeting, reports, projects, productivity tools, reminders, and responsive desktop and phone layouts.","Includes encrypted multi-profile Cloud Schema V3 synchronization, offline PWA support, recovery safeguards, and five-minute routine sync.","Preserves Finance Schema 12, Cloud Schema V3, account balances, paid state, recurrence, project payments, backups, encryption, persistent storage identifiers, and synchronization behavior."]}];
+    const VERSION_HISTORY = [{"version":"V2.5.0","title":"Talaan","changes":["Current production release under the Talaan product name.","Adds household groups, expense-level equal, percentage, and exact shares, payer tracking, member balances, and explicit settlement history.","Counts only the owner's allocated share in personal expense totals while preserving the full amount actually paid in Account Ledger cash movements.","Keeps settlements separate from income, expenses, paid state, and automatic account mutations, with recovery snapshots and Undo for material changes.","Uses responsibility-based runtime filenames instead of legacy product-era filenames.","Includes the complete local-first Finance workspace, Account Ledger, budgeting, reports, projects, productivity tools, reminders, and responsive desktop and phone layouts.","Includes encrypted multi-profile Cloud Schema V3 synchronization, offline PWA support, recovery safeguards, and five-minute routine sync.","Hardens Account Ledger balance corrections with transactional persistence, Viewer protection, profile verification, and fresh PWA delivery for account and sync runtimes.","Preserves Finance Schema 12, Cloud Schema V3, account balances, paid state, recurrence, project payments, backups, encryption, persistent storage identifiers, and synchronization behavior."]}];
 
     function normalizeSettingsPanelKey(key) {
       const normalized = SETTINGS_PANEL_ALIASES[key] || key;
@@ -7388,6 +7388,10 @@
 
     document.getElementById("accountForm").addEventListener("submit", event => {
       event.preventDefault();
+      if (Number(data?.ledgerSettings?.version || 0) > 0) {
+        showToast("Account ledger is updating. Reload Talaan before changing account balances.", "warning");
+        return;
+      }
       if (document.getElementById("accountDialog")?.dataset.accountMode === "spend") {
         // Record Spending is intentionally isolated from the account-maintenance form submit path.
         // Its primary action is a type=button bound directly by account-ledger.js.
@@ -7569,6 +7573,10 @@
 
     document.getElementById("accountsForm").addEventListener("submit", event => {
       event.preventDefault();
+      if (Number(data?.ledgerSettings?.version || 0) > 0) {
+        showToast("Account ledger is updating. Reload Talaan before changing account balances.", "warning");
+        return;
+      }
       pushUndo("Update account balances");
             const accountInputs = [...document.querySelectorAll(".account-input")];
       for (const input of accountInputs) { if (!validateMoneyInput(input, { required:false, min:0, message:"Enter a balance of zero or more." })) return; }
@@ -9219,8 +9227,8 @@
   <script src="./privacy-lock.js?v=2.5.0-talaan1"></script>
   <script src="./security-profiles.js?v=2.5.0-talaan1"></script>
   <script src="./cloud-conflict-review.js?v=2.5.0-talaan1"></script>
-  <script src="./cloud-conflict-resolution.js?v=2.5.0-talaan1"></script><script src="./cloud-sync-lifecycle.js?v=2.5.0-talaan1"></script><script src="./cloud-sync.js?v=2.5.0-talaan1"></script>
-  <script src="./account-ledger.js?v=2.5.0-talaan1"></script>
+  <script src="./cloud-conflict-resolution.js?v=2.5.0-talaan1"></script><script src="./cloud-sync-lifecycle.js?v=2.5.0-account-integrity1"></script><script src="./cloud-sync.js?v=2.5.0-account-integrity1"></script>
+  <script src="./account-ledger.js?v=2.5.0-account-integrity1"></script>
   <script src="./budget-planning.js?v=2.5.0-talaan1"></script>
   <script src="./reports-insights.js?v=2.5.0-talaan1"></script>
   <script src="./net-worth.js?v=2.5.0-talaan1"></script>

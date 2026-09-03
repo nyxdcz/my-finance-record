@@ -13,7 +13,7 @@ async function openAuthenticated(page) {
   await page.waitForFunction(() => !document.body.classList.contains("finance-auth-pending"));
   await page.evaluate(() => window.FinancePrivacyLock.setAuthenticated(true));
   await expect(page.locator("body")).toHaveClass(/finance-signed-in/);
-  await page.waitForFunction(() => Boolean(window.FinanceAccountLedger && window.FinanceAccountSubmitCompat?.installed));
+  await page.waitForFunction(() => Boolean(window.FinanceAccountLedger?.capabilities?.accountReconciliationOwner && window.FinanceAccountSubmitCompat?.ledgerGuard));
 }
 
 test("iPhone correction-mode Save is explicitly submitted instead of relying on dynamic button type", async ({ page }) => {
@@ -31,7 +31,7 @@ test("iPhone correction-mode Save is explicitly submitted instead of relying on 
   const card = page.locator(`#moneyAccounts [data-account-card="${setup.account}"]`);
   await card.locator("[data-edit-account]").click();
   await expect(page.locator("#accountDialogTitle")).toHaveText("Edit account");
-  await page.locator("#accountBalance").fill(String(setup.target));
+  await page.locator("#accountBalance").fill(setup.target.toLocaleString("en-PH", { minimumFractionDigits:2, maximumFractionDigits:2 }));
 
   await page.evaluate(() => {
     window.__accountCorrectionClickPrevented = false;

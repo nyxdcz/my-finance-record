@@ -2,7 +2,7 @@
 /* Phase 5.1 compatibility repair: load the canonical Dashboard interaction core.
    dashboard-interactions.css still points at a retired versioned filename. */
 @import url("./dashboard-interactions-core.css");
-@import url("./ui-radius.css?v=2.2.0-talaan1");
+@import url("./ui-radius.css?v=2.5.0-talaan4");
 
 /* Phase 5.1 · customization controls must never leak into normal Dashboard view. */
 .dashboard-drag-handle,

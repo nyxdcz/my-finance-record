@@ -19,6 +19,7 @@ const RELEASE = Object.freeze({
 const APP_STYLE_ASSET_QUERY = "2.5.0-talaan2";
 const SIDEBAR_BRAND_ASSET_QUERY = "2.2.0-talaan2";
 const UI_RADIUS_ASSET_QUERY = "2.5.0-talaan4";
+const ACCOUNT_INTEGRITY_ASSET_QUERY = "2.5.0-account-integrity1";
 
 const CURRENT_VERSION_HISTORY = Object.freeze([{
   version:RELEASE.displayVersion,
@@ -31,6 +32,7 @@ const CURRENT_VERSION_HISTORY = Object.freeze([{
     "Uses responsibility-based runtime filenames instead of legacy product-era filenames.",
     "Includes the complete local-first Finance workspace, Account Ledger, budgeting, reports, projects, productivity tools, reminders, and responsive desktop and phone layouts.",
     "Includes encrypted multi-profile Cloud Schema V3 synchronization, offline PWA support, recovery safeguards, and five-minute routine sync.",
+    "Hardens Account Ledger balance corrections with transactional persistence, Viewer protection, profile verification, and fresh PWA delivery for account and sync runtimes.",
     "Preserves Finance Schema 12, Cloud Schema V3, account balances, paid state, recurrence, project payments, backups, encryption, persistent storage identifiers, and synchronization behavior."
   ]
 }]);
@@ -67,6 +69,7 @@ const runtimeGroups = {
   ],
   "assets/js": [
     "account-ledger.js",
+    "account-submit-compat.js",
     "brand-icons.js",
     "budget-planning.js",
     "cloud-conflict-resolution.js",
@@ -186,8 +189,14 @@ const normalizeReleaseAssetQuery = source => source.replace(
   `?v=${RELEASE.assetQuery}`
 );
 
+const applyAccountIntegrityAssetQuery = source => source
+  .replace(/account-ledger\.js\?v=[^\"'\s<>)]+/g, `account-ledger.js?v=${ACCOUNT_INTEGRITY_ASSET_QUERY}`)
+  .replace(/account-submit-compat\.js\?v=[^\"'\s<>)]+/g, `account-submit-compat.js?v=${ACCOUNT_INTEGRITY_ASSET_QUERY}`)
+  .replace(/cloud-sync\.js\?v=[^\"'\s<>)]+/g, `cloud-sync.js?v=${ACCOUNT_INTEGRITY_ASSET_QUERY}`)
+  .replace(/cloud-sync-lifecycle\.js\?v=[^\"'\s<>)]+/g, `cloud-sync-lifecycle.js?v=${ACCOUNT_INTEGRITY_ASSET_QUERY}`);
+
 patchTextFile("index.html", source => {
-  let next = normalizeReleaseAssetQuery(normalizeRuntimeReferences(source))
+  let next = applyAccountIntegrityAssetQuery(normalizeReleaseAssetQuery(normalizeRuntimeReferences(source)))
     .replace(/app\.css\?v=[^"']+/, `app.css?v=${APP_STYLE_ASSET_QUERY}`)
     .replaceAll(PREVIOUS_BRAND, BRAND)
     .replaceAll("Finance Records installed", `${BRAND} installed`)
@@ -259,16 +268,33 @@ patchTextFile("offline.html", source => source
   .replace(/<title>[^<]+ · Offline<\/title>/, `<title>${BRAND} · Offline</title>`)
   .replace(/Open [^<]+<\/button>/, `Open ${BRAND}</button>`));
 
-patchTextFile("sw.js", source => normalizeReleaseAssetQuery(normalizeRuntimeReferences(source))
-  .replace(/app\.css\?v=[^"')]+/, `app.css?v=${APP_STYLE_ASSET_QUERY}`)
-  .replace(/sidebar-compact-brand\.css\?v=[^"')]+/g, `sidebar-compact-brand.css?v=${SIDEBAR_BRAND_ASSET_QUERY}`)
-  .replace(
-    /(?:url\.pathname\.endsWith\("sidebar-compact-brand\.css"\) \|\| )*url\.pathname\.endsWith\("ui-icon-alignment\.css"\) \|\|/,
-    'url.pathname.endsWith("sidebar-compact-brand.css") || url.pathname.endsWith("ui-icon-alignment.css") ||'
-  )
-  .replace(/const APP_VERSION = "\d+\.\d+\.\d+";/, `const APP_VERSION = "${RELEASE.version}";`)
-  .replace(/const CACHE_VERSION = "finance-v[^"]+";/, `const CACHE_VERSION = "${RELEASE.cache}";`)
-  .replaceAll("Open My Finance Records", `Open ${BRAND}`));
+patchTextFile("sw.js", source => {
+  let next = applyAccountIntegrityAssetQuery(normalizeReleaseAssetQuery(normalizeRuntimeReferences(source)))
+    .replace(/app\.css\?v=[^"')]+/, `app.css?v=${APP_STYLE_ASSET_QUERY}`)
+    .replace(/sidebar-compact-brand\.css\?v=[^"')]+/g, `sidebar-compact-brand.css?v=${SIDEBAR_BRAND_ASSET_QUERY}`)
+    .replace(
+      /(?:url\.pathname\.endsWith\("sidebar-compact-brand\.css"\) \|\| )*url\.pathname\.endsWith\("ui-icon-alignment\.css"\) \|\|/,
+      'url.pathname.endsWith("sidebar-compact-brand.css") || url.pathname.endsWith("ui-icon-alignment.css") ||'
+    )
+    .replace(/const APP_VERSION = "\d+\.\d+\.\d+";/, `const APP_VERSION = "${RELEASE.version}";`)
+    .replace(/const CACHE_VERSION = "finance-v[^"]+";/, `const CACHE_VERSION = "${RELEASE.cache}";`)
+    .replaceAll("Open My Finance Records", `Open ${BRAND}`);
+
+  if (!next.includes('asset("./account-submit-compat.js')) {
+    next = next.replace(
+      /(asset\("\.\/account-ledger\.js\?v=[^"')]+"\),)/,
+      `$1\n  asset("./account-submit-compat.js?v=${ACCOUNT_INTEGRITY_ASSET_QUERY}"),`
+    );
+  }
+  if (!next.includes('url.pathname.endsWith("account-ledger.js")')) {
+    next = next.replace(
+      'url.pathname.endsWith("cloud-sync-lifecycle.js") || url.pathname.endsWith("interaction-patterns.js") ||',
+      'url.pathname.endsWith("cloud-sync-lifecycle.js") || url.pathname.endsWith("cloud-sync.js") || url.pathname.endsWith("account-ledger.js") || url.pathname.endsWith("account-submit-compat.js") || url.pathname.endsWith("interaction-patterns.js") ||'
+    );
+  }
+  return next;
+});
+
 
 const lockPath = path.join(root, "package-lock.json");
 if (fs.existsSync(lockPath)) {

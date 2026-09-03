@@ -23,6 +23,7 @@
 - Normalized Calendar, Cash Flow, and Overview into one full-width Dashboard contract outside Customize mode, while preserving saved card order, visibility, and size preferences for editing.
 - Enlarged the desktop calendar canvas, matched its event panel height, bounded the Cash Flow chart on wide screens, and made Overview use predictable three-, two-, and full-width bento rows.
 - Kept the PWA cache at `finance-v2-20260828-household-splits-r17` and advanced the one-time Dashboard presentation refresh so installed clients receive the normalized layouts without changing the product version.
+- Hardened Account Ledger balance corrections so edits are reconciled, verified in active-profile storage before the dialog closes, blocked for Viewer profiles, and delivered through fresh network-first account/sync runtime assets without changing Finance Schema 12, Cloud Schema V3, or the product version.
 
 ## V2.4.0 · Talaan
 

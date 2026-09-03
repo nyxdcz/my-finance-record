@@ -374,6 +374,74 @@
 
   let accountSpendSubmitPending = false;
 
+  function accountMutationCanWrite() {
+    const architecture = window.FinanceProfileArchitecture;
+    if (!architecture || architecture.canWrite?.() !== false) return true;
+    showToast("This Viewer profile is read-only", "warning");
+    return false;
+  }
+
+  function expectedBalancesMatch(expectedBalances = []) {
+    return expectedBalances.every(item => Object.prototype.hasOwnProperty.call(data.accounts || {}, item.account)
+      && roundMoney(data.accounts[item.account]) === roundMoney(item.target));
+  }
+
+  function profileBalancesMatch(expectedBalances = []) {
+    if (!expectedBalances.length) return true;
+    const architecture = window.FinanceProfileArchitecture;
+    const profileId = architecture?.activeProfileId?.();
+    if (!profileId) return true;
+    try {
+      const raw = localStorage.getItem(`simple-finance-profile-data-v1:${profileId}`);
+      if (!raw) return false;
+      const stored = JSON.parse(raw);
+      return expectedBalances.every(item => Object.prototype.hasOwnProperty.call(stored.accounts || {}, item.account)
+        && roundMoney(stored.accounts[item.account]) === roundMoney(item.target));
+    } catch (error) {
+      console.error("Could not verify profile-scoped account persistence.", error);
+      return false;
+    }
+  }
+
+  function restoreAccountMutation(snapshot, message = "Account changes were not saved") {
+    data = normalizeData(cloneData(snapshot));
+    try {
+      if (typeof persistFinanceDataRaw === "function") persistFinanceDataRaw("Account correction rolled back");
+      else localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    } catch (error) {
+      console.error("Could not persist the account rollback; the prior stored copy remains authoritative.", error);
+    }
+    try { renderAll(false); } catch (error) { console.error("Could not refresh account state after rollback.", error); }
+    showToast(message, "warning");
+    return false;
+  }
+
+  function persistAccountMutation(snapshot, message, expectedBalances = []) {
+    recalculateBalances(data);
+    if (!expectedBalancesMatch(expectedBalances)) {
+      return restoreAccountMutation(snapshot, "The corrected account balance could not be verified. Nothing was saved.");
+    }
+    try {
+      const saved = saveData(message);
+      if (saved === false) return restoreAccountMutation(snapshot, "Account changes were not saved. Check profile permissions and try again.");
+    } catch (error) {
+      console.error("Account changes could not be persisted.", error);
+      return restoreAccountMutation(snapshot, "Account changes could not be saved on this device.");
+    }
+    if (!expectedBalancesMatch(expectedBalances)) {
+      return restoreAccountMutation(snapshot, "The account balance changed during save. The previous value was restored.");
+    }
+    if (!profileBalancesMatch(expectedBalances)) {
+      const architecture = window.FinanceProfileArchitecture;
+      let repaired = false;
+      try { repaired = architecture?.persistCurrentData?.(data, message) !== false; } catch (error) { console.error("Could not repair profile-scoped account persistence.", error); }
+      if (!repaired || !profileBalancesMatch(expectedBalances)) {
+        return restoreAccountMutation(snapshot, "The account update could not be stored in the active profile.");
+      }
+    }
+    return true;
+  }
+
   function setAccountSpendStatus(state = "", message = "") {
     const status = document.getElementById("accountSpendStatus");
     if (!status) return;
@@ -850,15 +918,18 @@
   }
 
   function submitAccountForm() {
+    if (!accountMutationCanWrite()) return false;
     const originalName = document.getElementById("originalAccountName").value;
     const newName = document.getElementById("accountName").value.trim();
-    if (!validateMoneyInput("accountBalance", { required:false, min:0, message:"Enter a valid account balance of zero or more." })) return;
+    if (!validateMoneyInput("accountBalance", { required:false, min:0, message:"Enter a valid account balance of zero or more." })) return false;
     const balanceInput = document.getElementById("accountBalance").value.trim();
     const targetBalance = balanceInput === "" ? 0 : moneyInputValue("accountBalance");
     const type = ACCOUNT_TYPES.includes(document.getElementById("accountType").value) ? document.getElementById("accountType").value : "Other";
-    if (!newName || !Number.isFinite(targetBalance)) return showToast("Enter a valid account name and balance", "warning");
+    if (!newName || !Number.isFinite(targetBalance)) { showToast("Enter a valid account name and balance", "warning"); return false; }
     const duplicate = accountNames().some(name => name.toLowerCase() === newName.toLowerCase() && name !== originalName);
-    if (duplicate) return showToast("An account with this name already exists", "warning");
+    if (duplicate) { showToast("An account with this name already exists", "warning"); return false; }
+
+    const snapshot = cloneData(data);
     pushUndo(originalName ? `Edit account ${originalName}` : `Add account ${newName}`);
     const existingOrder = accountNames();
     if (originalName && originalName !== newName) {
@@ -885,23 +956,39 @@
     if (type !== "Savings") (data.savingsGoals || []).forEach(goal => { if (goal.sourceType === "linked" && goal.linkedAccount === newName) { goal.sourceType = "manual"; goal.currentAmount = Number(data.accounts[newName] || 0); goal.linkedAccount = ""; goal.updatedAt = new Date().toISOString(); } });
     if (type === "Savings" && !data.savingsSettings.defaultAccount) data.savingsSettings.defaultAccount = newName;
     if (type !== "Savings" && data.savingsSettings.defaultAccount === newName) data.savingsSettings.defaultAccount = "";
+
+    const saved = persistAccountMutation(
+      snapshot,
+      originalName ? "Account updated and reconciled" : "Account added with opening balance",
+      [{ account:newName, target:targetBalance }]
+    );
+    if (!saved) return false;
     closeTrackedFormAfterAction("accountDialog");
-    saveData(originalName ? "Account updated and reconciled" : "Account added with opening balance");
     refreshReconciledAccountState(newName, targetBalance);
+    return true;
   }
 
   function submitAccountsReconciliationForm() {
+    if (!accountMutationCanWrite()) return false;
     const accountInputs = [...document.querySelectorAll(".account-input")];
-    for (const input of accountInputs) if (!validateMoneyInput(input, { required:false, min:0, message:"Enter a balance of zero or more." })) return;
+    for (const input of accountInputs) if (!validateMoneyInput(input, { required:false, min:0, message:"Enter a balance of zero or more." })) return false;
     const changes = accountInputs.map(input => ({ account:input.dataset.account, target:moneyInputValue(input) })).filter(item => roundMoney(data.accounts[item.account]) !== roundMoney(item.target));
     const typeChanges = [...document.querySelectorAll(".account-type-input")].filter(select => accountType(select.dataset.accountType) !== select.value);
-    if (!changes.length && !typeChanges.length) return showToast("Account balances already match the entered values", "info");
+    if (!changes.length && !typeChanges.length) { showToast("Account balances already match the entered values", "info"); return false; }
+
+    const snapshot = cloneData(data);
     pushUndo("Reconcile account balances");
     typeChanges.forEach(select => { data.accountTypes[select.dataset.accountType] = ACCOUNT_TYPES.includes(select.value) ? select.value : "Other"; });
     changes.forEach(item => appendReconciliation(item.account, item.target, { note:"Balances form reconciliation" }));
+    recalculateBalances(data, { stamp:changes.length > 0 });
     (data.savingsGoals || []).forEach(goal => { if (goal.sourceType === "linked" && accountType(goal.linkedAccount) !== "Savings") { goal.currentAmount = Number(data.accounts[goal.linkedAccount] || goal.currentAmount || 0); goal.sourceType = "manual"; goal.linkedAccount = ""; goal.updatedAt = new Date().toISOString(); } });
     if (data.savingsSettings.defaultAccount && accountType(data.savingsSettings.defaultAccount) !== "Savings") data.savingsSettings.defaultAccount = "";
-    saveData(`${changes.length} account balance${changes.length === 1 ? "" : "s"} reconciled`);
+
+    return persistAccountMutation(
+      snapshot,
+      `${changes.length} account balance${changes.length === 1 ? "" : "s"} reconciled`,
+      changes.map(item => ({ account:item.account, target:item.target }))
+    );
   }
 
   function submitIncomeForm() {
@@ -1018,10 +1105,12 @@
   window.FinanceAccountLedger = {
     version:LEDGER_VERSION,
     releaseVersion:"13.0.13",
-    capabilities:{ accountSpending:true, verifiedSpendSubmit:true, persistentSpendActions:true, transactionalSpend:true, isolatedSpendAction:true },
+    capabilities:{ accountSpending:true, verifiedSpendSubmit:true, persistentSpendActions:true, transactionalSpend:true, isolatedSpendAction:true, accountReconciliationOwner:true, transactionalAccountCorrection:true, profileVerifiedAccountCorrection:true },
     recalculateBalances,
     appendLedgerEntries,
     appendReconciliation,
+    submitAccountForm,
+    submitAccountsReconciliationForm,
     openSpend:openAccountSpendDialog,
     submitSpend:submitAccountSpending,
     recordSpend:({account,amount,description,category="Personal",date=localDateKey(),note="",includeInTotals=true}) => {
