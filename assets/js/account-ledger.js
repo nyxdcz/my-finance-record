@@ -36,6 +36,7 @@
   const originalOpenIncomeDialog = openIncomeDialog;
   const originalSyncIncomeCategoryFields = syncIncomeCategoryFields;
   const originalCloneRecurringIncomeForMonth = cloneRecurringIncomeForMonth;
+  const originalProcessGymMonthEndAutoPayments = typeof processGymMonthEndAutoPayments === "function" ? processGymMonthEndAutoPayments : null;
 
   function localDateKey(date = new Date()) {
     return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
@@ -281,7 +282,7 @@
     return result;
   };
 
-  applyExpensePayment = function ledgerExpensePayment(items, account, { auto = false, paidDate = localDateKey() } = {}) {
+  function mutateExpensePayment(items, account, { auto = false, paidDate = localDateKey() } = {}) {
     ensureLedgerShape(data);
     const eligible = (items || []).filter(item => item && !item.paid);
     const total = expensePaymentTotal(eligible);
@@ -317,23 +318,26 @@
       if (isGymExpense(item)) item.gymAutoPaySuppressed = false;
     });
     return { ok:true, total, transactionId, count:eligible.length, account, ledgerEntries:added };
-  };
+  }
 
-  restoreExpensePayment = function ledgerExpensePaymentRestore(item) {
-    if (!item?.paid) return { restored:0 };
+  function mutateExpensePaymentReversal(item) {
+    if (!item?.paid) return { ok:true, restored:0 };
     const restored = item.accountDeducted && item.paidFromAccount && Number(item.paidAmount || 0) > 0;
     const amount = restored ? roundMoney(item.paidAmount) : 0;
+    let reversalEntry = null;
     if (restored) {
-      if (!Object.prototype.hasOwnProperty.call(data.accounts || {}, item.paidFromAccount)) return { restored:0, missingAccount:item.paidFromAccount };
+      if (!Object.prototype.hasOwnProperty.call(data.accounts || {}, item.paidFromAccount)) return { ok:false, restored:0, missingAccount:item.paidFromAccount, reason:"missing-account" };
       const original = (data.accountLedger || []).find(entry => entry.transactionId === item.paymentTransactionId && entry.expenseId === item.id && ["expense-payment", "gym-auto-payment"].includes(entry.type));
       const operationId = `expense-payment-reversal:${item.paymentTransactionId || item.id}`;
-      appendLedgerEntries([{
+      const [entry] = appendLedgerEntries([{
         id:uid(), transactionId:uid(), operationId,
         account:item.paidFromAccount, type:"expense-payment-reversal", amount,
         date:localDateKey(), description:`Payment reversal: ${item.name}`,
         expenseId:item.id, reversesEntryId:original?.id || "",
-        source:"expense-reversal"
+        source:original ? "expense-reversal" : "expense-reversal-legacy"
       }]);
+      reversalEntry = entry || ledgerEntryForOperation(operationId);
+      if (!reversalEntry) return { ok:false, restored:0, reason:"duplicate-operation" };
     }
     item.paid = false;
     item.paidDate = "";
@@ -343,7 +347,17 @@
     item.paymentTransactionId = "";
     item.autoPaidAtMonthEnd = false;
     if (isGymExpense(item) && expenseMonth(item) < currentMonth) item.gymAutoPaySuppressed = true;
-    return { restored:amount };
+    return { ok:true, restored:amount, reversalEntry };
+  }
+
+  applyExpensePayment = function ledgerExpensePayment(items, account, options = {}) {
+    if (globalThis.__financeLedgerMutationInternal === true) return mutateExpensePayment(items, account, options);
+    return commitExpensePayment(items, account, options);
+  };
+
+  restoreExpensePayment = function ledgerExpensePaymentRestore(item, options = {}) {
+    if (globalThis.__financeLedgerMutationInternal === true) return mutateExpensePaymentReversal(item);
+    return commitExpensePaymentReversal(item, options);
   };
 
   cloneRecurringIncomeForMonth = function ledgerRecurringIncomeClone(source, month) {
@@ -374,16 +388,16 @@
 
   let accountSpendSubmitPending = false;
 
-  function accountMutationCanWrite() {
+  function moneyMutationCanWrite() {
     const architecture = window.FinanceProfileArchitecture;
     if (!architecture || architecture.canWrite?.() !== false) return true;
     showToast("This Viewer profile is read-only", "warning");
     return false;
   }
 
-  function expectedBalancesMatch(expectedBalances = []) {
-    return expectedBalances.every(item => Object.prototype.hasOwnProperty.call(data.accounts || {}, item.account)
-      && roundMoney(data.accounts[item.account]) === roundMoney(item.target));
+  function expectedBalancesMatch(expectedBalances = [], target = data) {
+    return expectedBalances.every(item => Object.prototype.hasOwnProperty.call(target.accounts || {}, item.account)
+      && roundMoney(target.accounts[item.account]) === roundMoney(item.target));
   }
 
   function accountStateMatchesRuntime(accounts) {
@@ -396,48 +410,42 @@
       && roundMoney(storedAccounts[name]) === roundMoney(runtimeAccounts[name]));
   }
 
-  function localAccountsMatchRuntime() {
+  function readStoredFinanceState(storageKey) {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return false;
-      return accountStateMatchesRuntime(JSON.parse(raw).accounts);
+      const raw = localStorage.getItem(storageKey);
+      return raw ? JSON.parse(raw) : null;
     } catch (error) {
-      console.error("Could not verify local account persistence.", error);
-      return false;
+      console.error(`Could not read finance state from ${storageKey}.`, error);
+      return null;
     }
   }
 
-  function profileAccountsMatchRuntime() {
-    const architecture = window.FinanceProfileArchitecture;
-    const profileId = architecture?.activeProfileId?.();
-    if (!profileId) return true;
+  function restoreUndoSnapshot(undoSnapshot, undoRaw) {
+    try { if (typeof undoState !== "undefined") undoState = undoSnapshot ? cloneData(undoSnapshot) : null; } catch (error) {}
     try {
-      const raw = localStorage.getItem(`simple-finance-profile-data-v1:${profileId}`);
-      if (!raw) return false;
-      return accountStateMatchesRuntime(JSON.parse(raw).accounts);
-    } catch (error) {
-      console.error("Could not verify profile-scoped account persistence.", error);
-      return false;
-    }
+      if (undoRaw == null) localStorage.removeItem(UNDO_KEY);
+      else localStorage.setItem(UNDO_KEY, undoRaw);
+    } catch (error) {}
   }
 
-  function restoreAccountMutation(snapshot, message = "Account changes were not saved") {
+  function restoreLedgerTransaction(snapshot, undoSnapshot, undoRaw, message = "Money changes were not saved") {
     data = normalizeData(cloneData(snapshot));
+    restoreUndoSnapshot(undoSnapshot, undoRaw);
     try {
-      if (typeof persistFinanceDataRaw === "function") persistFinanceDataRaw("Account correction rolled back");
+      if (typeof persistFinanceDataRaw === "function") persistFinanceDataRaw("Money transaction rolled back");
       else localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     } catch (error) {
-      console.error("Could not persist the account rollback; the prior stored copy remains authoritative.", error);
+      console.error("Could not persist the money-transaction rollback; the prior stored copy remains authoritative.", error);
     }
-    try { renderAll(false); } catch (error) { console.error("Could not refresh account state after rollback.", error); }
+    try { renderAll(false); } catch (error) { console.error("Could not refresh finance state after rollback.", error); }
     showToast(message, "warning");
-    return false;
+    return { ok:false, reason:message };
   }
 
-  function accountMutationInvariantReport(expectedBalances = []) {
+  function accountMutationInvariantReport(expectedBalances = [], target = data) {
     const errors = [];
-    const activeAccounts = data.accounts && typeof data.accounts === "object" ? data.accounts : {};
-    const ledgerEntries = Array.isArray(data.accountLedger) ? data.accountLedger : [];
+    const activeAccounts = target?.accounts && typeof target.accounts === "object" ? target.accounts : {};
+    const ledgerEntries = Array.isArray(target?.accountLedger) ? target.accountLedger : [];
     const calculated = Object.fromEntries(Object.keys(activeAccounts).map(name => [name, 0]));
     const operationIds = new Set();
     const ledgerById = new Map();
@@ -461,7 +469,7 @@
       else if (roundMoney(balance) !== roundMoney(calculated[account] || 0)) errors.push(`ledger-balance-mismatch:${account}`);
     }
 
-    for (const item of data.accountReconciliations || []) {
+    for (const item of target?.accountReconciliations || []) {
       if (!item?.ledgerEntryId) continue;
       const entry = ledgerById.get(item.ledgerEntryId);
       if (!entry || entry.account !== item.account || entry.reconciliationId !== item.id) errors.push(`broken-reconciliation:${item.id || item.account}`);
@@ -474,59 +482,366 @@
     return { ok:errors.length === 0, errors };
   }
 
-  function persistAccountMutation(snapshot, message, expectedBalances = []) {
-    recalculateBalances(data);
-    const beforePersist = accountMutationInvariantReport(expectedBalances);
-    if (!beforePersist.ok || !expectedBalancesMatch(expectedBalances)) {
-      console.error("Account mutation invariants failed before persistence.", beforePersist.errors);
-      return restoreAccountMutation(snapshot, "The account update failed its safety checks. Nothing was saved.");
+  function verificationErrors(result, label = "domain") {
+    if (result == null || result === true) return [];
+    if (result === false) return [`${label}-verification-failed`];
+    if (typeof result === "string") return [result];
+    if (Array.isArray(result)) return result.filter(Boolean).map(String);
+    if (typeof result === "object") {
+      if (result.ok === true) return [];
+      if (Array.isArray(result.errors)) return result.errors.filter(Boolean).map(String);
     }
+    return [`${label}-verification-failed`];
+  }
+
+  function moneyMutationInvariantReport(target = data, expectedBalances = [], verify = null, context = null) {
+    const base = accountMutationInvariantReport(expectedBalances, target);
+    const errors = [...base.errors];
+    if (typeof verify === "function") {
+      try { errors.push(...verificationErrors(verify(target, context), "money-domain")); }
+      catch (error) { errors.push(`money-domain-exception:${error?.message || "unknown"}`); }
+    }
+    return { ok:errors.length === 0, errors };
+  }
+
+  function persistedMoneyStateMatches(target, expectedBalances, verify, context) {
+    if (!target || !accountStateMatchesRuntime(target.accounts)) return false;
+    return moneyMutationInvariantReport(target, expectedBalances, verify, context).ok;
+  }
+
+  function runLedgerTransaction({ undoLabel, message = "Money transaction saved", expectedBalances = [], mutate, verify = null, recordUndo = true, notify = true }) {
+    if (!moneyMutationCanWrite()) return { ok:false, reason:"read-only" };
+    if (typeof mutate !== "function") return { ok:false, reason:"missing-mutation" };
+    const snapshot = cloneData(data);
+    const undoSnapshot = typeof undoState !== "undefined" && undoState ? cloneData(undoState) : null;
+    const undoRaw = (() => { try { return localStorage.getItem(UNDO_KEY); } catch (error) { return null; } })();
     try {
+      if (recordUndo) pushUndo(undoLabel || message || "Money transaction");
+      const context = mutate() || {};
+      recalculateBalances(data, { stamp:true });
+      const beforePersist = moneyMutationInvariantReport(data, expectedBalances, verify, context);
+      if (!beforePersist.ok || !expectedBalancesMatch(expectedBalances)) {
+        console.error("Money mutation invariants failed before persistence.", beforePersist.errors);
+        throw Object.assign(new Error("The money update failed its safety checks."), { userMessage:"The money update failed its safety checks. Nothing was saved." });
+      }
+      if (context?.changed === false) {
+        if (recordUndo) restoreUndoSnapshot(undoSnapshot, undoRaw);
+        return { ok:true, skipped:true, context };
+      }
       if (typeof persistFinanceDataRaw !== "function") throw new Error("Finance persistence is unavailable.");
       const saved = persistFinanceDataRaw(message);
-      if (saved === false) return restoreAccountMutation(snapshot, "Account changes were not saved. Check profile permissions and try again.");
-    } catch (error) {
-      console.error("Account changes could not be persisted.", error);
-      return restoreAccountMutation(snapshot, "Account changes could not be saved on this device.");
-    }
-    const afterPersist = accountMutationInvariantReport(expectedBalances);
-    if (!afterPersist.ok || !expectedBalancesMatch(expectedBalances)) {
-      console.error("Account mutation invariants failed after persistence.", afterPersist.errors);
-      return restoreAccountMutation(snapshot, "The account state changed during save. The previous value was restored.");
-    }
-    if (!localAccountsMatchRuntime()) {
-      return restoreAccountMutation(snapshot, "The account update could not be verified in local storage.");
-    }
-    if (!profileAccountsMatchRuntime()) {
-      const architecture = window.FinanceProfileArchitecture;
-      let repaired = false;
-      try { repaired = architecture?.persistCurrentData?.(data, message) !== false; } catch (error) { console.error("Could not repair profile-scoped account persistence.", error); }
-      if (!repaired || !profileAccountsMatchRuntime()) {
-        return restoreAccountMutation(snapshot, "The account update could not be stored in the active profile.");
+      if (saved === false) throw Object.assign(new Error("Finance persistence rejected the transaction."), { userMessage:"Money changes were not saved. Check profile permissions and try again." });
+
+      const afterPersist = moneyMutationInvariantReport(data, expectedBalances, verify, context);
+      if (!afterPersist.ok || !expectedBalancesMatch(expectedBalances)) {
+        console.error("Money mutation invariants failed after persistence.", afterPersist.errors);
+        throw Object.assign(new Error("Money state changed during persistence."), { userMessage:"The money state changed during save. The previous value was restored." });
       }
+
+      const localState = readStoredFinanceState(STORAGE_KEY);
+      if (!persistedMoneyStateMatches(localState, expectedBalances, verify, context)) {
+        throw Object.assign(new Error("Local persistence verification failed."), { userMessage:"The money update could not be verified in local storage." });
+      }
+
+      const architecture = window.FinanceProfileArchitecture;
+      const profileId = architecture?.activeProfileId?.();
+      if (profileId) {
+        const profileKey = `simple-finance-profile-data-v1:${profileId}`;
+        let profileState = readStoredFinanceState(profileKey);
+        if (!persistedMoneyStateMatches(profileState, expectedBalances, verify, context)) {
+          let repaired = false;
+          try { repaired = architecture?.persistCurrentData?.(data, message) !== false; } catch (error) { console.error("Could not repair profile-scoped money persistence.", error); }
+          profileState = readStoredFinanceState(profileKey);
+          if (!repaired || !persistedMoneyStateMatches(profileState, expectedBalances, verify, context)) {
+            throw Object.assign(new Error("Profile persistence verification failed."), { userMessage:"The money update could not be stored in the active profile." });
+          }
+        }
+      }
+
+      if (notify) showToast(message);
+      return { ok:true, context };
+    } catch (error) {
+      console.error("Money transaction failed.", error);
+      return restoreLedgerTransaction(snapshot, undoSnapshot, undoRaw, error?.userMessage || "The money update could not be completed. The previous state was restored.");
     }
-    showToast(message);
-    return true;
   }
 
   function runAccountMutation({ undoLabel, message, expectedBalances = [], mutate }) {
-    if (!accountMutationCanWrite()) return false;
-    if (typeof mutate !== "function") return false;
-    const snapshot = cloneData(data);
-    try {
-      pushUndo(undoLabel || message || "Account update");
-      mutate();
-      recalculateBalances(data, { stamp:true });
-      const report = accountMutationInvariantReport(expectedBalances);
-      if (!report.ok) {
-        console.error("Account mutation invariants failed.", report.errors);
-        return restoreAccountMutation(snapshot, "The account update failed its safety checks. Nothing was saved.");
-      }
-      return persistAccountMutation(snapshot, message || "Account updated", expectedBalances);
-    } catch (error) {
-      console.error("Account mutation failed before persistence.", error);
-      return restoreAccountMutation(snapshot, "The account update could not be completed. The previous value was restored.");
+    return runLedgerTransaction({ undoLabel, message:message || "Account updated", expectedBalances, mutate }).ok;
+  }
+
+  function expensePaymentStateErrors(target, context) {
+    const errors = [];
+    const expenses = Array.isArray(target?.expenses) ? target.expenses : [];
+    const ledger = Array.isArray(target?.accountLedger) ? target.accountLedger : [];
+    const expectedType = context.auto ? "gym-auto-payment" : "expense-payment";
+    const entries = ledger.filter(entry => entry.transactionId === context.transactionId && entry.type === expectedType);
+    if (entries.length !== context.itemIds.length) errors.push("expense-payment-entry-count");
+    for (const id of context.itemIds) {
+      const item = expenses.find(expense => expense.id === id);
+      const entry = entries.find(candidate => candidate.expenseId === id);
+      const amount = roundMoney(context.itemAmounts[id] || 0);
+      if (!item || !item.paid || !item.accountDeducted || item.paymentTransactionId !== context.transactionId || item.paidFromAccount !== context.account || roundMoney(item.paidAmount) !== amount) errors.push(`expense-payment-state:${id}`);
+      if (!entry || entry.account !== context.account || roundMoney(entry.amount) !== roundMoney(-amount)) errors.push(`expense-payment-ledger:${id}`);
     }
+    if (roundMoney(target?.accounts?.[context.account] || 0) !== roundMoney(context.expectedAfter)) errors.push(`expense-payment-balance:${context.account}`);
+    return errors;
+  }
+
+  function commitExpensePayment(items, account, { auto = false, paidDate = localDateKey(), undoLabel = "", message = "" } = {}) {
+    const ids = (items || []).map(item => item?.id).filter(Boolean);
+    const eligible = ids.map(id => (data.expenses || []).find(item => item.id === id)).filter(item => item && !item.paid);
+    const total = expensePaymentTotal(eligible);
+    if (!eligible.length || total <= 0) return { ok:false, reason:"empty", total:0 };
+    if (!Object.prototype.hasOwnProperty.call(data.accounts || {}, account)) return { ok:false, reason:"missing-account", total };
+    const before = roundMoney(data.accounts[account]);
+    if (before < total) return { ok:false, reason:"insufficient", total, balance:before };
+    const expectedAfter = roundMoney(before - total);
+    const itemAmounts = Object.fromEntries(eligible.map(item => [item.id, roundMoney(expensePaymentAmount(item))]));
+    let mutationResult = null;
+    const transaction = runLedgerTransaction({
+      undoLabel:undoLabel || (eligible.length === 1 ? `Pay ${eligible[0].name} from ${account}` : `Pay ${eligible.length} expenses from ${account}`),
+      message:message || `${money(total)} deducted from ${account}`,
+      expectedBalances:[{ account, target:expectedAfter }],
+      mutate:() => {
+        mutationResult = mutateExpensePayment(eligible, account, { auto, paidDate });
+        if (!mutationResult.ok) throw Object.assign(new Error(`Expense payment failed: ${mutationResult.reason || "unknown"}`), { userMessage:"Payment could not be completed. Nothing was changed." });
+        return { kind:"expense-payment", auto, account, expectedAfter, itemIds:eligible.map(item => item.id), itemAmounts, transactionId:mutationResult.transactionId };
+      },
+      verify:expensePaymentStateErrors
+    });
+    return transaction.ok ? { ...mutationResult, ok:true, before, after:expectedAfter } : { ok:false, reason:transaction.reason || mutationResult?.reason || "transaction-failed", total, balance:before };
+  }
+
+  function expenseReversalStateErrors(target, context) {
+    const errors = [];
+    const item = (target?.expenses || []).find(expense => expense.id === context.itemId);
+    if (!item || item.paid || item.accountDeducted || item.paymentTransactionId || item.paidFromAccount || roundMoney(item.paidAmount || 0) !== 0) errors.push(`expense-reversal-state:${context.itemId}`);
+    if (context.restored > 0) {
+      const reversal = (target?.accountLedger || []).find(entry => entry.operationId === context.operationId && entry.type === "expense-payment-reversal" && entry.expenseId === context.itemId);
+      if (!reversal || reversal.account !== context.account || roundMoney(reversal.amount) !== roundMoney(context.restored)) errors.push(`expense-reversal-ledger:${context.itemId}`);
+      if (context.originalEntryId && reversal?.reversesEntryId !== context.originalEntryId) errors.push(`expense-reversal-reference:${context.itemId}`);
+      if (roundMoney(target?.accounts?.[context.account] || 0) !== roundMoney(context.expectedAfter)) errors.push(`expense-reversal-balance:${context.account}`);
+    }
+    return errors;
+  }
+
+  function commitExpensePaymentReversal(item, { undoLabel = "", message = "" } = {}) {
+    const actual = item?.id ? (data.expenses || []).find(expense => expense.id === item.id) : item;
+    if (!actual?.paid) return { ok:false, reason:"not-paid", restored:0 };
+    const account = actual.paidFromAccount || "";
+    const restored = actual.accountDeducted && account ? roundMoney(actual.paidAmount || 0) : 0;
+    if (restored > 0 && !Object.prototype.hasOwnProperty.call(data.accounts || {}, account)) return { ok:false, reason:"missing-account", missingAccount:account, restored:0 };
+    const before = restored > 0 ? roundMoney(data.accounts[account]) : 0;
+    const expectedAfter = roundMoney(before + restored);
+    const originalTransactionId = actual.paymentTransactionId || "";
+    const originalEntry = (data.accountLedger || []).find(entry => entry.transactionId === originalTransactionId && entry.expenseId === actual.id && ["expense-payment", "gym-auto-payment"].includes(entry.type));
+    const operationId = `expense-payment-reversal:${originalTransactionId || actual.id}`;
+    let mutationResult = null;
+    const transaction = runLedgerTransaction({
+      undoLabel:undoLabel || `Move ${actual.name} back to unpaid`,
+      message:message || (restored ? `${money(restored)} restored to ${account}` : "Expense moved back to unpaid"),
+      expectedBalances:restored > 0 ? [{ account, target:expectedAfter }] : [],
+      mutate:() => {
+        mutationResult = mutateExpensePaymentReversal(actual);
+        if (!mutationResult.ok) throw Object.assign(new Error(`Expense reversal failed: ${mutationResult.reason || "unknown"}`), { userMessage:"The payment reversal could not be completed. Nothing was changed." });
+        return { kind:"expense-reversal", itemId:actual.id, account, restored, expectedAfter, originalTransactionId, originalEntryId:originalEntry?.id || "", operationId };
+      },
+      verify:expenseReversalStateErrors
+    });
+    return transaction.ok ? { ...mutationResult, ok:true, before, after:expectedAfter } : { ok:false, reason:transaction.reason || mutationResult?.reason || "transaction-failed", restored:0 };
+  }
+
+  function transferStateErrors(target, context) {
+    const entries = (target?.accountLedger || []).filter(entry => entry.transferId === context.transferId);
+    const out = entries.find(entry => entry.type === "transfer-out");
+    const incoming = entries.find(entry => entry.type === "transfer-in");
+    const errors = [];
+    if (entries.length !== 2 || !out || !incoming) errors.push("transfer-entry-count");
+    if (!out || out.account !== context.from || out.counterpartAccount !== context.to || roundMoney(out.amount) !== roundMoney(-context.amount)) errors.push("transfer-out-invalid");
+    if (!incoming || incoming.account !== context.to || incoming.counterpartAccount !== context.from || roundMoney(incoming.amount) !== roundMoney(context.amount)) errors.push("transfer-in-invalid");
+    if (out && incoming && out.transactionId !== incoming.transactionId) errors.push("transfer-transaction-mismatch");
+    return errors;
+  }
+
+  function commitTransfer({ from, to, amount, date = localDateKey(), note = "" }) {
+    amount = roundMoney(Number(amount || 0));
+    if (!from || !to || !date || amount <= 0) return { ok:false, reason:"invalid-transfer" };
+    if (from === to) return { ok:false, reason:"same-account" };
+    if (!Object.prototype.hasOwnProperty.call(data.accounts || {}, from) || !Object.prototype.hasOwnProperty.call(data.accounts || {}, to)) return { ok:false, reason:"missing-account" };
+    const beforeFrom = roundMoney(data.accounts[from]);
+    const beforeTo = roundMoney(data.accounts[to]);
+    if (beforeFrom < amount) return { ok:false, reason:"insufficient", balance:beforeFrom };
+    const transferId = uid();
+    const expectedFrom = roundMoney(beforeFrom - amount);
+    const expectedTo = roundMoney(beforeTo + amount);
+    const transaction = runLedgerTransaction({
+      undoLabel:`Transfer ${money(amount)} from ${from} to ${to}`,
+      message:`${money(amount)} transferred from ${from} to ${to}`,
+      expectedBalances:[{ account:from, target:expectedFrom }, { account:to, target:expectedTo }],
+      mutate:() => {
+        const added = appendLedgerEntries([
+          { id:uid(), transactionId:transferId, operationId:`transfer-out:${transferId}`, account:from, counterpartAccount:to, type:"transfer-out", amount:-amount, date, description:`Transfer to ${to}`, transferId, source:"transfer", notes:note },
+          { id:uid(), transactionId:transferId, operationId:`transfer-in:${transferId}`, account:to, counterpartAccount:from, type:"transfer-in", amount, date, description:`Transfer from ${from}`, transferId, source:"transfer", notes:note }
+        ]);
+        if (added.length !== 2) throw Object.assign(new Error("Transfer ledger pair was not created."), { userMessage:"The transfer could not be recorded. Nothing was changed." });
+        return { kind:"transfer", transferId, from, to, amount, expectedFrom, expectedTo };
+      },
+      verify:transferStateErrors
+    });
+    return transaction.ok ? { ok:true, transferId, from, to, amount, beforeFrom, beforeTo, afterFrom:expectedFrom, afterTo:expectedTo } : { ok:false, reason:transaction.reason || "transaction-failed" };
+  }
+
+  function incomeStateErrors(target, context) {
+    const errors = [];
+    const records = Array.isArray(target?.incomeRecords) ? target.incomeRecords : [];
+    const ledger = Array.isArray(target?.accountLedger) ? target.accountLedger : [];
+    const record = records.find(item => item.id === context.id);
+    if (context.deleted) {
+      if (record) errors.push(`income-delete-record:${context.id}`);
+    } else {
+      if (!record) errors.push(`income-record-missing:${context.id}`);
+      else if (context.postToLedger) {
+        const deposits = ledger.filter(entry => entry.transactionId === record.ledgerTransactionId && entry.type === "income-deposit" && entry.incomeId === context.id);
+        if (!record.ledgerTransactionId || deposits.length !== 1) errors.push(`income-deposit-count:${context.id}`);
+        const deposit = deposits[0];
+        if (!deposit || deposit.account !== context.account || roundMoney(deposit.amount) !== roundMoney(context.amount)) errors.push(`income-deposit-invalid:${context.id}`);
+      } else if (record?.ledgerTransactionId) errors.push(`income-ledger-flag:${context.id}`);
+    }
+    if (context.originalTransactionId) {
+      const operationId = `income-reversal:${context.id}:${context.originalTransactionId}`;
+      const reversal = ledger.find(entry => entry.operationId === operationId && entry.type === "income-deposit-reversal" && entry.incomeId === context.id);
+      if (!reversal) errors.push(`income-reversal-missing:${context.id}`);
+      if (context.originalDepositId && reversal?.reversesEntryId !== context.originalDepositId) errors.push(`income-reversal-reference:${context.id}`);
+    }
+    return errors;
+  }
+
+  function commitIncomeRecord(recordInput) {
+    const input = cloneData(recordInput || {});
+    const id = input.id || uid();
+    const existing = (data.incomeRecords || []).find(item => item.id === id) || null;
+    const postToLedger = Boolean(input.postToLedger);
+    if (!input.name || !input.date || !input.account || !Number.isFinite(Number(input.amount)) || Number(input.amount) <= 0) return { ok:false, reason:"invalid-income" };
+    if (!Object.prototype.hasOwnProperty.call(data.accounts || {}, input.account)) return { ok:false, reason:"missing-account" };
+    const originalTransactionId = existing?.ledgerTransactionId || "";
+    const originalDeposit = originalTransactionId ? (data.accountLedger || []).find(entry => entry.transactionId === originalTransactionId && entry.type === "income-deposit" && entry.incomeId === id) : null;
+    const record = { ...input, id, ledgerTransactionId:originalTransactionId, postToLedger };
+    let savedRecord = null;
+    const transaction = runLedgerTransaction({
+      undoLabel:existing ? `Edit income ${record.name}` : `Add income ${record.name}`,
+      message:postToLedger ? (existing ? "Income updated and account ledger adjusted" : "Income added to account ledger") : (existing ? "Income updated" : "Income added"),
+      mutate:() => {
+        if (existing?.ledgerTransactionId) reverseIncomeLedger(existing, postToLedger ? "Income was edited and reposted" : "Income posting was removed");
+        record.ledgerTransactionId = "";
+        if (postToLedger && !postIncomeLedger(record)) throw Object.assign(new Error("Income deposit ledger entry was not created."), { userMessage:"The income could not be added to the account ledger. Nothing was changed." });
+        if (existing) Object.assign(existing, record); else data.incomeRecords.push(record);
+        savedRecord = existing || record;
+        return { kind:"income", id, deleted:false, postToLedger, account:record.account, amount:roundMoney(record.amount), originalTransactionId, originalDepositId:originalDeposit?.id || "", ledgerTransactionId:savedRecord.ledgerTransactionId || "" };
+      },
+      verify:incomeStateErrors
+    });
+    return transaction.ok ? { ok:true, record:cloneData(savedRecord) } : { ok:false, reason:transaction.reason || "transaction-failed" };
+  }
+
+  function commitIncomeDeletion(id) {
+    const item = (data.incomeRecords || []).find(record => record.id === id);
+    if (!item) return { ok:false, reason:"missing-income" };
+    const originalTransactionId = item.ledgerTransactionId || "";
+    const originalDeposit = originalTransactionId ? (data.accountLedger || []).find(entry => entry.transactionId === originalTransactionId && entry.type === "income-deposit" && entry.incomeId === id) : null;
+    const transaction = runLedgerTransaction({
+      undoLabel:`Delete income ${item.name}`,
+      message:originalTransactionId ? "Income deleted and account deposit reversed" : "Income deleted",
+      mutate:() => {
+        if (originalTransactionId) reverseIncomeLedger(item, "Income record deleted");
+        data.incomeRecords = data.incomeRecords.filter(record => record.id !== id);
+        return { kind:"income", id, deleted:true, postToLedger:false, account:item.account, amount:roundMoney(item.amount), originalTransactionId, originalDepositId:originalDeposit?.id || "" };
+      },
+      verify:incomeStateErrors
+    });
+    return transaction.ok ? { ok:true, id } : { ok:false, reason:transaction.reason || "transaction-failed" };
+  }
+
+  function quickSpendStateErrors(target, context) {
+    const errors = expensePaymentStateErrors(target, context);
+    const expense = (target?.expenses || []).find(item => item.id === context.expenseId);
+    if (!expense || expense.quickSpend !== true || expense.quickSpendSource !== "account") errors.push(`quick-spend-record:${context.expenseId}`);
+    return errors;
+  }
+
+  function commitQuickSpend({ account, amount, description, category = "Personal", date = localDateKey(), note = "", includeInTotals = true }) {
+    amount = roundMoney(Number(amount || 0));
+    if (!Object.prototype.hasOwnProperty.call(data.accounts || {}, account)) return { ok:false, reason:"missing-account" };
+    if (amount <= 0) return { ok:false, reason:"invalid-amount" };
+    const before = roundMoney(data.accounts[account]);
+    if (before < amount) return { ok:false, reason:"insufficient", balance:before };
+    const expectedAfter = roundMoney(before - amount);
+    let expense = null;
+    let mutationResult = null;
+    const transaction = runLedgerTransaction({
+      undoLabel:`Spend ${money(amount)} from ${account}: ${description}`,
+      message:`${description} recorded · ${account} ${money(expectedAfter)} remaining`,
+      expectedBalances:[{ account, target:expectedAfter }],
+      mutate:() => {
+        expense = makeQuickSpendExpense({ account, amount, description:safeText(description || "Purchase", 80), category:safeText(category || "Personal", 80), date, note:safeText(note, 160), includeInTotals });
+        data.expenses.push(expense);
+        mutationResult = mutateExpensePayment([expense], account, { auto:false, paidDate:date });
+        if (!mutationResult.ok) throw Object.assign(new Error(`Quick spend failed: ${mutationResult.reason || "unknown"}`), { userMessage:"The purchase could not be recorded. Nothing was changed." });
+        return { kind:"quick-spend", auto:false, account, expectedAfter, itemIds:[expense.id], itemAmounts:{ [expense.id]:amount }, transactionId:mutationResult.transactionId, expenseId:expense.id };
+      },
+      verify:quickSpendStateErrors
+    });
+    return transaction.ok ? { ok:true, expense:cloneData(expense), before, after:expectedAfter, transactionId:mutationResult.transactionId } : { ok:false, reason:transaction.reason || mutationResult?.reason || "transaction-failed", balance:before };
+  }
+
+  function gymBatchStateErrors(target, context) {
+    const errors = [];
+    const ledger = Array.isArray(target?.accountLedger) ? target.accountLedger : [];
+    const expenses = Array.isArray(target?.expenses) ? target.expenses : [];
+    for (const id of context.entryIds || []) {
+      const entry = ledger.find(candidate => candidate.id === id && candidate.type === "gym-auto-payment");
+      if (!entry) { errors.push(`gym-ledger-missing:${id}`); continue; }
+      const item = expenses.find(expense => expense.id === entry.expenseId);
+      if (!item || !item.paid || !item.accountDeducted || !item.autoPaidAtMonthEnd || item.paymentTransactionId !== entry.transactionId || item.paidFromAccount !== entry.account || roundMoney(item.paidAmount) !== roundMoney(-entry.amount)) errors.push(`gym-payment-state:${entry.expenseId}`);
+    }
+    for (const id of context.generatedIds || []) if (!expenses.some(expense => expense.id === id)) errors.push(`gym-generated-missing:${id}`);
+    return errors;
+  }
+
+  function commitGymAutoPayments({ notify = true } = {}) {
+    if (typeof originalProcessGymMonthEndAutoPayments !== "function") return { ok:false, reason:"gym-owner-unavailable" };
+    const beforeLedgerIds = new Set((data.accountLedger || []).map(entry => entry.id));
+    const beforeExpenseIds = new Set((data.expenses || []).map(item => item.id));
+    const transaction = runLedgerTransaction({
+      message:"Gym auto-payments updated",
+      recordUndo:false,
+      notify:false,
+      mutate:() => {
+        globalThis.__financeLedgerMutationInternal = true;
+        globalThis.__financeLedgerGymMutationInternal = true;
+        try { originalProcessGymMonthEndAutoPayments({ notify:false }); }
+        finally {
+          globalThis.__financeLedgerGymMutationInternal = false;
+          globalThis.__financeLedgerMutationInternal = false;
+        }
+        const entryIds = (data.accountLedger || []).filter(entry => !beforeLedgerIds.has(entry.id) && entry.type === "gym-auto-payment").map(entry => entry.id);
+        const generatedIds = (data.expenses || []).filter(item => !beforeExpenseIds.has(item.id)).map(item => item.id);
+        return { kind:"gym-auto-pay", changed:Boolean(entryIds.length || generatedIds.length), entryIds, generatedIds, paidCount:entryIds.length, generatedCount:generatedIds.length };
+      },
+      verify:gymBatchStateErrors
+    });
+    if (!transaction.ok) return transaction;
+    const context = transaction.context || {};
+    if (!transaction.skipped) {
+      try { renderAll(false); } catch (error) { console.error("Gym auto-payments were saved but the interface refresh failed.", error); }
+    }
+    if (notify && context.paidCount) showToast(`${context.paidCount} gym auto-payment${context.paidCount === 1 ? "" : "s"} processed`);
+    else if (notify && context.generatedCount) showToast(`${context.generatedCount} recurring gym expense${context.generatedCount === 1 ? "" : "s"} prepared`, "info");
+    return { ok:true, changed:!transaction.skipped, ...context };
+  }
+
+  if (originalProcessGymMonthEndAutoPayments) {
+    processGymMonthEndAutoPayments = function ledgerGymAutoPayments(options = {}) { return commitGymAutoPayments(options); };
   }
 
   function setAccountSpendStatus(state = "", message = "") {
@@ -763,56 +1078,21 @@
     if (amount > balance) { setFieldError(amountInput, `Available balance is ${money(balance)}.`); updateAccountSpendPreview(); amountInput?.focus(); setAccountSpendStatus("error", `${account} has insufficient funds for this purchase.`); return false; }
 
     const primary = accountSpendPrimaryButton();
-    const beforeData = cloneData(data);
-    const beforeUndoState = undoState ? cloneData(undoState) : null;
-    const beforeUndoRaw = localStorage.getItem(UNDO_KEY);
-    const expectedAfter = roundMoney(balance - amount);
     accountSpendSubmitPending = true;
     if (primary) { primary.disabled = true; primary.textContent = "Recording…"; }
     setAccountSpendStatus("working", "Recording purchase…");
-    let persisted = false;
-    try {
-      pushUndo(`Spend ${money(amount)} from ${account}: ${description}`);
-      const expense = makeQuickSpendExpense({ account, amount, description, category, date, note, includeInTotals });
-      data.expenses.push(expense);
-      const result = applyExpensePayment([expense], account, { auto:false, paidDate:date });
-      if (!result.ok) throw new Error(result.reason === "insufficient" ? `${account} has insufficient funds for this purchase.` : "The purchase could not be recorded.");
-      recalculateBalances(data, { stamp:true });
-      const paidRecordReady = Boolean(expense.paid && expense.accountDeducted && expense.paymentTransactionId);
-      const matchingLedger = (data.accountLedger || []).filter(entry => entry.transactionId === result.transactionId && entry.expenseId === expense.id && entry.type === "expense-payment" && roundMoney(entry.amount) === roundMoney(-amount));
-      const balanceReady = roundMoney(data.accounts?.[account] || 0) === expectedAfter;
-      if (!paidRecordReady || matchingLedger.length !== 1 || !balanceReady) throw new Error("The purchase could not be fully verified before saving.");
-
-      const saved = saveData(`${description} recorded · ${account} ${money(expectedAfter)} remaining`);
-      if (saved !== true) throw new Error("The purchase could not be saved. Your records were left unchanged.");
-      persisted = true;
-      const storedRaw = localStorage.getItem(STORAGE_KEY);
-      if (!storedRaw) throw new Error("The saved purchase could not be verified in storage.");
-      const stored = JSON.parse(storedRaw);
-      const storedExpense = (Array.isArray(stored.expenses) ? stored.expenses : []).find(item => item.id === expense.id && item.paid && item.accountDeducted && item.paymentTransactionId === result.transactionId && roundMoney(item.paidAmount) === amount);
-      const storedLedger = (Array.isArray(stored.accountLedger) ? stored.accountLedger : []).filter(entry => entry.transactionId === result.transactionId && entry.expenseId === expense.id && entry.type === "expense-payment" && roundMoney(entry.amount) === roundMoney(-amount));
-      const storedBalance = roundMoney(stored.accounts?.[account] || 0);
-      if (!storedExpense || storedLedger.length !== 1 || storedBalance !== expectedAfter) throw new Error("The purchase did not pass storage verification. It was rolled back.");
-
-      refreshReconciledAccountState(account, expectedAfter);
-      setAccountSpendStatus("success", `${description} recorded successfully · ${account} ${money(expectedAfter)} remaining.`);
-      accountSpendSubmitPending = false;
-      closeTrackedFormAfterAction("accountDialog");
-      showToast(`${description} recorded · ${account} ${money(expectedAfter)} remaining`, "success");
-      return true;
-    } catch (error) {
-      data = normalizeData(beforeData);
-      undoState = beforeUndoState;
-      if (beforeUndoRaw == null) localStorage.removeItem(UNDO_KEY); else localStorage.setItem(UNDO_KEY, beforeUndoRaw);
-      if (persisted) persistFinanceDataRaw("Record spending rolled back");
-      renderAll(false);
-      accountSpendSubmitPending = false;
+    const result = commitQuickSpend({ account, amount, description, category, date, note, includeInTotals });
+    accountSpendSubmitPending = false;
+    if (!result.ok) {
       if (primary) { primary.disabled = false; primary.textContent = "Record spending"; }
-      const message = error?.message || "The purchase could not be recorded.";
+      const message = result.reason === "read-only" ? "This Viewer profile is read-only." : "The purchase could not be recorded. Your records were left unchanged.";
       setAccountSpendStatus("error", message);
-      showToast(message, "warning");
       return false;
     }
+    refreshReconciledAccountState(account, result.after);
+    setAccountSpendStatus("success", `${description} recorded successfully · ${account} ${money(result.after)} remaining.`);
+    closeTrackedFormAfterAction("accountDialog");
+    return true;
   }
 
   function bindPersistentSpendActionDelegation() {
@@ -986,22 +1266,19 @@
     const from = document.getElementById("transferFromAccount").value;
     const to = document.getElementById("transferToAccount").value;
     const date = document.getElementById("transferDate").value;
-    if (!validateMoneyInput("transferAmount", { required:true, min:.01, message:"Enter a transfer amount greater than zero." })) return;
+    if (!validateMoneyInput("transferAmount", { required:true, min:.01, message:"Enter a transfer amount greater than zero." })) return false;
     const amount = roundMoney(moneyInputValue("transferAmount"));
-    if (!from || !to || !date) return showToast("Complete all required transfer fields", "warning");
-    if (from === to) return showToast("Choose two different accounts", "warning");
-    if (!Object.prototype.hasOwnProperty.call(data.accounts, from) || !Object.prototype.hasOwnProperty.call(data.accounts, to)) return showToast("One of the transfer accounts no longer exists", "warning");
-    if (roundMoney(data.accounts[from]) < amount) return showToast(`${from} has insufficient funds for this transfer`, "warning");
-    pushUndo(`Transfer ${money(amount)} from ${from} to ${to}`);
-    const transferId = uid();
-    const note = document.getElementById("transferNote").value.trim();
-    const added = appendLedgerEntries([
-      { id:uid(), transactionId:transferId, operationId:`transfer-out:${transferId}`, account:from, counterpartAccount:to, type:"transfer-out", amount:-amount, date, description:`Transfer to ${to}`, transferId, source:"transfer", notes:note },
-      { id:uid(), transactionId:transferId, operationId:`transfer-in:${transferId}`, account:to, counterpartAccount:from, type:"transfer-in", amount, date, description:`Transfer from ${from}`, transferId, source:"transfer", notes:note }
-    ]);
-    if (added.length !== 2) return showToast("The transfer could not be recorded", "warning");
+    if (!from || !to || !date) { showToast("Complete all required transfer fields", "warning"); return false; }
+    if (from === to) { showToast("Choose two different accounts", "warning"); return false; }
+    const result = commitTransfer({ from, to, amount, date, note:document.getElementById("transferNote").value.trim() });
+    if (!result.ok) {
+      if (result.reason === "insufficient") showToast(`${from} has insufficient funds for this transfer`, "warning");
+      else if (result.reason === "missing-account") showToast("One of the transfer accounts no longer exists", "warning");
+      return false;
+    }
     document.getElementById("accountTransferDialog").close();
-    saveData(`${money(amount)} transferred from ${from} to ${to}`);
+    try { renderAll(false); } catch (error) { console.error("Transfer was saved but the interface refresh failed.", error); }
+    return true;
   }
 
   function submitAccountForm() {
@@ -1077,12 +1354,12 @@
   }
 
   function submitIncomeForm() {
-    if (!validateMoneyInput("incomeAmount", {required:true,min:.01,message:"Enter an income amount greater than zero."})) return;
+    if (!validateMoneyInput("incomeAmount", {required:true,min:.01,message:"Enter an income amount greater than zero."})) return false;
     const rawCategory=document.getElementById("incomeCategory").value;
     let category=rawCategory;
     if (INCOME_OTHER_CATEGORIES.has(rawCategory)) {
       category=document.getElementById("incomeCustomCategory").value.trim();
-      if(!category || !/[A-Za-z0-9]/.test(category)) { setFieldError(document.getElementById("incomeCustomCategory"),"Enter a clear category name."); document.getElementById("incomeCustomCategory").focus(); return; }
+      if(!category || !/[A-Za-z0-9]/.test(category)) { setFieldError(document.getElementById("incomeCustomCategory"),"Enter a clear category name."); document.getElementById("incomeCustomCategory").focus(); return false; }
     }
     const id=document.getElementById("incomeId").value;
     const existing=(data.incomeRecords||[]).find(item=>item.id===id);
@@ -1091,27 +1368,25 @@
     const recordId = id || uid();
     const postToLedger = rawCategory !== "Transfer from savings" && Boolean(document.getElementById("incomePostToLedger")?.checked);
     const record={ id:recordId, name:document.getElementById("incomeName").value.trim(), amount:moneyInputValue("incomeAmount"), date:document.getElementById("incomeDate").value, category, categoryGroup, account:document.getElementById("incomeAccount").value, recurring, seriesId:existing?.seriesId || (recurring==="Monthly"?`income-series-${recordId}`:""), includeInTotals:category==="Transfer from savings"?false:document.getElementById("incomeIncludeInTotals").checked, notes:document.getElementById("incomeNotes").value.trim(), icon:pickerIcon("income"), ledgerTransactionId:existing?.ledgerTransactionId || "", postToLedger };
-    if(!record.name || !record.date || !record.account) return showToast("Complete all required income fields", "warning");
-    pushUndo(existing ? `Edit income ${record.name}` : `Add income ${record.name}`);
-    if (existing?.ledgerTransactionId) reverseIncomeLedger(existing, postToLedger ? "Income was edited and reposted" : "Income posting was removed");
-    record.ledgerTransactionId = "";
-    if (postToLedger) postIncomeLedger(record);
-    if(existing) Object.assign(existing,record); else data.incomeRecords.push(record);
+    if(!record.name || !record.date || !record.account) { showToast("Complete all required income fields", "warning"); return false; }
+    const result = commitIncomeRecord(record);
+    if (!result.ok) return false;
     closeTrackedFormAfterAction("incomeDialog");
-    saveData(postToLedger ? (existing?"Income updated and account ledger adjusted":"Income added to account ledger") : (existing?"Income updated":"Income added"));
+    try { renderAll(false); } catch (error) { console.error("Income was saved but the interface refresh failed.", error); }
+    return true;
   }
 
   async function deleteIncomeRecord(button) {
     const id=button.dataset.deleteIncome;
     const item=(data.incomeRecords||[]).find(record=>record.id===id);
-    if(!item) return;
+    if(!item) return false;
     const confirmed=await openAppConfirmation({title:"Delete income?",message:`Delete “${item.name}”?`,details:`${money(item.amount)} · ${item.category}${item.ledgerTransactionId ? " · its account deposit will be reversed" : ""}`,confirmLabel:"Delete income",danger:true});
-    if(!confirmed) return;
-    pushUndo(`Delete income ${item.name}`);
-    if (item.ledgerTransactionId) reverseIncomeLedger(item, "Income record deleted");
-    data.incomeRecords=data.incomeRecords.filter(record=>record.id!==id);
+    if(!confirmed) return false;
+    const result = commitIncomeDeletion(id);
+    if (!result.ok) return false;
     closeTrackedFormAfterAction("incomeDialog");
-    saveData(item.ledgerTransactionId ? "Income deleted and account deposit reversed" : "Income deleted");
+    try { renderAll(false); } catch (error) { console.error("Income deletion was saved but the interface refresh failed.", error); }
+    return true;
   }
 
   async function deleteAccountSafely(button) {
@@ -1188,27 +1463,43 @@
   ensureAccountSpendUi();
   bindPersistentSpendActionDelegation();
   injectLedgerUi();
+  try { commitGymAutoPayments({ notify:false }); } catch (error) { console.error("Gym auto-payment hardening bootstrap failed.", error); }
   if (ledgerMigrationChanged) {
     if (typeof persistFinanceDataRaw === "function") persistFinanceDataRaw("Account ledger migrated");
     else localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   }
   renderAll(false);
 
+  window.FinanceLedgerTransactions = Object.freeze({
+    version:1,
+    owner:"account-ledger-v1",
+    capabilities:{ unifiedMoneyMutations:true, transactionalPersistence:true, localVerification:true, profileVerification:true, ledgerInvariants:true, domainInvariants:true, rollback:true },
+    run:runLedgerTransaction,
+    transfer:commitTransfer,
+    payExpenses:commitExpensePayment,
+    reverseExpensePayment:commitExpensePaymentReversal,
+    quickSpend:commitQuickSpend,
+    saveIncome:commitIncomeRecord,
+    deleteIncome:commitIncomeDeletion,
+    processGymAutoPayments:commitGymAutoPayments,
+    invariantReport:moneyMutationInvariantReport
+  });
+
   window.FinanceAccountMutations = {
     version:1,
     owner:"account-ledger-v1",
-    capabilities:{ singleOwner:true, transactionalPersistence:true, invariantChecks:true, profileVerification:true, failClosedFallback:true },
+    capabilities:{ singleOwner:true, transactionalPersistence:true, invariantChecks:true, profileVerification:true, failClosedFallback:true, unifiedMoneyEngine:true },
     submitAccountForm,
     submitAccountsReconciliationForm,
     deleteAccountSafely,
     run:runAccountMutation,
-    invariantReport:accountMutationInvariantReport
+    invariantReport:(expectedBalances = []) => accountMutationInvariantReport(expectedBalances, data)
   };
 
   window.FinanceAccountLedger = {
     version:LEDGER_VERSION,
     releaseVersion:"13.0.13",
-    capabilities:{ accountSpending:true, verifiedSpendSubmit:true, persistentSpendActions:true, transactionalSpend:true, isolatedSpendAction:true, accountReconciliationOwner:true, transactionalAccountCorrection:true, profileVerifiedAccountCorrection:true, singleAccountMutationOwner:true, accountMutationInvariants:true },
+    capabilities:{ accountSpending:true, verifiedSpendSubmit:true, persistentSpendActions:true, transactionalSpend:true, isolatedSpendAction:true, accountReconciliationOwner:true, transactionalAccountCorrection:true, profileVerifiedAccountCorrection:true, singleAccountMutationOwner:true, accountMutationInvariants:true, unifiedMoneyTransactions:true },
     recalculateBalances,
     appendLedgerEntries,
     appendReconciliation,
@@ -1216,14 +1507,7 @@
     submitAccountsReconciliationForm,
     openSpend:openAccountSpendDialog,
     submitSpend:submitAccountSpending,
-    recordSpend:({account,amount,description,category="Personal",date=localDateKey(),note="",includeInTotals=true}) => {
-      if (!Object.prototype.hasOwnProperty.call(data.accounts || {}, account)) return {ok:false,reason:"missing-account"};
-      amount=roundMoney(Number(amount||0)); if(amount<=0) return {ok:false,reason:"invalid-amount"};
-      const before=roundMoney(data.accounts[account]); if(before<amount) return {ok:false,reason:"insufficient",balance:before};
-      const expense=makeQuickSpendExpense({account,amount,description:safeText(description||"Purchase",80),category:safeText(category||"Personal",80),date,note:safeText(note,160),includeInTotals});
-      data.expenses.push(expense); const result=applyExpensePayment([expense],account,{auto:false,paidDate:date});
-      if(!result.ok){data.expenses=data.expenses.filter(item=>item.id!==expense.id);return result;} return {ok:true,expense,before,after:roundMoney(data.accounts[account]),transactionId:result.transactionId};
-    },
+    recordSpend:commitQuickSpend,
     render:renderLedgerWorkspace,
     get entries() { return cloneData(data.accountLedger || []); },
     get reconciliations() { return cloneData(data.accountReconciliations || []); }

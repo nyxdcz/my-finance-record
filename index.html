@@ -2937,7 +2937,7 @@
       const balance = roundMoney(data.accounts[account]);
       if (balance < total) return { ok:false, reason:"insufficient", total, balance };
       const transactionId = uid();
-      data.accounts[account] = roundMoney(balance - total);
+      return window.FinanceLedgerTransactions?.payExpenses ? window.FinanceLedgerTransactions.payExpenses(eligible, account, { auto, paidDate }) : { ok:false, reason:"ledger-unavailable", total, balance };
       eligible.forEach(item => {
         const amount = expensePaymentAmount(item);
         if (isDailyBudget(item)) item.amount = amount;
@@ -2961,7 +2961,7 @@
         if (!Object.prototype.hasOwnProperty.call(data.accounts || {}, item.paidFromAccount)) {
           return { restored:0, missingAccount:item.paidFromAccount };
         }
-        data.accounts[item.paidFromAccount] = roundMoney(Number(data.accounts[item.paidFromAccount] || 0) + amount);
+        return window.FinanceLedgerTransactions?.reverseExpensePayment ? window.FinanceLedgerTransactions.reverseExpensePayment(item) : { ok:false, restored:0, reason:"ledger-unavailable" };
       }
       item.paid = false;
       item.paidDate = "";
@@ -3034,7 +3034,7 @@
         else failures.push({ item, reason:result.reason, total:result.total, balance:result.balance });
       });
       const changed = Boolean(generated || paidCount);
-      if (changed) persistFinanceDataRaw();
+      if (changed && !globalThis.__financeLedgerGymMutationInternal) persistFinanceDataRaw();
       if (notify && paidCount) setTimeout(() => showToast(`${paidCount} Gym expense${paidCount === 1 ? "" : "s"} auto-paid · ${money(deducted)} deducted`, "success"), 0);
       if (notify && failures.length) {
         const unseen = failures.filter(entry => {
@@ -6900,9 +6900,11 @@
           if (item.accountDeducted && item.paidFromAccount && !Object.prototype.hasOwnProperty.call(data.accounts || {}, item.paidFromAccount)) {
             showToast(`Cannot restore ${money(item.paidAmount)} because ${item.paidFromAccount} no longer exists. Recreate the account first.`, "warning");
           } else {
-            pushUndo(`Move ${item.name} back to unpaid`);
-            const result = restoreExpensePayment(item);
-            saveData(result.restored ? `${money(result.restored)} restored to the payment account` : "Expense moved back to unpaid");
+            const service = window.FinanceLedgerTransactions;
+            if (!service?.reverseExpensePayment) { showToast("Account ledger is updating. Reload Talaan before reversing a payment.", "warning"); return; }
+            const result = service.reverseExpensePayment(item);
+            if (!result.ok) { showToast("Payment reversal could not be completed", "warning"); return; }
+            try { renderAll(false); } catch (error) { console.error("Payment reversal was saved but the interface refresh failed.", error); }
           }
         }
       }
@@ -7261,14 +7263,15 @@
       if (document.getElementById("confirmExpensePayment").disabled) return;
       expensePaymentSubmitting = true;
       document.getElementById("confirmExpensePayment").disabled = true;
-      pushUndo(items.length === 1 ? `Pay ${items[0].name} from ${account}` : `Pay ${items.length} expenses from ${account}`);
-      const result = applyExpensePayment(items, account, { auto:false });
+      const service = window.FinanceLedgerTransactions;
+      if (!service?.payExpenses) { expensePaymentSubmitting = false; refreshExpensePaymentPreview(); showToast("Account ledger is updating. Reload Talaan before recording a payment.", "warning"); return; }
+      const result = service.payExpenses(items, account, { auto:false });
       if (!result.ok) { expensePaymentSubmitting = false; refreshExpensePaymentPreview(); showToast("Payment could not be completed", "warning"); return; }
       closeExpensePaymentDialog();
       selectedExpenseIds.clear();
       document.getElementById("bulkExpenseAction").value = "";
       refreshBulkActionValue();
-      saveData(`${money(result.total)} deducted from ${account}`);
+      try { renderAll(false); } catch (error) { console.error("Payment was saved but the interface refresh failed.", error); }
     });
     document.getElementById("gymAutoPay").addEventListener("change", () => { toggleDailyBudgetFields(); updateExpenseFormDirty(); });
     document.getElementById("gymAutoPayAccount").addEventListener("change", () => { setFieldError(document.getElementById("gymAutoPayAccount"), ""); updateExpenseFormDirty(); });
@@ -9179,8 +9182,8 @@
   <script src="./privacy-lock.js?v=2.5.0-talaan1"></script>
   <script src="./security-profiles.js?v=2.5.0-talaan1"></script>
   <script src="./cloud-conflict-review.js?v=2.5.0-talaan1"></script>
-  <script src="./cloud-conflict-resolution.js?v=2.5.0-talaan1"></script><script src="./cloud-sync-lifecycle.js?v=2.5.0-account-7045429fa6a0"></script><script src="./cloud-sync.js?v=2.5.0-account-7045429fa6a0"></script>
-  <script src="./account-ledger.js?v=2.5.0-account-7045429fa6a0"></script>
+  <script src="./cloud-conflict-resolution.js?v=2.5.0-talaan1"></script><script src="./cloud-sync-lifecycle.js?v=2.5.0-account-0fbc28e28c89"></script><script src="./cloud-sync.js?v=2.5.0-account-0fbc28e28c89"></script>
+  <script src="./account-ledger.js?v=2.5.0-account-0fbc28e28c89"></script>
   <script src="./budget-planning.js?v=2.5.0-talaan1"></script>
   <script src="./reports-insights.js?v=2.5.0-talaan1"></script>
   <script src="./net-worth.js?v=2.5.0-talaan1"></script>
