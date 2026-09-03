@@ -438,15 +438,46 @@
 
   function applyEffectiveRecords(message = "Cloud records applied") {
     suppressQueue = true;
+    const previous = clone(typeof data !== "undefined" ? data : {});
+    let replaced = false;
     try {
+      const integrity = window.FinanceIntegrity;
+      if (!integrity?.scan) throw new Error("Financial integrity protection is unavailable. Reload Talaan before applying cloud records.");
       const next = fromRecordStore(effectiveRecordStore(), typeof data !== "undefined" ? data : {});
-      data = normalizeData(clone(next));
-      if (typeof persistFinanceDataRaw === "function") persistFinanceDataRaw(message);
-      else localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      const proposedReport = integrity.scan(next, { includeStorage:false });
+      if (proposedReport.counts.critical) {
+        setStatus("Integrity review required", `${proposedReport.counts.critical} critical issue${proposedReport.counts.critical === 1 ? "" : "s"} found in the proposed cloud finance state. Local records were kept.`, "danger");
+        throw new Error("Cloud finance state failed integrity verification before local replacement.");
+      }
+      const normalized = normalizeData(clone(next));
+      const normalizedReport = integrity.scan(normalized, { includeStorage:false });
+      if (normalizedReport.counts.critical) {
+        setStatus("Integrity review required", `${normalizedReport.counts.critical} critical issue${normalizedReport.counts.critical === 1 ? "" : "s"} remained after safe normalization. Local records were kept.`, "danger");
+        throw new Error("Cloud finance state failed integrity verification after normalization.");
+      }
+      data = normalized;
+      replaced = true;
+      if (typeof persistFinanceDataRaw === "function") {
+        const saved = persistFinanceDataRaw(message);
+        if (saved === false) throw new Error("Cloud records could not be persisted locally.");
+      } else localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      const persistedReport = integrity.scan(data, { includeStorage:true });
+      if (persistedReport.counts.critical) throw new Error("Persisted cloud finance state failed integrity verification.");
       lastObservedData = clone(data);
       if (typeof renderAll === "function") renderAll(false);
       if (typeof renderV12Settings === "function") renderV12Settings();
       try { if (typeof addSyncHistory === "function") addSyncHistory(message, "success", { cloudSchemaVersion:3, profileId:cloudProfileId(), auditId:state.lastAuditId }); } catch (error) {}
+    } catch (error) {
+      if (replaced) {
+        data = normalizeData(clone(previous));
+        try {
+          if (typeof persistFinanceDataRaw === "function") persistFinanceDataRaw("Cloud integrity rollback restored local records");
+          else localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+          lastObservedData = clone(data);
+          if (typeof renderAll === "function") renderAll(false);
+        } catch (rollbackError) { console.error("Cloud integrity rollback failed.", rollbackError); }
+      }
+      throw error;
     } finally { suppressQueue = false; }
   }
 

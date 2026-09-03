@@ -168,6 +168,56 @@
   function cloudProfileId() { return activeProfile()?.cloudProfileId || ""; }
   function activeRole() { return activeProfile()?.role || "owner"; }
   function canWrite() { return activeRole() !== "viewer"; }
+
+  function integrityReport(source = (typeof data !== "undefined" ? data : profileData() || {}), includeStorage = true) {
+    const service = window.FinanceIntegrity;
+    if (!service?.scan) throw new Error("Financial integrity protection is unavailable. Reload Talaan.");
+    return service.scan(source, { includeStorage });
+  }
+
+  function assertReplacementIntegrity(source, label = "Finance data") {
+    const report = integrityReport(source, false);
+    if (report.counts.critical) throw new Error(`${label} contains ${report.counts.critical} critical financial integrity issue${report.counts.critical === 1 ? "" : "s"}. The current profile was not replaced.`);
+    return report;
+  }
+
+  function restoreReplacementSnapshot(snapshot, message = "Finance replacement rolled back") {
+    if (typeof data !== "undefined") data = typeof normalizeData === "function" ? normalizeData(clone(snapshot)) : clone(snapshot);
+    if (typeof persistFinanceDataRaw === "function") {
+      const saved = persistFinanceDataRaw(message);
+      if (saved === false) throw new Error("The previous finance state could not be restored.");
+    } else {
+      localStorage.setItem(ACTIVE_DATA_KEY, JSON.stringify(data));
+      persistCurrentData(data, message);
+    }
+    if (typeof renderAll === "function") renderAll(false);
+  }
+
+  function applyGuardedFinanceReplacement(source, message) {
+    if (!canWrite()) throw new Error("Viewer profiles cannot replace records.");
+    assertReplacementIntegrity(source, message);
+    const before = clone(typeof data !== "undefined" ? data : profileData() || {});
+    try {
+      const next = typeof normalizeData === "function" ? normalizeData(clone(source)) : clone(source);
+      const normalizedReport = integrityReport(next, false);
+      if (normalizedReport.counts.critical) throw new Error(`${message} failed integrity verification before persistence.`);
+      if (typeof data !== "undefined") data = next;
+      if (typeof persistFinanceDataRaw === "function") {
+        const saved = persistFinanceDataRaw(message);
+        if (saved === false) throw new Error(`${message} could not be saved on this device.`);
+      } else {
+        localStorage.setItem(ACTIVE_DATA_KEY, JSON.stringify(next));
+        if (!persistCurrentData(next, message)) throw new Error(`${message} could not be stored in the active profile.`);
+      }
+      const finalReport = integrityReport(typeof data !== "undefined" ? data : next, true);
+      if (finalReport.counts.critical) throw new Error(`${message} failed final integrity verification.`);
+      if (typeof renderAll === "function") renderAll(false);
+      return finalReport;
+    } catch (error) {
+      restoreReplacementSnapshot(before, `${message} rolled back`);
+      throw error;
+    }
+  }
   function profileDataKey(profileId = activeProfileId()) { return `${PROFILE_DATA_PREFIX}${profileId}`; }
   function profileAuditKey(profileId = activeProfileId()) { return `${PROFILE_AUDIT_PREFIX}${profileId}`; }
 
@@ -420,13 +470,7 @@
     if (!payload?.data) throw new Error("The encrypted backup does not contain finance data.");
     if (!canWrite()) throw new Error("Viewer profiles cannot import or replace records.");
     if (typeof pushUndo === "function") pushUndo("Before encrypted backup restore");
-    if (typeof data !== "undefined") data = typeof normalizeData === "function" ? normalizeData(payload.data) : payload.data;
-    if (typeof persistFinanceDataRaw === "function") persistFinanceDataRaw("Encrypted backup restored");
-    else {
-      localStorage.setItem(ACTIVE_DATA_KEY, JSON.stringify(data));
-      persistCurrentData(data, "Encrypted backup restored");
-    }
-    if (typeof renderAll === "function") renderAll(false);
+    applyGuardedFinanceReplacement(payload.data, "Encrypted backup restored");
     appendLocalAudit("Encrypted backup imported", { sourceProfile:bundle.profile?.name || "Unknown" });
     return payload;
   }
@@ -614,9 +658,7 @@
     const snapshot = await decryptCloudPayload(envelope, { collection:"restore-point", recordId:result.encryption_record_id || id });
     if (!snapshot?.data) throw new Error("The restore point is incomplete.");
     if (typeof pushUndo === "function") pushUndo("Before cloud restore point");
-    data = typeof normalizeData === "function" ? normalizeData(snapshot.data) : snapshot.data;
-    if (typeof persistFinanceDataRaw === "function") persistFinanceDataRaw("Cloud restore point applied");
-    if (typeof renderAll === "function") renderAll(false);
+    applyGuardedFinanceReplacement(snapshot.data, "Cloud restore point applied");
     appendLocalAudit("Cloud restore point applied", { restorePointId:id });
     return snapshot;
   }
@@ -853,6 +895,13 @@
         ${profile.role === "viewer" ? `<div class="v13-warning">This is a read-only Viewer profile. Local edits and cloud writes are blocked.</div>` : ""}
       </article>
 
+      <article class="card profile-integrity-card">
+        <div class="card-header"><div><h3>Financial integrity</h3><p>Check Account Ledger, payments, income deposits, transfers, reconciliations, and persisted profile state</p></div><span class="v13-chip info" id="financeIntegrityChip">Not checked</span></div>
+        <p class="v13-help" id="financeIntegritySummary">Run a read-only integrity check. Talaan will not invent missing transactions or change financial history automatically.</p>
+        <div class="profile-actions"><button class="button button-secondary" id="runIntegrityCheckButton" type="button">Run integrity check</button><button class="button button-primary" id="repairIntegrityButton" type="button" hidden ${canWrite() ? "" : "disabled"}>Repair safe issues</button></div>
+        <div id="financeIntegrityIssues" class="profile-result"></div>
+      </article>
+
       <div class="profile-two-column">
         <article class="card">
           <div class="card-header"><div><h3>Create local profile</h3><p>Start empty or duplicate the active profile</p></div></div>
@@ -981,6 +1030,19 @@
       toast("Profile renamed successfully", "success");
       renderPanel();
     }));
+    get("runIntegrityCheckButton")?.addEventListener("click", () => run(async () => {
+      const report=renderIntegrityStatus(integrityReport());
+      if(report && !report.counts.critical && !report.counts.warning && !report.counts.safeRepair) toast("Financial integrity check passed", "success");
+    }));
+    get("repairIntegrityButton")?.addEventListener("click", () => run(async () => {
+      if(!canWrite()) throw new Error("Viewer profiles cannot repair finance records.");
+      const service=window.FinanceLedgerTransactions;
+      if(!service?.repairSafeIntegrity) throw new Error("Safe integrity repair is unavailable. Reload Talaan.");
+      const result=service.repairSafeIntegrity();
+      if(!result?.ok) throw new Error(result?.report?.counts?.critical ? "Critical issues require review and were not changed." : "Safe integrity repair could not be completed.");
+      renderIntegrityStatus(result.report || integrityReport());
+      toast(result.count ? `${result.count} safe integrity repair${result.count===1?"":"s"} applied` : "No safe integrity repairs were needed", "success");
+    }));
     get("profileSwitchButton")?.addEventListener("click", () => {
       const id = get("profileSwitcher")?.value;
       if (id && id !== activeProfileId()) switchProfile(id);
@@ -1083,6 +1145,28 @@
     }));
     get("registerPasskeyButton")?.addEventListener("click", () => run(async () => { await registerPasskey(); toast("Passkey registered", "success"); await renderSecurityStatus(); }));
     setTimeout(() => { renderSecurityStatus().catch(() => {}); renderRestorePoints().catch(() => {}); }, 0);
+  }
+
+  function renderIntegrityStatus(report = null) {
+    const chip = document.getElementById("financeIntegrityChip");
+    const summaryNode = document.getElementById("financeIntegritySummary");
+    const issuesNode = document.getElementById("financeIntegrityIssues");
+    const repairButton = document.getElementById("repairIntegrityButton");
+    if (!chip || !summaryNode || !issuesNode || !repairButton) return report;
+    try { report = report || integrityReport(); }
+    catch (error) {
+      chip.textContent = "Unavailable"; chip.className = "v13-chip warning";
+      summaryNode.textContent = error.message || "Financial integrity check is unavailable.";
+      repairButton.hidden = true; issuesNode.innerHTML = ""; return null;
+    }
+    const counts = report.counts || { critical:0, warning:0, safeRepair:0 };
+    chip.textContent = counts.critical ? `${counts.critical} critical` : (counts.warning || counts.safeRepair) ? "Review" : "Healthy";
+    chip.className = `v13-chip ${counts.critical ? "warning" : (counts.warning || counts.safeRepair) ? "info" : "success"}`;
+    summaryNode.textContent = window.FinanceIntegrity?.summary?.(report) || "Integrity check complete";
+    repairButton.hidden = !counts.safeRepair;
+    repairButton.disabled = !canWrite() || counts.critical > 0;
+    issuesNode.innerHTML = report.issues.length ? report.issues.slice(0,12).map(item => `<div class="profile-security-row"><div><strong>${escape(item.severity === "critical" ? "Critical" : item.severity === "safe-repair" ? "Safe repair" : "Review")}</strong><small>${escape(item.message)}</small></div></div>`).join("") : `<div class="v13-empty">No financial integrity issues found.</div>`;
+    return report;
   }
 
   async function renderAccessibleCloudProfiles() {

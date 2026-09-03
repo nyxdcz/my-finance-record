@@ -22,6 +22,7 @@ const SIDEBAR_BRAND_ASSET_QUERY = "2.2.0-talaan2";
 const UI_RADIUS_ASSET_QUERY = "2.5.0-talaan4";
 
 const ACCOUNT_INTEGRITY_SOURCES = Object.freeze([
+  "assets/js/finance-integrity.js",
   "assets/js/account-ledger.js",
   "assets/js/account-submit-compat.js",
   "assets/js/cloud-sync.js",
@@ -83,6 +84,7 @@ const runtimeGroups = {
     "ui-icon-alignment.css"
   ],
   "assets/js": [
+    "finance-integrity.js",
     "account-ledger.js",
     "account-submit-compat.js",
     "brand-icons.js",
@@ -207,6 +209,7 @@ const normalizeReleaseAssetQuery = source => source.replace(
 );
 
 const applyAccountIntegrityAssetQuery = source => source
+  .replace(/finance-integrity\.js\?v=[^\"'\s<>)]+/g, `finance-integrity.js?v=${ACCOUNT_INTEGRITY_ASSET_QUERY}`)
   .replace(/account-ledger\.js\?v=[^\"'\s<>)]+/g, `account-ledger.js?v=${ACCOUNT_INTEGRITY_ASSET_QUERY}`)
   .replace(/account-submit-compat\.js\?v=[^\"'\s<>)]+/g, `account-submit-compat.js?v=${ACCOUNT_INTEGRITY_ASSET_QUERY}`)
   .replace(/cloud-sync\.js\?v=[^\"'\s<>)]+/g, `cloud-sync.js?v=${ACCOUNT_INTEGRITY_ASSET_QUERY}`)
@@ -214,6 +217,10 @@ const applyAccountIntegrityAssetQuery = source => source
 
 patchTextFile("index.html", source => {
   let next = applyAccountIntegrityAssetQuery(normalizeReleaseAssetQuery(normalizeRuntimeReferences(source)))
+  if (!next.includes("finance-integrity.js")) {
+    next = next.replace(/(<script src="\.\/account-ledger\.js\?v=[^"]+"><\/script>)/, `<script src="./finance-integrity.js?v=${ACCOUNT_INTEGRITY_ASSET_QUERY}"></script>\n  $1`);
+  }
+  next = next
     .replace(/app\.css\?v=[^"']+/, `app.css?v=${APP_STYLE_ASSET_QUERY}`)
     .replaceAll(PREVIOUS_BRAND, BRAND)
     .replaceAll("Finance Records installed", `${BRAND} installed`)
@@ -297,6 +304,12 @@ patchTextFile("sw.js", source => {
     .replace(/const CACHE_VERSION = "finance-v[^"]+";/, `const CACHE_VERSION = "${RELEASE.cache}";`)
     .replaceAll("Open My Finance Records", `Open ${BRAND}`);
 
+  if (!next.includes('asset("./finance-integrity.js')) {
+    next = next.replace(
+      /(asset\("\.\/account-ledger\.js\?v=[^"')]+"\),)/,
+      `asset("./finance-integrity.js?v=${ACCOUNT_INTEGRITY_ASSET_QUERY}"),\n  $1`
+    );
+  }
   if (!next.includes('asset("./account-submit-compat.js')) {
     next = next.replace(
       /(asset\("\.\/account-ledger\.js\?v=[^"')]+"\),)/,
@@ -307,6 +320,12 @@ patchTextFile("sw.js", source => {
     next = next.replace(
       'url.pathname.endsWith("cloud-sync-lifecycle.js") || url.pathname.endsWith("interaction-patterns.js") ||',
       'url.pathname.endsWith("cloud-sync-lifecycle.js") || url.pathname.endsWith("cloud-sync.js") || url.pathname.endsWith("account-ledger.js") || url.pathname.endsWith("account-submit-compat.js") || url.pathname.endsWith("interaction-patterns.js") ||'
+    );
+  }
+  if (!next.includes('url.pathname.endsWith("finance-integrity.js")')) {
+    next = next.replace(
+      'url.pathname.endsWith("cloud-sync.js") || url.pathname.endsWith("account-ledger.js") ||',
+      'url.pathname.endsWith("cloud-sync.js") || url.pathname.endsWith("finance-integrity.js") || url.pathname.endsWith("account-ledger.js") ||'
     );
   }
   return next;

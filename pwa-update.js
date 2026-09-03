@@ -8,8 +8,8 @@
   const DASHBOARD_PRESENTATION_REFRESH_KEY = "finance-dashboard-presentation-v2-5-0-talaan9";
   const EXPENSE_DARK_MODE_REFRESH_KEY = "finance-expense-dark-mode-v2-5-0-talaan1";
   const INCOME_PLANNING_REFRESH_KEY = "finance-income-planning-v2-5-0-talaan1";
-  const ACCOUNT_INTEGRITY_REFRESH_KEY = "finance-account-integrity-1773f6cb2d8d";
-  const ACCOUNT_INTEGRITY_ASSET_QUERY = "2.5.0-account-1773f6cb2d8d";
+  const ACCOUNT_INTEGRITY_REFRESH_KEY = "finance-account-integrity-ebe7b3f4ee2f";
+  const ACCOUNT_INTEGRITY_ASSET_QUERY = "2.5.0-account-ebe7b3f4ee2f";
   const normalizeCacheVersion = cacheVersion => cacheVersion === LEGACY_INDEX_CACHE ? CURRENT_CACHE_VERSION : cacheVersion;
 
   async function installBrowserBrandIcons() {
@@ -136,6 +136,7 @@
     try {
       if (root.localStorage?.getItem(ACCOUNT_INTEGRITY_REFRESH_KEY) === "done") return false;
       const removed = await deleteCachedPaths([
+        "/finance-integrity.js",
         "/account-ledger.js",
         "/account-submit-compat.js",
         "/cloud-sync.js",

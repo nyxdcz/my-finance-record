@@ -11,7 +11,8 @@ assert.match(cloud, /ledgerSettings:sanitizeRecordPayload/);
 assert.match(cloud, /output\.ledgerSettings = clone\(settings\.ledgerSettings/);
 assert.match(privacy, /ledgerSettings/);
 assert.match(profiles, /data:clone\(typeof data/);
-assert.match(profiles, /normalizeData\(payload\.data\)/);
+assert.match(profiles, /applyGuardedFinanceReplacement\(payload\.data, "Encrypted backup restored"\)/);
+assert.match(profiles, /const next = typeof normalizeData === "function" \? normalizeData\(clone\(source\)\)/);
 assert.doesNotMatch(rules, /simple-finance-cloud-config/);
 assert.doesNotMatch(rules, /supabase/i);
 

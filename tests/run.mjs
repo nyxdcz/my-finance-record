@@ -3,11 +3,13 @@ import { spawnSync } from "node:child_process";
 const testPlan = [
   { suite: "finance", file: "tests/finance/validate-finance-ui-source.mjs" },
   { suite: "finance", file: "tests/finance/validate-money-mutation-ownership.mjs" },
+  { suite: "finance", file: "tests/finance/validate-finance-integrity.mjs" },
   { suite: "finance", file: "tests/finance/validate-savings-forecast-engine.mjs" },
   { suite: "sync", file: "tests/sync/validate-safe-multidevice-sync.mjs" },
   { suite: "sync", file: "tests/sync/validate-mobile-cloud-revert-safety.mjs" },
   { suite: "sync", file: "tests/sync/validate-account-reconciliation-sync.mjs" },
   { suite: "sync", file: "tests/sync/validate-money-mutation-sync.mjs" },
+  { suite: "sync", file: "tests/sync/validate-integrity-recovery-gates.mjs" },
   { suite: "sync", file: "tests/sync/validate-view-preference-boundary.mjs" },
   { suite: "sync", file: "tests/sync/validate-payees-rules-sync.mjs" },
   { suite: "sync", file: "tests/sync/validate-import-center-sync.mjs" },

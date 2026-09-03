@@ -84,8 +84,8 @@
 
   function reconcileImportedAccountBalances(mode, conflictPolicy){
     const service=window.FinanceLedgerTransactions;
-    if(!service?.reconcileAccounts) return 0;
-    if(window.FinanceProfileArchitecture?.canWrite?.()===false) return 0;
+    if(!service?.reconcileAccounts) return {ok:false,count:0,reason:"ledger-transaction-service-unavailable"};
+    if(window.FinanceProfileArchitecture?.canWrite?.()===false) return {ok:false,count:0,reason:"read-only"};
     const desired=importedAccounts();
     const before=importReviewState.beforeAccounts || {};
     const after=currentAccounts();
@@ -100,10 +100,10 @@
       if(Math.abs(actual-target)<0.005) return;
       changes.push({account:name,target});
     });
-    if(!changes.length) return 0;
+    if(!changes.length) return {ok:true,count:0};
     const result=service.reconcileAccounts(changes,{note:"Imported backup balance",message:"Imported account balances reconciled",recordUndo:false});
-    if(!result?.ok){ console.error("Imported balance reconciliation failed",result?.reason || "unknown error"); return 0; }
-    return Number(result.count || 0);
+    if(!result?.ok){ console.error("Imported balance reconciliation failed",result?.reason || "unknown error"); return {ok:false,count:0,reason:result?.reason || "reconciliation-failed"}; }
+    return {ok:true,count:Number(result.count || 0)};
   }
 
   function openRecoveryDb(){
@@ -165,6 +165,43 @@
       tx.oncomplete=()=>db.close();
       tx.onabort=()=>{ db.close(); reject(tx.error || new Error("Recovery read was aborted")); };
     });
+  }
+
+
+  async function recoveryGet(id){
+    if(!id) return null;
+    const db=await openRecoveryDb();
+    return new Promise((resolve,reject)=>{
+      const tx=db.transaction(RECOVERY_STORE,"readonly");
+      const request=tx.objectStore(RECOVERY_STORE).get(id);
+      request.onsuccess=()=>resolve(request.result || null);
+      request.onerror=()=>reject(request.error || new Error("Could not read recovery snapshot"));
+      tx.oncomplete=()=>db.close();
+      tx.onabort=()=>{ db.close(); reject(tx.error || new Error("Recovery snapshot read was aborted")); };
+    });
+  }
+
+  async function restoreRecoverySnapshot(id,fallbackData,message="Import rolled back to the recovery snapshot"){
+    const snapshot=await recoveryGet(id).catch(()=>null);
+    const source=cloneValue(snapshot?.data || fallbackData || {});
+    if(!source || typeof source!=="object") throw new Error("The pre-import recovery snapshot is unavailable.");
+    if(typeof data!=="undefined") {
+      const restored=typeof normalizeData==="function" ? normalizeData(source) : source;
+      restored.accounts=cloneValue(source.accounts || {});
+      restored.accountTypes=cloneValue(source.accountTypes || {});
+      restored.accountOrder=cloneValue(source.accountOrder || Object.keys(source.accounts || {}));
+      restored.accountIcons=cloneValue(source.accountIcons || {});
+      data=restored;
+    }
+    if(typeof persistFinanceDataRaw==="function"){
+      const saved=persistFinanceDataRaw(message);
+      if(saved===false) throw new Error("The recovery snapshot could not be restored to local storage.");
+    } else {
+      localStorage.setItem("simple-finance-project-records-v2",JSON.stringify(data));
+      window.FinanceProfileArchitecture?.persistCurrentData?.(data,message);
+    }
+    try { if(typeof renderAll==="function") renderAll(false); } catch(error) { console.error("Recovery snapshot restored but UI refresh failed",error); }
+    return true;
   }
 
   function recoveryMetaObject(){
@@ -293,10 +330,18 @@
     const dialog=document.getElementById("syncReviewDialog");
     let originalCreateRecoverySnapshot=null;
     let replacedSnapshotCreator=false;
+    let recoveryMeta=null;
+    let before=null;
+    let importApplied=false;
     try {
       await ensureRecoveryStorageReady();
-      const before=currentFinanceData();
-      const recoveryMeta=await persistRecoverySnapshot(`Before ${action[0]} import`,before);
+      before=currentFinanceData();
+      recoveryMeta=await persistRecoverySnapshot(`Before ${action[0]} import`,before);
+      const integrity=window.FinanceIntegrity;
+      if(!integrity?.scan) throw new Error("Financial integrity protection is unavailable. Reload Talaan before importing records.");
+      const incoming=importReviewState.bundle?.data || importReviewState.bundle || {};
+      const incomingReport=integrity.scan(incoming,{includeStorage:false});
+      if(incomingReport.counts.critical) throw new Error(`Import blocked: ${incomingReport.counts.critical} critical financial integrity issue${incomingReport.counts.critical===1?"":"s"} found.`);
 
       try {
         if(typeof createRecoverySnapshot!=="function") throw new Error("Recovery snapshot hook is unavailable");
@@ -309,10 +354,20 @@
 
       if(typeof window.applyPendingSyncImport!=="function") throw new Error("Import action is unavailable");
       window.applyPendingSyncImport(action[0],action[1]);
+      importApplied=true;
       if(dialog?.open) throw new Error("Import review expired. Choose the backup again.");
-      reconcileImportedAccountBalances(action[0],action[1]);
+      const appliedReport=integrity.scan(currentFinanceData(),{includeStorage:false});
+      if(appliedReport.counts.critical) throw new Error(`Imported records failed integrity verification with ${appliedReport.counts.critical} critical issue${appliedReport.counts.critical===1?"":"s"}.`);
+      const reconciliation=reconcileImportedAccountBalances(action[0],action[1]);
+      if(!reconciliation?.ok) throw new Error(`Imported account reconciliation failed: ${reconciliation?.reason || "unknown error"}.`);
+      const finalReport=integrity.scan(currentFinanceData(),{includeStorage:true});
+      if(finalReport.counts.critical) throw new Error(`Imported records failed final integrity verification with ${finalReport.counts.critical} critical issue${finalReport.counts.critical===1?"":"s"}.`);
       clearImportReviewCapture();
     } catch(error) {
+      if(importApplied && recoveryMeta?.id){
+        try { await restoreRecoverySnapshot(recoveryMeta.id,before,"Import failed; pre-import recovery snapshot restored"); }
+        catch(rollbackError){ console.error("Recovery import rollback failed",rollbackError); }
+      }
       console.error("Recovery import action failed",error);
       try { if(typeof showToast==="function") showToast(`Import failed: ${error?.message || "unknown error"}`,"warning"); } catch(e){}
     } finally {

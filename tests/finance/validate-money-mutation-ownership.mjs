@@ -42,6 +42,7 @@ runtimeFiles.push("index.html");
 // These files are explicit hydration/restore boundaries rather than user money-mutation owners.
 const hydrationAllowlist = new Set([
   "assets/js/cloud-sync.js",
+  "assets/js/finance-integrity.js",
   "assets/js/security-profiles.js",
   "assets/js/import-center.js",
   "assets/js/productivity-tools.js"

@@ -803,6 +803,34 @@
     return transaction.ok ? { ok:true, count:effective.length } : { ok:false, reason:transaction.reason || "transaction-failed", count:0 };
   }
 
+  function commitSafeIntegrityRepair({ message = "Safe financial integrity repairs applied" } = {}) {
+    const architecture = window.FinanceProfileArchitecture;
+    if (architecture?.canWrite?.() === false) return { ok:false, reason:"read-only", count:0 };
+    const service = window.FinanceIntegrity;
+    if (!service?.repairSafe || !service?.scan) return { ok:false, reason:"integrity-service-unavailable" };
+    const planned = service.repairSafe(data);
+    if (!planned.ok) return { ok:false, reason:planned.reason || "critical-integrity", report:planned.report };
+    if (!planned.changes.length) return { ok:true, skipped:true, count:0, report:planned.report };
+    const expectedBalances = Object.entries(planned.data.accounts || {}).map(([account, target]) => ({ account, target:roundMoney(target) }));
+    const repairedReconciliations = cloneData(planned.data.accountReconciliations || []);
+    const transaction = runLedgerTransaction({
+      undoLabel:"Repair safe financial integrity issues",
+      message,
+      expectedBalances,
+      mutate:() => {
+        data.accounts = cloneData(planned.data.accounts || {});
+        data.accountReconciliations = repairedReconciliations;
+        return { kind:"integrity-safe-repair", changed:true, changes:cloneData(planned.changes) };
+      },
+      verify:target => {
+        const report = service.scan(target, { includeStorage:false });
+        return report.counts.critical ? report.issues.filter(item => item.severity === "critical").map(item => `integrity:${item.code}`) : [];
+      }
+    });
+    const report = service.scan(data, { includeStorage:true });
+    return transaction.ok ? { ok:true, count:planned.changes.length, changes:planned.changes, report } : { ok:false, reason:transaction.reason || "transaction-failed", report };
+  }
+
   function requestLedgerEntries(requestId, types = []) {
     const normalized = safeText(requestId, 160);
     if (!normalized) return [];
@@ -1659,7 +1687,7 @@
   window.FinanceLedgerTransactions = Object.freeze({
     version:1,
     owner:"account-ledger-v1",
-    capabilities:{ unifiedMoneyMutations:true, centralizedOwnership:true, transactionalPersistence:true, localVerification:true, profileVerification:true, ledgerInvariants:true, domainInvariants:true, rollback:true, idempotentRequests:true, externalPayments:true, paymentAccountCorrection:true, reconciliationBatch:true },
+    capabilities:{ unifiedMoneyMutations:true, centralizedOwnership:true, transactionalPersistence:true, localVerification:true, profileVerification:true, ledgerInvariants:true, domainInvariants:true, rollback:true, idempotentRequests:true, externalPayments:true, paymentAccountCorrection:true, reconciliationBatch:true, integrityRepair:true },
     run:runLedgerTransaction,
     transfer:commitTransfer,
     payExpenses:commitExpensePayment,
@@ -1667,6 +1695,7 @@
     markExpensesPaidExternally:commitExternalExpensePayment,
     correctPaidExpenseAccounts:commitPaidExpenseAccountCorrection,
     reconcileAccounts:commitReconciliationBatch,
+    repairSafeIntegrity:commitSafeIntegrityRepair,
     quickSpend:commitQuickSpend,
     saveIncome:commitIncomeRecord,
     deleteIncome:commitIncomeDeletion,

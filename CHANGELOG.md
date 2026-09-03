@@ -1,6 +1,7 @@
 # Changelog
 
 ## V2.5.0 · Talaan
+- Adds read-only financial integrity detection and guarded recovery for historical, imported, restored, and cloud-reconstructed finance data, with deterministic safe repairs only and automatic rollback on failed imports/restores.
 
 **Current production release:** V2.5.0
 
