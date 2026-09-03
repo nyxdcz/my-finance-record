@@ -38,3 +38,4 @@ jobs:
           git add -A
           git commit -m "fix: preserve account balance corrections"
           git push origin HEAD:main
+# Retry after aligning the Cloud Sync asset-query regression.
