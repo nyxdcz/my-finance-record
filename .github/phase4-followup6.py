@@ -11,9 +11,27 @@ if source.count(old) != 1:
     raise SystemExit("account balance PWA integrity hash source contract changed")
 path.write_text(source.replace(old, new, 1))
 
-# Open Profile & Security through the visible Settings overview card used by the current simple presentation layout.
+# Financial Integrity is private profile data. Authenticate the browser fixture before opening Profile & Security.
 path = root / "tests/browser/finance-integrity-recovery.spec.mjs"
 source = path.read_text()
+old = '''async function stable(page) {
+  await page.waitForLoadState("networkidle");
+  await page.waitForFunction(() => Boolean(window.FinanceIntegrity?.scan && window.FinanceLedgerTransactions?.repairSafeIntegrity));
+}
+'''
+new = '''async function stable(page) {
+  await page.waitForLoadState("networkidle");
+  await page.waitForFunction(() => Boolean(window.FinanceIntegrity?.scan && window.FinanceLedgerTransactions?.repairSafeIntegrity));
+  await page.waitForFunction(() => Boolean(window.FinancePrivacyLock));
+  await page.waitForFunction(() => !document.body.classList.contains("finance-auth-pending"));
+  await page.evaluate(() => window.FinancePrivacyLock.setAuthenticated(true));
+  await page.waitForFunction(() => document.body.classList.contains("finance-signed-in"));
+}
+'''
+if source.count(old) != 1:
+    raise SystemExit("integrity browser stable fixture changed")
+source = source.replace(old, new, 1)
+
 old = '''  await page.goto(appUrl, { waitUntil:"networkidle" });
   await stable(page);
   const before = await page.evaluate(() => JSON.stringify(data));
@@ -21,9 +39,7 @@ old = '''  await page.goto(appUrl, { waitUntil:"networkidle" });
 '''
 new = '''  await page.goto(appUrl, { waitUntil:"networkidle" });
   await stable(page);
-  const profileCard = page.locator('[data-settings-open="profiles"]').first();
-  await expect(profileCard).toBeVisible();
-  await profileCard.click();
+  await page.evaluate(() => window.activateSettingsPanel?.("profiles", false));
   await expect(page.locator("#settings-panel-profiles")).toBeVisible();
   const before = await page.evaluate(() => JSON.stringify(data));
   await expect(page.locator("#runIntegrityCheckButton")).toBeVisible();
@@ -70,4 +86,4 @@ if source.count(old) != 1:
     raise SystemExit("recovery snapshot restore assignment changed")
 path.write_text(source.replace(old, new, 1))
 
-print("Phase 4 browser hash, visible settings routing, synchronized rollback, and exact account restore hardened.")
+print("Phase 4 browser hash, authenticated integrity UI, synchronized rollback, and exact account restore hardened.")
