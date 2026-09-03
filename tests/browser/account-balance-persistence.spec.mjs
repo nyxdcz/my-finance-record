@@ -146,7 +146,12 @@ test("Settings account balance update is reconciled and profile-persisted", asyn
   await openControlledPwa(page, { width:1440, height:1000 });
   const setup = await accountSetup(page, 8765.43);
   expect(setup.account).not.toBe("");
-  await page.evaluate(() => renderSettings());
+  await page.evaluate(() => {
+    window.goToPage?.("settings", { historyMode:"none", smooth:false });
+    window.activateSettingsPanel?.("accounts", false);
+    renderSettings();
+  });
+  await expect(page.locator("#settings-panel-accounts")).toBeVisible();
   await page.evaluate(({ account, target }) => {
     const input = [...document.querySelectorAll(".account-input")].find(node => node.dataset.account === account);
     if (!input) throw new Error("Settings account input is unavailable");
@@ -154,7 +159,9 @@ test("Settings account balance update is reconciled and profile-persisted", asyn
     input.dispatchEvent(new Event("input", { bubbles:true }));
     input.dispatchEvent(new Event("change", { bubbles:true }));
   }, setup);
-  await page.locator('#accountsForm button[type="submit"]').click();
+  const submit = page.locator('#accountsForm button[type="submit"]');
+  await expect(submit).toBeVisible();
+  await submit.click();
   await expect.poll(async () => (await readAccountState(page, setup)).runtime).toBe(setup.target);
   const result = await readAccountState(page, setup);
   expect(result.persisted).toBe(setup.target);
