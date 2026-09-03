@@ -16,7 +16,7 @@ const version = JSON.parse(read("version.json"));
 const pkg = JSON.parse(read("package.json"));
 const lock = JSON.parse(read("package-lock.json"));
 const query = "2.5.0-talaan1";
-const accountIntegrityQuery = "2.5.0-account-integrity1";
+const accountIntegrityQuery = "2.5.0-account-integrity2";
 
 for (const [pageId, marqueeId] of [["income", "incomeFinanceWeekMarquee"], ["money", "financeWeekMarquee"], ["paid-expenses", "paidFinanceWeekMarquee"]]) {
   const start = index.indexOf(`id="${pageId}"`);

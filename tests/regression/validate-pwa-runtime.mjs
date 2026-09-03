@@ -12,7 +12,7 @@ const accountLedger = read("account-ledger.js");
 const accountSubmitCompat = read("account-submit-compat.js");
 const version = JSON.parse(read("version.json"));
 const query = "2.5.0-talaan1";
-const accountIntegrityQuery = "2.5.0-account-integrity1";
+const accountIntegrityQuery = "2.5.0-account-integrity2";
 
 assert.equal(version.version, "2.5.0");
 assert.equal(version.cacheVersion, "finance-v2-20260828-household-splits-r17");
@@ -27,7 +27,7 @@ assert.match(updater, /const UI_HOTFIX_REFRESH_KEY = "finance-ui-hotfix-v2-0-1-t
 assert.match(updater, /const DASHBOARD_PRESENTATION_REFRESH_KEY = "finance-dashboard-presentation-v2-5-0-talaan9";/);
 assert.match(updater, /const EXPENSE_DARK_MODE_REFRESH_KEY = "finance-expense-dark-mode-v2-5-0-talaan1";/);
 assert.match(updater, /const INCOME_PLANNING_REFRESH_KEY = "finance-income-planning-v2-5-0-talaan1";/);
-assert.match(updater, /const ACCOUNT_INTEGRITY_REFRESH_KEY = "finance-account-integrity-v2-5-0-talaan1";/);
+assert.match(updater, /const ACCOUNT_INTEGRITY_REFRESH_KEY = "finance-account-integrity-v2-5-0-talaan2";/);
 assert.match(updater, /async function refreshAccountIntegrityRuntimeOnce\(\)/);
 assert.match(updater, /void refreshAccountIntegrityRuntimeOnce\(\)\.then/);
 assert.match(updater, /async function refreshExpenseDarkModeOnce\(\)/);
@@ -80,6 +80,8 @@ assert.match(accountLedger, /accountReconciliationOwner:true/);
 assert.match(accountLedger, /transactionalAccountCorrection:true/);
 assert.match(accountLedger, /profileVerifiedAccountCorrection:true/);
 assert.match(accountLedger, /function persistAccountMutation\(/);
+assert.match(accountLedger, /typeof persistFinanceDataRaw !== "function"/);
+assert.match(accountLedger, /const saved = persistFinanceDataRaw\(message\)/);
 assert.match(accountLedger, /if \(!accountMutationCanWrite\(\)\) return false;/);
 assert.match(accountSubmitCompat, /ledgerGuard:true/);
 assert.match(accountSubmitCompat, /guardLedgerBackedAccountSubmit/);

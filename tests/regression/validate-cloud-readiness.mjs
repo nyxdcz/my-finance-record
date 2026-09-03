@@ -6,7 +6,7 @@ const source = read("assets/js/cloud-sync.js");
 const index = read("index.html");
 const worker = read("sw.js");
 const version = JSON.parse(read("version.json"));
-const accountIntegrityQuery = "2.5.0-account-integrity1";
+const accountIntegrityQuery = "2.5.0-account-integrity2";
 
 assert.match(source, /let clientPromise = null;/);
 assert.match(source, /if \(clientPromise\) return clientPromise;/);

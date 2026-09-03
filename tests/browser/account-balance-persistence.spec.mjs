@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 /* global data, renderSettings */
 
 const APP_URL = "http://127.0.0.1:3000";
-const ACCOUNT_REFRESH_KEY = "finance-account-integrity-v2-5-0-talaan1";
+const ACCOUNT_REFRESH_KEY = "finance-account-integrity-v2-5-0-talaan2";
 
 test.use({ serviceWorkers:"allow" });
 
@@ -68,7 +68,7 @@ async function readAccountState(page, setup) {
       ledgerEntryId:ledgerEntry?.id || "",
       ledgerAmount:Number(ledgerEntry?.amount || 0),
       controlled:Boolean(navigator.serviceWorker.controller),
-      ledgerAsset:[...performance.getEntriesByType("resource")].some(entry => entry.name.includes("account-ledger.js?v=2.5.0-account-integrity1"))
+      ledgerAsset:[...performance.getEntriesByType("resource")].some(entry => entry.name.includes("account-ledger.js?v=2.5.0-account-integrity2"))
     };
   }, setup);
 }
@@ -100,6 +100,36 @@ for (const viewport of [{ name:"desktop", width:1440, height:1000 }, { name:"pho
     expect(reloaded.ledgerEntryId).toBe(saved.ledgerEntryId);
   });
 }
+
+test("account correction remains saved when post-persistence rendering fails", async ({ page }) => {
+  await openControlledPwa(page, { width:1440, height:1000 });
+  const setup = await accountSetup(page, 4321.09);
+  expect(setup.account).not.toBe("");
+
+  const card = page.locator(`#moneyAccounts [data-account-card="${setup.account}"]`);
+  await card.locator("[data-edit-account]").click();
+  await page.locator("#accountBalance").fill(setup.target.toLocaleString("en-PH", { minimumFractionDigits:2, maximumFractionDigits:2 }));
+  await page.evaluate(() => {
+    window.__accountIntegrityOriginalRenderAll = window.renderAll;
+    window.renderAll = () => { throw new Error("simulated post-save render failure"); };
+  });
+
+  await page.locator("#accountPrimaryAction").click();
+  await expect(page.locator("#accountDialog")).not.toBeVisible();
+  await expect(page.getByText("Account changes could not be saved on this device.")).toHaveCount(0);
+
+  const saved = await readAccountState(page, setup);
+  expect(saved.runtime).toBe(setup.target);
+  expect(saved.persisted).toBe(setup.target);
+  expect(saved.profilePersisted).toBe(setup.target);
+  expect(saved.reconciliationId).not.toBe("");
+  expect(saved.ledgerEntryId).not.toBe("");
+
+  await page.evaluate(() => {
+    if (window.__accountIntegrityOriginalRenderAll) window.renderAll = window.__accountIntegrityOriginalRenderAll;
+    delete window.__accountIntegrityOriginalRenderAll;
+  });
+});
 
 test("Settings account balance update is reconciled and profile-persisted", async ({ page }) => {
   await openControlledPwa(page, { width:1440, height:1000 });

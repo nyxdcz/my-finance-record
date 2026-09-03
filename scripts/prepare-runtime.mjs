@@ -19,7 +19,7 @@ const RELEASE = Object.freeze({
 const APP_STYLE_ASSET_QUERY = "2.5.0-talaan2";
 const SIDEBAR_BRAND_ASSET_QUERY = "2.2.0-talaan2";
 const UI_RADIUS_ASSET_QUERY = "2.5.0-talaan4";
-const ACCOUNT_INTEGRITY_ASSET_QUERY = "2.5.0-account-integrity1";
+const ACCOUNT_INTEGRITY_ASSET_QUERY = "2.5.0-account-integrity2";
 
 const CURRENT_VERSION_HISTORY = Object.freeze([{
   version:RELEASE.displayVersion,

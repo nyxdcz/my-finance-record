@@ -422,7 +422,8 @@
       return restoreAccountMutation(snapshot, "The corrected account balance could not be verified. Nothing was saved.");
     }
     try {
-      const saved = saveData(message);
+      if (typeof persistFinanceDataRaw !== "function") throw new Error("Finance persistence is unavailable.");
+      const saved = persistFinanceDataRaw(message);
       if (saved === false) return restoreAccountMutation(snapshot, "Account changes were not saved. Check profile permissions and try again.");
     } catch (error) {
       console.error("Account changes could not be persisted.", error);
@@ -439,6 +440,7 @@
         return restoreAccountMutation(snapshot, "The account update could not be stored in the active profile.");
       }
     }
+    showToast(message);
     return true;
   }
 
@@ -984,11 +986,15 @@
     (data.savingsGoals || []).forEach(goal => { if (goal.sourceType === "linked" && accountType(goal.linkedAccount) !== "Savings") { goal.currentAmount = Number(data.accounts[goal.linkedAccount] || goal.currentAmount || 0); goal.sourceType = "manual"; goal.linkedAccount = ""; goal.updatedAt = new Date().toISOString(); } });
     if (data.savingsSettings.defaultAccount && accountType(data.savingsSettings.defaultAccount) !== "Savings") data.savingsSettings.defaultAccount = "";
 
-    return persistAccountMutation(
+    const saved = persistAccountMutation(
       snapshot,
       `${changes.length} account balance${changes.length === 1 ? "" : "s"} reconciled`,
       changes.map(item => ({ account:item.account, target:item.target }))
     );
+    if (saved) {
+      try { renderAll(false); } catch (error) { console.error("Account balances were saved but Settings refresh failed.", error); }
+    }
+    return saved;
   }
 
   function submitIncomeForm() {

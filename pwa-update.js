@@ -8,7 +8,7 @@
   const DASHBOARD_PRESENTATION_REFRESH_KEY = "finance-dashboard-presentation-v2-5-0-talaan9";
   const EXPENSE_DARK_MODE_REFRESH_KEY = "finance-expense-dark-mode-v2-5-0-talaan1";
   const INCOME_PLANNING_REFRESH_KEY = "finance-income-planning-v2-5-0-talaan1";
-  const ACCOUNT_INTEGRITY_REFRESH_KEY = "finance-account-integrity-v2-5-0-talaan1";
+  const ACCOUNT_INTEGRITY_REFRESH_KEY = "finance-account-integrity-v2-5-0-talaan2";
   const normalizeCacheVersion = cacheVersion => cacheVersion === LEGACY_INDEX_CACHE ? CURRENT_CACHE_VERSION : cacheVersion;
 
   async function installBrowserBrandIcons() {
@@ -22,7 +22,7 @@
 
   async function installAccountSubmitCompat() {
     try {
-      await import("./account-submit-compat.js?v=2.5.0-account-integrity1");
+      await import("./account-submit-compat.js?v=2.5.0-account-integrity2");
       return true;
     } catch (error) {
       return false;

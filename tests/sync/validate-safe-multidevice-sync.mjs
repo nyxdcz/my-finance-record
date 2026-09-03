@@ -42,7 +42,7 @@ const pushLoop = cloud.indexOf("while (Object.values(pending)", syncStart);
 assert(syncStart >= 0 && firstPull > syncStart && pushLoop > firstPull, "sync must pull current cloud revisions before queued device uploads");
 assert(cloud.includes("5*60*1000"), "five-minute routine sync cadence changed");
 assert(worker.includes(version.cacheVersion), "PWA cache does not match the current Talaan release");
-assert(worker.includes('asset("./cloud-sync.js?v=2.5.0-account-integrity1")'), "PWA shell does not precache the account-integrity cloud sync client");
+assert(worker.includes('asset("./cloud-sync.js?v=2.5.0-account-integrity2")'), "PWA shell does not precache the account-integrity cloud sync client");
 assert(worker.includes('url.pathname.endsWith("cloud-sync.js")'), "cloud-sync is no longer delivered network-first");
 assert(worker.includes('new Request(url, { cache:"reload" })'), "PWA precache no longer bypasses stale HTTP cache");
 
