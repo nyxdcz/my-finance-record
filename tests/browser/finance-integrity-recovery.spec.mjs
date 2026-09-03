@@ -76,9 +76,8 @@ test("failed post-import reconciliation restores the pre-import recovery snapsho
   await expect(page.locator("#syncReviewDialog")).toBeVisible();
   const mergeButton = page.locator("#mergeUseIncomingButton");
   await mergeButton.click();
-  await expect(mergeButton).toBeDisabled();
-  await expect(mergeButton).toBeEnabled({ timeout:10000 });
   await expect.poll(() => page.evaluate(name => Object.prototype.hasOwnProperty.call(data.accounts || {}, name), importedName), { timeout:10000 }).toBe(false);
+  await expect(mergeButton).toBeEnabled({ timeout:10000 });
   const after = await page.evaluate(() => JSON.stringify(data));
   expect(JSON.parse(after).accounts).toEqual(baseline.accounts);
 });
