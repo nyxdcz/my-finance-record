@@ -24,6 +24,7 @@ jobs:
         run: |
           python .github/account-phase1-hardening.py
           python .github/account-phase1-hardening-followup.py
+          python .github/account-phase1-browser-fix.py
           node scripts/prepare-runtime.mjs
           node --check assets/js/account-ledger.js
           node --check assets/js/pwa-update.js
@@ -51,7 +52,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          rm -f .github/account-phase1-hardening.py .github/account-phase1-hardening-followup.py .github/workflows/account-phase1-hardening.yml
+          rm -f .github/account-phase1-hardening.py .github/account-phase1-hardening-followup.py .github/account-phase1-browser-fix.py .github/workflows/account-phase1-hardening.yml
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
