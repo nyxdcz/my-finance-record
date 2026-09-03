@@ -48,6 +48,39 @@ if source.count(old) != 1:
     raise SystemExit("integrity UI browser setup changed")
 source = source.replace(old, new, 1)
 
+# A fresh default profile may exist only in memory. Seed the actual active profile into metadata before changing its role.
+old = '''  await page.evaluate(() => {
+    const meta = JSON.parse(localStorage.getItem("simple-finance-profiles-v1") || "{}");
+    const active = meta.profiles?.find(item => item.id === meta.activeProfileId);
+    if (active) active.role = "viewer";
+    localStorage.setItem("simple-finance-profiles-v1", JSON.stringify(meta));
+  });
+  await page.reload({ waitUntil:"networkidle" });
+  await stable(page);
+  const viewerResult = await page.evaluate(() => window.FinanceLedgerTransactions.repairSafeIntegrity());
+'''
+new = '''  await page.evaluate(() => {
+    const architecture = window.FinanceProfileArchitecture;
+    const runtimeActive = architecture?.activeProfile?.() || { id:"profile-personal", name:"My Finances", type:"personal", role:"owner", cloudProfileId:"", encryption:{ enabled:false } };
+    let meta = null;
+    try { meta = JSON.parse(localStorage.getItem("simple-finance-profiles-v1") || "null"); } catch (error) {}
+    if (!Array.isArray(meta?.profiles) || !meta.profiles.length) {
+      meta = { version:1, activeProfileId:runtimeActive.id || "profile-personal", profiles:[structuredClone(runtimeActive)] };
+    }
+    if (!meta.activeProfileId) meta.activeProfileId = runtimeActive.id || meta.profiles[0].id;
+    const active = meta.profiles.find(item => item.id === meta.activeProfileId) || meta.profiles[0];
+    active.role = "viewer";
+    localStorage.setItem("simple-finance-profiles-v1", JSON.stringify(meta));
+  });
+  await page.reload({ waitUntil:"networkidle" });
+  await stable(page);
+  await page.waitForFunction(() => window.FinanceProfileArchitecture?.canWrite?.() === false);
+  const viewerResult = await page.evaluate(() => window.FinanceLedgerTransactions.repairSafeIntegrity());
+'''
+if source.count(old) != 1:
+    raise SystemExit("integrity Viewer fixture changed")
+source = source.replace(old, new, 1)
+
 # The guarded import handler is asynchronous. Wait for its busy cycle to finish before asserting rollback state.
 old = '''  await expect(page.locator("#syncReviewDialog")).toBeVisible();
   await page.locator("#mergeUseIncomingButton").click();
@@ -86,4 +119,4 @@ if source.count(old) != 1:
     raise SystemExit("recovery snapshot restore assignment changed")
 path.write_text(source.replace(old, new, 1))
 
-print("Phase 4 browser hash, authenticated integrity UI, synchronized rollback, and exact account restore hardened.")
+print("Phase 4 browser hash, authenticated integrity UI, Viewer metadata, synchronized rollback, and exact account restore hardened.")
