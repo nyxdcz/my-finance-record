@@ -2,6 +2,8 @@ import { expect, test } from "@playwright/test";
 import crypto from "node:crypto";
 import fs from "node:fs";
 
+/* global data */
+
 const APP_URL = "http://127.0.0.1:3000";
 const ACCOUNT_INTEGRITY_SOURCES = ["assets/js/account-ledger.js","assets/js/account-submit-compat.js","assets/js/cloud-sync.js","assets/js/cloud-sync-lifecycle.js"];
 const hash = crypto.createHash("sha256");
@@ -35,13 +37,6 @@ async function boostAccount(page, account, target) {
     input.value = target.toLocaleString("en-PH", { minimumFractionDigits:2, maximumFractionDigits:2 });
     document.getElementById("accountForm").dispatchEvent(new Event("submit", { bubbles:true, cancelable:true }));
   }, { account, target });
-}
-
-function storedSnapshot() {
-  const persisted = JSON.parse(localStorage.getItem("simple-finance-project-records-v2") || "{}");
-  const profileId = window.FinanceProfileArchitecture?.activeProfileId?.() || "";
-  const profile = JSON.parse(localStorage.getItem(`simple-finance-profile-data-v1:${profileId}`) || "{}");
-  return { persisted, profile };
 }
 
 test("transfer persists as one equal-and-opposite ledger transaction", async ({ page }) => {
