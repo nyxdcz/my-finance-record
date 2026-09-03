@@ -37,6 +37,19 @@ for legacy in legacy_markers:
         raise SystemExit(f"expected legacy release marker missing: {legacy}")
 write(sync_path, sync[sync.index(marker):].rstrip() + "\n")
 
+# Cloud Sync was the only runtime consumer of the old app-version override.
+cloud_path = "assets/js/cloud-sync.js"
+cloud = read(cloud_path)
+if 'const APP_VERSION_FALLBACK = "15.2.1";' not in cloud:
+    raise SystemExit("Cloud Sync legacy app-version fallback not found")
+cloud = cloud.replace('const APP_VERSION_FALLBACK = "15.2.1";', 'const APP_VERSION_FALLBACK = "2.5.0";', 1)
+old_version_reader = 'return window.FINANCE_APP_VERSION_OVERRIDE || (typeof APP_VERSION !== "undefined" ? APP_VERSION : APP_VERSION_FALLBACK);'
+new_version_reader = 'return typeof APP_VERSION !== "undefined" ? APP_VERSION : APP_VERSION_FALLBACK;'
+if old_version_reader not in cloud:
+    raise SystemExit("Cloud Sync release override reader not found")
+cloud = cloud.replace(old_version_reader, new_version_reader, 1)
+write(cloud_path, cloud)
+
 # 2. Keep phone runtime behavior dynamic, but move static Settings touch sizing to CSS.
 phone_path = "assets/js/ui/phone-finance-compat.js"
 phone = read(phone_path)
