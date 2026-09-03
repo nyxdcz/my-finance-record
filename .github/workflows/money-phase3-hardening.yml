@@ -1,0 +1,66 @@
+name: Money Phase 3 hardening
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/money-phase3-runner.py"
+      - ".github/workflows/money-phase3-hardening.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  harden:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          package-manager-cache: false
+
+      - name: Apply Phase 3 money ownership hardening
+        run: |
+          python .github/money-phase3-runner.py
+          node scripts/prepare-runtime.mjs
+          node --check assets/js/account-ledger.js
+          node --check assets/js/productivity-tools.js
+          node --check assets/js/household-splits.js
+          node --check assets/js/privacy-lock.js
+
+      - name: Install locked project metadata
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Run focused ownership, finance, sync, and PWA source tests
+        run: |
+          node tests/finance/validate-money-mutation-ownership.mjs
+          node tests/finance/validate-finance-ui-source.mjs
+          node tests/sync/validate-money-mutation-sync.mjs
+          node tests/sync/validate-account-reconciliation-sync.mjs
+          node tests/regression/validate-pwa-runtime.mjs
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run focused money browser regressions
+        run: npx playwright test tests/browser/money-mutation-integrity.spec.mjs --reporter=line
+
+      - name: Commit Phase 3 and remove temporary runner
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm -f .github/money-phase3-runner.py .github/workflows/money-phase3-hardening.yml
+          git add -A
+          git commit -m "refactor: enforce money mutation ownership"
+          git push origin HEAD:main
+          gh workflow run quality-pages.yml --ref main
