@@ -1,5 +1,5 @@
 name: Phase 4 approved integrity hardening
-# Phase 4 browser rerun: visible Settings routing and synchronized rollback assertion.
+# Phase 4 browser rerun: authenticated Profile & Security integrity fixture.
 
 on:
   push:
