@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import fs from "node:fs";
-/* global data, renderSettings */
+/* global data */
 
 const APP_URL = "http://127.0.0.1:3000";
 const preparedIndex = fs.readFileSync("index.html", "utf8");
@@ -146,12 +146,12 @@ test("Settings account balance update is reconciled and profile-persisted", asyn
   await openControlledPwa(page, { width:1440, height:1000 });
   const setup = await accountSetup(page, 8765.43);
   expect(setup.account).not.toBe("");
-  await page.evaluate(() => {
-    window.goToPage?.("settings", { historyMode:"none", smooth:false });
-    window.activateSettingsPanel?.("accounts", false);
-    renderSettings();
-  });
+
+  await page.goto(`${APP_URL}/?page=settings&settings=accounts`, { waitUntil:"networkidle" });
+  await authenticate(page);
+  await page.waitForFunction(() => Boolean(navigator.serviceWorker.controller));
   await expect(page.locator("#settings-panel-accounts")).toBeVisible();
+
   await page.evaluate(({ account, target }) => {
     const input = [...document.querySelectorAll(".account-input")].find(node => node.dataset.account === account);
     if (!input) throw new Error("Settings account input is unavailable");
@@ -159,6 +159,7 @@ test("Settings account balance update is reconciled and profile-persisted", asyn
     input.dispatchEvent(new Event("input", { bubbles:true }));
     input.dispatchEvent(new Event("change", { bubbles:true }));
   }, setup);
+
   const submit = page.locator('#accountsForm button[type="submit"]');
   await expect(submit).toBeVisible();
   await submit.click();
