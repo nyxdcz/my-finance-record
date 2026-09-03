@@ -23,12 +23,15 @@ jobs:
       - name: Apply single-owner account hardening
         run: |
           python .github/account-phase1-hardening.py
+          python .github/account-phase1-hardening-followup.py
           node scripts/prepare-runtime.mjs
           node --check assets/js/account-ledger.js
           node --check assets/js/pwa-update.js
           node --check pwa-update.js
           node tests/regression/validate-pwa-runtime.mjs
+          node tests/regression/validate-cloud-readiness.mjs
           node tests/finance/validate-finance-ui-source.mjs
+          node tests/sync/validate-safe-multidevice-sync.mjs
           if grep -R "2.5.0-account-integrity2\|finance-account-integrity-v2-5-0-talaan2" assets scripts tests index.html sw.js --exclude-dir=node_modules; then
             echo "Stale manually-versioned account integrity reference remains"
             exit 1
@@ -39,6 +42,7 @@ jobs:
         run: |
           npm run test:finance
           npm run test:regression
+          npm run test:sync
       - name: Install Chromium for account regressions
         run: npx playwright install chromium --with-deps
       - name: Run focused account PWA regressions
@@ -47,7 +51,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          rm -f .github/account-phase1-hardening.py .github/workflows/account-phase1-hardening.yml
+          rm -f .github/account-phase1-hardening.py .github/account-phase1-hardening-followup.py .github/workflows/account-phase1-hardening.yml
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
