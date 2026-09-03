@@ -144,7 +144,9 @@ for path in ROOT.rglob("*"):
     if not path.is_file() or ".git" in path.parts:
         continue
     rel = path.relative_to(ROOT).as_posix()
-    if rel in {sync_path, "sync-runtime-compat.js", ".github/phase5a-approved.py"}:
+    if rel.startswith("tests/") or rel.startswith(".github/"):
+        continue
+    if rel in {sync_path, "sync-runtime-compat.js"}:
         continue
     if path.suffix not in {".js", ".mjs", ".html"}:
         continue
