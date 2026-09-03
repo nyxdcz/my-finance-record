@@ -30,6 +30,8 @@ jobs:
           node tests/finance/validate-finance-ui-source.mjs
       - name: Install browser test metadata
         run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Install Chromium for focused regressions
+        run: npx playwright install --with-deps chromium
       - name: Run focused account browser regressions
         run: npx playwright test tests/browser/account-balance-persistence.spec.mjs tests/browser/account-submit-compat.spec.mjs
       - name: Commit hotfix and remove temporary runner
