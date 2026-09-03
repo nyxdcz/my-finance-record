@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import fs from "node:fs";
+import crypto from "node:crypto";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
@@ -14,6 +15,10 @@ const worker = read("sw.js");
 const resolution = read("cloud-conflict-resolution.js");
 const review = read("cloud-conflict-review.js");
 const version = JSON.parse(read("version.json"));
+const accountIntegritySources = ["assets/js/account-ledger.js","assets/js/account-submit-compat.js","assets/js/cloud-sync.js","assets/js/cloud-sync-lifecycle.js"];
+const accountIntegrityHash = crypto.createHash("sha256");
+for (const file of accountIntegritySources) { accountIntegrityHash.update(`${file}\0`); accountIntegrityHash.update(fs.readFileSync(path.join(root, file))); }
+const accountIntegrityQuery = `2.5.0-account-${accountIntegrityHash.digest("hex").slice(0, 12)}`;
 
 for (const file of ["cloud-sync.js","cloud-conflict-resolution.js","cloud-conflict-review.js","sw.js"]) {
   const result = spawnSync(process.execPath, ["--check", path.join(root, file)], { encoding:"utf8" });
@@ -42,7 +47,7 @@ const pushLoop = cloud.indexOf("while (Object.values(pending)", syncStart);
 assert(syncStart >= 0 && firstPull > syncStart && pushLoop > firstPull, "sync must pull current cloud revisions before queued device uploads");
 assert(cloud.includes("5*60*1000"), "five-minute routine sync cadence changed");
 assert(worker.includes(version.cacheVersion), "PWA cache does not match the current Talaan release");
-assert(worker.includes('asset("./cloud-sync.js?v=2.5.0-account-integrity2")'), "PWA shell does not precache the account-integrity cloud sync client");
+assert(worker.includes(`asset("./cloud-sync.js?v=${accountIntegrityQuery}")`), "PWA shell does not precache the content-derived account-integrity cloud sync client");
 assert(worker.includes('url.pathname.endsWith("cloud-sync.js")'), "cloud-sync is no longer delivered network-first");
 assert(worker.includes('new Request(url, { cache:"reload" })'), "PWA precache no longer bypasses stale HTTP cache");
 

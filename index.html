@@ -7388,55 +7388,13 @@
 
     document.getElementById("accountForm").addEventListener("submit", event => {
       event.preventDefault();
-      if (Number(data?.ledgerSettings?.version || 0) > 0) {
-        showToast("Account ledger is updating. Reload Talaan before changing account balances.", "warning");
+      if (document.getElementById("accountDialog")?.dataset.accountMode === "spend") return;
+      const mutations = window.FinanceAccountMutations;
+      if (!mutations?.submitAccountForm) {
+        showToast("Account maintenance is unavailable. Reload Talaan before changing account balances.", "warning");
         return;
       }
-      if (document.getElementById("accountDialog")?.dataset.accountMode === "spend") {
-        // Record Spending is intentionally isolated from the account-maintenance form submit path.
-        // Its primary action is a type=button bound directly by account-ledger.js.
-        return;
-      }
-      const originalName = document.getElementById("originalAccountName").value;
-      const newName = document.getElementById("accountName").value.trim();
-      const balanceInput = document.getElementById("accountBalance").value.trim();
-      if (!validateMoneyInput("accountBalance", { required:false, min:0, message:"Enter a valid account balance of zero or more." })) return;
-      const balance = balanceInput === "" ? 0 : moneyInputValue("accountBalance");
-      const type = ACCOUNT_TYPES.includes(document.getElementById("accountType").value) ? document.getElementById("accountType").value : "Other";
-      if (!newName) { const field=document.getElementById("accountName"); setFieldError(field,"Enter an account name."); field.focus(); return; }
-      if (!Number.isFinite(balance)) {
-        showToast("Enter a valid account balance", "warning");
-        return;
-      }
-      const duplicate = accountNames().some(name => name.toLowerCase() === newName.toLowerCase() && name !== originalName);
-      if (duplicate) {
-        showToast("An account with this name already exists");
-        return;
-      }
-      pushUndo(originalName ? `Edit account ${originalName}` : `Add account ${newName}`);
-      const existingOrder = accountNames();
-      if (originalName && originalName !== newName) {
-        data.accountOrder = existingOrder.map(name => name === originalName ? newName : name);
-        delete data.accounts[originalName];
-        delete data.accountTypes[originalName];
-        if (data.accountIcons?.[originalName]) { data.accountIcons[newName] = data.accountIcons[originalName]; delete data.accountIcons[originalName]; }
-        if (data.savingsSettings?.defaultAccount === originalName) data.savingsSettings.defaultAccount = newName;
-        data.expenses.forEach(item => {
-          if (item.account === originalName) item.account = newName;
-        });
-        (data.savingsGoals || []).forEach(goal => { if (goal.sourceType === "linked" && goal.linkedAccount === originalName) goal.linkedAccount = newName; });
-      }
-      data.accounts[newName] = balance;
-      data.accountTypes[newName] = type;
-      data.accountIcons = data.accountIcons || {};
-      const accountIcon = pickerIcon("account");
-      if (accountIcon) data.accountIcons[newName] = accountIcon; else delete data.accountIcons[newName];
-      if (!originalName && !data.accountOrder.includes(newName)) data.accountOrder.push(newName);
-      if (type !== "Savings") (data.savingsGoals || []).forEach(goal => { if (goal.sourceType === "linked" && goal.linkedAccount === newName) { goal.sourceType = "manual"; goal.currentAmount = balance; goal.linkedAccount = ""; goal.updatedAt = new Date().toISOString(); } });
-      if (type === "Savings" && !data.savingsSettings.defaultAccount) data.savingsSettings.defaultAccount = newName;
-      if (type !== "Savings" && data.savingsSettings.defaultAccount === newName) data.savingsSettings.defaultAccount = "";
-      closeTrackedFormAfterAction("accountDialog");
-      saveData(originalName ? "Account updated" : "Account added");
+      mutations.submitAccountForm();
     });
 
     document.getElementById("expenseForm").addEventListener("submit", async event => {
@@ -7573,18 +7531,12 @@
 
     document.getElementById("accountsForm").addEventListener("submit", event => {
       event.preventDefault();
-      if (Number(data?.ledgerSettings?.version || 0) > 0) {
-        showToast("Account ledger is updating. Reload Talaan before changing account balances.", "warning");
+      const mutations = window.FinanceAccountMutations;
+      if (!mutations?.submitAccountsReconciliationForm) {
+        showToast("Account maintenance is unavailable. Reload Talaan before changing account balances.", "warning");
         return;
       }
-      pushUndo("Update account balances");
-            const accountInputs = [...document.querySelectorAll(".account-input")];
-      for (const input of accountInputs) { if (!validateMoneyInput(input, { required:false, min:0, message:"Enter a balance of zero or more." })) return; }
-      accountInputs.forEach(input => data.accounts[input.dataset.account] = moneyInputValue(input));
-      document.querySelectorAll(".account-type-input").forEach(select => data.accountTypes[select.dataset.accountType] = ACCOUNT_TYPES.includes(select.value) ? select.value : "Other");
-      (data.savingsGoals || []).forEach(goal => { if (goal.sourceType === "linked" && accountType(goal.linkedAccount) !== "Savings") { goal.currentAmount = Number(data.accounts[goal.linkedAccount] || goal.currentAmount || 0); goal.sourceType = "manual"; goal.linkedAccount = ""; goal.updatedAt = new Date().toISOString(); } });
-      if (data.savingsSettings.defaultAccount && accountType(data.savingsSettings.defaultAccount) !== "Savings") data.savingsSettings.defaultAccount = "";
-      saveData("Account balances and types updated");
+      mutations.submitAccountsReconciliationForm();
     });
 
     document.getElementById("exportBackup").addEventListener("click", () => {
@@ -9227,8 +9179,8 @@
   <script src="./privacy-lock.js?v=2.5.0-talaan1"></script>
   <script src="./security-profiles.js?v=2.5.0-talaan1"></script>
   <script src="./cloud-conflict-review.js?v=2.5.0-talaan1"></script>
-  <script src="./cloud-conflict-resolution.js?v=2.5.0-talaan1"></script><script src="./cloud-sync-lifecycle.js?v=2.5.0-account-integrity2"></script><script src="./cloud-sync.js?v=2.5.0-account-integrity2"></script>
-  <script src="./account-ledger.js?v=2.5.0-account-integrity2"></script>
+  <script src="./cloud-conflict-resolution.js?v=2.5.0-talaan1"></script><script src="./cloud-sync-lifecycle.js?v=2.5.0-account-7045429fa6a0"></script><script src="./cloud-sync.js?v=2.5.0-account-7045429fa6a0"></script>
+  <script src="./account-ledger.js?v=2.5.0-account-7045429fa6a0"></script>
   <script src="./budget-planning.js?v=2.5.0-talaan1"></script>
   <script src="./reports-insights.js?v=2.5.0-talaan1"></script>
   <script src="./net-worth.js?v=2.5.0-talaan1"></script>

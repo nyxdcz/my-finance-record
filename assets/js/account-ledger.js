@@ -386,17 +386,35 @@
       && roundMoney(data.accounts[item.account]) === roundMoney(item.target));
   }
 
-  function profileBalancesMatch(expectedBalances = []) {
-    if (!expectedBalances.length) return true;
+  function accountStateMatchesRuntime(accounts) {
+    const runtimeAccounts = data.accounts && typeof data.accounts === "object" ? data.accounts : {};
+    const storedAccounts = accounts && typeof accounts === "object" ? accounts : {};
+    const runtimeNames = Object.keys(runtimeAccounts).sort();
+    const storedNames = Object.keys(storedAccounts).sort();
+    if (runtimeNames.length !== storedNames.length || runtimeNames.some((name, index) => name !== storedNames[index])) return false;
+    return runtimeNames.every(name => Number.isFinite(Number(storedAccounts[name]))
+      && roundMoney(storedAccounts[name]) === roundMoney(runtimeAccounts[name]));
+  }
+
+  function localAccountsMatchRuntime() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return false;
+      return accountStateMatchesRuntime(JSON.parse(raw).accounts);
+    } catch (error) {
+      console.error("Could not verify local account persistence.", error);
+      return false;
+    }
+  }
+
+  function profileAccountsMatchRuntime() {
     const architecture = window.FinanceProfileArchitecture;
     const profileId = architecture?.activeProfileId?.();
     if (!profileId) return true;
     try {
       const raw = localStorage.getItem(`simple-finance-profile-data-v1:${profileId}`);
       if (!raw) return false;
-      const stored = JSON.parse(raw);
-      return expectedBalances.every(item => Object.prototype.hasOwnProperty.call(stored.accounts || {}, item.account)
-        && roundMoney(stored.accounts[item.account]) === roundMoney(item.target));
+      return accountStateMatchesRuntime(JSON.parse(raw).accounts);
     } catch (error) {
       console.error("Could not verify profile-scoped account persistence.", error);
       return false;
@@ -416,10 +434,52 @@
     return false;
   }
 
+  function accountMutationInvariantReport(expectedBalances = []) {
+    const errors = [];
+    const activeAccounts = data.accounts && typeof data.accounts === "object" ? data.accounts : {};
+    const ledgerEntries = Array.isArray(data.accountLedger) ? data.accountLedger : [];
+    const calculated = Object.fromEntries(Object.keys(activeAccounts).map(name => [name, 0]));
+    const operationIds = new Set();
+    const ledgerById = new Map();
+
+    for (const entry of ledgerEntries) {
+      if (!entry || typeof entry !== "object") { errors.push("invalid-ledger-entry"); continue; }
+      if (entry.id) ledgerById.set(entry.id, entry);
+      if (entry.operationId) {
+        if (operationIds.has(entry.operationId)) errors.push(`duplicate-operation:${entry.operationId}`);
+        operationIds.add(entry.operationId);
+      }
+      if (Object.prototype.hasOwnProperty.call(calculated, entry.account)) {
+        const amount = Number(entry.amount);
+        if (!Number.isFinite(amount)) errors.push(`invalid-ledger-amount:${entry.id || entry.account}`);
+        else calculated[entry.account] = roundMoney(calculated[entry.account] + amount);
+      }
+    }
+
+    for (const [account, balance] of Object.entries(activeAccounts)) {
+      if (!Number.isFinite(Number(balance))) errors.push(`invalid-account-balance:${account}`);
+      else if (roundMoney(balance) !== roundMoney(calculated[account] || 0)) errors.push(`ledger-balance-mismatch:${account}`);
+    }
+
+    for (const item of data.accountReconciliations || []) {
+      if (!item?.ledgerEntryId) continue;
+      const entry = ledgerById.get(item.ledgerEntryId);
+      if (!entry || entry.account !== item.account || entry.reconciliationId !== item.id) errors.push(`broken-reconciliation:${item.id || item.account}`);
+    }
+
+    for (const expected of expectedBalances) {
+      if (!Object.prototype.hasOwnProperty.call(activeAccounts, expected.account)
+        || roundMoney(activeAccounts[expected.account]) !== roundMoney(expected.target)) errors.push(`expected-balance-mismatch:${expected.account}`);
+    }
+    return { ok:errors.length === 0, errors };
+  }
+
   function persistAccountMutation(snapshot, message, expectedBalances = []) {
     recalculateBalances(data);
-    if (!expectedBalancesMatch(expectedBalances)) {
-      return restoreAccountMutation(snapshot, "The corrected account balance could not be verified. Nothing was saved.");
+    const beforePersist = accountMutationInvariantReport(expectedBalances);
+    if (!beforePersist.ok || !expectedBalancesMatch(expectedBalances)) {
+      console.error("Account mutation invariants failed before persistence.", beforePersist.errors);
+      return restoreAccountMutation(snapshot, "The account update failed its safety checks. Nothing was saved.");
     }
     try {
       if (typeof persistFinanceDataRaw !== "function") throw new Error("Finance persistence is unavailable.");
@@ -429,19 +489,44 @@
       console.error("Account changes could not be persisted.", error);
       return restoreAccountMutation(snapshot, "Account changes could not be saved on this device.");
     }
-    if (!expectedBalancesMatch(expectedBalances)) {
-      return restoreAccountMutation(snapshot, "The account balance changed during save. The previous value was restored.");
+    const afterPersist = accountMutationInvariantReport(expectedBalances);
+    if (!afterPersist.ok || !expectedBalancesMatch(expectedBalances)) {
+      console.error("Account mutation invariants failed after persistence.", afterPersist.errors);
+      return restoreAccountMutation(snapshot, "The account state changed during save. The previous value was restored.");
     }
-    if (!profileBalancesMatch(expectedBalances)) {
+    if (!localAccountsMatchRuntime()) {
+      return restoreAccountMutation(snapshot, "The account update could not be verified in local storage.");
+    }
+    if (!profileAccountsMatchRuntime()) {
       const architecture = window.FinanceProfileArchitecture;
       let repaired = false;
       try { repaired = architecture?.persistCurrentData?.(data, message) !== false; } catch (error) { console.error("Could not repair profile-scoped account persistence.", error); }
-      if (!repaired || !profileBalancesMatch(expectedBalances)) {
+      if (!repaired || !profileAccountsMatchRuntime()) {
         return restoreAccountMutation(snapshot, "The account update could not be stored in the active profile.");
       }
     }
     showToast(message);
     return true;
+  }
+
+  function runAccountMutation({ undoLabel, message, expectedBalances = [], mutate }) {
+    if (!accountMutationCanWrite()) return false;
+    if (typeof mutate !== "function") return false;
+    const snapshot = cloneData(data);
+    try {
+      pushUndo(undoLabel || message || "Account update");
+      mutate();
+      recalculateBalances(data, { stamp:true });
+      const report = accountMutationInvariantReport(expectedBalances);
+      if (!report.ok) {
+        console.error("Account mutation invariants failed.", report.errors);
+        return restoreAccountMutation(snapshot, "The account update failed its safety checks. Nothing was saved.");
+      }
+      return persistAccountMutation(snapshot, message || "Account updated", expectedBalances);
+    } catch (error) {
+      console.error("Account mutation failed before persistence.", error);
+      return restoreAccountMutation(snapshot, "The account update could not be completed. The previous value was restored.");
+    }
   }
 
   function setAccountSpendStatus(state = "", message = "") {
@@ -920,7 +1005,6 @@
   }
 
   function submitAccountForm() {
-    if (!accountMutationCanWrite()) return false;
     const originalName = document.getElementById("originalAccountName").value;
     const newName = document.getElementById("accountName").value.trim();
     if (!validateMoneyInput("accountBalance", { required:false, min:0, message:"Enter a valid account balance of zero or more." })) return false;
@@ -931,39 +1015,37 @@
     const duplicate = accountNames().some(name => name.toLowerCase() === newName.toLowerCase() && name !== originalName);
     if (duplicate) { showToast("An account with this name already exists", "warning"); return false; }
 
-    const snapshot = cloneData(data);
-    pushUndo(originalName ? `Edit account ${originalName}` : `Add account ${newName}`);
-    const existingOrder = accountNames();
-    if (originalName && originalName !== newName) {
-      renameAccountReferences(originalName, newName);
-      data.accountOrder = existingOrder.map(name => name === originalName ? newName : name);
-      data.accounts[newName] = Number(data.accounts[originalName] || 0);
-      delete data.accounts[originalName];
-      data.accountTypes[newName] = data.accountTypes[originalName];
-      delete data.accountTypes[originalName];
-      if (data.accountIcons?.[originalName]) { data.accountIcons[newName] = data.accountIcons[originalName]; delete data.accountIcons[originalName]; }
-      if (data.savingsSettings?.defaultAccount === originalName) data.savingsSettings.defaultAccount = newName;
-    }
-    data.accounts[newName] = Number(data.accounts[newName] || 0);
-    data.accountTypes[newName] = type;
-    data.accountIcons = data.accountIcons || {};
-    const accountIcon = pickerIcon("account");
-    if (accountIcon) data.accountIcons[newName] = accountIcon; else delete data.accountIcons[newName];
-    if (!originalName && !data.accountOrder.includes(newName)) data.accountOrder.push(newName);
-    if (!originalName) {
-      const openingId = `opening:${uid()}`;
-      appendLedgerEntries([{ id:uid(), transactionId:openingId, operationId:openingId, account:newName, type:"opening-balance", amount:targetBalance, date:localDateKey(), description:`Opening balance for ${newName}`, source:"account-create" }]);
-    } else appendReconciliation(newName, targetBalance, { note:"Balance changed from Edit account" });
-    recalculateBalances(data, { stamp:true });
-    if (type !== "Savings") (data.savingsGoals || []).forEach(goal => { if (goal.sourceType === "linked" && goal.linkedAccount === newName) { goal.sourceType = "manual"; goal.currentAmount = Number(data.accounts[newName] || 0); goal.linkedAccount = ""; goal.updatedAt = new Date().toISOString(); } });
-    if (type === "Savings" && !data.savingsSettings.defaultAccount) data.savingsSettings.defaultAccount = newName;
-    if (type !== "Savings" && data.savingsSettings.defaultAccount === newName) data.savingsSettings.defaultAccount = "";
-
-    const saved = persistAccountMutation(
-      snapshot,
-      originalName ? "Account updated and reconciled" : "Account added with opening balance",
-      [{ account:newName, target:targetBalance }]
-    );
+    const saved = runAccountMutation({
+      undoLabel:originalName ? `Edit account ${originalName}` : `Add account ${newName}`,
+      message:originalName ? "Account updated and reconciled" : "Account added with opening balance",
+      expectedBalances:[{ account:newName, target:targetBalance }],
+      mutate:() => {
+        const existingOrder = accountNames();
+        if (originalName && originalName !== newName) {
+          renameAccountReferences(originalName, newName);
+          data.accountOrder = existingOrder.map(name => name === originalName ? newName : name);
+          data.accounts[newName] = Number(data.accounts[originalName] || 0);
+          delete data.accounts[originalName];
+          data.accountTypes[newName] = data.accountTypes[originalName];
+          delete data.accountTypes[originalName];
+          if (data.accountIcons?.[originalName]) { data.accountIcons[newName] = data.accountIcons[originalName]; delete data.accountIcons[originalName]; }
+          if (data.savingsSettings?.defaultAccount === originalName) data.savingsSettings.defaultAccount = newName;
+        }
+        data.accounts[newName] = Number(data.accounts[newName] || 0);
+        data.accountTypes[newName] = type;
+        data.accountIcons = data.accountIcons || {};
+        const accountIcon = pickerIcon("account");
+        if (accountIcon) data.accountIcons[newName] = accountIcon; else delete data.accountIcons[newName];
+        if (!originalName && !data.accountOrder.includes(newName)) data.accountOrder.push(newName);
+        if (!originalName) {
+          const openingId = `opening:${uid()}`;
+          appendLedgerEntries([{ id:uid(), transactionId:openingId, operationId:openingId, account:newName, type:"opening-balance", amount:targetBalance, date:localDateKey(), description:`Opening balance for ${newName}`, source:"account-create" }]);
+        } else appendReconciliation(newName, targetBalance, { note:"Balance changed from Edit account" });
+        if (type !== "Savings") (data.savingsGoals || []).forEach(goal => { if (goal.sourceType === "linked" && goal.linkedAccount === newName) { goal.sourceType = "manual"; goal.currentAmount = Number(data.accounts[newName] || 0); goal.linkedAccount = ""; goal.updatedAt = new Date().toISOString(); } });
+        if (type === "Savings" && !data.savingsSettings.defaultAccount) data.savingsSettings.defaultAccount = newName;
+        if (type !== "Savings" && data.savingsSettings.defaultAccount === newName) data.savingsSettings.defaultAccount = "";
+      }
+    });
     if (!saved) return false;
     closeTrackedFormAfterAction("accountDialog");
     refreshReconciledAccountState(newName, targetBalance);
@@ -971,26 +1053,23 @@
   }
 
   function submitAccountsReconciliationForm() {
-    if (!accountMutationCanWrite()) return false;
     const accountInputs = [...document.querySelectorAll(".account-input")];
     for (const input of accountInputs) if (!validateMoneyInput(input, { required:false, min:0, message:"Enter a balance of zero or more." })) return false;
     const changes = accountInputs.map(input => ({ account:input.dataset.account, target:moneyInputValue(input) })).filter(item => roundMoney(data.accounts[item.account]) !== roundMoney(item.target));
     const typeChanges = [...document.querySelectorAll(".account-type-input")].filter(select => accountType(select.dataset.accountType) !== select.value);
     if (!changes.length && !typeChanges.length) { showToast("Account balances already match the entered values", "info"); return false; }
 
-    const snapshot = cloneData(data);
-    pushUndo("Reconcile account balances");
-    typeChanges.forEach(select => { data.accountTypes[select.dataset.accountType] = ACCOUNT_TYPES.includes(select.value) ? select.value : "Other"; });
-    changes.forEach(item => appendReconciliation(item.account, item.target, { note:"Balances form reconciliation" }));
-    recalculateBalances(data, { stamp:changes.length > 0 });
-    (data.savingsGoals || []).forEach(goal => { if (goal.sourceType === "linked" && accountType(goal.linkedAccount) !== "Savings") { goal.currentAmount = Number(data.accounts[goal.linkedAccount] || goal.currentAmount || 0); goal.sourceType = "manual"; goal.linkedAccount = ""; goal.updatedAt = new Date().toISOString(); } });
-    if (data.savingsSettings.defaultAccount && accountType(data.savingsSettings.defaultAccount) !== "Savings") data.savingsSettings.defaultAccount = "";
-
-    const saved = persistAccountMutation(
-      snapshot,
-      `${changes.length} account balance${changes.length === 1 ? "" : "s"} reconciled`,
-      changes.map(item => ({ account:item.account, target:item.target }))
-    );
+    const saved = runAccountMutation({
+      undoLabel:"Reconcile account balances",
+      message:`${changes.length} account balance${changes.length === 1 ? "" : "s"} reconciled`,
+      expectedBalances:changes.map(item => ({ account:item.account, target:item.target })),
+      mutate:() => {
+        typeChanges.forEach(select => { data.accountTypes[select.dataset.accountType] = ACCOUNT_TYPES.includes(select.value) ? select.value : "Other"; });
+        changes.forEach(item => appendReconciliation(item.account, item.target, { note:"Balances form reconciliation" }));
+        (data.savingsGoals || []).forEach(goal => { if (goal.sourceType === "linked" && accountType(goal.linkedAccount) !== "Savings") { goal.currentAmount = Number(data.accounts[goal.linkedAccount] || goal.currentAmount || 0); goal.sourceType = "manual"; goal.linkedAccount = ""; goal.updatedAt = new Date().toISOString(); } });
+        if (data.savingsSettings.defaultAccount && accountType(data.savingsSettings.defaultAccount) !== "Savings") data.savingsSettings.defaultAccount = "";
+      }
+    });
     if (saved) {
       try { renderAll(false); } catch (error) { console.error("Account balances were saved but Settings refresh failed.", error); }
     }
@@ -1037,23 +1116,30 @@
 
   async function deleteAccountSafely(button) {
     const name = button.dataset.deleteAccount;
-    if (!name) return;
-    if (accountNames().length <= 1) return showToast("Keep at least one account", "warning");
+    if (!name) return false;
+    if (accountNames().length <= 1) { showToast("Keep at least one account", "warning"); return false; }
     const balance = roundMoney(data.accounts[name]);
-    if (balance !== 0) return showToast(`Transfer or reconcile ${name} to ₱0.00 before deleting it. Current balance: ${money(balance)}`, "warning");
+    if (balance !== 0) { showToast(`Transfer or reconcile ${name} to ₱0.00 before deleting it. Current balance: ${money(balance)}`, "warning"); return false; }
     const deductedPayments = data.expenses.filter(item => item.paid && item.accountDeducted && item.paidFromAccount === name).length;
-    if (deductedPayments) return showToast(`Move ${deductedPayments} paid expense${deductedPayments === 1 ? "" : "s"} back to unpaid before deleting ${name}.`, "warning");
+    if (deductedPayments) { showToast(`Move ${deductedPayments} paid expense${deductedPayments === 1 ? "" : "s"} back to unpaid before deleting ${name}.`, "warning"); return false; }
     const confirmed = await openAppConfirmation({ title:"Delete zero-balance account?", message:`Delete “${name}”?`, details:"Historical ledger entries remain available for audit, but the account will no longer appear in selectors.", confirmLabel:"Delete account", danger:true });
-    if (!confirmed) return;
-    pushUndo(`Delete account ${name}`);
-    (data.savingsGoals || []).forEach(goal => { if (goal.sourceType === "linked" && goal.linkedAccount === name) { goal.sourceType = "manual"; goal.currentAmount = 0; goal.linkedAccount = ""; goal.updatedAt = new Date().toISOString(); } });
-    delete data.accounts[name];
-    delete data.accountTypes[name];
-    if (data.accountIcons) delete data.accountIcons[name];
-    data.accountOrder = accountNames().filter(accountName => accountName !== name);
-    if (data.savingsSettings?.defaultAccount === name) data.savingsSettings.defaultAccount = "";
+    if (!confirmed) return false;
+    const saved = runAccountMutation({
+      undoLabel:`Delete account ${name}`,
+      message:"Zero-balance account deleted; ledger history preserved",
+      mutate:() => {
+        (data.savingsGoals || []).forEach(goal => { if (goal.sourceType === "linked" && goal.linkedAccount === name) { goal.sourceType = "manual"; goal.currentAmount = 0; goal.linkedAccount = ""; goal.updatedAt = new Date().toISOString(); } });
+        delete data.accounts[name];
+        delete data.accountTypes[name];
+        if (data.accountIcons) delete data.accountIcons[name];
+        data.accountOrder = accountNames().filter(accountName => accountName !== name);
+        if (data.savingsSettings?.defaultAccount === name) data.savingsSettings.defaultAccount = "";
+      }
+    });
+    if (!saved) return false;
     if (button.closest("#accountDialog")) closeTrackedFormAfterAction("accountDialog");
-    saveData("Zero-balance account deleted; ledger history preserved");
+    try { renderAll(false); } catch (error) { console.error("Account deletion was saved but the interface refresh failed.", error); }
+    return true;
   }
 
   function exportLedgerCsv() {
@@ -1108,10 +1194,21 @@
   }
   renderAll(false);
 
+  window.FinanceAccountMutations = {
+    version:1,
+    owner:"account-ledger-v1",
+    capabilities:{ singleOwner:true, transactionalPersistence:true, invariantChecks:true, profileVerification:true, failClosedFallback:true },
+    submitAccountForm,
+    submitAccountsReconciliationForm,
+    deleteAccountSafely,
+    run:runAccountMutation,
+    invariantReport:accountMutationInvariantReport
+  };
+
   window.FinanceAccountLedger = {
     version:LEDGER_VERSION,
     releaseVersion:"13.0.13",
-    capabilities:{ accountSpending:true, verifiedSpendSubmit:true, persistentSpendActions:true, transactionalSpend:true, isolatedSpendAction:true, accountReconciliationOwner:true, transactionalAccountCorrection:true, profileVerifiedAccountCorrection:true },
+    capabilities:{ accountSpending:true, verifiedSpendSubmit:true, persistentSpendActions:true, transactionalSpend:true, isolatedSpendAction:true, accountReconciliationOwner:true, transactionalAccountCorrection:true, profileVerifiedAccountCorrection:true, singleAccountMutationOwner:true, accountMutationInvariants:true },
     recalculateBalances,
     appendLedgerEntries,
     appendReconciliation,

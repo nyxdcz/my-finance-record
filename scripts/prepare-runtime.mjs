@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import crypto from "node:crypto";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -19,7 +20,21 @@ const RELEASE = Object.freeze({
 const APP_STYLE_ASSET_QUERY = "2.5.0-talaan2";
 const SIDEBAR_BRAND_ASSET_QUERY = "2.2.0-talaan2";
 const UI_RADIUS_ASSET_QUERY = "2.5.0-talaan4";
-const ACCOUNT_INTEGRITY_ASSET_QUERY = "2.5.0-account-integrity2";
+
+const ACCOUNT_INTEGRITY_SOURCES = Object.freeze([
+  "assets/js/account-ledger.js",
+  "assets/js/account-submit-compat.js",
+  "assets/js/cloud-sync.js",
+  "assets/js/cloud-sync-lifecycle.js"
+]);
+const accountIntegrityHash = crypto.createHash("sha256");
+for (const file of ACCOUNT_INTEGRITY_SOURCES) {
+  accountIntegrityHash.update(`${file}\0`);
+  accountIntegrityHash.update(fs.readFileSync(path.join(root, file)));
+}
+const ACCOUNT_INTEGRITY_REVISION = accountIntegrityHash.digest("hex").slice(0, 12);
+const ACCOUNT_INTEGRITY_ASSET_QUERY = `2.5.0-account-${ACCOUNT_INTEGRITY_REVISION}`;
+const ACCOUNT_INTEGRITY_REFRESH_KEY = `finance-account-integrity-${ACCOUNT_INTEGRITY_REVISION}`;
 
 const CURRENT_VERSION_HISTORY = Object.freeze([{
   version:RELEASE.displayVersion,
@@ -166,7 +181,9 @@ patchTextFile("sync-runtime-compat.js", source => source
   .replace(/link\.href\s*=\s*(?:`|\")[^`\"]*liquid-glass[^`\"]*(?:`|\");/g, `link.href = "./liquid-glass.css?v=${RELEASE.assetQuery}";`));
 
 patchTextFile("pwa-update.js", source => source
-  .replace(/const CURRENT_CACHE_VERSION = "finance-v[^"]+";/, `const CURRENT_CACHE_VERSION = "${RELEASE.cache}";`));
+  .replace(/const CURRENT_CACHE_VERSION = "finance-v[^"]+";/, `const CURRENT_CACHE_VERSION = "${RELEASE.cache}";`)
+  .replace(/const ACCOUNT_INTEGRITY_REFRESH_KEY = "[^"]+";/, `const ACCOUNT_INTEGRITY_REFRESH_KEY = "${ACCOUNT_INTEGRITY_REFRESH_KEY}";`)
+  .replace(/const ACCOUNT_INTEGRITY_ASSET_QUERY = "[^"]+";/, `const ACCOUNT_INTEGRITY_ASSET_QUERY = "${ACCOUNT_INTEGRITY_ASSET_QUERY}";`));
 
 patchTextFile("summary-mascots.css", source => source
   .replace(/\.\/ui-radius\.css\?v=[^"')]+/g, `./ui-radius.css?v=${UI_RADIUS_ASSET_QUERY}`));
