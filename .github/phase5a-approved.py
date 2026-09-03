@@ -147,6 +147,14 @@ if anchor2 not in pwa:
 pwa = pwa.replace(anchor2, anchor2 + extra, 1)
 write(pwa_test_path, pwa)
 
+sync_test_path = "tests/regression/validate-sync-config-separation.mjs"
+sync_test = read(sync_test_path)
+old_expected = 'for (const expectedMarker of ["applyTalaanReleaseLayer", "enhanceTalaanRuntimeUi", "MutationObserver"]) {\n  if (!runtime.includes(expectedMarker)) throw new Error(`sync-runtime-compat.js is missing runtime marker: ${expectedMarker}`);\n}'
+new_expected = 'for (const expectedMarker of ["enhanceTalaanRuntimeUi", "MutationObserver"]) {\n  if (!runtime.includes(expectedMarker)) throw new Error(`sync-runtime-compat.js is missing runtime marker: ${expectedMarker}`);\n}\nfor (const removedMarker of ["applyTalaanReleaseLayer", "FINANCE_APP_VERSION_OVERRIDE", "FINANCE_RELEASE_OVERRIDE", "financeLiquidGlassStyles"]) {\n  if (runtime.includes(removedMarker)) throw new Error(`sync-runtime-compat.js still contains removed release ownership: ${removedMarker}`);\n}'
+if old_expected not in sync_test:
+    raise SystemExit("sync-config separation legacy release expectation not found")
+write(sync_test_path, sync_test.replace(old_expected, new_expected, 1))
+
 # Preserve the account correction safety shim and ensure no canonical release override consumers remain.
 account_submit = read("assets/js/account-submit-compat.js")
 for required in ["guardLedgerBackedAccountSubmit", "ledgerGuard:true", "submitCorrectionFromPrimaryAction"]:
