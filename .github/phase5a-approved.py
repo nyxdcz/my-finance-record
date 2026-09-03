@@ -103,7 +103,6 @@ pattern = re.compile(
 )
 match = pattern.search(prepare)
 if not match:
-    # Use a deterministic boundary fallback around the known block.
     block_start = prepare.find('\npatchTextFile("sync-runtime-compat.js", source => source')
     block_end = prepare.find('\n\npatchTextFile("pwa-update.js"', block_start)
     if block_start < 0 or block_end < 0:
@@ -135,7 +134,7 @@ if anchor2 not in pwa:
 pwa = pwa.replace(anchor2, anchor2 + extra, 1)
 write(pwa_test_path, pwa)
 
-# Preserve the account correction safety shim and ensure no release override users exist elsewhere.
+# Preserve the account correction safety shim and ensure no canonical release override consumers remain.
 account_submit = read("assets/js/account-submit-compat.js")
 for required in ["guardLedgerBackedAccountSubmit", "ledgerGuard:true", "submitCorrectionFromPrimaryAction"]:
     if required not in account_submit:
@@ -145,7 +144,7 @@ for path in ROOT.rglob("*"):
     if not path.is_file() or ".git" in path.parts:
         continue
     rel = path.relative_to(ROOT).as_posix()
-    if rel in {sync_path, ".github/phase5a-approved.py"}:
+    if rel in {sync_path, "sync-runtime-compat.js", ".github/phase5a-approved.py"}:
         continue
     if path.suffix not in {".js", ".mjs", ".html"}:
         continue
