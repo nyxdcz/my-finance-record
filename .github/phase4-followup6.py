@@ -11,7 +11,7 @@ if source.count(old) != 1:
     raise SystemExit("account balance PWA integrity hash source contract changed")
 path.write_text(source.replace(old, new, 1))
 
-# The integrity card lives in the Profile & Security settings panel. Open that panel through its normal tab control.
+# The integrity card lives in the Profile & Security settings panel. Open Settings and that panel through Talaan's controller.
 path = root / "tests/browser/finance-integrity-recovery.spec.mjs"
 source = path.read_text()
 old = '''  await page.goto(appUrl, { waitUntil:"networkidle" });
@@ -21,7 +21,10 @@ old = '''  await page.goto(appUrl, { waitUntil:"networkidle" });
 '''
 new = '''  await page.goto(appUrl, { waitUntil:"networkidle" });
   await stable(page);
-  await page.locator("#settings-tab-profiles").click();
+  await page.evaluate(() => {
+    window.goToPage?.("settings", { historyMode:"none", smooth:false });
+    window.activateSettingsPanel?.("profiles", false);
+  });
   await expect(page.locator("#settings-panel-profiles")).toBeVisible();
   const before = await page.evaluate(() => JSON.stringify(data));
   await expect(page.locator("#runIntegrityCheckButton")).toBeVisible();
