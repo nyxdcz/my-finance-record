@@ -71,14 +71,39 @@ html body :where(
   border-radius: var(--talaan-ui-radius) !important;
 }
 
+/* Structural surfaces with higher-specificity legacy radius rules still resolve to
+   Talaan's canonical 7px contract. */
+html body #money .period-card,
+html body #projects .finance-kanban-column,
+html body #reports .report-section-nav {
+  border-radius: var(--talaan-ui-radius) !important;
+}
+
+/* Canonical structural line contract. Internal dividers use the shared line token,
+   reach the intended card edge, and avoid adjacent double seams. */
+#reports > .report-savings-goals-card {
+  margin-bottom: 10px !important;
+}
+
+@media (min-width: 851px) {
+  html body #settings .cloud-config-card > .advanced-settings-disclosure {
+    box-sizing: border-box;
+    margin-inline: calc(-1 * var(--workspace-card-padding, 13px));
+    padding-inline: var(--workspace-card-padding, 13px);
+  }
+}
+
+
 /* Composite Finance period headers keep their structural join, but their visible
    outer corners follow the same 7px system. */
-@media (max-width: 700px) {
+@media (max-width: 850px) {
   html body #money .period-header {
     border-radius: 7px 7px 0 0 !important;
+    border-bottom: 1px solid var(--line) !important;
   }
 
   html body #money .period-card.is-collapsed .period-header {
+    border-bottom: 0 !important;
     border-radius: 7px !important;
   }
 }
