@@ -2,16 +2,19 @@ import { expect, test } from "@playwright/test";
 
 const APP_URL = "http://127.0.0.1:3000";
 
-async function openDividerFixture(page, viewport) {
+async function openDividerFixture(page, viewport, theme) {
   await page.setViewportSize(viewport);
   await page.goto(`${APP_URL}/`, { waitUntil:"networkidle" });
-  await page.setContent(`<!doctype html><html><head>
+  await page.setContent(`<!doctype html><html data-theme="${theme}"><head>
     <link rel="stylesheet" href="${APP_URL}/budget-planning.css">
     <link rel="stylesheet" href="${APP_URL}/projects-calendar.css">
     <link rel="stylesheet" href="${APP_URL}/app.css">
     <link rel="stylesheet" href="${APP_URL}/desktop-ux.css">
     <link rel="stylesheet" href="${APP_URL}/production-ui-audit.css">
+    <link rel="stylesheet" href="${APP_URL}/sidebar-compact-brand.css">
+    <link rel="stylesheet" href="${APP_URL}/ui-radius.css">
   </head><body>
+    <aside class="sidebar open" id="sidebar" aria-label="Main navigation"><nav class="sidebar-navigation">Navigation</nav></aside>
     <section id="projects">
       <div class="agenda-kanban-board"><article class="pc-event-card"><div class="pc-event-main">Agenda</div><div class="pc-event-actions" id="agendaActions"><button class="button">Complete</button></div></article></div>
       <div class="project-kanban-board"><article class="finance-kanban-card project-record"><div>Project</div><div class="project-row-actions" id="projectActions"><button class="button">Edit</button></div></article></div>
@@ -42,6 +45,34 @@ function dividerGeometry(page) {
         )
       };
     };
+
+    const sidebar = document.querySelector("#sidebar");
+    const sidebarStates = window.innerWidth >= 851
+      ? [
+          ["collapsed", "sidebar"],
+          ["expanded", "sidebar desktop-open"],
+          ["pinned", "sidebar sidebar-pinned"]
+        ]
+      : [["phone-open", "sidebar open"]];
+
+    const sidebarEdges = sidebarStates.map(([state, className]) => {
+      sidebar.className = className;
+      const sidebarRect = sidebar.getBoundingClientRect();
+      const sidebarStyle = getComputedStyle(sidebar);
+      const edgeStyle = getComputedStyle(sidebar, "::after");
+      return {
+        state,
+        edgeContent:edgeStyle.content,
+        edgePosition:edgeStyle.position,
+        edgeWidth:edgeStyle.width,
+        edgeTop:edgeStyle.top,
+        edgeBottom:edgeStyle.bottom,
+        topGap:Math.abs(sidebarRect.top),
+        bottomGap:Math.abs(window.innerHeight - sidebarRect.bottom),
+        boxShadow:sidebarStyle.boxShadow
+      };
+    });
+
     return {
       agenda:measure("#agendaActions", ".agenda-kanban-board .pc-event-card"),
       project:measure("#projectActions", ".project-kanban-board .project-record"),
@@ -49,28 +80,41 @@ function dividerGeometry(page) {
       savings:measure("#savingsOutlook", "#forecastBody"),
       expense:measure("#expenseActions", "#earlyExpenses > [data-expense-row]"),
       expenseVisible:getComputedStyle(document.querySelector("#expenseActions")).display !== "none",
+      sidebarEdges,
       overflow:document.documentElement.scrollWidth > document.documentElement.clientWidth + 1
     };
   });
 }
 
-for (const viewport of [{ width:1440, height:1000 }, { width:393, height:852 }]) {
-  test(`Specified section dividers reach both edges at ${viewport.width}px`, async ({ page }) => {
-    await openDividerFixture(page, viewport);
-    const geometry = await dividerGeometry(page);
-    const rows = {
-      agenda:geometry.agenda,
-      project:geometry.project,
-      available:geometry.available,
-      savings:geometry.savings
-    };
-    if (geometry.expenseVisible) rows.expense = geometry.expense;
-    const failures = Object.entries(rows).filter(([, row]) => !row
-      || row.leftGap > 1
-      || row.rightGap > 1
-      || row.dividerWidth !== 1);
+for (const theme of ["light", "dark"]) {
+  for (const viewport of [{ width:1440, height:1000 }, { width:393, height:852 }]) {
+    test(`Specified section dividers reach both edges in ${theme} theme at ${viewport.width}px`, async ({ page }) => {
+      await openDividerFixture(page, viewport, theme);
+      const geometry = await dividerGeometry(page);
+      const rows = {
+        agenda:geometry.agenda,
+        project:geometry.project,
+        available:geometry.available,
+        savings:geometry.savings
+      };
+      if (geometry.expenseVisible) rows.expense = geometry.expense;
+      const failures = Object.entries(rows).filter(([, row]) => !row
+        || row.leftGap > 1
+        || row.rightGap > 1
+        || row.dividerWidth !== 1);
 
-    expect(failures, `Divider geometry:\n${JSON.stringify(geometry, null, 2)}`).toEqual([]);
-    expect(geometry.overflow).toBe(false);
-  });
+      expect(failures, `Divider geometry:\n${JSON.stringify(geometry, null, 2)}`).toEqual([]);
+      for (const sidebar of geometry.sidebarEdges) {
+        expect(sidebar.edgeContent, sidebar.state).toBe('""');
+        expect(sidebar.edgePosition, sidebar.state).toBe("absolute");
+        expect(sidebar.edgeWidth, sidebar.state).toBe("1px");
+        expect(sidebar.edgeTop, sidebar.state).toBe("0px");
+        expect(sidebar.edgeBottom, sidebar.state).toBe("0px");
+        expect(sidebar.topGap, sidebar.state).toBe(0);
+        expect(sidebar.bottomGap, sidebar.state).toBe(0);
+        expect(sidebar.boxShadow, sidebar.state).toBe("none");
+      }
+      expect(geometry.overflow).toBe(false);
+    });
+  }
 }

@@ -173,15 +173,27 @@ html body .workspace-switcher-button[aria-selected="true"] {
   box-shadow: none !important;
 }
 
-/* Level 1 — reserved for the shell edge and a single floating primary action. */
-@media (min-width: 851px) {
-  html body #sidebar.sidebar,
-  html body #sidebar.sidebar.desktop-open,
-  html body #sidebar.sidebar.sidebar-pinned {
-    box-shadow: 1px 0 0 color-mix(in srgb, var(--line) 72%, transparent) !important;
-  }
+/* The sidebar edge is a structural divider, not elevation. A pseudo-element keeps
+   the 1px line continuous without changing collapsed, expanded, pinned, or phone
+   sidebar geometry. */
+html body #sidebar.sidebar,
+html body #sidebar.sidebar.desktop-open,
+html body #sidebar.sidebar.sidebar-pinned {
+  box-shadow: none !important;
 }
 
+html body #sidebar.sidebar::after {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inset-inline-end: 0;
+  width: 1px;
+  background: var(--line);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Level 1 — reserved for a single floating primary action. */
 html body .mobile-add-expense-fab {
   box-shadow: var(--shadow-level-1) !important;
 }
