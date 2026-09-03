@@ -1,7 +1,7 @@
 from pathlib import Path
 
-path = Path("tests/finance/validate-finance-ui-source.mjs")
-text = path.read_text()
+finance_path = Path("tests/finance/validate-finance-ui-source.mjs")
+text = finance_path.read_text()
 old = '''assert.match(ledger, /const saved = saveData\\(/s, "Record spending must persist before final UI refresh");
 assert.match(ledger, /storedLedger\\.length !== 1/, "Record spending must verify one ledger debit");
 '''
@@ -17,5 +17,12 @@ text = text.replace(old, new, 1)
 text = text.replace('assert(accountLedger.includes("function runLedgerTransaction("), "unified ledger transaction runner is missing");', 'assert(ledger.includes("function runLedgerTransaction("), "unified ledger transaction runner is missing");')
 text = text.replace('assert(accountLedger.includes("window.FinanceLedgerTransactions = Object.freeze"), "money mutation service is not exposed");', 'assert(ledger.includes("window.FinanceLedgerTransactions = Object.freeze"), "money mutation service is not exposed");')
 text = text.replace('for (const capability of ["unifiedMoneyMutations:true","transactionalPersistence:true","domainInvariants:true","rollback:true"]) assert(accountLedger.includes(capability), `money mutation capability ${capability} is missing`);', 'for (const capability of ["unifiedMoneyMutations:true","transactionalPersistence:true","domainInvariants:true","rollback:true"]) assert(ledger.includes(capability), `money mutation capability ${capability} is missing`);')
-path.write_text(text)
-print("Aligned finance source contract with unified Phase 2 money transactions.")
+finance_path.write_text(text)
+
+pwa_path = Path("tests/regression/validate-pwa-runtime.mjs")
+pwa = pwa_path.read_text()
+pwa = pwa.replace('assert.match(accountLedger, /function persistAccountMutation\\(/);', 'assert.match(accountLedger, /function runLedgerTransaction\\(/);\nassert.match(accountLedger, /function moneyMutationInvariantReport\\(/);\nassert.match(accountLedger, /window\\.FinanceLedgerTransactions = Object\\.freeze/);')
+pwa = pwa.replace('assert.match(accountLedger, /if \\(!accountMutationCanWrite\\(\\)\\) return false;/);', 'assert.match(accountLedger, /if \\(!moneyMutationCanWrite\\(\\)\\) return \\{ ok:false, reason:"read-only" \\};/);')
+pwa_path.write_text(pwa)
+
+print("Aligned finance and PWA source contracts with unified Phase 2 money transactions.")
