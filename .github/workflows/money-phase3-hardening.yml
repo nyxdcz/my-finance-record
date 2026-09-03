@@ -34,10 +34,17 @@ jobs:
           from pathlib import Path
           path = Path("tests/finance/validate-money-mutation-ownership.mjs")
           lines = path.read_text().splitlines()
-          matches = [i for i, line in enumerate(lines) if '"direct account balance assignment"' in line]
-          if len(matches) != 1:
-              raise SystemExit(f"Expected one account-assignment guard; found {len(matches)}")
-          lines[matches[0]] = r'  ["direct account balance assignment", /\bdata\.accounts\s*\[[^\]]+\]\s*(?:=|\+=|-=|\*=|\/=)(?!=)/g],'
+          replacements = {
+              '"direct account balance assignment"': r'  ["direct account balance assignment", /\bdata\.accounts\s*\[[^\]]+\]\s*(?:=|\+=|-=|\*=|\/=)(?!=)/g],',
+              '"direct account ledger collection mutation"': r'  ["direct account ledger collection mutation", /\bdata\.accountLedger\s*(?:=|\.push\s*\(|\.splice\s*\(|\.unshift\s*\()/g],',
+              '"direct paid-expense lifecycle mutation"': r'  ["direct paid-expense lifecycle mutation", /\b(?:item|expense|record|plan\.item)\.(?:paid|paidDate|paidFromAccount|paidAmount|accountDeducted|paymentTransactionId|autoPaidAtMonthEnd)\s*=(?!=)/g],',
+              '"raw ledger append API outside the transaction owner"': r'  ["raw ledger append API outside the transaction owner", /FinanceAccountLedger[^\n]{0,120}append(?:LedgerEntries|Reconciliation)/g],',
+          }
+          for label, replacement in replacements.items():
+              matches = [i for i, line in enumerate(lines) if label in line]
+              if len(matches) != 1:
+                  raise SystemExit(f"Expected one {label} guard; found {len(matches)}")
+              lines[matches[0]] = replacement
           path.write_text("\n".join(lines) + "\n")
           PY
           node scripts/prepare-runtime.mjs
