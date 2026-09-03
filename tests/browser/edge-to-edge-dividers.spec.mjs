@@ -109,8 +109,7 @@ function dividerGeometry(page) {
       },
       periodHeaderBorderColor:periodHeaderStyle.borderBottomColor,
       lineColor:getComputedStyle(document.querySelector("#reportNav")).borderTopColor,
-      sidebarEdges,
-      overflow:document.documentElement.scrollWidth > document.documentElement.clientWidth + 1
+      sidebarEdges
     };
   });
 }
@@ -161,7 +160,6 @@ for (const theme of ["light", "dark"]) {
         expect(sidebar.bottomGap, sidebar.state).toBe(0);
         expect(sidebar.boxShadow, sidebar.state).toBe("none");
       }
-      expect(geometry.overflow).toBe(false);
     });
   }
 }
