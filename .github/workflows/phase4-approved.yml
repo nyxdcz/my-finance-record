@@ -1,4 +1,5 @@
 name: Phase 4 approved integrity hardening
+# Phase 4 final browser rerun: controller-routed Profile & Security panel.
 
 on:
   push:
