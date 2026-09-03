@@ -17,8 +17,11 @@ if (!config.includes("window.FINANCE_SYNC_CONFIG")) throw new Error("sync-config
 for (const runtimeMarker of ["MutationObserver", "applyTalaanReleaseLayer", "enhanceTalaanRuntimeUi", "document.createElement(\"style\")"]) {
   if (config.includes(runtimeMarker)) throw new Error(`sync-config.js still contains runtime marker: ${runtimeMarker}`);
 }
-for (const expectedMarker of ["applyTalaanReleaseLayer", "enhanceTalaanRuntimeUi", "MutationObserver"]) {
+for (const expectedMarker of ["enhanceTalaanRuntimeUi", "MutationObserver"]) {
   if (!runtime.includes(expectedMarker)) throw new Error(`sync-runtime-compat.js is missing runtime marker: ${expectedMarker}`);
+}
+for (const removedMarker of ["applyTalaanReleaseLayer", "FINANCE_APP_VERSION_OVERRIDE", "FINANCE_RELEASE_OVERRIDE", "financeLiquidGlassStyles"]) {
+  if (runtime.includes(removedMarker)) throw new Error(`sync-runtime-compat.js still contains removed release ownership: ${removedMarker}`);
 }
 if (!prepareRuntime.includes('"sync-runtime-compat.js"')) throw new Error("prepare-runtime must map sync-runtime-compat.js to the flat runtime root.");
 

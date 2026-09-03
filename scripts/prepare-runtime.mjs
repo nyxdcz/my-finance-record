@@ -174,13 +174,6 @@ for (const file of runtimeJsTargets) {
     .replaceAll("Finance Records installed", `${BRAND} installed`));
 }
 
-patchTextFile("sync-runtime-compat.js", source => source
-  .replace(/const VERSION = "\d+\.\d+\.\d+";/, `const VERSION = "${RELEASE.version}";`)
-  .replace(/const RELEASE_NAME = "[^"]+";/, `const RELEASE_NAME = "${RELEASE.name}";`)
-  .replace(/const RELEASE_DATE = "[^"]+";/, `const RELEASE_DATE = "${RELEASE.date}";`)
-  .replace(/released:"\d{4}-\d{2}-\d{2}"/, `released:"${RELEASE.dateIso}"`)
-  .replace(/document\.title = `Talaan · V\$\{VERSION\}`;/, `document.title = "${BRAND}";`)
-  .replace(/link\.href\s*=\s*(?:`|\")[^`\"]*liquid-glass[^`\"]*(?:`|\");/g, `link.href = "./liquid-glass.css?v=${RELEASE.assetQuery}";`));
 
 patchTextFile("pwa-update.js", source => source
   .replace(/const CURRENT_CACHE_VERSION = "finance-v[^"]+";/, `const CURRENT_CACHE_VERSION = "${RELEASE.cache}";`)

@@ -3,7 +3,7 @@
    Safe multi-device sync refreshes cloud revisions before upload, preserves concurrent device edits,
    merges non-overlapping changes, and pauses overlapping changes for explicit review. */
 (function financeCloudSyncV3Bootstrap() {
-  const APP_VERSION_FALLBACK = "15.2.1";
+  const APP_VERSION_FALLBACK = "2.5.0";
   const APP_VERSION_CODE = 130000;
   const CLOUD_SCHEMA_VERSION = 3;
   const CORE_SCHEMA_VERSION = 12;
@@ -90,7 +90,7 @@
   const lifecycle = window.FinanceCloudSyncLifecycle?.create?.({canPoll:()=>Boolean(cloudReadiness().ready&&state.autoSync!==false&&navigator.onLine&&!document.hidden),canRetry:()=>Boolean(cloudReadiness().ready&&state.autoSync!==false),pull:reason=>syncNow({reason}),reconnect:()=>setupRealtime()});
   if(!lifecycle)throw new Error("Cloud Sync lifecycle support is unavailable. Reload the latest app version."); const {clearForegroundPoll,scheduleForegroundPoll,clearRealtimeRetry,scheduleRealtimeRecovery,noteRealtimeSubscribed}=lifecycle;
   function appVersion() {
-    return window.FINANCE_APP_VERSION_OVERRIDE || (typeof APP_VERSION !== "undefined" ? APP_VERSION : APP_VERSION_FALLBACK);
+    return typeof APP_VERSION !== "undefined" ? APP_VERSION : APP_VERSION_FALLBACK;
   }
 
   function cloudProfileId() { return String(PROFILE_ARCH()?.cloudProfileId?.() || ""); }

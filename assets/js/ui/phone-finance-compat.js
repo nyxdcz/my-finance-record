@@ -3,35 +3,6 @@
   const doc = root.document;
   if (!doc) return;
 
-  function installPhoneSettingsTouchContract() {
-    if (doc.getElementById("phoneSettingsTouchContract")) return;
-    const style = doc.createElement("style");
-    style.id = "phoneSettingsTouchContract";
-    style.textContent = `
-@media (max-width: 700px) {
-  html body #settings :is(button, summary, [role="tab"]) {
-    box-sizing: border-box !important;
-    min-width: 44px !important;
-    min-height: 44px !important;
-  }
-
-  html body #settings .context-help-button.section-help-button {
-    display: inline-grid !important;
-    place-items: center !important;
-    width: 44px !important;
-    min-width: 44px !important;
-    max-width: 44px !important;
-    height: 44px !important;
-    min-height: 44px !important;
-    max-height: 44px !important;
-    padding: 0 !important;
-    flex: 0 0 44px !important;
-  }
-}
-`;
-    doc.head?.appendChild(style);
-  }
-
   function bindPhoneIconOnlyButton(button, label, iconMarkup) {
     if (!button || button.dataset.phoneCompactIconBound === "true") return;
     const visibleLabel = String(button.textContent || label).trim() || label;
@@ -64,7 +35,6 @@
   }
 
   function installPhoneFinanceCompactUi() {
-    installPhoneSettingsTouchContract();
     const apply = () => enhancePhoneCompactButtons();
     if (doc.readyState === "loading") doc.addEventListener("DOMContentLoaded", apply, { once:true }); else apply();
     const startObserver = () => {
