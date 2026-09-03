@@ -20,4 +20,13 @@ assert.match(cloud, /accountReconciliations/);
 assert.match(cloud, /accounts/);
 assert.match(cloud, /finance:data-persisted/);
 
-console.log("Unified money mutations persist before Cloud Sync observation and retain ledger/account collections.");
+
+assert.match(ledger, /requestId:safeText\(entry\.requestId \|\| "", 160\)/);
+assert.match(ledger, /function requestLedgerEntries\(/);
+assert.match(ledger, /idempotencyKey = ""/);
+assert.match(ledger, /commitExternalExpensePayment/);
+assert.match(ledger, /commitPaidExpenseAccountCorrection/);
+assert.match(ledger, /commitReconciliationBatch/);
+assert.match(cloud, /payload:clone\(item\.payload \|\| \{\}\)/);
+
+console.log("Unified money mutations, idempotency request IDs, and Phase 3 correction APIs survive Cloud Sync record mapping.");

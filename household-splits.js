@@ -572,12 +572,19 @@
     event.preventDefault(); event.stopImmediatePropagation();
     if (expensePaymentSubmitting) return;
     expensePaymentSubmitting = true;
-    if (typeof pushUndo === "function") pushUndo(items.length === 1 ? `Mark ${items[0].name} paid by ${group.members.find(member => member.id === payer.value)?.name || "member"}` : `Mark ${items.length} household expenses paid`);
-    items.forEach(item => {
-      item.paid = true; item.paidDate = todayKey(); item.paidFromAccount = ""; item.paidAmount = 0; item.accountDeducted = false; item.paymentTransactionId = ""; item.autoPaidAtMonthEnd = false;
-      item.householdSplit = { ...item.householdSplit, payerMemberId:payer.value, updatedAt:nowIso() };
+    const service = window.FinanceLedgerTransactions;
+    if (!service?.markExpensesPaidExternally) { expensePaymentSubmitting = false; showToast("Account ledger is updating. Reload Talaan before recording this household payment.", "warning"); return; }
+    const payerId = payer.value;
+    const payerName = group.members.find(member => member.id === payerId)?.name || "member";
+    const result = service.markExpensesPaidExternally(items, {
+      paidDate:todayKey(),
+      undoLabel:items.length === 1 ? `Mark ${items[0].name} paid by ${payerName}` : `Mark ${items.length} household expenses paid`,
+      message:"Household expense marked paid without an account deduction",
+      decorateItem:item => { item.householdSplit = { ...item.householdSplit, payerMemberId:payerId, updatedAt:nowIso() }; },
+      verifyItem:item => item?.householdSplit?.payerMemberId === payerId
     });
-    closeExpensePaymentDialog(); selectedExpenseIds.clear(); document.getElementById("bulkExpenseAction").value = ""; refreshBulkActionValue(); saveData("Household expense marked paid without an account deduction"); renderPanel();
+    if (!result?.ok) { expensePaymentSubmitting = false; showToast("The household payment could not be saved. Nothing was changed.", "warning"); return; }
+    closeExpensePaymentDialog(); selectedExpenseIds.clear(); document.getElementById("bulkExpenseAction").value = ""; refreshBulkActionValue(); renderPanel();
   }, true);
 
   document.addEventListener("change", event => {

@@ -169,3 +169,124 @@ test("Viewer money mutation fails before transfer ledger changes", async ({ page
   const after = await page.evaluate(() => ({ accounts:{...data.accounts}, count:(data.accountLedger || []).length }));
   expect(after).toEqual(before);
 });
+
+
+test("Phase 3 transfer request is idempotent after reload", async ({ page }) => {
+  await openApp(page);
+  const setup = await page.evaluate(() => ({ names:Object.keys(data.accounts || {}).slice(0,2), balances:{...data.accounts} }));
+  expect(setup.names.length).toBe(2);
+  const [from,to] = setup.names;
+  await boostAccount(page, from, Math.max(2000, Number(setup.balances[from] || 0) + 1000));
+  const before = await page.evaluate(({from,to}) => ({ from:Number(data.accounts[from]), to:Number(data.accounts[to]) }), {from,to});
+  const requestId = `phase3-transfer-${Date.now()}`;
+  const first = await page.evaluate(({from,to,requestId}) => window.FinanceLedgerTransactions.transfer({ from, to, amount:77.77, date:new Date().toISOString().slice(0,10), note:"Phase 3 transfer request", idempotencyKey:requestId }), {from,to,requestId});
+  expect(first.ok).toBe(true);
+  const once = await page.evaluate(({from,to,requestId}) => ({ from:Number(data.accounts[from]), to:Number(data.accounts[to]), entries:data.accountLedger.filter(entry => entry.requestId === requestId) }), {from,to,requestId});
+  expect(once.from).toBeCloseTo(before.from - 77.77, 2);
+  expect(once.to).toBeCloseTo(before.to + 77.77, 2);
+  expect(once.entries).toHaveLength(2);
+
+  await page.reload({ waitUntil:"networkidle" });
+  await authenticate(page);
+  const second = await page.evaluate(({from,to,requestId}) => window.FinanceLedgerTransactions.transfer({ from, to, amount:77.77, date:new Date().toISOString().slice(0,10), note:"Phase 3 transfer request", idempotencyKey:requestId }), {from,to,requestId});
+  expect(second.ok).toBe(true);
+  expect(second.idempotent).toBe(true);
+  const twice = await page.evaluate(({from,to,requestId}) => ({ from:Number(data.accounts[from]), to:Number(data.accounts[to]), entries:data.accountLedger.filter(entry => entry.requestId === requestId) }), {from,to,requestId});
+  expect(twice.from).toBeCloseTo(once.from, 2);
+  expect(twice.to).toBeCloseTo(once.to, 2);
+  expect(twice.entries).toHaveLength(2);
+});
+
+test("Phase 3 quick spend survives offline save and rejects replay after reconnect", async ({ page, context }) => {
+  await openApp(page);
+  const account = await page.evaluate(() => Object.keys(data.accounts || {})[0]);
+  const original = await page.evaluate(account => Number(data.accounts[account]), account);
+  await boostAccount(page, account, Math.max(1800, original + 900));
+  const before = await page.evaluate(account => Number(data.accounts[account]), account);
+  const requestId = `phase3-spend-${Date.now()}`;
+  await context.setOffline(true);
+  const first = await page.evaluate(({account,requestId}) => window.FinanceLedgerTransactions.quickSpend({ account, amount:64.32, description:"Phase 3 offline purchase", category:"Personal", date:new Date().toISOString().slice(0,10), note:"offline idempotency", includeInTotals:true, idempotencyKey:requestId }), {account,requestId});
+  expect(first.ok).toBe(true);
+  const offline = await page.evaluate(({account,requestId}) => ({ balance:Number(data.accounts[account]), entries:data.accountLedger.filter(entry => entry.requestId === requestId), expenses:data.expenses.filter(item => item.mutationRequestId === requestId) }), {account,requestId});
+  expect(offline.balance).toBeCloseTo(before - 64.32, 2);
+  expect(offline.entries).toHaveLength(1);
+  expect(offline.expenses).toHaveLength(1);
+  await context.setOffline(false);
+  await page.reload({ waitUntil:"networkidle" });
+  await authenticate(page);
+  const second = await page.evaluate(({account,requestId}) => window.FinanceLedgerTransactions.quickSpend({ account, amount:64.32, description:"Phase 3 offline purchase", category:"Personal", date:new Date().toISOString().slice(0,10), note:"offline idempotency", includeInTotals:true, idempotencyKey:requestId }), {account,requestId});
+  expect(second.ok).toBe(true);
+  expect(second.idempotent).toBe(true);
+  const reloaded = await page.evaluate(({account,requestId}) => ({ balance:Number(data.accounts[account]), entries:data.accountLedger.filter(entry => entry.requestId === requestId), expenses:data.expenses.filter(item => item.mutationRequestId === requestId) }), {account,requestId});
+  expect(reloaded.balance).toBeCloseTo(offline.balance, 2);
+  expect(reloaded.entries).toHaveLength(1);
+  expect(reloaded.expenses).toHaveLength(1);
+});
+
+test("Phase 3 payment-account correction is transactional and replay-safe", async ({ page }) => {
+  await openApp(page);
+  const names = await page.evaluate(() => Object.keys(data.accounts || {}).slice(0,2));
+  expect(names.length).toBe(2);
+  const [from,to] = names;
+  const initial = await page.evaluate(({from,to}) => ({ from:Number(data.accounts[from]), to:Number(data.accounts[to]) }), {from,to});
+  await boostAccount(page, from, Math.max(1600, initial.from + 800));
+  await boostAccount(page, to, Math.max(1600, initial.to + 800));
+  const before = await page.evaluate(({from,to}) => ({ from:Number(data.accounts[from]), to:Number(data.accounts[to]) }), {from,to});
+  const spend = await page.evaluate(from => window.FinanceLedgerTransactions.quickSpend({ account:from, amount:55.5, description:"Phase 3 correction purchase", category:"Personal", date:new Date().toISOString().slice(0,10), idempotencyKey:`phase3-correction-spend-${Date.now()}` }), from);
+  expect(spend.ok).toBe(true);
+  const corrected = await page.evaluate(({id,to}) => window.FinanceLedgerTransactions.correctPaidExpenseAccounts([id], to), {id:spend.expense.id,to});
+  expect(corrected.ok).toBe(true);
+  expect(corrected.count).toBe(1);
+  const state = await page.evaluate(({id,from,to}) => {
+    const item = data.expenses.find(expense => expense.id === id);
+    const pair = data.accountLedger.filter(entry => entry.transactionId === item.paymentTransactionId && entry.expenseId === id);
+    return { item, pair, fromBalance:Number(data.accounts[from]), toBalance:Number(data.accounts[to]) };
+  }, {id:spend.expense.id,from,to});
+  expect(state.item.paidFromAccount).toBe(to);
+  expect(state.pair).toHaveLength(2);
+  expect(state.fromBalance).toBeCloseTo(before.from, 2);
+  expect(state.toBalance).toBeCloseTo(before.to - 55.5, 2);
+  const replay = await page.evaluate(({id,to}) => window.FinanceLedgerTransactions.correctPaidExpenseAccounts([id], to), {id:spend.expense.id,to});
+  expect(replay.ok).toBe(true);
+  expect(replay.skipped).toBe(true);
+  expect(replay.count).toBe(0);
+});
+
+test("Phase 3 external payment and reconciliation batch persist without bypassing accounts", async ({ page }) => {
+  await openApp(page);
+  const account = await page.evaluate(() => Object.keys(data.accounts || {})[0]);
+  const before = await page.evaluate(account => Number(data.accounts[account]), account);
+  const expenseId = `phase3-external-${Date.now()}`;
+  await page.evaluate(({expenseId,account}) => {
+    data.expenses.push({ id:expenseId, expenseType:"normal", name:"Phase 3 externally paid bill", amount:42, date:new Date().toISOString().slice(0,10), category:"Bills", account, recurring:"No", seriesId:"", includeInTotals:true, notes:"", paid:false, paidDate:"", paidFromAccount:"", paidAmount:0, accountDeducted:false, paymentTransactionId:"", autoPaidAtMonthEnd:false, gymAutoPay:false, gymAutoPayAccount:"", gymAutoPaySuppressed:false, icon:null });
+    persistFinanceDataRaw("Phase 3 browser setup");
+  }, {expenseId,account});
+  const external = await page.evaluate(expenseId => {
+    const item = data.expenses.find(expense => expense.id === expenseId);
+    return window.FinanceLedgerTransactions.markExpensesPaidExternally([item], { message:"Phase 3 external payment", decorateItem:expense => { expense.testExternalPayer = "member"; }, verifyItem:expense => expense?.testExternalPayer === "member" });
+  }, expenseId);
+  expect(external.ok).toBe(true);
+  const paidState = await page.evaluate(({expenseId,account}) => {
+    const item = data.expenses.find(expense => expense.id === expenseId);
+    return { item, balance:Number(data.accounts[account]), ledger:data.accountLedger.filter(entry => entry.expenseId === expenseId) };
+  }, {expenseId,account});
+  expect(paidState.item.paid).toBe(true);
+  expect(paidState.item.accountDeducted).toBe(false);
+  expect(paidState.balance).toBeCloseTo(before, 2);
+  expect(paidState.ledger).toHaveLength(0);
+
+  const target = Number((before + 11.11).toFixed(2));
+  const reconciled = await page.evaluate(({account,target}) => window.FinanceLedgerTransactions.reconcileAccounts([{account,target}], { note:"Phase 3 recovery reconciliation", message:"Phase 3 reconciliation", recordUndo:false }), {account,target});
+  expect(reconciled.ok).toBe(true);
+  expect(reconciled.count).toBe(1);
+  const stored = await page.evaluate(({account,target}) => {
+    const local = JSON.parse(localStorage.getItem("simple-finance-project-records-v2") || "{}");
+    const profileId = window.FinanceProfileArchitecture?.activeProfileId?.() || "";
+    const profile = JSON.parse(localStorage.getItem(`simple-finance-profile-data-v1:${profileId}`) || "{}");
+    return { runtime:Number(data.accounts[account]), local:Number(local.accounts[account]), profile:Number(profile.accounts[account]), reconciliation:data.accountReconciliations.find(item => item.account === account && Number(item.statementBalance) === target) };
+  }, {account,target});
+  expect(stored.runtime).toBeCloseTo(target, 2);
+  expect(stored.local).toBeCloseTo(target, 2);
+  expect(stored.profile).toBeCloseTo(target, 2);
+  expect(stored.reconciliation).toBeTruthy();
+});

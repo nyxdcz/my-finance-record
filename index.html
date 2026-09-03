@@ -2936,42 +2936,12 @@
       if (!Object.prototype.hasOwnProperty.call(data.accounts || {}, account)) return { ok:false, reason:"missing-account", total };
       const balance = roundMoney(data.accounts[account]);
       if (balance < total) return { ok:false, reason:"insufficient", total, balance };
-      const transactionId = uid();
       return window.FinanceLedgerTransactions?.payExpenses ? window.FinanceLedgerTransactions.payExpenses(eligible, account, { auto, paidDate }) : { ok:false, reason:"ledger-unavailable", total, balance };
-      eligible.forEach(item => {
-        const amount = expensePaymentAmount(item);
-        if (isDailyBudget(item)) item.amount = amount;
-        item.paid = true;
-        item.paidDate = paidDate;
-        item.paidFromAccount = account;
-        item.paidAmount = amount;
-        item.accountDeducted = true;
-        item.paymentTransactionId = transactionId;
-        item.autoPaidAtMonthEnd = Boolean(auto);
-        if (isGymExpense(item)) item.gymAutoPaySuppressed = false;
-      });
-      return { ok:true, total, transactionId, count:eligible.length, account };
     }
 
     function restoreExpensePayment(item) {
-      if (!item?.paid) return { restored:0 };
-      const restored = item.accountDeducted && item.paidFromAccount && Number(item.paidAmount || 0) > 0;
-      const amount = restored ? roundMoney(item.paidAmount) : 0;
-      if (restored) {
-        if (!Object.prototype.hasOwnProperty.call(data.accounts || {}, item.paidFromAccount)) {
-          return { restored:0, missingAccount:item.paidFromAccount };
-        }
-        return window.FinanceLedgerTransactions?.reverseExpensePayment ? window.FinanceLedgerTransactions.reverseExpensePayment(item) : { ok:false, restored:0, reason:"ledger-unavailable" };
-      }
-      item.paid = false;
-      item.paidDate = "";
-      item.paidFromAccount = "";
-      item.paidAmount = 0;
-      item.accountDeducted = false;
-      item.paymentTransactionId = "";
-      item.autoPaidAtMonthEnd = false;
-      if (isGymExpense(item) && expenseMonth(item) < currentMonth) item.gymAutoPaySuppressed = true;
-      return { restored:amount };
+      if (!item?.paid) return { ok:true, restored:0 };
+      return window.FinanceLedgerTransactions?.reverseExpensePayment ? window.FinanceLedgerTransactions.reverseExpensePayment(item) : { ok:false, restored:0, reason:"ledger-unavailable" };
     }
 
     function nextMonthKey(month) {
@@ -7771,9 +7741,16 @@
       const categoryGroup = rawCategory === "Other wages" ? "Wages" : (rawCategory === "Transfer from savings" ? "Internal transfer" : (rawCategory === "Other income" ? "Other income" : incomeCategoryGroup(rawCategory)));
       const record={ id:id||uid(), name:document.getElementById("incomeName").value.trim(), amount:moneyInputValue("incomeAmount"), date:document.getElementById("incomeDate").value, category, categoryGroup, account:document.getElementById("incomeAccount").value, recurring, seriesId:existing?.seriesId || (recurring==="Monthly"?`income-series-${id||uid()}`:""), includeInTotals:category==="Transfer from savings"?false:document.getElementById("incomeIncludeInTotals").checked, notes:document.getElementById("incomeNotes").value.trim(), icon:pickerIcon("income") };
       if(!record.name){const field=document.getElementById("incomeName");setFieldError(field,"Enter an income name.");field.focus();return;}if(!record.date){const field=document.getElementById("incomeDate");setFieldError(field,"Choose the date received.");field.focus();return;}if(!record.account){const field=document.getElementById("incomeAccount");setFieldError(field,"Choose the account that received this income.");field.focus();return;}
-      if(existing) Object.assign(existing,record); else data.incomeRecords.push(record); closeTrackedFormAfterAction("incomeDialog"); saveData(existing?"Income updated":"Income added");
+      record.ledgerTransactionId=existing?.ledgerTransactionId||"";
+      record.postToLedger=rawCategory!=="Transfer from savings"&&Boolean(document.getElementById("incomePostToLedger")?.checked);
+      const service=window.FinanceLedgerTransactions;
+      if(!service?.saveIncome){showToast("Account ledger is updating. Reload Talaan before editing income.","warning");return;}
+      const result=service.saveIncome(record);
+      if(!result?.ok)return;
+      closeTrackedFormAfterAction("incomeDialog");
+      try{renderAll(false);}catch(error){console.error("Income was saved but the interface refresh failed.",error);}
     });
-    document.getElementById("deleteIncomeFromDialog").addEventListener("click", async event => { const id=event.currentTarget.dataset.deleteIncome; const item=(data.incomeRecords||[]).find(record=>record.id===id); if(!item) return; const confirmed=await openAppConfirmation({title:"Delete income?",message:`Delete “${item.name}”?`,details:`${money(item.amount)} · ${item.category}`,confirmLabel:"Delete income",danger:true}); if(confirmed){ pushUndo(`Delete income ${item.name}`); data.incomeRecords=data.incomeRecords.filter(record=>record.id!==id); closeTrackedFormAfterAction("incomeDialog"); saveData("Income deleted"); } });
+    document.getElementById("deleteIncomeFromDialog").addEventListener("click", async event => { const id=event.currentTarget.dataset.deleteIncome; const item=(data.incomeRecords||[]).find(record=>record.id===id); if(!item) return; const confirmed=await openAppConfirmation({title:"Delete income?",message:`Delete “${item.name}”?`,details:`${money(item.amount)} · ${item.category}`,confirmLabel:"Delete income",danger:true}); if(!confirmed)return; const service=window.FinanceLedgerTransactions; if(!service?.deleteIncome){showToast("Account ledger is updating. Reload Talaan before deleting income.","warning");return;} const result=service.deleteIncome(id); if(!result?.ok)return; closeTrackedFormAfterAction("incomeDialog"); try{renderAll(false);}catch(error){console.error("Income deletion was saved but the interface refresh failed.",error);} });
     document.getElementById("exportIncomeCsv").addEventListener("click", () => { const rows=[["Date","Income","Category","Account","Amount","Included in Totals","Recurring","Icon Type","Icon Value","Notes"],...(data.incomeRecords||[]).map(item=>[item.date,item.name,item.category,item.account,item.amount,incomeIncludedInTotals(item)?"Yes":"No",item.recurring,item.icon?.type||"",item.icon?.value||"",item.notes])]; exportCsv("income.csv",rows); });
     document.getElementById("exportIncomeReportCsv").addEventListener("click", () => { const report=reportForMonth(selectedMonth()); exportCsv(`income-${report.month}.csv`, [["Date","Income","Category","Account","Amount","Included in Totals","Recurring","Icon Type","Icon Value","Notes"],...(report.incomeRecords||[]).map(item=>[item.date,item.name,item.category,item.account,item.amount,item.includeInTotals?"Yes":"No",item.recurring,item.icon?.type||"",item.icon?.value||"",item.notes])]); });
     document.getElementById("exportAnnualIncomeCsv").addEventListener("click", () => {
@@ -9182,8 +9159,8 @@
   <script src="./privacy-lock.js?v=2.5.0-talaan1"></script>
   <script src="./security-profiles.js?v=2.5.0-talaan1"></script>
   <script src="./cloud-conflict-review.js?v=2.5.0-talaan1"></script>
-  <script src="./cloud-conflict-resolution.js?v=2.5.0-talaan1"></script><script src="./cloud-sync-lifecycle.js?v=2.5.0-account-0fbc28e28c89"></script><script src="./cloud-sync.js?v=2.5.0-account-0fbc28e28c89"></script>
-  <script src="./account-ledger.js?v=2.5.0-account-0fbc28e28c89"></script>
+  <script src="./cloud-conflict-resolution.js?v=2.5.0-talaan1"></script><script src="./cloud-sync-lifecycle.js?v=2.5.0-account-1773f6cb2d8d"></script><script src="./cloud-sync.js?v=2.5.0-account-1773f6cb2d8d"></script>
+  <script src="./account-ledger.js?v=2.5.0-account-1773f6cb2d8d"></script>
   <script src="./budget-planning.js?v=2.5.0-talaan1"></script>
   <script src="./reports-insights.js?v=2.5.0-talaan1"></script>
   <script src="./net-worth.js?v=2.5.0-talaan1"></script>

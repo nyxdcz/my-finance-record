@@ -83,13 +83,13 @@
   }
 
   function reconcileImportedAccountBalances(mode, conflictPolicy){
-    const ledger=window.FinanceAccountLedger;
-    if(!ledger || typeof ledger.appendReconciliation!=="function") return 0;
+    const service=window.FinanceLedgerTransactions;
+    if(!service?.reconcileAccounts) return 0;
     if(window.FinanceProfileArchitecture?.canWrite?.()===false) return 0;
     const desired=importedAccounts();
     const before=importReviewState.beforeAccounts || {};
     const after=currentAccounts();
-    let adjusted=0;
+    const changes=[];
     Object.entries(desired).forEach(([name, rawValue])=>{
       const target=Number(rawValue);
       if(!Number.isFinite(target) || !Object.prototype.hasOwnProperty.call(after,name)) return;
@@ -98,16 +98,12 @@
       if(!shouldUseIncoming) return;
       const actual=Number(after[name] || 0);
       if(Math.abs(actual-target)<0.005) return;
-      const result=ledger.appendReconciliation(name,target,{note:"Imported backup balance"});
-      if(result) adjusted+=1;
+      changes.push({account:name,target});
     });
-    if(adjusted){
-      try {
-        if(typeof window.saveData==="function") window.saveData("Imported account balances reconciled");
-        else if(typeof saveData==="function") saveData("Imported account balances reconciled");
-      } catch(error){ console.error("Imported balance persistence failed",error); }
-    }
-    return adjusted;
+    if(!changes.length) return 0;
+    const result=service.reconcileAccounts(changes,{note:"Imported backup balance",message:"Imported account balances reconciled",recordUndo:false});
+    if(!result?.ok){ console.error("Imported balance reconciliation failed",result?.reason || "unknown error"); return 0; }
+    return Number(result.count || 0);
   }
 
   function openRecoveryDb(){

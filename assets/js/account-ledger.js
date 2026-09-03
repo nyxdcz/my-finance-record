@@ -63,6 +63,7 @@
       id,
       transactionId:safeText(entry.transactionId || id, 120),
       operationId:safeText(entry.operationId || id, 180),
+      requestId:safeText(entry.requestId || "", 160),
       account,
       type,
       amount,
@@ -282,7 +283,7 @@
     return result;
   };
 
-  function mutateExpensePayment(items, account, { auto = false, paidDate = localDateKey() } = {}) {
+  function mutateExpensePayment(items, account, { auto = false, paidDate = localDateKey(), requestId = "" } = {}) {
     ensureLedgerShape(data);
     const eligible = (items || []).filter(item => item && !item.paid);
     const total = expensePaymentTotal(eligible);
@@ -301,6 +302,7 @@
       description:`${auto ? "Gym auto-payment" : "Expense payment"}: ${item.name}`,
       expenseId:item.id,
       source:auto ? "gym-auto-pay" : "expense",
+      requestId:safeText(requestId, 160),
       notes:item.notes || ""
     }));
     const added = appendLedgerEntries(ledgerEntries);
@@ -652,6 +654,161 @@
     return transaction.ok ? { ...mutationResult, ok:true, before, after:expectedAfter } : { ok:false, reason:transaction.reason || mutationResult?.reason || "transaction-failed", restored:0 };
   }
 
+  function externalExpensePaymentStateErrors(target, context) {
+    const errors = [];
+    const expenses = Array.isArray(target?.expenses) ? target.expenses : [];
+    for (const id of context.itemIds || []) {
+      const item = expenses.find(expense => expense.id === id);
+      if (!item || !item.paid || item.accountDeducted || item.paidFromAccount || roundMoney(item.paidAmount || 0) !== 0 || item.paymentTransactionId || item.autoPaidAtMonthEnd) errors.push(`external-payment-state:${id}`);
+      if (typeof context.verifyItem === "function") {
+        try { if (context.verifyItem(item, target) === false) errors.push(`external-payment-metadata:${id}`); }
+        catch (error) { errors.push(`external-payment-metadata:${id}`); }
+      }
+    }
+    return errors;
+  }
+
+  function commitExternalExpensePayment(items, { paidDate = localDateKey(), undoLabel = "", message = "Expense marked paid without an account deduction", decorateItem = null, verifyItem = null } = {}) {
+    const ids = (items || []).map(item => item?.id).filter(Boolean);
+    const eligible = ids.map(id => (data.expenses || []).find(item => item.id === id)).filter(item => item && !item.paid);
+    if (!eligible.length) {
+      const existing = ids.map(id => (data.expenses || []).find(item => item.id === id)).filter(Boolean);
+      const alreadyApplied = existing.length === ids.length && existing.every(item => item.paid && !item.accountDeducted && !item.paidFromAccount && !item.paymentTransactionId);
+      return alreadyApplied ? { ok:true, idempotent:true, count:existing.length } : { ok:false, reason:"empty", count:0 };
+    }
+    const transaction = runLedgerTransaction({
+      undoLabel:undoLabel || (eligible.length === 1 ? `Mark ${eligible[0].name} paid externally` : `Mark ${eligible.length} expenses paid externally`),
+      message,
+      mutate:() => {
+        eligible.forEach(item => {
+          item.paid = true;
+          item.paidDate = paidDate;
+          item.paidFromAccount = "";
+          item.paidAmount = 0;
+          item.accountDeducted = false;
+          item.paymentTransactionId = "";
+          item.autoPaidAtMonthEnd = false;
+          if (typeof decorateItem === "function") decorateItem(item);
+        });
+        return { kind:"external-expense-payment", itemIds:eligible.map(item => item.id), verifyItem };
+      },
+      verify:externalExpensePaymentStateErrors
+    });
+    return transaction.ok ? { ok:true, count:eligible.length } : { ok:false, reason:transaction.reason || "transaction-failed", count:0 };
+  }
+
+  function paidExpenseAccountCorrectionStateErrors(target, context) {
+    const errors = [];
+    const expenses = Array.isArray(target?.expenses) ? target.expenses : [];
+    const ledger = Array.isArray(target?.accountLedger) ? target.accountLedger : [];
+    for (const plan of context.plans || []) {
+      const item = expenses.find(expense => expense.id === plan.itemId);
+      if (!item || !item.paid || item.paidFromAccount !== context.newAccount) errors.push(`payment-account-state:${plan.itemId}`);
+      if (!plan.deducted) continue;
+      if (item?.paymentTransactionId !== plan.correctionId || !item.accountDeducted) errors.push(`payment-account-transaction:${plan.itemId}`);
+      const pair = ledger.filter(entry => entry.transactionId === plan.correctionId && entry.expenseId === plan.itemId);
+      const reversal = pair.find(entry => entry.type === "expense-payment-reversal");
+      const debit = pair.find(entry => ["expense-payment", "gym-auto-payment"].includes(entry.type) && entry.account === context.newAccount);
+      if (pair.length !== 2 || !reversal || !debit) errors.push(`payment-account-ledger-pair:${plan.itemId}`);
+      if (reversal && (reversal.account !== plan.oldAccount || roundMoney(reversal.amount) !== roundMoney(plan.amount) || (plan.originalEntryId && reversal.reversesEntryId !== plan.originalEntryId))) errors.push(`payment-account-reversal:${plan.itemId}`);
+      if (debit && roundMoney(debit.amount) !== roundMoney(-plan.amount)) errors.push(`payment-account-debit:${plan.itemId}`);
+    }
+    return errors;
+  }
+
+  function commitPaidExpenseAccountCorrection(items, newAccount, { message = "", undoLabel = "" } = {}) {
+    if (!Object.prototype.hasOwnProperty.call(data.accounts || {}, newAccount)) return { ok:false, reason:"missing-account", count:0 };
+    const ids = (items || []).map(item => typeof item === "string" ? item : item?.id).filter(Boolean);
+    const changed = ids.map(id => (data.expenses || []).find(item => item.id === id)).filter(item => item?.paid && (item.paidFromAccount || item.account || "") !== newAccount);
+    if (!changed.length) return { ok:true, skipped:true, count:0 };
+    const plans = changed.map(item => {
+      const oldAccount = item.paidFromAccount || item.account || "";
+      const amount = roundMoney(Number(item.paidAmount || expensePaymentAmount(item) || 0));
+      if (item.accountDeducted && (!oldAccount || !Object.prototype.hasOwnProperty.call(data.accounts || {}, oldAccount))) throw Object.assign(new Error(`Original payment account missing for ${item.name}.`), { userMessage:`The original payment account for ${item.name} is missing.` });
+      if (item.accountDeducted && amount <= 0) throw Object.assign(new Error(`Invalid paid amount for ${item.name}.`), { userMessage:`The paid amount for ${item.name} is invalid.` });
+      const correctionId = uid();
+      const original = (data.accountLedger || []).find(entry => entry.transactionId === item.paymentTransactionId && entry.expenseId === item.id && ["expense-payment", "gym-auto-payment"].includes(entry.type));
+      return { item, itemId:item.id, oldAccount, amount, correctionId, deducted:Boolean(item.accountDeducted), originalEntryId:original?.id || "" };
+    });
+    const amountRequired = plans.filter(plan => plan.deducted).reduce((total, plan) => roundMoney(total + plan.amount), 0);
+    if (roundMoney(data.accounts[newAccount]) < amountRequired) return { ok:false, reason:"insufficient", count:0, balance:roundMoney(data.accounts[newAccount]), required:amountRequired };
+    const deltas = new Map();
+    for (const plan of plans.filter(candidate => candidate.deducted)) {
+      deltas.set(plan.oldAccount, roundMoney((deltas.get(plan.oldAccount) || 0) + plan.amount));
+      deltas.set(newAccount, roundMoney((deltas.get(newAccount) || 0) - plan.amount));
+    }
+    const expectedBalances = [...deltas.entries()].map(([account, delta]) => ({ account, target:roundMoney(data.accounts[account] + delta) }));
+    const transaction = runLedgerTransaction({
+      undoLabel:undoLabel || `Correct payment account for ${plans.length} paid expense${plans.length === 1 ? "" : "s"}`,
+      message:message || `${plans.length} payment account${plans.length === 1 ? "" : "s"} corrected with ledger entries`,
+      expectedBalances,
+      mutate:() => {
+        const entries = [];
+        for (const plan of plans) {
+          if (plan.deducted) {
+            entries.push(
+              { id:uid(), transactionId:plan.correctionId, operationId:`payment-account-correction-reversal:${plan.correctionId}:${plan.itemId}`, account:plan.oldAccount, type:"expense-payment-reversal", amount:plan.amount, date:localDateKey(), description:`Payment-account correction reversal: ${plan.item.name}`, expenseId:plan.itemId, reversesEntryId:plan.originalEntryId, source:"payment-account-correction", notes:`Moved payment from ${plan.oldAccount} to ${newAccount}` },
+              { id:uid(), transactionId:plan.correctionId, operationId:`payment-account-correction-debit:${plan.correctionId}:${plan.itemId}`, account:newAccount, type:plan.item.autoPaidAtMonthEnd ? "gym-auto-payment" : "expense-payment", amount:-plan.amount, date:localDateKey(), description:`Payment-account correction: ${plan.item.name}`, expenseId:plan.itemId, source:"payment-account-correction", notes:`Corrected from ${plan.oldAccount} to ${newAccount}` }
+            );
+          }
+        }
+        if (entries.length) {
+          const added = appendLedgerEntries(entries);
+          if (added.length !== entries.length) throw Object.assign(new Error("Payment-account correction ledger pair was not created."), { userMessage:"The payment account correction could not be completed. Nothing was changed." });
+        }
+        plans.forEach(plan => {
+          if (plan.deducted) plan.item.paymentTransactionId = plan.correctionId;
+          plan.item.paidFromAccount = newAccount;
+          plan.item.paymentAccountCorrectedAt = new Date().toISOString();
+        });
+        return { kind:"payment-account-correction", newAccount, plans:plans.map(plan => ({ itemId:plan.itemId, oldAccount:plan.oldAccount, amount:plan.amount, correctionId:plan.correctionId, deducted:plan.deducted, originalEntryId:plan.originalEntryId })) };
+      },
+      verify:paidExpenseAccountCorrectionStateErrors
+    });
+    return transaction.ok ? { ok:true, count:plans.length } : { ok:false, reason:transaction.reason || "transaction-failed", count:0 };
+  }
+
+  function reconciliationBatchStateErrors(target, context) {
+    const errors = [];
+    const reconciliations = Array.isArray(target?.accountReconciliations) ? target.accountReconciliations : [];
+    const ledger = Array.isArray(target?.accountLedger) ? target.accountLedger : [];
+    for (const item of context.applied || []) {
+      const reconciliation = reconciliations.find(candidate => candidate.id === item.reconciliationId);
+      const entry = reconciliation ? ledger.find(candidate => candidate.id === reconciliation.ledgerEntryId) : null;
+      if (!reconciliation || reconciliation.account !== item.account || roundMoney(reconciliation.statementBalance) !== roundMoney(item.target)) errors.push(`reconciliation-batch-record:${item.account}`);
+      if (!entry || entry.reconciliationId !== reconciliation?.id || entry.account !== item.account) errors.push(`reconciliation-batch-ledger:${item.account}`);
+    }
+    return errors;
+  }
+
+  function commitReconciliationBatch(changes, { note = "", message = "Account balances reconciled", undoLabel = "", recordUndo = true } = {}) {
+    const normalized = (changes || []).map(item => ({ account:safeText(item?.account, 100), target:roundMoney(Number(item?.target)) })).filter(item => item.account && Number.isFinite(item.target) && Object.prototype.hasOwnProperty.call(data.accounts || {}, item.account));
+    const effective = normalized.filter(item => roundMoney(data.accounts[item.account]) !== item.target);
+    if (!effective.length) return { ok:true, skipped:true, count:0 };
+    const transaction = runLedgerTransaction({
+      undoLabel:undoLabel || `Reconcile ${effective.length} account balance${effective.length === 1 ? "" : "s"}`,
+      message,
+      recordUndo,
+      expectedBalances:effective,
+      mutate:() => {
+        const applied = effective.map(item => {
+          const reconciliation = appendReconciliation(item.account, item.target, { note });
+          if (!reconciliation) throw Object.assign(new Error(`Could not reconcile ${item.account}.`), { userMessage:`The balance for ${item.account} could not be reconciled. Nothing was changed.` });
+          return { account:item.account, target:item.target, reconciliationId:reconciliation.id };
+        });
+        return { kind:"reconciliation-batch", applied };
+      },
+      verify:reconciliationBatchStateErrors
+    });
+    return transaction.ok ? { ok:true, count:effective.length } : { ok:false, reason:transaction.reason || "transaction-failed", count:0 };
+  }
+
+  function requestLedgerEntries(requestId, types = []) {
+    const normalized = safeText(requestId, 160);
+    if (!normalized) return [];
+    return (data.accountLedger || []).filter(entry => entry.requestId === normalized && (!types.length || types.includes(entry.type)));
+  }
+
   function transferStateErrors(target, context) {
     const entries = (target?.accountLedger || []).filter(entry => entry.transferId === context.transferId);
     const out = entries.find(entry => entry.type === "transfer-out");
@@ -664,11 +821,22 @@
     return errors;
   }
 
-  function commitTransfer({ from, to, amount, date = localDateKey(), note = "" }) {
+  function commitTransfer({ from, to, amount, date = localDateKey(), note = "", idempotencyKey = "" }) {
     amount = roundMoney(Number(amount || 0));
     if (!from || !to || !date || amount <= 0) return { ok:false, reason:"invalid-transfer" };
     if (from === to) return { ok:false, reason:"same-account" };
     if (!Object.prototype.hasOwnProperty.call(data.accounts || {}, from) || !Object.prototype.hasOwnProperty.call(data.accounts || {}, to)) return { ok:false, reason:"missing-account" };
+    const requestId = safeText(idempotencyKey, 160);
+    if (requestId) {
+      const existing = requestLedgerEntries(requestId, ["transfer-out", "transfer-in"]);
+      if (existing.length) {
+        const out = existing.find(entry => entry.type === "transfer-out");
+        const incoming = existing.find(entry => entry.type === "transfer-in");
+        const valid = existing.length === 2 && out && incoming && out.account === from && out.counterpartAccount === to && incoming.account === to && incoming.counterpartAccount === from && roundMoney(out.amount) === roundMoney(-amount) && roundMoney(incoming.amount) === amount && out.transferId && out.transferId === incoming.transferId;
+        if (!valid) return { ok:false, reason:"idempotency-conflict" };
+        return { ok:true, idempotent:true, transferId:out.transferId, from, to, amount, afterFrom:roundMoney(data.accounts[from]), afterTo:roundMoney(data.accounts[to]) };
+      }
+    }
     const beforeFrom = roundMoney(data.accounts[from]);
     const beforeTo = roundMoney(data.accounts[to]);
     if (beforeFrom < amount) return { ok:false, reason:"insufficient", balance:beforeFrom };
@@ -681,11 +849,11 @@
       expectedBalances:[{ account:from, target:expectedFrom }, { account:to, target:expectedTo }],
       mutate:() => {
         const added = appendLedgerEntries([
-          { id:uid(), transactionId:transferId, operationId:`transfer-out:${transferId}`, account:from, counterpartAccount:to, type:"transfer-out", amount:-amount, date, description:`Transfer to ${to}`, transferId, source:"transfer", notes:note },
-          { id:uid(), transactionId:transferId, operationId:`transfer-in:${transferId}`, account:to, counterpartAccount:from, type:"transfer-in", amount, date, description:`Transfer from ${from}`, transferId, source:"transfer", notes:note }
+          { id:uid(), transactionId:transferId, operationId:`transfer-out:${transferId}`, requestId, account:from, counterpartAccount:to, type:"transfer-out", amount:-amount, date, description:`Transfer to ${to}`, transferId, source:"transfer", notes:note },
+          { id:uid(), transactionId:transferId, operationId:`transfer-in:${transferId}`, requestId, account:to, counterpartAccount:from, type:"transfer-in", amount, date, description:`Transfer from ${from}`, transferId, source:"transfer", notes:note }
         ]);
         if (added.length !== 2) throw Object.assign(new Error("Transfer ledger pair was not created."), { userMessage:"The transfer could not be recorded. Nothing was changed." });
-        return { kind:"transfer", transferId, from, to, amount, expectedFrom, expectedTo };
+        return { kind:"transfer", requestId, transferId, from, to, amount, expectedFrom, expectedTo };
       },
       verify:transferStateErrors
     });
@@ -769,10 +937,21 @@
     return errors;
   }
 
-  function commitQuickSpend({ account, amount, description, category = "Personal", date = localDateKey(), note = "", includeInTotals = true }) {
+  function commitQuickSpend({ account, amount, description, category = "Personal", date = localDateKey(), note = "", includeInTotals = true, idempotencyKey = "" }) {
     amount = roundMoney(Number(amount || 0));
     if (!Object.prototype.hasOwnProperty.call(data.accounts || {}, account)) return { ok:false, reason:"missing-account" };
     if (amount <= 0) return { ok:false, reason:"invalid-amount" };
+    const requestId = safeText(idempotencyKey, 160);
+    if (requestId) {
+      const existingEntries = requestLedgerEntries(requestId, ["expense-payment"]);
+      if (existingEntries.length) {
+        const entry = existingEntries[0];
+        const expense = (data.expenses || []).find(item => item.id === entry.expenseId && item.quickSpend === true && item.mutationRequestId === requestId);
+        const valid = existingEntries.length === 1 && entry.account === account && roundMoney(entry.amount) === roundMoney(-amount) && expense && roundMoney(expense.paidAmount || expense.amount) === amount;
+        if (!valid) return { ok:false, reason:"idempotency-conflict", balance:roundMoney(data.accounts[account]) };
+        return { ok:true, idempotent:true, expense:cloneData(expense), before:roundMoney(data.accounts[account] + amount), after:roundMoney(data.accounts[account]), transactionId:entry.transactionId };
+      }
+    }
     const before = roundMoney(data.accounts[account]);
     if (before < amount) return { ok:false, reason:"insufficient", balance:before };
     const expectedAfter = roundMoney(before - amount);
@@ -783,11 +962,11 @@
       message:`${description} recorded · ${account} ${money(expectedAfter)} remaining`,
       expectedBalances:[{ account, target:expectedAfter }],
       mutate:() => {
-        expense = makeQuickSpendExpense({ account, amount, description:safeText(description || "Purchase", 80), category:safeText(category || "Personal", 80), date, note:safeText(note, 160), includeInTotals });
+        expense = makeQuickSpendExpense({ account, amount, description:safeText(description || "Purchase", 80), category:safeText(category || "Personal", 80), date, note:safeText(note, 160), includeInTotals, requestId });
         data.expenses.push(expense);
-        mutationResult = mutateExpensePayment([expense], account, { auto:false, paidDate:date });
+        mutationResult = mutateExpensePayment([expense], account, { auto:false, paidDate:date, requestId });
         if (!mutationResult.ok) throw Object.assign(new Error(`Quick spend failed: ${mutationResult.reason || "unknown"}`), { userMessage:"The purchase could not be recorded. Nothing was changed." });
-        return { kind:"quick-spend", auto:false, account, expectedAfter, itemIds:[expense.id], itemAmounts:{ [expense.id]:amount }, transactionId:mutationResult.transactionId, expenseId:expense.id };
+        return { kind:"quick-spend", requestId, auto:false, account, expectedAfter, itemIds:[expense.id], itemAmounts:{ [expense.id]:amount }, transactionId:mutationResult.transactionId, expenseId:expense.id };
       },
       verify:quickSpendStateErrors
     });
@@ -968,6 +1147,8 @@
     if (date) date.value = localDateKey();
     if (note) note.value = "";
     if (include) include.checked = true;
+    const dialog = document.getElementById("accountDialog");
+    if (dialog) dialog.dataset.spendRequestId = uid();
     setAccountSpendStatus();
     const name = document.getElementById("accountSpendAccountName");
     if (name) name.textContent = account || "—";
@@ -1043,14 +1224,14 @@
     else text.innerHTML = `This will deduct <strong>${money(amount)}</strong> from ${escapeHtml(account)} and create a <strong>Paid Expense</strong>.`;
   }
 
-  function makeQuickSpendExpense({ account, amount, description, category, date, note, includeInTotals }) {
+  function makeQuickSpendExpense({ account, amount, description, category, date, note, includeInTotals, requestId = "" }) {
     const id = uid();
     return {
       id, expenseType:"normal", name:description, amount, dailyRate:null, electricBillAmount:null, waterBillAmount:null,
       gymPricePerVisit:null, gymDays:[], gymSeriesPricePerVisit:null, gymSeriesDays:[], gymDateOverrides:{added:[],removed:[]}, gymVisitCount:0,
       expensePeriod:"other", budgetPeriod:"", date, dueDay:null, category, account, recurring:"No", seriesId:"", includeInTotals:Boolean(includeInTotals), notes:note,
       paid:false, paidDate:"", paidFromAccount:"", paidAmount:0, accountDeducted:false, paymentTransactionId:"", autoPaidAtMonthEnd:false,
-      gymAutoPay:false, gymAutoPayAccount:"", gymAutoPaySuppressed:false, quickSpend:true, quickSpendSource:"account", icon:null
+      gymAutoPay:false, gymAutoPayAccount:"", gymAutoPaySuppressed:false, quickSpend:true, quickSpendSource:"account", mutationRequestId:safeText(requestId, 160), icon:null
     };
   }
 
@@ -1081,7 +1262,8 @@
     accountSpendSubmitPending = true;
     if (primary) { primary.disabled = true; primary.textContent = "Recording…"; }
     setAccountSpendStatus("working", "Recording purchase…");
-    const result = commitQuickSpend({ account, amount, description, category, date, note, includeInTotals });
+    const requestId = document.getElementById("accountDialog")?.dataset.spendRequestId || uid();
+    const result = commitQuickSpend({ account, amount, description, category, date, note, includeInTotals, idempotencyKey:requestId });
     accountSpendSubmitPending = false;
     if (!result.ok) {
       if (primary) { primary.disabled = false; primary.textContent = "Record spending"; }
@@ -1248,6 +1430,8 @@
     setMoneyInputValue("transferAmount", "", true);
     document.getElementById("transferDate").value = localDateKey();
     document.getElementById("transferNote").value = "";
+    const dialog = document.getElementById("accountTransferDialog");
+    if (dialog) dialog.dataset.transferRequestId = uid();
     updateTransferPreview();
     showAppDialog("accountTransferDialog", "#transferFromAccount");
   }
@@ -1270,10 +1454,12 @@
     const amount = roundMoney(moneyInputValue("transferAmount"));
     if (!from || !to || !date) { showToast("Complete all required transfer fields", "warning"); return false; }
     if (from === to) { showToast("Choose two different accounts", "warning"); return false; }
-    const result = commitTransfer({ from, to, amount, date, note:document.getElementById("transferNote").value.trim() });
+    const requestId = document.getElementById("accountTransferDialog")?.dataset.transferRequestId || uid();
+    const result = commitTransfer({ from, to, amount, date, note:document.getElementById("transferNote").value.trim(), idempotencyKey:requestId });
     if (!result.ok) {
       if (result.reason === "insufficient") showToast(`${from} has insufficient funds for this transfer`, "warning");
       else if (result.reason === "missing-account") showToast("One of the transfer accounts no longer exists", "warning");
+      else if (result.reason === "idempotency-conflict") showToast("This transfer request no longer matches the saved transaction. Reopen the transfer form and try again.", "warning");
       return false;
     }
     document.getElementById("accountTransferDialog").close();
@@ -1473,11 +1659,14 @@
   window.FinanceLedgerTransactions = Object.freeze({
     version:1,
     owner:"account-ledger-v1",
-    capabilities:{ unifiedMoneyMutations:true, transactionalPersistence:true, localVerification:true, profileVerification:true, ledgerInvariants:true, domainInvariants:true, rollback:true },
+    capabilities:{ unifiedMoneyMutations:true, centralizedOwnership:true, transactionalPersistence:true, localVerification:true, profileVerification:true, ledgerInvariants:true, domainInvariants:true, rollback:true, idempotentRequests:true, externalPayments:true, paymentAccountCorrection:true, reconciliationBatch:true },
     run:runLedgerTransaction,
     transfer:commitTransfer,
     payExpenses:commitExpensePayment,
     reverseExpensePayment:commitExpensePaymentReversal,
+    markExpensesPaidExternally:commitExternalExpensePayment,
+    correctPaidExpenseAccounts:commitPaidExpenseAccountCorrection,
+    reconcileAccounts:commitReconciliationBatch,
     quickSpend:commitQuickSpend,
     saveIncome:commitIncomeRecord,
     deleteIncome:commitIncomeDeletion,

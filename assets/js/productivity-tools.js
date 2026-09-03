@@ -859,40 +859,15 @@
   }
 
   function correctPaidAccounts(items, newAccount) {
-    if (!Object.prototype.hasOwnProperty.call(data.accounts || {}, newAccount)) throw new Error("Choose an existing account.");
-    const changed = items.filter(item => item.paid && (item.paidFromAccount || item.account) !== newAccount);
-    const plans = changed.map(item => {
-      const oldAccount = item.paidFromAccount || item.account || "";
-      const amount = Number(item.paidAmount || settledExpenseAmount(item) || 0);
-      if (item.accountDeducted && (!oldAccount || !Object.prototype.hasOwnProperty.call(data.accounts || {}, oldAccount))) throw new Error(`The original payment account for ${item.name} is missing.`);
-      if (item.accountDeducted && amount <= 0) throw new Error(`The paid amount for ${item.name} is invalid.`);
-      const correctionId = makeId("payment-account-correction");
-      const original = (data.accountLedger || []).find(entry => entry.transactionId === item.paymentTransactionId && entry.expenseId === item.id && ["expense-payment","gym-auto-payment"].includes(entry.type));
-      const entries = item.accountDeducted ? [
-        {id:makeId("ledger"),transactionId:correctionId,operationId:`payment-account-correction-reversal:${correctionId}:${item.id}`,account:oldAccount,type:"expense-payment-reversal",amount,date:localDate(),description:`Payment-account correction reversal: ${item.name}`,expenseId:item.id,reversesEntryId:original?.id || "",source:"payment-account-correction",notes:`Moved payment from ${oldAccount} to ${newAccount}`},
-        {id:makeId("ledger"),transactionId:correctionId,operationId:`payment-account-correction-debit:${correctionId}:${item.id}`,account:newAccount,type:item.autoPaidAtMonthEnd?"gym-auto-payment":"expense-payment",amount:-amount,date:localDate(),description:`Payment-account correction: ${item.name}`,expenseId:item.id,source:"payment-account-correction",notes:`Corrected from ${oldAccount} to ${newAccount}`}
-      ] : [];
-      return {item,oldAccount,amount,correctionId,entries};
-    });
-    const amountRequired = plans.filter(plan => plan.item.accountDeducted).reduce((total,plan)=>total+plan.amount,0);
-    if (Number(data.accounts[newAccount] || 0) < amountRequired) throw new Error(`${newAccount} does not have enough balance for these corrected payments.`);
-    const entries = plans.flatMap(plan => plan.entries);
-    if (entries.length) {
-      const ledgerBefore = clone(data.accountLedger || []);
-      const accountsBefore = clone(data.accounts || {});
-      const added = window.FinanceAccountLedger?.appendLedgerEntries?.(entries) || [];
-      if (added.length !== entries.length) {
-        data.accountLedger = ledgerBefore;
-        data.accounts = accountsBefore;
-        throw new Error("The ledger correction could not be completed safely.");
-      }
+    const service = window.FinanceLedgerTransactions;
+    if (!service?.correctPaidExpenseAccounts) throw new Error("Account ledger is updating. Reload Talaan before correcting payment accounts.");
+    const result = service.correctPaidExpenseAccounts(items, newAccount);
+    if (!result?.ok) {
+      if (result?.reason === "insufficient") throw new Error(`${newAccount} does not have enough balance for these corrected payments.`);
+      if (result?.reason === "missing-account") throw new Error("Choose an existing account.");
+      throw new Error("The payment account correction could not be completed safely.");
     }
-    plans.forEach(plan => {
-      if (plan.item.accountDeducted) plan.item.paymentTransactionId = plan.correctionId;
-      plan.item.paidFromAccount = newAccount;
-      plan.item.paymentAccountCorrectedAt = nowIso();
-    });
-    return plans.length;
+    return Number(result.count || 0);
   }
 
   function applyPaidBulkAction() {
@@ -901,14 +876,15 @@
     const value = document.getElementById("paidProductivityValue")?.value;
     if (!items.length || !action || !value) return;
     try {
-      pushUndo(action === "category" ? `Bulk category correction for ${items.length} paid expenses` : `Bulk payment-account correction for ${items.length} paid expenses`);
       let count = 0;
-      if (action === "category") { items.forEach(item => { if (item.category !== value) { item.category=value; count+=1; } }); }
-      else count = correctPaidAccounts(items,value);
+      if (action === "category") {
+        pushUndo(`Bulk category correction for ${items.length} paid expenses`);
+        items.forEach(item => { if (item.category !== value) { item.category=value; count+=1; } });
+        saveData(`${count} paid expense categor${count===1?"y":"ies"} corrected`);
+      } else count = correctPaidAccounts(items,value);
       paidSelection.clear();
       document.getElementById("paidProductivityAction").value="";
       refreshPaidBulkValue();
-      saveData(action === "category" ? `${count} paid expense categor${count===1?"y":"ies"} corrected` : `${count} payment account${count===1?"":"s"} corrected with ledger entries`);
     } catch (error) { showToast(error?.message || "Could not apply the bulk correction", "warning"); }
   }
 
