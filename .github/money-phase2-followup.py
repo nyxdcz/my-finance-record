@@ -13,5 +13,9 @@ assert.match(ledger, /refreshReconciledAccountState\\(account, result\\.after\\)
 '''
 if old not in text:
     raise SystemExit("Stale quick-spend source contract was not found after Phase 2 patch")
-path.write_text(text.replace(old, new, 1))
+text = text.replace(old, new, 1)
+text = text.replace('assert(accountLedger.includes("function runLedgerTransaction("), "unified ledger transaction runner is missing");', 'assert(ledger.includes("function runLedgerTransaction("), "unified ledger transaction runner is missing");')
+text = text.replace('assert(accountLedger.includes("window.FinanceLedgerTransactions = Object.freeze"), "money mutation service is not exposed");', 'assert(ledger.includes("window.FinanceLedgerTransactions = Object.freeze"), "money mutation service is not exposed");')
+text = text.replace('for (const capability of ["unifiedMoneyMutations:true","transactionalPersistence:true","domainInvariants:true","rollback:true"]) assert(accountLedger.includes(capability), `money mutation capability ${capability} is missing`);', 'for (const capability of ["unifiedMoneyMutations:true","transactionalPersistence:true","domainInvariants:true","rollback:true"]) assert(ledger.includes(capability), `money mutation capability ${capability} is missing`);')
+path.write_text(text)
 print("Aligned finance source contract with unified Phase 2 money transactions.")
