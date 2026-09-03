@@ -1,0 +1,75 @@
+name: Phase 4 approved integrity hardening
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/phase4-approved.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  phase4:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Apply approved Phase 4 patch
+        run: python .github/phase4-approved.py
+
+      - name: Prepare production runtime
+        run: node scripts/prepare-runtime.mjs
+
+      - name: Syntax checks
+        run: |
+          node --check assets/js/finance-integrity.js
+          node --check assets/js/account-ledger.js
+          node --check assets/js/privacy-lock.js
+          node --check assets/js/security-profiles.js
+          node --check assets/js/cloud-sync.js
+          node --check finance-integrity.js
+          node --check account-ledger.js
+          node --check privacy-lock.js
+          node --check security-profiles.js
+          node --check cloud-sync.js
+
+      - name: Source finance, sync, and regression validation
+        run: node tests/run.mjs all
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Focused Phase 4 browser validation
+        run: >-
+          npx playwright test
+          tests/browser/finance-integrity-recovery.spec.mjs
+          tests/browser/account-balance-persistence.spec.mjs
+          tests/browser/money-mutation-integrity.spec.mjs
+          tests/security/import-review-privacy.spec.mjs
+          --project=chromium
+
+      - name: Remove temporary Phase 4 helper
+        run: rm -f .github/phase4-approved.py .github/workflows/phase4-approved.yml
+
+      - name: Commit validated Phase 4
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git commit -m "feat: add guarded finance integrity recovery"
+          git push origin HEAD:main
