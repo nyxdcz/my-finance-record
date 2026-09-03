@@ -2,6 +2,18 @@
   let workMarqueeObserver = null;
   let dashboardActionObserver = null;
 
+  function preserveLiquidGlassCascadeOrder() {
+    const link = [...document.querySelectorAll('link[rel="stylesheet"]')].find(node => {
+      try {
+        return new URL(node.href, window.location.href).pathname.endsWith("/liquid-glass.css");
+      } catch (error) {
+        return false;
+      }
+    });
+    if (!link || link.parentElement !== document.head || link === document.head.lastElementChild) return;
+    document.head.appendChild(link);
+  }
+
   function insertEnhancementStyles() {
     if (document.getElementById("financeUiEnhancementStyles")) return;
     const style = document.createElement("style");
@@ -124,6 +136,7 @@
   }
 
   function boot() {
+    preserveLiquidGlassCascadeOrder();
     insertEnhancementStyles();
     bindUploadedIcons();
     bindDashboardToolbarAction();
