@@ -16,6 +16,7 @@ const version = JSON.parse(read("version.json"));
 const pkg = JSON.parse(read("package.json"));
 const lock = JSON.parse(read("package-lock.json"));
 const query = "2.5.0-talaan1";
+const accountIntegrityQuery = "2.5.0-account-integrity1";
 
 for (const [pageId, marqueeId] of [["income", "incomeFinanceWeekMarquee"], ["money", "financeWeekMarquee"], ["paid-expenses", "paidFinanceWeekMarquee"]]) {
   const start = index.indexOf(`id="${pageId}"`);
@@ -68,10 +69,12 @@ for (const icon of ["repeat-monthly-off.png", "repeat-monthly-on.png"]) {
 }
 assert.match(compactCss, /\[data-toggle-saved\] \.saved-icon\s*\{[\s\S]*opacity:\s*0 !important;/, "text star must remain visually hidden behind PNG artwork");
 
-for (const file of ["interaction-patterns.js", "account-ledger.js", "budget-planning.js", "form-inputs.js"]) {
+for (const file of ["interaction-patterns.js", "budget-planning.js", "form-inputs.js"]) {
   assert.ok(index.includes(`./${file}?v=${query}`), `index must load ${file} with the Talaan query`);
   assert.ok(worker.includes(`./${file}?v=${query}`), `service worker must precache ${file}`);
 }
+assert.ok(index.includes(`./account-ledger.js?v=${accountIntegrityQuery}`), "index must load account-ledger.js with the Account Integrity query");
+assert.ok(worker.includes(`./account-ledger.js?v=${accountIntegrityQuery}`), "service worker must precache account-ledger.js with the Account Integrity query");
 assert.equal(version.version, "2.5.0");
 assert.equal(version.schemaVersion, 12);
 assert.equal(version.cloudSchemaVersion, 3);
