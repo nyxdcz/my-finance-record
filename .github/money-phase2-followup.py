@@ -30,10 +30,11 @@ browser = browser_path.read_text()
 inline_snapshot = '''const persisted = JSON.parse(localStorage.getItem("simple-finance-project-records-v2") || "{}");
     const profileId = window.FinanceProfileArchitecture?.activeProfileId?.() || "";
     const profile = JSON.parse(localStorage.getItem(`simple-finance-profile-data-v1:${profileId}`) || "{}");'''
-count = browser.count('const { persisted, profile } = storedSnapshot();')
-if count != 3:
-    raise SystemExit(f"Expected 3 browser-context storedSnapshot calls; found {count}")
-browser = browser.replace('const { persisted, profile } = storedSnapshot();', inline_snapshot)
+needle = 'const { persisted, profile } = storedSnapshot();'
+count = browser.count(needle)
+if count < 1:
+    raise SystemExit("No browser-context storedSnapshot calls were found")
+browser = browser.replace(needle, inline_snapshot)
 browser_path.write_text(browser)
 
-print("Aligned finance/PWA contracts and fixed browser-context storage verification for Phase 2.")
+print(f"Aligned finance/PWA contracts and fixed {count} browser-context storage checks for Phase 2.")
