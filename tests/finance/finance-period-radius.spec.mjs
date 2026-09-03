@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-test("Talaan V2.5.0 Finance period headers and expense rows use 9px corners", async ({ page }) => {
+test("Talaan V2.5.0 Finance period surfaces follow the 7px radius contract", async ({ page }) => {
   await page.goto("http://127.0.0.1:3000/index.html?page=money", { waitUntil:"networkidle" });
 
   await page.evaluate(() => {
@@ -26,10 +26,10 @@ test("Talaan V2.5.0 Finance period headers and expense rows use 9px corners", as
     "#periodRadiusFixture .record-row"
   ]) {
     expect(await radiusOf(selector)).toEqual({
-      topLeft:"9px",
-      topRight:"9px",
-      bottomRight:"9px",
-      bottomLeft:"9px"
+      topLeft:"7px",
+      topRight:"7px",
+      bottomRight:"7px",
+      bottomLeft:"7px"
     });
   }
 });

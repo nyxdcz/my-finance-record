@@ -18,7 +18,7 @@ const RELEASE = Object.freeze({
 });
 const APP_STYLE_ASSET_QUERY = "2.5.0-talaan2";
 const SIDEBAR_BRAND_ASSET_QUERY = "2.2.0-talaan2";
-const UI_RADIUS_ASSET_QUERY = "2.5.0-talaan3";
+const UI_RADIUS_ASSET_QUERY = "2.5.0-talaan4";
 
 const CURRENT_VERSION_HISTORY = Object.freeze([{
   version:RELEASE.displayVersion,
