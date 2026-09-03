@@ -30,11 +30,22 @@ jobs:
       - name: Apply Phase 3 money ownership hardening
         run: |
           python .github/money-phase3-runner.py
+          python - <<'PY'
+          from pathlib import Path
+          path = Path("tests/finance/validate-money-mutation-ownership.mjs")
+          text = path.read_text()
+          bad = r'  ["direct account balance assignment", /\bdata\.accounts\s*\[[^\]]+\]\s*(?:[+\-*/]?=)(?!=)/g],'
+          good = r'  ["direct account balance assignment", /\bdata\.accounts\s*\[[^\]]+\]\s*(?:=|\+=|-=|\*=|\/=)(?!=)/g],'
+          if bad not in text:
+              raise SystemExit("Generated ownership guard pattern was not found")
+          path.write_text(text.replace(bad, good, 1))
+          PY
           node scripts/prepare-runtime.mjs
           node --check assets/js/account-ledger.js
           node --check assets/js/productivity-tools.js
           node --check assets/js/household-splits.js
           node --check assets/js/privacy-lock.js
+          node --check tests/finance/validate-money-mutation-ownership.mjs
 
       - name: Install locked project metadata
         run: npm ci --ignore-scripts --no-audit --no-fund
