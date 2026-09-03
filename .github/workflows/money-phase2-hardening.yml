@@ -1,0 +1,54 @@
+name: Money Phase 2 hardening
+
+on:
+  push:
+    paths:
+      - ".github/money-phase2-hardening.py"
+      - ".github/workflows/money-phase2-hardening.yml"
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  harden:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          package-manager-cache: false
+      - name: Apply Phase 2 money hardening
+        run: |
+          python .github/money-phase2-hardening.py
+          node scripts/prepare-runtime.mjs
+          node --check assets/js/account-ledger.js
+          node --check account-ledger.js
+          node tests/finance/validate-finance-ui-source.mjs
+          node tests/sync/validate-money-mutation-sync.mjs
+          node tests/regression/validate-pwa-runtime.mjs
+      - name: Install locked project metadata
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Run focused finance, regression, and sync suites
+        run: |
+          npm run test:finance
+          npm run test:regression
+          npm run test:sync
+      - name: Install Chromium
+        run: npx playwright install chromium --with-deps
+      - name: Run focused money browser regressions
+        run: npx playwright test tests/browser/account-balance-persistence.spec.mjs tests/browser/account-submit-compat.spec.mjs tests/browser/money-mutation-integrity.spec.mjs
+      - name: Commit Phase 2 and remove temporary runner
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          rm -f .github/money-phase2-hardening.py .github/workflows/money-phase2-hardening.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "refactor: centralize money mutations"
+          git push origin HEAD:main
+          gh workflow run quality-pages.yml --ref main
