@@ -1,5 +1,5 @@
 name: Phase 4 approved integrity hardening
-# Phase 4 browser rerun: seeded Viewer metadata and authenticated integrity fixture.
+# Phase 4 browser rerun: Viewer repair guard enforced before no-op success.
 
 on:
   push:
@@ -38,6 +38,7 @@ jobs:
           python .github/phase4-followup4.py
           python .github/phase4-followup5.py
           python .github/phase4-followup6.py
+          python .github/phase4-followup7.py
 
       - name: Prepare production runtime
         run: node scripts/prepare-runtime.mjs
@@ -70,7 +71,7 @@ jobs:
           tests/security/import-review-privacy.spec.mjs
 
       - name: Remove temporary Phase 4 helper
-        run: rm -f .github/phase4-approved.py .github/phase4-followup.py .github/phase4-followup2.py .github/phase4-followup3.py .github/phase4-followup4.py .github/phase4-followup5.py .github/phase4-followup6.py .github/workflows/phase4-approved.yml
+        run: rm -f .github/phase4-approved.py .github/phase4-followup.py .github/phase4-followup2.py .github/phase4-followup3.py .github/phase4-followup4.py .github/phase4-followup5.py .github/phase4-followup6.py .github/phase4-followup7.py .github/workflows/phase4-approved.yml
 
       - name: Commit validated Phase 4
         run: |
