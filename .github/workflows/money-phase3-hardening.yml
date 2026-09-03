@@ -33,12 +33,12 @@ jobs:
           python - <<'PY'
           from pathlib import Path
           path = Path("tests/finance/validate-money-mutation-ownership.mjs")
-          text = path.read_text()
-          bad = r'  ["direct account balance assignment", /\bdata\.accounts\s*\[[^\]]+\]\s*(?:[+\-*/]?=)(?!=)/g],'
-          good = r'  ["direct account balance assignment", /\bdata\.accounts\s*\[[^\]]+\]\s*(?:=|\+=|-=|\*=|\/=)(?!=)/g],'
-          if bad not in text:
-              raise SystemExit("Generated ownership guard pattern was not found")
-          path.write_text(text.replace(bad, good, 1))
+          lines = path.read_text().splitlines()
+          matches = [i for i, line in enumerate(lines) if '"direct account balance assignment"' in line]
+          if len(matches) != 1:
+              raise SystemExit(f"Expected one account-assignment guard; found {len(matches)}")
+          lines[matches[0]] = r'  ["direct account balance assignment", /\bdata\.accounts\s*\[[^\]]+\]\s*(?:=|\+=|-=|\*=|\/=)(?!=)/g],'
+          path.write_text("\n".join(lines) + "\n")
           PY
           node scripts/prepare-runtime.mjs
           node --check assets/js/account-ledger.js
