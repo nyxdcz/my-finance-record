@@ -6,7 +6,7 @@ const source = read("assets/js/cloud-sync.js");
 const index = read("index.html");
 const worker = read("sw.js");
 const version = JSON.parse(read("version.json"));
-const query = "2.5.0-talaan1";
+const accountIntegrityQuery = "2.5.0-account-integrity1";
 
 assert.match(source, /let clientPromise = null;/);
 assert.match(source, /if \(clientPromise\) return clientPromise;/);
@@ -29,9 +29,9 @@ assert.match(source, /showMobileSyncFeedback\("Syncing…"\)/);
 assert.match(index, /id="cloudSyncMobileLive" role="status" aria-live="polite"/);
 assert.match(source, /activateSettingsPanel\(cloudReadiness\(\)\.ready \? "sync" : "profiles"/);
 assert.match(index, /id="cloudConnectionChip">Connected<\/span>/);
-assert.ok(index.includes(`./cloud-sync.js?v=${query}`));
-assert.ok(worker.includes(`./cloud-sync.js?v=${query}`));
+assert.ok(index.includes(`./cloud-sync.js?v=${accountIntegrityQuery}`));
+assert.ok(worker.includes(`./cloud-sync.js?v=${accountIntegrityQuery}`));
 assert.equal(version.version, "2.5.0");
 assert.equal(version.cloudSchemaVersion, 3);
 
-console.log("Cloud client deduplication, profile readiness, sync gating, and Talaan runtime delivery validated.");
+console.log("Cloud client deduplication, profile readiness, sync gating, and Talaan account-integrity runtime delivery validated.");
