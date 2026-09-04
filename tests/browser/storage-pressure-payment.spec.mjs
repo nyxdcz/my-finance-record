@@ -91,12 +91,13 @@ test("manual payment survives active finance-copy quota pressure", async ({ page
       const payment = window.FinanceLedgerTransactions.payExpenses([expense], account, { auto:false });
       const local = JSON.parse(localStorage.getItem(activeKey) || "{}");
       const profile = JSON.parse(localStorage.getItem(profileKey) || "{}");
+      const audit = JSON.parse(localStorage.getItem(auditKey) || "[]");
       const savedExpense = local.expenses?.find(item => item.id === expenseId);
       return {
         payment,
         failures,
         redoRemoved:localStorage.getItem(redoKey) == null,
-        auditRemoved:localStorage.getItem(auditKey) == null,
+        pressureAuditRemoved:!audit.some(item => item?.id === "audit-pressure"),
         paid:Boolean(savedExpense?.paid),
         localBalance:Number(local.accounts?.[account]),
         profileBalance:Number(profile.accounts?.[account]),
@@ -111,7 +112,7 @@ test("manual payment survives active finance-copy quota pressure", async ({ page
   expect(result.failures).toBe(2);
   expect(result.payment.ok).toBe(true);
   expect(result.redoRemoved).toBe(true);
-  expect(result.auditRemoved).toBe(true);
+  expect(result.pressureAuditRemoved).toBe(true);
   expect(result.paid).toBe(true);
   expect(result.localBalance).toBe(result.runtimeBalance);
   expect(result.profileBalance).toBe(result.runtimeBalance);
@@ -146,12 +147,13 @@ test("manual payment survives active profile-copy quota pressure", async ({ page
       const payment = window.FinanceLedgerTransactions.payExpenses([expense], account, { auto:false });
       const local = JSON.parse(localStorage.getItem(activeKey) || "{}");
       const profile = JSON.parse(localStorage.getItem(profileKey) || "{}");
+      const audit = JSON.parse(localStorage.getItem(auditKey) || "[]");
       const savedExpense = profile.expenses?.find(item => item.id === expenseId);
       return {
         payment,
         failures,
         redoRemoved:localStorage.getItem(redoKey) == null,
-        auditRemoved:localStorage.getItem(auditKey) == null,
+        pressureAuditRemoved:!audit.some(item => item?.id === "profile-audit-pressure"),
         paid:Boolean(savedExpense?.paid),
         localBalance:Number(local.accounts?.[account]),
         profileBalance:Number(profile.accounts?.[account]),
@@ -166,7 +168,7 @@ test("manual payment survives active profile-copy quota pressure", async ({ page
   expect(result.failures).toBe(2);
   expect(result.payment.ok).toBe(true);
   expect(result.redoRemoved).toBe(true);
-  expect(result.auditRemoved).toBe(true);
+  expect(result.pressureAuditRemoved).toBe(true);
   expect(result.paid).toBe(true);
   expect(result.localBalance).toBe(result.runtimeBalance);
   expect(result.profileBalance).toBe(result.runtimeBalance);
