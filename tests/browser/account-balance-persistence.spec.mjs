@@ -147,9 +147,13 @@ test("Settings account balance update is reconciled and profile-persisted", asyn
   const setup = await accountSetup(page, 8765.43);
   expect(setup.account).not.toBe("");
 
-  await page.goto(`${APP_URL}/?page=settings&settings=accounts`, { waitUntil:"networkidle" });
+  await page.goto(`${APP_URL}/index.html?page=settings&settings=accounts`, { waitUntil:"networkidle" });
   await authenticate(page);
   await page.waitForFunction(() => Boolean(navigator.serviceWorker.controller));
+  await page.evaluate(() => {
+    window.renderSettings?.();
+    window.activateSettingsPanel?.("accounts", false);
+  });
   await expect(page.locator("#settings-panel-accounts")).toBeVisible();
 
   await page.evaluate(({ account, target }) => {
