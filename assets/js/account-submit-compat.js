@@ -89,7 +89,8 @@
 
   function installPaymentCompatibility() {
     const transactions = root.FinanceLedgerTransactions;
-    if (!transactions?.payExpenses || transactions?.capabilities?.paymentCompatibilityRepair) return false;
+    if (!transactions?.payExpenses) return false;
+    if (transactions.capabilities?.paymentCompatibilityRepair) return true;
 
     const wrapped = Object.freeze({
       ...transactions,
@@ -109,9 +110,11 @@
     return true;
   }
 
-  const originalShowToast = typeof root.showToast === "function" ? root.showToast : null;
-  if (originalShowToast) {
-    root.showToast = function accountCompatToast(message, tone, ...args) {
+  function installToastCompatibility() {
+    if (root.showToast?.__accountPaymentFailureCompat === true) return true;
+    if (typeof root.showToast !== "function") return false;
+    const originalShowToast = root.showToast;
+    const wrappedShowToast = function accountCompatToast(message, tone, ...args) {
       let nextMessage = message;
       if (String(message || "") === "Payment could not be completed" && lastPaymentFailure) {
         nextMessage = friendlyPaymentFailure(lastPaymentFailure);
@@ -119,15 +122,36 @@
       }
       return originalShowToast.call(this, nextMessage, tone, ...args);
     };
+    Object.defineProperty(wrappedShowToast, "__accountPaymentFailureCompat", { value:true });
+    root.showToast = wrappedShowToast;
+    return true;
+  }
+
+  function ensureCompatibilityReady() {
+    const paymentReady = installPaymentCompatibility();
+    const toastReady = installToastCompatibility();
+    if (paymentReady && toastReady) return;
+
+    let attempts = 0;
+    const retry = () => {
+      attempts += 1;
+      const paymentInstalled = installPaymentCompatibility();
+      const toastInstalled = installToastCompatibility();
+      if (paymentInstalled && toastInstalled) return;
+      if (attempts < 100) root.setTimeout(retry, 50);
+    };
+    root.setTimeout(retry, 0);
   }
 
   root.document.addEventListener("submit", guardLedgerBackedAccountSubmit, true);
   root.document.addEventListener("click", submitCorrectionFromPrimaryAction, true);
-  installPaymentCompatibility();
+  root.addEventListener?.("load", ensureCompatibilityReady, { once:true });
+  ensureCompatibilityReady();
   root.FinanceAccountSubmitCompat = Object.freeze({
     installed:true,
     ledgerGuard:true,
     paymentCompatibilityRepair:true,
-    paymentFailureReason:true
+    paymentFailureReason:true,
+    deferredInitialization:true
   });
 })(typeof window !== "undefined" ? window : globalThis);
