@@ -22,6 +22,7 @@ const SIDEBAR_BRAND_ASSET_QUERY = "2.2.0-talaan2";
 const UI_RADIUS_ASSET_QUERY = "2.5.0-talaan4";
 
 const ACCOUNT_INTEGRITY_SOURCES = Object.freeze([
+  "assets/js/finance-transaction-diagnostics.js",
   "assets/js/finance-integrity.js",
   "assets/js/account-ledger.js",
   "assets/js/account-submit-compat.js",
@@ -49,6 +50,7 @@ const CURRENT_VERSION_HISTORY = Object.freeze([{
     "Includes the complete local-first Finance workspace, Account Ledger, budgeting, reports, projects, productivity tools, reminders, and responsive desktop and phone layouts.",
     "Includes encrypted multi-profile Cloud Schema V3 synchronization, offline PWA support, recovery safeguards, and five-minute routine sync.",
     "Hardens Account Ledger balance corrections with transactional persistence, Viewer protection, profile verification, and fresh PWA delivery for account and sync runtimes.",
+    "Queues account-changing Cloud Sync records only after verified local/profile persistence and records technical-only transaction diagnostics.",
     "Preserves Finance Schema 12, Cloud Schema V3, account balances, paid state, recurrence, project payments, backups, encryption, persistent storage identifiers, and synchronization behavior."
   ]
 }]);
@@ -84,6 +86,7 @@ const runtimeGroups = {
     "ui-icon-alignment.css"
   ],
   "assets/js": [
+    "finance-transaction-diagnostics.js",
     "finance-integrity.js",
     "account-ledger.js",
     "account-submit-compat.js",
@@ -202,6 +205,7 @@ const normalizeReleaseAssetQuery = source => source.replace(
 );
 
 const applyAccountIntegrityAssetQuery = source => source
+  .replace(/finance-transaction-diagnostics\.js\?v=[^\"'\s<>)]+/g, `finance-transaction-diagnostics.js?v=${ACCOUNT_INTEGRITY_ASSET_QUERY}`)
   .replace(/finance-integrity\.js\?v=[^\"'\s<>)]+/g, `finance-integrity.js?v=${ACCOUNT_INTEGRITY_ASSET_QUERY}`)
   .replace(/account-ledger\.js\?v=[^\"'\s<>)]+/g, `account-ledger.js?v=${ACCOUNT_INTEGRITY_ASSET_QUERY}`)
   .replace(/account-submit-compat\.js\?v=[^\"'\s<>)]+/g, `account-submit-compat.js?v=${ACCOUNT_INTEGRITY_ASSET_QUERY}`)
@@ -210,6 +214,12 @@ const applyAccountIntegrityAssetQuery = source => source
 
 patchTextFile("index.html", source => {
   let next = applyAccountIntegrityAssetQuery(normalizeReleaseAssetQuery(normalizeRuntimeReferences(source)))
+  if (!next.includes("finance-transaction-diagnostics.js")) {
+    next = next.replace(
+      /(<script src="\.\/security-profiles\.js\?v=[^"]+"><\/script>)/,
+      `<script src="./finance-transaction-diagnostics.js?v=${ACCOUNT_INTEGRITY_ASSET_QUERY}"></script>\n  $1`
+    );
+  }
   if (!next.includes("finance-integrity.js")) {
     next = next.replace(/(<script src="\.\/account-ledger\.js\?v=[^"]+"><\/script>)/, `<script src="./finance-integrity.js?v=${ACCOUNT_INTEGRITY_ASSET_QUERY}"></script>\n  $1`);
   }
@@ -297,6 +307,12 @@ patchTextFile("sw.js", source => {
     .replace(/const CACHE_VERSION = "finance-v[^"]+";/, `const CACHE_VERSION = "${RELEASE.cache}";`)
     .replaceAll("Open My Finance Records", `Open ${BRAND}`);
 
+  if (!next.includes('asset("./finance-transaction-diagnostics.js')) {
+    next = next.replace(
+      /(asset\("\.\/finance-integrity\.js\?v=[^"')]+"\),)/,
+      `asset("./finance-transaction-diagnostics.js?v=${ACCOUNT_INTEGRITY_ASSET_QUERY}"),\n  $1`
+    );
+  }
   if (!next.includes('asset("./finance-integrity.js')) {
     next = next.replace(
       /(asset\("\.\/account-ledger\.js\?v=[^"')]+"\),)/,
@@ -319,6 +335,12 @@ patchTextFile("sw.js", source => {
     next = next.replace(
       'url.pathname.endsWith("cloud-sync.js") || url.pathname.endsWith("account-ledger.js") ||',
       'url.pathname.endsWith("cloud-sync.js") || url.pathname.endsWith("finance-integrity.js") || url.pathname.endsWith("account-ledger.js") ||'
+    );
+  }
+  if (!next.includes('url.pathname.endsWith("finance-transaction-diagnostics.js")')) {
+    next = next.replace(
+      'url.pathname.endsWith("finance-integrity.js") || url.pathname.endsWith("account-ledger.js") ||',
+      'url.pathname.endsWith("finance-transaction-diagnostics.js") || url.pathname.endsWith("finance-integrity.js") || url.pathname.endsWith("account-ledger.js") ||'
     );
   }
   return next;

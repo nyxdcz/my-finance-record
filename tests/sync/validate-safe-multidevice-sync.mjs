@@ -15,7 +15,7 @@ const worker = read("sw.js");
 const resolution = read("cloud-conflict-resolution.js");
 const review = read("cloud-conflict-review.js");
 const version = JSON.parse(read("version.json"));
-const accountIntegritySources = ["assets/js/finance-integrity.js","assets/js/account-ledger.js","assets/js/account-submit-compat.js","assets/js/cloud-sync.js","assets/js/cloud-sync-lifecycle.js"];
+const accountIntegritySources = ["assets/js/finance-transaction-diagnostics.js","assets/js/finance-integrity.js","assets/js/account-ledger.js","assets/js/account-submit-compat.js","assets/js/cloud-sync.js","assets/js/cloud-sync-lifecycle.js"];
 const accountIntegrityHash = crypto.createHash("sha256");
 for (const file of accountIntegritySources) { accountIntegrityHash.update(`${file}\0`); accountIntegrityHash.update(fs.readFileSync(path.join(root, file))); }
 const accountIntegrityQuery = `2.5.0-account-${accountIntegrityHash.digest("hex").slice(0, 12)}`;

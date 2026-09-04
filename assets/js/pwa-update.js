@@ -136,6 +136,7 @@
     try {
       if (root.localStorage?.getItem(ACCOUNT_INTEGRITY_REFRESH_KEY) === "done") return false;
       const removed = await deleteCachedPaths([
+        "/finance-transaction-diagnostics.js",
         "/finance-integrity.js",
         "/account-ledger.js",
         "/account-submit-compat.js",
