@@ -279,6 +279,37 @@ test("desktop expense cards match the approved compact type, status, and footer 
   expect(metrics.mobileActionsDisplay).toBe("none");
 });
 
+test("desktop expense action rows stay inside their cards without a divider through the metadata", async ({ page }) => {
+  await openFinance(page, { width:1440, height:1100 });
+  const geometry = await page.evaluate(() => {
+    const row = document.querySelector("#money .record-row[data-expense-row]");
+    const account = row?.querySelector(":scope > [data-label='Planned account']");
+    const amount = row?.querySelector(":scope > .amount");
+    const actions = row?.querySelector(":scope > .desktop-record-actions");
+    const rect = node => node?.getBoundingClientRect();
+    const style = node => node ? getComputedStyle(node) : null;
+    const rowRect = rect(row);
+    const accountRect = rect(account);
+    const amountRect = rect(amount);
+    const actionRect = rect(actions);
+    return {
+      rowLeft:rowRect?.left || 0,
+      rowRight:rowRect?.right || 0,
+      accountBottom:accountRect?.bottom || 0,
+      amountBottom:amountRect?.bottom || 0,
+      actionLeft:actionRect?.left || 0,
+      actionRight:actionRect?.right || 0,
+      actionTop:actionRect?.top || 0,
+      actionBorderTop:parseFloat(style(actions)?.borderTopWidth || "0")
+    };
+  });
+
+  expect(geometry.actionBorderTop).toBe(0);
+  expect(geometry.actionLeft).toBeGreaterThan(geometry.rowLeft);
+  expect(geometry.actionRight).toBeLessThan(geometry.rowRight);
+  expect(geometry.actionTop).toBeGreaterThanOrEqual(Math.max(geometry.accountBottom, geometry.amountBottom));
+});
+
 test("First half, Second half, and Other expenses collapse independently and restore their cards", async ({ page }) => {
   await openFinance(page, { width:1440, height:1000 });
   const keys = ["first-half", "second-half", "other-expenses"];
