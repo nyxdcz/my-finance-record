@@ -129,7 +129,6 @@ for (const theme of ["light", "dark"]) {
         available:geometry.available,
         savings:geometry.savings
       };
-      if (geometry.expenseVisible) rows.expense = geometry.expense;
       if (viewport.width <= 850) rows.period = geometry.period;
       if (viewport.width >= 851) rows.advanced = geometry.advanced;
 
@@ -139,6 +138,13 @@ for (const theme of ["light", "dark"]) {
         || row.dividerWidth !== 1);
 
       expect(failures, `Divider geometry:\n${JSON.stringify(geometry, null, 2)}`).toEqual([]);
+      if (geometry.expenseVisible) {
+        expect(geometry.expense, "Desktop expense footer geometry").toEqual({
+          leftGap:10,
+          rightGap:10,
+          dividerWidth:0
+        });
+      }
       expect(geometry.reportGap).toBeGreaterThanOrEqual(8);
       expect(geometry.radii.period).toBe("7px");
       expect(geometry.radii.projectColumn).toBe("7px");
