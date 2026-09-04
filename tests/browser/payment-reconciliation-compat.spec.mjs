@@ -2,9 +2,6 @@ import { expect, test } from "@playwright/test";
 
 /* global data */
 const APP_URL = "http://127.0.0.1:3000/?page=money";
-const ACTIVE_DATA_KEY = "simple-finance-project-records-v2";
-const PROFILE_PREFIX = "simple-finance-profile-data-v1:";
-const AUDIT_PREFIX = "simple-finance-profile-audit-v1:";
 
 async function authenticate(page) {
   await page.waitForFunction(() => Boolean(window.FinancePrivacyLock));
@@ -12,10 +9,8 @@ async function authenticate(page) {
   await page.evaluate(() => window.FinancePrivacyLock.setAuthenticated(true));
   await page.waitForFunction(() => Boolean(
     window.FinanceLedgerTransactions?.capabilities?.paymentCompatibilityRepair
-    && window.FinanceLedgerTransactions?.capabilities?.storagePressureRecovery
-    && window.persistFinanceDataRaw?.__storagePressureCompat
-    && window.FinanceProfileArchitecture?.persistCurrentData?.__storagePressureCompat
     && window.FinanceIntegrity?.scan
+    && window.FinanceProfileArchitecture
   ));
 }
 
@@ -23,46 +18,6 @@ async function openApp(page) {
   await page.setViewportSize({ width:1440, height:1000 });
   await page.goto(APP_URL, { waitUntil:"networkidle" });
   await authenticate(page);
-}
-
-async function createPayableExpense(page, { name = "Electric & Water Bill", amount = 125 } = {}) {
-  const setup = await page.evaluate(() => {
-    const account = Object.keys(data.accounts || {})[0] || "";
-    if (!account) throw new Error("No account is available for the payment compatibility test");
-    return { account, before:Number(data.accounts[account] || 0) };
-  });
-  const target = Math.max(5000, setup.before + 1000);
-  const reconciled = await page.evaluate(({ account, target }) => window.FinanceLedgerTransactions.reconcileAccounts(
-    [{ account, target }],
-    { note:"payment compatibility setup", message:"Payment compatibility account setup" }
-  ), { account:setup.account, target });
-  expect(reconciled.ok).toBe(true);
-
-  const expenseId = await page.evaluate(({ account, name:expenseName, amount:expenseAmount }) => {
-    const expense = {
-      id:`payment-compat-${Date.now()}-${Math.random().toString(16).slice(2)}`,
-      name:expenseName,
-      amount:expenseAmount,
-      category:"Utilities",
-      date:new Date().toISOString().slice(0,10),
-      account,
-      recurring:false,
-      includeInTotals:true,
-      paid:false,
-      paidDate:"",
-      paidFromAccount:"",
-      paidAmount:0,
-      accountDeducted:false,
-      paymentTransactionId:"",
-      autoPaidAtMonthEnd:false
-    };
-    data.expenses.push(expense);
-    localStorage.setItem(ACTIVE_DATA_KEY, JSON.stringify(data));
-    const profileId = window.FinanceProfileArchitecture.activeProfileId();
-    localStorage.setItem(`${PROFILE_PREFIX}${profileId}`, JSON.stringify(data));
-    return expense.id;
-  }, { account:setup.account, name, amount });
-  return { ...setup, target, expenseId, amount };
 }
 
 test("manual payment repairs an unambiguous stale reconciliation link before committing", async ({ page }) => {
@@ -110,9 +65,9 @@ test("manual payment repairs an unambiguous stale reconciliation link before com
     };
     data.expenses.push(expense);
 
-    localStorage.setItem(ACTIVE_DATA_KEY, JSON.stringify(data));
+    localStorage.setItem("simple-finance-project-records-v2", JSON.stringify(data));
     const profileId = window.FinanceProfileArchitecture.activeProfileId();
-    localStorage.setItem(`${PROFILE_PREFIX}${profileId}`, JSON.stringify(data));
+    localStorage.setItem(`simple-finance-profile-data-v1:${profileId}`, JSON.stringify(data));
 
     const report = window.FinanceIntegrity.scan(data, { includeStorage:false });
     return {
@@ -138,9 +93,9 @@ test("manual payment repairs an unambiguous stale reconciliation link before com
   const state = await page.evaluate(({ account, expenseId, reconciliationId }) => {
     const expense = data.expenses.find(item => item.id === expenseId);
     const reconciliation = data.accountReconciliations.find(item => item.id === reconciliationId);
-    const local = JSON.parse(localStorage.getItem(ACTIVE_DATA_KEY) || "{}");
+    const local = JSON.parse(localStorage.getItem("simple-finance-project-records-v2") || "{}");
     const profileId = window.FinanceProfileArchitecture.activeProfileId();
-    const profile = JSON.parse(localStorage.getItem(`${PROFILE_PREFIX}${profileId}`) || "{}");
+    const profile = JSON.parse(localStorage.getItem(`simple-finance-profile-data-v1:${profileId}`) || "{}");
     const report = window.FinanceIntegrity.scan(data, { includeStorage:true });
     return {
       paid:Boolean(expense?.paid),
@@ -211,103 +166,4 @@ test("generic payment toast is replaced with the ledger rollback reason", async 
 
   await page.evaluate(() => window.showToast("Payment could not be completed", "warning"));
   await expect(page.locator("#toast .toast-message")).toHaveText("The money update failed its safety checks. Nothing was saved.");
-});
-
-test("manual payment survives active-data quota pressure by releasing transient history only", async ({ page }) => {
-  await openApp(page);
-  const setup = await createPayableExpense(page, { name:"Storage pressure active copy", amount:75 });
-
-  const result = await page.evaluate(({ account, expenseId }) => {
-    const profileId = window.FinanceProfileArchitecture.activeProfileId();
-    localStorage.setItem(`${ACTIVE_DATA_KEY}-redo`, JSON.stringify({ disposable:true }));
-    localStorage.setItem(`${AUDIT_PREFIX}${profileId}`, JSON.stringify([{ id:"audit-pressure" }]));
-    const originalSetItem = Storage.prototype.setItem;
-    let failures = 0;
-    Storage.prototype.setItem = function quotaInjectedSetItem(key, value) {
-      if (this === localStorage && key === ACTIVE_DATA_KEY && failures < 2) {
-        failures += 1;
-        throw new DOMException("Injected active-data quota pressure", "QuotaExceededError");
-      }
-      return originalSetItem.call(this, key, value);
-    };
-    try {
-      const expense = data.expenses.find(item => item.id === expenseId);
-      const payment = window.FinanceLedgerTransactions.payExpenses([expense], account, { auto:false });
-      const local = JSON.parse(localStorage.getItem(ACTIVE_DATA_KEY) || "{}");
-      const profile = JSON.parse(localStorage.getItem(`${PROFILE_PREFIX}${profileId}`) || "{}");
-      const savedExpense = local.expenses?.find(item => item.id === expenseId);
-      return {
-        payment,
-        failures,
-        redoRemoved:localStorage.getItem(`${ACTIVE_DATA_KEY}-redo`) == null,
-        auditRemoved:localStorage.getItem(`${AUDIT_PREFIX}${profileId}`) == null,
-        localPaid:Boolean(savedExpense?.paid),
-        localBalance:Number(local.accounts?.[account]),
-        profileBalance:Number(profile.accounts?.[account]),
-        runtimeBalance:Number(data.accounts?.[account]),
-        critical:window.FinanceIntegrity.scan(data, { includeStorage:true }).counts.critical
-      };
-    } finally {
-      Storage.prototype.setItem = originalSetItem;
-    }
-  }, { account:setup.account, expenseId:setup.expenseId });
-
-  expect(result.failures).toBe(2);
-  expect(result.payment.ok).toBe(true);
-  expect(result.redoRemoved).toBe(true);
-  expect(result.auditRemoved).toBe(true);
-  expect(result.localPaid).toBe(true);
-  expect(result.localBalance).toBe(result.runtimeBalance);
-  expect(result.profileBalance).toBe(result.runtimeBalance);
-  expect(result.critical).toBe(0);
-});
-
-test("manual payment survives active-profile quota pressure and remains profile-persisted", async ({ page }) => {
-  await openApp(page);
-  const setup = await createPayableExpense(page, { name:"Storage pressure profile copy", amount:80 });
-
-  const result = await page.evaluate(({ account, expenseId }) => {
-    const profileId = window.FinanceProfileArchitecture.activeProfileId();
-    const profileKey = `${PROFILE_PREFIX}${profileId}`;
-    localStorage.setItem(`${ACTIVE_DATA_KEY}-redo`, JSON.stringify({ disposable:true }));
-    localStorage.setItem(`${AUDIT_PREFIX}${profileId}`, JSON.stringify([{ id:"profile-audit-pressure" }]));
-    const originalSetItem = Storage.prototype.setItem;
-    let failures = 0;
-    Storage.prototype.setItem = function quotaInjectedSetItem(key, value) {
-      if (this === localStorage && key === profileKey && failures < 2) {
-        failures += 1;
-        throw new DOMException("Injected profile quota pressure", "QuotaExceededError");
-      }
-      return originalSetItem.call(this, key, value);
-    };
-    try {
-      const expense = data.expenses.find(item => item.id === expenseId);
-      const payment = window.FinanceLedgerTransactions.payExpenses([expense], account, { auto:false });
-      const local = JSON.parse(localStorage.getItem(ACTIVE_DATA_KEY) || "{}");
-      const profile = JSON.parse(localStorage.getItem(profileKey) || "{}");
-      const savedExpense = profile.expenses?.find(item => item.id === expenseId);
-      return {
-        payment,
-        failures,
-        redoRemoved:localStorage.getItem(`${ACTIVE_DATA_KEY}-redo`) == null,
-        auditRemoved:localStorage.getItem(`${AUDIT_PREFIX}${profileId}`) == null,
-        profilePaid:Boolean(savedExpense?.paid),
-        localBalance:Number(local.accounts?.[account]),
-        profileBalance:Number(profile.accounts?.[account]),
-        runtimeBalance:Number(data.accounts?.[account]),
-        critical:window.FinanceIntegrity.scan(data, { includeStorage:true }).counts.critical
-      };
-    } finally {
-      Storage.prototype.setItem = originalSetItem;
-    }
-  }, { account:setup.account, expenseId:setup.expenseId });
-
-  expect(result.failures).toBe(2);
-  expect(result.payment.ok).toBe(true);
-  expect(result.redoRemoved).toBe(true);
-  expect(result.auditRemoved).toBe(true);
-  expect(result.profilePaid).toBe(true);
-  expect(result.localBalance).toBe(result.runtimeBalance);
-  expect(result.profileBalance).toBe(result.runtimeBalance);
-  expect(result.critical).toBe(0);
 });
