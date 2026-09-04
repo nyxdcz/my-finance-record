@@ -2,7 +2,6 @@ import { expect, test } from "@playwright/test";
 
 /* global data */
 const APP_URL = "http://127.0.0.1:3000/?page=money";
-const ACTIVE_DATA_KEY = "simple-finance-project-records-v2";
 
 async function authenticate(page) {
   await page.waitForFunction(() => Boolean(window.FinancePrivacyLock));
