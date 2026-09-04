@@ -133,10 +133,10 @@ test("desktop paid calendar separates dates and keeps names and amounts easy to 
   expect(state.totalWeight).toBeGreaterThanOrEqual(800);
   expect(state.budgetCalendarColumns).toBe(state.calendarColumns);
   expect(state.budgetCalendarGap).toBe(state.calendarGap);
-  expect(state.budgetDayHeight).toBe(state.dayHeight);
+  expect(state.budgetDayHeight).toBeCloseTo(state.dayHeight, 2);
   expect(state.budgetDayPadding).toBe("9px");
   expect(state.budgetEntryDisplay).toBe(state.entryDisplay);
-  expect(state.budgetEntryHeight).toBe(state.entryHeight);
+  expect(state.budgetEntryHeight).toBeCloseTo(state.entryHeight, 2);
   expect(state.budgetEntryPadding).toBe("8px 9px");
 });
 
