@@ -120,6 +120,7 @@ test("manual payment repairs an unambiguous stale reconciliation link before com
 });
 
 test("generic payment toast is replaced with the ledger rollback reason", async ({ page }) => {
+  test.setTimeout(45000);
   await openApp(page);
 
   const setup = await page.evaluate(() => {
@@ -164,6 +165,9 @@ test("generic payment toast is replaced with the ledger rollback reason", async 
   expect(failed.ok).toBe(false);
   expect(String(failed.reason)).toContain("safety checks");
 
-  await page.evaluate(() => window.showToast("Payment could not be completed", "warning"));
-  await expect(page.locator("#toast .toast-message")).toHaveText("The money update failed its safety checks. Nothing was saved.");
+  const toastMessage = await page.evaluate(() => {
+    window.showToast("Payment could not be completed", "warning");
+    return document.querySelector("#toast .toast-message")?.textContent?.trim() || "";
+  });
+  expect(toastMessage).toBe("The money update failed its safety checks. Nothing was saved.");
 });

@@ -17,15 +17,26 @@
  * intentionally strict and otherwise blocks every later money mutation. Before a
  * manual payment, repair that deterministic history link through the ledger-owned
  * safe-repair transaction, then retry the payment against the verified state.
+ *
+ * Storage-pressure compatibility protects large real-world datasets from browser
+ * localStorage quota failures. Only disposable local history is released during a
+ * quota retry: Redo first, profile audit logs second, and Undo only as a final
+ * fallback. Finance records, account ledger history, balances, profiles, and Cloud
+ * data are never removed by this recovery path.
  */
 (function installAccountSubmitCompat(root) {
   if (!root?.document || root.FinanceAccountSubmitCompat?.installed) return;
 
+  const ACTIVE_DATA_KEY = "simple-finance-project-records-v2";
+  const REDO_KEY = `${ACTIVE_DATA_KEY}-redo`;
+  const UNDO_KEY = `${ACTIVE_DATA_KEY}-undo`;
+  const PROFILE_AUDIT_PREFIX = "simple-finance-profile-audit-v1:";
+  const STORAGE_FULL_MESSAGE = "This device's local storage is full. Talaan kept the previous finance state. Free some browser storage or remove unused local profiles, then try again.";
   let lastPaymentFailure = null;
 
   function activeLedgerVersion() {
     try {
-      const stored = JSON.parse(root.localStorage?.getItem("simple-finance-project-records-v2") || "{}");
+      const stored = JSON.parse(root.localStorage?.getItem(ACTIVE_DATA_KEY) || "{}");
       return Number(stored?.ledgerSettings?.version || 0);
     } catch (error) { return 0; }
   }
@@ -56,6 +67,105 @@
 
   function currentFinanceData() {
     try { return typeof data !== "undefined" ? data : null; } catch (error) { return null; }
+  }
+
+  function isStorageQuotaError(error) {
+    const name = String(error?.name || "").toLowerCase();
+    const message = String(error?.message || "").toLowerCase();
+    const code = Number(error?.code || 0);
+    return name === "quotaexceedederror"
+      || name === "ns_error_dom_quota_reached"
+      || code === 22
+      || code === 1014
+      || message.includes("quota")
+      || message.includes("storage is full")
+      || message.includes("storage full");
+  }
+
+  function removeStorageKey(key) {
+    try {
+      if (root.localStorage?.getItem(key) == null) return false;
+      root.localStorage.removeItem(key);
+      return true;
+    } catch (error) { return false; }
+  }
+
+  function removeProfileAuditLogs() {
+    const keys = [];
+    try {
+      for (let index = 0; index < root.localStorage.length; index += 1) {
+        const key = root.localStorage.key(index);
+        if (key?.startsWith(PROFILE_AUDIT_PREFIX)) keys.push(key);
+      }
+    } catch (error) { return 0; }
+    return keys.reduce((count, key) => count + (removeStorageKey(key) ? 1 : 0), 0);
+  }
+
+  function releaseTransientStorage({ includeUndo = false } = {}) {
+    const removed = [];
+    if (removeStorageKey(REDO_KEY)) removed.push("redo");
+    const auditCount = removeProfileAuditLogs();
+    if (auditCount) removed.push(`audit:${auditCount}`);
+    if (includeUndo && removeStorageKey(UNDO_KEY)) removed.push("undo");
+    return removed;
+  }
+
+  function storageFullError(error) {
+    const next = error instanceof Error ? error : new Error(String(error || "Browser storage quota exceeded."));
+    try { next.userMessage = STORAGE_FULL_MESSAGE; } catch (assignmentError) {}
+    return next;
+  }
+
+  function runWithStoragePressureRecovery(operation) {
+    try { return operation(); }
+    catch (error) {
+      if (!isStorageQuotaError(error)) throw error;
+      releaseTransientStorage({ includeUndo:false });
+      try { return operation(); }
+      catch (retryError) {
+        if (!isStorageQuotaError(retryError)) throw retryError;
+        releaseTransientStorage({ includeUndo:true });
+        try { return operation(); }
+        catch (finalError) {
+          if (isStorageQuotaError(finalError)) throw storageFullError(finalError);
+          throw finalError;
+        }
+      }
+    }
+  }
+
+  function installPersistenceCompatibility() {
+    let activeReady = false;
+    let profileReady = false;
+
+    if (typeof root.persistFinanceDataRaw === "function") {
+      if (root.persistFinanceDataRaw.__storagePressureCompat === true) activeReady = true;
+      else {
+        const originalPersist = root.persistFinanceDataRaw;
+        const wrappedPersist = function storagePressurePersistFinanceDataRaw(...args) {
+          return runWithStoragePressureRecovery(() => originalPersist.apply(this, args));
+        };
+        Object.defineProperty(wrappedPersist, "__storagePressureCompat", { value:true });
+        root.persistFinanceDataRaw = wrappedPersist;
+        activeReady = true;
+      }
+    }
+
+    const architecture = root.FinanceProfileArchitecture;
+    if (architecture?.persistCurrentData) {
+      if (architecture.persistCurrentData.__storagePressureCompat === true) profileReady = true;
+      else {
+        const originalProfilePersist = architecture.persistCurrentData;
+        const wrappedProfilePersist = function storagePressurePersistCurrentData(...args) {
+          return runWithStoragePressureRecovery(() => originalProfilePersist.apply(architecture, args));
+        };
+        Object.defineProperty(wrappedProfilePersist, "__storagePressureCompat", { value:true });
+        architecture.persistCurrentData = wrappedProfilePersist;
+        profileReady = true;
+      }
+    }
+
+    return activeReady && profileReady;
   }
 
   function safelyRepairPaymentHistory(transactions) {
@@ -94,7 +204,12 @@
 
     const wrapped = Object.freeze({
       ...transactions,
-      capabilities:Object.freeze({ ...(transactions.capabilities || {}), paymentCompatibilityRepair:true, paymentFailureReason:true }),
+      capabilities:Object.freeze({
+        ...(transactions.capabilities || {}),
+        paymentCompatibilityRepair:true,
+        paymentFailureReason:true,
+        storagePressureRecovery:true
+      }),
       payExpenses(items, account, options = {}) {
         const repair = safelyRepairPaymentHistory(transactions);
         if (repair.attempted && !repair.ok) {
@@ -130,14 +245,16 @@
   function ensureCompatibilityReady() {
     const paymentReady = installPaymentCompatibility();
     const toastReady = installToastCompatibility();
-    if (paymentReady && toastReady) return;
+    const persistenceReady = installPersistenceCompatibility();
+    if (paymentReady && toastReady && persistenceReady) return;
 
     let attempts = 0;
     const retry = () => {
       attempts += 1;
       const paymentInstalled = installPaymentCompatibility();
       const toastInstalled = installToastCompatibility();
-      if (paymentInstalled && toastInstalled) return;
+      const persistenceInstalled = installPersistenceCompatibility();
+      if (paymentInstalled && toastInstalled && persistenceInstalled) return;
       if (attempts < 100) root.setTimeout(retry, 50);
     };
     root.setTimeout(retry, 0);
@@ -152,6 +269,8 @@
     ledgerGuard:true,
     paymentCompatibilityRepair:true,
     paymentFailureReason:true,
+    storagePressureRecovery:true,
+    transientOnlyCleanup:true,
     deferredInitialization:true
   });
 })(typeof window !== "undefined" ? window : globalThis);
