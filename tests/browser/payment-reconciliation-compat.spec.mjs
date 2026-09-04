@@ -165,5 +165,5 @@ test("generic payment toast is replaced with the ledger rollback reason", async 
   expect(String(failed.reason)).toContain("safety checks");
 
   await page.evaluate(() => window.showToast("Payment could not be completed", "warning"));
-  await expect(page.getByText("The money update failed its safety checks. Nothing was saved.")).toBeVisible();
+  await expect(page.locator("#toast .toast-message")).toHaveText("The money update failed its safety checks. Nothing was saved.");
 });
