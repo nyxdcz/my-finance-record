@@ -156,6 +156,11 @@ test("Settings account balance update is reconciled and profile-persisted", asyn
   });
   await expect(page.locator("#settings-panel-accounts")).toBeVisible();
 
+  const moreOptions = page.locator('#settings-panel-accounts details[data-settings-more-options="accounts"]');
+  await expect(moreOptions).toBeVisible();
+  if (!await moreOptions.evaluate(node => node.open)) await moreOptions.locator("summary").click();
+  await expect.poll(() => moreOptions.evaluate(node => node.open)).toBe(true);
+
   await page.evaluate(({ account, target }) => {
     const input = [...document.querySelectorAll(".account-input")].find(node => node.dataset.account === account);
     if (!input) throw new Error("Settings account input is unavailable");
