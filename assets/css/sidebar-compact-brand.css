@@ -30,7 +30,7 @@ html body #sidebar.sidebar .brand > strong {
 
 /* Keep the approved dark sidebar authoritative over the later Liquid Glass light-mode layer. */
 html body #sidebar.sidebar {
-  background:#172B28 !important;
+  background:var(--surface) !important;
   background-image:none !important;
   color:#FFFFFF !important;
   border-right:0 !important;
@@ -47,12 +47,12 @@ html body #sidebar.sidebar .nav-button {
   border-color:transparent !important;
   border-radius:7px !important;
   box-shadow:none !important;
-  color:#D9E5E2 !important;
+  color:var(--muted) !important;
 }
 
 html body #sidebar.sidebar .nav-icon {
   background:transparent !important;
-  color:#D9E5E2 !important;
+  color:var(--muted) !important;
 }
 
 html body #sidebar.sidebar .nav-icon-image {
@@ -61,19 +61,19 @@ html body #sidebar.sidebar .nav-icon-image {
 }
 
 html body #sidebar.sidebar .nav-label {
-  color:#D9E5E2 !important;
+  color:var(--muted) !important;
   font-size:12px !important;
   font-weight:700 !important;
 }
 
 html body #sidebar.sidebar .nav-button:is(:hover,:focus-visible) {
-  background:rgba(53,111,209,.1) !important;
-  border-color:rgba(92,145,232,.18) !important;
+  background:color-mix(in srgb,var(--primary) 10%,transparent) !important;
+  border-color:color-mix(in srgb,var(--primary) 18%,transparent) !important;
 }
 
 html body #sidebar.sidebar .nav-button.active {
-  background:rgba(53,111,209,.18) !important;
-  border-color:rgba(92,145,232,.3) !important;
+  background:color-mix(in srgb,var(--primary) 18%,transparent) !important;
+  border-color:color-mix(in srgb,var(--primary) 30%,transparent) !important;
 }
 
 html body #sidebar.sidebar .nav-button:hover,
@@ -86,7 +86,7 @@ html body #sidebar.sidebar .nav-button.active .nav-label {
 }
 
 html body #sidebar.sidebar .nav-button.active .nav-icon {
-  background:#356FD1 !important;
+  background:var(--primary) !important;
   color:#FFFFFF !important;
   border-radius:7px !important;
 }
@@ -116,7 +116,7 @@ html body #sidebar.sidebar .sidebar-settings-bottom {
     min-width:var(--sidebar-rail-width) !important;
     max-width:var(--sidebar-rail-width) !important;
     padding:10px 6px !important;
-    background:#172B28 !important;
+    background:var(--surface) !important;
     color:#FFFFFF !important;
     transform:none !important;
     overflow:visible !important;
@@ -256,7 +256,7 @@ html body #sidebar.sidebar .sidebar-settings-bottom {
     padding:8px 10px !important;
     gap:9px !important;
     overflow:visible !important;
-    color:#D9E5E2 !important;
+    color:var(--muted) !important;
   }
 
   html body .sidebar.desktop-open .nav-button,
@@ -297,7 +297,7 @@ html body #sidebar.sidebar .sidebar-settings-bottom {
     transform:none !important;
     font-size:12px !important;
     font-weight:700 !important;
-    color:#D9E5E2 !important;
+    color:var(--muted) !important;
   }
 
   html body .sidebar.desktop-open .nav-label,
@@ -341,8 +341,8 @@ html body #sidebar.sidebar .sidebar-settings-bottom {
   html[data-theme="dark"] body .sidebar .nav-button.active,
   html body .sidebar.desktop-open .nav-button.active,
   html body .sidebar.sidebar-pinned .nav-button.active {
-    background:rgba(53,111,209,.18) !important;
-    border-color:rgba(92,145,232,.3) !important;
+    background:color-mix(in srgb,var(--primary) 18%,transparent) !important;
+    border-color:color-mix(in srgb,var(--primary) 30%,transparent) !important;
     box-shadow:none !important;
   }
 
@@ -352,7 +352,7 @@ html body #sidebar.sidebar .sidebar-settings-bottom {
   html body .sidebar.sidebar-pinned .nav-button.active .nav-icon {
     display:grid !important;
     place-items:center !important;
-    background:#356FD1 !important;
+    background:var(--primary) !important;
     color:#FFFFFF !important;
     border-radius:7px !important;
   }
@@ -473,13 +473,13 @@ html[data-theme="dark"] body #sidebar.sidebar {
 }
 
 html[data-theme="light"] body #sidebar.sidebar {
-  background:#FFFFFF !important;
-  color:#080B10 !important;
+  background:var(--surface) !important;
+  color:var(--text) !important;
 }
 
 html[data-theme="dark"] body #sidebar.sidebar {
-  background:#080B10 !important;
-  color:#FFFFFF !important;
+  background:var(--surface) !important;
+  color:var(--text) !important;
 }
 
 html[data-theme="light"] body #sidebar.sidebar .brand > strong,
@@ -496,7 +496,7 @@ html[data-theme="dark"] body #sidebar.sidebar.sidebar-pinned .brand > strong {
 
 html[data-theme="light"] body #sidebar.sidebar .brand > strong,
 html[data-theme="light"] body #sidebar.sidebar .sidebar-close-button {
-  color:#080B10 !important;
+  color:var(--text) !important;
 }
 
 html[data-theme="dark"] body #sidebar.sidebar .brand > strong,
@@ -516,7 +516,7 @@ html[data-theme="dark"] body #sidebar.sidebar :is(.sidebar-close-button,.nav-but
 
 html[data-theme="light"] body #sidebar.sidebar .nav-button,
 html[data-theme="light"] body #sidebar.sidebar .nav-label {
-  color:#080B10 !important;
+  color:var(--text) !important;
 }
 
 html[data-theme="dark"] body #sidebar.sidebar .nav-button,
@@ -537,7 +537,7 @@ html[data-theme="dark"] body #sidebar.sidebar .nav-icon {
 }
 
 html[data-theme="light"] body #sidebar.sidebar .nav-icon {
-  color:#080B10 !important;
+  color:var(--text) !important;
 }
 
 html[data-theme="dark"] body #sidebar.sidebar .nav-icon {
@@ -560,7 +560,7 @@ html[data-theme="light"] body #sidebar.sidebar .nav-button.active,
 html[data-theme="light"] body #sidebar.sidebar .nav-button:hover .nav-label,
 html[data-theme="light"] body #sidebar.sidebar .nav-button:focus-visible .nav-label,
 html[data-theme="light"] body #sidebar.sidebar .nav-button.active .nav-label {
-  color:#080B10 !important;
+  color:var(--text) !important;
 }
 
 html[data-theme="dark"] body #sidebar.sidebar .nav-button:hover,
@@ -576,7 +576,7 @@ html[data-theme="light"] body #sidebar.sidebar .nav-button.active .nav-icon,
 html[data-theme="dark"] body #sidebar.sidebar .nav-button.active .nav-icon {
   display:grid !important;
   place-items:center !important;
-  background:#356FD1 !important;
+  background:var(--primary) !important;
   color:#FFFFFF !important;
   border-radius:7px !important;
 }
@@ -589,31 +589,31 @@ html[data-theme="dark"] body #sidebar.sidebar .nav-button.active .nav-icon-image
 
 /* Full-row selection is the final authoritative sidebar state in both themes. */
 html[data-theme="light"] body #sidebar.sidebar .nav-button:is(:hover,:focus-visible) {
-  background:rgba(53,111,209,.07) !important;
-  border-color:rgba(53,111,209,.12) !important;
+  background:color-mix(in srgb,var(--primary) 7%,transparent) !important;
+  border-color:color-mix(in srgb,var(--primary) 12%,transparent) !important;
 }
 
 html[data-theme="dark"] body #sidebar.sidebar .nav-button:is(:hover,:focus-visible) {
-  background:rgba(53,111,209,.12) !important;
-  border-color:rgba(92,145,232,.2) !important;
+  background:color-mix(in srgb,var(--primary) 12%,transparent) !important;
+  border-color:color-mix(in srgb,var(--primary) 20%,transparent) !important;
 }
 
 html[data-theme="light"] body #sidebar.sidebar .nav-button.active {
-  background:rgba(53,111,209,.12) !important;
-  border-color:rgba(53,111,209,.22) !important;
+  background:color-mix(in srgb,var(--primary) 12%,transparent) !important;
+  border-color:color-mix(in srgb,var(--primary) 22%,transparent) !important;
 }
 
 html[data-theme="dark"] body #sidebar.sidebar .nav-button.active {
-  background:rgba(53,111,209,.22) !important;
-  border-color:rgba(92,145,232,.36) !important;
+  background:color-mix(in srgb,var(--primary) 22%,transparent) !important;
+  border-color:color-mix(in srgb,var(--primary) 36%,transparent) !important;
 }
 
 html[data-theme="light"] body #sidebar.sidebar .sidebar-settings-bottom {
-  border-block-start-color:rgba(8,11,16,.12) !important;
+  border-block-start-color:color-mix(in srgb,var(--text) 12%,transparent) !important;
 }
 
 html[data-theme="dark"] body #sidebar.sidebar .sidebar-settings-bottom {
-  border-block-start-color:rgba(255,255,255,.14) !important;
+  border-block-start-color:color-mix(in srgb,var(--text) 14%,transparent) !important;
 }
 
 /* Collapsed desktop rail: the Talaan logo owns the expand/pin affordance. */
