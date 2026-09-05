@@ -373,6 +373,7 @@ html body #money #availableMoneySection [data-collapse-toggle="available-money"]
 html body #income #monthlyBudgetPlannerToggle,
 html body #income [data-budget-panel-toggle],
 html body #paid-expenses [data-collapse-toggle="paid-expenses"],
+html body #paid-expenses #paidExpensesSection [data-collapse-toggle="paid-expenses"],
 html body #reports .report-compact-chevron,
 html body .budget-panel-collapse,
 html body #monthlyBudgetPlannerCard #monthlySavingsTarget,
