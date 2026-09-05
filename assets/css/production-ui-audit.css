@@ -1640,3 +1640,11 @@ html body :is(
     align-self: start !important;
   }
 }
+
+
+/* V15.2.25 · Phone topbar offset follows the 35px two-row rhythm. */
+@media (max-width: 700px) {
+  :root {
+    --mobile-topbar-offset: calc(max(5px, env(safe-area-inset-top)) + 80px);
+  }
+}
