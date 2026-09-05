@@ -376,6 +376,7 @@
   /* All phone action controls share the requested 35px maximum. */
   html body :is(
     button,
+    .button,
     input[type="button"],
     input[type="submit"],
     input[type="reset"],
@@ -525,7 +526,7 @@
     height: 35px !important;
     min-height: 35px !important;
     max-height: 35px !important;
-    margin: 0 0 4px !important;
+    margin: 0 -10px 4px !important;
     padding: 0 6px !important;
     gap: 4px !important;
     align-items: center !important;
@@ -752,3 +753,112 @@
   }
 }
 
+/* V15.2.25 · Phone control specificity repair. Feature styles loaded before this
+   overlay still contain legacy 44px declarations; these explicit selectors keep
+   the approved 35px contract without changing tablet or desktop geometry. */
+@media (max-width: 700px) {
+  html body :is(
+    button,
+    .button,
+    input[type="button"],
+    input[type="submit"],
+    input[type="reset"],
+    summary,
+    [role="button"]
+  ) {
+    height: 35px !important;
+    min-height: 35px !important;
+    max-height: 35px !important;
+  }
+
+  html body :is(
+    .nav-button,
+    .sidebar .nav-button,
+    #sidebar .nav-button,
+    #cloudSyncStatusButton,
+    .topbar-actions .cloud-sync-toolbar-button,
+    #previousMonthButton,
+    #nextMonthButton,
+    .topbar-actions .month-nav-button,
+    #quickAddExpense:not([hidden]),
+    .topbar-actions .topbar-add-button,
+    .topbar-tools-menu > summary,
+    #availableMoneySection #addAccountButton,
+    .project-calendar-v13020 [data-pc-add],
+    .project-calendar-v13020 [data-pc-full-add],
+    .project-calendar-v13020 [data-pc-view],
+    .project-calendar-v13020 [data-kanban-add-column],
+    #toastDismissButton,
+    .toast .toast-dismiss,
+    .structured-drag-toast-dismiss,
+    .cloud-sync-popover-close,
+    .compact-help-close,
+    .month-picker-year-button,
+    .settings-search-field button,
+    .emoji-option,
+    .emoji-custom-button,
+    .gym-override-chip button,
+    .kanban-column-menu .overflow-menu-trigger,
+    .pc-event-actions .button,
+    .project-kanban-board .button,
+    .structured-drag-toast button
+  ) {
+    height: 35px !important;
+    min-height: 35px !important;
+    max-height: 35px !important;
+  }
+
+  html body :is(
+    #money .money-workspace-switcher .workspace-switcher-button,
+    #income .money-workspace-switcher .workspace-switcher-button,
+    #paid-expenses .money-workspace-switcher .workspace-switcher-button,
+    .finance-workspace-marquee-row > .money-workspace-switcher .workspace-switcher-button,
+    #dashboard .dashboard-view-tabs .dashboard-view-tab,
+    #dashboard .dashboard-view-tabs .workspace-switcher-button,
+    #projects .project-workspace-switcher .workspace-switcher-button
+  ) {
+    height: 35px !important;
+    min-height: 35px !important;
+    max-height: 35px !important;
+  }
+
+  html body :is(
+    #money .account-card-actions .button,
+    #money .account-card-actions .account-spend-button,
+    #availableMoneySection .account-card-actions .button,
+    #money .record-row[data-expense-row] > .mobile-record-actions,
+    #money .record-row[data-expense-row] > .mobile-record-actions > .button,
+    #money .record-row[data-expense-row] > .mobile-record-actions > .record-more-menu,
+    #money .record-row[data-expense-row] > .mobile-record-actions > .record-more-menu > .overflow-menu-trigger,
+    #paid-expenses [data-paid-expense-row] > .mobile-record-actions,
+    #paid-expenses [data-paid-expense-row] > .mobile-record-actions > .button,
+    #paid-expenses [data-paid-expense-row] > .mobile-record-actions > .record-more-menu,
+    #paid-expenses [data-paid-expense-row] .overflow-menu-trigger,
+    #income .income-record-row > .record-actions .button,
+    #settings .section-help-button,
+    #settings .context-help-button.section-help-button,
+    #settings .settings-tablist button,
+    #settings .settings-disclosure > summary,
+    #settings .button,
+    #settings-panel-finance-tools button,
+    #settings-panel-finance-tools .button,
+    #accountDialog .button,
+    #expenseDialog .button,
+    #projectDialog .button,
+    [role="dialog"] .button,
+    #projects .project-mobile-actions > .button,
+    #projects .project-mobile-actions > details > summary,
+    .budget-planner-card .budget-planner-toggle,
+    .budget-bento-panel .budget-panel-collapse
+  ) {
+    height: 35px !important;
+    min-height: 35px !important;
+    max-height: 35px !important;
+  }
+
+  /* Keep the available-money divider flush with its card edge after the
+     compact header loses its former vertical padding. */
+  html body #availableMoneySection .card-header {
+    margin-inline: -10px !important;
+  }
+}
