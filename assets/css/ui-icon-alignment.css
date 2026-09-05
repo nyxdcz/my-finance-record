@@ -213,7 +213,7 @@ html body .button-saved.active:hover {
   min-height:34px !important;
   padding:0 !important;
   border-color:transparent !important;
-  border-radius:8px !important;
+  border-radius:var(--talaan-control-radius) !important;
   background:transparent !important;
   color:inherit !important;
   box-shadow:none !important;
@@ -367,7 +367,7 @@ html[data-theme-preference="dark"] body #themeToggleText::after {
     max-width:38px !important;
     padding:0 !important;
     border-inline-end:0 !important;
-    border-radius:8px 0 0 8px !important;
+    border-radius:var(--talaan-control-radius) 0 0 var(--talaan-control-radius) !important;
   }
 
   html body .topbar-actions .month-navigator > .month-control {
@@ -411,7 +411,7 @@ html[data-theme-preference="dark"] body #themeToggleText::after {
     margin-inline-start:8px !important;
     padding-inline:10px !important;
     border:1px solid var(--line) !important;
-    border-radius:8px !important;
+    border-radius:var(--talaan-control-radius) !important;
     background:var(--surface) !important;
     background-image:none !important;
     box-shadow:none !important;
@@ -425,7 +425,7 @@ html[data-theme-preference="dark"] body #themeToggleText::after {
     min-height:38px !important;
     max-height:38px !important;
     margin-inline-start:8px !important;
-    border-radius:8px !important;
+    border-radius:var(--talaan-control-radius) !important;
   }
 
   html body .topbar-actions .month-display-label {
@@ -667,7 +667,7 @@ html body #topbarToolsPanel #productivityCenterButton .toolbar-icon > svg {
     gap:7px !important;
     padding:4px 10px !important;
     border:0 !important;
-    border-radius:8px !important;
+    border-radius:var(--talaan-control-radius) !important;
     background:transparent !important;
     color:var(--text) !important;
     box-shadow:none !important;
@@ -761,7 +761,7 @@ html body #topbarToolsPanel #productivityCenterButton .toolbar-icon > svg {
     height:32px !important;
     padding:0 !important;
     border:1px solid var(--line) !important;
-    border-radius:8px !important;
+    border-radius:var(--talaan-control-radius) !important;
     background:var(--surface) !important;
     color:var(--text) !important;
     box-shadow:0 1px 4px color-mix(in srgb,#0f172a 8%,transparent) !important;
@@ -776,7 +776,7 @@ html body #topbarToolsPanel #productivityCenterButton .toolbar-icon > svg {
     min-height:36px !important;
     padding:5px 4px !important;
     border:1px solid var(--line) !important;
-    border-radius:8px !important;
+    border-radius:var(--talaan-control-radius) !important;
     background:var(--surface) !important;
     color:var(--text) !important;
     font-size:.65rem !important;

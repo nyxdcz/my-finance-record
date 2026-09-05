@@ -44,7 +44,7 @@
   #settings .cloud-device-table td, #settings #knownDevicesBody, #settings #knownDevicesBody tr,
   #settings #knownDevicesBody td { display: block; width: 100%; min-width: 0; }
   #settings .cloud-device-table thead { display: none; }
-  #settings .cloud-device-table tr, #settings #knownDevicesBody tr { margin: 0 0 8px; padding: 9px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface-soft); }
+  #settings .cloud-device-table tr, #settings #knownDevicesBody tr { margin: 0 0 8px; padding: 9px; border: 1px solid var(--line); border-radius: var(--talaan-card-radius); background: var(--surface-soft); }
   #settings .cloud-device-table td, #settings #knownDevicesBody td { display: grid !important; grid-template-columns: minmax(86px, .38fr) minmax(0, .62fr); gap: 8px; align-items: start; padding: 5px 0; border: 0; overflow-wrap: anywhere; }
   #settings .cloud-device-table td::before, #settings #knownDevicesBody td::before { content: attr(data-label); color: var(--muted); font-size: .62rem; font-weight: 750; }
   #settings .cloud-device-table td > *, #settings #knownDevicesBody td > * { min-width: 0; max-width: 100%; }

@@ -42,6 +42,7 @@ html body :where(
   .budget-preview,
   .account-setting-row,
   .cloud-pending-item,
+  .cloud-v3-health-grid > div,
   .cloud-conflict-item,
   .productivity-search-result,
   .settings-disclosure,
