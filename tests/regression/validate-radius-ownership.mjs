@@ -17,6 +17,7 @@ const payees = read("assets/css/payees-rules.css");
 const reminders = read("assets/css/reminders-alerts.css");
 const security = read("assets/css/security-profiles.css");
 const projects = read("assets/css/projects-calendar.css");
+const cloudSync = read("assets/js/cloud-sync.js");
 
 for (const token of [
   "--talaan-control-radius: 8px",
@@ -48,5 +49,10 @@ assert.match(payees, /\.finance-tool-row,.finance-preview-item\{border-radius:va
 assert.match(reminders, /\.finance-alert-row\{border-radius:var\(--talaan-card-radius\)\}/);
 assert.match(security, /\.finance-device-lock-card\{border-radius:var\(--talaan-dialog-radius\)\}/);
 assert.match(projects, /\.finance-kanban-empty[^}]*border-radius:var\(--talaan-control-radius\)/);
+assert.match(app, /\.button \{[^}]*border-radius: var\(--talaan-control-radius\)/s);
+assert.match(app, /\.account-card \{[^}]*border-radius: var\(--talaan-card-radius\)/s);
+assert.match(app, /dialog \{[^}]*border-radius: var\(--talaan-dialog-radius\)/s);
+assert.match(cloudSync, /cloud-v3-health-grid>div\{[^}]*border-radius:var\(--talaan-card-radius\)/);
+assert.match(cloudSync, /cloud-pending-item\{[^}]*border-radius:var\(--talaan-card-radius\)/);
 
 console.log("Radius tokens are canonical and Finance geometry is owned without clipping overlays.");
