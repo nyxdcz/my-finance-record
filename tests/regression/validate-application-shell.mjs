@@ -52,7 +52,7 @@ for (const sidebarContract of [
 ]) {
   assert.ok(sidebar.includes(sidebarContract), `sidebar stylesheet must retain ${sidebarContract}`);
 }
-assert.match(sidebar, /html\[data-theme="light"\] body #sidebar\.sidebar \.nav-button\.active \{[\s\S]*background:rgba\(53,111,209,\.12\) !important/);
-assert.match(sidebar, /html\[data-theme="dark"\] body #sidebar\.sidebar \.nav-button\.active \{[\s\S]*background:rgba\(53,111,209,\.22\) !important/);
+assert.match(sidebar, /html\[data-theme="light"\] body #sidebar\.sidebar \.nav-button\.active \{[\s\S]*background:color-mix\(in srgb,var\(--primary\) 12%,transparent\) !important/);
+assert.match(sidebar, /html\[data-theme="dark"\] body #sidebar\.sidebar \.nav-button\.active \{[\s\S]*background:color-mix\(in srgb,var\(--primary\) 22%,transparent\) !important/);
 
 console.log("Application shell, Help boundaries, header tools, CSS ownership, and sidebar navigation validated.");
