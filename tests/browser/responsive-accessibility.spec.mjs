@@ -84,20 +84,27 @@ test("phone controls use the approved 35px compact rhythm", async ({ page }) => 
         .filter(visible)
         .map(element => {
           const box = element.getBoundingClientRect();
-          return { width:box.width, height:box.height };
+          return {
+            id:element.id || "",
+            className:String(element.className || ""),
+            text:(element.textContent || "").trim().replace(/\s+/g, " ").slice(0, 60),
+            width:box.width,
+            height:box.height
+          };
         });
       const controls = sizes('button, input[type="button"], input[type="submit"], input[type="reset"], summary, [role="button"]');
       const collapse = sizes('#money .collapse-toggle, #availableMoneySection [data-collapse-toggle], .budget-planner-toggle, .budget-panel-collapse');
       const headers = sizes('#money .period-header, #availableMoneySection .card-header, #money .legend-item, #money .summary-item');
       return {
         controls,
+        oversized:controls.filter(size => size.height < 34.5 || size.height > 35.5),
         collapse,
         headers,
         overflow:Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) > innerWidth + 1
       };
     });
     expect(metrics.controls.length).toBeGreaterThan(0);
-    expect(metrics.controls.every(size => size.height <= 35.5)).toBe(true);
+    expect(metrics.oversized, JSON.stringify(metrics.oversized, null, 2)).toEqual([]);
     expect(metrics.collapse.length).toBeGreaterThan(0);
     metrics.collapse.forEach(size => {
       expect(size.width).toBeGreaterThanOrEqual(34.5);
