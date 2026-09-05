@@ -19,7 +19,10 @@ test("UI surfaces use the platform-aligned radius hierarchy while structural and
       <select id="select"><option>One</option></select>
       <textarea id="textarea">Text</textarea>
       <div class="context-menu" id="contextMenu">Menu</div>
-      <div class="topbar-tools-panel" id="panel">Panel</div>
+      <div class="panel" id="panel">Panel</div>
+      <div class="topbar-tools-panel" id="popover">Popover</div>
+      <div class="month-picker-popover" id="semanticPopover" role="dialog">Semantic popover</div>
+      <div class="finance-privacy-lock-card" id="privacyLock">Privacy lock</div>
       <dialog id="dialog" open>Dialog</dialog>
       <div class="legend-item" id="legendItem">Legend</div>
       <div class="month-comparison-item" id="comparisonItem">Comparison</div>
@@ -44,6 +47,9 @@ test("UI surfaces use the platform-aligned radius hierarchy while structural and
   }
   await expect(page.locator("#contextMenu")).toHaveCSS("border-radius", "12px");
   await expect(page.locator("#panel")).toHaveCSS("border-radius", "16px");
+  await expect(page.locator("#popover")).toHaveCSS("border-radius", "12px");
+  await expect(page.locator("#semanticPopover")).toHaveCSS("border-radius", "12px");
+  await expect(page.locator("#privacyLock")).toHaveCSS("border-radius", "20px");
   await expect(page.locator("#dialog")).toHaveCSS("border-radius", "20px");
 
   await expect(page.locator("#pill")).toHaveCSS("border-radius", "999px");

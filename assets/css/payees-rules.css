@@ -3,3 +3,7 @@
 @media(max-width:620px){.finance-tool-form-grid,.finance-rule-condition,.finance-preview-controls{grid-template-columns:1fr}.finance-tool-wide,.finance-condition-value,.finance-preview-controls>.button{grid-column:auto}.finance-tool-row{display:grid}.finance-tool-row-actions{max-width:none;justify-content:flex-start}.finance-tool-header-actions{display:grid;grid-template-columns:1fr 1fr;width:100%}.finance-tool-header-actions .button,.finance-tool-header-actions .finance-rule-import{display:flex;min-height:44px;align-items:center;justify-content:center}.finance-tool-header-actions [data-add-rule]{grid-column:1/-1}.finance-preview-footer{position:sticky;bottom:72px;z-index:4;padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--surface,#fff)}}
 @media(prefers-reduced-motion:reduce){.finance-tools-panel *{scroll-behavior:auto!important;transition:none!important}}
 @media(forced-colors:active){.finance-tool-row,.finance-rule-condition,.finance-preview-item,.finance-preview-footer{border:1px solid CanvasText}}
+
+/* Radius ownership: rule records and previews are cards; editor rows are controls. */
+.finance-tool-row,.finance-preview-item{border-radius:var(--talaan-card-radius)}
+.finance-rule-condition,.finance-preview-footer{border-radius:var(--talaan-control-radius)}

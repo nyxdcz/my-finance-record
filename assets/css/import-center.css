@@ -3,3 +3,11 @@
 @media(max-width:620px){.import-center-dialog{width:calc(100vw - 12px);max-height:calc(100dvh - 12px)}.import-center-dialog .modal-header{align-items:flex-start}.import-mapping-grid,.import-settings-grid,.import-profile-row{grid-template-columns:1fr}.import-profile-row .button{width:100%;min-height:44px}.import-summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.import-preview-row{grid-template-columns:1fr}.import-preview-row>.status-chip{justify-self:start}.import-batch-row{display:grid}.import-batch-row .button{justify-self:start}.import-center-dialog .modal-footer{position:sticky;bottom:0;z-index:4;background:var(--surface,#fff)}.import-center-dialog .modal-footer .button{min-height:44px}}
 @media(prefers-reduced-motion:reduce){.import-center-dialog *,.import-center-card *{scroll-behavior:auto!important;transition:none!important}}
 @media(forced-colors:active){.import-batch-row,.import-source-notes,.import-currency-confirmation,.import-summary-grid>div,.import-preview-row{border:1px solid CanvasText}}
+
+/* Radius ownership: import records are cards; mapping notes and summary cells are controls. */
+.import-batch-row,.import-preview-row{border-radius:var(--talaan-card-radius)}
+.import-source-notes,.import-currency-confirmation,.import-summary-grid>div,.import-rule-suggestions{border-radius:var(--talaan-control-radius)}
+
+/* Keep the review footer in the dialog viewport while the preview body scrolls. */
+.import-center-dialog[open] { display:flex; flex-direction:column; }
+.import-center-dialog[open] > .modal-body { flex:1 1 auto; min-height:0; overflow:auto; }

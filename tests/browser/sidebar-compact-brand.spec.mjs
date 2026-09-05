@@ -93,7 +93,7 @@ test("desktop sidebar collapses to 60px and expands to 185px with the approved T
     color:"rgb(24, 34, 48)",
     paddingTop:"7px",
     paddingRight:"10px",
-    borderRadius:"7px"
+    borderRadius:"8px"
   });
 
   await active.hover();

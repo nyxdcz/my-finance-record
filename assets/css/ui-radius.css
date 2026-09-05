@@ -42,6 +42,7 @@ html body :where(
   .budget-preview,
   .account-setting-row,
   .cloud-pending-item,
+  .cloud-v3-health-grid > div,
   .cloud-conflict-item,
   .productivity-search-result,
   .settings-disclosure,
@@ -49,25 +50,31 @@ html body :where(
   .toast,
   .snackbar,
   .toast-message
-):not([class*="status-chip"]):not([class*="badge"]):not([class*="pill"]):not([class*="avatar"]):not([class*="dot"]):not([class*="swatch"]):not([class*="mascot"]) {
+):not([class*="status-chip"]):not([class*="badge"]):not([class*="pill"]):not([class*="avatar"]):not([class*="dot"]):not([class*="swatch"]):not([class*="mascot"]):not(.finance-privacy-lock-card):not(.finance-device-lock-card) {
   border-radius: var(--talaan-ui-radius) !important;
 }
 
 /* Structural surfaces use the card tier, while larger workflow containers use the
-   section tier. These selectors outrank older feature-specific radius rules. */
-html body #money .period-card,
-html body #money .period-card > .period-header,
-html body #money .period-card .record-row,
-html body #money .period-card .record-row {
-  border-radius: var(--talaan-ui-radius) !important;
+   section tier. Component owners below retain control of attached joins. */
+html body #money .period-card {
+  border-radius: var(--talaan-card-radius) !important;
+}
+
+html body #money .period-card > .period-header {
+  border-start-start-radius: var(--talaan-card-radius) !important;
+  border-start-end-radius: var(--talaan-card-radius) !important;
+  border-end-start-radius: 0 !important;
+  border-end-end-radius: 0 !important;
 }
 
 html body #projects .finance-kanban-column,
 html body #reports .report-section-nav,
-html body .panel,
-html body [class$="-panel"],
-html body [class*="-panel "] {
+html body .panel {
   border-radius: var(--talaan-section-radius) !important;
+}
+
+html body :is(.topbar-tools-panel,.record-more-panel,.project-dialog-more-panel,.report-export-menu-panel,.menu-popover,.context-menu,.popover) {
+  border-radius: var(--talaan-popover-radius) !important;
 }
 
 /* Compact controls remain easy to scan and fit dense finance rows. */
@@ -91,6 +98,27 @@ html body :where(
 }
 
 html body :where(dialog,[role="dialog"],.modal,[class$="-dialog"],[class*="-dialog "]) {
+  border-radius: var(--talaan-dialog-radius) !important;
+}
+
+/* Some floating controls expose dialog semantics for assistive technology but
+   remain popovers visually; keep their compact surface tier. Lock cards are
+   blocking dialog surfaces even though their class names end in `-card`. */
+html body :is(
+  .cloud-sync-toolbar-popover,
+  .month-picker-popover,
+  .topbar-tools-panel,
+  .record-more-panel,
+  .project-dialog-more-panel,
+  .report-export-menu-panel,
+  .menu-popover,
+  .context-menu,
+  .popover
+) {
+  border-radius: var(--talaan-popover-radius) !important;
+}
+
+html body :is(.finance-privacy-lock-card,.finance-device-lock-card) {
   border-radius: var(--talaan-dialog-radius) !important;
 }
 
@@ -388,7 +416,6 @@ html body #monthlyBudgetPlannerCard .savings-check-row input {
   border-radius: var(--talaan-control-radius) !important;
 }
 
-html body #monthlyBudgetPlannerCard .cash-forecast-panel,
 html body #monthlyBudgetPlannerCard .savings-confirmation,
 html body #monthlyBudgetPlannerCard .savings-projection-row,
 html body #monthlyBudgetPlannerCard .savings-outlook-stat {

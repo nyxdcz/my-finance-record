@@ -45,7 +45,7 @@ html body #sidebar.sidebar .sidebar-close-button {
 html body #sidebar.sidebar .nav-button {
   background:transparent !important;
   border-color:transparent !important;
-  border-radius:7px !important;
+  border-radius:var(--talaan-control-radius) !important;
   box-shadow:none !important;
   color:var(--muted) !important;
 }
@@ -88,7 +88,7 @@ html body #sidebar.sidebar .nav-button.active .nav-label {
 html body #sidebar.sidebar .nav-button.active .nav-icon {
   background:var(--primary) !important;
   color:var(--primary-contrast) !important;
-  border-radius:7px !important;
+  border-radius:var(--talaan-control-radius) !important;
 }
 
 html body #sidebar.sidebar .nav-button.active .nav-icon-image {
@@ -354,7 +354,7 @@ html body #sidebar.sidebar .sidebar-settings-bottom {
     place-items:center !important;
     background:var(--primary) !important;
     color:var(--primary-contrast) !important;
-    border-radius:7px !important;
+    border-radius:var(--talaan-control-radius) !important;
   }
 
   html body .sidebar .nav-button.active .nav-icon-image,
@@ -375,7 +375,7 @@ html body #sidebar.sidebar .sidebar-settings-bottom {
     transform:translate(5px,-50%) !important;
     padding:7px 10px !important;
     border:1px solid rgba(255,255,255,.18) !important;
-    border-radius:7px !important;
+    border-radius:var(--talaan-control-radius) !important;
     background:#1F2937 !important;
     color:var(--text) !important;
     box-shadow:0 8px 22px rgba(15,23,42,.28) !important;
@@ -434,7 +434,7 @@ html body #sidebar.sidebar .sidebar-settings-bottom {
     min-height:48px !important;
     padding:10px !important;
     gap:10px !important;
-    border-radius:7px !important;
+    border-radius:var(--talaan-control-radius) !important;
   }
 
   html body #sidebar.sidebar .nav-icon {
@@ -578,7 +578,7 @@ html[data-theme="dark"] body #sidebar.sidebar .nav-button.active .nav-icon {
   place-items:center !important;
   background:var(--primary) !important;
   color:var(--primary-contrast) !important;
-  border-radius:7px !important;
+  border-radius:var(--talaan-control-radius) !important;
 }
 
 html[data-theme="light"] body #sidebar.sidebar .nav-button.active .nav-icon-image,

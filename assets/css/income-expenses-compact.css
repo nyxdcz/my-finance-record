@@ -222,14 +222,18 @@
   }
 }
 
-/* Keep the analytics cards on the same 7px/12px Dashboard system. */
+/* Keep analytics surfaces on the shared card tier; the range switcher remains a
+   compact control because its shortest dimension is the control height. */
 #dashboard :is(
   .income-expenses-summary,
   .income-expenses-chart-card,
-  .income-expenses-lower-card,
-  .income-expenses-range
+  .income-expenses-lower-card
 ) {
-  border-radius: 7px !important;
+  border-radius: var(--talaan-card-radius) !important;
+}
+
+#dashboard .income-expenses-range {
+  border-radius: var(--talaan-control-radius) !important;
 }
 
 /* Bound the over-time chart so wide desktops do not turn its SVG aspect ratio

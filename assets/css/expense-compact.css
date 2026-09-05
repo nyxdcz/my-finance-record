@@ -80,7 +80,7 @@
     margin: 0 !important;
     padding: 0 !important;
     border: 1px solid #D5DCE5 !important;
-    border-radius: 7px !important;
+    border-radius: var(--talaan-control-radius) !important;
     background: color-mix(in srgb, #F8FAFC 94%, transparent) !important;
     color: #64748B !important;
     display: inline-grid !important;
@@ -313,7 +313,7 @@
     max-height: 30px !important;
     padding: 0 10px !important;
     border: 1px solid #356FD1 !important;
-    border-radius: 7px !important;
+    border-radius: var(--talaan-control-radius) !important;
     background: #356FD1 !important;
     color: #FFFFFF !important;
     font-size: 11px !important;
@@ -333,7 +333,7 @@
     max-height: 30px !important;
     padding: 0 10px !important;
     border: 1px solid #D5DCE5 !important;
-    border-radius: 7px !important;
+    border-radius: var(--talaan-control-radius) !important;
     background: #FFFFFF !important;
     color: #1F2937 !important;
     font-size: 11px !important;

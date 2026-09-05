@@ -3,7 +3,7 @@
   #paid-expenses .card { min-width: 0; }
   #paid-expenses [data-paid-expense-row] { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 7px !important; padding: 10px !important; overflow: visible; }
   #paid-expenses [data-paid-expense-row] > .record-title { grid-column: 1 / -1 !important; padding-bottom: 7px; border-bottom: 1px solid var(--line); }
-  #paid-expenses [data-paid-expense-row] > [data-label] { grid-column: auto !important; min-width: 0; padding: 7px 8px; border: 1px solid var(--line); border-radius: 7px; background: var(--surface-soft); text-align: left !important; overflow-wrap: anywhere; }
+  #paid-expenses [data-paid-expense-row] > [data-label] { grid-column: auto !important; min-width: 0; padding: 7px 8px; border: 1px solid var(--line); border-radius: var(--talaan-control-radius); background: var(--surface-soft); text-align: left !important; overflow-wrap: anywhere; }
   #paid-expenses [data-paid-expense-row] > [data-label]::before { content: attr(data-label) !important; display: block; margin: 0 0 3px; color: var(--muted); font-size: .62rem; font-weight: 750; line-height: 1.15; }
   #paid-expenses [data-paid-expense-row] > .amount[data-label] { grid-column: 1 / -1 !important; color: var(--green); font-size: .9rem; }
   #paid-expenses [data-paid-expense-row] > .mobile-record-actions { grid-column: 1 / -1 !important; grid-template-columns: minmax(0, 1fr) 44px !important; gap: 7px !important; align-items: stretch; }
@@ -44,13 +44,13 @@
   #settings .cloud-device-table td, #settings #knownDevicesBody, #settings #knownDevicesBody tr,
   #settings #knownDevicesBody td { display: block; width: 100%; min-width: 0; }
   #settings .cloud-device-table thead { display: none; }
-  #settings .cloud-device-table tr, #settings #knownDevicesBody tr { margin: 0 0 8px; padding: 9px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface-soft); }
+  #settings .cloud-device-table tr, #settings #knownDevicesBody tr { margin: 0 0 8px; padding: 9px; border: 1px solid var(--line); border-radius: var(--talaan-card-radius); background: var(--surface-soft); }
   #settings .cloud-device-table td, #settings #knownDevicesBody td { display: grid !important; grid-template-columns: minmax(86px, .38fr) minmax(0, .62fr); gap: 8px; align-items: start; padding: 5px 0; border: 0; overflow-wrap: anywhere; }
   #settings .cloud-device-table td::before, #settings #knownDevicesBody td::before { content: attr(data-label); color: var(--muted); font-size: .62rem; font-weight: 750; }
   #settings .cloud-device-table td > *, #settings #knownDevicesBody td > * { min-width: 0; max-width: 100%; }
   #settings .device-platform-details { grid-column: 1 / -1; min-width: 0; margin-top: 4px; }
   #settings .device-platform-details summary { min-height: 36px; display: flex; align-items: center; color: var(--muted); font-size: .66rem; font-weight: 750; cursor: pointer; }
-  #settings .device-platform-details small { display: block; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; overflow-wrap: anywhere; }
+  #settings .device-platform-details small { display: block; padding: 6px 8px; border: 1px solid var(--line); border-radius: var(--talaan-control-radius); overflow-wrap: anywhere; }
   #settings .cloud-device-table .button { width: 100%; min-height: 44px; white-space: normal; }
   #settings .system-table-wrap { max-height: none; overflow: visible; border: 0; }
   #settings .system-table-wrap .system-table { display: block; width: 100%; }
