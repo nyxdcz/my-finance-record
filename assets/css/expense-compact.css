@@ -881,3 +881,23 @@
     padding: 0 !important;
   }
 }
+
+
+/* V15.2.25 · Phone picker and summary height specificity repair. */
+@media (max-width: 700px) {
+  html body .month-picker-grid .month-picker-option,
+  html body .month-picker-option {
+    box-sizing: border-box !important;
+    height: 35px !important;
+    min-height: 35px !important;
+    max-height: 35px !important;
+  }
+
+  html body #money :is(.legend-item, .summary-item),
+  html body #availableMoneySection .card-header {
+    box-sizing: border-box !important;
+    height: 35px !important;
+    min-height: 35px !important;
+    max-height: 35px !important;
+  }
+}
