@@ -49,9 +49,9 @@ assert.match(budget, /savingsProgress:normalizeSavingsProgress\(value\?\.savings
 assert.match(budget, /Tracking only:<\/strong> confirming savings does not change any account balance/, "Savings confirmation must not imply a balance transfer");
 assert.match(budget, /function savingsProjection\(startMonth, previewTarget = null\)/, "Savings outlook must calculate a four-month projection");
 assert.match(budget, /plan\.savingsProgress = \{confirmed,actualAmount/, "Savings confirmation must preserve the actual amount");
-assert.match(budgetCss, /\.cash-forecast-panel \{ border-radius:7px; \}/, "The integrated savings panel must use the approved 7px radius");
-assert.match(budgetCss, /\.savings-money-input \.input,\.savings-target-controls \.button \{ border-radius:7px !important; \}/, "Savings controls must use the approved 7px radius");
-assert.match(budgetCss, /\.savings-check-row input \{[^}]*border-radius:7px;/, "Savings confirmation must use the approved 7px radius");
+assert.match(budgetCss, /\.budget-category-panel,\.cash-forecast-panel \{ border-radius:var\(--talaan-card-radius\); \}/, "The integrated savings panel must use the card radius");
+assert.match(budgetCss, /\.savings-money-input \.input,\.savings-target-controls \.button \{ border-radius:var\(--talaan-control-radius\) !important; \}/, "Savings controls must use the control radius");
+assert.match(budgetCss, /\.savings-check-row input \{[^}]*border-radius:var\(--talaan-control-radius\);/, "Savings confirmation must use the control radius");
 const legacyAccountHandler = index.match(/document\.getElementById\("accountForm"\)\.addEventListener\("submit"[\s\S]*?document\.getElementById\("expenseForm"\)/)?.[0] || "";
 const legacyAccountsHandler = index.match(/document\.getElementById\("accountsForm"\)\.addEventListener\("submit"[\s\S]*?document\.getElementById\("exportBackup"\)/)?.[0] || "";
 assert.match(legacyAccountHandler, /FinanceAccountMutations/, "Edit/Add account fallback must delegate to the single mutation owner");

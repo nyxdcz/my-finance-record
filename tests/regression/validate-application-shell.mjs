@@ -45,7 +45,7 @@ for (const sidebarContract of [
   "min-height:48px !important",
   "font-size:12px !important",
   "font-weight:700 !important",
-  "border-radius:7px !important",
+  "border-radius:var(--talaan-control-radius) !important",
   "left:18px !important",
   "right:44px !important",
   "right:8px !important"

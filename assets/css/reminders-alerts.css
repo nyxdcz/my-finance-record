@@ -41,3 +41,7 @@
   .finance-alert-card{padding-bottom:calc(12px + env(safe-area-inset-bottom))}
 }
 @media (max-width: 430px){.finance-alert-actions{grid-template-columns:1fr}}
+
+/* Radius ownership: alerts are cards; status and rule rows remain compact controls. */
+.finance-alert-row{border-radius:var(--talaan-card-radius)}
+.finance-alert-status-grid>div,.finance-alert-toggle,.finance-alert-rule-grid label,.finance-alert-history-row{border-radius:var(--talaan-control-radius)}

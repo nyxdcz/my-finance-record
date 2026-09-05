@@ -912,7 +912,7 @@
 
         <article class="card profile-encryption-card">
           <div class="card-header"><div><h3>Profile encryption</h3><p>AES-256-GCM cloud records with a passphrase-derived key</p></div><span class="v13-chip ${unlocked ? "success" : "warning"}">${unlocked ? "Unlocked" : "Locked"}</span></div>
-          <div id="profileEncryptionStatusBanner" class="v13-encryption-status" style="background:${isSavedOnDevice ? 'rgba(16,185,129,0.15)' : isSavedInSession ? 'rgba(59,130,246,0.15)' : unlocked ? 'rgba(245,158,11,0.15)' : profile.encryption?.enabled ? 'rgba(239,68,68,0.15)' : 'rgba(100,116,139,0.15)'}; border:1px solid ${isSavedOnDevice ? 'rgba(16,185,129,0.4)' : isSavedInSession ? 'rgba(59,130,246,0.4)' : unlocked ? 'rgba(245,158,11,0.4)' : profile.encryption?.enabled ? 'rgba(239,68,68,0.4)' : 'rgba(100,116,139,0.4)'}; color:var(--text, inherit); font-size:0.88em; padding:10px 14px; border-radius:8px; margin-bottom:14px; display:flex; align-items:center; gap:8px;">
+          <div id="profileEncryptionStatusBanner" class="v13-encryption-status" style="background:${isSavedOnDevice ? 'rgba(16,185,129,0.15)' : isSavedInSession ? 'rgba(59,130,246,0.15)' : unlocked ? 'rgba(245,158,11,0.15)' : profile.encryption?.enabled ? 'rgba(239,68,68,0.15)' : 'rgba(100,116,139,0.15)'}; border:1px solid ${isSavedOnDevice ? 'rgba(16,185,129,0.4)' : isSavedInSession ? 'rgba(59,130,246,0.4)' : unlocked ? 'rgba(245,158,11,0.4)' : profile.encryption?.enabled ? 'rgba(239,68,68,0.4)' : 'rgba(100,116,139,0.4)'}; color:var(--text, inherit); font-size:0.88em; padding:10px 14px; border-radius:var(--talaan-control-radius); margin-bottom:14px; display:flex; align-items:center; gap:8px;">
             ${isSavedOnDevice
               ? `<strong>✓ Saved on device.</strong> Auto-unlocks without entering password on this device.`
               : isSavedInSession
@@ -927,15 +927,15 @@
           <div class="field" style="margin-top:12px;">
             <label>Passphrase memory</label>
             <div class="remember-mode-buttons" id="rememberModeButtonGroup" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:6px;">
-              <button type="button" class="remember-option-btn ${defaultMode === 'device' ? 'active' : ''}" data-mode="device" style="padding:8px 10px; border-radius:6px; border:1px solid ${defaultMode === 'device' ? 'var(--primary)' : 'var(--line)'}; background:${defaultMode === 'device' ? 'var(--primary)' : 'var(--surface-soft)'}; color:${defaultMode === 'device' ? '#fff' : 'var(--text)'}; font-size:.75rem; text-align:left; cursor:pointer; display:flex; flex-direction:column; gap:2px; transition:all 0.15s ease;">
+              <button type="button" class="remember-option-btn ${defaultMode === 'device' ? 'active' : ''}" data-mode="device" style="padding:8px 10px; border-radius:var(--talaan-control-radius); border:1px solid ${defaultMode === 'device' ? 'var(--primary)' : 'var(--line)'}; background:${defaultMode === 'device' ? 'var(--primary)' : 'var(--surface-soft)'}; color:${defaultMode === 'device' ? '#fff' : 'var(--text)'}; font-size:.75rem; text-align:left; cursor:pointer; display:flex; flex-direction:column; gap:2px; transition:all 0.15s ease;">
                 <strong style="font-weight:700;">Permanent device</strong>
                 <span style="font-size:.65rem; opacity:0.8;">Auto-unlocks on this device</span>
               </button>
-              <button type="button" class="remember-option-btn ${defaultMode === 'session' ? 'active' : ''}" data-mode="session" style="padding:8px 10px; border-radius:6px; border:1px solid ${defaultMode === 'session' ? 'var(--primary)' : 'var(--line)'}; background:${defaultMode === 'session' ? 'var(--primary)' : 'var(--surface-soft)'}; color:${defaultMode === 'session' ? '#fff' : 'var(--text)'}; font-size:.75rem; text-align:left; cursor:pointer; display:flex; flex-direction:column; gap:2px; transition:all 0.15s ease;">
+              <button type="button" class="remember-option-btn ${defaultMode === 'session' ? 'active' : ''}" data-mode="session" style="padding:8px 10px; border-radius:var(--talaan-control-radius); border:1px solid ${defaultMode === 'session' ? 'var(--primary)' : 'var(--line)'}; background:${defaultMode === 'session' ? 'var(--primary)' : 'var(--surface-soft)'}; color:${defaultMode === 'session' ? '#fff' : 'var(--text)'}; font-size:.75rem; text-align:left; cursor:pointer; display:flex; flex-direction:column; gap:2px; transition:all 0.15s ease;">
                 <strong style="font-weight:700;">Tab session</strong>
                 <span style="font-size:.65rem; opacity:0.8;">Until browser tab closes</span>
               </button>
-              <button type="button" class="remember-option-btn ${defaultMode === 'none' ? 'active' : ''}" data-mode="none" style="padding:8px 10px; border-radius:6px; border:1px solid ${defaultMode === 'none' ? 'var(--primary)' : 'var(--line)'}; background:${defaultMode === 'none' ? 'var(--primary)' : 'var(--surface-soft)'}; color:${defaultMode === 'none' ? '#fff' : 'var(--text)'}; font-size:.75rem; text-align:left; cursor:pointer; display:flex; flex-direction:column; gap:2px; transition:all 0.15s ease;">
+              <button type="button" class="remember-option-btn ${defaultMode === 'none' ? 'active' : ''}" data-mode="none" style="padding:8px 10px; border-radius:var(--talaan-control-radius); border:1px solid ${defaultMode === 'none' ? 'var(--primary)' : 'var(--line)'}; background:${defaultMode === 'none' ? 'var(--primary)' : 'var(--surface-soft)'}; color:${defaultMode === 'none' ? '#fff' : 'var(--text)'}; font-size:.75rem; text-align:left; cursor:pointer; display:flex; flex-direction:column; gap:2px; transition:all 0.15s ease;">
                 <strong style="font-weight:700;">One-time password</strong>
                 <span style="font-size:.65rem; opacity:0.8;">Ask for password every time</span>
               </button>
@@ -1087,7 +1087,7 @@
     get("createProfileInviteButton")?.addEventListener("click", () => run(async () => {
       const result = await createInvite(get("profileInviteRole").value, get("profileInviteHours").value);
       get("profileInviteResult").innerHTML = `
-        <div style="padding:12px; background:var(--v12-surface-subtle, rgba(0,0,0,0.03)); border:1px solid var(--v12-border, rgba(0,0,0,0.1)); border-radius:8px; margin-top:8px;">
+        <div style="padding:12px; background:var(--v12-surface-subtle, rgba(0,0,0,0.03)); border:1px solid var(--v12-border, rgba(0,0,0,0.1)); border-radius:var(--talaan-card-radius); margin-top:8px;">
           <div style="font-weight:600; color:var(--text); margin-bottom:4px;">Invitation code generated (copied to clipboard)</div>
           <code style="display:inline-block; font-size:1.05em; padding:4px 8px; background:var(--v12-bg, #fff); border:1px dashed var(--v12-border); border-radius:4px; letter-spacing:0.5px; word-break:break-all;">${escape(result.code)}</code>
           <p style="margin:8px 0 0 0; font-size:0.85em; opacity:0.9; line-height:1.4;">

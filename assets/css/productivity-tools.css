@@ -7,7 +7,7 @@
   align-items: center;
   justify-content: center;
   border: 1px solid var(--line);
-  border-radius: 7px;
+  border-radius: var(--talaan-control-radius);
   background: var(--surface);
   color: var(--text);
   font: inherit;
@@ -29,7 +29,7 @@
   gap: 4px;
   padding: 12px;
   border: 1px solid var(--line);
-  border-radius: 9px;
+  border-radius: var(--talaan-card-radius);
   background: var(--surface-soft);
   color: var(--text);
   text-align: left;
@@ -74,7 +74,7 @@
   gap: 12px;
   padding: 9px 10px;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: var(--talaan-card-radius);
   background: var(--surface-soft);
   color: var(--text);
   text-align: left;
@@ -91,13 +91,13 @@
 .productivity-search-copy small { margin-top: 2px; color: var(--muted); font-size: .62rem; }
 .productivity-search-value { font-size: .72rem; font-weight: 850; white-space: nowrap; }
 .productivity-type-badge { display: inline-flex; align-items: center; min-height: 22px; margin-right: 6px; padding: 2px 6px; border-radius: 999px; background: var(--surface); color: var(--muted); font-size: .57rem; font-weight: 850; text-transform: uppercase; letter-spacing: .04em; }
-.productivity-empty { padding: 18px; border: 1px dashed var(--line); border-radius: 8px; color: var(--muted); text-align: center; font-size: .7rem; }
+.productivity-empty { padding: 18px; border: 1px dashed var(--line); border-radius: var(--talaan-card-radius); color: var(--muted); text-align: center; font-size: .7rem; }
 .productivity-tabs { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; }
-.productivity-tab { flex: 0 0 auto; min-height: 38px; padding: 7px 10px; border: 1px solid var(--line); border-radius: 7px; background: var(--surface); color: var(--muted); font: inherit; font-size: .68rem; font-weight: 800; cursor: pointer; }
+.productivity-tab { flex: 0 0 auto; min-height: 38px; padding: 7px 10px; border: 1px solid var(--line); border-radius: var(--talaan-control-radius); background: var(--surface); color: var(--muted); font: inherit; font-size: .68rem; font-weight: 800; cursor: pointer; }
 .productivity-tab[aria-selected="true"] { border-color: var(--primary); background: color-mix(in srgb, var(--surface) 85%, var(--primary) 8%); color: var(--primary); }
 .productivity-panel[hidden] { display: none !important; }
 .productivity-list { display: grid; gap: 7px; }
-.productivity-list-item { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 9px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface-soft); }
+.productivity-list-item { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 9px 10px; border: 1px solid var(--line); border-radius: var(--talaan-card-radius); background: var(--surface-soft); }
 .productivity-list-item > div:first-child { min-width: 0; }
 .productivity-list-item strong,
 .productivity-list-item small { display: block; overflow-wrap: anywhere; }
@@ -105,9 +105,9 @@
 .productivity-list-item small { margin-top: 2px; color: var(--muted); font-size: .6rem; line-height: 1.35; }
 .productivity-list-actions { flex: 0 0 auto; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; }
 .productivity-shortcuts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
-.productivity-shortcut { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 9px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface-soft); }
+.productivity-shortcut { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 9px 10px; border: 1px solid var(--line); border-radius: var(--talaan-card-radius); background: var(--surface-soft); }
 .productivity-shortcut span { font-size: .68rem; }
-.productivity-shortcut kbd { min-width: 76px; padding: 4px 7px; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 5px; background: var(--surface); color: var(--text); font: 700 .62rem/1.2 ui-monospace, SFMono-Regular, Menlo, monospace; text-align: center; white-space: nowrap; }
+.productivity-shortcut kbd { min-width: 76px; padding: 4px 7px; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: var(--talaan-control-radius); background: var(--surface); color: var(--text); font: 700 .62rem/1.2 ui-monospace, SFMono-Regular, Menlo, monospace; text-align: center; white-space: nowrap; }
 .productivity-template-form-grid,
 .productivity-filter-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
 .productivity-filter-grid .field-full,
@@ -123,7 +123,7 @@
   margin: 0 0 8px;
   padding: 7px;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: var(--talaan-card-radius);
   background: var(--surface-soft);
 }
 .productivity-paid-bulk[hidden] { display: none !important; }
@@ -136,7 +136,7 @@
 .productivity-record-filtered { display: none !important; }
 .productivity-filter-empty { margin: 8px 0; }
 .productivity-duplicate-list { display: grid; gap: 7px; max-height: 52vh; overflow: auto; }
-.productivity-duplicate-item { width: 100%; display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; gap: 10px; padding: 9px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface-soft); color: var(--text); text-align: left; font: inherit; cursor: pointer; }
+.productivity-duplicate-item { width: 100%; display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; gap: 10px; padding: 9px 10px; border: 1px solid var(--line); border-radius: var(--talaan-card-radius); background: var(--surface-soft); color: var(--text); text-align: left; font: inherit; cursor: pointer; }
 .productivity-duplicate-item:hover,
 .productivity-duplicate-item:focus-visible { border-color: var(--primary); }
 .productivity-duplicate-item strong,
@@ -168,7 +168,7 @@
     max-width: none;
     max-height: 92dvh;
     margin: 0;
-    border-radius: 16px 16px 0 0;
+    border-radius: var(--talaan-dialog-radius) var(--talaan-dialog-radius) 0 0;
     transform: none;
   }
   .productivity-dialog[open],

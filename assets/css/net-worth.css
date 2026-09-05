@@ -3,3 +3,7 @@
 @media(max-width:620px){.net-worth-heading,.net-worth-item-main,.net-worth-controls,.net-worth-list-heading{align-items:stretch;flex-direction:column}.net-worth-heading-actions{display:grid;grid-template-columns:1fr 1fr}.net-worth-heading-actions .button,.net-worth-item-actions .button{min-height:44px}.net-worth-kpis{grid-template-columns:1fr 1fr}.net-worth-item-value{text-align:left}.net-worth-item-actions{display:grid;grid-template-columns:1fr 1fr}.net-worth-evolution-row{grid-template-columns:86px minmax(70px,1fr);gap:8px}.net-worth-evolution-row strong{grid-column:1/-1;text-align:left}.net-worth-history li{grid-template-columns:1fr}.net-worth-history-actions{display:grid;grid-template-columns:1fr 1fr}.net-worth-form-grid{grid-template-columns:1fr}.net-worth-wide{grid-column:auto}.net-worth-dialog{width:calc(100vw - 12px);max-height:calc(100dvh - 12px)}.net-worth-initial{display:grid}}
 @media(prefers-reduced-motion:reduce){.net-worth-card *{scroll-behavior:auto!important;transition:none!important}}
 @media(forced-colors:active){.net-worth-kpis>div,.net-worth-controls,.net-worth-grid>section,.net-worth-item{border:1px solid CanvasText}}
+
+/* Radius ownership: valuation surfaces are cards; the control strip stays compact. */
+.net-worth-kpis>div,.net-worth-grid>section,.net-worth-item{border-radius:var(--talaan-card-radius)}
+.net-worth-controls{border-radius:var(--talaan-control-radius)}

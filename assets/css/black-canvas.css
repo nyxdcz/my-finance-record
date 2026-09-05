@@ -102,13 +102,5 @@ html[data-theme="light"] #availableMoneySection .account-card {
   border-color:var(--line) !important;
 }
 
-/* V15.1.0 Finance nested-panel corner-radius contract. */
-#money .period-card {
-  border-radius:9px !important;
-  overflow:hidden;
-}
-#money .period-card .period-header,
-#money .period-card .record-row {
-  border-radius:9px !important;
-  overflow:hidden;
-}
+/* Geometry is owned by the Finance component styles.  This palette layer must
+   not clip or reshape period cards and their internal rows. */

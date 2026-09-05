@@ -49,7 +49,7 @@ assert.match(index, /createCompactReportGroup\("report-exports"/);
 assert.match(index, /details\.dataset\.reportCollapseKey = key/);
 assert.match(index, /collapsedSections\[key\] = !details\.open;[\s\S]*persistCollapsedSections\(\)/);
 assert.match(index, /class="report-compact-chevron"[\s\S]*<svg viewBox="0 0 24 24"[\s\S]*<path d="m6 15 6-6 6 6"/);
-assert.match(appCss, /\.report-compact-chevron \{[\s\S]*width:30px;[\s\S]*height:30px;[\s\S]*border-radius:7px/);
+assert.match(appCss, /\.report-compact-chevron \{[\s\S]*width:30px;[\s\S]*height:30px;[\s\S]*border-radius:var\(--talaan-control-radius\)/);
 assert.match(appCss, /\.report-compact-chevron svg \{ width:20px; height:20px/);
 assert.match(appCss, /@media \(max-width:850px\), \(hover:none\) and \(pointer:coarse\)[\s\S]*\.report-compact-chevron \{[\s\S]*width:35px;[\s\S]*height:35px/);
 

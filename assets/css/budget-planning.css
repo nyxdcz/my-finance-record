@@ -3,7 +3,7 @@
 .budget-planner-header { align-items:flex-start; gap:12px; }
 .budget-planner-actions { display:flex; flex-wrap:wrap; gap:7px; justify-content:flex-end; }
 .budget-planner-summary { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:8px; margin:12px 0; }
-.budget-plan-kpi { min-width:0; padding:10px 11px; border:1px solid var(--line); border-radius:10px; background:var(--surface-soft); }
+.budget-plan-kpi { min-width:0; padding:10px 11px; border:1px solid var(--line); border-radius:var(--talaan-card-radius); background:var(--surface-soft); }
 .budget-plan-kpi span,.budget-plan-kpi strong,.budget-plan-kpi small { display:block; }
 .budget-plan-kpi span { color:var(--muted); font-size:.68rem; font-weight:700; letter-spacing:.01em; }
 .budget-plan-kpi strong { margin-top:3px; font-size:.98rem; line-height:1.2; }
@@ -13,7 +13,6 @@
 .budget-plan-kpi.is-success { background:var(--green-soft); border-color:rgba(47,143,70,.26); }
 .budget-planner-grid { display:grid; grid-template-columns:minmax(0,1.35fr) minmax(280px,.65fr); gap:12px; align-items:start; }
 .budget-category-panel,.cash-forecast-panel { min-width:0; border:1px solid var(--line); border-radius:12px; background:var(--surface); }
-.cash-forecast-panel { border-radius:7px; }
 .budget-panel-heading { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; padding:11px 12px; border-bottom:1px solid var(--line); }
 .budget-panel-heading h4 { margin:0; font-size:.84rem; }
 .budget-panel-heading p { margin:2px 0 0; color:var(--muted); font-size:.68rem; }
@@ -39,7 +38,7 @@
 .forecast-line strong { text-align:right; }
 .forecast-line.forecast-total { margin-top:4px; padding-top:10px; border-top:2px solid var(--line); border-bottom:0; font-size:.8rem; }
 .forecast-classification { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px; margin-top:10px; }
-.forecast-classification > div { padding:8px; border:1px solid var(--line); border-radius:8px; background:var(--surface-soft); }
+.forecast-classification > div { padding:8px; border:1px solid var(--line); border-radius:var(--talaan-card-radius); background:var(--surface-soft); }
 .forecast-classification span,.forecast-classification strong { display:block; }
 .forecast-classification span { color:var(--muted); font-size:.61rem; }
 .forecast-classification strong { margin-top:2px; font-size:.76rem; }
@@ -53,7 +52,7 @@
 .savings-outlook-heading h5 { margin:0; font-size:.8rem; }
 .savings-outlook-heading p { margin:2px 0 0; color:var(--muted); font-size:.64rem; line-height:1.35; }
 .savings-outlook-summary { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px; margin-top:10px; }
-.savings-outlook-stat { min-width:0; padding:8px; border:1px solid var(--line); border-radius:7px; background:var(--surface-soft); }
+.savings-outlook-stat { min-width:0; padding:8px; border:1px solid var(--line); border-radius:var(--talaan-card-radius); background:var(--surface-soft); }
 .savings-outlook-stat span,.savings-outlook-stat strong { display:block; }
 .savings-outlook-stat span { color:var(--muted); font-size:.61rem; }
 .savings-outlook-stat strong { margin-top:2px; font-size:.76rem; }
@@ -63,12 +62,12 @@
 .savings-target-field,.savings-actual-field { min-width:0; margin:0; }
 .savings-money-input { display:grid; grid-template-columns:auto minmax(0,1fr) auto; align-items:center; gap:6px; margin-top:4px; }
 .savings-money-input > span { color:var(--muted); font-size:.65rem; white-space:nowrap; }
-.savings-money-input .input,.savings-target-controls .button { border-radius:7px !important; }
+.savings-money-input .input,.savings-target-controls .button { border-radius:var(--talaan-control-radius) !important; }
 .savings-target-controls .button { min-height:35px; }
 .savings-suggestion { min-height:1.2em; margin:7px 0 0; color:var(--muted); font-size:.65rem; line-height:1.35; }
-.savings-confirmation { display:grid; gap:9px; margin-top:10px; padding:9px; border:1px solid var(--line); border-radius:7px; background:var(--surface-soft); }
+.savings-confirmation { display:grid; gap:9px; margin-top:10px; padding:9px; border:1px solid var(--line); border-radius:var(--talaan-card-radius); background:var(--surface-soft); }
 .savings-check-row { display:flex; align-items:flex-start; gap:8px; cursor:pointer; }
-.savings-check-row input { appearance:none !important; display:grid; place-items:center; flex:0 0 18px; width:18px; height:18px; margin-top:1px; border:1px solid var(--line); border-radius:7px; background:var(--surface); color:var(--primary-foreground); }
+.savings-check-row input { appearance:none !important; display:grid; place-items:center; flex:0 0 18px; width:18px; height:18px; margin-top:1px; border:1px solid var(--line); border-radius:var(--talaan-control-radius); background:var(--surface); color:var(--primary-foreground); }
 .savings-check-row input::after { content:"✓"; opacity:0; font-size:.68rem; font-weight:700; line-height:1; }
 .savings-check-row input:checked { border-color:var(--primary); background:var(--primary); }
 .savings-check-row input:checked::after { opacity:1; }
@@ -78,7 +77,7 @@
 .savings-check-row small { margin-top:2px; color:var(--muted); font-size:.61rem; line-height:1.35; }
 .savings-progress-copy { min-height:1.2em; color:var(--muted); font-size:.65rem; line-height:1.35; }
 .savings-projection-list { display:grid; gap:6px; margin-top:10px; }
-.savings-projection-row { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:8px 9px; border-radius:7px; background:var(--surface-soft); }
+.savings-projection-row { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:8px 9px; border-radius:var(--talaan-card-radius); background:var(--surface-soft); }
 .savings-projection-row > span,.savings-projection-row strong,.savings-projection-row small { display:block; }
 .savings-projection-row strong { font-size:.7rem; }
 .savings-projection-row small { margin-top:2px; color:var(--muted); font-size:.59rem; }
@@ -89,13 +88,13 @@
 .budget-empty { padding:24px 14px; text-align:center; color:var(--muted); }
 .budget-empty strong { display:block; color:var(--text); margin-bottom:4px; }
 .budget-dashboard-forecast { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:7px; margin-top:8px; }
-.budget-dashboard-forecast > div { padding:8px 9px; border:1px solid var(--line); border-radius:7px; background:var(--surface-soft); }
+.budget-dashboard-forecast > div { padding:8px 9px; border:1px solid var(--line); border-radius:var(--talaan-card-radius); background:var(--surface-soft); }
 .budget-dashboard-forecast span,.budget-dashboard-forecast strong { display:block; }
 .budget-dashboard-forecast span { color:var(--muted); font-size:.61rem; }
 .budget-dashboard-forecast strong { margin-top:2px; font-size:.76rem; }
 .budget-report-card { margin-top:12px; }
 .budget-report-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; }
-.budget-report-grid > div { padding:9px 10px; border:1px solid var(--line); border-radius:9px; background:var(--surface-soft); }
+.budget-report-grid > div { padding:9px 10px; border:1px solid var(--line); border-radius:var(--talaan-card-radius); background:var(--surface-soft); }
 .budget-report-grid span,.budget-report-grid strong { display:block; }
 .budget-report-grid span { color:var(--muted); font-size:.64rem; }
 .budget-report-grid strong { margin-top:2px; font-size:.82rem; }
@@ -138,12 +137,11 @@
 .budget-planner-toggle { flex:0 0 34px; }
 .budget-planner-body { min-width:0; }
 .budget-planner-summary { gap:7px; margin:8px 12px 10px; }
-.budget-plan-kpi { padding:8px 9px; border-radius:8px; min-height:70px; }
+.budget-plan-kpi { padding:8px 9px; border-radius:var(--talaan-card-radius); min-height:70px; }
 .budget-plan-kpi strong { margin-top:2px; font-size:.9rem; }
 .budget-plan-kpi small { margin-top:2px; font-size:.59rem; line-height:1.25; }
 .budget-planner-grid { gap:8px; padding:0 12px 12px; }
-.budget-category-panel { border-radius:9px; }
-.cash-forecast-panel { border-radius:7px; }
+.budget-category-panel,.cash-forecast-panel { border-radius:var(--talaan-card-radius); }
 .budget-panel-heading { min-height:58px; padding:8px 10px; align-items:center; }
 .budget-panel-heading h4 { font-size:.79rem; }
 .budget-panel-heading p { font-size:.64rem; line-height:1.3; }
@@ -203,7 +201,7 @@
 
 
 /* V13.0.8 · shared disclosure-control size contract */
-.budget-panel-collapse { width:30px; min-width:30px; height:30px; min-height:30px; border-radius:7px; }
+.budget-panel-collapse { width:30px; min-width:30px; height:30px; min-height:30px; border-radius:var(--talaan-control-radius); }
 .budget-panel-collapse > svg { width:20px; height:20px; }
 @media (max-width:850px) {
   .budget-panel-collapse { width:35px !important; min-width:35px !important; height:35px !important; min-height:35px !important; }

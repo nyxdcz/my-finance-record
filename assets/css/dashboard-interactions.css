@@ -47,15 +47,15 @@ html[data-theme="dark"] .sidebar .nav-button.active .nav-icon-image{
 
 
 /* V14.0.24 · self-contained compact marquee fallback for production Pages. */
-.dashboard-week-marquee{box-sizing:border-box;height:43px;min-height:43px;max-height:43px;display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:6px;margin-bottom:7px;padding:3px 6px;border:1px solid var(--line);border-radius:7px;background:var(--surface);overflow:hidden}
+.dashboard-week-marquee{box-sizing:border-box;height:43px;min-height:43px;max-height:43px;display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:6px;margin-bottom:7px;padding:3px 6px;border:1px solid var(--line);border-radius:var(--talaan-card-radius);background:var(--surface);overflow:hidden}
 .dashboard-week-marquee-heading{min-width:78px;display:grid;gap:0}
 .dashboard-week-marquee-heading strong{font-size:.68rem}
 .dashboard-week-marquee-heading span{color:var(--muted);font-size:.54rem}
 .dashboard-week-marquee-window{min-width:0;overflow:hidden;-webkit-mask-image:linear-gradient(to right,transparent,black 7%,black 93%,transparent);mask-image:linear-gradient(to right,transparent,black 7%,black 93%,transparent)}
-.dashboard-week-marquee-window:focus-visible{outline:auto;outline-offset:3px;border-radius:6px}
+.dashboard-week-marquee-window:focus-visible{outline:auto;outline-offset:3px;border-radius:var(--talaan-control-radius)}
 .dashboard-week-marquee-track{width:max-content;display:flex;animation:dashboard-week-marquee 34s linear infinite;will-change:transform}
 .dashboard-week-marquee-group{display:flex;flex:none;gap:5px;padding-right:5px}
-.dashboard-week-day{box-sizing:border-box;width:148px;min-width:148px;height:35px;min-height:35px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:5px;align-items:center;padding:2px 5px;border:1px solid var(--line);border-radius:6px;background:var(--surface-soft);color:var(--text)}
+.dashboard-week-day{box-sizing:border-box;width:148px;min-width:148px;height:35px;min-height:35px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:5px;align-items:center;padding:2px 5px;border:1px solid var(--line);border-radius:var(--talaan-control-radius);background:var(--surface-soft);color:var(--text)}
 .dashboard-week-date{display:grid;place-items:center;align-content:center;width:27px;min-height:29px;border-inline-end:1px solid var(--line);padding-inline-end:5px}
 .dashboard-week-date strong{font-size:.74rem}.dashboard-week-date span{color:var(--muted);font-size:.52rem;text-transform:uppercase}
 .dashboard-week-copy{min-width:0;display:grid;gap:2px}
@@ -102,7 +102,7 @@ html[data-theme="dark"] .sidebar .nav-button.active .nav-icon-image{
     max-width:min(220px,calc(100vw - 24px));
     padding:5px 8px;
     border:1px solid color-mix(in srgb,currentColor 42%,var(--line));
-    border-radius:7px;
+    border-radius:var(--talaan-popover-radius);
     background:var(--surface);
     box-shadow:0 8px 24px rgba(15,23,42,.16);
     color:var(--text);
@@ -233,7 +233,7 @@ html[data-theme="dark"] .sidebar .nav-button.active .nav-icon-image{
 .workspace-switcher,
 .dashboard-week-marquee{
   border-color:var(--line);
-  border-radius:7px;
+  border-radius:var(--talaan-card-radius);
   background:color-mix(in srgb,var(--surface) 96%,transparent);
   -webkit-backdrop-filter:blur(12px);
   backdrop-filter:blur(12px);

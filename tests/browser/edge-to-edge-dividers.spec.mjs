@@ -116,9 +116,11 @@ function dividerGeometry(page) {
 
 for (const theme of ["light", "dark"]) {
   for (const viewport of [
+    { width:1920, height:1100 },
     { width:1440, height:1000 },
+    { width:1024, height:1000 },
     { width:768, height:900 },
-    { width:393, height:852 }
+    { width:375, height:852 }
   ]) {
     test(`Structural dividers and boundaries stay consistent in ${theme} theme at ${viewport.width}px`, async ({ page }) => {
       await openDividerFixture(page, viewport, theme);

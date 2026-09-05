@@ -2,5 +2,9 @@
 @media(max-width:620px){.household-heading,.household-group-head,.household-expense-control{align-items:stretch;flex-direction:column}.household-heading-actions,.household-group-head>div:last-child{display:grid;grid-template-columns:1fr 1fr}.household-heading-actions .button,.household-group-head .button,.household-expense-control .button{min-height:44px}.household-form-grid{grid-template-columns:1fr}.household-wide{grid-column:auto}.household-share-row{grid-template-columns:1fr}.household-history li{display:grid;grid-template-columns:1fr auto}.household-history li .button{grid-column:1/-1}.household-dialog{width:calc(100vw - 12px);max-height:calc(100dvh - 12px)}}
 @media(prefers-reduced-motion:reduce){.household-card *{scroll-behavior:auto!important;transition:none!important}}
 @media(forced-colors:active){.household-group,.household-empty,.household-expense-control,.household-split-total{border:1px solid CanvasText}}
+
+/* Radius ownership: cards use the card tier; compact rows and notes use controls. */
+.household-group,.household-empty,.household-split-total,.household-expense-control{border-radius:var(--talaan-card-radius)}
+.household-balance-list>div,.household-safety-note{border-radius:var(--talaan-control-radius)}
 .status-household{background:color-mix(in srgb,var(--blue,#356fd1) 12%,transparent);color:var(--blue,#356fd1)}
 @media(max-width:620px){.household-card .context-help-button{width:44px!important;min-width:44px!important;height:44px!important;min-height:44px!important;flex:0 0 44px}}

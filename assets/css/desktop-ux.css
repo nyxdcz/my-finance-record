@@ -40,7 +40,7 @@
   gap:9px;
   padding:10px;
   border:1px solid var(--line);
-  border-radius:8px;
+  border-radius:var(--talaan-card-radius);
   background:var(--surface-soft);
 }
 #dashCashFlowChart .cash-flow-summary-head{
@@ -72,7 +72,7 @@
   min-width:0;
   padding:7px 8px;
   border:1px solid var(--line);
-  border-radius:7px;
+  border-radius:var(--talaan-control-radius);
   background:var(--surface);
 }
 #dashCashFlowChart .cash-flow-summary-metric span{
@@ -107,7 +107,7 @@
   margin-top:auto;
   padding:8px;
   border:1px solid var(--line);
-  border-radius:7px;
+  border-radius:var(--talaan-control-radius);
   background:var(--surface-soft);
 }
 #dashCashFlowChart .cash-flow-summary-change span{

@@ -258,13 +258,13 @@ test("desktop expense cards match the approved compact type, status, and footer 
   expect(metrics.markPaidFont.size).toBeCloseTo(11, 0);
   expect(metrics.markPaidFont.weight).toBe(600);
   expect(metrics.markPaidBackground).toBe("rgb(53, 111, 209)");
-  expect(metrics.markPaidRadius).toBeCloseTo(7, 0);
+  expect(metrics.markPaidRadius).toBeCloseTo(8, 0);
   expect(metrics.editSize[0]).toBeCloseTo(48, 0);
   expect(metrics.editSize[1]).toBeCloseTo(30, 0);
   expect(metrics.editFont.size).toBeCloseTo(11, 0);
   expect(metrics.editFont.weight).toBe(600);
   expect(metrics.editBorder).toBe("rgb(213, 220, 229)");
-  expect(metrics.editRadius).toBeCloseTo(7, 0);
+  expect(metrics.editRadius).toBeCloseTo(8, 0);
   expect(metrics.repeatToPaidGap).toBeCloseTo(5, 0);
   expect(metrics.paidToEditGap).toBeCloseTo(5, 0);
   expect(metrics.actionCount).toBeGreaterThanOrEqual(3);

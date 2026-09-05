@@ -631,7 +631,7 @@ html body #topbarToolsPanel #productivityCenterButton .toolbar-icon > svg {
     max-height:38px !important;
     margin:0 !important;
     border:1px solid var(--line) !important;
-    border-radius:9px !important;
+    border-radius:var(--talaan-control-radius) !important;
     background:var(--surface) !important;
     background-image:none !important;
     box-shadow:0 2px 8px color-mix(in srgb,#0f172a 10%,transparent) !important;
@@ -646,7 +646,7 @@ html body #topbarToolsPanel #productivityCenterButton .toolbar-icon > svg {
     max-width:38px !important;
     padding:0 !important;
     border-inline:1px solid var(--line) !important;
-    border-radius:9px !important;
+    border-radius:var(--talaan-control-radius) !important;
   }
 
   html body .topbar-actions .month-navigator > .month-control {
@@ -716,7 +716,7 @@ html body #topbarToolsPanel #productivityCenterButton .toolbar-icon > svg {
     min-height:38px !important;
     max-height:38px !important;
     margin-inline-start:2px !important;
-    border-radius:9px !important;
+    border-radius:var(--talaan-control-radius) !important;
     box-shadow:0 2px 8px color-mix(in srgb,#0f172a 8%,transparent) !important;
   }
 
@@ -737,7 +737,7 @@ html body #topbarToolsPanel #productivityCenterButton .toolbar-icon > svg {
     width:280px !important;
     padding:10px !important;
     border:1px solid var(--line) !important;
-    border-radius:12px !important;
+    border-radius:var(--talaan-popover-radius) !important;
     background:var(--surface) !important;
     background-image:none !important;
     box-shadow:0 14px 34px color-mix(in srgb,#0f172a 18%,transparent) !important;
