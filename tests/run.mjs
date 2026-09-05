@@ -27,6 +27,7 @@ const testPlan = [
   { suite: "regression", file: "tests/regression/validate-mobile-ui.mjs" },
   { suite: "regression", file: "tests/regression/validate-dashboard-view-system.mjs" },
   { suite: "regression", file: "tests/regression/validate-application-shell.mjs" },
+  { suite: "regression", file: "tests/regression/validate-color-tokens.mjs" },
   { suite: "sync", file: "tests/regression/validate-cloud-readiness.mjs" },
   { suite: "regression", file: "tests/regression/validate-production-ui.mjs" },
   { suite: "regression", file: "tests/regression/validate-project-interactions.mjs" },

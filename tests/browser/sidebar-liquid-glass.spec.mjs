@@ -56,25 +56,25 @@ test("desktop sidebar stays flat white in light mode and flat #080B10 in dark mo
   await expect(sidebar).toHaveCSS("width", "185px");
   await expect(sidebar).toHaveCSS("background-color", "rgb(255, 255, 255)");
   await expect(sidebar).toHaveCSS("background-image", "none");
-  await expect(sidebar).toHaveCSS("color", "rgb(8, 11, 16)");
+  await expect(sidebar).toHaveCSS("color", "rgb(24, 34, 48)");
   await expect(sidebar).toHaveCSS("box-shadow", "none");
   await expect(sidebar).toHaveCSS("backdrop-filter", "none");
 
   await expect(brandText).toHaveCSS("font-size", "20px");
   await expect(brandText).toHaveCSS("font-weight", "700");
-  await expect(brandText).toHaveCSS("color", "rgb(8, 11, 16)");
+  await expect(brandText).toHaveCSS("color", "rgb(24, 34, 48)");
 
   await expect(normalButton).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
-  await expect(normalButton).toHaveCSS("color", "rgb(8, 11, 16)");
+  await expect(normalButton).toHaveCSS("color", "rgb(24, 34, 48)");
   await expect(normalIcon).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
   await expect(normalIconImage).toHaveCSS("filter", "brightness(0) saturate(1)");
   await expect(normalLabel).toHaveCSS("font-size", "12px");
   await expect(normalLabel).toHaveCSS("font-weight", "700");
-  await expect(normalLabel).toHaveCSS("color", "rgb(8, 11, 16)");
+  await expect(normalLabel).toHaveCSS("color", "rgb(24, 34, 48)");
 
   await expect(active).toHaveCSS("background-color", "rgba(53, 111, 209, 0.12)");
   await expect(active).toHaveCSS("border-radius", "8px");
-  await expect(activeLabel).toHaveCSS("color", "rgb(8, 11, 16)");
+  await expect(activeLabel).toHaveCSS("color", "rgb(24, 34, 48)");
   await expect(activeIcon).toHaveCSS("background-color", "rgb(53, 111, 209)");
   await expect(activeIconImage).toHaveCSS("filter", "brightness(0) invert(1)");
 
@@ -120,10 +120,10 @@ test("mobile light sidebar stays flat white with a 320px drawer and readable lab
   await expect(sidebar).toHaveCSS("backdrop-filter", "none");
   await expect(brandText).toHaveCSS("font-size", "20px");
   await expect(brandText).toHaveCSS("font-weight", "700");
-  await expect(brandText).toHaveCSS("color", "rgb(8, 11, 16)");
+  await expect(brandText).toHaveCSS("color", "rgb(24, 34, 48)");
   await expect(normalLabel).toHaveCSS("font-size", "12px");
   await expect(normalLabel).toHaveCSS("font-weight", "700");
-  await expect(normalLabel).toHaveCSS("color", "rgb(8, 11, 16)");
+  await expect(normalLabel).toHaveCSS("color", "rgb(24, 34, 48)");
   await expect(normalIconImage).toHaveCSS("filter", "brightness(0) saturate(1)");
   await expect(activeIcon).toHaveCSS("background-color", "rgb(53, 111, 209)");
 });
