@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-test("Talaan V2.5.0 Finance period surfaces follow the 7px radius contract", async ({ page }) => {
+test("Talaan V2.5.0 Finance period surfaces follow the 12px card radius contract", async ({ page }) => {
   await page.goto("http://127.0.0.1:3000/index.html?page=money", { waitUntil:"networkidle" });
 
   await page.evaluate(() => {
@@ -26,10 +26,10 @@ test("Talaan V2.5.0 Finance period surfaces follow the 7px radius contract", asy
     "#periodRadiusFixture .record-row"
   ]) {
     expect(await radiusOf(selector)).toEqual({
-      topLeft:"7px",
-      topRight:"7px",
-      bottomRight:"7px",
-      bottomLeft:"7px"
+      topLeft:"12px",
+      topRight:"12px",
+      bottomRight:"12px",
+      bottomLeft:"12px"
     });
   }
 });

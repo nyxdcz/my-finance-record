@@ -25,6 +25,7 @@ async function installSidebarFixture(page, extraSidebarClass = "") {
   await page.addStyleTag({ url:"http://127.0.0.1:3000/app.css?v=2.5.0-talaan1" });
   await page.addStyleTag({ url:"http://127.0.0.1:3000/shell-ui.css?v=2.5.0-talaan1" });
   await page.addStyleTag({ url:"http://127.0.0.1:3000/sidebar-compact-brand.css?v=2.2.0-talaan2" });
+  await page.addStyleTag({ url:"http://127.0.0.1:3000/ui-radius.css?v=2.5.0-talaan4" });
   await page.addStyleTag({ url:"http://127.0.0.1:3000/assets/css/ui-icon-alignment.css?v=2.5.0-talaan1" });
 }
 
@@ -67,7 +68,7 @@ test("desktop sidebar collapses to 60px and expands to 185px with the approved T
   await expect(activeIconImage).toHaveCSS("width", "16px");
   await expect(activeIconImage).toHaveCSS("height", "16px");
   await expect(active).toHaveCSS("background-color", "rgba(53, 111, 209, 0.18)");
-  await expect(active).toHaveCSS("border-radius", "7px");
+  await expect(active).toHaveCSS("border-radius", "8px");
   await expect(active).toHaveCSS("color", "rgb(255, 255, 255)");
   await expect(activeIcon).toHaveCSS("background-color", "rgb(53, 111, 209)");
 
@@ -175,7 +176,7 @@ test("mobile drawer keeps a roomy 320px shell, 48px rows, and the real Talaan br
   await expect(mark).toHaveCSS("width", "25px");
   await expect(mark).toHaveCSS("height", "25px");
   await expect(firstButton).toHaveCSS("min-height", "48px");
-  await expect(firstButton).toHaveCSS("border-radius", "7px");
+  await expect(firstButton).toHaveCSS("border-radius", "8px");
   await expect(firstLabel).toHaveCSS("font-size", "12px");
   await expect(firstLabel).toHaveCSS("font-weight", "700");
   await expect.poll(() => mark.evaluate(node => node.complete && node.naturalWidth > 0)).toBe(true);

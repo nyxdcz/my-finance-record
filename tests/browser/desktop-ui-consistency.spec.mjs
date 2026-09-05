@@ -11,7 +11,8 @@ const css = [
   "dashboard-interactions.css?v=2.5.0-talaan1",
   "liquid-glass.css?v=2.5.0-talaan1",
   "black-canvas.css?v=2.5.0-talaan1",
-  "desktop-ui-phase1.css?v=2.5.0-talaan1"
+  "desktop-ui-phase1.css?v=2.5.0-talaan1",
+  "ui-radius.css?v=2.5.0-talaan4"
 ];
 
 async function fixture(page, width, theme) {
@@ -62,11 +63,11 @@ for (const width of widths) {
       contentTop:"18px",
       contentRight:"24px",
       contentBottom:"34px",
-      cardRadius:"9px",
+      cardRadius:"12px",
       cardPadding:"13px",
       buttonMin:"38px",
       compactHeight:"35px",
-      workspaceRadius:"7px",
+      workspaceRadius:"8px",
       workspaceButton:"35px",
       financeStickyTop:"64px",
       reportTab:"35px",
@@ -76,7 +77,7 @@ for (const width of widths) {
       budgetKpi:"70px",
       budgetToggle:"30px",
       profileChip:"23px",
-      calendarRadius:"8px",
+        calendarRadius:"12px",
       calendarAction:"32px",
       insightsPseudo:"none",
       insightsIconWidth:"20px",

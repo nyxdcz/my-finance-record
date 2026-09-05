@@ -1251,7 +1251,7 @@
 
 /* Talaan · authoritative Dashboard view and bento system */
 #dashboard {
-  --dashboard-card-radius: 7px;
+  --dashboard-card-radius: 12px;
   --dashboard-card-gap: 12px;
   --dashboard-card-padding: 14px;
 }

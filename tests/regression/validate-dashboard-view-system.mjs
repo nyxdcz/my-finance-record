@@ -20,7 +20,7 @@ assert.match(index, /dashboardCalendarToday[\s\S]*applySelectedMonth\(dashboardC
 assert.match(index, /calendarMonth!==selectedMonth\(\)\)applySelectedMonth\(calendarMonth,true\)/);
 assert.match(index, /data-dashboard-card="cash-flow" data-dashboard-view="cash-flow"/);
 assert.match(index, /data-dashboard-card="activity" data-dashboard-view="overview"/);
-assert.match(production, /--dashboard-card-radius:\s*7px/);
+assert.match(production, /--dashboard-card-radius:\s*12px/);
 assert.match(production, /--dashboard-card-gap:\s*12px/);
 assert.match(production, /#dashboard \.dashboard-view-tabs[\s\S]*height:\s*43px[\s\S]*min-height:\s*43px[\s\S]*max-height:\s*43px/);
 assert.match(production, /@media \(min-width: 701px\)[\s\S]*#dashboard \.dashboard-view-tabs[\s\S]*display:\s*flex/);

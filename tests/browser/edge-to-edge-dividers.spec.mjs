@@ -146,9 +146,9 @@ for (const theme of ["light", "dark"]) {
         });
       }
       expect(geometry.reportGap).toBeGreaterThanOrEqual(8);
-      expect(geometry.radii.period).toBe("7px");
-      expect(geometry.radii.projectColumn).toBe("7px");
-      expect(geometry.radii.reportNav).toBe("7px");
+      expect(geometry.radii.period).toBe("12px");
+      expect(geometry.radii.projectColumn).toBe("16px");
+      expect(geometry.radii.reportNav).toBe("16px");
 
       if (viewport.width <= 850) {
         expect(geometry.periodHeaderBottomRadii.left).toBe("0px");

@@ -5,7 +5,7 @@ const source = name => fs.readFileSync(new URL(`../../${name}`, import.meta.url)
 
 test.use({ serviceWorkers:"block" });
 
-test("rectangular UI surfaces use 7px while structural and circular shapes stay intentional", async ({ page }) => {
+test("UI surfaces use the platform-aligned radius hierarchy while structural and circular shapes stay intentional", async ({ page }) => {
   await page.setViewportSize({ width:1280, height:800 });
   await page.goto("http://127.0.0.1:3000/offline.html", { waitUntil:"networkidle" });
   await page.evaluate(() => {
@@ -36,13 +36,15 @@ test("rectangular UI surfaces use 7px while structural and circular shapes stay 
   ` });
   await page.addStyleTag({ url:"http://127.0.0.1:3000/ui-radius.css?v=2.5.0-talaan4" });
 
-  for (const selector of [
-    "#card", "#summaryCard", "#button", "#monthButton", "#monthControl",
-    "#input", "#select", "#textarea", "#contextMenu", "#panel", "#dialog",
-    "#legendItem", "#comparisonItem", "#ledgerPreview"
-  ]) {
-    await expect(page.locator(selector)).toHaveCSS("border-radius", "7px");
+  for (const selector of ["#card", "#summaryCard", "#legendItem", "#comparisonItem", "#ledgerPreview"]) {
+    await expect(page.locator(selector)).toHaveCSS("border-radius", "12px");
   }
+  for (const selector of ["#button", "#monthButton", "#monthControl", "#input", "#select", "#textarea"]) {
+    await expect(page.locator(selector)).toHaveCSS("border-radius", "8px");
+  }
+  await expect(page.locator("#contextMenu")).toHaveCSS("border-radius", "12px");
+  await expect(page.locator("#panel")).toHaveCSS("border-radius", "16px");
+  await expect(page.locator("#dialog")).toHaveCSS("border-radius", "20px");
 
   await expect(page.locator("#pill")).toHaveCSS("border-radius", "999px");
   await expect(page.locator("#avatar")).toHaveCSS("border-radius", "50%");
@@ -51,9 +53,9 @@ test("rectangular UI surfaces use 7px while structural and circular shapes stay 
 
 test("runtime summary layer imports the canonical radius stylesheet", () => {
   expect(source("summary-mascots.css")).toContain('@import url("./ui-radius.css?v=2.5.0-talaan4")');
-  expect(source("ui-radius.css")).toContain("--talaan-ui-radius: 7px");
-  expect(source("ui-radius.css")).toContain("--radius: 7px");
-  expect(source("ui-radius.css")).toContain("--desktop-panel-radius: 7px");
-  expect(source("ui-radius.css")).toContain("--desktop-inner-radius: 7px");
-  expect(source("ui-radius.css")).toContain("--liquid-glass-radius: 7px");
+  expect(source("ui-radius.css")).toContain("--talaan-control-radius: 8px");
+  expect(source("ui-radius.css")).toContain("--talaan-card-radius: 12px");
+  expect(source("ui-radius.css")).toContain("--talaan-section-radius: 16px");
+  expect(source("ui-radius.css")).toContain("--talaan-dialog-radius: 20px");
+  expect(source("ui-radius.css")).toContain("--talaan-ui-radius: var(--talaan-card-radius)");
 });

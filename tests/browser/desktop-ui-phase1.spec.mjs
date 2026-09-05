@@ -11,7 +11,8 @@ const css = [
   "dashboard-interactions.css?v=2.5.0-talaan1",
   "liquid-glass.css?v=2.5.0-talaan1",
   "black-canvas.css?v=2.5.0-talaan1",
-  "desktop-ui-phase1.css?v=2.5.0-talaan1"
+  "desktop-ui-phase1.css?v=2.5.0-talaan1",
+  "ui-radius.css?v=2.5.0-talaan4"
 ];
 
 const links = css.map(href => `<link rel="stylesheet" href="http://127.0.0.1:3000/${href}">`).join("");
@@ -41,7 +42,7 @@ for (const width of widths) {
     expect(metrics.helpOpacity).toBe("0.28");
     expect(metrics.nearBackground).toBe("rgb(255, 255, 255)");
     expect(metrics.overdueBackground).not.toBe(metrics.nearBackground);
-    expect(metrics.projectFilterRadius).toBe("7px");
+    expect(metrics.projectFilterRadius).toBe("8px");
     expect(metrics.hasHorizontalOverflow).toBe(false);
   });
 }

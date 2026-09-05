@@ -32,6 +32,7 @@ async function installFixture(page, { mobile = false } = {}) {
   await page.addStyleTag({ url:"http://127.0.0.1:3000/app.css?v=2.2.0-talaan1" });
   await page.addStyleTag({ url:"http://127.0.0.1:3000/shell-ui.css?v=2.2.0-talaan1" });
   await page.addStyleTag({ url:"http://127.0.0.1:3000/sidebar-compact-brand.css?v=2.2.0-talaan2" });
+  await page.addStyleTag({ url:"http://127.0.0.1:3000/ui-radius.css?v=2.5.0-talaan4" });
   await page.addStyleTag({ url:"http://127.0.0.1:3000/assets/css/ui-icon-alignment.css?v=2.2.0-talaan1" });
   await page.addStyleTag({ url:"http://127.0.0.1:3000/liquid-glass.css?v=2.2.0-talaan1" });
 }
@@ -72,7 +73,7 @@ test("desktop sidebar stays flat white in light mode and flat #080B10 in dark mo
   await expect(normalLabel).toHaveCSS("color", "rgb(8, 11, 16)");
 
   await expect(active).toHaveCSS("background-color", "rgba(53, 111, 209, 0.12)");
-  await expect(active).toHaveCSS("border-radius", "7px");
+  await expect(active).toHaveCSS("border-radius", "8px");
   await expect(activeLabel).toHaveCSS("color", "rgb(8, 11, 16)");
   await expect(activeIcon).toHaveCSS("background-color", "rgb(53, 111, 209)");
   await expect(activeIconImage).toHaveCSS("filter", "brightness(0) invert(1)");
