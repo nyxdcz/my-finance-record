@@ -1627,3 +1627,16 @@ html body :is(
     align-self: start !important;
   }
 }
+
+
+/* V15.2.25 · Phone month option ID specificity repair. */
+@media (max-width: 700px) {
+  html body #monthPickerPopover.month-picker-popover .month-picker-grid > button.month-picker-option,
+  html body #monthPicker.month-picker-popover .month-picker-grid > button.month-picker-option {
+    box-sizing: border-box !important;
+    height: 35px !important;
+    min-height: 35px !important;
+    max-height: 35px !important;
+    align-self: start !important;
+  }
+}
