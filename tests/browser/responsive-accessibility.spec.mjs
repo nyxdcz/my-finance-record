@@ -71,6 +71,46 @@ test("collapsed Monthly Budget Plan stays compact and readable at narrow phone w
   }
 });
 
+test("phone controls use the approved 35px compact rhythm", async ({ page }) => {
+  for (const width of [320, 360, 390, 430]) {
+    await openApp(page, width);
+    const metrics = await page.evaluate(() => {
+      const visible = element => {
+        const box = element.getBoundingClientRect();
+        const style = getComputedStyle(element);
+        return box.width > 0 && box.height > 0 && style.visibility !== "hidden" && style.display !== "none";
+      };
+      const sizes = selector => [...document.querySelectorAll(selector)]
+        .filter(visible)
+        .map(element => {
+          const box = element.getBoundingClientRect();
+          return { width:box.width, height:box.height };
+        });
+      const controls = sizes('button, input[type="button"], input[type="submit"], input[type="reset"], summary, [role="button"]');
+      const collapse = sizes('#money .collapse-toggle, #availableMoneySection [data-collapse-toggle], .budget-planner-toggle, .budget-panel-collapse');
+      const headers = sizes('#money .period-header, #availableMoneySection .card-header, #money .legend-item, #money .summary-item');
+      return {
+        controls,
+        collapse,
+        headers,
+        overflow:Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) > innerWidth + 1
+      };
+    });
+    expect(metrics.controls.length).toBeGreaterThan(0);
+    expect(metrics.controls.every(size => size.height <= 35.5)).toBe(true);
+    expect(metrics.collapse.length).toBeGreaterThan(0);
+    metrics.collapse.forEach(size => {
+      expect(size.width).toBeGreaterThanOrEqual(34.5);
+      expect(size.width).toBeLessThanOrEqual(35.5);
+      expect(size.height).toBeGreaterThanOrEqual(34.5);
+      expect(size.height).toBeLessThanOrEqual(35.5);
+    });
+    expect(metrics.headers.every(size => size.height <= 35.5)).toBe(true);
+    expect(metrics.overflow).toBe(false);
+  }
+});
+
+
 test("dark mode keyboard focus indicator is visible", async ({ page }) => {
   await openApp(page, 390);
   await page.evaluate(() => {
