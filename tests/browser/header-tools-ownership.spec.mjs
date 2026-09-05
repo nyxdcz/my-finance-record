@@ -45,8 +45,8 @@ test("desktop More Tools preserves ordering, semantics, actions, and duplicate s
     const rect = node.getBoundingClientRect();
     return { left:rect.left, right:rect.right, width:rect.width, height:rect.height, viewport:innerWidth };
   });
-  expect(triggerGeometry.width).toBeCloseTo(34, 0);
-  expect(triggerGeometry.height).toBeCloseTo(34, 0);
+  expect(triggerGeometry.width).toBeCloseTo(30, 0);
+  expect(triggerGeometry.height).toBeCloseTo(30, 0);
   expect(triggerGeometry.left).toBeGreaterThanOrEqual(0);
   expect(triggerGeometry.right).toBeLessThanOrEqual(triggerGeometry.viewport - 12);
 

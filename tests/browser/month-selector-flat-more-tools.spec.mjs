@@ -54,23 +54,23 @@ test("desktop month selector uses compact standalone controls and a centered 4x3
   const next = page.locator("#nextMonthButton");
   const current = page.locator(".month-status-chip");
 
-  await expect(nav).toHaveCSS("height", "34px");
+  await expect(nav).toHaveCSS("height", "30px");
   await expect(nav).toHaveCSS("box-shadow", "none");
   await expect(nav).toHaveCSS("backdrop-filter", "none");
   await expect(nav).toHaveCSS("gap", "4px");
 
-  await expect(previous).toHaveCSS("width", "34px");
-  await expect(previous).toHaveCSS("height", "34px");
+  await expect(previous).toHaveCSS("width", "30px");
+  await expect(previous).toHaveCSS("height", "30px");
   await expect(previous).toHaveCSS("border-right-width", "1px");
   await expect(previous).toHaveCSS("border-radius", "8px");
   await expect(previous).toHaveCSS("box-shadow", "none");
-  await expect(next).toHaveCSS("width", "34px");
-  await expect(next).toHaveCSS("height", "34px");
+  await expect(next).toHaveCSS("width", "30px");
+  await expect(next).toHaveCSS("height", "30px");
   await expect(next).toHaveCSS("border-left-width", "1px");
   await expect(next).toHaveCSS("border-radius", "8px");
   await expect(next).toHaveCSS("box-shadow", "none");
 
-  await expect(control).toHaveCSS("height", "34px");
+  await expect(control).toHaveCSS("height", "30px");
   await expect(control).toHaveCSS("width", "175px");
   await expect(control).toHaveCSS("border-right-width", "1px");
   await expect(control).toHaveCSS("border-radius", "8px");
@@ -113,7 +113,7 @@ test("desktop month selector uses compact standalone controls and a centered 4x3
   expect(geometry.displayMode).toBe("flex");
   expect(geometry.displayJustify).toBe("center");
   expect(geometry.displayGap).toBe("6px");
-  expect(geometry.displayHeight).toBe(32);
+  expect(geometry.displayHeight).toBe(28);
   expect(geometry.calendarMask).not.toBe("none");
   expect(geometry.popoverWidth).toBe("280px");
   expect(geometry.popoverTransform).toBe("none");
@@ -125,7 +125,7 @@ test("desktop month selector uses compact standalone controls and a centered 4x3
   await expect(popover).toHaveCSS("border-radius", "12px");
   await expect(grid.locator(".month-picker-option").nth(7)).toHaveCSS("background-color", "rgb(53, 111, 209)");
   await expect(current).toHaveCSS("margin-left", "0px");
-  await expect(current).toHaveCSS("height", "34px");
+  await expect(current).toHaveCSS("height", "30px");
   await expect(current).toHaveCSS("border-radius", "8px");
   await expect(current).toHaveCSS("box-shadow", "none");
 });

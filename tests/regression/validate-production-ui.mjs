@@ -29,6 +29,9 @@ assert.match(css, /@media \(prefers-reduced-motion: reduce\)/);
 assert.match(css, /min-height:\s*56px !important/);
 assert.match(css, /#money \.section-stack[\s\S]*gap:\s*8px !important/);
 assert.match(css, /#money \.period-header \.collapse-toggle[\s\S]*min-width:\s*30px !important/);
+assert.match(css, /Fine-pointer desktop toolbar: 30px controls/);
+assert.match(css, /height:\s*var\(--ui-disclosure-size, 30px\) !important/);
+assert.match(css, /#money #availableMoneySection #addAccountButton/);
 assert.match(index, /data-toggle-saved="\$\{item\.id\}"[^>]*>[\s\S]*class="saved-icon-container"/);
 assert.match(index, /class="expense-select-footer"><input class="expense-select-checkbox"/);
 

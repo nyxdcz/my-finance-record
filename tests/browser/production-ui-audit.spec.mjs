@@ -65,9 +65,9 @@ for (const width of [1024, 1280, 1366, 1440, 1920]) {
     });
     expect(metrics.overflow).toBe(false);
     expect(metrics.toolbarGap).toBe(4);
-    expect(metrics.requiredToolbarHeights.monthNavigator).toBeCloseTo(34, 0);
-    expect(metrics.requiredToolbarHeights.moreTools).toBeCloseTo(34, 0);
-    metrics.visibleToolbarHeights.forEach(heightValue => expect(heightValue).toBeCloseTo(34, 0));
+    expect(metrics.requiredToolbarHeights.monthNavigator).toBeCloseTo(30, 0);
+    expect(metrics.requiredToolbarHeights.moreTools).toBeCloseTo(30, 0);
+    metrics.visibleToolbarHeights.forEach(heightValue => expect(heightValue).toBeCloseTo(30, 0));
     expect(metrics.summaryHeights).toHaveLength(8);
     metrics.summaryHeights.forEach(heightValue => expect(heightValue).toBeLessThanOrEqual(58));
     expect(metrics.periodDisclosureSizes).toHaveLength(3);
@@ -122,6 +122,22 @@ for (const contract of [{ width:1440, size:30 }, { width:390, size:35 }]) {
     expect(total).toBe(8);
   });
 }
+
+test("fine-pointer desktop account and project header actions use the 30px compact contract", async ({ page }) => {
+  await openFinance(page, { width:1440, height:1000 });
+
+  const account = page.locator("#money #availableMoneySection #addAccountButton");
+  await expect(account).toBeVisible();
+  expect(await account.evaluate(node => node.getBoundingClientRect().height)).toBeCloseTo(30, 0);
+
+  await page.evaluate(() => window.goToPage("projects", { historyMode:"none", smooth:false }));
+  await expect(page.locator("#projects")).toHaveClass(/active/);
+  const projectActions = page.locator("#projectCalendarV13020 .pc-header-actions > .button, #activeProjectsCard .project-kanban-header-actions > .button");
+  await expect(projectActions).toHaveCount(4);
+  const heights = await projectActions.evaluateAll(nodes => nodes.map(node => node.getBoundingClientRect().height));
+  heights.forEach(height => expect(height).toBeCloseTo(30, 0));
+  expect(await page.evaluate(() => Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) > innerWidth + 1)).toBe(false);
+});
 
 test("desktop expense cards match the approved compact type, status, and footer specification", async ({ page }) => {
   await openFinance(page, { width:1440, height:1100 });

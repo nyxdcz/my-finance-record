@@ -434,7 +434,7 @@
   }
 }
 
-/* V15.2.18 · Fine-pointer desktop toolbar: 34px controls, 7px corners, 4px rhythm. */
+/* V15.2.18 · Fine-pointer desktop toolbar: 30px controls, 7px corners, 4px rhythm. */
 @media (min-width: 851px) and (hover: hover) and (pointer: fine) {
   html body .topbar-actions {
     gap: 4px !important;
@@ -450,9 +450,10 @@
   html body .topbar-actions .month-navigator > .month-current-button,
   html body .topbar-actions .month-navigator > .month-status-chip {
     box-sizing: border-box !important;
-    height: 34px !important;
-    min-height: 34px !important;
-    max-height: 34px !important;
+    height: var(--ui-disclosure-size, 30px) !important;
+    min-height: var(--ui-disclosure-size, 30px) !important;
+    max-height: var(--ui-disclosure-size, 30px) !important;
+    padding-block: 3px !important;
   }
 
   html body .topbar-actions > .cloud-sync-toolbar-button,
@@ -467,10 +468,19 @@
   }
 
   html body .topbar-actions .topbar-tools-trigger {
-    width: 34px !important;
-    min-width: 34px !important;
-    max-width: 34px !important;
+    width: var(--ui-disclosure-size, 30px) !important;
+    min-width: var(--ui-disclosure-size, 30px) !important;
+    max-width: var(--ui-disclosure-size, 30px) !important;
     padding-inline: 0 !important;
+  }
+
+  html body .topbar-actions :is(
+    .cloud-sync-toolbar-button,
+    .topbar-add-button
+  ) .toolbar-icon {
+    width: 18px !important;
+    height: 18px !important;
+    flex: 0 0 18px !important;
   }
 
   html body .topbar-actions .month-navigator {
@@ -487,9 +497,9 @@
 
   html body .topbar-actions .month-navigator > #previousMonthButton,
   html body .topbar-actions .month-navigator > #nextMonthButton {
-    width: 34px !important;
-    min-width: 34px !important;
-    max-width: 34px !important;
+    width: var(--ui-disclosure-size, 30px) !important;
+    min-width: var(--ui-disclosure-size, 30px) !important;
+    max-width: var(--ui-disclosure-size, 30px) !important;
     padding: 0 !important;
     border-inline: 1px solid var(--line) !important;
     border-radius: var(--talaan-control-radius) !important;
@@ -509,8 +519,8 @@
   html body .topbar-actions .month-navigator .month-display-button {
     box-sizing: border-box !important;
     width: 100% !important;
-    height: 32px !important;
-    min-height: 32px !important;
+    height: calc(var(--ui-disclosure-size, 30px) - 2px) !important;
+    min-height: calc(var(--ui-disclosure-size, 30px) - 2px) !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -538,6 +548,14 @@
     margin-inline-start: 0 !important;
     border-radius: var(--talaan-control-radius) !important;
     box-shadow: none !important;
+  }
+
+  html body #money #availableMoneySection #addAccountButton {
+    box-sizing: border-box !important;
+    height: var(--ui-disclosure-size, 30px) !important;
+    min-height: var(--ui-disclosure-size, 30px) !important;
+    max-height: var(--ui-disclosure-size, 30px) !important;
+    padding-block: 3px !important;
   }
 }
 
@@ -1182,24 +1200,24 @@
 
   html body .topbar-actions .topbar-tools-menu {
     position: relative !important;
-    flex: 0 0 34px !important;
-    width: 34px !important;
-    min-width: 34px !important;
-    max-width: 34px !important;
+    flex: 0 0 var(--ui-disclosure-size, 30px) !important;
+    width: var(--ui-disclosure-size, 30px) !important;
+    min-width: var(--ui-disclosure-size, 30px) !important;
+    max-width: var(--ui-disclosure-size, 30px) !important;
     margin: 0 !important;
   }
 
   html body .topbar-actions #topbarToolsTrigger {
     box-sizing: border-box !important;
-    width: 34px !important;
-    min-width: 34px !important;
-    max-width: 34px !important;
-    height: 34px !important;
-    min-height: 34px !important;
-    max-height: 34px !important;
+    width: var(--ui-disclosure-size, 30px) !important;
+    min-width: var(--ui-disclosure-size, 30px) !important;
+    max-width: var(--ui-disclosure-size, 30px) !important;
+    height: var(--ui-disclosure-size, 30px) !important;
+    min-height: var(--ui-disclosure-size, 30px) !important;
+    max-height: var(--ui-disclosure-size, 30px) !important;
     display: grid !important;
     place-items: center !important;
-    flex: 0 0 34px !important;
+    flex: 0 0 var(--ui-disclosure-size, 30px) !important;
     margin: 0 !important;
     padding: 0 !important;
     border: 1px solid var(--line) !important;
