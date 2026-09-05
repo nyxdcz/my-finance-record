@@ -19,16 +19,17 @@ html[data-theme="dark"] {
   --line:#202938;
   --nav:#000000;
   --primary:#356FD1;
-  --primary-dark:#102f5c;
+  --primary-dark:#2457AD;
   --primary-contrast:#ffffff;
   --focus-ring:#8ab4f8;
   --field-label:#dbe3ef;
-  --nav-active-bg:#356FD1;
-  --nav-active-text:#ffffff;
+  --nav-active-bg:var(--primary);
+  --nav-active-text:var(--primary-contrast);
   --green-soft:#10271a;
   --red-soft:#2a1412;
   --orange-soft:#2b1d0d;
   --blue-soft:#111d33;
+  --warning-foreground:#ffb35f;
   --shadow:0 10px 30px rgba(0,0,0,.42);
 }
 html[data-theme="light"],
@@ -89,7 +90,7 @@ html[data-theme="light"] body #money #availableMoneySection .account-card .accou
 
 /* V15.1.0 Available money account-border softening. */
 html[data-theme="dark"] #availableMoneySection .account-card {
-  border-color:rgba(207,231,213,.24) !important;
+  border-color:color-mix(in srgb,var(--green) 24%,var(--line)) !important;
 }
 html[data-theme="light"] #availableMoneySection .account-card {
   border-color:color-mix(in srgb,var(--green) 22%,var(--line)) !important;
