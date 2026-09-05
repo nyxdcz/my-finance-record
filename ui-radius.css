@@ -354,6 +354,44 @@ html body :is(
   /* Existing inset declarations remain authoritative. */
 }
 
+/* Final specificity bridge for legacy feature layers.  Several older feature
+   sheets intentionally use high-specificity 7px declarations; keep the new
+   hierarchy authoritative without requiring a broad refactor of those files. */
+html body #projects .project-toolbar-compact,
+html body #projects .project-toolbar-compact :is(.input,.select,.button),
+html body .topbar-actions > :is(.cloud-sync-toolbar-button,.topbar-history-button,.topbar-add-button,.topbar-tools-trigger),
+html body .topbar-actions .month-navigator > :is(.month-nav-button,.month-control,.month-current-button,.month-status-chip),
+html body .topbar-actions .month-navigator > #previousMonthButton,
+html body .topbar-actions .month-navigator > #nextMonthButton,
+html body .topbar-actions #topbarToolsTrigger,
+html body #sidebar.sidebar .nav-button,
+html body .sidebar .nav-button,
+html body .sidebar .nav-button.active,
+html body .sidebar .nav-icon,
+html body #money .period-card .collapse-toggle,
+html body #money #availableMoneySection [data-collapse-toggle="available-money"],
+html body #income #monthlyBudgetPlannerToggle,
+html body #income [data-budget-panel-toggle],
+html body #paid-expenses [data-collapse-toggle="paid-expenses"],
+html body #reports .report-compact-chevron,
+html body .budget-panel-collapse,
+html body #monthlyBudgetPlannerCard #monthlySavingsTarget,
+html body #monthlyBudgetPlannerCard #setMonthlySavingsTarget,
+html body #monthlyBudgetPlannerCard .savings-check-row input {
+  border-radius: var(--talaan-control-radius) !important;
+}
+
+html body #monthlyBudgetPlannerCard .cash-forecast-panel,
+html body #monthlyBudgetPlannerCard .savings-confirmation,
+html body #monthlyBudgetPlannerCard .savings-projection-row,
+html body #monthlyBudgetPlannerCard .savings-outlook-stat {
+  border-radius: var(--talaan-card-radius) !important;
+}
+
+html body #monthlyBudgetPlannerCard .cash-forecast-panel {
+  border-radius: var(--talaan-section-radius) !important;
+}
+
 @media print,
        (forced-colors: active) {
   html body :is(

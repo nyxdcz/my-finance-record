@@ -87,7 +87,7 @@ test("Savings outlook previews, confirms, persists, and never changes balances",
 });
 
 for (const contract of [{ width:1440, touch:false }, { width:390, touch:true }]) {
-  test(`Savings controls preserve 7px radii without overflow at ${contract.width}px`, async ({ page }) => {
+  test(`Savings controls follow the shared radius hierarchy without overflow at ${contract.width}px`, async ({ page }) => {
     await openSavingsForecast(page,contract.width);
     const metrics = await page.locator("#monthlyBudgetPlannerCard").evaluate(card => {
       const radius = selector => parseFloat(getComputedStyle(card.querySelector(selector)).borderRadius);
@@ -101,12 +101,12 @@ for (const contract of [{ width:1440, touch:false }, { width:390, touch:true }])
         overflow:document.documentElement.scrollWidth > innerWidth + 1
       };
     });
-    expect(metrics.panel).toBe(7);
-    expect(metrics.target).toBe(7);
-    expect(metrics.button).toBe(7);
-    expect(metrics.checkbox).toBe(7);
-    expect(metrics.confirmation).toBe(7);
-    expect(metrics.row).toBe(7);
+    expect(metrics.panel).toBe(16);
+    expect(metrics.target).toBe(8);
+    expect(metrics.button).toBe(8);
+    expect(metrics.checkbox).toBe(8);
+    expect(metrics.confirmation).toBe(12);
+    expect(metrics.row).toBe(12);
     expect(metrics.overflow).toBe(false);
   });
 }

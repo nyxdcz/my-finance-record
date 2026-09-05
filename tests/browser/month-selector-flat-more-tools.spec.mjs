@@ -42,6 +42,7 @@ test("desktop month selector uses compact standalone controls and a centered 4x3
   await page.addStyleTag({ url:"http://127.0.0.1:3000/ui-icon-alignment.css?v=month-rounded-test" });
   await page.addStyleTag({ url:"http://127.0.0.1:3000/liquid-glass.css?v=month-rounded-test" });
   await page.addStyleTag({ url:"http://127.0.0.1:3000/production-ui-audit.css?v=month-rounded-test" });
+  await page.addStyleTag({ url:"http://127.0.0.1:3000/ui-radius.css?v=month-rounded-test" });
 
   const nav = page.locator(".month-navigator");
   const previous = page.locator("#previousMonthButton");
