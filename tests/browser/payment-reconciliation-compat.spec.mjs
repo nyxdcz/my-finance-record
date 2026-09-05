@@ -117,6 +117,9 @@ test("manual payment repairs an unambiguous stale reconciliation link before com
   expect(state.localBalance).toBe(state.balance);
   expect(state.profileBalance).toBe(state.balance);
   expect(state.critical).toBe(0);
+  await page.locator('#money [data-workspace-page="paid-expenses"]').click();
+  await expect(page.locator('.paid-expenses-info-note')).toContainText('deducts its payment from the actual account you choose');
+  await expect(page.locator('.paid-expenses-info-note')).toContainText('Moving it back to unpaid reverses that recorded payment');
 });
 
 test("generic payment toast is replaced with the ledger rollback reason", async ({ page }) => {
