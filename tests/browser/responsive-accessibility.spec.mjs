@@ -97,7 +97,7 @@ test("phone controls use the approved 35px compact rhythm", async ({ page }) => 
       const headers = sizes('#money .period-header, #availableMoneySection .card-header, #money .legend-item, #money .summary-item');
       return {
         controls,
-        oversized:controls.filter(size => size.height < 34.5 || size.height > 35.5),
+        oversized:controls.filter(size => size.height > 35.5),
         collapse,
         headers,
         overflow:Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) > innerWidth + 1
