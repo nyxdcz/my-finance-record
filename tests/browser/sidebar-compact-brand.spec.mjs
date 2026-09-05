@@ -49,7 +49,7 @@ test("desktop sidebar collapses to 60px and expands to 185px with the approved T
   await expect(sidebar).toHaveCSS("width", "60px");
   await expect(sidebar).toHaveCSS("padding-left", "6px");
   await expect(sidebar).toHaveCSS("padding-right", "6px");
-  await expect(sidebar).toHaveCSS("background-color", "rgb(23, 43, 40)");
+  await expect(sidebar).toHaveCSS("background-color", "rgb(255, 255, 255)");
   await expect(main).toHaveCSS("margin-left", "60px");
 
   await expect(brand).toBeVisible();
@@ -69,7 +69,7 @@ test("desktop sidebar collapses to 60px and expands to 185px with the approved T
   await expect(activeIconImage).toHaveCSS("height", "16px");
   await expect(active).toHaveCSS("background-color", "rgba(53, 111, 209, 0.18)");
   await expect(active).toHaveCSS("border-radius", "8px");
-  await expect(active).toHaveCSS("color", "rgb(255, 255, 255)");
+  await expect(active).toHaveCSS("color", "rgb(24, 34, 48)");
   await expect(activeIcon).toHaveCSS("background-color", "rgb(53, 111, 209)");
 
   const collapsedTooltip = await active.evaluate(node => {
@@ -90,7 +90,7 @@ test("desktop sidebar collapses to 60px and expands to 185px with the approved T
     fontSize:"13px",
     fontWeight:"700",
     backgroundColor:"rgb(31, 41, 55)",
-    color:"rgb(255, 255, 255)",
+    color:"rgb(24, 34, 48)",
     paddingTop:"7px",
     paddingRight:"10px",
     borderRadius:"7px"
@@ -105,7 +105,7 @@ test("desktop sidebar collapses to 60px and expands to 185px with the approved T
   await expect(sidebar).toHaveCSS("width", "185px");
   await expect(sidebar).toHaveCSS("padding-left", "8px");
   await expect(sidebar).toHaveCSS("padding-right", "8px");
-  await expect(sidebar).toHaveCSS("background-color", "rgb(23, 43, 40)");
+  await expect(sidebar).toHaveCSS("background-color", "rgb(255, 255, 255)");
   await expect(main).toHaveCSS("margin-left", "60px");
 
   await expect(brand).toBeVisible();
@@ -114,7 +114,7 @@ test("desktop sidebar collapses to 60px and expands to 185px with the approved T
   await expect(brandText).toHaveText("Talaan");
   await expect(brandText).toHaveCSS("font-size", "25px");
   await expect(brandText).toHaveCSS("font-weight", "700");
-  await expect(brandText).toHaveCSS("color", "rgb(255, 255, 255)");
+  await expect(brandText).toHaveCSS("color", "rgb(24, 34, 48)");
   await expect(brandLogo).toBeVisible();
   await expect(brandLogo).toHaveCSS("width", "25px");
   await expect(brandLogo).toHaveCSS("height", "25px");
@@ -123,8 +123,8 @@ test("desktop sidebar collapses to 60px and expands to 185px with the approved T
   await expect(firstLabel).toHaveCSS("opacity", "1");
   await expect(firstLabel).toHaveCSS("font-size", "12px");
   await expect(firstLabel).toHaveCSS("font-weight", "700");
-  await expect(firstLabel).toHaveCSS("color", "rgb(217, 229, 226)");
-  await expect(activeLabel).toHaveCSS("color", "rgb(255, 255, 255)");
+  await expect(firstLabel).toHaveCSS("color", "rgb(102, 112, 133)");
+  await expect(activeLabel).toHaveCSS("color", "rgb(24, 34, 48)");
   await expect(active).toHaveCSS("background-color", "rgba(53, 111, 209, 0.18)");
   await expect(activeIcon).toHaveCSS("background-color", "rgb(53, 111, 209)");
   expect(await active.evaluate(node => getComputedStyle(node, "::after").content)).toBe("none");
@@ -171,7 +171,7 @@ test("mobile drawer keeps a roomy 320px shell, 48px rows, and the real Talaan br
   await expect(brandText).toHaveText("Talaan");
   await expect(brandText).toHaveCSS("font-size", "25px");
   await expect(brandText).toHaveCSS("font-weight", "700");
-  await expect(brandText).toHaveCSS("color", "rgb(255, 255, 255)");
+  await expect(brandText).toHaveCSS("color", "rgb(24, 34, 48)");
   await expect(mark).toBeVisible();
   await expect(mark).toHaveCSS("width", "25px");
   await expect(mark).toHaveCSS("height", "25px");
