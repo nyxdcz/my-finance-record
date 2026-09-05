@@ -50,7 +50,7 @@ html body :where(
   .toast,
   .snackbar,
   .toast-message
-):not([class*="status-chip"]):not([class*="badge"]):not([class*="pill"]):not([class*="avatar"]):not([class*="dot"]):not([class*="swatch"]):not([class*="mascot"]) {
+):not([class*="status-chip"]):not([class*="badge"]):not([class*="pill"]):not([class*="avatar"]):not([class*="dot"]):not([class*="swatch"]):not([class*="mascot"]):not(.finance-privacy-lock-card):not(.finance-device-lock-card) {
   border-radius: var(--talaan-ui-radius) !important;
 }
 
@@ -416,7 +416,6 @@ html body #monthlyBudgetPlannerCard .savings-check-row input {
   border-radius: var(--talaan-control-radius) !important;
 }
 
-html body #monthlyBudgetPlannerCard .cash-forecast-panel,
 html body #monthlyBudgetPlannerCard .savings-confirmation,
 html body #monthlyBudgetPlannerCard .savings-projection-row,
 html body #monthlyBudgetPlannerCard .savings-outlook-stat {
@@ -424,7 +423,7 @@ html body #monthlyBudgetPlannerCard .savings-outlook-stat {
 }
 
 html body #monthlyBudgetPlannerCard .cash-forecast-panel {
-  border-radius: var(--talaan-card-radius) !important;
+  border-radius: var(--talaan-section-radius) !important;
 }
 
 @media print,

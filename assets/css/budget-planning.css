@@ -12,7 +12,7 @@
 .budget-plan-kpi.is-warning { background:var(--orange-soft); border-color:rgba(230,138,31,.3); }
 .budget-plan-kpi.is-success { background:var(--green-soft); border-color:rgba(47,143,70,.26); }
 .budget-planner-grid { display:grid; grid-template-columns:minmax(0,1.35fr) minmax(280px,.65fr); gap:12px; align-items:start; }
-.budget-category-panel,.cash-forecast-panel { min-width:0; border:1px solid var(--line); border-radius:var(--talaan-card-radius); background:var(--surface); }
+.budget-category-panel,.cash-forecast-panel { min-width:0; border:1px solid var(--line); border-radius:var(--talaan-section-radius); background:var(--surface); }
 .budget-panel-heading { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; padding:11px 12px; border-bottom:1px solid var(--line); }
 .budget-panel-heading h4 { margin:0; font-size:.84rem; }
 .budget-panel-heading p { margin:2px 0 0; color:var(--muted); font-size:.68rem; }
@@ -141,7 +141,7 @@
 .budget-plan-kpi strong { margin-top:2px; font-size:.9rem; }
 .budget-plan-kpi small { margin-top:2px; font-size:.59rem; line-height:1.25; }
 .budget-planner-grid { gap:8px; padding:0 12px 12px; }
-.budget-category-panel,.cash-forecast-panel { border-radius:var(--talaan-card-radius); }
+.budget-category-panel,.cash-forecast-panel { border-radius:var(--talaan-section-radius); }
 .budget-panel-heading { min-height:58px; padding:8px 10px; align-items:center; }
 .budget-panel-heading h4 { font-size:.79rem; }
 .budget-panel-heading p { font-size:.64rem; line-height:1.3; }

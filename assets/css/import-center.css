@@ -7,3 +7,7 @@
 /* Radius ownership: import records are cards; mapping notes and summary cells are controls. */
 .import-batch-row,.import-preview-row{border-radius:var(--talaan-card-radius)}
 .import-source-notes,.import-currency-confirmation,.import-summary-grid>div,.import-rule-suggestions{border-radius:var(--talaan-control-radius)}
+
+/* Keep the review footer in the dialog viewport while the preview body scrolls. */
+.import-center-dialog[open] { display:flex; flex-direction:column; }
+.import-center-dialog[open] > .modal-body { flex:1 1 auto; min-height:0; overflow:auto; }

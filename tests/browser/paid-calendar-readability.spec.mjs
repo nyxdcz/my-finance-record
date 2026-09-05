@@ -4,6 +4,7 @@ async function loadPaidCalendarFixture(page, width) {
   await page.setViewportSize({ width, height:900 });
   await page.setContent(`<!doctype html><html data-theme="light"><head>
     <link rel="stylesheet" href="http://127.0.0.1:3000/app.css?v=2.5.0-talaan1">
+    <link rel="stylesheet" href="http://127.0.0.1:3000/ui-radius.css?v=2.5.0-talaan4">
     <link rel="stylesheet" href="http://127.0.0.1:3000/productivity-tools.css?v=2.5.0-talaan1">
     <link rel="stylesheet" href="http://127.0.0.1:3000/transaction-views.css?v=2.5.0-talaan1">
   </head><body><div class="app"><main class="main"><div class="content">
@@ -115,7 +116,7 @@ test("desktop paid calendar separates dates and keeps names and amounts easy to 
   expect(state.calendarGap).toBeCloseTo(10, 0);
   expect(state.dayHeight).toBeGreaterThanOrEqual(176);
   expect(state.dayBorder).toBe("solid");
-  expect(state.dayRadius).toBeCloseTo(10, 0);
+  expect(state.dayRadius).toBeCloseTo(12, 0);
   expect(state.headingWeight).toBeGreaterThanOrEqual(800);
   expect(state.entryDisplay).toBe("grid");
   expect(state.entryHeight).toBeGreaterThanOrEqual(40);

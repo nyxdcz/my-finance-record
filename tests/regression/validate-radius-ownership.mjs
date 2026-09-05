@@ -39,7 +39,7 @@ assert.match(production, /#money \.period-card \{[\s\S]*border-radius: var\(--ta
 assert.match(production, /#money \.record-row\[data-expense-row\] > \.desktop-record-actions > \.button \{[\s\S]*border-radius: var\(--talaan-control-radius\)/);
 assert.doesNotMatch(blackCanvas, /#money \.period-card|#money \.period-card \.period-header|#money \.period-card \.record-row/);
 assert.doesNotMatch(transactions, /section-stack>\.period-card\{border-radius:10px|border-radius:10px!important;overflow:hidden!important/);
-assert.match(budget, /\.budget-category-panel,\.cash-forecast-panel \{ border-radius:var\(--talaan-card-radius\); \}/);
+assert.match(budget, /\.budget-category-panel,\.cash-forecast-panel \{[^}]*border-radius:var\(--talaan-section-radius\);/);
 assert.ok((sidebar.match(/border-radius:var\(--talaan-control-radius\) !important/g) || []).length >= 6);
 assert.match(accountLedger, /ledger-summary-grid > div[^}]*border-radius:var\(--talaan-card-radius\)/);
 assert.match(household, /\.household-group,.household-empty,.household-split-total,.household-expense-control\{border-radius:var\(--talaan-card-radius\)\}/);
