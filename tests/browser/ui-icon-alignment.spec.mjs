@@ -51,7 +51,7 @@ test("Talaan V2.5.0 header moves Dashboard customization into More tools", async
 });
 
 
-test("V15.2.18 desktop topbar keeps persistent controls at the compact 34px height", async ({ page }) => {
+test("V15.2.18 desktop topbar keeps persistent controls at the compact 30px height", async ({ page }) => {
   await page.setViewportSize({ width:1440, height:900 });
   await page.goto("http://127.0.0.1:3000/index.html?page=money", { waitUntil:"networkidle" });
 
@@ -64,7 +64,7 @@ test("V15.2.18 desktop topbar keeps persistent controls at the compact 34px heig
   await expect(page.locator("#cloudSyncStatusButton")).toBeVisible();
   const heightOf = selector => page.locator(selector).first().evaluate(element => element.getBoundingClientRect().height);
   const reference = await heightOf("#cloudSyncStatusButton");
-  expect(reference).toBe(34);
+  expect(reference).toBe(30);
 
   for (const selector of [
     ".month-navigator",
@@ -83,7 +83,7 @@ test("V15.2.18 desktop topbar keeps persistent controls at the compact 34px heig
       return { borderRadius:computed.borderRadius, width:element.getBoundingClientRect().width };
     });
     expect(style.borderRadius, `${selector} should use the shared control radius`).toBe("8px");
-    if (selector === "#topbarToolsTrigger") expect(style.width).toBe(34);
+    if (selector === "#topbarToolsTrigger") expect(style.width).toBe(30);
   }
 
   await expect(page.locator(".topbar-history-actions")).toBeHidden();
@@ -113,7 +113,7 @@ test("V15.2.18 desktop month navigation uses compact standalone controls", async
       backdrop:style.backdropFilter
     };
   });
-  expect(shellStyle.height).toBe(34);
+  expect(shellStyle.height).toBe(30);
   expect(shellStyle.gap).toBe("4px");
   expect(shellStyle.borderWidth).toBe("0px");
   expect(shellStyle.background).toBe("rgba(0, 0, 0, 0)");
@@ -131,7 +131,7 @@ test("V15.2.18 desktop month navigation uses compact standalone controls", async
         backdrop:computed.backdropFilter
       };
     });
-    expect(style.height, `${selector} should stay at the compact toolbar height`).toBe(34);
+    expect(style.height, `${selector} should stay at the compact toolbar height`).toBe(30);
     expect(style.borderWidth, `${selector} should use the standalone outline`).toBe("1px");
     expect(style.borderRadius, `${selector} should use the shared control radius`).toBe("8px");
     expect(style.shadow, `${selector} should stay shadow-free`).toBe("none");
@@ -144,7 +144,7 @@ test("V15.2.18 desktop month navigation uses compact standalone controls", async
     const style = getComputedStyle(element);
     return { height:element.getBoundingClientRect().height, marginLeft:style.marginLeft, borderRadius:style.borderRadius, shadow:style.boxShadow };
   });
-  expect(currentStyle.height).toBe(34);
+  expect(currentStyle.height).toBe(30);
   expect(currentStyle.marginLeft).toBe("0px");
   expect(currentStyle.borderRadius).toBe("8px");
   expect(currentStyle.shadow).toBe("none");

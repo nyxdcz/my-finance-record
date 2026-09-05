@@ -53,6 +53,22 @@
 .pc-full-list { max-height:none; overflow:visible; }
 
 .project-kanban-header-actions { display:flex; align-items:center; justify-content:flex-end; gap:8px; flex-wrap:wrap; }
+
+/* Fine-pointer desktop project headers share the compact 30px control rhythm.
+   Touch breakpoints below keep their larger accessible targets. */
+@media (min-width:851px) and (hover:hover) and (pointer:fine) {
+  html body :is(
+    .project-calendar-v13020 .pc-header-actions,
+    #activeProjectsCard .project-kanban-header-actions
+  ) > .button {
+    box-sizing:border-box;
+    height:var(--ui-disclosure-size,30px);
+    min-height:var(--ui-disclosure-size,30px);
+    max-height:var(--ui-disclosure-size,30px);
+    padding-block:3px;
+  }
+}
+
 .finance-kanban-board {
   min-width:0;
   padding:8px;
