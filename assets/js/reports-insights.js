@@ -444,7 +444,7 @@
 
   function renderGymSummary(metrics) {
     const target=document.getElementById("insightsGymSummary");if(!target)return;
-    target.innerHTML=`<div class="insight-mini-kpis"><div><span>Scheduled visits</span><strong>${metrics.gymVisits}</strong></div><div><span>Planned Gym cost</span><strong>${formatMoney(metrics.gymCost)}</strong></div><div><span>Cost per visit</span><strong>${metrics.gymVisits?formatMoney(metrics.gymCostPerVisit):"—"}</strong></div></div>${metrics.gymVisits?"":'<p class="insight-muted">Add Gym expense records to calculate visits and cost per visit.</p>'}`;
+    target.innerHTML=`<div class="insight-mini-kpis"><div><span>Scheduled visits</span><strong>${metrics.gymVisits}</strong></div><div><span>Planned Gym cost</span><strong>${formatMoney(metrics.gymCost)}</strong></div><div><span>Cost per visit</span><strong>${metrics.gymVisits?formatMoney(metrics.gymCostPerVisit):"N/A"}</strong></div></div>${metrics.gymVisits?"":'<p class="insight-muted">Add Gym expense records to calculate visits and cost per visit.</p>'}`;
   }
 
   function renderRecurringChanges(metrics) {

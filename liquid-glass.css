@@ -79,7 +79,7 @@ html[data-theme="dark"] {
 .finance-week-marquee,
 .work-week-marquee,
 :is(.cloud-sync-toolbar-popover,.month-picker-popover,.topbar-tools-panel,.overflow-menu,.context-menu,.menu-popover,.popover),
-:is(.toast,.snackbar,.toast-message,[role="status"].toast,[role="status"].snackbar) {
+:is(.toast,.snackbar,[role="status"].toast,[role="status"].snackbar) {
   border-radius:var(--liquid-glass-radius);
 }
 
@@ -644,4 +644,36 @@ html[data-theme="light"] :is(dialog,.modal,.dialog) :is(.modal-header,.dialog-he
   background:linear-gradient(180deg,var(--liquid-glass-surface-strong),var(--liquid-glass-surface)) !important;
   border-color:var(--liquid-glass-border) !important;
   color:var(--text) !important;
+}
+
+/* Anti-Slop material budget: keep glass to the cloud-status popover only. */
+.sidebar,
+.workspace-switcher,
+.finance-workspace-marquee-row>.workspace-switcher,
+.dashboard-week-marquee,
+.finance-week-marquee,
+.work-week-marquee,
+:is(.dashboard-week-marquee,.finance-week-marquee,.work-week-marquee) .dashboard-week-day,
+:is(.month-picker-popover,.topbar-tools-panel,.overflow-menu,.context-menu,.menu-popover,.popover),
+:is(dialog,.modal,.dialog) :is(.modal-header,.dialog-header,.modal-footer,.dialog-footer,.modal-actions,.dialog-actions),
+:is(.pc-full-dialog,.project-calendar-dialog) :is(.modal-header,.dialog-header,.pc-dialog-header,.modal-actions,.dialog-actions),
+:is(.toast,.snackbar,.toast-message,[role="status"].toast,[role="status"].snackbar) {
+  background:var(--surface)!important;
+  border-color:var(--line)!important;
+  box-shadow:none!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+}
+
+/* The sync status popover remains the single floating glass surface. */
+.cloud-sync-toolbar-popover {
+  -webkit-backdrop-filter:blur(22px) saturate(145%);
+  backdrop-filter:blur(22px) saturate(145%);
+}
+
+@media (prefers-reduced-transparency:reduce), (forced-colors:active) {
+  .cloud-sync-toolbar-popover {
+    -webkit-backdrop-filter:none!important;
+    backdrop-filter:none!important;
+  }
 }

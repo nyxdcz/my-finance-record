@@ -1134,8 +1134,8 @@
     panel.hidden = true;
     panel.innerHTML = `
       <div class="account-spend-summary">
-        <div class="account-spend-summary-copy"><span>Payment account</span><strong id="accountSpendAccountName">—</strong></div>
-        <div class="account-spend-summary-balance"><span>Current balance</span><strong id="accountSpendCurrentBalance">—</strong></div>
+        <div class="account-spend-summary-copy"><span>Payment account</span><strong id="accountSpendAccountName">N/A</strong></div>
+        <div class="account-spend-summary-balance"><span>Current balance</span><strong id="accountSpendCurrentBalance">N/A</strong></div>
       </div>
       <div class="account-spend-grid">
         <div class="field"><label for="accountSpendAmount">Amount spent <span class="required-mark" aria-hidden="true">*</span></label><input class="input" id="accountSpendAmount" type="text" inputmode="decimal" autocomplete="off" data-money-input placeholder="0.00"></div>
@@ -1145,7 +1145,7 @@
         <div class="field field-full"><label for="accountSpendNote">Note <span class="muted-label">(optional)</span></label><input class="input" id="accountSpendNote" maxlength="160" placeholder="Example: Jollibee SM City"></div>
         <label class="account-spend-total-choice field-full" for="accountSpendIncludeTotals"><input id="accountSpendIncludeTotals" type="checkbox" checked><span><strong>Include in calculated totals</strong><small>Included by default in expenses and Money Remaining.</small></span></label>
       </div>
-      <div class="account-spend-preview" id="accountSpendPreview" aria-live="polite">${SPEND_ICON}<p id="accountSpendPreviewText">Enter an amount to preview this purchase.</p><strong class="account-spend-preview-balance" id="accountSpendAfterBalance">—</strong></div>
+      <div class="account-spend-preview" id="accountSpendPreview" aria-live="polite">${SPEND_ICON}<p id="accountSpendPreviewText">Enter an amount to preview this purchase.</p><strong class="account-spend-preview-balance" id="accountSpendAfterBalance">N/A</strong></div>
       <div class="account-spend-status" id="accountSpendStatus" role="status" aria-live="polite" hidden></div>`;
     grid.insertAdjacentElement("afterend", panel);
     bindAccountSpendControls(panel);
@@ -1179,7 +1179,7 @@
     if (dialog) dialog.dataset.spendRequestId = uid();
     setAccountSpendStatus();
     const name = document.getElementById("accountSpendAccountName");
-    if (name) name.textContent = account || "—";
+    if (name) name.textContent = account || "N/A";
     updateAccountSpendPreview();
   }
 
@@ -1241,8 +1241,8 @@
     const afterEl = document.getElementById("accountSpendAfterBalance");
     const preview = document.getElementById("accountSpendPreview");
     const text = document.getElementById("accountSpendPreviewText");
-    if (currentEl) currentEl.textContent = exists ? money(current) : "—";
-    if (afterEl) afterEl.textContent = exists && amount > 0 ? `After: ${money(after)}` : "—";
+    if (currentEl) currentEl.textContent = exists ? money(current) : "N/A";
+    if (afterEl) afterEl.textContent = exists && amount > 0 ? `After: ${money(after)}` : "N/A";
     const invalid = !exists || amount <= 0 || after < 0;
     preview?.classList.toggle("is-warning", Boolean(amount > 0 && invalid));
     if (!text) return;
@@ -1471,7 +1471,7 @@
     const fromBalance = Number(data.accounts?.[from] || 0);
     const preview = document.getElementById("transferPreview");
     if (!preview) return;
-    preview.innerHTML = `<div><span>Source balance</span><strong>${from ? money(fromBalance) : "—"}</strong></div><div><span>After transfer</span><strong class="${amount > fromBalance ? "text-red" : ""}">${from ? money(fromBalance - amount) : "—"}</strong></div><div><span>Destination receives</span><strong class="text-green">${to ? money(amount) : "—"}</strong></div>`;
+    preview.innerHTML = `<div><span>Source balance</span><strong>${from ? money(fromBalance) : "N/A"}</strong></div><div><span>After transfer</span><strong class="${amount > fromBalance ? "text-red" : ""}">${from ? money(fromBalance - amount) : "N/A"}</strong></div><div><span>Destination receives</span><strong class="text-green">${to ? money(amount) : "N/A"}</strong></div>`;
   }
 
   function submitTransfer() {

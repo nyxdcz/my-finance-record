@@ -80,7 +80,7 @@
   const profileId = profile => String(profile?.profile_id || profile?.cloudProfileId || "");
   const shortId = value => {
     const text = String(value || "");
-    return text.length > 10 ? `…${text.slice(-8)}` : text || "—";
+    return text.length > 10 ? `…${text.slice(-8)}` : text || "N/A";
   };
   const roleLabel = value => String(value || "viewer").toLowerCase() === "owner" ? "Owner" : String(value || "viewer").toLowerCase() === "editor" ? "Editor" : "Viewer";
   const escapeHtml = value => String(value ?? "").replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[ch]);
@@ -141,8 +141,8 @@
       if (String(row.dataset.cloudProfileId || "") !== String(id || "")) return;
       const value = row.querySelector("[data-cloud-profile-stats]");
       if (!value) return;
-      const accounts = Number.isFinite(normalized.accounts) ? normalized.accounts : "—";
-      const devices = Number.isFinite(normalized.devices) ? normalized.devices : "—";
+      const accounts = Number.isFinite(normalized.accounts) ? normalized.accounts : "N/A";
+      const devices = Number.isFinite(normalized.devices) ? normalized.devices : "N/A";
       value.textContent = `Accounts ${accounts} · Devices ${devices}`;
     });
   }
@@ -217,7 +217,7 @@
         ].filter(Boolean).join(" ");
         const radioId = `cloudProfileSelectionRadio${index}`;
         return `<div data-cloud-profile-id="${escapeHtml(id)}" title="Cloud Profile ${escapeHtml(id)}" style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:var(--surface-soft);">
-          <label for="${radioId}" style="display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:start;flex:1 1 320px;min-width:0;cursor:pointer;"><input id="${radioId}" type="radio" name="cloudProfileSelection" value="${escapeHtml(id)}" ${checked ? "checked" : ""}><span><span style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;"><strong>${escapeHtml(profile.name || "Cloud finances")}</strong>${chips}</span><small style="display:block;color:var(--muted);margin-top:3px;">${escapeHtml(roleLabel(profile.role))} · Profile ${escapeHtml(shortId(id))}</small><small style="display:block;color:var(--muted);margin-top:2px;">Updated ${escapeHtml(formatDate(profile.updated_at))} · Created ${escapeHtml(formatDate(profile.created_at))}</small><small data-cloud-profile-stats style="display:block;color:var(--muted);margin-top:2px;">Accounts — · Devices —</small></span></label>
+          <label for="${radioId}" style="display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:start;flex:1 1 320px;min-width:0;cursor:pointer;"><input id="${radioId}" type="radio" name="cloudProfileSelection" value="${escapeHtml(id)}" ${checked ? "checked" : ""}><span><span style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;"><strong>${escapeHtml(profile.name || "Cloud finances")}</strong>${chips}</span><small style="display:block;color:var(--muted);margin-top:3px;">${escapeHtml(roleLabel(profile.role))} · Profile ${escapeHtml(shortId(id))}</small><small style="display:block;color:var(--muted);margin-top:2px;">Updated ${escapeHtml(formatDate(profile.updated_at))} · Created ${escapeHtml(formatDate(profile.created_at))}</small><small data-cloud-profile-stats style="display:block;color:var(--muted);margin-top:2px;">Accounts N/A · Devices N/A</small></span></label>
           ${ownerActions(profile)}
         </div>`;
       }).join("")}</div>
@@ -386,8 +386,8 @@
     if (String(profile.role || "").toLowerCase() !== "owner") return toast("Only the Cloud Profile owner can rename or delete this profile.", "warning");
     const overlay = managementDialog();
     const stats = statsByProfileId.get(profileId(profile)) || {};
-    const accounts = Number.isFinite(stats.accounts) ? stats.accounts : "—";
-    const devices = Number.isFinite(stats.devices) ? stats.devices : "—";
+    const accounts = Number.isFinite(stats.accounts) ? stats.accounts : "N/A";
+    const devices = Number.isFinite(stats.devices) ? stats.devices : "N/A";
     const current = String(architecture()?.cloudProfileId?.() || "") === profileId(profile);
     const deleting = mode === "delete";
     overlay.dataset.mode = deleting ? "delete" : "rename";
@@ -558,7 +558,7 @@
       if (!item) {
         item = document.createElement("div");
         item.id = "cloudHealthProfileItem";
-        item.innerHTML = `<span>Active Cloud Profile</span><strong id="cloudHealthProfile">—</strong>`;
+        item.innerHTML = `<span>Active Cloud Profile</span><strong id="cloudHealthProfile">N/A</strong>`;
         grid.appendChild(item);
       }
       const next = `${current.name} · ${current.role} · ${shortId(current.id)}`;

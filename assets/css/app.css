@@ -1353,6 +1353,26 @@
     .sync-summary strong { display: block; margin-top: 2px; font-size: .82rem; }
     .warning-box { padding:10px; border-radius:10px; background:var(--orange-soft); border:1px solid color-mix(in srgb,var(--orange) 34%,var(--line)); color:var(--orange); font-size:.73rem; }
     .success-box { padding: 10px; border-radius: 10px; background: var(--green-soft); border: 1px solid #cdebd4; color: #28723b; font-size: .73rem; }
+    .sample-data-notice {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 0 0 14px;
+      padding: 11px 13px;
+      border: 1px solid color-mix(in srgb, var(--orange) 38%, var(--line));
+      border-radius: var(--radius);
+      background: var(--orange-soft);
+      color: var(--text);
+    }
+    .sample-data-notice[hidden] { display: none; }
+    body.finance-signed-out .sample-data-notice,
+    body.finance-auth-pending .sample-data-notice { display: none !important; }
+    .sample-data-notice-copy { display: flex; align-items: flex-start; gap: 10px; min-width: 0; }
+    .sample-data-notice-copy > div { min-width: 0; }
+    .sample-data-notice-copy strong { display: block; font-size: .78rem; line-height: 1.25; }
+    .sample-data-notice-copy p { margin: 3px 0 0; color: var(--muted); font-size: .71rem; line-height: 1.4; }
+    .sample-data-notice .button { flex: 0 0 auto; }
     .file-label { display: inline-flex; align-items: center; justify-content: center; }
     @media (max-width: 850px) {
       .recovery-pack-form, .system-inline-form { grid-template-columns: 1fr; }
@@ -1360,6 +1380,8 @@
       .pwa-update-inner { align-items: flex-start; flex-direction: column; }
       .pwa-update-actions { width: 100%; }
       .pwa-update-actions .button { flex: 1; }
+      .sample-data-notice { align-items: stretch; flex-direction: column; }
+      .sample-data-notice .button { width: 100%; }
     }
 
 
@@ -5383,4 +5405,19 @@ html[data-theme="dark"] :is(.money-workspace-switcher, .project-workspace-switch
   #settings .settings-panel .system-card {
     --row-divider-bleed:10px;
   }
+}
+
+/* Anti-Slop keyboard focus: compact controls keep a visible high-contrast ring. */
+:is(.expense-toolbar-single-line,.expense-toolbar-compact,.paid-toolbar-compact,.project-toolbar-compact,.income-toolbar) :is(.input,.select):focus-visible,
+.topbar .month-display-button:focus-visible,
+.record-icon-trigger:focus-visible {
+  outline:2px solid var(--focus-ring,var(--primary)) !important;
+  outline-offset:2px !important;
+  border-color:var(--focus-ring,var(--primary)) !important;
+  background:var(--surface) !important;
+  box-shadow:0 0 0 1px var(--focus-ring,var(--primary)) !important;
+}
+:is(.expense-toolbar-single-line,.expense-toolbar-compact,.paid-toolbar-compact,.project-toolbar-compact,.income-toolbar) :is(.input.input-error,.select.input-error):focus-visible {
+  border-color:var(--danger) !important;
+  box-shadow:0 0 0 1px var(--danger) !important;
 }

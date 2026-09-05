@@ -592,7 +592,7 @@
       const { group } = pendingHouseholdPayment(), other = group && event.target.value !== group.ownerMemberId;
       const account = document.getElementById("expensePaymentAccount"), warning = document.getElementById("expensePaymentWarning"), confirmButton = document.getElementById("confirmExpensePayment");
       if (account) { account.disabled = Boolean(other); account.required = !other; }
-      if (other) { warning.hidden = true; warning.textContent = ""; confirmButton.disabled = false; document.getElementById("expensePaymentCurrentBalance").textContent = "—"; document.getElementById("expensePaymentAfterBalance").textContent = "—"; }
+      if (other) { warning.hidden = true; warning.textContent = ""; confirmButton.disabled = false; document.getElementById("expensePaymentCurrentBalance").textContent = "N/A"; document.getElementById("expensePaymentAfterBalance").textContent = "N/A"; }
       else { account.disabled = false; refreshExpensePaymentPreview(); }
     }
   });

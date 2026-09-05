@@ -163,6 +163,13 @@
       </header>
 
       <div class="content">
+        <aside class="sample-data-notice no-print" id="sampleDataNotice" hidden role="status" aria-live="polite">
+          <div class="sample-data-notice-copy">
+            <span class="status-chip warning">Sample data</span>
+            <div><strong>This workspace contains sample records</strong><p>These values are for demonstration. Start with an empty workspace before adding your own finances.</p></div>
+          </div>
+          <button class="button button-secondary button-small" id="startEmptyWorkspaceButton" type="button">Start with empty workspace</button>
+        </aside>
         <section class="page" id="dashboard" aria-labelledby="dashboard-title">
           <section class="dashboard-week-marquee" id="dashboardWeekMarquee" aria-labelledby="dashboardWeekMarqueeTitle">
             <div class="dashboard-week-marquee-heading"><strong id="dashboardWeekMarqueeTitle">This week</strong><span id="dashboardWeekMarqueeRange">Seven-day calendar</span></div>
@@ -242,11 +249,11 @@
               </div>
               <div class="chart-shell chart-sensitive" id="dashSavingsTrendChart" role="img" aria-label="Savings trend chart"></div>
               <div class="savings-detail-grid chart-sensitive">
-                <div><span>First recorded savings</span><strong id="dashSavingsStart">—</strong></div>
-                <div><span>Ending savings</span><strong id="dashSavingsEnd">—</strong></div>
-                <div><span>Change</span><strong id="dashSavingsChange">—</strong></div>
-                <div><span>Change percentage</span><strong id="dashSavingsPercent">—</strong></div>
-                <div><span>Highest / lowest</span><strong id="dashSavingsRange">—</strong></div>
+                <div><span>First recorded savings</span><strong id="dashSavingsStart">N/A</strong></div>
+                <div><span>Ending savings</span><strong id="dashSavingsEnd">N/A</strong></div>
+                <div><span>Change</span><strong id="dashSavingsChange">N/A</strong></div>
+                <div><span>Change percentage</span><strong id="dashSavingsPercent">N/A</strong></div>
+                <div><span>Highest / lowest</span><strong id="dashSavingsRange">N/A</strong></div>
               </div>
             </article>
 
@@ -363,7 +370,7 @@
           </article>
           <article class="card annual-income-card">
             <div class="card-header"><div><h3 id="annualIncomeHeading">Annual income table</h3><p>Monthly totals by category for the selected year.</p></div><div class="annual-income-actions"><label class="sr-only" for="incomeYearPicker">Income year</label><select class="select" id="incomeYearPicker"></select><label class="annual-show-all" for="incomeShowAllCategories" aria-label="Show all income categories"><input type="checkbox" id="incomeShowAllCategories"> Show all</label><button class="button button-secondary button-small" id="exportAnnualIncomeCsv" type="button" aria-label="Export annual income CSV">Export CSV</button></div></div>
-            <div class="annual-income-summary" aria-label="Annual income summary"><div><span>Annual income</span><strong class="text-green" id="annualIncomeTotal">₱0.00</strong></div><div><span>Average per month</span><strong id="annualIncomeAverage">₱0.00</strong></div><div><span>Highest-income month</span><strong id="annualIncomeHighest">—</strong></div><div><span>Lowest-income month</span><strong id="annualIncomeLowest">—</strong></div></div>
+            <div class="annual-income-summary" aria-label="Annual income summary"><div><span>Annual income</span><strong class="text-green" id="annualIncomeTotal">₱0.00</strong></div><div><span>Average per month</span><strong id="annualIncomeAverage">₱0.00</strong></div><div><span>Highest-income month</span><strong id="annualIncomeHighest">N/A</strong></div><div><span>Lowest-income month</span><strong id="annualIncomeLowest">N/A</strong></div></div>
             <p class="annual-income-scroll-hint">Review monthly totals below. Phones stack each month vertically; wider screens keep the compact table.</p>
             <div class="annual-income-table-wrap"><table class="annual-income-table" id="annualIncomeTable"></table></div>
           </article>
@@ -892,7 +899,7 @@
                 <div class="card-header"><div><h3>Sync across devices</h3><p>Keep the same finance records available on your devices</p></div><span class="status-chip info" id="cloudStatusChip">Checking</span></div>
                 <div class="cloud-sync-status-grid">
                   <div><span>Status</span><strong id="cloudStatusDetail">Checking configuration</strong></div>
-                  <div><span>Signed-in account</span><strong id="cloudUserEmail">—</strong></div>
+                  <div><span>Signed-in account</span><strong id="cloudUserEmail">Not signed in</strong></div>
                   <div><span>Last successful sync</span><strong id="cloudLastSync">Never</strong></div>
                   <div><span>Pending local changes</span><strong id="cloudPendingCount">0</strong></div>
                   <div><span>Current device</span><strong id="cloudCurrentDevice">This device</strong></div>
@@ -1040,8 +1047,8 @@
 
             <article class="card system-card" id="storageProtectionCard">
               <div class="card-header"><div><h3>Storage protection</h3><p>Review quota and request persistent browser storage</p></div><span class="status-chip" id="storagePersistChip">Checking</span></div>
-              <div class="system-status-row"><span>Storage used</span><span class="system-status-value" id="storageUsed">—</span></div>
-              <div class="system-status-row"><span>Estimated quota</span><span class="system-status-value" id="storageQuota">—</span></div>
+              <div class="system-status-row"><span>Storage used</span><span class="system-status-value" id="storageUsed">N/A</span></div>
+              <div class="system-status-row"><span>Estimated quota</span><span class="system-status-value" id="storageQuota">N/A</span></div>
               <div class="system-status-row"><span>Last backup</span><span class="system-status-value" id="lastBackupStatus">Never</span></div>
               <div class="system-actions">
                 <button class="button button-primary" id="requestPersistenceButton" type="button">Request persistent storage</button>
@@ -1145,7 +1152,7 @@
               <div class="field"><label for="salaryCompensationModelSetting">Compensation model</label><select class="select" id="salaryCompensationModelSetting"><option value="fixed-monthly-salary">Fixed monthly salary</option></select></div>
               <div class="field"><label for="salaryOfficeDaysSetting">Office days</label><input class="input" id="salaryOfficeDaysSetting" placeholder="Tuesday, Thursday, Saturday"></div>
               <div class="field"><label for="salaryHomeDaysSetting">Work-from-home days</label><input class="input" id="salaryHomeDaysSetting" placeholder="Monday, Wednesday, Friday"></div>
-              <div class="field field-full"><p class="field-help">Projects 1–3 in a work month default to Included in Fixed Salary. The next project defaults to Extra Project — Freelance Payment. Existing saved compensation choices are never silently changed.</p></div>
+              <div class="field field-full"><p class="field-help">Projects 1–3 in a work month default to Included in Fixed Salary. The next project defaults to Extra Project: Freelance Payment. Existing saved compensation choices are never silently changed.</p></div>
               <div class="field-full"><button class="button button-primary" type="submit">Save salary-work settings</button></div>
             </form>
             <div class="salary-work-preview"><div><span>Workdays</span><strong id="salaryWorkdaysPreview">Monday–Saturday</strong></div><div><span>Office</span><strong id="salaryOfficePreview">Tuesday, Thursday, Saturday</strong></div><div><span>Home</span><strong id="salaryHomePreview">Monday, Wednesday, Friday</strong></div></div>
@@ -1372,13 +1379,13 @@
       <div class="modal-header"><h3 id="expensePaymentDialogTitle">Mark expense as paid</h3><button type="button" class="button button-secondary button-small" id="closeExpensePaymentDialog">Close</button></div>
       <div class="modal-body">
         <div class="expense-payment-summary" aria-live="polite">
-          <div class="expense-payment-summary-row"><span id="expensePaymentItemLabel">Expense</span><strong id="expensePaymentItemName">—</strong></div>
+          <div class="expense-payment-summary-row"><span id="expensePaymentItemLabel">Expense</span><strong id="expensePaymentItemName">N/A</strong></div>
           <div class="expense-payment-summary-row"><span>Payment amount</span><strong id="expensePaymentAmount">₱0.00</strong></div>
         </div>
         <div class="field"><label for="expensePaymentAccount">Actual payment account <span class="required-mark" aria-hidden="true">*</span></label><select class="select" id="expensePaymentAccount" required><option value="">Select payment account</option></select><small class="field-help">The planned account saved in the expense is disregarded for this payment.</small></div>
         <div class="expense-payment-balance">
-          <div><span>Current balance</span><strong id="expensePaymentCurrentBalance">—</strong></div>
-          <div><span>Balance after payment</span><strong id="expensePaymentAfterBalance">—</strong></div>
+          <div><span>Current balance</span><strong id="expensePaymentCurrentBalance">N/A</strong></div>
+          <div><span>Balance after payment</span><strong id="expensePaymentAfterBalance">N/A</strong></div>
         </div>
         <p class="expense-payment-warning" id="expensePaymentWarning" hidden></p>
       </div>
@@ -1464,7 +1471,7 @@
           <div class="field"><label for="projectDeadline">Deadline</label><input class="input" id="projectDeadline" type="date"></div>
           <div class="project-work-section" id="salaryProjectFields" hidden>
             <div class="field"><label for="projectWorkMonth">Work month</label><input class="input" id="projectWorkMonth" type="month"></div>
-            <div class="field"><label for="projectCompensationType">Compensation</label><select class="select" id="projectCompensationType"><option value="fixed-salary">Included in fixed salary</option><option value="extra-paid">Extra project — freelance payment</option></select></div>
+            <div class="field"><label for="projectCompensationType">Compensation</label><select class="select" id="projectCompensationType"><option value="fixed-salary">Included in fixed salary</option><option value="extra-paid">Extra project: freelance payment</option></select></div>
             <div class="salary-work-summary"><div><strong id="salaryProjectCountPreview">Salary projects this month: 1 of 3</strong><small id="salaryProjectPositionPreview">This project is included in the monthly salary allowance.</small></div><span class="status-pill status-fixed-salary" id="salaryProjectCompensationChip">Fixed salary</span></div>
             <p class="salary-work-notice" id="salaryProjectLimitNotice" hidden>More than three salary-job projects this month are treated as freelance-paid work.</p>
             <p class="salary-schedule-note" id="salaryScheduleNote">Hybrid schedule: Office Tue, Thu &amp; Sat · Home Mon, Wed &amp; Fri.</p>
@@ -1569,7 +1576,7 @@
           <div class="field"><label for="savingsGoalTarget">Target amount</label><input class="input" id="savingsGoalTarget" type="text" inputmode="decimal" autocomplete="off" data-money-input data-min="0.01" placeholder="0.00"></div>
           <div class="field"><label for="savingsGoalTargetDate">Target date <span class="optional-label">Optional</span></label><input class="input" id="savingsGoalTargetDate" type="date"></div>
           <div class="field"><label for="savingsGoalSource">Savings source</label><select class="select" id="savingsGoalSource"><option value="manual">Manual goal progress</option><option value="linked">Link a Savings account</option></select></div>
-          <div class="field" id="savingsGoalManualField"><label for="savingsGoalCurrent">Current saved amount</label><input class="input" id="savingsGoalCurrent" type="text" inputmode="decimal" autocomplete="off" data-money-input data-min="0" placeholder="0.00"><small class="field-help">Planning only — this does not change Total Savings.</small></div>
+          <div class="field" id="savingsGoalManualField"><label for="savingsGoalCurrent">Current saved amount</label><input class="input" id="savingsGoalCurrent" type="text" inputmode="decimal" autocomplete="off" data-money-input data-min="0" placeholder="0.00"><small class="field-help">Planning only. This does not change Total Savings.</small></div>
           <div class="field field-full" id="savingsGoalLinkedField" hidden><label for="savingsGoalAccount">Savings account</label><select class="select" id="savingsGoalAccount"></select><small class="field-help">Progress follows this Savings account balance and is not counted twice.</small></div>
         </div>
       </div>
@@ -1658,6 +1665,7 @@
     const { closeOverflowMenu, setupOverflowMenus, renderDuplicatedMarquee, renderActiveFilterChips, middleTruncateFilename, createDashboardDragController } = window.FinanceInteractionPatterns;
 
     const STORAGE_KEY = "simple-finance-project-records-v2";
+    const SAMPLE_DATA_STATE_KEY = `${STORAGE_KEY}-sample-state`;
     const THEME_KEY = "simple-finance-theme-v1";
     const THEME_OPTIONS = ["system", "light", "dark"];
     let philippineThemeTimer = 0;
@@ -2083,11 +2091,51 @@
       };
     }
 
+    function readSampleDataState() {
+      try {
+        const parsed = JSON.parse(localStorage.getItem(SAMPLE_DATA_STATE_KEY) || "null");
+        return parsed && parsed.state === "sample" ? parsed : null;
+      } catch (error) {
+        return null;
+      }
+    }
+
+    let sampleDataState = readSampleDataState();
+
+    function setSampleDataState(state, reason = "") {
+      const next = { version:1, state, reason:String(reason || "").slice(0, 80), updatedAt:new Date().toISOString() };
+      sampleDataState = state === "sample" ? next : null;
+      try {
+        localStorage.setItem(SAMPLE_DATA_STATE_KEY, JSON.stringify(next));
+      } catch (error) {}
+      if (typeof renderSampleDataNotice === "function") renderSampleDataNotice();
+    }
+
+    function sampleDataIsActive() {
+      return sampleDataState?.state === "sample";
+    }
+
+    function createEmptyWorkspaceData() {
+      return normalizeData({
+        accounts:{ Cash:0 }, accountTypes:{ Cash:"Cash" }, accountOrder:["Cash"], accountIcons:{}, iconLibrary:{},
+        savingsSettings:{ defaultAccount:"", includeInAvailable:true, trendMonths:6 }, savingsGoals:[], incomeRecords:[],
+        expenses:[], expenseRecurrenceSkips:[], projects:[], monthlyReports:{}, monthlyChecklists:{}, monthlyBudgets:{}, budgetTemplates:[],
+        budgetSettings:{ version:1, defaultLowBalanceThreshold:1000, includeExpectedIncome:true, includeRecurringEstimates:true },
+        projectCalendarSettings:{ autoPrepare:true, defaultReminder:"P1D", includeNotes:true, includeFinancialValues:false },
+        projectKanban:{ version:1, projectColumns:[], agendaColumns:[] },
+        salaryWorkSettings:{ includedProjectsPerMonth:3, officeDays:["Tuesday","Thursday","Saturday"], homeDays:["Monday","Wednesday","Friday"], compensationModel:"fixed-monthly-salary" },
+        accountLedger:[], accountReconciliations:[], ledgerSettings:{}
+      });
+    }
+
     function loadData() {
       try {
         const saved = localStorage.getItem(STORAGE_KEY);
-        return saved ? normalizeData(JSON.parse(saved)) : createSampleData();
+        if (saved) return normalizeData(JSON.parse(saved));
+        setSampleDataState("sample", "first-run");
+        return createSampleData();
       } catch (error) {
+        setSampleDataState("sample", "recovery-fallback");
         return createSampleData();
       }
     }
@@ -2369,7 +2417,7 @@
     }
 
     function formatDate(value) {
-      if (!value) return "—";
+      if (!value) return "N/A";
       return new Intl.DateTimeFormat("en-PH", { month: "short", day: "numeric", year: "numeric" }).format(new Date(`${value}T00:00:00`));
     }
 
@@ -2895,8 +2943,8 @@
       const exists = account && Object.prototype.hasOwnProperty.call(data.accounts || {}, account);
       const balance = exists ? roundMoney(data.accounts[account]) : 0;
       const after = roundMoney(balance - total);
-      document.getElementById("expensePaymentCurrentBalance").textContent = exists ? money(balance) : "—";
-      document.getElementById("expensePaymentAfterBalance").textContent = exists ? money(after) : "—";
+      document.getElementById("expensePaymentCurrentBalance").textContent = exists ? money(balance) : "N/A";
+      document.getElementById("expensePaymentAfterBalance").textContent = exists ? money(after) : "N/A";
       const warning = document.getElementById("expensePaymentWarning");
       const confirmButton = document.getElementById("confirmExpensePayment");
       let message = "";
@@ -4067,14 +4115,14 @@
       document.getElementById("dashSavingsTrendPeriod").textContent = `${points.length} months`;
       if (!finite.length || (!savingsAccountEntries().length && !historicalFinite.length)) {
         target.innerHTML = `<div class="chart-empty compact-savings-empty">No Savings history yet. Mark an account as Savings and save monthly reports to build the trend.</div>`;
-        ["dashSavingsStart", "dashSavingsEnd", "dashSavingsChange", "dashSavingsPercent", "dashSavingsRange"].forEach(id => document.getElementById(id).textContent = "—");
+        ["dashSavingsStart", "dashSavingsEnd", "dashSavingsChange", "dashSavingsPercent", "dashSavingsRange"].forEach(id => document.getElementById(id).textContent = "N/A");
         return;
       }
       if (finite.every(point => Math.abs(Number(point.value || 0)) < .005)) {
         const dataRows = points.map(point => `<tr><th scope="row">${escapeHtml(point.label)}</th><td>${Number.isFinite(point.value) ? money(point.value) : "No snapshot"}</td></tr>`).join("");
         target.innerHTML = `<div class="chart-zero-state compact-savings-empty"><strong>No Savings history yet</strong><span>Mark an account as Savings and save monthly reports to build the trend.</span></div><details class="chart-data-details"><summary>View exact savings values</summary><div class="chart-data-table-wrap"><table><thead><tr><th>Month</th><th>Savings</th></tr></thead><tbody>${dataRows}</tbody></table></div></details>`;
         ["dashSavingsStart", "dashSavingsEnd", "dashSavingsChange", "dashSavingsRange"].forEach(id => document.getElementById(id).textContent = money(0));
-        document.getElementById("dashSavingsPercent").textContent = "—";
+        document.getElementById("dashSavingsPercent").textContent = "N/A";
         return;
       }
       const width = 760, height = 170, left = 62, right = 18, top = 14, bottom = 34;
@@ -4414,7 +4462,7 @@
         const totals=model.months.map((_,i)=>allRows.reduce((t,row)=>t+row.values[i],0));
         const total=totals.reduce((a,b)=>a+b,0);
         if(!showAll && !visibleRows.length && total===0) return "";
-        return `<tr class="income-group-row"><th colspan="15">${escapeHtml(group.name)}</th></tr><tr class="income-total-row"><th>Monthly totals</th>${totals.map((value,index)=>`<td data-label="${escapeHtml(monthLabels[index])}">${money(value)}</td>`).join("")}<td data-label="Total">${money(total)}</td><td data-label="Average">${money(total/12)}</td></tr>${visibleRows.map(row=>`<tr><th>${escapeHtml(row.category)}</th>${row.values.map((value,index)=>`<td data-label="${escapeHtml(monthLabels[index])}">${value?money(value):"—"}</td>`).join("")}<td data-label="Total">${row.total?money(row.total):"—"}</td><td data-label="Average">${row.total?money(row.total/12):"—"}</td></tr>`).join("")}`;
+        return `<tr class="income-group-row"><th colspan="15">${escapeHtml(group.name)}</th></tr><tr class="income-total-row"><th>Monthly totals</th>${totals.map((value,index)=>`<td data-label="${escapeHtml(monthLabels[index])}">${money(value)}</td>`).join("")}<td data-label="Total">${money(total)}</td><td data-label="Average">${money(total/12)}</td></tr>${visibleRows.map(row=>`<tr><th>${escapeHtml(row.category)}</th>${row.values.map((value,index)=>`<td data-label="${escapeHtml(monthLabels[index])}">${value?money(value):"N/A"}</td>`).join("")}<td data-label="Total">${row.total?money(row.total):"N/A"}</td><td data-label="Average">${row.total?money(row.total/12):"N/A"}</td></tr>`).join("")}`;
       }).join("");
       const table=document.getElementById("annualIncomeTable");
       const tableWrap=table.closest(".annual-income-table-wrap");
@@ -4430,11 +4478,11 @@
       const highest=Math.max(...monthlyTotals), lowest=Math.min(...monthlyTotals);
       const highestIndex=annualTotal>0?monthlyTotals.indexOf(highest):-1;
       const lowestIndex=annualTotal>0?monthlyTotals.indexOf(lowest):-1;
-      const monthName=index=>index<0?"—":new Date(year,index,1).toLocaleDateString("en-PH",{month:"short"});
+      const monthName=index=>index<0?"N/A":new Date(year,index,1).toLocaleDateString("en-PH",{month:"short"});
       document.getElementById("annualIncomeTotal").textContent=money(annualTotal);
       document.getElementById("annualIncomeAverage").textContent=money(annualTotal/12);
-      document.getElementById("annualIncomeHighest").textContent=highestIndex<0?"—":`${monthName(highestIndex)} · ${money(highest)}`;
-      document.getElementById("annualIncomeLowest").textContent=lowestIndex<0?"—":`${monthName(lowestIndex)} · ${money(lowest)}`;
+      document.getElementById("annualIncomeHighest").textContent=highestIndex<0?"N/A":`${monthName(highestIndex)} · ${money(highest)}`;
+      document.getElementById("annualIncomeLowest").textContent=lowestIndex<0?"N/A":`${monthName(lowestIndex)} · ${money(lowest)}`;
     }
 
     function openIncomeDialog(item=null) {
@@ -4502,7 +4550,7 @@
       document.getElementById("dashAvailable").textContent = money(available);
       document.getElementById("dashAvailableMeta").textContent = data.savingsSettings?.includeInAvailable === false ? "Savings balances excluded" : "All included account balances";
       const savingsElement = document.getElementById("dashSavings");
-      savingsElement.textContent = Number.isFinite(savings) ? money(savings) : "—";
+      savingsElement.textContent = Number.isFinite(savings) ? money(savings) : "N/A";
       if (Number.isFinite(savings)) setMoneyState(savingsElement, savings);
       const savingsMeta = document.getElementById("dashSavingsMeta");
       if (!liveSavingsAccounts.length && selectedMonth() === monthKey(new Date())) savingsMeta.textContent = "Mark an account as Savings";
@@ -4729,7 +4777,7 @@
         <div class="record-row" data-paid-expense-row="${item.id}">
           <div class="record-title record-title-with-icon">${recordIconHtml(item.icon,{label:`${item.name} icon`})}<div class="record-title-copy"><strong>${escapeHtml(item.name)}</strong><small><span class="ui-tag">${escapeHtml(item.category)}</span>${expenseRecordDescription(item) ? ` · ${escapeHtml(expenseRecordDescription(item))}` : ""}</small><div class="record-statuses"><span class="status-badge ui-pill status-paid">Paid</span>${item.autoPaidAtMonthEnd ? `<span class="status-badge status-auto-paid">Auto-paid after month end</span>` : ""}<span class="status-badge ${item.recurring === "Monthly" ? "status-saved" : "status-one-time"}">${item.recurring === "Monthly" ? "Saved monthly" : "One-time"}</span>${expenseIncludedInTotals(item) ? "" : `<span class="status-badge status-excluded">Excluded from totals</span>`}${item.householdSplit ? `<span class="status-badge status-household" title="Full bill ${escapeAttribute(money(item.householdSplit.totalAmount))}">${escapeHtml(item.householdSplit.groupName || "Household")} · your share</span>` : ""}</div></div></div>
           <div data-label="Paid date">${formatDate(item.paidDate)}</div>
-          <div data-label="Paid from">${escapeHtml(item.paidFromAccount || item.account || "—")}</div>
+          <div data-label="Paid from">${escapeHtml(item.paidFromAccount || item.account || "N/A")}</div>
           <div class="amount text-green" data-label="${item.householdSplit ? "Your share" : "Amount"}">${money(settledExpenseAmount(item))}</div>
           <div class="record-actions desktop-record-actions">
             <button class="button button-saved button-small ${item.recurring === "Monthly" ? "active" : ""}" data-toggle-saved="${item.id}" title="${item.recurring === "Monthly" ? "Repeats monthly" : "Does not repeat monthly"}" aria-label="${item.recurring === "Monthly" ? "Monthly recurrence on. Click to stop repeating" : "Repeat this expense monthly"}">
@@ -4788,8 +4836,8 @@
         const revisionInline = currentRevision ? `<span class="project-revision-inline">Revision ${currentRevision.number}${currentRevision.deadline ? ` · ${formatDate(currentRevision.deadline)}` : ""}</span>` : (revisionCount ? `<span class="project-revision-inline">${revisionCount} revision${revisionCount === 1 ? "" : "s"}</span>` : "");
         const deadlineBadge = completedBox ? `<span class="project-deadline-state upcoming">Completed ${formatDate(project.completedDate || project.updatedDate)}</span>` : (deadline.label ? `<span class="project-deadline-state ${deadline.className}">${escapeHtml(deadline.label)}</span>` : "");
         const calendarShortLabel = calendar.className === "ready" ? "✓ Added" : calendar.className === "update" ? "Update" : "Add";
-        const calendarButton = projectCalendarContext(project).deadline ? `<button class="button button-small project-calendar-button ${calendar.className === "ready" ? "button-secondary is-added" : calendar.className === "update" ? "button-secondary needs-update" : "button-secondary"}" data-calendar-project="${project.id}" aria-label="${escapeAttribute(calendar.label)}" title="${escapeAttribute(calendar.label)}">${calendarShortLabel}</button>` : `<button class="button button-small button-secondary project-calendar-button no-deadline" type="button" aria-label="No project deadline" title="No project deadline" disabled>—</button>`;
-        const financialValue = projectIsFinancial(project) ? money(project.value) : "—";
+        const calendarButton = projectCalendarContext(project).deadline ? `<button class="button button-small project-calendar-button ${calendar.className === "ready" ? "button-secondary is-added" : calendar.className === "update" ? "button-secondary needs-update" : "button-secondary"}" data-calendar-project="${project.id}" aria-label="${escapeAttribute(calendar.label)}" title="${escapeAttribute(calendar.label)}">${calendarShortLabel}</button>` : `<button class="button button-small button-secondary project-calendar-button no-deadline" type="button" aria-label="No project deadline" title="No project deadline" disabled>N/A</button>`;
+        const financialValue = projectIsFinancial(project) ? money(project.value) : "N/A";
         const paidButton = projectIsFinancial(project) && balance > 0 ? `<button class="button button-primary button-small project-compact-action" data-mark-project-paid="${project.id}" aria-label="Mark ${escapeAttribute(project.name)} fully paid" title="Mark fully paid">Mark paid</button>` : "";
         const revisionAction = project.status === "Completed" ? `<button class="button button-secondary button-small project-compact-action" data-reopen-project-revision="${project.id}" aria-label="Reopen ${escapeAttribute(project.name)} for revision" title="Reopen for revision">Reopen</button>` : (project.status === "In revision" ? `<button class="button button-primary button-small project-compact-action" data-complete-project-revision="${project.id}" aria-label="Mark revision complete for ${escapeAttribute(project.name)}" title="Mark revision complete">Finish revision</button>` : "");
         const editButton = `<button class="button button-secondary button-small project-compact-action" data-edit-project="${project.id}">Edit</button>`;
@@ -5187,7 +5235,7 @@
             <div data-label="Schedule">${item.group === "early" ? "First half" : item.group === "late" ? "Second half" : "Other"}</div>
             <div class="amount" data-label="Amount">${money(item.amount)}</div>
             <div data-label="Status"><span class="status-pill ${item.paid ? "status-paid" : "status-unpaid"}">${item.paid ? "Paid" : "Unpaid"}</span></div>
-            <div data-label="Account">${escapeHtml(item.account || "—")}</div>
+            <div data-label="Account">${escapeHtml(item.account || "N/A")}</div>
           </div>`).join("");
       }
       if (type === "paid expenses") {
@@ -5197,7 +5245,7 @@
             <div data-label="Paid date">${formatDate(item.paidDate)}</div>
             <div class="amount text-green" data-label="Amount">${money(item.amount)}</div>
             <div data-label="Category">${escapeHtml(item.category)}</div>
-            <div data-label="Paid from">${escapeHtml(item.paidFromAccount || item.account || "—")}</div>
+            <div data-label="Paid from">${escapeHtml(item.paidFromAccount || item.account || "N/A")}</div>
           </div>`).join("");
       }
       if (type === "projects") {
@@ -5205,9 +5253,9 @@
           <div class="report-table-row">
             <div><strong>${escapeHtml(project.name)}</strong><small>${escapeHtml(project.status)} · ${escapeHtml(project.includedInSalary ? "Fixed salary" : project.extraFreelanceProject ? "Salary work · Extra paid" : "Freelance")}</small></div>
             <div data-label="Type">${escapeHtml(project.type)}</div>
-            <div class="amount" data-label="Value">${project.includedInSalary ? "—" : money(project.value)}</div>
-            <div class="amount text-green" data-label="Received">${project.includedInSalary ? "—" : money(project.received)}</div>
-            <div class="amount ${project.balance ? "text-orange" : "text-green"}" data-label="Balance">${project.includedInSalary ? "—" : money(project.balance)}</div>
+            <div class="amount" data-label="Value">${project.includedInSalary ? "N/A" : money(project.value)}</div>
+            <div class="amount text-green" data-label="Received">${project.includedInSalary ? "N/A" : money(project.received)}</div>
+            <div class="amount ${project.balance ? "text-orange" : "text-green"}" data-label="Balance">${project.includedInSalary ? "N/A" : money(project.balance)}</div>
           </div>`).join("");
       }
       return items.map(payment => `
@@ -5248,7 +5296,7 @@
       ];
       document.getElementById("reportComparisonSubtitle").textContent = `${monthLabel(month)} compared with ${monthLabel(previousMonth)}`;
       document.getElementById("reportComparisonGrid").innerHTML = metrics.map(([label, current, previousValue, lowerIsBetter]) => {
-        if (!Number.isFinite(current) || !Number.isFinite(previousValue)) return `<div class="report-comparison-item"><span>${escapeHtml(label)}</span><strong>${Number.isFinite(current) ? money(current) : "—"}</strong><small class="comparison-neutral">No saved comparison snapshot</small></div>`;
+        if (!Number.isFinite(current) || !Number.isFinite(previousValue)) return `<div class="report-comparison-item"><span>${escapeHtml(label)}</span><strong>${Number.isFinite(current) ? money(current) : "N/A"}</strong><small class="comparison-neutral">No saved comparison snapshot</small></div>`;
         const comparison = reportComparisonValue(current, previousValue, lowerIsBetter);
         return `<div class="report-comparison-item"><span>${escapeHtml(label)}</span><strong>${money(current)}</strong><small class="${comparison.className}">${comparison.text} · ${comparison.percentText}</small></div>`;
       }).join("");
@@ -5315,7 +5363,7 @@
       document.getElementById("reportProjectBalance").textContent = money(report.projectBalance);
       document.getElementById("reportAvailable").textContent = money(report.available);
       const reportSavings = reportSavingsValue(report);
-      document.getElementById("reportSavingsTotal").textContent = Number.isFinite(reportSavings) ? money(reportSavings) : "—";
+      document.getElementById("reportSavingsTotal").textContent = Number.isFinite(reportSavings) ? money(reportSavings) : "N/A";
       const reportSavingsAccounts = Array.isArray(report.savingsAccounts) ? report.savingsAccounts : (report.accountBalances && report.accountTypes ? savingsAccountEntries(report.accountBalances, report.accountTypes) : []);
       document.getElementById("reportSavingsCount").textContent = `${reportSavingsAccounts.length} savings account${reportSavingsAccounts.length === 1 ? "" : "s"} in this snapshot`;
       document.getElementById("reportSavingsAccounts").innerHTML = reportSavingsAccounts.length ? barRows(reportSavingsAccounts.map(account => [`${account.name}${account.name === report.defaultSavingsAccount ? " · Default" : ""}`, Number(account.balance || 0)]), Math.max(1, Number(reportSavings || 0))) : emptyHtml("No Savings accounts", "Mark an account as Savings to include it in future monthly snapshots.");
@@ -5420,6 +5468,45 @@
       setupApplicationHelp(document.getElementById(pageId) || document);
     }
 
+    function renderSampleDataNotice() {
+      const notice = document.getElementById("sampleDataNotice");
+      if (notice) notice.hidden = !sampleDataIsActive();
+    }
+
+    async function startEmptyWorkspace() {
+      if (window.FinanceProfileArchitecture && !window.FinanceProfileArchitecture.canWrite()) {
+        showToast("This Viewer profile is read-only", "warning");
+        return;
+      }
+      const confirmed = await openAppConfirmation({
+        title:"Start with an empty workspace?",
+        message:"The sample records will be removed from this device's active workspace.",
+        details:"A recovery snapshot is created first. Existing external backups and cloud profiles are not changed.",
+        confirmLabel:"Start empty workspace",
+        danger:true
+      });
+      if (!confirmed) return;
+      const before = cloneData(data);
+      try {
+        ensureCurrentDevice();
+        createRecoverySnapshot("Before starting empty workspace", before);
+        pushUndo("Start empty workspace");
+        data = createEmptyWorkspaceData();
+        if (!saveData("Empty workspace ready")) {
+          data = before;
+          renderAll(false);
+          return;
+        }
+        setSampleDataState("empty", "user-started");
+        showToast("Empty workspace ready. Your recovery snapshot is available in Settings.", "success");
+      } catch (error) {
+        data = before;
+        renderAll(false);
+        console.error("Starting an empty workspace stopped before the sample records were replaced", error);
+        showToast("The empty workspace could not be created. Your records were not changed.", "warning");
+      }
+    }
+
     function renderAll(full = false) {
       processGymMonthEndAutoPayments({ notify:true });
       ensureSavedExpensesForMonth(selectedMonth());
@@ -5432,6 +5519,7 @@
       syncThemeControls();
       updateAllFilterControlStates();
       syncPageSpecificActions(activePageId());
+      renderSampleDataNotice();
       const selectedAccount = document.getElementById("expenseAccount").value;
       refreshAccountSelect(accountNames().includes(selectedAccount) ? selectedAccount : (accountNames()[0] || ""));
       updateUndoButton();
@@ -5665,7 +5753,7 @@
     const SETTINGS_PANEL_LABELS = { overview:"Overview", accounts:"Accounts", calendar:"Work & Calendar", "finance-tools":"Finance tools", profiles:"Profile & Security", sync:"Sync & Backup", app:"App & About" };
     const SETTINGS_PANEL_ALIASES = { cloud:"sync", backup:"sync", offline:"app", advanced:"app" };
 
-    const VERSION_HISTORY = [{"version":"V2.5.0","title":"Talaan","changes":["Current production release under the Talaan product name.","Adds household groups, expense-level equal, percentage, and exact shares, payer tracking, member balances, and explicit settlement history.","Counts only the owner's allocated share in personal expense totals while preserving the full amount actually paid in Account Ledger cash movements.","Keeps settlements separate from income, expenses, paid state, and automatic account mutations, with recovery snapshots and Undo for material changes.","Uses responsibility-based runtime filenames instead of legacy product-era filenames.","Includes the complete local-first Finance workspace, Account Ledger, budgeting, reports, projects, productivity tools, reminders, and responsive desktop and phone layouts.","Includes encrypted multi-profile Cloud Schema V3 synchronization, offline PWA support, recovery safeguards, and five-minute routine sync.","Hardens Account Ledger balance corrections with transactional persistence, Viewer protection, profile verification, and fresh PWA delivery for account and sync runtimes.","Preserves Finance Schema 12, Cloud Schema V3, account balances, paid state, recurrence, project payments, backups, encryption, persistent storage identifiers, and synchronization behavior."]}];
+    const VERSION_HISTORY = [{"version":"V2.5.0","title":"Talaan","changes":["Current production release under the Talaan product name.","Adds household groups, expense-level equal, percentage, and exact shares, payer tracking, member balances, and explicit settlement history.","Counts only the owner's allocated share in personal expense totals while preserving the full amount actually paid in Account Ledger cash movements.","Keeps settlements separate from income, expenses, paid state, and automatic account mutations, with recovery snapshots and Undo for material changes.","Uses responsibility-based runtime filenames instead of legacy product-era filenames.","Includes the complete local-first Finance workspace, Account Ledger, budgeting, reports, projects, productivity tools, reminders, and responsive desktop and phone layouts.","Includes encrypted multi-profile Cloud Schema V3 synchronization, offline PWA support, recovery safeguards, and five-minute routine sync.","Hardens Account Ledger balance corrections with transactional persistence, Viewer protection, profile verification, and fresh PWA delivery for account and sync runtimes.","Queues account-changing Cloud Sync records only after verified local/profile persistence and records technical-only transaction diagnostics.","Preserves Finance Schema 12, Cloud Schema V3, account balances, paid state, recurrence, project payments, backups, encryption, persistent storage identifiers, and synchronization behavior."]}];
 
     function normalizeSettingsPanelKey(key) {
       const normalized = SETTINGS_PANEL_ALIASES[key] || key;
@@ -7527,7 +7615,7 @@
           const imported = normalizeData(JSON.parse(reader.result));
           pushUndo("Import backup");
           data = imported;
-          saveData("Backup imported");
+          if (saveData("Backup imported")) setSampleDataState("local", "backup-import");
         } catch (error) {
           showToast("The backup file is not valid");
         }
@@ -7606,7 +7694,7 @@
         createRecoverySnapshot("Before sample data reset", data);
         pushUndo("Reset all records");
         data = normalizeData(createSampleData());
-        saveData("Sample data restored");
+        if (saveData("Sample data restored")) setSampleDataState("sample", "manual-reset");
         closeSampleResetDialog();
         goToPage("dashboard");
         showToast("Sample data restored. A recovery snapshot of your previous records was created.", "success");
@@ -8206,7 +8294,7 @@
     function formatDateTime(value) {
       if (!value) return "Never";
       const date = new Date(value);
-      if (Number.isNaN(date.getTime())) return "—";
+      if (Number.isNaN(date.getTime())) return "N/A";
       return new Intl.DateTimeFormat("en-PH", { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" }).format(date);
     }
 
@@ -8375,7 +8463,7 @@
       const details = { mode, conflictPolicy, conflicts: pendingSyncImport.conflicts, before: dataSummary(before), after: dataSummary(data) };
       document.getElementById("syncReviewDialog").close();
       pendingSyncImport = null;
-      saveData(mode === "replace" ? "Backup replaced after recovery snapshot" : "Sync bundle merged");
+      if (saveData(mode === "replace" ? "Backup replaced after recovery snapshot" : "Sync bundle merged")) setSampleDataState("local", "sync-import");
       addSyncHistory(mode === "replace" ? "Import · replace" : `Import · merge (${conflictPolicy})`, "success", details);
       renderFinanceSettings();
     }
@@ -8923,7 +9011,7 @@
         createRecoverySnapshot("Before legacy rollback", data);
         pushUndo("Restore legacy recovery copy");
         data = normalizeData(bundle.data || bundle);
-        saveData("Legacy recovery copy restored into Talaan");
+        if (saveData("Legacy recovery copy restored into Talaan")) setSampleDataState("local", "legacy-restore");
         addSyncHistory("Restore legacy recovery copy", "success", { sourceChecksum: bundle.checksum || "" });
       } catch (error) {
         showToast("The legacy recovery copy could not be restored", "warning");
@@ -8942,6 +9030,7 @@
             suppressSyncLog = true;
             data = normalizeData(JSON.parse(incoming));
             lastPersistedData = cloneData(data);
+            sampleDataState = readSampleDataState();
             renderAll();
             suppressSyncLog = false;
             addSyncHistory("Same-device tab refresh", "success", { checksum: event.data.checksum });
@@ -8955,6 +9044,7 @@
           suppressSyncLog = true;
           data = normalizeData(JSON.parse(event.newValue));
           lastPersistedData = cloneData(data);
+          sampleDataState = readSampleDataState();
           renderAll();
           suppressSyncLog = false;
           addSyncHistory("Storage-event refresh", "success", {});
@@ -9001,6 +9091,7 @@
     async function runButtonTask(buttonId,busyLabel,task){const button=document.getElementById(buttonId);if(!button||button.disabled)return;const original=button.textContent;button.disabled=true;button.setAttribute("aria-busy","true");if(busyLabel)button.textContent=busyLabel;try{return await task();}finally{button.disabled=false;button.removeAttribute("aria-busy");button.textContent=original;}}
     function setupFinanceEventHandlers() {
       replaceLegacyBackupControls();
+      document.getElementById("startEmptyWorkspaceButton")?.addEventListener("click", () => startEmptyWorkspace());
       document.getElementById("saveDeviceNameButton").addEventListener("click", saveDeviceName);
       document.getElementById("exportSyncBundleButton").addEventListener("click", () => exportFinanceBundle("my-finance-v12-sync", "finance-sync-v12"));
       document.getElementById("exportRecoveryButton").addEventListener("click", () => exportFinanceBundle("my-finance-v12-recovery", "finance-recovery-v12"));
